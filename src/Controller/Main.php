@@ -10,8 +10,15 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
+/**
+ * Main controller
+ */
 class Main extends TemplateController
 {
+    /**
+     * / route handler
+     * Renders main view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "Main.tpl");
@@ -132,6 +139,10 @@ class Main extends TemplateController
         $this->render($data);
     }
 
+    /**
+     * /about/ route handler
+     * Renders about view
+     */
     public function about()
     {
         $this->template = new Template(VIEW_TPL_PATH . "About.tpl");

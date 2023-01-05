@@ -3,12 +3,17 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 
+/**
+ * Users API controller
+ */
 class User extends ApiListController
 {
-    protected $createRequiredFields = [ "login", "password", "name", "access" ];
+    protected $createRequiredFields = ["login", "password", "name", "access"];
 
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -20,9 +25,12 @@ class User extends ApiListController
     }
 
 
+    /**
+     * Login user
+     */
     public function login()
     {
-        $requiredFields = [ "login", "password" ];
+        $requiredFields = ["login", "password"];
 
         if (!$this->isPOST()) {
             throw new \Error(__("ERR_INVALID_REQUEST"));
@@ -37,7 +45,9 @@ class User extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Logout user
+     */
     public function logout()
     {
         if (!$this->isPOST()) {
@@ -49,7 +59,9 @@ class User extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Register new user
+     */
     public function register()
     {
         if (!$this->isPOST()) {
@@ -84,39 +96,53 @@ class User extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Returns list of users
+     */
     public function getList()
     {
         $this->checkAdminAccess();
         parent::getList();
     }
 
-
-    protected function getExpectedFields($request)
+    /**
+     * Returns array of mandatory fields
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function getExpectedFields(array $request)
     {
         return $this->createRequiredFields;
     }
 
-
+    /**
+     * Creates new user
+     */
     public function create()
     {
         $this->checkAdminAccess();
         parent::create();
     }
 
-
+    /**
+     * Updates user
+     */
     public function update()
     {
         $this->checkAdminAccess();
         parent::update();
     }
 
-
+    /**
+     * Changes user password
+     */
     public function changePassword()
     {
         $this->checkAdminAccess();
 
-        $requiredFields = [ "id", "password" ];
+        $requiredFields = ["id", "password"];
         $defMsg = __("ERR_PROFILE_PASSWORD");
 
         if (!$this->isPOST()) {
@@ -152,7 +178,9 @@ class User extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Removes user(s)
+     */
     public function del()
     {
         $this->checkAdminAccess();

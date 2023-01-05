@@ -11,11 +11,16 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 
+/**
+ * Profile API controller
+ */
 class Profile extends ApiController
 {
     protected $personMod = null;
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -26,7 +31,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Reads profile data
+     */
     public function read()
     {
         $pObj = $this->personMod->getItem($this->owner_id);
@@ -44,7 +51,9 @@ class Profile extends ApiController
         ]);
     }
 
-
+    /**
+     * Changes user name
+     */
     public function changename()
     {
         $requiredFields = ["name"];
@@ -78,7 +87,9 @@ class Profile extends ApiController
         $this->ok($reqData);
     }
 
-
+    /**
+     * Changes user password
+     */
     public function changepass()
     {
         $requiredFields = ["current", "new"];
@@ -117,8 +128,12 @@ class Profile extends ApiController
         $this->ok();
     }
 
-
-    private function resetAccounts($deletePersons = false)
+    /**
+     * Removes all accounts of user
+     *
+     * @param bool $deletePersons delete persons flag
+     */
+    private function resetAccounts(bool $deletePersons = false)
     {
         $accMod = AccountModel::getInstance();
         $result = false;
@@ -132,7 +147,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Removes all persons of user
+     */
     private function resetPersons()
     {
         $result = false;
@@ -146,7 +163,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Removes all categories of user
+     */
     private function resetCategories()
     {
         $categoryModel = CategoryModel::getInstance();
@@ -161,7 +180,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Removes all transactions of user
+     */
     private function resetTransactions($keepBalance = false)
     {
         $transMod = TransactionModel::getInstance();
@@ -176,7 +197,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Removes all import templates of user
+     */
     private function resetImportTemplates()
     {
         $tplModel = ImportTemplateModel::getInstance();
@@ -191,7 +214,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Removes all import rules of user
+     */
     private function resetImportRules()
     {
         $rulesModel = ImportRuleModel::getInstance();
@@ -206,7 +231,9 @@ class Profile extends ApiController
         }
     }
 
-
+    /**
+     * Resets user data
+     */
     public function reset()
     {
         if (!$this->isPOST()) {
@@ -254,7 +281,9 @@ class Profile extends ApiController
         $this->ok();
     }
 
-
+    /**
+     * Removes user profile
+     */
     public function del()
     {
         if (!$this->isPOST()) {

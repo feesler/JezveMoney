@@ -5,8 +5,15 @@ namespace JezveMoney\App\Admin\Controller;
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 
+/**
+ * Users admin controller
+ */
 class User extends AdminController
 {
+    /**
+     * /admin/user/ route handler
+     * Renders users admin view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "User.tpl");

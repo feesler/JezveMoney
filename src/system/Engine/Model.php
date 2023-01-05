@@ -47,7 +47,7 @@ abstract class Model
     /**
      * Converts table row from database to object
      *
-     * @param array $row
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -56,8 +56,8 @@ abstract class Model
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -66,17 +66,20 @@ abstract class Model
     /**
      * Performs model-specific actions after new item successfully created
      *
-     * @param array|int $item_id - item id
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
      */
-    protected function postCreate(mixed $item_id)
+    protected function postCreate(mixed $items)
     {
+        return true;
     }
 
     /**
      * Prepares data of single row for new item insert query
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -99,7 +102,7 @@ abstract class Model
     /**
      * Creates new item and returns id
      *
-     * @param array $params - item data
+     * @param array $params item data
      *
      * @return int
      */
@@ -116,7 +119,10 @@ abstract class Model
         $item_id = $this->dbObj->insertId();
         wlog("item_id: " . $item_id);
 
-        $this->postCreate($item_id);
+        $postCreateResult = $this->postCreate($item_id);
+        if (!$postCreateResult) {
+            throw new \Error("postCreate failed");
+        }
 
         return $item_id;
     }
@@ -124,9 +130,9 @@ abstract class Model
     /**
      * Creates multiple items and returns array of ids
      *
-     * @param array $params - array of items to create
+     * @param array $params array of items to create
      *
-     * @return array[int]
+     * @return int[]
      */
     public function createMultiple(array $params)
     {
@@ -161,7 +167,10 @@ abstract class Model
             $res[] = $item_id++;
         }
 
-        $this->postCreate($res);
+        $postCreateResult = $this->postCreate($res);
+        if (!$postCreateResult) {
+            throw new \Error("postCreate failed");
+        }
 
         return $res;
     }
@@ -169,8 +178,8 @@ abstract class Model
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -179,19 +188,20 @@ abstract class Model
     /**
      * Performs model-specific actions after update successfully completed
      *
-     * @param int $item_id - item id
+     * @param int $item_id item id
      *
-     * @return [type]
+     * @return bool
      */
     protected function postUpdate(int $item_id)
     {
+        return true;
     }
 
     /**
      * Updates specified item and returns bool result
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return bool
      */
@@ -217,7 +227,10 @@ abstract class Model
             throw new \Error("updateQ failed");
         }
 
-        $this->postUpdate($item_id);
+        $postUpdateRes = $this->postUpdate($item_id);
+        if (!$postUpdateRes) {
+            throw new \Error("postUpdate failed");
+        }
 
         return true;
     }
@@ -225,7 +238,7 @@ abstract class Model
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -234,16 +247,19 @@ abstract class Model
     /**
      * Performs model-specific actions after delete successfully completed
      *
-     * @param array $items - ids array of removed items
+     * @param array $items ids array of removed items
+     *
+     * @return bool
      */
     protected function postDelete(array $items)
     {
+        return true;
     }
 
     /**
      * Removes specified item(s)
      *
-     * @param array $items - id or array of item ids to remove
+     * @param int|int[]|null $items id or array of item ids to remove
      *
      * @return bool
      */
@@ -269,7 +285,10 @@ abstract class Model
             throw new \Error("deleteQ failed");
         }
 
-        $this->postDelete($items);
+        $postDeleteRes = $this->postDelete($items);
+        if (!$postDeleteRes) {
+            throw new \Error("postDelete failed");
+        }
 
         return true;
     }

@@ -3,15 +3,19 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Item\PersonItem;
 
+/**
+ * Persons API controller
+ */
 class Person extends ApiListController
 {
-    protected $requiredFields = [ "name", "flags" ];
+    protected $requiredFields = ["name", "flags"];
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -22,13 +26,21 @@ class Person extends ApiListController
         $this->deleteErrorMsg = __("ERR_PERSON_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item)
     {
         return new PersonItem($item);
     }
 
-
+    /**
+     * Shows person(s)
+     */
     public function show()
     {
         if (!$this->isPOST()) {
@@ -51,7 +63,9 @@ class Person extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Hides person(s)
+     */
     public function hide()
     {
         if (!$this->isPOST()) {

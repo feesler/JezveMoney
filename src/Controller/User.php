@@ -6,14 +6,22 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * User controller
+ */
 class User extends TemplateController
 {
     public function index()
     {
     }
 
-
-    protected function fail($msg = null, $action = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     * @param string|null $action current action of controller
+     */
+    protected function fail(?string $msg = null, ?string $action = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);
@@ -26,7 +34,10 @@ class User extends TemplateController
         }
     }
 
-
+    /**
+     * /login/ route handler
+     * Renders login view
+     */
     public function login()
     {
         if ($this->isPOST()) {
@@ -44,7 +55,9 @@ class User extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * Handles user login form submit
+     */
     protected function loginUser()
     {
         $loginFields = ["login", "password"];
@@ -71,7 +84,9 @@ class User extends TemplateController
         setLocation(BASEURL);
     }
 
-
+    /**
+     * Handles user logout
+     */
     public function logout()
     {
         $this->uMod->logout();
@@ -79,7 +94,10 @@ class User extends TemplateController
         setLocation(BASEURL . "login/");
     }
 
-
+    /**
+     * /register/ route handler
+     * Renders registration view
+     */
     public function register()
     {
         if ($this->isPOST()) {
@@ -97,7 +115,9 @@ class User extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * Handles user registration form submit
+     */
     protected function registerUser()
     {
         $registerFields = ["login", "password", "name"];

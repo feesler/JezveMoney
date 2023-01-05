@@ -1,6 +1,5 @@
 <?php
 
-use JezveMoney\Core\JSON;
 use JezveMoney\Core\Locale;
 
 define("WHITE_THEME", 0);
@@ -10,13 +9,19 @@ define("DARK_THEME", 1);
 define("ICON_TILE", 1);
 
 
-// Check request is HTTPS
+/**
+ * Checks request is HTTPS
+ *
+ * @return bool
+ */
 function isSecure()
 {
     return (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || $_SERVER["SERVER_PORT"] == 443;
 }
 
-
+/**
+ * Writes application boot ups log
+ */
 function bootLog()
 {
     wlog("\r\n==================================================");
@@ -38,7 +43,9 @@ function bootLog()
     }
 }
 
-
+/**
+ * Writes HTTP response to log
+ */
 function responseLog()
 {
     wlog("=== Response headers =============================");
@@ -47,8 +54,12 @@ function responseLog()
     }
 }
 
-
-function setLogs($enable)
+/**
+ * Enables/disabled logs
+ *
+ * @param bool $enable enable flag
+ */
+function setLogs(bool $enable)
 {
     global $noLogs;
     $writeBootLog = ($noLogs && $enable);
@@ -58,51 +69,78 @@ function setLogs($enable)
     }
 }
 
-
+/**
+ * Initializes logs
+ */
 function setupLogs()
 {
     global $noLogs;
 
+    function wlog(?string $str = null)
+    {
+        if ((isset($noLogs) && $noLogs) || is_null($str)) {
+            return;
+        }
+
+        \JezveMoney\Core\Logger::write((string)$str);
+    }
+
     if (!isset($noLogs) || !$noLogs) {
-        function wlog($str = null)
-        {
-            \JezveMoney\Core\Logger::write($str);
-        }
         bootLog();
-    } else {
-        function wlog()
-        {
-        }
     }
 }
 
-// Set location header to redirect page and exit from script
-function setLocation($loc)
+/**
+ * Sets location header to redirect page and exit from script
+ *
+ * @param string $loc
+ */
+function setLocation(string $loc)
 {
     header("Location: " . $loc);
     responseLog();
     exit();
 }
 
-
-// Check string is null or empty
-function is_empty($str)
+/**
+ * Returns true if string is null or empty
+ *
+ * @param mixed $str
+ *
+ * @return bool
+ */
+function is_empty(mixed $str)
 {
     return is_null($str) || $str == "";
 }
 
-
-// If specified object is array just return it
-// If object is not array then return array contains it
-function asArray($obj)
+/**
+ * If specified object is array just return it
+ * If object is not array then return array contains it
+ *
+ * @param mixed $obj
+ *
+ * @return array
+ */
+function asArray(mixed $obj)
 {
     return is_array($obj) ? $obj : [$obj];
 }
 
-
-// Convert string to be compatible with HTML
-function e($str, $lineEnd = false)
+/**
+ * Converts string to be compatible with HTML
+ *
+ * @param string|null $str
+ * @param bool $lineEnd if true converts line endings to <br> tag
+ *
+ * @return string
+ */
+function e(?string $str, bool $lineEnd = false)
 {
+    if (is_null($str)) {
+        return "";
+    }
+
     $str = htmlentities($str, ENT_QUOTES, "UTF-8");
     if ($lineEnd) {
         $str = str_replace(["\r\n", "\r", "\n"], "<br>", $str);
@@ -111,9 +149,15 @@ function e($str, $lineEnd = false)
     return $str;
 }
 
-
-// Format value
-function valFormat($format, $val)
+/**
+ * Returns formatted value
+ *
+ * @param string $format format string
+ * @param mixed $val value
+ *
+ * @return string
+ */
+function valFormat(string $format, mixed $val)
 {
     if (!is_numeric($val)) {
         return "";
@@ -134,15 +178,22 @@ function valFormat($format, $val)
     }
 }
 
-
-// Converts value to float and return rounded
-function normalize($value, $precision = 2)
+/**
+ * Returns value converted to float and rounded
+ *
+ * @param mixed $value
+ * @param int $precision
+ *
+ * @return float
+ */
+function normalize(mixed $value, int $precision = 2)
 {
     return round(floatval($value), $precision);
 }
 
-
-// Check session and start if it is not started yet
+/**
+ * Checks session and start if it is not started yet
+ */
 function sessionStart()
 {
     if (session_id()) {
@@ -152,9 +203,16 @@ function sessionStart()
     session_start();
 }
 
-
-// Build URL from base and array of parameters
-function urlJoin($base, $params = null, $raw = false)
+/**
+ * Builds URL from base and array of parameters
+ *
+ * @param string $base
+ * @param array|null $params
+ * @param bool $raw
+ *
+ * @return string
+ */
+function urlJoin(string $base, array $params = null, bool $raw = false)
 {
     if (is_empty($base)) {
         return "";
@@ -189,9 +247,14 @@ function urlJoin($base, $params = null, $raw = false)
     return $resStr;
 }
 
-
-// Return file modification timestamp
-function getModifiedTime($file)
+/**
+ * Returns file modification timestamp
+ *
+ * @param string $file file name
+ *
+ * @return int|bool
+ */
+function getModifiedTime(string $file)
 {
     if (!is_string($file) || !file_exists(APP_ROOT . $file)) {
         return false;
@@ -200,9 +263,14 @@ function getModifiedTime($file)
     return filemtime(APP_ROOT . $file);
 }
 
-
-// Append to file name unique string to fix cache issues
-function auto_version($file)
+/**
+ * Appends to file name unique string to fix cache issues
+ *
+ * @param string $file file name
+ *
+ * @return string
+ */
+function auto_version(string $file)
 {
     $mtime = getModifiedTime($file);
     if ($mtime === false) {
@@ -212,8 +280,14 @@ function auto_version($file)
     return $file . "?" . $mtime;
 }
 
-
-function getThemes($base)
+/**
+ * Returns array of available themes
+ *
+ * @param string $base
+ *
+ * @return array
+ */
+function getThemes(string $base)
 {
     $themeFiles = [
         WHITE_THEME => "white-theme",
@@ -237,8 +311,14 @@ function getThemes($base)
     return $res;
 }
 
-
-function skipZeros($arr)
+/**
+ * Returns array filtered for zeros
+ *
+ * @param mixed $arr
+ *
+ * @return array
+ */
+function skipZeros(mixed $arr)
 {
     $res = [];
     if (!is_array($arr)) {
@@ -255,9 +335,17 @@ function skipZeros($arr)
     return $res;
 }
 
-// Check is all of expected fields present in the array or object
-// Return array with only expected fields or FALSE if something goes wrong
-function checkFields($obj, $expectedFields, $throw = false)
+/**
+ * Checks is all of expected fields present in the array or object
+ * Returns array with only expected fields or false if something goes wrong
+ *
+ * @param mixed $obj
+ * @param array $expectedFields
+ * @param bool $throw
+ *
+ * @return array|bool
+ */
+function checkFields(mixed $obj, array $expectedFields, bool $throw = false)
 {
     if (is_null($obj) || !isset($expectedFields) || !is_array($expectedFields)) {
         if ($throw) {
@@ -288,9 +376,14 @@ function checkFields($obj, $expectedFields, $throw = false)
     return $res;
 }
 
-
-// Convert associative array to array of objects {id, name}
-function convertToObjectArray($data)
+/**
+ * Converts associative array to array of objects {id, name}
+ *
+ * @param array $data
+ *
+ * @return array|null
+ */
+function convertToObjectArray(array $data)
 {
     if (!is_array($data)) {
         return null;
@@ -308,9 +401,15 @@ function convertToObjectArray($data)
     return $res;
 }
 
-
-// Return content of specified SVG icon
-function svgIcon($name, $className = null)
+/**
+ * Returns content of specified SVG icon
+ *
+ * @param string $name icon name
+ * @param string|null $className CSS class string
+ *
+ * @return string
+ */
+function svgIcon(string $name, string $className = null)
 {
     $fileName = APP_ROOT . "view/img/svg/$name.svg";
     if (!file_exists($fileName)) {
@@ -325,10 +424,16 @@ function svgIcon($name, $className = null)
     return $content;
 }
 
-
-// Return SVG use content for specified icon
-// Related SVG symbols should be available on target page
-function useIcon($name, $className = null)
+/**
+ * Return SVG use content for specified icon
+ * Related SVG symbols should be available on target page
+ *
+ * @param string $name icon name
+ * @param string|null $className
+ *
+ * @return string
+ */
+function useIcon(string $name, string $className = null)
 {
     if (is_empty($name)) {
         return "";
@@ -342,26 +447,50 @@ function useIcon($name, $className = null)
     return "<svg$attrs><use xlink:href=\"#$name\"></use></svg>";
 }
 
-// Returns 'hidden' string if condition is true
-function hidden($cond = true)
+/**
+ * Returns 'hidden' string if condition is true
+ *
+ * @param bool $cond
+ *
+ * @return string
+ */
+function hidden(bool $cond = true)
 {
     return ($cond) ? " hidden" : "";
 }
 
-// Returns 'disabled' string if condition is true
-function disabled($cond = true)
+/**
+ * Returns 'disabled' string if condition is true
+ *
+ * @param bool $cond
+ *
+ * @return string
+ */
+function disabled(bool $cond = true)
 {
     return ($cond) ? " disabled" : "";
 }
 
-// Returns 'checked' string if condition is true
-function checked($cond = true)
+/**
+ * Returns 'checked' string if condition is true
+ *
+ * @param bool $cond
+ *
+ * @return string
+ */
+function checked(bool $cond = true)
 {
     return ($cond) ? " checked" : "";
 }
 
-// Returns locale string for specified token
-function __($token)
+/**
+ * Returns locale string for specified token
+ *
+ * @param string $token
+ *
+ * @return string
+ */
+function __(string $token)
 {
     return Locale::getString($token);
 }

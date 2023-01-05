@@ -3,14 +3,19 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Item\AccountItem;
 
+/**
+ * Accounts API controller
+ */
 class Account extends ApiListController
 {
     protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
 
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -21,22 +26,36 @@ class Account extends ApiListController
         $this->deleteErrorMsg = __("ERR_ACCOUNT_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item)
     {
         return new AccountItem($item);
     }
 
-
-    protected function preCreate($item)
+    /**
+     * Performs controller-specific preparation of create request data
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function preCreate(array $request)
     {
-        $res = $item;
+        $res = $request;
         $res["owner_id"] = $this->owner_id;
 
         return $res;
     }
 
-
+    /**
+     * Shows account(s)
+     */
     public function show()
     {
         if (!$this->isPOST()) {
@@ -59,7 +78,9 @@ class Account extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Hides account(s)
+     */
     public function hide()
     {
         if (!$this->isPOST()) {

@@ -12,13 +12,19 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
+/**
+ * Transactions controller
+ */
 class Transactions extends TemplateController
 {
     protected $model = null;
     protected $accModel = null;
     protected $currModel = null;
+    protected $catModel = null;
 
-
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = TransactionModel::getInstance();
@@ -27,7 +33,10 @@ class Transactions extends TemplateController
         $this->catModel = CategoryModel::getInstance();
     }
 
-
+    /**
+     * /transactions/ route handler
+     * Renders transactions list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
@@ -144,8 +153,12 @@ class Transactions extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);
@@ -154,8 +167,14 @@ class Transactions extends TemplateController
         setLocation(BASEURL);
     }
 
-
-    protected function getHiddenAccountTileData($tileId)
+    /**
+     * Returns properties for hidden Tile
+     *
+     * @param string $tileId tile id
+     *
+     * @return array
+     */
+    protected function getHiddenAccountTileData(string $tileId)
     {
         return [
             "id" => $tileId,
@@ -165,8 +184,16 @@ class Transactions extends TemplateController
         ];
     }
 
-
-    protected function getAccountTileData($account, $tileId, $balanceDiff = 0)
+    /**
+     * Returns properties for account Tile
+     *
+     * @param object $account
+     * @param string $tileId tile id
+     * @param float $balanceDiff difference to add to account balance
+     *
+     * @return array
+     */
+    protected function getAccountTileData(object $account, string $tileId, float $balanceDiff = 0)
     {
         return [
             "id" => $tileId,
@@ -176,8 +203,15 @@ class Transactions extends TemplateController
         ];
     }
 
-
-    protected function getRequestedType($request, $default)
+    /**
+     * Returns transaction type from request
+     *
+     * @param array $request request data
+     * @param int $default default transaction type
+     *
+     * @return int
+     */
+    protected function getRequestedType(array $request, int $default)
     {
         if (!is_array($request) || !isset($request["type"])) {
             return $default;
@@ -193,8 +227,16 @@ class Transactions extends TemplateController
         return $res;
     }
 
-
-    protected function getTypeMenu($baseUrl, $selectedType, $params = [])
+    /**
+     * Retunrs properties for transaction type menu
+     *
+     * @param string $baseUrl
+     * @param int $selectedType
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getTypeMenu(string $baseUrl, int $selectedType, array $params = [])
     {
         $trTypes = TransactionModel::getTypeNames();
         $acc_id = (is_array($params) && isset($params["acc_id"])) ? intval($params["acc_id"]) : 0;
@@ -220,14 +262,23 @@ class Transactions extends TemplateController
         return $res;
     }
 
-
-    protected function getContainersData($data)
+    /**
+     * Returns properties for accounts and person containers
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function getContainersData(array $data)
     {
         $trAvailable = $data["trAvailable"];
         $tr = $data["tr"];
         $debtType = $data["debtType"];
         $noAccount = $data["noAccount"];
         $acc_count = $data["acc_count"];
+        if (!is_array($tr) || !isset($tr["type"])) {
+            throw new \Error("Invalid parameters");
+        }
 
         $personContainer = [
             "id" => "personContainer",
@@ -323,7 +374,10 @@ class Transactions extends TemplateController
         return $data;
     }
 
-
+    /**
+     * /transactions/create/ route handler
+     * Renders create transaction view
+     */
     public function create()
     {
         if ($this->isPOST()) {
@@ -355,6 +409,7 @@ class Transactions extends TemplateController
 
         // Check availability of selected type of transaction
         $notAvailMessage = null;
+        $trAvailable = false;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
             $trAvailable = $acc_count > 0;
             $notAvailMessage = __("TR_NO_ACCOUNTS");
@@ -543,6 +598,8 @@ class Transactions extends TemplateController
          * Meanwhile source amount for expense and destination amount for income are
          * always have the same currency as account.
          */
+        $showSrcAmount = false;
+        $showDestAmount = false;
         if ($tr["type"] == EXPENSE) {
             $showSrcAmount = $isDiffCurr;
             $showDestAmount = true;
@@ -654,7 +711,10 @@ class Transactions extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /transactions/update/ route handler
+     * Renders update transaction view
+     */
     public function update()
     {
         if ($this->isPOST()) {
@@ -721,6 +781,8 @@ class Transactions extends TemplateController
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
+        $showSrcAmount = false;
+        $showDestAmount = false;
         if ($tr["type"] == EXPENSE) {
             $showSrcAmount = $isDiffCurr;
             $showDestAmount = true;

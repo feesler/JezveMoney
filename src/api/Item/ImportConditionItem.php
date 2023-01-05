@@ -10,6 +10,7 @@ class ImportConditionItem
     public $operator = 0;
     public $value = null;
     public $flags = null;
+    public $user_id = 0;
 
 
     public function __construct($obj, $userField = false)

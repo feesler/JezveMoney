@@ -36,7 +36,7 @@ class CategoryModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -61,7 +61,7 @@ class CategoryModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -71,8 +71,8 @@ class CategoryModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -122,8 +122,8 @@ class CategoryModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -137,8 +137,14 @@ class CategoryModel extends CachedTable
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
     protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
@@ -151,8 +157,8 @@ class CategoryModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -175,7 +181,7 @@ class CategoryModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -198,8 +204,14 @@ class CategoryModel extends CachedTable
         return $this->del($categoriesToDelete);
     }
 
-
-    protected function postDelete(mixed $items)
+    /**
+     * Performs final steps after items were successfully removed
+     *
+     * @param array $items ids array of removed items
+     *
+     * @return bool
+     */
+    protected function postDelete(array $items)
     {
         $this->cleanCache();
 
@@ -247,13 +259,11 @@ class CategoryModel extends CachedTable
     /**
      * Returns array of categories
      *
-     * @param array $params - array of parameters
-     *    $params = [
-     *      parent_id - filter categories by parent. Returns all if not set or set to zero
-     *      returnIds - if true returns array of ids. Otherwise returns array of CategoryItem
-     *    ]
+     * @param array $params options array:
+     *     - 'parent_id' => (int) - filter categories by parent. Returns all if not set
+     *     - 'returnIds' => (bool) - if true returns array of ids. Otherwise returns array of CategoryItem
      *
-     * @return [int|CategoryItem]
+     * @return int[]|CategoryItem[]
      */
     public function getData(array $params = [])
     {
@@ -276,17 +286,23 @@ class CategoryModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Returns array of child categories for specified parent
+     *
+     * @param int $parentId parent category id, default is 0
+     *
+     * @return array
+     */
     public function findByParent(int $parentId = 0)
     {
         return $this->getData(["parent_id" => $parentId]);
     }
 
     /**
-     * Searches for category with specified name
+     * Search for category with specified name
      *
-     * @param string $name - name of category to find
-     * @param bool $caseSens - case sensitive flag
+     * @param string $name name of category to find
+     * @param bool $caseSens case sensitive flag
      *
      * @return object|null
      */

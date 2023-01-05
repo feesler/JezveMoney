@@ -2,11 +2,18 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Locale class
+ */
 class Locale
 {
     private static $tokens = null;
 
-
+    /**
+     * Returns user preferred locale
+     *
+     * @return string
+     */
     public static function getUserLocale()
     {
         if (!isset($_COOKIE["locale"])) {
@@ -26,7 +33,11 @@ class Locale
         return $locale;
     }
 
-
+    /**
+     * Returns array of available locales
+     *
+     * @return string[]
+     */
     public static function getAvailable()
     {
         $files = glob(self::getFileName("*"));
@@ -47,20 +58,36 @@ class Locale
         return $res;
     }
 
-
-    public static function getFileName($locale)
+    /**
+     * Returns file name for locale
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    public static function getFileName(string $locale)
     {
         return APP_ROOT . "lang/" . $locale . ".json";
     }
 
-
-    public static function isExists($locale)
+    /**
+     * Returns true if specified locale exists
+     *
+     * @param string $locale
+     *
+     * @return bool
+     */
+    public static function isExists(string $locale)
     {
         return file_exists(self::getFileName($locale));
     }
 
-
-    public static function load($locale)
+    /**
+     * Loads specified locale
+     *
+     * @param string $locale
+     */
+    public static function load(string $locale)
     {
         if (!self::isExists($locale)) {
             throw new \Error("Locale not found");
@@ -69,12 +96,13 @@ class Locale
         static::$tokens = JSON::fromFile(self::getFileName($locale), true);
     }
 
-
+    /**
+     * Loads user preferred locale
+     */
     public static function loadUserLocale()
     {
         self::load(self::getUserLocale());
     }
-
 
     /**
      * Returns locale string for specified token
@@ -83,7 +111,7 @@ class Locale
      *
      * @return string
      */
-    public static function getString($token)
+    public static function getString(string $token)
     {
         if (!is_array(static::$tokens)) {
             throw new \Error("Locale not loaded");
@@ -91,10 +119,12 @@ class Locale
         if (!is_string($token) || $token === "") {
             throw new \Error("Invalid token");
         }
-        if (!isset(static::$tokens[$token])) {
+
+        $res = static::$tokens[$token] ?? null;
+        if (is_null($res)) {
             throw new \Error("Token '$token' not found");
         }
 
-        return static::$tokens[$token];
+        return $res;
     }
 }

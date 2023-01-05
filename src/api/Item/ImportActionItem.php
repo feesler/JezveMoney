@@ -8,6 +8,7 @@ class ImportActionItem
     public $rule_id = 0;
     public $action_id = 0;
     public $value = 0;
+    public $user_id = 0;
 
 
     public function __construct($obj, $userField = false)

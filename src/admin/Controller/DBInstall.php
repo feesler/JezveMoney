@@ -6,17 +6,25 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\DBVersion;
 
+/**
+ * Database migration controller
+ */
 class DBInstall extends AdminController
 {
     protected $dbVer = null;
 
-
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->dbVer = DBVersion::getInstance();
     }
 
-
+    /**
+     * /admin/dbinstall/ route handler
+     * Renders DB install view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "DBInstall.tpl");
@@ -32,7 +40,10 @@ class DBInstall extends AdminController
         $this->render($data);
     }
 
-
+    /**
+     * /admin/dbinstall/update/ route handler
+     * Runs database migrations
+     */
     public function update()
     {
         if (!$this->isPOST()) {

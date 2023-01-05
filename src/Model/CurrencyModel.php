@@ -31,7 +31,7 @@ class CurrencyModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -55,7 +55,7 @@ class CurrencyModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -65,8 +65,8 @@ class CurrencyModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -108,8 +108,8 @@ class CurrencyModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -126,8 +126,8 @@ class CurrencyModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -142,8 +142,8 @@ class CurrencyModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -160,16 +160,21 @@ class CurrencyModel extends CachedTable
         return $res;
     }
 
-
-    // Check currency is in use
-    public function isInUse(int $curr_id)
+    /**
+     * Returns true if currency is in use by other models
+     *
+     * @param int $item_id currency id
+     *
+     * @return bool
+     */
+    public function isInUse(int $item_id)
     {
-        $curr_id = intval($curr_id);
-        if (!$curr_id) {
+        $item_id = intval($item_id);
+        if (!$item_id) {
             return false;
         }
 
-        $qResult = $this->dbObj->selectQ("id", "account", "curr_id=" . $curr_id);
+        $qResult = $this->dbObj->selectQ("id", "account", "curr_id=" . $item_id);
         if ($this->dbObj->rowsCount($qResult) > 0) {
             return true;
         }
@@ -177,7 +182,7 @@ class CurrencyModel extends CachedTable
         $qResult = $this->dbObj->selectQ(
             "id",
             "transactions",
-            orJoin(["src_curr=" . $curr_id, "dest_curr=" . $curr_id])
+            orJoin(["src_curr=" . $item_id, "dest_curr=" . $item_id])
         );
         if ($this->dbObj->rowsCount($qResult) > 0) {
             return true;
@@ -189,7 +194,7 @@ class CurrencyModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -211,9 +216,15 @@ class CurrencyModel extends CachedTable
         return true;
     }
 
-
-    // Format value in specified currency
-    public function format($value, int $curr_id)
+    /**
+     * Returns value formatted with specified currency
+     *
+     * @param float $value value to format
+     * @param int $curr_id currency id
+     *
+     * @return string|null
+     */
+    public function format(float $value, int $curr_id)
     {
         $currObj = $this->getItem($curr_id);
         if (!$currObj) {
@@ -227,7 +238,7 @@ class CurrencyModel extends CachedTable
     /**
      * Returns array of currencies
      *
-     * @return array
+     * @return CurrencyItem[]
      */
     public function getData()
     {
@@ -246,10 +257,10 @@ class CurrencyModel extends CachedTable
     }
 
     /**
-     * Searches for currency with specified name
+     * Search for currency with specified name
      *
-     * @param string $name - name of currency to find
-     * @param bool $caseSens - case sensitive flag
+     * @param string $name name of currency to find
+     * @param bool $caseSens case sensitive flag
      *
      * @return object|null
      */

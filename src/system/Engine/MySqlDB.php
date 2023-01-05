@@ -2,15 +2,27 @@
 
 namespace JezveMoney\Core;
 
-// Return quotted string or NULL
-function qnull($str)
+/**
+ * Return quotted string or NULL
+ *
+ * @param mixed $str
+ *
+ * @return string
+ */
+function qnull(mixed $str)
 {
     return (is_null($str) ? "NULL" : "'$str'");
 }
 
-
-// Quotting join
-function qjoin($glue, $pieces)
+/**
+ * Returns array of quotted values joined with specified separator
+ *
+ * @param string $glue separator
+ * @param array $pieces array of values
+ *
+ * @return string
+ */
+function qjoin(string $glue, array $pieces)
 {
     if (!is_array($pieces)) {
         return "";
@@ -24,9 +36,15 @@ function qjoin($glue, $pieces)
     return implode($glue, $quotted);
 }
 
-
-// Prepare string for fields or tables list of query
-function asJoin($pieces)
+/**
+ * Returns string of joined 'key' as 'value' entries of specified array
+ * Result is used as fields and tables requests
+ *
+ * @param string|array|null $pieces
+ *
+ * @return string|null
+ */
+function asJoin(mixed $pieces)
 {
     $fstr = null;
 
@@ -47,9 +65,14 @@ function asJoin($pieces)
     return $fstr;
 }
 
-
-// Prepare string of AND joined conditions for query
-function andJoin($pieces)
+/**
+ * Returns string of 'AND' joined conditions
+ *
+ * @param string|array|null $pieces
+ *
+ * @return string|null
+ */
+function andJoin(mixed $pieces)
 {
     $fstr = null;
 
@@ -62,8 +85,15 @@ function andJoin($pieces)
     return $fstr;
 }
 
-
-function brace($str)
+/**
+ * Returns specified string enclosed in parentheses
+ * Returns unchanged string if it is already parenthesized
+ *
+ * @param string $str
+ *
+ * @return string
+ */
+function brace(string $str)
 {
     $len = strlen($str);
     if ($len > 1 && ($str[0] != "(" || $str[$len - 1] != ")")) {
@@ -73,9 +103,14 @@ function brace($str)
     return $str;
 }
 
-
-// Prepare string of OR joined conditions for query
-function orJoin($pieces)
+/**
+ * Returns string of 'OR' joined conditions
+ *
+ * @param string|array|null $pieces
+ *
+ * @return string|null
+ */
+function orJoin(mixed $pieces)
 {
     $fstr = null;
 
@@ -88,8 +123,15 @@ function orJoin($pieces)
     return $fstr;
 }
 
-
-function assignJoin($assignments)
+/**
+ * Returns string of joined 'key' = 'value' entries of specified array
+ * Result is used as expressions for UPDATE query
+ *
+ * @param string|array|null $assignments
+ *
+ * @return string
+ */
+function assignJoin(mixed $assignments)
 {
     if (!is_array($assignments)) {
         $assignments = [$assignments];
@@ -109,8 +151,15 @@ function assignJoin($assignments)
     return implode(", ", $res);
 }
 
-
-function fieldsJoin($fields)
+/**
+ * Returns string of joined quotted values of specified array
+ * Result is used as fields list for INSERT query
+ *
+ * @param array $fields
+ *
+ * @return string
+ */
+function fieldsJoin(array $fields)
 {
     $quotted = [];
     foreach ($fields as $field) {
@@ -120,16 +169,29 @@ function fieldsJoin($fields)
     return "(" . implode(", ", $quotted) . ")";
 }
 
-
-function valuesJoin($values)
+/**
+ * Returns string of joined quotted values of specified array
+ * Result is used as values list for INSERT query
+ *
+ * @param array $values
+ *
+ * @return string
+ */
+function valuesJoin(array $values)
 {
     return "(" . qjoin(", ", $values) . ")";
 }
 
-
-// Return right part of query condition to check field equal id or in set of ids
-// Zero values are omitted. In case no valid values found NULL is returned
-function inSetCondition($ids, $skipZero = true)
+/**
+ * Returns right part of query condition to check field equal id or in set of ids
+ * Zero values are omitted. In case no valid values found NULL is returned
+ *
+ * @param int|int[]|null $ids
+ * @param bool $skipZero
+ *
+ * @return string|null
+ */
+function inSetCondition(mixed $ids, bool $skipZero = true)
 {
     if (is_null($ids)) {
         return null;
@@ -147,7 +209,9 @@ function inSetCondition($ids, $skipZero = true)
     }
 }
 
-
+/**
+ * MySQL database class
+ */
 class MySqlDB
 {
     use Singleton;
@@ -162,8 +226,12 @@ class MySqlDB
     protected $insert_id = 0;
     protected $affected = 0;
 
-
-    public static function setup($config)
+    /**
+     * Sets up database configuration
+     *
+     * @param array $config
+     */
+    public static function setup(array $config)
     {
         $reqFields = ["location", "user", "password", "name"];
 
@@ -179,14 +247,21 @@ class MySqlDB
         self::$config = $config;
     }
 
-
+    /**
+     * Returns database connection
+     *
+     * @return \mysqli
+     */
     public function getConnection()
     {
         return self::$conn;
     }
 
-
-    // Connect to database server
+    /**
+     * Connects to database server
+     *
+     * @return bool
+     */
     protected function connect()
     {
         $dbcnx = mysqli_connect(self::$config["location"], self::$config["user"], self::$config["password"]);
@@ -201,9 +276,14 @@ class MySqlDB
         return (self::$conn != null);
     }
 
-
-    // Select database
-    public function selectDB($name)
+    /**
+     * Selects database
+     *
+     * @param string $name database name
+     *
+     * @return bool
+     */
+    public function selectDB(string $name)
     {
         wlog("USE " . $name . ";");
 
@@ -218,8 +298,11 @@ class MySqlDB
         return $res;
     }
 
-
-    // Check connection is already created
+    /**
+     * Checks connection is already created
+     *
+     * @return bool
+     */
     private function checkConnection()
     {
         if (!is_null(self::$conn)) {
@@ -238,9 +321,14 @@ class MySqlDB
         return true;
     }
 
-
-    // Return escaped string
-    public function escape($str)
+    /**
+     * Returns escaped string
+     *
+     * @param string $str
+     *
+     * @return string|null
+     */
+    public function escape(string $str)
     {
         if (!$this->checkConnection()) {
             return null;
@@ -249,9 +337,14 @@ class MySqlDB
         return mysqli_real_escape_string(self::$conn, $str);
     }
 
-
-    // Raw query to database
-    public function rawQ($query)
+    /**
+     * Executes raw query on database and returns result
+     *
+     * @param string $query
+     *
+     * @return \mysqli_result|null
+     */
+    public function rawQ(string $query)
     {
         if (!$this->checkConnection()) {
             return null;
@@ -271,24 +364,33 @@ class MySqlDB
         return ($res !== false) ? $res : null;
     }
 
-
-    // Starts transaction
+    /**
+     * Starts transaction
+     *
+     * @return bool
+     */
     public function startTransaction()
     {
         $this->rawQ("START TRANSACTION;");
         return ($this->errno == 0);
     }
 
-
-    // Commits transaction
+    /**
+     * Commits transaction
+     *
+     * @return bool
+     */
     public function commitTransaction()
     {
         $this->rawQ("COMMIT;");
         return ($this->errno == 0);
     }
 
-
-    // Rolls back transaction
+    /**
+     * Rolls back transaction
+     *
+     * @return bool
+     */
     public function rollbackTransaction()
     {
         $this->rawQ("ROLLBACK;");
@@ -297,8 +399,24 @@ class MySqlDB
 
 
     // Select query
-    public function selectQ($fields, $tables, $condition = null, $group = null, $order = null)
-    {
+    /**
+     * Executes SELECT query and returns result
+     *
+     * @param string|array|null $fields
+     * @param string|array|null $tables
+     * @param mixed|null $condition
+     * @param string|null $group
+     * @param string|null $order
+     *
+     * @return \mysqli_result|null
+     */
+    public function selectQ(
+        mixed $fields,
+        mixed $tables,
+        mixed $condition = null,
+        string $group = null,
+        string $order = null
+    ) {
         $fstr = asJoin($fields);
         $tstr = asJoin($tables);
         if (!$fstr || !$tstr) {
@@ -325,8 +443,14 @@ class MySqlDB
         return $result;
     }
 
-
-    public function rowsCount($result)
+    /**
+     * Returns rows count of SELECT query result
+     *
+     * @param \mysqli_result $result
+     *
+     * @return int
+     */
+    public function rowsCount(\mysqli_result $result)
     {
         if (is_null($result)) {
             return 0;
@@ -335,8 +459,14 @@ class MySqlDB
         return mysqli_num_rows($result);
     }
 
-
-    public function fetchRow($result)
+    /**
+     * Fetches next row from SELECT query result
+     *
+     * @param \mysqli_result $result
+     *
+     * @return mixed
+     */
+    public function fetchRow(\mysqli_result $result)
     {
         if (is_null($result)) {
             return null;
@@ -345,9 +475,15 @@ class MySqlDB
         return mysqli_fetch_array($result, MYSQLI_ASSOC);
     }
 
-
-    // Insert query
-    public function insertQ($table, $data)
+    /**
+     * Executes INSERT query and returns result
+     *
+     * @param string $table table name
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function insertQ(string $table, array $data)
     {
         $table = $this->escape($table);
         if (!$table || $table == "" || !is_array($data) || !count($data)) {
@@ -374,40 +510,56 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Return error number for last query
+    /**
+     * Returns error number for last query
+     *
+     * @return int
+     */
     public function getError()
     {
         return $this->errno;
     }
 
-
-    // Return error number for last query
+    /**
+     * Returns error message for last query
+     *
+     * @return string
+     */
     public function getMessage()
     {
         return $this->errorMessage;
     }
 
-
-    // Return last insert id
+    /**
+     * Returns last insert id
+     *
+     * @return int
+     */
     public function insertId()
     {
         return $this->insert_id;
     }
 
-
-    // Return last insert id
+    /**
+     * Returns count of affected rows
+     *
+     * @return int
+     */
     public function affectedRows()
     {
         return $this->affected;
     }
 
-
-    // Insert multiple rows query
-    // $data should be array of row arrays, each same as for insertQ() method
-    // Obtain fields from the first item of data array
-    // Next other rows is compared match
-    public function insertMultipleQ($table, $data, $isUpdate = false)
+    /**
+     * Executes INSERT query for multiple rows
+     *
+     * @param string $table
+     * @param array $data array of row arrays, each same as for insertQ() method
+     * @param bool $isUpdate
+     *
+     * @return bool
+     */
+    public function insertMultipleQ(string $table, array $data, bool $isUpdate = false)
     {
         $table = $this->escape($table);
         if (!$table || $table == "" || !is_array($data) || !count($data)) {
@@ -466,9 +618,16 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Update query
-    public function updateQ($table, $data, $condition = null)
+    /**
+     * Executes UPDATE query and returns result
+     *
+     * @param string $table table name
+     * @param array $data array of update expressions
+     * @param mixed|null $condition update condition
+     *
+     * @return bool
+     */
+    public function updateQ(string $table, array $data, mixed $condition = null)
     {
         $table = $this->escape($table);
         if (!$table || $table == "" || empty($data)) {
@@ -488,15 +647,27 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    public function updateMultipleQ($table, $data)
+    /**
+     * Updates multiple items
+     *
+     * @param string $table table name
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function updateMultipleQ(string $table, array $data)
     {
         return $this->insertMultipleQ($table, $data, true);
     }
 
-
-    // Truncate table query
-    public function truncateQ($table)
+    /**
+     * Executes TRUNCATE TABLE query
+     *
+     * @param string $table table name
+     *
+     * @return bool
+     */
+    public function truncateQ(string $table)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -511,9 +682,15 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Delete query
-    public function deleteQ($table, $condition = null)
+    /**
+     * Executes DELETE query on table
+     *
+     * @param string $table table name
+     * @param mixed|null $condition delete conditions
+     *
+     * @return bool
+     */
+    public function deleteQ(string $table, mixed $condition = null)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -532,9 +709,15 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Return count of rows
-    public function countQ($table, $condition = null)
+    /**
+     * Returns count of rows for specified condition
+     *
+     * @param string $table table name
+     * @param mixed|null $condition
+     *
+     * @return int|bool
+     */
+    public function countQ(string $table, mixed $condition = null)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -560,9 +743,14 @@ class MySqlDB
         return $res;
     }
 
-
-    // Check table is exist
-    public function isTableExist($table)
+    /**
+     * Returns true if specified table is exists
+     *
+     * @param string $table
+     *
+     * @return bool
+     */
+    public function isTableExist(string $table)
     {
         if (is_null(self::$tblCache)) {
             $query = "SHOW TABLES;";
@@ -582,11 +770,20 @@ class MySqlDB
         return (isset(self::$tblCache[$table]));
     }
 
-
-    // Create table if not exist query
-    public function createTableQ($table, $defs, $options)
+    /**
+     * Executes CREATE TABLE query
+     *
+     * @param string $table table name
+     * @param string $defs columns
+     * @param string $options
+     *
+     * @return bool
+     */
+    public function createTableQ(string $table, string $defs, string $options)
     {
         $table = $this->escape($table);
+        $defs = $this->escape($defs);
+        $options = $this->escape($options);
         if (!$table || $table == "" || !$defs || $defs == "") {
             return false;
         }
@@ -601,9 +798,14 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Drop table if exist query
-    public function dropTableQ($table)
+    /**
+     * Executes DROP TABLE query
+     *
+     * @param string $table table name
+     *
+     * @return bool
+     */
+    public function dropTableQ(string $table)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -619,8 +821,14 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    public function getColumns($table)
+    /**
+     * Returns array of table columns
+     *
+     * @param string $table table name
+     *
+     * @return array|bool
+     */
+    public function getColumns(string $table)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -648,11 +856,15 @@ class MySqlDB
         return $columns;
     }
 
-
-    // Add columns to specified table
-    // $columns expected to be an array as follows:
-    //  ["column_1" => "INT NOT NULL", "column_2" => "VARCHAR(255) NULL"]
-    public function addColumns($table, $columns)
+    /**
+     * Add columns to specified table
+     *
+     * @param string $table table name
+     * @param array $columns array of columns as following: ["column_1" => "INT NOT NULL", ...]
+     *
+     * @return bool
+     */
+    public function addColumns(string $table, array $columns)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -677,9 +889,17 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Rename column in specified table
-    public function changeColumn($table, $oldName, $newName, $dataType)
+    /**
+     * Renames column in specified table
+     *
+     * @param string $table table name
+     * @param string $oldName current name of column
+     * @param string $newName new name of column
+     * @param string $dataType column data type
+     *
+     * @return bool
+     */
+    public function changeColumn(string $table, string $oldName, string $newName, string $dataType)
     {
         $table = $this->escape($table);
         $oldName = $this->escape($oldName);
@@ -700,9 +920,15 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Remove specified columns from table
-    public function dropColumns($table, $columns)
+    /**
+     * Removes specified columns from table
+     *
+     * @param string $table table name
+     * @param string|string[]|null $columns
+     *
+     * @return bool
+     */
+    public function dropColumns(string $table, mixed $columns)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -731,11 +957,16 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Add keys(indexes) to specified table
-    // $keys expected to be an associative array as follows:
-    //  ["key_name_1" => "field_name", "key_name_2" => ["field_1", "field_2"]]
-    public function addKeys($table, $keys)
+    /**
+     * Add keys(indexes) to specified table
+     *
+     * @param string $table table name
+     * @param array $keys array of keys as following:
+     *              ["key_1" => "field_name", "key_2" => ["field_1", "field_2"], ...]
+     *
+     * @return bool
+     */
+    public function addKeys(string $table, array $keys)
     {
         $table = $this->escape($table);
         if (!$table || $table == "") {
@@ -761,10 +992,15 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Return current autoincrement value of specified table
-    // Return FALSE in case of error
-    public function getAutoIncrement($table)
+    /**
+     * Returns current autoincrement value of specified table
+     * Return false in case of error
+     *
+     * @param string $table table name
+     *
+     * @return int|bool
+     */
+    public function getAutoIncrement(string $table)
     {
         if (!self::$dbname) {
             return false;
@@ -791,9 +1027,15 @@ class MySqlDB
         return intval($row["AUTO_INCREMENT"]);
     }
 
-
-    // Change table engine
-    public function setTableEngine($table, $engine)
+    /**
+     * Changes table engine
+     *
+     * @param string $table table name
+     * @param string $engine table engine
+     *
+     * @return bool
+     */
+    public function setTableEngine(string $table, string $engine)
     {
         $table = $this->escape($table);
         $engine = $this->escape($engine);
@@ -807,9 +1049,15 @@ class MySqlDB
         return ($this->errno == 0);
     }
 
-
-    // Change table engine
-    public function convertTableCharset($table, $charset)
+    /**
+     * Changes table charset
+     *
+     * @param string $table table name
+     * @param string $charset table charset
+     *
+     * @return bool
+     */
+    public function convertTableCharset(string $table, string $charset)
     {
         $table = $this->escape($table);
         $charset = $this->escape($charset);

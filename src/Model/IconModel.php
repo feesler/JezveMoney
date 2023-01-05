@@ -30,7 +30,7 @@ class IconModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -54,7 +54,7 @@ class IconModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -64,8 +64,8 @@ class IconModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -107,8 +107,8 @@ class IconModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -126,8 +126,8 @@ class IconModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -142,8 +142,8 @@ class IconModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -160,16 +160,21 @@ class IconModel extends CachedTable
         return $res;
     }
 
-
-    // Check item is in use
-    public function isInUse($curr_id)
+    /**
+     * Returns true if icon is in use by other models
+     *
+     * @param int $item_id icon id
+     *
+     * @return bool
+     */
+    public function isInUse($item_id)
     {
-        $curr_id = intval($curr_id);
-        if (!$curr_id) {
+        $item_id = intval($item_id);
+        if (!$item_id) {
             return false;
         }
 
-        $qResult = $this->dbObj->selectQ("id", "account", "icon_id=" . $curr_id);
+        $qResult = $this->dbObj->selectQ("id", "account", "icon_id=" . $item_id);
         if ($this->dbObj->rowsCount($qResult) > 0) {
             return true;
         }
@@ -180,7 +185,7 @@ class IconModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -202,14 +207,17 @@ class IconModel extends CachedTable
         return true;
     }
 
-
-    // Return array of items
-    public function getData($params = null)
+    /**
+     * Returns array of icons
+     *
+     * @param array $params array of options:
+     *     - 'type' => (int) - select icons by type
+     *     - 'file' => (string) - select icons by file
+     *
+     * @return IconItem[]
+     */
+    public function getData(array $params = [])
     {
-        if (is_null($params)) {
-            $params = [];
-        }
-
         $typeFilter = isset($params["type"]) ? intval($params["type"]) : null;
         $fileFilter = isset($params["file"]) ? $params["file"] : null;
 

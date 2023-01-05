@@ -6,6 +6,9 @@ use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 
+/**
+ * Transactions API controller
+ */
 class Transaction extends ApiListController
 {
     protected $requiredFields = [
@@ -34,7 +37,9 @@ class Transaction extends ApiListController
         "comment"
     ];
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -45,14 +50,26 @@ class Transaction extends ApiListController
         $this->deleteErrorMsg = __("ERR_TRANS_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item)
     {
         return new TransactionItem($item);
     }
 
-
-    protected function prepareListRequest($request)
+    /**
+     * Returns list request prepared for controller-specific model
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function prepareListRequest(array $request)
     {
         $defaultParams = [
             "onPage" => 10,
@@ -77,7 +94,9 @@ class Transaction extends ApiListController
         return $res;
     }
 
-
+    /**
+     * Read items list
+     */
     public function getList()
     {
         $res = new \stdClass();
@@ -110,16 +129,28 @@ class Transaction extends ApiListController
         $this->ok($res);
     }
 
-
-    protected function getExpectedFields($request)
+    /**
+     * Returns array of mandatory fields
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function getExpectedFields(array $request)
     {
         $trans_type = intval($request["type"]);
 
         return ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
     }
 
-
-    protected function preCreate($request)
+    /**
+     * Performs controller-specific preparation of create request data
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function preCreate(array $request)
     {
         $trans_type = intval($request["type"]);
         if ($trans_type == DEBT) {
@@ -129,13 +160,21 @@ class Transaction extends ApiListController
         }
     }
 
-
-    protected function preUpdate($request)
+    /**
+     * Performs controller-specific preparation of update request data
+     *
+     * @param array $request update request data
+     *
+     * @return array
+     */
+    protected function preUpdate(array $request)
     {
         return $this->preCreate($request);
     }
 
-
+    /**
+     * Set category of transaction(s)
+     */
     public function setCategory()
     {
         if (!$this->isPOST()) {
@@ -159,7 +198,9 @@ class Transaction extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Sets position of transaction
+     */
     public function setPos()
     {
         if (!$this->isPOST()) {
@@ -183,7 +224,9 @@ class Transaction extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Returns statistics data
+     */
     public function statistics()
     {
         $res = new \stdClass();

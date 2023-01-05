@@ -9,7 +9,7 @@
                 <div class="upload-form__descr"><?= __("IMPORT_SELECT_FILE_DESCR") ?></div>
                 <div class="upload-form__filename"></div>
             </form>
-            <?php if ($this->adminUser || $this->testerUser) { ?>
+            <?php if ($this->adminUser || $testerUser) { ?>
                 <div id="serverAddressBlock" class="input-group" hidden>
                     <input id="serverAddress" class="stretch-input input-group__input" type="text">
                     <input id="serverUploadBtn" class="btn submit-btn input-group__btn" type="button" value="<?= __("IMPORT_UPLOAD") ?>">
@@ -22,7 +22,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label"><?= __("IMPORT_CP1251_ENCODING") ?></span>
             </label>
-            <?php if ($this->adminUser || $this->testerUser) { ?>
+            <?php if ($this->adminUser || $testerUser) { ?>
                 <label id="useServerCheck" class="checkbox">
                     <input type="checkbox">
                     <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>

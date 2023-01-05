@@ -37,7 +37,7 @@ class ImportRuleModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -60,7 +60,7 @@ class ImportRuleModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -70,8 +70,8 @@ class ImportRuleModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -95,8 +95,8 @@ class ImportRuleModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -113,8 +113,8 @@ class ImportRuleModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -137,7 +137,7 @@ class ImportRuleModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -158,11 +158,13 @@ class ImportRuleModel extends CachedTable
     }
 
     /**
-     * Returns array of items
+     * Returns array of import conditions
      *
-     * @param array $params
+     * @param array $params array of options:
+     *     - 'full' => (bool) - returns import conditions of all users, admin only
+     *     - 'extended' => (int) - return extenden condition objects, default is false
      *
-     * @return array[ImportRuleItem]|null
+     * @return ImportRuleItem[]|null
      */
     public function getData(array $params = [])
     {
@@ -243,10 +245,10 @@ class ImportRuleModel extends CachedTable
     }
 
     /**
-     * Handles account(s) delete event
-     * Removes conditions and actions related to removed accounts
+     * Handles account delete event
+     * Removes conditions and actions with removed accounts
      *
-     * @param mixed $accounts
+     * @param mixed $accounts id or array of account ids
      *
      * @return bool
      */
@@ -263,8 +265,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-    // Delete conditions and actions related to removed accounts
-    public function onPersonDelete($persons)
+    /**
+     * Handles person delete event
+     * Removes actions with removed persons
+     *
+     * @param mixed $persons id or array of person ids
+     *
+     * @return bool
+     */
+    public function onPersonDelete(mixed $persons)
     {
         if (is_null($persons)) {
             return false;
@@ -276,8 +285,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-    // Delete conditions and actions related to removed categories
-    public function onCategoryDelete($categories)
+    /**
+     * Handles category delete event
+     * Removes actions with removed persons
+     *
+     * @param mixed $categories id or array of category ids
+     *
+     * @return bool
+     */
+    public function onCategoryDelete(mixed $categories)
     {
         if (is_null($categories)) {
             return false;
@@ -294,7 +310,11 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-    // Delete all import rules of user
+    /**
+     * Removes all import rules of user
+     *
+     * @return bool
+     */
     public function reset()
     {
         if (!self::$user_id) {

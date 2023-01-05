@@ -6,7 +6,9 @@ class ImportRuleItem
 {
     public $id = 0;
     public $flags = 0;
-
+    public $user_id = 0;
+    public $conditions = null;
+    public $actions = null;
 
     public function __construct($obj, $userField = false)
     {

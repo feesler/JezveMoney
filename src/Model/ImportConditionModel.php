@@ -73,7 +73,7 @@ class ImportConditionModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -100,7 +100,7 @@ class ImportConditionModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -110,8 +110,8 @@ class ImportConditionModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -170,8 +170,8 @@ class ImportConditionModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -187,15 +187,15 @@ class ImportConditionModel extends CachedTable
             "operator" => $params["operator"],
             "value" => $params["value"]
         ]);
-        $foundItem = (count($items) > 0) ? $items[0] : null;
+        $foundItem = (is_array($items) && count($items) > 0) ? $items[0] : null;
         return ($foundItem && $foundItem->id != $item_id);
     }
 
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -212,8 +212,8 @@ class ImportConditionModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -236,7 +236,7 @@ class ImportConditionModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -254,11 +254,16 @@ class ImportConditionModel extends CachedTable
     }
 
     /**
-     * Returns array of conditions
+     * Returns array of import conditions
      *
-     * @param array{string} $params
+     * @param array $params array of options:
+     *     - 'full' => (bool) - returns import conditions of all users, admin only
+     *     - 'rule' => (int) - select import conditions by rule, default is 0
+     *     - 'field' => (int) - select import conditions by field type, default is 0
+     *     - 'operator' => (int) - select import conditions by operator, default is 0
+     *     - 'value' => (int) - select import conditions by value, default is null
      *
-     * @return array[PersonItem]
+     * @return ImportConditionItem[]|null
      */
     public function getData(array $params = [])
     {
@@ -308,15 +313,27 @@ class ImportConditionModel extends CachedTable
         return $res;
     }
 
-    // Return array of conditions of specified rule
-    public function getRuleConditions($rule_id)
+    /**
+     * Returns array of import conditions of specified import rule
+     *
+     * @param int $rule_id import rule id
+     *
+     * @return ImportConditionItem[]|null
+     */
+    public function getRuleConditions(int $rule_id)
     {
         return $this->getData(["rule" => $rule_id]);
     }
 
-    // Set conditions for specified rule
-    // Delete all previous conditions for rule
-    public function setRuleConditions($rule_id, $conditions)
+    /**
+     * Sets new conditions for specified import rule. Removes all previous conditions of rule
+     *
+     * @param int $rule_id import rule id
+     * @param int|int[]|null $conditions array of import conditions
+     *
+     * @return bool
+     */
+    public function setRuleConditions(int $rule_id, mixed $conditions)
     {
         $rule_id = intval($rule_id);
         if (!$rule_id) {
@@ -338,11 +355,17 @@ class ImportConditionModel extends CachedTable
         return true;
     }
 
-    // Delete all conditions of specified rules
-    public function deleteRuleConditions($rules)
+    /**
+     * Removes all conditions of specified import rules
+     *
+     * @param int[]|int|null $rules id or array of import rule ids
+     *
+     * @return bool
+     */
+    public function deleteRuleConditions(mixed $rules)
     {
         if (is_null($rules)) {
-            return;
+            return false;
         }
         $rules = asArray($rules);
 
@@ -360,11 +383,17 @@ class ImportConditionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Delete all conditions for specified templates
-    public function deleteTemplateConditions($templates)
+    /**
+     * Removes all conditions with specified templates
+     *
+     * @param int[]|int|null $templates id or array of template ids
+     *
+     * @return bool
+     */
+    public function deleteTemplateConditions(mixed $templates)
     {
         if (is_null($templates)) {
-            return;
+            return false;
         }
         $templates = asArray($templates);
 
@@ -385,11 +414,17 @@ class ImportConditionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Delete all conditions for specified accounts
-    public function deleteAccountConditions($accounts)
+    /**
+     * Removes all conditions with specified accounts
+     *
+     * @param int[]|int|null $accounts id or array of account ids
+     *
+     * @return bool
+     */
+    public function deleteAccountConditions(mixed $accounts)
     {
         if (is_null($accounts)) {
-            return;
+            return false;
         }
         $accounts = asArray($accounts);
 
@@ -410,19 +445,21 @@ class ImportConditionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-
-    public static function isPropertyValue($data)
-    {
-        return (intval($data) & IMPORT_COND_OP_FIELD_FLAG) == IMPORT_COND_OP_FIELD_FLAG;
-    }
-
-
+    /**
+     * Returns array of available condition field types
+     *
+     * @return array
+     */
     public static function getFields()
     {
         return convertToObjectArray(self::getFieldNames());
     }
 
-
+    /**
+     * Returns array of names for available condition field types
+     *
+     * @return array
+     */
     public static function getFieldNames()
     {
         return [
@@ -437,7 +474,14 @@ class ImportConditionModel extends CachedTable
         ];
     }
 
-    public static function getFieldName($field_id)
+    /**
+     * Returns name of specified condition field type
+     *
+     * @param int $field_id condition field type
+     *
+     * @return string|null
+     */
+    public static function getFieldName(int $field_id)
     {
         $condFieldNames = self::getFieldNames();
         if (!isset($condFieldNames[$field_id])) {
@@ -447,13 +491,21 @@ class ImportConditionModel extends CachedTable
         return $condFieldNames[$field_id];
     }
 
-
+    /**
+     * Returns array of available condition operators
+     *
+     * @return array
+     */
     public static function getOperators()
     {
         return convertToObjectArray(self::getOperatorNames());
     }
 
-
+    /**
+     * Returns array of names for available condition operators
+     *
+     * @return array
+     */
     public static function getOperatorNames()
     {
         return [
@@ -465,7 +517,14 @@ class ImportConditionModel extends CachedTable
         ];
     }
 
-    public static function getOperatorName($operator_id)
+    /**
+     * Returns name of specified condition operator type
+     *
+     * @param int $operator_id condition operator type
+     *
+     * @return string|null
+     */
+    public static function getOperatorName(int $operator_id)
     {
         $condOperatorNames = self::getOperatorNames();
         $operator_id = intval($operator_id);

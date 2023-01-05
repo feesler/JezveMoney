@@ -3,12 +3,14 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Item\ImportRuleItem;
 
+/**
+ * Import rules API controller
+ */
 class ImportRule extends ApiListController
 {
     protected $requiredFields = [
@@ -17,7 +19,12 @@ class ImportRule extends ApiListController
         "actions"
     ];
 
+    protected $condModel = null;
+    protected $actionModel = null;
 
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -30,14 +37,26 @@ class ImportRule extends ApiListController
         $this->deleteErrorMsg = __("ERR_IMPORT_RULE_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item)
     {
         return new ImportRuleItem($item);
     }
 
-
-    protected function prepareListRequest($request)
+    /**
+     * Returns list request prepared for controller-specific model
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function prepareListRequest(array $request)
     {
         $res = [];
         if (isset($request["full"]) && $request["full"] == true) {
@@ -50,14 +69,26 @@ class ImportRule extends ApiListController
         return $res;
     }
 
-
-    protected function getListItems($request)
+    /**
+     * Returns array of items for specified request
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function getListItems(array $request = [])
     {
         return $this->model->getData($request);
     }
 
-
-    protected function verifyRequest($request)
+    /**
+     * Returns request verification result
+     *
+     * @param array $request
+     *
+     * @return bool
+     */
+    protected function verifyRequest(array $request)
     {
         if (
             !is_array($request)
@@ -86,8 +117,15 @@ class ImportRule extends ApiListController
         return true;
     }
 
-
-    private function setRuleData($ruleId, $data)
+    /**
+     * Sets conditions and actions for specified rule
+     *
+     * @param int $ruleId import rule id
+     * @param array $data condition and action lists
+     *
+     * @return bool
+     */
+    private function setRuleData(int $ruleId, array $data)
     {
         if (!is_array($data)) {
             return false;
@@ -110,8 +148,14 @@ class ImportRule extends ApiListController
         return true;
     }
 
-
-    protected function preCreate($request)
+    /**
+     * Performs controller-specific preparation of create request data
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function preCreate(array $request)
     {
         if (!$this->verifyRequest($request)) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
@@ -120,8 +164,13 @@ class ImportRule extends ApiListController
         return $request;
     }
 
-
-    protected function postCreate($item_id, $request)
+    /**
+     * Performs controller-specific actions after new item successfully created
+     *
+     * @param int|int[]|null $item_id id or array of created item ids
+     * @param array $request create request data
+     */
+    protected function postCreate(mixed $item_id, array $request)
     {
         if (!$this->setRuleData($item_id, $request)) {
             $this->model->del($item_id);
@@ -129,14 +178,24 @@ class ImportRule extends ApiListController
         }
     }
 
-
-    protected function preUpdate($request)
+    /**
+     * Performs controller-specific preparation of update request data
+     *
+     * @param array $request update request data
+     *
+     * @return array
+     */
+    protected function preUpdate(array $request)
     {
         return $this->preCreate($request);
     }
 
-
-    protected function postUpdate($request)
+    /**
+     * Performs controller-specific actions after update successfully completed
+     *
+     * @param array $request update request data
+     */
+    protected function postUpdate(array $request)
     {
         if (!$this->setRuleData($request["id"], $request)) {
             throw new \Error($this->updateErrorMsg);

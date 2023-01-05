@@ -3,14 +3,19 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Item\CategoryItem;
 
+/**
+ * Categories API controller
+ */
 class Category extends ApiListController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
 
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -21,8 +26,14 @@ class Category extends ApiListController
         $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item)
     {
         return new CategoryItem($item);
     }

@@ -3,12 +3,16 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportTemplateModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Reader\IReader;
 
+/**
+ * Import API controller
+ */
 class Import extends ApiController
 {
     protected $templateModel = null;
@@ -21,7 +25,9 @@ class Import extends ApiController
         "accAmount" => null,
     ];
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
@@ -29,9 +35,13 @@ class Import extends ApiController
         $this->templateModel = ImportTemplateModel::getInstance();
     }
 
-
-    // Set index of specified column
-    private function setColumnInd($colName, $ind)
+    /**
+     * Sets index of specified column
+     *
+     * @param string $colName
+     * @param int $ind
+     */
+    private function setColumnInd(string $colName, int $ind)
     {
         if (is_empty($colName)) {
             throw new \Error("Invalid column name: " . $colName);
@@ -40,8 +50,11 @@ class Import extends ApiController
         $this->columns[$colName] = intval($ind);
     }
 
-
-    // Apply import template
+    /**
+     * Sets column indexes by specified template
+     *
+     * @param mixed $template
+     */
     private function applyTemplate($template)
     {
         if (is_null($template)) {
@@ -56,29 +69,49 @@ class Import extends ApiController
         $this->setColumnInd("accAmount", $template->columns["accountAmount"]);
     }
 
-
-    // Return value from cell at specified column and row
-    private function getCellValue($sheet, $colName, $rowIndex)
+    /**
+     * Returns value from cell at specified column and row
+     *
+     * @param Worksheet $sheet
+     * @param string $colName
+     * @param int $rowIndex
+     *
+     * @return mixed
+     */
+    private function getCellValue(Worksheet $sheet, string $colName, int $rowIndex)
     {
         if (!$sheet) {
             throw new \Error("Invalid sheet");
         }
-        if (!isset($this->columns[$colName])) {
+        if (!isset($this->columns[$colName]) || !is_int($this->columns[$colName])) {
             throw new \Error("Invalid column " . $colName);
         }
 
-        return $sheet->getCellByColumnAndRow($this->columns[$colName], intval($rowIndex))->getValue();
+        $columnIndex = intval($this->columns[$colName]);
+        return $sheet->getCell([$columnIndex, intval($rowIndex)])->getValue();
     }
 
-
-    // Replace space characters and convert to float
-    private static function floatFix($str)
+    /**
+     * Replaces space characters and convert to float
+     *
+     * @param string $str
+     *
+     * @return float
+     */
+    private static function floatFix(string $str)
     {
         return floatval(str_replace(" ", "", $str));
     }
 
-
-    private function createReader($fileType, $encodeCP1251)
+    /**
+     * Returns new reader for specified file type
+     *
+     * @param string $fileType
+     * @param bool $encodeCP1251
+     *
+     * @return IReader
+     */
+    private function createReader(string $fileType, bool $encodeCP1251)
     {
         $fileType = strtoupper($fileType);
         if ($fileType == "XLS") {
@@ -103,8 +136,16 @@ class Import extends ApiController
         return $reader;
     }
 
-
-    private function readWithTemplate($reader, $fileName, $fileTemplate)
+    /**
+     * Process file with specified template and return result
+     *
+     * @param IReader $reader
+     * @param string $fileName
+     * @param int $fileTemplate
+     *
+     * @return array
+     */
+    private function readWithTemplate(IReader $reader, string $fileName, int $fileTemplate)
     {
         if (!$reader) {
             throw new \Error("Invalid reader");
@@ -155,8 +196,15 @@ class Import extends ApiController
         return $res;
     }
 
-
-    private function readRaw($reader, $fileName)
+    /**
+     * Returns raw file data
+     *
+     * @param IReader $reader
+     * @param string $fileName
+     *
+     * @return array
+     */
+    private function readRaw(IReader $reader, string $fileName)
     {
         if (!$reader) {
             throw new \Error("Invalid reader");
@@ -174,7 +222,7 @@ class Import extends ApiController
             $rowData = [];
 
             for ($col = 1; $col <= $lastColumnInd; $col++) {
-                $val = $src->getCellByColumnAndRow($col, $rowIndex)->getValue();
+                $val = $src->getCell([$col, $rowIndex])->getValue();
                 if (is_null($val)) {
                     $val = "";
                 }
@@ -189,7 +237,9 @@ class Import extends ApiController
         return $res;
     }
 
-
+    /**
+     * Writes to HTTP response current progress of file upload
+     */
     public function uploadstatus()
     {
         $hdrs = [];

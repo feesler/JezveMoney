@@ -28,7 +28,14 @@ define("MAX_LOG_SIZE", 1024 * 1024);
 define("MAX_LOG_FILES", 10);
 
 
-function domainFromHost($host)
+/**
+ * Returns domain name from specified host string
+ *
+ * @param string $host
+ *
+ * @return string
+ */
+function domainFromHost(string $host)
 {
     $pos = strpos($host, ":");
     if ($pos !== false) {
@@ -38,7 +45,11 @@ function domainFromHost($host)
     }
 }
 
-
+/**
+ * Checks current host is valid
+ *
+ * @return string
+ */
 function verifyHost()
 {
     $avHosts = [PROD_HOST, DEV_HOST, LOCAL_DEV_HOST];
@@ -51,7 +62,11 @@ function verifyHost()
     return $_SERVER["HTTP_HOST"];
 }
 
-
+/**
+ * Return application root directory
+ *
+ * @return string
+ */
 function getRootDir()
 {
     $res = $_SERVER['DOCUMENT_ROOT'];
@@ -62,7 +77,13 @@ function getRootDir()
     return $res;
 }
 
-
+/**
+ * Returns string of joined path segments
+ *
+ * @param mixed ...$segments
+ *
+ * @return string
+ */
 function pathJoin(...$segments)
 {
     if (!is_array($segments) || !count($segments)) {
@@ -80,7 +101,9 @@ function pathJoin(...$segments)
     return $res;
 }
 
-
+/**
+ * Initializes host specific constants
+ */
 function defineHostConstants()
 {
     $host = verifyHost();

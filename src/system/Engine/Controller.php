@@ -2,6 +2,9 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Base controler class
+ */
 abstract class Controller
 {
     public $action = null;
@@ -12,17 +15,28 @@ abstract class Controller
 
     abstract public function index();
 
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Error handler
+     *
+     * @param string|null $msg
+     */
+    protected function fail(?string $msg = null)
     {
     }
 
-
-    public function runAction($action)
+    /**
+     * Runs specified action on controller instance
+     *
+     * @param string $action controller method to run
+     */
+    public function runAction(string $action)
     {
         if (!method_exists($this, $action)) {
             return;
@@ -38,15 +52,24 @@ abstract class Controller
         }
     }
 
-
-    // Check current request is POST
+    /**
+     * Returns true if current request is POST
+     *
+     * @return bool
+     */
     protected function isPOST()
     {
         return ($_SERVER["REQUEST_METHOD"] == "POST");
     }
 
-
-    protected function getHeader($name)
+    /**
+     * Returns value of specified HTTP header or null if header not found
+     *
+     * @param string $name
+     *
+     * @return string|null
+     */
+    protected function getHeader(string $name)
     {
         if (is_empty($name)) {
             return null;
@@ -67,8 +90,11 @@ abstract class Controller
         return null;
     }
 
-
-    // Check request is AJAX
+    /**
+     * Returns true if current request is AJAX
+     *
+     * @return bool
+     */
     protected function isAJAX()
     {
         $xRequestedWith = $this->getHeader("X-Requested-With");
@@ -76,16 +102,27 @@ abstract class Controller
         return ($xRequestedWith && $xRequestedWith == "XMLHttpRequest");
     }
 
-
-    // Obtain input of request and try to decode it as JSON
-    protected function getJSONContent($asArray = false)
+    /**
+     * Obtains input of request and try to decode it as JSON
+     *
+     * @param bool $asArray convert result object to array
+     *
+     * @return array|object
+     */
+    protected function getJSONContent(bool $asArray = false)
     {
         return JSON::fromFile('php://input', $asArray);
     }
 
-
-    // Obtain requested ids from actionParam of from GET id parameter and return array of integers
-    protected function getRequestedIds($isPOST = false, $isJSON = false)
+    /**
+     * Obtains requested ids from actionParam of from GET id parameter and return array of integers
+     *
+     * @param bool $isPOST
+     * @param bool $isJSON
+     *
+     * @return int[]|null
+     */
+    protected function getRequestedIds(bool $isPOST = false, bool $isJSON = false)
     {
         if ($isPOST) {
             $httpSrc = ($isJSON) ? $this->getJSONContent(true) : $_POST;
@@ -120,8 +157,9 @@ abstract class Controller
         return $res;
     }
 
-
-    // Requests Model to start database transaction
+    /**
+     * Requests Model to start database transaction
+     */
     protected function begin()
     {
         if (!Model::begin()) {
@@ -131,8 +169,9 @@ abstract class Controller
         $this->transactionRunning = true;
     }
 
-
-    // Requests Model to commit current database transaction
+    /**
+     * Requests Model to commit current database transaction
+     */
     protected function commit()
     {
         if (!$this->transactionRunning) {
@@ -144,8 +183,9 @@ abstract class Controller
         }
     }
 
-
-    // Requests Model to rollback current database transaction
+    /**
+     * Requests Model to rollback current database transaction
+     */
     protected function rollback()
     {
         if (!$this->transactionRunning) {

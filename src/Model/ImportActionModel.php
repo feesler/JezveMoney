@@ -60,11 +60,11 @@ class ImportActionModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row
      *
      * @return object|null
      */
-    protected function rowToObj($row)
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -82,15 +82,25 @@ class ImportActionModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return \mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = [
             "rule_id",
@@ -129,8 +139,13 @@ class ImportActionModel extends CachedTable
         return $res;
     }
 
-
-    protected function validateAction($actionId, $value)
+    /**
+     * Validates action data before to send create/update request to database
+     *
+     * @param int $actionId action type
+     * @param mixed $value item id
+     */
+    protected function validateAction(int $actionId, mixed $value)
     {
         $importTransactionTypes = [
             "expense",
@@ -171,9 +186,15 @@ class ImportActionModel extends CachedTable
         }
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["rule_id"]) || !isset($params["action_id"])) {
             return false;
@@ -183,13 +204,19 @@ class ImportActionModel extends CachedTable
             "rule" => $params["rule_id"],
             "action" => $params["action_id"]
         ]);
-        $foundItem = (count($items) > 0) ? $items[0] : null;
+        $foundItem = (is_array($items) && count($items) > 0) ? $items[0] : null;
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -201,9 +228,15 @@ class ImportActionModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -225,9 +258,14 @@ class ImportActionModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         foreach ($items as $item_id) {
             // check item is exist
@@ -240,14 +278,18 @@ class ImportActionModel extends CachedTable
         return true;
     }
 
-
-    // Return array of items
-    public function getData($params = [])
+    /**
+     * Returns array of import actions
+     *
+     * @param array $params array of options:
+     *     - 'full' => (bool) - returns import actions of all users, admin only
+     *     - 'rule' => (int) - select import actions by rule, default is 0
+     *     - 'action' => (int) - select import actions by action type, default is 0
+     *
+     * @return ImportActionItem[]|null
+     */
+    public function getData(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $ruleFilter = isset($params["rule"]) ? intval($params["rule"]) : 0;
         $actionFilter = isset($params["action"]) ? intval($params["action"]) : 0;
@@ -285,15 +327,27 @@ class ImportActionModel extends CachedTable
         return $res;
     }
 
-
-    public function getRuleActions($rule_id)
+    /**
+     * Returns array of import actions of specified import rule
+     *
+     * @param int $rule_id import rule id
+     *
+     * @return ImportActionItem[]|null
+     */
+    public function getRuleActions(int $rule_id)
     {
         return $this->getData(["rule" => $rule_id]);
     }
 
-    // Set actions for specified rule
-    // Delete all previous actions for rule
-    public function setRuleActions($rule_id, $actions)
+    /**
+     * Sets new actions for specified import rule. Removes all previous actions of rule
+     *
+     * @param int $rule_id import rule id
+     * @param array $actions array of import actions
+     *
+     * @return bool
+     */
+    public function setRuleActions(int $rule_id, array $actions)
     {
         $rule_id = intval($rule_id);
         if (!$rule_id) {
@@ -315,11 +369,17 @@ class ImportActionModel extends CachedTable
         return true;
     }
 
-    // Delete all actions of specified rules
-    public function deleteRuleActions($rules)
+    /**
+     * Removes all actions of specified import rules
+     *
+     * @param int[]|int|null $rules id or array of import rule ids
+     *
+     * @return bool
+     */
+    public function deleteRuleActions(mixed $rules)
     {
         if (is_null($rules)) {
-            return;
+            return false;
         }
         $rules = asArray($rules);
 
@@ -337,8 +397,14 @@ class ImportActionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Delete all actions for specified accounts
-    public function deleteAccountActions($accounts)
+    /**
+     * Removes all actions with specified accounts
+     *
+     * @param int[]|int|null $accounts id or array of account ids
+     *
+     * @return bool
+     */
+    public function deleteAccountActions(mixed $accounts)
     {
         if (is_null($accounts)) {
             return false;
@@ -362,8 +428,14 @@ class ImportActionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Delete all actions for specified persons
-    public function deletePersonActions($persons)
+    /**
+     * Removes all actions with specified persons
+     *
+     * @param int[]|int|null $persons id or array of person ids
+     *
+     * @return bool
+     */
+    public function deletePersonActions(mixed $persons)
     {
         if (is_null($persons)) {
             return false;
@@ -387,8 +459,14 @@ class ImportActionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Delete all actions for specified categories
-    public function deleteCategoryActions($categories)
+    /**
+     * Removes all actions with specified categories
+     *
+     * @param int[]|int|null $categories id or array of category ids
+     *
+     * @return bool
+     */
+    public function deleteCategoryActions(mixed $categories)
     {
         if (is_null($categories)) {
             return false;
@@ -412,7 +490,11 @@ class ImportActionModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-
+    /**
+     * Returns array of names for available action types
+     *
+     * @return array
+     */
     public static function getActionNames()
     {
         return [
@@ -426,7 +508,14 @@ class ImportActionModel extends CachedTable
         ];
     }
 
-    public static function getActionName($action_id)
+    /**
+     * Returns name of specified action type
+     *
+     * @param int $action_id action type
+     *
+     * @return string|null
+     */
+    public static function getActionName(int $action_id)
     {
         $actionNames = self::getActionNames();
         if (!isset($actionNames[$action_id])) {

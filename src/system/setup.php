@@ -13,12 +13,12 @@ require_once(APP_ROOT . "system/common.php");
 if (PRODUCTION) {
     ini_set("display_errors", "0");
     ini_set("display_startup_errors", "0");
-    ini_set("error_reporting", 0);
+    ini_set("error_reporting", "0");
     error_reporting(0);
 } else {
     ini_set("display_errors", "1");
     ini_set("display_startup_errors", "1");
-    ini_set('error_reporting', E_ALL & ~E_STRICT);
+    ini_set('error_reporting', strval(E_ALL & ~E_STRICT));
     error_reporting(E_ALL & ~E_STRICT);
 }
 

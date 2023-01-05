@@ -36,7 +36,7 @@ class UserModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -61,7 +61,7 @@ class UserModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -71,7 +71,7 @@ class UserModel extends CachedTable
     /**
      * Returns salt for specified string
      *
-     * @param string $str - source string
+     * @param string $str source string
      *
      * @return string
      */
@@ -85,8 +85,8 @@ class UserModel extends CachedTable
     /**
      * Returns hash for specified string and salt
      *
-     * @param string $str - source string
-     * @param string $salt - salt
+     * @param string $str source string
+     * @param string $salt salt
      *
      * @return string
      */
@@ -98,9 +98,9 @@ class UserModel extends CachedTable
     /**
      * Checks correctness of hash
      *
-     * @param string $str - source string
-     * @param string $salt - salt
-     * @param string $hash - hash to test
+     * @param string $str source string
+     * @param string $salt salt
+     * @param string $hash hash to test
      *
      * @return bool
      */
@@ -114,8 +114,8 @@ class UserModel extends CachedTable
     /**
      * Creates pre hash for login/password pair
      *
-     * @param string $login - login string
-     * @param string $password - password string
+     * @param string $login login string
+     * @param string $password password string
      *
      * @return string
      */
@@ -128,8 +128,8 @@ class UserModel extends CachedTable
     /**
      * Creates hash for login/password pair
      *
-     * @param string $login - login string
-     * @param string $password - password string
+     * @param string $login login string
+     * @param string $password password string
      *
      * @return string
      */
@@ -144,8 +144,8 @@ class UserModel extends CachedTable
     /**
      * Checks correctness of login/password data
      *
-     * @param string $login - login string
-     * @param string $password - password string
+     * @param string $login login string
+     * @param string $password password string
      *
      * @return bool
      */
@@ -166,8 +166,8 @@ class UserModel extends CachedTable
     /**
      * Checks correctness of cookies data
      *
-     * @param string $login - login string
-     * @param string $password - password string
+     * @param string $login login string
+     * @param string $passhash password string
      *
      * @return bool
      */
@@ -187,10 +187,8 @@ class UserModel extends CachedTable
     /**
      * Sets cookies for specified login/password
      *
-     * @param string $login - login string
-     * @param string $password - password string
-     *
-     * @return bool
+     * @param string $login login string
+     * @param string $passhash password string
      */
     private function setupCookies($login, $passhash)
     {
@@ -292,7 +290,7 @@ class UserModel extends CachedTable
     /**
      * Returns true if user has admin access
      *
-     * @param int $item_id - user id
+     * @param int $item_id user id
      *
      * @return bool
      */
@@ -306,7 +304,7 @@ class UserModel extends CachedTable
     /**
      * Returns true if user has test access
      *
-     * @param int $item_id - user id
+     * @param int $item_id user id
      *
      * @return bool
      */
@@ -381,8 +379,8 @@ class UserModel extends CachedTable
     /**
      * Sets owner person for specified user
      *
-     * @param int $user_id - user id
-     * @param int $owner_id - owner person id
+     * @param int $user_id user id
+     * @param int $owner_id owner person id
      *
      * @return bool
      */
@@ -433,8 +431,8 @@ class UserModel extends CachedTable
     /**
      * Sets password hash for specified user
      *
-     * @param string $login - user login
-     * @param string $passhash - password hash
+     * @param string $login user login
+     * @param string $passhash password hash
      *
      * @return bool
      */
@@ -464,8 +462,8 @@ class UserModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -516,8 +514,8 @@ class UserModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -534,8 +532,8 @@ class UserModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -551,11 +549,24 @@ class UserModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Performs final steps after new item was successfully created
+     *
+     * @param int|int[]|null $item_id id or array of created item ids
+     *
+     * @return bool
+     */
     protected function postCreate(mixed $item_id)
     {
+        if (is_null($item_id)) {
+            return false;
+        }
+
         $this->cleanCache();
 
+        if (is_array($item_id)) {
+            $item_id = $item_id[0];
+        }
         $item_id = intval($item_id);
 
         $pMod = PersonModel::getInstance();
@@ -564,13 +575,15 @@ class UserModel extends CachedTable
         $this->personName = null;
 
         $this->setOwner($item_id, $p_id);
+
+        return true;
     }
 
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -591,7 +604,13 @@ class UserModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Performs final steps after item was successfully updated
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
     protected function postUpdate(int $item_id)
     {
         $this->cleanCache();
@@ -599,7 +618,7 @@ class UserModel extends CachedTable
         if (!is_null($this->personName)) {
             $userObj = $this->getItem($item_id);
             if (!$userObj) {
-                return;
+                return false;
             }
 
             $personMod = PersonModel::getInstance();
@@ -628,14 +647,21 @@ class UserModel extends CachedTable
 
             $this->personName = null;
         }
+
+        return true;
     }
 
-
-    // Loggin in user
+    /**
+     * Loggin in user
+     *
+     * @param array $params user data
+     *
+     * @return bool
+     */
     public function login(array $params)
     {
         if (!is_array($params)) {
-            return null;
+            return false;
         }
 
         $login = $params["login"];
@@ -654,8 +680,9 @@ class UserModel extends CachedTable
         return true;
     }
 
-
-    // Loggin out user
+    /**
+     * Loggin out user
+     */
     public function logout()
     {
         sessionStart();
@@ -667,8 +694,15 @@ class UserModel extends CachedTable
         $this->deleteCookies();
     }
 
-
-    // Change user password
+    /**
+     * Changes user password
+     *
+     * @param string $login login of user
+     * @param string $oldpass old password
+     * @param string $newpass new password
+     *
+     * @return bool
+     */
     public function changePassword(string $login, string $oldpass, string $newpass)
     {
         if (!$login || !$oldpass || !$newpass) {
@@ -682,8 +716,14 @@ class UserModel extends CachedTable
         return $this->setPassword($login, $newpass);
     }
 
-
-    // Set up new password for user
+    /**
+     * Sets new password for user
+     *
+     * @param string $login user login
+     * @param string $newpass password
+     *
+     * @return bool
+     */
     public function setPassword(string $login, string $newpass)
     {
         if (!$login || !$newpass) {
@@ -706,8 +746,15 @@ class UserModel extends CachedTable
         return true;
     }
 
-
-    // Set up new login for user
+    /**
+     * Sets new login for user
+     *
+     * @param int $user_id user id
+     * @param string $login new login
+     * @param string $password password
+     *
+     * @return bool
+     */
     public function setLogin(int $user_id, string $login, string $password)
     {
         $user_id = intval($user_id);
@@ -759,8 +806,14 @@ class UserModel extends CachedTable
         return true;
     }
 
-
-    // Set up access level for user
+    /**
+     * Sets access level for user
+     *
+     * @param int $user_id user id
+     * @param int $access access level
+     *
+     * @return bool
+     */
     public function setAccess(int $user_id, int $access)
     {
         $user_id = intval($user_id);
@@ -800,8 +853,11 @@ class UserModel extends CachedTable
         return true;
     }
 
-
-    // Return array of users
+    /**
+     * Returns array of users. Admin access is required
+     *
+     * @return \stdClass[]
+     */
     public function getData()
     {
         $res = [];
@@ -855,8 +911,13 @@ class UserModel extends CachedTable
         return $res;
     }
 
-
-    // Delete user and all related data
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
     protected function preDelete(array $items)
     {
         if (!$this->currentUser) {
@@ -891,11 +952,19 @@ class UserModel extends CachedTable
         return true;
     }
 
-
+    /**
+     * Performs final steps after items were successfully removed
+     *
+     * @param array $items ids array of removed items
+     *
+     * @return bool
+     */
     protected function postDelete(array $items)
     {
         if ($this->currentUser && in_array($this->currentUser->id, $items)) {
             $this->logout();
         }
+
+        return true;
     }
 }

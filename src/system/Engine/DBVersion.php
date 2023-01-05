@@ -6,6 +6,9 @@ use JezveMoney\App\Model\IconModel;
 
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 
+/**
+ * Database version manager class
+ */
 class DBVersion
 {
     use Singleton;
@@ -29,6 +32,9 @@ class DBVersion
         "users"
     ];
 
+    /**
+     * Initialization
+     */
     protected function onStart()
     {
         $this->dbClient = MySqlDB::getInstance();
@@ -38,8 +44,9 @@ class DBVersion
         }
     }
 
-
-    // Create all tables
+    /**
+     * Creates all tables
+     */
     private function install()
     {
         try {
@@ -68,8 +75,11 @@ class DBVersion
         }
     }
 
-
-    // Create DB table if not exist
+    /**
+     * Creates DB table if not exist
+     *
+     * @return bool
+     */
     private function createDBVersionTable()
     {
         if (!$this->dbClient) {
@@ -87,7 +97,11 @@ class DBVersion
         return $res;
     }
 
-
+    /**
+     * Sets new database version
+     *
+     * @return bool
+     */
     private function setVersion($version)
     {
         if (!$this->dbClient) {
@@ -107,7 +121,11 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Returns current version of database
+     *
+     * @return int
+     */
     public function getCurrentVersion()
     {
         if (!$this->dbClient) {
@@ -123,13 +141,19 @@ class DBVersion
         return intval($row["version"]);
     }
 
-
+    /**
+     * Returns latest version of database
+     *
+     * @return int
+     */
     public function getLatestVersion()
     {
         return $this->latestVersion;
     }
 
-
+    /**
+     * Updates database to latest version
+     */
     public function autoUpdate()
     {
         try {
@@ -191,7 +215,11 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates database version 1
+     *
+     * @return int
+     */
     private function version1()
     {
         if (!$this->dbClient) {
@@ -206,7 +234,11 @@ class DBVersion
         return 1;
     }
 
-
+    /**
+     * Creates database version 2
+     *
+     * @return int
+     */
     private function version2()
     {
         if (!$this->dbClient) {
@@ -221,7 +253,11 @@ class DBVersion
         return 2;
     }
 
-
+    /**
+     * Creates database version 3
+     *
+     * @return int
+     */
     private function version3()
     {
         if (!$this->dbClient) {
@@ -236,7 +272,11 @@ class DBVersion
         return 3;
     }
 
-
+    /**
+     * Creates database version 4
+     *
+     * @return int
+     */
     private function version4()
     {
         if (!$this->dbClient) {
@@ -253,7 +293,11 @@ class DBVersion
         return 4;
     }
 
-
+    /**
+     * Creates database version 5
+     *
+     * @return int
+     */
     private function version5()
     {
         $this->createImportTemplateTable();
@@ -261,7 +305,11 @@ class DBVersion
         return 5;
     }
 
-
+    /**
+     * Creates database version 6
+     *
+     * @return int
+     */
     private function version6()
     {
         $this->createImportRuleTable();
@@ -270,7 +318,11 @@ class DBVersion
         return 6;
     }
 
-
+    /**
+     * Creates database version 7
+     *
+     * @return int
+     */
     private function version7()
     {
         if (!$this->dbClient) {
@@ -298,7 +350,11 @@ class DBVersion
         return 7;
     }
 
-
+    /**
+     * Creates database version 8
+     *
+     * @return int
+     */
     private function version8()
     {
         if (!$this->dbClient) {
@@ -341,7 +397,11 @@ class DBVersion
         return 8;
     }
 
-
+    /**
+     * Creates database version 9
+     *
+     * @return int
+     */
     private function version9()
     {
         if (!$this->dbClient) {
@@ -355,7 +415,11 @@ class DBVersion
         return 9;
     }
 
-
+    /**
+     * Creates database version 10
+     *
+     * @return int
+     */
     private function version10()
     {
         if (!$this->dbClient) {
@@ -380,7 +444,11 @@ class DBVersion
         return 10;
     }
 
-
+    /**
+     * Creates database version 11
+     *
+     * @return int
+     */
     private function version11()
     {
         if (!$this->dbClient) {
@@ -394,7 +462,11 @@ class DBVersion
         return 11;
     }
 
-
+    /**
+     * Creates database version 12
+     *
+     * @return int
+     */
     private function version12()
     {
         if (!$this->dbClient) {
@@ -419,7 +491,11 @@ class DBVersion
         return 12;
     }
 
-
+    /**
+     * Creates database version 13
+     *
+     * @return int
+     */
     private function version13()
     {
         if (!$this->dbClient) {
@@ -449,7 +525,9 @@ class DBVersion
         return 13;
     }
 
-
+    /**
+     * Creates currency table
+     */
     private function createCurrencyTable()
     {
         if (!$this->dbClient) {
@@ -477,7 +555,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates accounts table
+     */
     private function createAccountsTable()
     {
         if (!$this->dbClient) {
@@ -511,7 +591,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates persons table
+     */
     private function createPersonsTable()
     {
         if (!$this->dbClient) {
@@ -539,7 +621,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates transactions table
+     */
     private function createTransactionsTable()
     {
         if (!$this->dbClient) {
@@ -577,7 +661,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates categories table
+     */
     private function createCategoriesTable()
     {
         if (!$this->dbClient) {
@@ -606,7 +692,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates users table
+     */
     private function createUsersTable()
     {
         if (!$this->dbClient) {
@@ -635,7 +723,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates icons table
+     */
     private function createIconTable()
     {
         if (!$this->dbClient) {
@@ -675,7 +765,9 @@ class DBVersion
         $iconModel->createMultiple($data);
     }
 
-
+    /**
+     * Creates import tamplates table
+     */
     private function createImportTemplateTable()
     {
         if (!$this->dbClient) {
@@ -713,7 +805,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates import rules table
+     */
     private function createImportRuleTable()
     {
         if (!$this->dbClient) {
@@ -739,7 +833,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates import conditions table
+     */
     private function createImportConditionTable()
     {
         if (!$this->dbClient) {
@@ -769,7 +865,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates import actions table
+     */
     private function createImportActionTable()
     {
         if (!$this->dbClient) {
@@ -797,7 +895,9 @@ class DBVersion
         }
     }
 
-
+    /**
+     * Creates admin queries table
+     */
     private function createAdminQueryTable()
     {
         if (!$this->dbClient) {

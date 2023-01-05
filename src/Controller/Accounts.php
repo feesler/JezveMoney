@@ -14,18 +14,26 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
+/**
+ * Accounts controller
+ */
 class Accounts extends TemplateController
 {
     protected $model = null;
     protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
 
-
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = AccountModel::getInstance();
     }
 
-
+    /**
+     * /accounts/ route handler
+     * Renders accounts list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
@@ -51,7 +59,10 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /accounts/create/ route handler
+     * Renders create account view
+     */
     public function create()
     {
         if ($this->isPOST()) {
@@ -108,8 +119,12 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);
@@ -118,7 +133,10 @@ class Accounts extends TemplateController
         setLocation(BASEURL . "accounts/");
     }
 
-
+    /**
+     * /accounts/update/ route handler
+     * Renders update account view
+     */
     public function update()
     {
         if ($this->isPOST()) {
@@ -174,14 +192,22 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
-    // Short alias for Coordinate::stringFromColumnIndex() method
-    private static function columnStr($ind)
+    /**
+     * Short alias for Coordinate::stringFromColumnIndex() method
+     *
+     * @param int $ind column index
+     *
+     * @return string
+     */
+    private static function columnStr(int $ind)
     {
         return Coordinate::stringFromColumnIndex($ind);
     }
 
-
+    /**
+     * /accounts/export/ route handler
+     * Prepares CSV file and sends it to user
+     */
     public function export()
     {
         $transMod = TransactionModel::getInstance();

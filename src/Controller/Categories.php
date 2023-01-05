@@ -7,15 +7,26 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * Categories controller
+ */
 class Categories extends TemplateController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
+    protected $model = null;
 
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = CategoryModel::getInstance();
     }
 
+    /**
+     * /categories/ route handler
+     * Renders categories list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "CategoryList.tpl");
@@ -32,8 +43,12 @@ class Categories extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);
@@ -42,7 +57,10 @@ class Categories extends TemplateController
         setLocation(BASEURL . "categories/");
     }
 
-
+    /**
+     * /categories/create/ route handler
+     * Renders create category view
+     */
     public function create()
     {
         if ($this->isPOST()) {
@@ -78,7 +96,10 @@ class Categories extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /categories/update/ route handler
+     * Renders update category view
+     */
     public function update()
     {
         if ($this->isPOST()) {

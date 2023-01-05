@@ -6,8 +6,15 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * Profile controller
+ */
 class Profile extends TemplateController
 {
+    /**
+     * /profile/ route handler
+     * Renders profile view
+     */
     public function index()
     {
         $availActions = ["name", "password", "reset"];
@@ -56,26 +63,39 @@ class Profile extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /profile/name/ route handler
+     * Renders change name dialog at profile view
+     */
     public function name()
     {
         $this->index();
     }
 
-
+    /**
+     * /profile/password/ route handler
+     * Renders change password dialog at profile view
+     */
     public function password()
     {
         $this->index();
     }
 
-
+    /**
+     * /profile/reset/ route handler
+     * Renders reset data dialog at profile view
+     */
     public function reset()
     {
         $this->index();
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);

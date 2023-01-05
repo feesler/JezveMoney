@@ -6,11 +6,17 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * Persons controller
+ */
 class Persons extends TemplateController
 {
     protected $requiredFields = ["name", "flags"];
 
-
+    /**
+     * /persons/ route handler
+     * Renders persons list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "PersonList.tpl");
@@ -27,8 +33,12 @@ class Persons extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);
@@ -37,7 +47,10 @@ class Persons extends TemplateController
         setLocation(BASEURL . "persons/");
     }
 
-
+    /**
+     * /persons/create/ route handler
+     * Renders create person view
+     */
     public function create()
     {
         if ($this->isPOST()) {
@@ -71,7 +84,10 @@ class Persons extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /persons/update/ route handler
+     * Renders update person view
+     */
     public function update()
     {
         if ($this->isPOST()) {

@@ -39,7 +39,7 @@ class ImportTemplateModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -73,7 +73,7 @@ class ImportTemplateModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -83,8 +83,8 @@ class ImportTemplateModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -166,8 +166,8 @@ class ImportTemplateModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -188,8 +188,8 @@ class ImportTemplateModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -206,8 +206,8 @@ class ImportTemplateModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -230,7 +230,7 @@ class ImportTemplateModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -248,8 +248,16 @@ class ImportTemplateModel extends CachedTable
         return $ruleModel->onTemplateDelete($items);
     }
 
-
-    // Return array of items
+    /**
+     * Returns array of import templates
+     *
+     * @param array $params array of options:
+     *     - 'returnIds' => (bool) - returns ids instead of objects, default is false
+     *     - 'type' => (int) - select templates by type, default is 0
+     *     - 'name' => (int) - select template by name, default is null
+     *
+     * @return ImportTemplateItem[]|int[]
+     */
     public function getData(array $params = [])
     {
         $res = [];
@@ -310,7 +318,11 @@ class ImportTemplateModel extends CachedTable
         ];
     }
 
-    // Delete all import templates of user
+    /**
+     * Removes all import templates of user
+     *
+     * @return bool
+     */
     public function reset()
     {
         if (!self::$user_id) {
@@ -333,8 +345,15 @@ class ImportTemplateModel extends CachedTable
         return true;
     }
 
-    // Update templates with removed accounts
-    public function onAccountDelete($accounts)
+    /**
+     * Handles account delete event
+     * Removes templates with removed accounts
+     *
+     * @param mixed $accounts id or array of account ids
+     *
+     * @return bool
+     */
+    public function onAccountDelete(mixed $accounts)
     {
         if (is_null($accounts)) {
             return false;

@@ -2,12 +2,16 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Cached model class
+ */
 abstract class CachedTable extends Model
 {
     protected $cache = null;
 
-
-    // Return link to cache of derived class
+    /**
+     * Returns link to cache of derived class
+     */
     protected function &getDerivedCache()
     {
         return static::$dcache;
@@ -16,7 +20,7 @@ abstract class CachedTable extends Model
     /**
      * Query data from DB
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     abstract protected function dataQuery();
 
@@ -40,8 +44,11 @@ abstract class CachedTable extends Model
         }
     }
 
-
-    // Check state of cache and update if needed
+    /**
+     * Checks state of cache and update if needed
+     *
+     * @return bool
+     */
     protected function checkCache()
     {
         $this->cache = &$this->getDerivedCache();
@@ -53,8 +60,13 @@ abstract class CachedTable extends Model
         return (!is_null($this->cache));
     }
 
-
-    // Return specified object from cache
+    /**
+     * Return specified item from cache
+     *
+     * @param int $obj_id item id
+     *
+     * @return object|null
+     */
     public function getItem(int $obj_id)
     {
         $obj_id = intval($obj_id);
@@ -117,7 +129,7 @@ abstract class CachedTable extends Model
     /**
      * Returns true if specified item is exist
      *
-     * @param int $obj_id - item id
+     * @param int $obj_id item id
      *
      * @return bool
      */
@@ -138,7 +150,7 @@ abstract class CachedTable extends Model
     /**
      * Returns id of item at specified position
      *
-     * @param int $position
+     * @param int $position item position
      *
      * @return int
      */
@@ -156,21 +168,45 @@ abstract class CachedTable extends Model
         return 0;
     }
 
-
-    protected function postCreate(mixed $item_id)
+    /**
+     * Performs final steps after new item was successfully created
+     *
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
+     */
+    protected function postCreate(mixed $items)
     {
         $this->cleanCache();
+
+        return true;
     }
 
-
+    /**
+     * Performs final steps after item was successfully updated
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
     protected function postUpdate(int $item_id)
     {
         $this->cleanCache();
+
+        return true;
     }
 
-
-    protected function postDelete(array $item_id)
+    /**
+     * Performs final steps after items were successfully removed
+     *
+     * @param int[] $items ids array of removed items
+     *
+     * @return bool
+     */
+    protected function postDelete(array $items)
     {
         $this->cleanCache();
+
+        return true;
     }
 }

@@ -8,67 +8,70 @@ use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
-use JezveMoney\App\Item\AccountItem;
 use JezveMoney\App\Item\PersonItem;
 use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
+/**
+ * State API controller
+ */
 class State extends ApiController
 {
-    protected $trModel = null;
-    protected $accModel = null;
-    protected $pModel = null;
-
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
-
-        $this->trModel = TransactionModel::getInstance();
-        $this->accModel = AccountModel::getInstance();
-        $this->pModel = PersonModel::getInstance();
-        $this->catModel = CategoryModel::getInstance();
-        $this->tplModel = ImportTemplateModel::getInstance();
-        $this->ruleModel = ImportRuleModel::getInstance();
     }
 
-
+    /**
+     * /api/state/ route handler
+     * Returns application state object
+     */
     public function index()
     {
+        $trModel = TransactionModel::getInstance();
+        $accModel = AccountModel::getInstance();
+        $pModel = PersonModel::getInstance();
+        $catModel = CategoryModel::getInstance();
+        $tplModel = ImportTemplateModel::getInstance();
+        $ruleModel = ImportRuleModel::getInstance();
+
         $res = new \stdClass();
         // Accounts
         $res->accounts = new \stdClass();
-        $items = $this->accModel->getData(["owner" => "all", "visibility" => "all"]);
+        $items = $accModel->getData(["owner" => "all", "visibility" => "all"]);
         $res->accounts->data = $items;
-        $res->accounts->autoincrement = $this->accModel->autoIncrement();
+        $res->accounts->autoincrement = $accModel->autoIncrement();
         // Transactions
         $res->transactions = new \stdClass();
         $res->transactions->data = [];
-        $items = $this->trModel->getData(["onPage" => 0]);
+        $items = $trModel->getData(["onPage" => 0]);
         foreach ($items as $item) {
             $res->transactions->data[] = new TransactionItem($item);
         }
-        $res->transactions->autoincrement = $this->trModel->autoIncrement();
+        $res->transactions->autoincrement = $trModel->autoIncrement();
         // Persons
         $res->persons = new \stdClass();
         $res->persons->data = [];
-        $items = $this->pModel->getData(["visibility" => "all"]);
+        $items = $pModel->getData(["visibility" => "all"]);
         foreach ($items as $item) {
             $res->persons->data[] = new PersonItem($item);
         }
-        $res->persons->autoincrement = $this->pModel->autoIncrement();
+        $res->persons->autoincrement = $pModel->autoIncrement();
         // Categories
         $res->categories = new \stdClass();
-        $res->categories->data = $this->catModel->getData();
-        $res->categories->autoincrement = $this->catModel->autoIncrement();
+        $res->categories->data = $catModel->getData();
+        $res->categories->autoincrement = $catModel->autoIncrement();
         // Import templates
         $res->templates = new \stdClass();
-        $res->templates->data = $this->tplModel->getData();
-        $res->templates->autoincrement = $this->tplModel->autoIncrement();
+        $res->templates->data = $tplModel->getData();
+        $res->templates->autoincrement = $tplModel->autoIncrement();
         // Import templates
         $res->rules = new \stdClass();
-        $res->rules->data = $this->ruleModel->getData(["extended" => true]);
-        $res->rules->autoincrement = $this->ruleModel->autoIncrement();
+        $res->rules->data = $ruleModel->getData(["extended" => true]);
+        $res->rules->autoincrement = $ruleModel->autoIncrement();
         // User profile
         $userObj = $this->uMod->getItem($this->user_id);
         if (!$userObj) {
@@ -76,7 +79,7 @@ class State extends ApiController
         }
 
         $res->profile = new \stdClass();
-        $pObj = $this->pModel->getItem($this->owner_id);
+        $pObj = $pModel->getItem($this->owner_id);
         if (!$pObj) {
             throw new \Error("Person not found");
         }

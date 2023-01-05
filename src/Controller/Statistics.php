@@ -10,8 +10,15 @@ use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 
+/**
+ * Statistics controller
+ */
 class Statistics extends TemplateController
 {
+    /**
+     * /statistics/ route handler
+     * Renders statistics view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "Statistics.tpl");
@@ -145,8 +152,12 @@ class Statistics extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
             Message::setError($msg);

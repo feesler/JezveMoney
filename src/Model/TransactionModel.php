@@ -92,7 +92,7 @@ class TransactionModel extends CachedTable
      *
      * @return object|null
      */
-    protected function rowToObj($row)
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -123,7 +123,7 @@ class TransactionModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -133,12 +133,12 @@ class TransactionModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params
-     * @param int $item_id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
-    protected function validateParams($params, $item_id = false)
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = [
             "type",
@@ -165,6 +165,8 @@ class TransactionModel extends CachedTable
             if (!in_array($res["type"], self::$availTypes)) {
                 throw new \Error("Invalid type specified");
             }
+        } else {
+            $res["type"] = $item->type;
         }
 
         $srcAcc = null;
@@ -216,7 +218,11 @@ class TransactionModel extends CachedTable
         }
 
         // Check source and destination are not the same
-        if ($res["src_id"] && $res["dest_id"] && $res["src_id"] == $res["dest_id"]) {
+        if (
+            isset($res["src_id"])
+            && isset($res["dest_id"])
+            && $res["src_id"] == $res["dest_id"]
+        ) {
             throw new \Error("Source and destination are the same.");
         }
 
@@ -289,9 +295,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Convert debt specific params to transaction object
-    public function prepareDebt($params)
+    /**
+     * Converts debt specific params to common transaction fields
+     *
+     * @param array $params debt fields
+     *
+     * @return array
+     */
+    public function prepareDebt(array $params)
     {
         $mandatoryParams = [
             "person_id",
@@ -360,7 +371,11 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Saves affected transactions to database
+     *
+     * @return bool
+     */
     protected function commitAffected()
     {
         if (
@@ -406,8 +421,14 @@ class TransactionModel extends CachedTable
         return $updResult;
     }
 
-
-    protected function getAffected($item)
+    /**
+     * Returns affected transaction object if available
+     *
+     * @param mixed $item transaction object
+     *
+     * @return array|object|null
+     */
+    protected function getAffected(mixed $item)
     {
         if (!$item || !$item->id) {
             return null;
@@ -424,8 +445,14 @@ class TransactionModel extends CachedTable
         return $this->affectedTransactions[$item->id];
     }
 
-
-    protected function pushAffected($item)
+    /**
+     * Add item to the affected transactions list
+     *
+     * @param mixed $item transaction object
+     *
+     * @return bool
+     */
+    protected function pushAffected(mixed $item)
     {
         if (!$item || !$item->id) {
             return false;
@@ -440,7 +467,9 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
+    /**
+     * Sorts affected transactions list by position
+     */
     protected function sortAffected()
     {
         if (!is_array($this->cache)) {
@@ -458,8 +487,8 @@ class TransactionModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -483,14 +512,18 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    protected function postCreate($items)
+    /**
+     * Performs final steps after new item was successfully created
+     *
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
+     */
+    protected function postCreate(mixed $items)
     {
         $this->cleanCache();
 
-        if (!is_array($items)) {
-            $items = [$items];
-        }
+        $items = asArray($items);
 
         // Commit balance changes for affected accounts
         $this->accModel->updateBalances($this->balanceChanges);
@@ -500,7 +533,7 @@ class TransactionModel extends CachedTable
         foreach ($items as $item_id) {
             $trObj = $this->getItem($item_id);
             if (!$trObj) {
-                return;
+                return false;
             }
 
             // Update position of transaction if target date is not today
@@ -511,10 +544,18 @@ class TransactionModel extends CachedTable
         }
 
         $this->commitAffected();
+
+        return true;
     }
 
-
-    protected function getAffectedAccount($account_id)
+    /**
+     * Returns affected account object
+     *
+     * @param int $account_id
+     *
+     * @return object|null
+     */
+    protected function getAffectedAccount(int $account_id)
     {
         if (is_array($this->balanceChanges) && isset($this->balanceChanges[$account_id])) {
             return $this->balanceChanges[$account_id];
@@ -523,8 +564,15 @@ class TransactionModel extends CachedTable
         }
     }
 
-
-    public function pushBalance($account_id, $accountsList = [])
+    /**
+     * Add specified account to the affected accounts list
+     *
+     * @param int $account_id acvcount id
+     * @param array $accountsList array of accounts
+     *
+     * @return array
+     */
+    public function pushBalance(int $account_id, array $accountsList = [])
     {
         $res = $accountsList;
 
@@ -544,10 +592,16 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Apply specified transaction to the list of accounts and return new state
-    // If accounts list not specified returns only impact of transaction
-    public function applyTransaction($trans, $accountsList = [])
+    /**
+     * Applies specified transaction to the list of accounts and returns new state
+     * If accounts list not specified returns only impact of transaction
+     *
+     * @param mixed $trans transaction object
+     * @param array $accountsList array of accounts
+     *
+     * @return array
+     */
+    public function applyTransaction(mixed $trans, array $accountsList = [])
     {
         if (!$trans) {
             throw new \Error("Invalid Transaction object");
@@ -569,10 +623,16 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Cancel changes by specified transaction on list of accounts and return new state
-    // If accounts list not specified returns only cancel of transaction impact
-    public function cancelTransaction($trans, $accountsList = [])
+    /**
+     * Cancel changes by specified transaction on list of accounts and return new state
+     * If accounts list not specified returns only cancel of transaction impact
+     *
+     * @param mixed $trans transaction object
+     * @param array $accountsList array of accounts
+     *
+     * @return array
+     */
+    public function cancelTransaction(mixed $trans, array $accountsList = [])
     {
         if (!$trans) {
             throw new \Error("Invalid Transaction object");
@@ -597,8 +657,8 @@ class TransactionModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -642,14 +702,20 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Performs final steps after item was successfully updated
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
     protected function postUpdate($item_id)
     {
         $this->cleanCache();
 
         $trObj = $this->getItem($item_id);
         if (!$trObj) {
-            return;
+            return false;
         }
 
         // Commit balance changes for affected accounts
@@ -674,11 +740,18 @@ class TransactionModel extends CachedTable
         $this->originalTrans = null;
 
         $this->commitAffected();
+
+        return true;
     }
 
-
-    // Check is transaction with specified position exist
-    public function isPosExist($trans_pos)
+    /**
+     * Checks transaction with specified position is exists
+     *
+     * @param int $trans_pos position
+     *
+     * @return bool
+     */
+    public function isPosExist(int $trans_pos)
     {
         $tr_pos = intval($trans_pos);
 
@@ -697,7 +770,15 @@ class TransactionModel extends CachedTable
     }
 
 
-    public function setCategory($items, $categoryId)
+    /**
+     * Sets category for specified transactions
+     *
+     * @param int|int[]|null $items id or array of transaction ids
+     * @param int $categoryId category id
+     *
+     * @return bool
+     */
+    public function setCategory(mixed $items, int $categoryId)
     {
         $catModel = CategoryModel::getInstance();
 
@@ -733,8 +814,17 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    protected function getRange($fromPos, $includeFrom, $toPos, $includeTo)
+    /**
+     * Returns array of transactions within specified range of positions
+     *
+     * @param int $fromPos start position
+     * @param bool $includeFrom if true then start position included to result
+     * @param int $toPos end position
+     * @param bool $includeTo if true then end position included to result
+     *
+     * @return array|false
+     */
+    protected function getRange(int $fromPos, bool $includeFrom, int $toPos, bool $includeTo)
     {
         if (!$this->checkCache()) {
             return false;
@@ -764,9 +854,15 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Update position of specified transaction and fix position of
-    protected function updatePos($trans_id, $new_pos)
+    /**
+     * Updates position of specified transaction and fix position of transactions between old and new position
+     *
+     * @param int $trans_id transaction id
+     * @param int $new_pos position
+     *
+     * @return bool
+     */
+    protected function updatePos(int $trans_id, int $new_pos)
     {
         $trans_id = intval($trans_id);
         $new_pos = intval($new_pos);
@@ -828,9 +924,15 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // For external use: update position and commit affected
-    public function updatePosition($trans_id, $new_pos)
+    /**
+     * Updates position of transaction and commit affected transactions
+     *
+     * @param int $trans_id
+     * @param int $new_pos
+     *
+     * @return bool
+     */
+    public function updatePosition(int $trans_id, int $new_pos)
     {
         $res = $this->updatePos($trans_id, $new_pos);
         if ($res) {
@@ -840,9 +942,15 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return result balance of account before transaction with specified position
-    public function getLatestResult($acc_id, $pos = false)
+    /**
+     * Returns result balance of account before transaction with specified position
+     *
+     * @param int $acc_id account id
+     * @param int|bool|null $pos position or false to use latest position
+     *
+     * @return float|null
+     */
+    public function getLatestResult(int $acc_id, mixed $pos = false)
     {
         $acc_id = intval($acc_id);
         if (!$acc_id) {
@@ -855,7 +963,7 @@ class TransactionModel extends CachedTable
         $res = null;
         if ($pos > 1) {
             $posOfRes = 0;
-            foreach ($this->cache as $tr_id => $item) {
+            foreach ($this->cache as $item) {
                 $trans = $this->getAffected($item);
 
                 if ($trans->src_id != $acc_id && $trans->dest_id != $acc_id) {
@@ -879,10 +987,10 @@ class TransactionModel extends CachedTable
     }
 
     /**
-     * Update result balance values of specified transactions
+     * Updates result balance values of specified transactions
      *
-     * @param mixed $accounts - id or arrays of account ids to filter transactions by
-     * @param int $pos - position of transaction to start update from, inclusively
+     * @param mixed $accounts id or arrays of account ids to filter transactions by
+     * @param int $pos position of transaction to start update from, inclusively
      *
      * @return bool
      */
@@ -902,7 +1010,7 @@ class TransactionModel extends CachedTable
 
         // Request affected transactions
         if (!$this->checkCache()) {
-            return null;
+            return false;
         }
 
         foreach ($this->cache as $item_id => $item) {
@@ -950,9 +1058,14 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         $this->balanceChanges = [];
         $this->removedItems = [];
@@ -974,9 +1087,14 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // Preparations for item delete
-    protected function postDelete($items)
+    /**
+     * Performs final steps after items were successfully removed
+     *
+     * @param array $items ids array of removed items
+     *
+     * @return bool
+     */
+    protected function postDelete(array $items)
     {
         // Commit balance changes for affected accounts
         $this->accModel->updateBalances($this->balanceChanges);
@@ -990,18 +1108,26 @@ class TransactionModel extends CachedTable
         $this->commitAffected();
 
         $this->cleanCache();
+
+        return true;
     }
 
-
-    // Return latest position of user transactions
-    public function getLatestPos($trans_date = false)
+    /**
+     * Returns latest position of transaction
+     * In case date is specified returns latest position before this date
+     *
+     * @param int|bool|null $trans_date date
+     *
+     * @return int
+     */
+    public function getLatestPos(mixed $trans_date = false)
     {
         if (!$this->checkCache()) {
             return 0;
         }
 
         $res = 0;
-        foreach ($this->cache as $tr_id => $item) {
+        foreach ($this->cache as $item) {
             $trans = $this->getAffected($item);
 
             if ($trans_date !== false && $trans->date > $trans_date) {
@@ -1014,9 +1140,15 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Delete all transactions of user
-    public function reset($keepAccountBalance = false)
+    /**
+     * Removes all transactions of user
+     *
+     * @param bool $keepAccountBalance if true current balance of accounts is preserved,
+     *                                  initial balance in restored otherwise
+     *
+     * @return bool
+     */
+    public function reset(bool $keepAccountBalance = false)
     {
         $setCond = inSetCondition(self::$user_id);
         if (is_null($setCond)) {
@@ -1045,7 +1177,14 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-    public function onAccountUpdate($acc_id)
+    /**
+     * Handles account update event
+     *
+     * @param int $acc_id account id
+     *
+     * @return bool
+     */
+    public function onAccountUpdate(int $acc_id)
     {
         $accObj = $this->accModel->getItem($acc_id);
         if (!$accObj) {
@@ -1054,10 +1193,10 @@ class TransactionModel extends CachedTable
 
         $new_curr = $accObj->curr_id;
         if (!$this->checkCache()) {
-            return 0;
+            return false;
         }
 
-        foreach ($this->cache as $item_id => $item) {
+        foreach ($this->cache as $item) {
             $trans = $this->getAffected($item);
 
             if ($trans->src_id != $acc_id && $trans->dest_id != $acc_id) {
@@ -1088,9 +1227,15 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // Remove specified account from transactions
-    public function onAccountDelete($accounts)
+    /**
+     * Handles account delete event
+     * Removes specified accounts from transactions
+     *
+     * @param mixed $accounts id or array of account ids
+     *
+     * @return bool
+     */
+    public function onAccountDelete(mixed $accounts)
     {
         if (!self::$user_id || is_null($accounts)) {
             return false;
@@ -1117,7 +1262,7 @@ class TransactionModel extends CachedTable
         }
 
         if (!$this->checkCache()) {
-            return 0;
+            return false;
         }
 
         $idsToRemove = [];
@@ -1213,9 +1358,15 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // Update transactions with removed categories
-    public function onCategoryDelete($categories)
+    /**
+     * Handles category delete event
+     * Update transactions with removed categories
+     *
+     * @param mixed $categories id or array of category ids
+     *
+     * @return bool
+     */
+    public function onCategoryDelete(mixed $categories)
     {
         if (is_null($categories)) {
             return false;
@@ -1240,9 +1391,14 @@ class TransactionModel extends CachedTable
         return true;
     }
 
-
-    // Return condition string for list of accounts
-    private function getAccCondition($accounts = null)
+    /**
+     * Returns condition string for list of accounts
+     *
+     * @param mixed $accounts
+     *
+     * @return string|null
+     */
+    private function getAccCondition(mixed $accounts = null)
     {
         $setCond = inSetCondition($accounts);
         if (is_null($setCond)) {
@@ -1252,9 +1408,14 @@ class TransactionModel extends CachedTable
         return orJoin(["src_id" . $setCond, "dest_id" . $setCond]);
     }
 
-
-    // Return list of accounts of specified persons
-    private function getPersonAccounts($persons = null)
+    /**
+     * Returns list of accounts of specified persons
+     *
+     * @param int|int[]|null $persons id or array of person ids
+     *
+     * @return array|null
+     */
+    private function getPersonAccounts(mixed $persons = null)
     {
         if (is_null($persons)) {
             return null;
@@ -1276,9 +1437,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return list of categories and all of its child categories
-    private function getCategoriesSet($categories = null)
+    /**
+     * Returns list of categories and all of its child categories
+     *
+     * @param int|int[]|null $categories  id or array of category ids
+     *
+     * @return int[]|null
+     */
+    private function getCategoriesSet(mixed $categories = null)
     {
         if (is_null($categories)) {
             return null;
@@ -1305,9 +1471,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return condition string for list of categories
-    private function getCategoryCondition($categories = null)
+    /**
+     * Returns condition string for list of categories
+     *
+     * @param int|int[]|null $categories id or array of category ids
+     *
+     * @return string|null
+     */
+    private function getCategoryCondition(mixed $categories = null)
     {
         $setCond = inSetCondition($categories, false);
         if (is_null($setCond)) {
@@ -1317,9 +1488,14 @@ class TransactionModel extends CachedTable
         return "category_id" . $setCond;
     }
 
-
-    // Return condition string for list of types
-    private function getTypeCondition($types = null)
+    /**
+     * Returns condition string for list of types
+     *
+     * @param int|int[]|null $types id or array of category ids
+     *
+     * @return string|null
+     */
+    private function getTypeCondition(mixed $types = null)
     {
         $setCond = inSetCondition($types);
         if (is_null($setCond)) {
@@ -1329,9 +1505,16 @@ class TransactionModel extends CachedTable
         return "type" . $setCond;
     }
 
-
-    // Convert request object to transaction request parameters
-    public function getRequestFilters($request, $defaults = [], $throw = false)
+    /**
+     * Converts request object to transaction request parameters
+     *
+     * @param array $request
+     * @param array $defaults array of default filter values
+     * @param bool $throw if true then throws on error
+     *
+     * @return array
+     */
+    public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
     {
         $res = $defaults;
 
@@ -1445,8 +1628,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-    // Conver filter parameters to filter object
-    public function getFilterObject($params)
+    /**
+     * Converts filter parameters to filter object
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function getFilterObject(array $params)
     {
         $res = [];
 
@@ -1500,9 +1689,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Returns array of DB conditions
-    private function getDBCondition($params = null)
+    /**
+     * Returns array of DB conditions
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    private function getDBCondition(array $params = [])
     {
         if (is_null($params)) {
             $params = [];
@@ -1586,20 +1780,18 @@ class TransactionModel extends CachedTable
     /**
      * Returns array of transactions
      *
-     * @param array $params - array of parameters
-     *    $params = [
-     *      type - type of transaction filter. Default is ALL
-     *      accounts - array of accounts to filter by. Default is empty
-     *      persons - array of persons to filter by. Default is empty
-     *      categories - array of categories to filter by. Default is empty
-     *      search - query string to search by comments. Default is empty
-     *      startDate - start date of transactions filter. Default is empty
-     *      endDate - end date of transactions filter. Default is empty
-     *      desc - sort result descending
-     *      onPage - count of transactions per page.
-     *      page - page to return. zero based
-     *      range - count of pages to return. Default is 1
-     *    ]
+     * @param array $params array of options:
+     *     - 'type' => (int|int[]) - type of transaction filter. Default is ALL
+     *     - 'accounts' => (int|int[]) - array of accounts to filter by. Default is empty
+     *     - 'persons' => (int|int[]) - array of persons to filter by. Default is empty
+     *     - 'categories' => (int|int[]) - array of categories to filter by. Default is empty
+     *     - 'search' => (string) - query string to search by comments. Default is empty
+     *     - 'startDate' => (string) - start date of transactions filter. Default is empty
+     *     - 'endDate' => (string) - end date of transactions filter. Default is empty
+     *     - 'desc' => (bool) - sort result descending
+     *     - 'onPage' => (int) - count of transactions per page.
+     *     - 'page' => (int) - page to return. zero based
+     *     - 'range' => (int) - count of pages to return. Default is 1
      *
      * @return array
      */
@@ -1675,9 +1867,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return total count of transactions for specified condition
-    public function getTransCount($params = null)
+    /**
+     * Returns total count of transactions for specified condition
+     *
+     * @param array $params
+     *
+     * @return int
+     */
+    public function getTransCount(array $params = [])
     {
         if (!self::$user_id) {
             return 0;
@@ -1688,8 +1885,15 @@ class TransactionModel extends CachedTable
         return $this->dbObj->countQ($this->tbl_name, $condArr);
     }
 
-
-    protected function getLabel($time, $groupType)
+    /**
+     * Returns label for specified timestamp and group type
+     *
+     * @param int $time timestamp
+     * @param int $groupType group type
+     *
+     * @return string|null
+     */
+    protected function getLabel(int $time, int $groupType)
     {
         if ($groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
             return date("d.m.Y", $time);
@@ -1706,8 +1910,15 @@ class TransactionModel extends CachedTable
         return null;
     }
 
-
-    protected function getDateInfo($time, $groupType)
+    /**
+     * Returns date info for specified timestamp and group type
+     *
+     * @param int $time timestamp
+     * @param int $groupType group type
+     *
+     * @return array
+     */
+    protected function getDateInfo(int $time, int $groupType)
     {
         $info = getdate($time);
         $info["week"] = intval(date("W", $time));
@@ -1729,7 +1940,15 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Returns difference between dates for specified group type
+     *
+     * @param mixed $itemA
+     * @param mixed $itemB
+     * @param mixed $groupType group type
+     *
+     * @return int
+     */
     protected function getDateDiff($itemA, $itemB, $groupType)
     {
         if (!is_array($itemA) || !is_array($itemB)) {
@@ -1766,8 +1985,15 @@ class TransactionModel extends CachedTable
         throw new \Error("Invalid group type");
     }
 
-
-    protected function getNextDate($time, $groupType)
+    /**
+     * Returns next date timestamp for specified group type
+     *
+     * @param int $time timestamp
+     * @param int $groupType group type
+     *
+     * @return int
+     */
+    protected function getNextDate(int $time, int $groupType)
     {
         $durationMap = [
             GROUP_BY_DAY => "P1D",
@@ -1792,9 +2018,14 @@ class TransactionModel extends CachedTable
         return $date->add(new DateInterval($duration))->getTimestamp();
     }
 
-
-    // Convert request object to histogram request parameters
-    public function getHistogramFilters($request)
+    /**
+     * Converts request object to histogram request parameters
+     *
+     * @param array $request
+     *
+     * @return \stdClass
+     */
+    public function getHistogramFilters(array $request)
     {
         $currModel = CurrencyModel::getInstance();
 
@@ -1889,9 +2120,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return series array of amounts and date of transactions for statistics histogram
-    public function getHistogramSeries($params = [])
+    /**
+     * Returns series array of amounts and date of transactions for statistics histogram
+     *
+     * @param array $params
+     *
+     * @return \stdClass|null
+     */
+    public function getHistogramSeries(array $params = [])
     {
         $res = new \stdClass();
         $res->values = [];
@@ -2063,7 +2299,7 @@ class TransactionModel extends CachedTable
         foreach ($transTypes as $type) {
             $remainSum += array_sum($curSum[$type]);
         }
-        if ($remainSum != 0.0) {
+        if ($remainSum != 0.0 && is_array($sumDate)) {
             foreach ($transTypes as $type) {
                 foreach ($dataCategories as $cat) {
                     $amountArr[$type][$cat][] = $curSum[$type][$cat];
@@ -2122,9 +2358,14 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return string for specified transaction type
-    public static function stringToType($value)
+    /**
+     * Returns transaction type for specified string
+     *
+     * @param string $value transaction type string
+     *
+     * @return int
+     */
+    public static function stringToType(string $value)
     {
         $stringTypes = [
             "expense" => EXPENSE,
@@ -2140,9 +2381,14 @@ class TransactionModel extends CachedTable
         return $stringTypes[$value];
     }
 
-
-    // Return string for specified transaction type
-    public static function typeToString($trans_type)
+    /**
+     * Returns string for specified transaction type
+     *
+     * @param int $trans_type transaction type
+     *
+     * @return string|null
+     */
+    public static function typeToString(int $trans_type)
     {
         $typeNames = self::getTypeNames();
         if (!isset($typeNames[$trans_type])) {
@@ -2152,9 +2398,11 @@ class TransactionModel extends CachedTable
         return $typeNames[$trans_type];
     }
 
-
-    // Return array of names of available types of transactions
-    // [ type => 'name string', ... ]
+    /**
+     * Return array of names of available transaction types
+     *
+     * @return array
+     */
     public static function getTypeNames()
     {
         return [
@@ -2165,8 +2413,14 @@ class TransactionModel extends CachedTable
         ];
     }
 
-
-    public static function getHistogramGroupName($groupType)
+    /**
+     * Returns name of specified group type
+     *
+     * @param int $groupType
+     *
+     * @return string|null
+     */
+    public static function getHistogramGroupName(int $groupType)
     {
         if (!isset(self::$availGroupTypes[$groupType])) {
             return null;
@@ -2175,8 +2429,14 @@ class TransactionModel extends CachedTable
         return self::$availGroupTypes[$groupType];
     }
 
-
-    public static function getHistogramGroupTypeByName($name)
+    /**
+     * Returns group type for specified group name
+     *
+     * @param string $name group name
+     *
+     * @return int|false
+     */
+    public static function getHistogramGroupTypeByName(string $name)
     {
         $lname = strtolower($name);
         foreach (self::$availGroupTypes as $groupType => $groupName) {
@@ -2188,8 +2448,11 @@ class TransactionModel extends CachedTable
         return false;
     }
 
-    // Return array of histogram group names
-    // [ type => 'group name string', ... ]
+    /**
+     * Returns array of histogram group names
+     *
+     * @return array
+     */
     public static function getHistogramGroupNames()
     {
         return [
@@ -2200,7 +2463,11 @@ class TransactionModel extends CachedTable
         ];
     }
 
-    /** Returns array of available histogram report types */
+    /**
+     * Returns array of available histogram report types
+     *
+     * @return array
+     */
     public static function getHistogramReportTypes()
     {
         return self::$availReports;

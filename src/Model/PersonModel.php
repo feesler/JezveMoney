@@ -40,7 +40,7 @@ class PersonModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row - array of table row fields
+     * @param array $row array of table row fields
      *
      * @return object|null
      */
@@ -64,7 +64,7 @@ class PersonModel extends CachedTable
     /**
      * Returns data query object for CachedTable::updateCache()
      *
-     * @return mysqli_result|bool
+     * @return \mysqli_result|bool
      */
     protected function dataQuery()
     {
@@ -74,8 +74,8 @@ class PersonModel extends CachedTable
     /**
      * Validates item fields before to send create/update request to database
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return array
      */
@@ -125,8 +125,8 @@ class PersonModel extends CachedTable
     /**
      * Checks same item already exist
      *
-     * @param array $params - item fields
-     * @param int $item_id - item id
+     * @param array $params item fields
+     * @param int $item_id item id
      *
      * @return bool
      */
@@ -143,8 +143,8 @@ class PersonModel extends CachedTable
     /**
      * Checks item create conditions and returns array of expressions
      *
-     * @param array $params - item fields
-     * @param bool $isMultiple - flag for multiple create
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
      *
      * @return array|null
      */
@@ -156,7 +156,14 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Updates specified person of different user. Admin access is required
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return bool
+     */
     public function adminUpdate(int $item_id, array $params)
     {
         if (!UserModel::isAdminUser()) {
@@ -173,8 +180,8 @@ class PersonModel extends CachedTable
     /**
      * Checks update conditions and returns array of expressions
      *
-     * @param int $item_id - item id
-     * @param array $params - item fields
+     * @param int $item_id item id
+     * @param array $params item fields
      *
      * @return array
      */
@@ -194,7 +201,13 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Removes specified persons of different user. Admin access is required
+     *
+     * @param int|int[]|null $items id or array of person ids to remove
+     *
+     * @return bool
+     */
     public function adminDelete(mixed $items)
     {
         if (!UserModel::isAdminUser()) {
@@ -211,7 +224,7 @@ class PersonModel extends CachedTable
     /**
      * Checks delete conditions and returns bool result
      *
-     * @param array $items - array of item ids to remove
+     * @param array $items array of item ids to remove
      *
      * @return bool
      */
@@ -239,7 +252,14 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
+    /**
+     * Shows or hides specified persons
+     *
+     * @param int|int[]|null $items id or array of person ids to show/hide
+     * @param bool $val show if true, hide otherwise
+     *
+     * @return bool
+     */
     public function show(mixed $items, bool $val = true)
     {
         if (!is_array($items)) {
@@ -279,14 +299,25 @@ class PersonModel extends CachedTable
         return true;
     }
 
-
+    /**
+     * Hides specified persons
+     *
+     * @param int|int[]|null $items id or array of account ids to hide
+     *
+     * @return bool
+     */
     public function hide(mixed $items)
     {
         return $this->show($items, false);
     }
 
-
-    // Return person id by specified position
+    /**
+     * Returns id of item at specified position
+     *
+     * @param int $pos item position
+     *
+     * @return int
+     */
     public function getIdByPos(int $pos)
     {
         if (!$this->checkCache()) {
@@ -311,25 +342,25 @@ class PersonModel extends CachedTable
     }
 
     /**
-     * Searches for person with specified name
+     * Search for person with specified name
      *
-     * @param string $name - name of person to find
-     * @param bool $caseSens - case sensitive flag
+     * @param string $name name of person to find
+     * @param bool $caseSens case sensitive flag
      *
      * @return object|null
      */
-    public function findByName(string $p_name, bool $caseSens = false)
+    public function findByName(string $name, bool $caseSens = false)
     {
-        if (is_empty($p_name)) {
+        if (is_empty($name)) {
             return null;
         }
 
         if (!$this->checkCache()) {
-            return 0;
+            return null;
         }
 
         if (!$caseSens) {
-            $p_name = strtolower($p_name);
+            $name = strtolower($name);
         }
         foreach ($this->cache as $p_id => $item) {
             // Skip person of user
@@ -338,18 +369,21 @@ class PersonModel extends CachedTable
             }
 
             if (
-                ($caseSens && $item->name == $p_name) ||
-                (!$caseSens && strtolower($item->name) == $p_name)
+                ($caseSens && $item->name == $name) ||
+                (!$caseSens && strtolower($item->name) == $name)
             ) {
                 return $item;
             }
         }
 
-        return 0;
+        return null;
     }
 
-
-    // Delete all persons except owner of user
+    /**
+     * Removes all persons of user except owner of user
+     *
+     * @return bool
+     */
     public function reset()
     {
         if (!self::$user_id || !self::$owner_id) {
@@ -379,7 +413,13 @@ class PersonModel extends CachedTable
         return true;
     }
 
-
+    /**
+     * Return specified item from cache
+     *
+     * @param int $obj_id item id
+     *
+     * @return object|null
+     */
     public function getItem(int $obj_id)
     {
         $item = parent::getItem($obj_id);
@@ -392,8 +432,14 @@ class PersonModel extends CachedTable
         return $item;
     }
 
-
-    // Return count of objects
+    /**
+     * Returns count of persons
+     *
+     * @param array $params array of options:
+     *     - 'user' => (int) - select persons by user. Admin access is required
+     *
+     * @return int
+     */
     public function getCount(array $params = [])
     {
         $userRequest = isset($params["user"]) ? intval($params["user"]) : 0;
@@ -420,14 +466,12 @@ class PersonModel extends CachedTable
     /**
      * Returns array of persons
      *
-     * @param array{string} $params
-     *      Query parameters
-     *      - full (bool): if set to true and current user have admin rights method
-     *                        will return persons of all users ;
-     *      - visibility (string): visibility filter. Possible values: "all", "visible", "hidden" ;
-     *      - sort (string): sort result array. Possible value: "visibility" ;
+     * @param array $params array of options:
+     *     - 'full' => (bool): return persons of all users. Admin access is required
+     *     - 'visibility' => (string): select persons by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'sort' => (string): sort result array. Possible value: "visibility"
      *
-     * @return array[PersonItem]
+     * @return PersonItem[]
      */
     public function getData(array $params = [])
     {
@@ -480,8 +524,13 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    // Check item is hidden
+    /**
+     * Returns true if specified item is hidden
+     *
+     * @param object|int|null $item id or item object
+     *
+     * @return bool
+     */
     public function isHidden(mixed $item)
     {
         if (is_int($item)) {

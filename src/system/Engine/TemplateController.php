@@ -6,6 +6,9 @@ use JezveMoney\Core\Controller;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\PersonModel;
 
+/**
+ * Base template controller
+ */
 abstract class TemplateController extends Controller
 {
     public $action = null;
@@ -15,20 +18,21 @@ abstract class TemplateController extends Controller
     protected $css = null;
     protected $jsArr = null;
     protected $uMod = null;
+    protected $adminUser = null;
     protected $personMod = null;
     protected $user_name = null;
     protected $user_id = 0;
     protected $owner_id = 0;
     protected $themesPath = "view/css/themes/";
+    protected $locale = null;
+    protected $locales = [];
 
 
     abstract public function index();
 
-    protected function onStart()
-    {
-    }
-
-
+    /**
+     * Initialize application resources
+     */
     public function initDefResources()
     {
         $this->cssArr = [];
@@ -41,13 +45,18 @@ abstract class TemplateController extends Controller
         ];
     }
 
+    /**
+     * Loads locales
+     */
     protected function setupLocales()
     {
         $this->locale = Locale::getUserLocale();
         $this->locales = Locale::getAvailable();
     }
 
-
+    /**
+     * Loads themes data
+     */
     protected function setupThemes()
     {
         $userTheme = $this->uMod->getUserTheme();
@@ -58,8 +67,12 @@ abstract class TemplateController extends Controller
         $this->template->themeClass = $themes[$userTheme]["className"];
     }
 
-
-    protected function render($data = [])
+    /**
+     * Renders template with specified data
+     *
+     * @param array $data
+     */
+    protected function render(array $data = [])
     {
         $this->template->action = $this->action;
         $this->template->actionParam = $this->actionParam;
@@ -93,9 +106,13 @@ abstract class TemplateController extends Controller
         echo $this->template->render($data);
     }
 
-
-    // Check user status required for page access
-    public function checkUser($loggedIn = true, $adminOnly = false)
+    /**
+     * Checks user status required for page access
+     *
+     * @param bool $loggedIn logged in flag
+     * @param bool $adminOnly admin access flag
+     */
+    public function checkUser(bool $loggedIn = true, bool $adminOnly = false)
     {
         $this->uMod = UserModel::getInstance();
         // Check session and cookies
@@ -130,7 +147,11 @@ abstract class TemplateController extends Controller
         $this->onStart();
     }
 
-    // Returns profile data for view
+    /**
+     * Returns profile data for view
+     *
+     * @return array
+     */
     public function getProfileData()
     {
         return [
