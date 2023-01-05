@@ -1,16 +1,14 @@
 .heading {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   padding: 10px 0 0 0;
   column-gap: 24px;
 
   h1 {
-    font-size: 26px;
+    font-size: 1.4rem;
     font-weight: 300;
     line-height: 32px;
-    height: 32px;
     vertical-align: middle;
-    white-space: nowrap;
   }
 }
 

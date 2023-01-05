@@ -1,6 +1,6 @@
 /* Heading */
 .heading {
-  max-width: 300px;
+  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
   padding-bottom: 10px;
 }
 
