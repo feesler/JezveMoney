@@ -288,6 +288,17 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.submitRule();
 
         await ImportTests.cancelRule();
+
+        setBlock('Add all actions', 2);
+        await ImportTests.createRule();
+
+        await ImportTests.addRuleAction();
+        await ImportTests.addRuleAction();
+        await ImportTests.addRuleAction();
+        await ImportTests.addRuleAction();
+        await ImportTests.addRuleAction();
+
+        await ImportTests.cancelRule();
     }
 
     // Create import rule tests

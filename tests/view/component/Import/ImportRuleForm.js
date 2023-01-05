@@ -351,10 +351,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportAction.isCategoryValue(type)) {
-            const category = App.state.categories.getItemByIndex(0);
-            assert(category, 'No categories available');
-
-            return category.id;
+            return 0;
         }
 
         return '';

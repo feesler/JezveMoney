@@ -309,6 +309,10 @@ export class ImportRuleForm extends Component {
             return item.id;
         }
 
+        if (ImportAction.isCategoryValue(actionType)) {
+            return 0;
+        }
+
         return '';
     }
 
