@@ -147,6 +147,7 @@
     "IMPORT": "Import",
     "IMPORT_NO_DATA": "No transactions to import",
     "IMPORT_NO_ACCOUNTS_MSG": "You have no one account. To start the import create one.",
+    "IMPORT_UPLOAD_BUTTON": "Upload",
     "IMPORT_UPLOAD": "Upload",
     "ERR_UPLOAD": "Fail to process file",
     "IMPORT_CONVERT": "Convert",

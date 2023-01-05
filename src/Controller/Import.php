@@ -58,7 +58,7 @@ class Import extends TemplateController
             "uploadBtn" => [
                 "id" => "uploadBtn",
                 "classNames" => "circle-icon",
-                "title" => __("IMPORT_UPLOAD"),
+                "title" => __("IMPORT_UPLOAD_BUTTON"),
                 "icon" => "import",
             ],
         ];
