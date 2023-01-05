@@ -1,6 +1,6 @@
 /* Heading */
 .heading {
-  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  max-width: var(--section-width);
   padding-bottom: 10px;
 }
 
@@ -66,7 +66,7 @@
 
 .tile-base {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
 }
 
 .tile_container {
@@ -100,7 +100,7 @@
   flex-flow: column nowrap;
   align-items: baseline;
   position: relative;
-  max-width: 300px;
+  max-width: var(--section-width);
 }
 
 .account-container {

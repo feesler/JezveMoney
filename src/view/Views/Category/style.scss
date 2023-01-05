@@ -1,4 +1,4 @@
 .heading {
-  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  max-width: var(--section-width);
   padding-bottom: 10px;
 }

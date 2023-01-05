@@ -16,6 +16,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --input-height: 37px;
   --header-size: 50px;
   --content-padding-bottom: 50px;
+  --section-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
 
   /* Popup menu, Chart popup & etc. */
   --popup-menu-backdrop-filter: blur(2px);
@@ -453,7 +454,7 @@ label {
   display: flex;
   flex-flow: row wrap;
   gap: var(--tile-gap);
-  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  max-width: var(--section-width);
   padding: 0.25rem 0;
 }
 
