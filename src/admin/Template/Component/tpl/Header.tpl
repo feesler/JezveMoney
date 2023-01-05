@@ -71,7 +71,7 @@
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5">Profile</a></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
             <li class="nav-separator"></li>
-            <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>" tabindex="7">Back</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>" tabindex="7">Back</a></li>
         </ul>
     <?php    }        ?>
 </div>
