@@ -60,7 +60,7 @@
         <ul class="nav-list">
             <li class="nav-item">
                 <div class="theme-switch">
-                    <span class="theme-switch__label">Dark theme</span>
+                    <span class="nav-item__title">Dark theme</span>
                     <label id="theme-check" class="switch">
                         <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
                         <div class="switch-slider"></div>

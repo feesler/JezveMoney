@@ -85,17 +85,16 @@
 
     <?php if ($this->user_id != 0) {        ?>
         <ul class="nav-list">
-            <li class="nav-item">
+            <li class="nav-item locale-select">
+                <span class="nav-item__title"><?= __("LANGUAGE") ?></span>
                 <select id="localeSelect"></select>
             </li>
-            <li class="nav-item">
-                <div class="theme-switch">
-                    <span class="theme-switch__label"><?= __("DARK_THEME") ?></span>
-                    <label id="theme-check" class="switch">
-                        <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
-                        <div class="switch-slider"></div>
-                    </label>
-                </div>
+            <li class="nav-item theme-switch">
+                <span class="nav-item__title"><?= __("DARK_THEME") ?></span>
+                <label id="theme-check" class="switch">
+                    <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
+                    <div class="switch-slider"></div>
+                </label>
             </li>
             <li class="nav-separator"></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5"><?= __("PROFILE") ?></a></li>
