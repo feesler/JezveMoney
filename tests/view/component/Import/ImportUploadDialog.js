@@ -250,11 +250,11 @@ export class ImportUploadDialog extends TestComponent {
         res.filename = cont.uploadFilename;
         res.fileData = cont.fileData;
 
-        if (cont.state === CREATE_TPL_STATE) {
-            res.template = {};
-        } else {
-            res.template = App.state.templates.getItem(cont.templateSel.value);
-        }
+        res.selectedTemplateId = cont.templateSel?.value ?? 0;
+
+        res.template = (cont.state === CREATE_TPL_STATE)
+            ? {}
+            : App.state.templates.getItem(res.selectedTemplateId);
 
         if (
             (cont.state === CREATE_TPL_STATE || cont.state === UPDATE_TPL_STATE)
@@ -813,6 +813,14 @@ export class ImportUploadDialog extends TestComponent {
         assert(visible && !disabled, 'Cancel template button is invisible or disabled');
 
         this.model.state = RAW_DATA_STATE;
+
+        const template = App.state.templates.getItem(this.model.selectedTemplateId);
+        this.model.template = template;
+        if (template?.account_id) {
+            this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+        }
+        this.model.isValid = this.isValidTemplate(template);
+
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => click(this.content.cancelTplBtn.elem));

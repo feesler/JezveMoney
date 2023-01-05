@@ -44,6 +44,8 @@ export class ImportTemplateManager extends Component {
         this.state = {
             mainAccount: this.props.mainAccount,
             templates: window.app.model.templates.data,
+            template: null,
+            selectedTemplateId: 0,
             validation: {
                 name: true,
                 firstRow: true,
@@ -186,6 +188,8 @@ export class ImportTemplateManager extends Component {
             filename: null,
             rowsToShow: 3,
             listLoading: false,
+            template: null,
+            selectedTemplateId: 0,
         });
 
         this.hide();
@@ -211,13 +215,17 @@ export class ImportTemplateManager extends Component {
 
         let template = this.findValidTemplate(this.state.rawData);
         if (!template) {
-            template = this.templateDropDown.getSelectionData();
+            template = this.state.templates.getItemByIndex(0);
             if (!template) {
                 throw new Error('Invalid selection');
             }
         }
 
         this.setTemplate(template.id);
+        this.setState({
+            ...this.state,
+            selectedTemplateId: template.id,
+        });
         this.setSelectTemplateState();
     }
 
@@ -268,6 +276,11 @@ export class ImportTemplateManager extends Component {
         }
 
         this.setTemplate(selectedTemplate.id);
+
+        this.setState({
+            ...this.state,
+            selectedTemplateId: selectedTemplate.id,
+        });
     }
 
     /**
@@ -554,7 +567,10 @@ export class ImportTemplateManager extends Component {
                     template = templates.getItemByIndex(0);
                 }
                 this.setTemplate(template.id);
-
+                this.setState({
+                    ...this.state,
+                    selectedTemplateId: template.id,
+                });
                 this.setSelectTemplateState();
             } else {
                 this.setCreateTemplateState();
@@ -597,8 +613,7 @@ export class ImportTemplateManager extends Component {
 
         this.setSelectTemplateState();
         // Restore previously selected template
-        const selectedTemplate = this.templateDropDown.getSelectionData();
-        this.setTemplate(selectedTemplate.id);
+        this.setTemplate(this.state.selectedTemplateId);
     }
 
     /** Raw data table column 'click' event handler */
@@ -734,7 +749,7 @@ export class ImportTemplateManager extends Component {
     /** Render import template select element according to the data in model */
     renderTemplateSelect(state, prevState) {
         if (
-            state.template === prevState?.template
+            state.selectedTemplateId === prevState?.selectedTemplateId
             && state.templates === prevState?.templates
         ) {
             return;
@@ -746,8 +761,8 @@ export class ImportTemplateManager extends Component {
             .map((item) => ({ id: item.id, title: item.name }));
         this.templateDropDown.append(templateItems);
 
-        if (state.template?.id) {
-            this.templateDropDown.selectItem(state.template.id);
+        if (state.selectedTemplateId) {
+            this.templateDropDown.selectItem(state.selectedTemplateId);
         }
     }
 
