@@ -577,11 +577,6 @@ class ImportView extends View {
         this.store.dispatch(actions.editItem());
     }
 
-    /** ImportTransaction 'update' event handler */
-    onFormUpdate(data) {
-        this.store.dispatch(actions.formChanged(data));
-    }
-
     /**
      * Main account select event handler
      */
