@@ -515,7 +515,7 @@ class TransactionView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
+                locales: window.app.getCurrrentLocale(),
                 ondateselect: (d) => this.onSelectDate(d),
             });
             this.datePickerWrapper.append(this.datePicker.elem);

@@ -644,7 +644,7 @@ export class ImportTransactionForm extends Component {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.dateGroup.elem,
-                locales: window.app.datePickerLocale,
+                locales: window.app.getCurrrentLocale(),
                 ondateselect: (date) => this.onDateSelect(date),
             });
             insertAfter(this.datePicker.elem, this.dateGroup.elem);

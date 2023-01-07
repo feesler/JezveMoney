@@ -205,7 +205,7 @@ export class DateRangeInput extends Component {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
+                locales: window.app.getCurrrentLocale(),
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),

@@ -27,7 +27,6 @@ export class Application {
         }
 
         this.config = {
-            datePickerLocale: 'en',
             dateFormatLocale: 'ru',
         };
 
@@ -78,10 +77,6 @@ export class Application {
 
     get message() {
         return this.props.message;
-    }
-
-    get datePickerLocale() {
-        return this.config.datePickerLocale;
     }
 
     get dateFormatLocale() {
