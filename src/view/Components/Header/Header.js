@@ -144,9 +144,7 @@ export class Header extends Component {
     }
 
     /** Show user navigation */
-    showUserNavigation(e) {
-        e.stopPropagation();
-
+    showUserNavigation() {
         this.hideNavigation();
         show(this.userNavContent, true);
         this.userNavigation.open();
