@@ -78,6 +78,8 @@ function setupLogs()
 
     function wlog(?string $str = null)
     {
+        global $noLogs;
+
         if ((isset($noLogs) && $noLogs) || is_null($str)) {
             return;
         }
