@@ -75,6 +75,8 @@ export class Header extends Component {
             content: this.userNavContent,
             placement: 'right',
             className: 'user-navigation',
+            onOpened: () => this.onUserNavigationOpened(),
+            onClosed: () => this.onUserNavigationClosed(),
         });
         show(this.userNavContent, false);
 
@@ -148,15 +150,21 @@ export class Header extends Component {
         this.hideNavigation();
         show(this.userNavContent, true);
         this.userNavigation.open();
-
-        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
     }
 
     /** Hide user navigation */
     hideUserNavigation() {
         this.userNavigation.close();
-        show(this.userNavContent, false);
+    }
 
+    /** User navigation 'opened' event handler */
+    onUserNavigationOpened() {
+        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
+    }
+
+    /** User navigation 'closed' event handler */
+    onUserNavigationClosed() {
+        show(this.userNavContent, false);
         removeEmptyClick(this.userNavEmptyClick);
     }
 
