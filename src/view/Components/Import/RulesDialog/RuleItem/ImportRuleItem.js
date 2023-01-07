@@ -172,9 +172,13 @@ export class ImportRuleItem extends Component {
 
     /** Render component state */
     render(state) {
-        if (!state
+        if (
+            !state
             || !(state.actions instanceof ImportActionList)
-            || !(state.conditions instanceof ImportConditionList)) {
+            || !(state.conditions instanceof ImportConditionList)
+            || state.conditions.length === 0
+            || state.actions.length === 0
+        ) {
             throw new Error('Invalid state');
         }
 
@@ -186,34 +190,20 @@ export class ImportRuleItem extends Component {
         const conditionItems = state.conditions.map(
             (data) => ImportConditionItem.create({ data }),
         );
-        show(this.conditionsHeader, (conditionItems.length > 0));
         this.setListContainerData(this.conditionsContainer, conditionItems);
 
-        show(this.operatorLabel, (conditionItems.length > 0));
-        show(this.valueLabel, (conditionItems.length > 0));
+        const firstCondition = conditionItems[0];
+        const { isFieldValue } = firstCondition.state;
+        this.propertyLabel.textContent = firstCondition.propertyLabel.textContent;
+        this.operatorLabel.textContent = firstCondition.operatorLabel.textContent;
 
-        const actionsTitle = (state.actions.length > 0)
-            ? `${state.actions.length} action(s).`
-            : __('IMPORT_ACTIONS_NO_DATA');
+        this.valueLabel.classList.toggle('rule-item__value-property', !!isFieldValue);
+        this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
+        this.valueLabel.textContent = firstCondition.valueLabel.textContent;
 
-        if (conditionItems.length > 0) {
-            const firstCondition = conditionItems[0];
-
-            this.propertyLabel.textContent = firstCondition.propertyLabel.textContent;
-            this.operatorLabel.textContent = firstCondition.operatorLabel.textContent;
-
-            const { isFieldValue } = firstCondition.state;
-            this.valueLabel.classList.toggle('rule-item__value-property', !!isFieldValue);
-            this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
-
-            this.valueLabel.textContent = firstCondition.valueLabel.textContent;
-        } else {
-            this.propertyLabel.textContent = __('IMPORT_CONDITIONS_NO_DATA');
-        }
-
+        const actionsTitle = __('IMPORT_RULE_INFO_ACTIONS', state.actions.length);
         if (conditionItems.length > 1) {
-            const conditionsTitle = `${conditionItems.length - 1} more condition(s).`;
-
+            const conditionsTitle = __('IMPORT_RULE_INFO_CONDITIONS', conditionItems.length - 1);
             this.infoLabel.textContent = `${conditionsTitle} ${actionsTitle}`;
         } else {
             this.infoLabel.textContent = actionsTitle;

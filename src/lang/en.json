@@ -161,6 +161,8 @@
     "IMPORT_RULE_CREATE": "Create import rule",
     "IMPORT_RULE_UPDATE": "Update import rule",
     "IMPORT_RULE_DELETE": "Delete import rule",
+    "IMPORT_RULE_INFO_CONDITIONS": "${1} more condition(s).",
+    "IMPORT_RULE_INFO_ACTIONS": "${1} action(s).",
     "MSG_RULE_DELETE": "Are you sure to delete this import rule?",
     "ERR_RULE_LIST_READ": "Fail to read list of import rules",
     "ERR_RULE_NO_CONDITIONS": "Rule must contain at least one condition",

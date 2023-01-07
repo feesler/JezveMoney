@@ -194,19 +194,36 @@ export const formatValueShort = (value) => {
     return `${fmtValue}${size}`;
 };
 
+/** Formats token string with specified arguments */
+export const formatTokenString = (value, ...args) => (
+    value.replace(/\$\{(\d+)\}/g, (_, num) => {
+        const argNum = parseInt(num, 10);
+        if (!argNum) {
+            throw new Error(`Invalid argument: ${num}`);
+        }
+        if (args.length < argNum) {
+            throw new Error(`Argument ${num} not defined`);
+        }
+
+        return args[argNum - 1];
+    })
+);
+
 /* eslint-disable no-underscore-dangle */
 /** Returns locale string for specified token */
-export const __ = (token) => {
-    if (!isObject(window.localeTokens)) {
+export const __ = (token, ...args) => {
+    const { localeTokens } = window;
+
+    if (!isObject(localeTokens)) {
         throw new Error('Locale not loaded');
     }
     if (typeof token !== 'string') {
         throw new Error('Invalid token');
     }
-    if (typeof window.localeTokens[token] !== 'string') {
+    if (typeof localeTokens[token] !== 'string') {
         throw new Error(`Token ${token} not found`);
     }
 
-    return window.localeTokens[token];
+    return formatTokenString(localeTokens[token], args);
 };
 /* eslint-enable no-underscore-dangle */

@@ -161,6 +161,8 @@
     "IMPORT_RULE_CREATE": "Новое правило импорта",
     "IMPORT_RULE_UPDATE": "Изменить правило импорта",
     "IMPORT_RULE_DELETE": "Удалить правило импорта",
+    "IMPORT_RULE_INFO_CONDITIONS": "других условий: ${1}.",
+    "IMPORT_RULE_INFO_ACTIONS": "Действий: ${1}.",
     "MSG_RULE_DELETE": "Вы действительно хотите удалить выбранное правило?",
     "ERR_RULE_LIST_READ": "Не удалось загрузить список правил",
     "ERR_RULE_NO_CONDITIONS": "Правило должно содержать хотя бы одно условие",
