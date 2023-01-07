@@ -39,13 +39,13 @@
 .filters-list {
   display: flex;
   flex-flow: column nowrap;
-  row-gap: 12px;
   column-gap: 24px;
 }
 
 /* Filter item */
 .filter-item {
   flex: 1 1 auto;
+  margin: 8px 0 12px 0;
 }
 
 .filter-item__title {
@@ -56,6 +56,13 @@
   white-space: nowrap;
 }
 
+/* Horizontal filters separator */
+.filters-separator {
+  width: 100%;
+  border: 0 none;
+  border-top: 1px solid var(--list-separator-color);
+}
+
 /* Horizontal group of filters, on screen smaller 576px become vertical */
 .filters-row {
   display: flex;
@@ -63,7 +70,6 @@
   align-items: normal;
   flex-grow: 1;
   column-gap: 24px;
-  row-gap: 12px;
 }
 
 /* Horizontal group of filters */
@@ -102,6 +108,10 @@
 @media (min-width: 576px) {
   .filters-row {
     flex-flow: row nowrap;
+  }
+
+  .filters-separator {
+    display: none;
   }
 }
 

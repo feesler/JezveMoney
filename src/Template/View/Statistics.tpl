@@ -46,10 +46,14 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         ]) ?>
                                     </section>
 
+                                    <hr class="filters-separator">
+
                                     <section class="filter-item report-type-filter">
                                         <header class="filter-item__title"><?= __("STAT_FILTER_REPORT") ?></header>
                                         <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
                                     </section>
+
+                                    <hr class="filters-separator">
 
                                     <section class="filter-item group-type-filter">
                                         <header class="filter-item__title"><?= __("STAT_GROUP_BY") ?></header>
@@ -64,6 +68,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </select>
                                     </section>
                                 </div>
+
+                                <hr class="filters-separator">
 
                                 <div class="filters-row">
                                     <section id="accountsFilter" class="filter-item accounts-filter" <?= hidden($report !== "account") ?>>
@@ -80,6 +86,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         <header class="filter-item__title"><?= __("STAT_FILTER_CURRENCY") ?></header>
                                         <select id="curr_id"></select>
                                     </section>
+
+                                    <hr class="filters-separator">
 
                                     <section id="dateFilter" class="filter-item date-range-filter">
                                         <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>

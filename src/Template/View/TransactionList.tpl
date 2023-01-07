@@ -56,10 +56,14 @@ include(TPL_PATH . "Header.tpl"); ?>
                                         ]) ?>
                                     </section>
 
+                                    <hr class="filters-separator">
+
                                     <section id="accountsFilter" class="filter-item">
                                         <header class="filter-item__title"><?= __("FILTER_ACCOUNTS_PERSONS") ?></header>
                                         <select id="acc_id" name="acc_id" multiple></select>
                                     </section>
+
+                                    <hr class="filters-separator">
 
                                     <section id="categoriesFilter" class="filter-item">
                                         <header class="filter-item__title"><?= __("FILTER_CATEGORIES") ?></header>
@@ -67,11 +71,15 @@ include(TPL_PATH . "Header.tpl"); ?>
                                     </section>
                                 </div>
 
+                                <hr class="filters-separator">
+
                                 <div class="filters-row">
                                     <section id="dateFilter" class="filter-item date-range-filter validation-block">
                                         <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
                                         <?= DateRangeInput::render($dateRange) ?>
                                     </section>
+
+                                    <hr class="filters-separator">
 
                                     <section id="searchFilter" class="filter-item">
                                         <header class="filter-item__title"><?= __("FILTER_SEARCH") ?></header>

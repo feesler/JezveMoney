@@ -6,6 +6,9 @@
   --semitrans-bg-color: #20202066;
   --alt-bg-color: #2a2a2a;
 
+  /* List separator */
+  --list-separator-color: #2a2a2a;
+
   /* Header */
   --header-bg-color: #181818;
   --header-hover-btn-bg-color: #303030;
@@ -271,7 +274,7 @@
   .popup-menu,
   .popup-menu-list {
     --popupmenu-border-color: #444444;
-    --popupmenu-separator-color: #2a2a2a;
+    --popupmenu-separator-color: var(--list-separator-color);
     --popupmenu-background: var(--popup-menu-bg);
     --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
