@@ -56,7 +56,7 @@
         </div>
 
         <div class="popup__controls">
-            <input class="btn submit-btn" type="submit" value="Submit">
+            <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>
     </form>
 </div>
