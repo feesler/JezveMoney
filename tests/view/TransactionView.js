@@ -8,6 +8,7 @@ import {
     asyncMap,
     isObject,
     copyObject,
+    formatDate,
 } from 'jezve-test';
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -2215,11 +2216,22 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async changeDate(val) {
+    async inputDate(val) {
         this.model.date = val.toString();
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.datePicker.input(val));
+
+        return this.checkState();
+    }
+
+    async selectDate(val) {
+        assert.isDate(val, 'Invalid date');
+
+        this.model.date = formatDate(val);
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.datePicker.selectDate(val));
 
         return this.checkState();
     }

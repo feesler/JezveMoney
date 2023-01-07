@@ -6,6 +6,7 @@ import {
     goTo,
     copyObject,
     asArray,
+    formatDate,
 } from 'jezve-test';
 import { TransactionListView } from '../view/TransactionListView.js';
 import { TransactionView } from '../view/TransactionView.js';
@@ -140,12 +141,16 @@ export const runAction = async ({ action, data }) => {
         testDescr = 'Click on exchange rate';
     }
 
-    if (action === 'changeDate') {
-        testDescr = `Date (${data}) input`;
+    if (action === 'inputDate') {
+        testDescr = `Input date '${data}'`;
+    }
+
+    if (action === 'selectDate') {
+        testDescr = `Select date '${formatDate(data)}'`;
     }
 
     if (action === 'inputComment') {
-        testDescr = `Comment (${data}) input`;
+        testDescr = `Input comment '${data}'`;
     }
 
     if (action === 'changeTransactionType') {
