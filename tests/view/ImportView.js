@@ -1118,7 +1118,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: App.dates.now,
+            date: App.datesFmt.now,
             comment: '',
         });
         this.formIndex = this.items.length;

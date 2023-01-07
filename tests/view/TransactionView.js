@@ -21,6 +21,7 @@ import {
     trimToDigitsLimit,
     EXCHANGE_DIGITS,
     CENTS_DIGITS,
+    dateStringToSeconds,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
@@ -473,7 +474,7 @@ export class TransactionView extends AppView {
         res.dest_amount = this.model.fDestAmount;
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
-        res.date = this.model.date;
+        res.date = dateStringToSeconds(this.model.date);
         res.category_id = this.model.categoryId;
         res.comment = this.model.comment;
 

@@ -9,7 +9,6 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
 /**
@@ -76,7 +75,7 @@ class Transactions extends TemplateController
         }
         $data["showDetails"] = $showDetails;
 
-        $transArr = $this->model->getData($trParams);
+        $transactions = $this->model->getData($trParams);
 
         $transCount = $this->model->getTransCount($trParams);
         $pagination["total"] = $transCount;
@@ -127,12 +126,6 @@ class Transactions extends TemplateController
             $pagination["page"] = $page_num + 1;
         }
 
-        // Prepare data of transaction list items
-        $trItems = [];
-        foreach ($transArr as $trans) {
-            $trItems[] = new TransactionItem($trans);
-        }
-
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -140,7 +133,7 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "categories" => $this->catModel->getData(),
             "view" => [
-                "transArr" => $trItems,
+                "transArr" => $transactions,
                 "filter" => (object)$filterObj,
                 "pagination" => $pagination,
                 "mode" => $showDetails ? "details" : "classic",
@@ -398,11 +391,14 @@ class Transactions extends TemplateController
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
+        $targetDate = getdate();
+        $targetTime = mktime(0, 0, 0, $targetDate["mon"], $targetDate["mday"], $targetDate["year"]);
+
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
-            "date" => strtotime(date("d.m.Y")),
+            "date" => $targetTime,
             "category_id" => 0,
             "comment" => ""
         ];

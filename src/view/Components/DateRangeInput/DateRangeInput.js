@@ -8,7 +8,7 @@ import {
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { fixDate } from '../../js/utils.js';
+import { dateStringToTime, fixDate, timeToDate } from '../../js/utils.js';
 
 const defaultValidation = {
     stdate: true,
@@ -43,7 +43,9 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const { stdate, enddate } = data;
+        const stdate = (data.stdate) ? window.app.formatDate(timeToDate(data.stdate)) : null;
+        const enddate = (data.enddate) ? window.app.formatDate(timeToDate(data.enddate)) : null;
+
         this.setState({
             form: { stdate, enddate },
             filter: { stdate, enddate },
@@ -92,9 +94,14 @@ export class DateRangeInput extends Component {
     }
 
     notifyChanged(data) {
-        if (isFunction(this.props.onChange)) {
-            this.props.onChange(data);
+        if (!isFunction(this.props.onChange)) {
+            return;
         }
+
+        this.props.onChange({
+            stdate: dateStringToTime(data.stdate),
+            enddate: dateStringToTime(data.enddate),
+        });
     }
 
     /**

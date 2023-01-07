@@ -57,11 +57,7 @@ class Main extends TemplateController
         $data["totalsArr"] = $totalsArr;
 
         // Prepare data of transaction list items
-        $latestArr = $transMod->getData(["desc" => true, "onPage" => 5]);
-        $transactions = [];
-        foreach ($latestArr as $trans) {
-            $transactions[] = new TransactionItem($trans);
-        }
+        $transactions = $transMod->getData(["desc" => true, "onPage" => 5]);
         $data["transactions"] = $transactions;
 
         $persArr = $this->personMod->getData();

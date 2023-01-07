@@ -1,7 +1,10 @@
 import { assert } from 'jezve-test';
 import { App } from '../Application.js';
 import {
-    fixFloat, normalize,
+    convDate,
+    dateStringToSeconds,
+    fixFloat,
+    normalize,
 } from '../common.js';
 import { __ } from './locale.js';
 import {
@@ -464,10 +467,16 @@ export class ImportTransaction {
             type: ImportTransaction.typeFromString(this.type),
             src_curr: this.src_curr,
             dest_curr: this.dest_curr,
-            date: this.date,
             category_id: this.category_id,
             comment: this.comment,
         };
+
+        if (typeof this.date === 'number') {
+            res.date = this.date;
+        } else {
+            const isValidDate = convDate(this.date) !== null;
+            res.date = (isValidDate) ? dateStringToSeconds(this.date) : null;
+        }
 
         if (res.type !== DEBT) {
             res.src_id = this.src_id;

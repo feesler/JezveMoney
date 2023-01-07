@@ -17,7 +17,12 @@ import {
     DEBT,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
-import { normalize, fixFloat } from '../../../common.js';
+import {
+    normalize,
+    fixFloat,
+    dateStringToSeconds,
+    secondsToDateString,
+} from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 import { __ } from '../../../model/locale.js';
@@ -330,7 +335,7 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_amount = res.src_amount;
         }
 
-        res.date = model.date;
+        res.date = dateStringToSeconds(model.date);
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -513,7 +518,9 @@ export class ImportTransactionItem extends TestComponent {
                 visible: isDebt,
             },
             dateField: {
-                value: item.date,
+                value: (
+                    (typeof item.date === 'string') ? item.date : secondsToDateString(item.date)
+                ),
                 visible: true,
             },
             commentField: {

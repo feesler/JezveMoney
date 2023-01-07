@@ -113,10 +113,10 @@ export class TransactionListStory extends TestStory {
             },
         }, {
             action: TransactionListTests.filterByDate,
-            data: { start: App.dates.weekAgo, end: App.dates.now, directNavigate },
+            data: { start: App.datesFmt.weekAgo, end: App.datesFmt.now, directNavigate },
         }, {
             action: TransactionListTests.filterByDate,
-            data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+            data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
         }]);
 
         const searchData = [
@@ -133,7 +133,7 @@ export class TransactionListStory extends TestStory {
             { action: TransactionListTests.search, data: { text: '1', directNavigate } },
             {
                 action: TransactionListTests.filterByDate,
-                data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+                data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
             },
             { action: TransactionListTests.clearAllFilters, directNavigate },
         ]);

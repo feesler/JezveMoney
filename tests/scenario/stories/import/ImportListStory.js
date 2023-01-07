@@ -260,7 +260,7 @@ export class ImportListStory extends TestStory {
 
         // Correct date
         await ImportTests.runFormActions(
-            { action: 'inputDate', data: App.dates.now },
+            { action: 'inputDate', data: App.datesFmt.now },
         );
         await ImportTests.saveItem();
         await ImportTests.submit();

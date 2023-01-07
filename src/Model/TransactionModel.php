@@ -5,6 +5,7 @@ namespace JezveMoney\App\Model;
 use DateTime;
 use DateInterval;
 use DateTimeZone;
+use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
@@ -90,34 +91,11 @@ class TransactionModel extends CachedTable
      *
      * @param array $row
      *
-     * @return object|null
+     * @return TransactionItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->src_id = intval($row["src_id"]);
-        $res->dest_id = intval($row["dest_id"]);
-        $res->type = intval($row["type"]);
-        $res->src_amount = floatval($row["src_amount"]);
-        $res->dest_amount = floatval($row["dest_amount"]);
-        $res->src_result = floatval($row["src_result"]);
-        $res->dest_result = floatval($row["dest_result"]);
-        $res->src_curr = intval($row["src_curr"]);
-        $res->dest_curr = intval($row["dest_curr"]);
-        $res->date = strtotime($row["date"]);
-        $res->category_id = intval($row["category_id"]);
-        $res->comment = $row["comment"];
-        $res->pos = intval($row["pos"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return TransactionItem::fromTableRow($row);
     }
 
     /**
@@ -282,7 +260,7 @@ class TransactionModel extends CachedTable
         }
 
         if (isset($params["date"])) {
-            $res["date"] = is_string($params["date"]) ? strtotime($params["date"]) : intval($params["date"]);
+            $res["date"] = intval($params["date"]);
             if (!$res["date"]) {
                 throw new \Error("Invalid date specified");
             }
@@ -1602,8 +1580,8 @@ class TransactionModel extends CachedTable
         }
 
         // Date range filter
-        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
-        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        $stDate = (isset($_GET["stdate"]) ? intval($_GET["stdate"]) : null);
+        $endDate = (isset($_GET["enddate"]) ? intval($_GET["enddate"]) : null);
         if (!is_null($stDate) && !is_null($endDate)) {
             $res["startDate"] = $stDate;
             $res["endDate"] = $endDate;
@@ -1763,15 +1741,11 @@ class TransactionModel extends CachedTable
             isset($params["startDate"]) && !is_null($params["startDate"]) &&
             isset($params["endDate"]) && !is_null($params["endDate"])
         ) {
-            $stdate = strtotime($params["startDate"]);
-            $enddate = strtotime($params["endDate"]);
-            if ($stdate != -1 && $enddate != -1) {
-                $fstdate = date("Y-m-d H:i:s", $stdate);
-                $fenddate = date("Y-m-d H:i:s", $enddate);
+            $startDate = date("Y-m-d H:i:s", $params["startDate"]);
+            $endDate = date("Y-m-d H:i:s", $params["endDate"]);
 
-                $res[] = "date >= " . qnull($fstdate);
-                $res[] = "date <= " . qnull($fenddate);
-            }
+            $res[] = "date >= " . qnull($startDate);
+            $res[] = "date <= " . qnull($endDate);
         }
 
         return $res;
@@ -1793,7 +1767,7 @@ class TransactionModel extends CachedTable
      *     - 'page' => (int) - page to return. zero based
      *     - 'range' => (int) - count of pages to return. Default is 1
      *
-     * @return array
+     * @return TransactionItem[]
      */
     public function getData(array $params = [])
     {

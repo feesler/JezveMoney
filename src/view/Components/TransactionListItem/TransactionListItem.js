@@ -6,7 +6,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { PopupMenuButton } from 'jezvejs/PopupMenu';
-import { __ } from '../../js/utils.js';
+import { timeToDate, __ } from '../../js/utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -378,6 +378,10 @@ export class TransactionListItem extends Component {
         show(this.controlsElem, state.showControls);
     }
 
+    renderDate(date) {
+        return window.app.formatDate(timeToDate(date));
+    }
+
     renderClassic(state) {
         const { item } = state;
 
@@ -387,7 +391,7 @@ export class TransactionListItem extends Component {
 
         this.amountElem.textContent = this.formatAmount(item);
 
-        this.dateElem.textContent = item.date;
+        this.dateElem.textContent = this.renderDate(item.date);
 
         const categoryTitle = this.getCategoryTitle(state);
         show(this.categoryElem, !!categoryTitle);
@@ -451,7 +455,7 @@ export class TransactionListItem extends Component {
         this.destResultField.show(showDest);
 
         // Date
-        this.dateField.setContent(item.date);
+        this.dateField.setContent(this.renderDate(item.date));
 
         // Category field
         const categoryTitle = this.getCategoryTitle(state);

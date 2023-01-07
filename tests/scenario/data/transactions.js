@@ -1,5 +1,5 @@
-import { formatDate } from 'jezve-test';
 import { App } from '../../Application.js';
+import { dateToSeconds } from '../../common.js';
 import { api } from '../../model/api.js';
 import {
     EXPENSE,
@@ -174,7 +174,7 @@ export const createTransactions = async () => {
     let lastExpense = null;
     for (const transaction of data) {
         const extracted = Transaction.extract(transaction, App.state);
-        for (const date of App.dateList) {
+        for (const date of App.dateSecList) {
             multi.push({
                 ...extracted,
                 date,
@@ -187,12 +187,10 @@ export const createTransactions = async () => {
 
     // Add transaction year after latest for statistics tests
     const now = new Date();
-    const yearAfter = formatDate(
-        new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
-    );
+    const yearAfter = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
     multi.push({
         ...lastExpense,
-        date: yearAfter,
+        date: dateToSeconds(yearAfter),
     });
 
     await api.transaction.createMultiple(multi);

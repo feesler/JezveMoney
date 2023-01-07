@@ -5,10 +5,7 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import {
-    checkDate,
-    isValidValue,
-} from '../common.js';
+import { isValidValue } from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -185,21 +182,17 @@ export class AppState {
         return res;
     }
 
+    compareLists(local, expected) {
+        assert(local.length === expected.length);
+        assert.deepMeet(local.data, expected.data);
+    }
+
     meetExpectation(expected) {
-        assert(this.accounts.length === expected.accounts.length);
-        assert.deepMeet(this.accounts.data, expected.accounts.data);
-
-        assert(this.transactions.length === expected.transactions.length);
-        assert.deepMeet(this.transactions.data, expected.transactions.data);
-
-        assert(this.persons.length === expected.persons.length);
-        assert.deepMeet(this.persons.data, expected.persons.data);
-
-        assert(this.categories.length === expected.categories.length);
-        assert.deepMeet(this.categories.data, expected.categories.data);
-
-        assert(this.templates.length === expected.templates.length);
-        assert.deepMeet(this.templates.data, expected.templates.data);
+        this.compareLists(this.accounts, expected.accounts);
+        this.compareLists(this.transactions, expected.transactions);
+        this.compareLists(this.persons, expected.persons);
+        this.compareLists(this.categories, expected.categories);
+        this.compareLists(this.templates, expected.templates);
 
         assert(this.rules.length === expected.rules.length);
         this.rules.forEach((rule, index) => {
@@ -853,7 +846,7 @@ export class AppState {
             }
         }
 
-        if ('date' in params && !checkDate(params.date)) {
+        if ('date' in params && !isInt(params.date)) {
             return false;
         }
 
@@ -899,7 +892,7 @@ export class AppState {
     getExpectedTransaction(params) {
         const res = copyObject(params);
         if (!res.date) {
-            res.date = App.dates.now;
+            res.date = App.datesSec.now;
         }
         if (typeof res.category_id !== 'number') {
             res.category_id = 0;

@@ -36,7 +36,7 @@ setupLogs();
 $dbConfig = (require_once(APP_ROOT . "system/dbsetup.php"));
 MySqlDB::setup($dbConfig);
 
-date_default_timezone_set("Europe/Moscow");
+date_default_timezone_set("UTC");
 
 Locale::loadUserLocale();
 

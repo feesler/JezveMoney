@@ -108,13 +108,13 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'inputDestAmount', data: '0.01' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'changeSrcAccount', data: CARD_RUB },
             { action: 'inputDestAmount', data: '99.99' },
-            { action: 'changeDate', data: App.dates.monthAgo },
+            { action: 'changeDate', data: App.datesFmt.monthAgo },
         ]);
 
         // Check create transaction with hidden account
@@ -165,7 +165,7 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '10023.7801' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
             { action: 'inputComment', data: 'some income' },
         ]);
 
@@ -180,7 +180,7 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '0.01' },
-            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeDate', data: App.datesFmt.weekAgo },
             { action: 'changeCategory', data: INVEST_CATEGORY },
         ]);
 
@@ -188,7 +188,7 @@ export class TransactionsStory extends TestStory {
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeDestAccount', data: CARD_RUB },
             { action: 'inputSrcAmount', data: '99.99' },
-            { action: 'changeDate', data: App.dates.monthAgo },
+            { action: 'changeDate', data: App.datesFmt.monthAgo },
         ]);
 
         // Check create transaction with hidden account
@@ -339,7 +339,7 @@ export class TransactionsStory extends TestStory {
             { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '100' },
-            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeDate', data: App.datesFmt.weekAgo },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
@@ -352,14 +352,14 @@ export class TransactionsStory extends TestStory {
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '10' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'toggleAccount' },
             { action: 'inputDestAmount', data: '105' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
         ]);
 
         await TransactionTests.createFromPersonAndSubmit(1, [
@@ -367,7 +367,7 @@ export class TransactionsStory extends TestStory {
             { action: 'swapSourceAndDest' },
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '105' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
         ]);
 
         await TransactionTests.createFromPersonAndSubmit(0, [
@@ -449,13 +449,13 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.updateAndSubmit(EXPENSE, 2, [
             { action: 'inputDestAmount', data: '0.02' },
-            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeDate', data: App.datesFmt.weekAgo },
         ]);
 
         await TransactionTests.updateAndSubmit(EXPENSE, 3, [
             { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '99.9' },
-            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'changeDate', data: App.datesFmt.yesterday },
         ]);
 
         // Check update transaction with hidden account
@@ -477,7 +477,7 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.updateAndSubmit(INCOME, 1, [
             { action: 'inputSrcAmount', data: '100.001' },
-            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeDate', data: App.datesFmt.weekAgo },
             { action: 'changeCategory', data: TAXES_CATEGORY },
         ]);
 
@@ -566,7 +566,7 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.updateAndSubmit(DEBT, 3, [
             { action: 'changeAccount', data: ACC_RUB },
             { action: 'inputSrcAmount', data: '105' },
-            { action: 'changeDate', data: App.dates.now },
+            { action: 'changeDate', data: App.datesFmt.now },
         ]);
 
         await TransactionTests.updateAndSubmit(DEBT, 4, [
@@ -580,7 +580,7 @@ export class TransactionsStory extends TestStory {
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: USD },
             { action: 'inputDestAmount', data: '200.0202' },
-            { action: 'changeDate', data: App.dates.monthAgo },
+            { action: 'changeDate', data: App.datesFmt.monthAgo },
         ]);
 
         await TransactionTests.updateAndSubmit(DEBT, 6, [
@@ -590,7 +590,7 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.updateAndSubmit(DEBT, 2, [
             { action: 'inputSrcAmount', data: '1001' },
-            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeDate', data: App.datesFmt.weekAgo },
         ]);
 
         // Check update transaction with hidden person
@@ -730,7 +730,7 @@ export class TransactionsStory extends TestStory {
             dest_amount: 111,
             src_curr: RUB,
             dest_curr: RUB,
-            date: '22.05.2022',
+            date: App.datesSec.now,
             category_id: 0,
             comment: '',
         });

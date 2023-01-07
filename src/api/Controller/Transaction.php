@@ -51,18 +51,6 @@ class Transaction extends ApiListController
     }
 
     /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new TransactionItem($item);
-    }
-
-    /**
      * Returns list request prepared for controller-specific model
      *
      * @param array $request

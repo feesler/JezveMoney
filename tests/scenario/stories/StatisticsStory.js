@@ -80,12 +80,12 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.filterByCategories(0);
 
         await StatisticsTests.selectDateRange({
-            start: App.dates.yearAgo,
-            end: App.dates.monthAgo,
+            start: App.datesFmt.yearAgo,
+            end: App.datesFmt.monthAgo,
         });
         await StatisticsTests.selectDateRange({
-            start: App.dates.weekAgo,
-            end: App.dates.now,
+            start: App.datesFmt.weekAgo,
+            end: App.datesFmt.now,
         });
         await StatisticsTests.clearDateRange();
 

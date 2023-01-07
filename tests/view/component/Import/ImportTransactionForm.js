@@ -19,7 +19,13 @@ import {
     DEBT,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
-import { normalize, fixFloat } from '../../../common.js';
+import {
+    normalize,
+    fixFloat,
+    dateStringToSeconds,
+    secondsToDateString,
+    convDate,
+} from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 
@@ -402,7 +408,8 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_amount = res.src_amount;
         }
 
-        res.date = model.date;
+        const isValidDate = convDate(model.date) !== null;
+        res.date = (isValidDate) ? dateStringToSeconds(model.date) : null;
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -859,7 +866,9 @@ export class ImportTransactionForm extends TestComponent {
                 disabled: !isDebt,
             },
             dateField: {
-                value: item.date,
+                value: (
+                    (typeof item.date === 'string') ? item.date : secondsToDateString(item.date)
+                ),
                 disabled: false,
             },
             commentField: {

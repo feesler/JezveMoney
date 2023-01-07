@@ -2,12 +2,11 @@ import {
     test,
     assert,
     copyObject,
-    formatDate,
 } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { Transaction } from '../../model/Transaction.js';
-import { fixDate, formatProps } from '../../common.js';
+import { formatProps } from '../../common.js';
 import { App } from '../../Application.js';
 
 /**
@@ -63,10 +62,12 @@ export const createMultiple = async (params) => {
         let expectedResult = false;
         if (Array.isArray(params)) {
             expectedResult = [];
+            const origState = App.state.clone();
+
             for (const item of params) {
                 const resExpected = App.state.createTransaction(item);
                 if (!resExpected) {
-                    App.state.deleteTransactions(expectedResult);
+                    App.state.setState(origState);
                     expectedResult = false;
                     break;
                 }
@@ -136,7 +137,7 @@ export const update = async (params) => {
         const resExpected = App.state.updateTransaction(params);
 
         // Obtain data for API request
-        let updParams = { date: App.dates.now, comment: '' };
+        let updParams = { date: App.datesSec.now, comment: '' };
         const expTrans = App.state.transactions.getItem(params.id);
 
         if (expTrans) {
@@ -281,8 +282,8 @@ export const filter = async (params) => {
             reqParams.category_id = params.categories;
         }
         if ('startDate' in params && 'endDate' in params) {
-            reqParams.stdate = formatDate(new Date(fixDate(params.startDate)));
-            reqParams.enddate = formatDate(new Date(fixDate(params.endDate)));
+            reqParams.stdate = params.startDate;
+            reqParams.enddate = params.endDate;
         }
         if ('search' in params) {
             reqParams.search = params.search;

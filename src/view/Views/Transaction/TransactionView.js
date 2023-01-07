@@ -822,7 +822,7 @@ class TransactionView extends View {
             dest_amount: transaction.dest_amount,
             src_curr: transaction.src_curr,
             dest_curr: transaction.dest_curr,
-            date: window.app.formatDate(timeToDate(state.transaction.date)),
+            date: state.transaction.date,
             category_id: transaction.category_id,
             comment: transaction.comment,
         };

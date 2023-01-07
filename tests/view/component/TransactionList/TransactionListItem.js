@@ -12,6 +12,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    Transaction,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 
@@ -171,7 +172,7 @@ export class TransactionListItem extends TestComponent {
             }
         }
 
-        res.dateFmt = transaction.date;
+        res.dateFmt = Transaction.formatDate(transaction.date);
         res.comment = transaction.comment;
 
         return res;

@@ -1,4 +1,4 @@
-import { setBlock, formatDate } from 'jezve-test';
+import { setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -7,6 +7,7 @@ import {
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 import * as TransactionApiTests from '../../../run/api/transaction.js';
+import { dateToSeconds } from '../../../common.js';
 
 const create = async () => {
     setBlock('Create transactions', 2);
@@ -40,7 +41,7 @@ const create = async () => {
         type: EXPENSE,
         src_id: ACC_USD,
         src_amount: 1,
-        date: App.dates.yesterday,
+        date: App.datesSec.yesterday,
         category_id: FOOD_CATEGORY,
     }, {
         type: INCOME,
@@ -327,7 +328,7 @@ const createMultiple = async () => {
         src_amount: 7608,
         dest_amount: 100,
         dest_curr: EUR,
-        date: App.dates.yesterday,
+        date: App.datesSec.yesterday,
         comment: 'multiple expense',
         category_id: FOOD_CATEGORY,
     }, {
@@ -356,8 +357,8 @@ const createMultiple = async () => {
 
     // Add transaction year after latest for statistics tests
     const now = new Date();
-    const yearAfter = formatDate(
-        new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
+    const yearAfter = dateToSeconds(
+        new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()),
     );
     const [expenseItem] = data;
     data.push({
@@ -420,7 +421,7 @@ const update = async () => {
         id: App.scenario.TR_EXPENSE_3,
         dest_amount: 0.89,
         dest_curr: EUR,
-        date: App.dates.weekAgo,
+        date: App.datesSec.weekAgo,
     }, {
         id: App.scenario.TR_INCOME_1,
         dest_id: CASH_RUB,
@@ -438,7 +439,7 @@ const update = async () => {
         dest_id: CASH_RUB,
         dest_curr: RUB,
         dest_amount: 6500,
-        date: App.dates.yesterday,
+        date: App.datesSec.yesterday,
     }, {
         id: App.scenario.TR_DEBT_1,
         op: 2,
@@ -661,11 +662,11 @@ const filter = async () => {
         onPage: 10,
         page: 2,
     }, {
-        startDate: App.dates.now,
-        endDate: App.dates.weekAfter,
+        startDate: App.datesSec.now,
+        endDate: App.datesSec.weekAfter,
     }, {
-        startDate: App.dates.now,
-        endDate: App.dates.weekAfter,
+        startDate: App.datesSec.now,
+        endDate: App.datesSec.weekAfter,
         search: '1',
     }, {
         search: 'la',
@@ -697,8 +698,8 @@ const statistics = async () => {
             report: 'currency',
             curr_id: RUB,
             group: 'week',
-            stdate: App.dates.monthAgo,
-            enddate: App.dates.now,
+            stdate: App.datesSec.monthAgo,
+            enddate: App.datesSec.now,
         },
         {
             report: 'account',

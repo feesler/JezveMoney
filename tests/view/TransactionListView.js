@@ -25,7 +25,13 @@ import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
-import { fixDate, isEmpty, urlJoin } from '../common.js';
+import {
+    dateToSeconds,
+    fixDate,
+    isEmpty,
+    secondsToDateString,
+    urlJoin,
+} from '../common.js';
 import { Counter } from './component/Counter.js';
 import { __ } from '../model/locale.js';
 
@@ -206,8 +212,11 @@ export class TransactionListView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            res.filter.startDate = dateRange.startDate;
-            res.filter.endDate = dateRange.endDate;
+            const startDate = new Date(fixDate(dateRange.startDate));
+            const endDate = new Date(fixDate(dateRange.endDate));
+
+            res.filter.startDate = dateToSeconds(startDate);
+            res.filter.endDate = dateToSeconds(endDate);
         }
 
         res.filtered = res.data.applyFilter(res.filter);
@@ -424,8 +433,12 @@ export class TransactionListView extends AppView {
             dateFilter: {
                 visible: filtersVisible,
                 value: {
-                    startDate: model.filter.startDate,
-                    endDate: model.filter.endDate,
+                    startDate: (model.filter.startDate)
+                        ? secondsToDateString(model.filter.startDate)
+                        : null,
+                    endDate: (model.filter.endDate)
+                        ? secondsToDateString(model.filter.endDate)
+                        : null,
                 },
             },
             searchForm: {
@@ -766,12 +779,12 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        this.model.filter.startDate = start;
-        this.model.filter.endDate = end;
-        const expected = this.onFilterUpdate();
-
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
+
+        this.model.filter.startDate = dateToSeconds(startDate);
+        this.model.filter.endDate = dateToSeconds(endDate);
+        const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());

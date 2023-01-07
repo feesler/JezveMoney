@@ -205,7 +205,7 @@ export const exportTest = async (accounts) => {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            transaction.date,
+            Transaction.formatDate(transaction.date),
             transaction.comment,
         ]);
 

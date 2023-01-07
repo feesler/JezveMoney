@@ -9,7 +9,6 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Item\PersonItem;
-use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
 /**
@@ -46,11 +45,7 @@ class State extends ApiController
         $res->accounts->autoincrement = $accModel->autoIncrement();
         // Transactions
         $res->transactions = new \stdClass();
-        $res->transactions->data = [];
-        $items = $trModel->getData(["onPage" => 0]);
-        foreach ($items as $item) {
-            $res->transactions->data[] = new TransactionItem($item);
-        }
+        $res->transactions->data = $trModel->getData(["onPage" => 0]);
         $res->transactions->autoincrement = $trModel->autoIncrement();
         // Persons
         $res->persons = new \stdClass();

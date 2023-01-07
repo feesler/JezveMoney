@@ -1,5 +1,5 @@
 import { copyObject, checkDate } from 'jezvejs';
-import { fixFloat, __ } from '../utils.js';
+import { dateStringToTime, fixFloat, __ } from '../utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -749,7 +749,7 @@ export class ImportTransaction {
             res.dest_amount = srcAmountVal;
         }
 
-        res.date = this.date;
+        res.date = dateStringToTime(this.date);
         res.category_id = this.categoryId;
         res.comment = this.comment;
 
