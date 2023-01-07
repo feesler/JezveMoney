@@ -81,7 +81,7 @@ class Transactions extends TemplateController
         $pagination["total"] = $transCount;
 
         // Prepare transaction types menu
-        $trTypes = [0 => "Show all"];
+        $trTypes = [0 => __("SHOW_ALL")];
         $availTypes = TransactionModel::getTypeNames();
         array_push($trTypes, ...$availTypes);
 
