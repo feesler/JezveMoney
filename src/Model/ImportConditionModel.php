@@ -75,26 +75,11 @@ class ImportConditionModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return ImportConditionItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->rule_id = intval($row["rule_id"]);
-        $res->field_id = intval($row["field_id"]);
-        $res->operator = intval($row["operator"]);
-        $res->flags = intval($row["flags"]);
-        $res->value = $row["value"];
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return ImportConditionItem::fromTableRow($row);
     }
 
     /**
@@ -305,9 +290,7 @@ class ImportConditionModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new ImportConditionItem($item, $requestAll);
-
-            $res[] = $itemObj;
+            $res[] = $item;
         }
 
         return $res;

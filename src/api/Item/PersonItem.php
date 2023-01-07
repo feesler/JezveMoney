@@ -7,26 +7,49 @@ use JezveMoney\App\Model\AccountModel;
 class PersonItem
 {
     public $id = 0;
+    public $user_id = 0;
     public $name = null;
     public $flags = 0;
     public $accounts = null;
+    public $createdate = 0;
+    public $updatedate = 0;
 
-
-    public function __construct($obj)
+    /**
+     * Converts table row from database to PersonItem object
+     *
+     * @param array $row
+     *
+     * @return PersonItem|null
+     */
+    public static function fromTableRow(array $row)
     {
-        if (is_null($obj)) {
-            throw new \Error("Invalid object");
+        if (is_null($row)) {
+            return null;
         }
 
-        $this->id = $obj->id;
-        $this->name = $obj->name;
-        $this->flags = $obj->flags;
+        $res = new static();
+        $res->id = intval($row["id"]);
+        $res->name = $row["name"];
+        $res->user_id = intval($row["user_id"]);
+        $res->flags = intval($row["flags"]);
+        $res->createdate = strtotime($row["createdate"]);
+        $res->updatedate = strtotime($row["updatedate"]);
 
-        if (isset($obj->accounts) && is_array($obj->accounts)) {
-            $accData = $obj->accounts;
+        return $res;
+    }
+
+    /**
+     * Sets accounts property of item
+     *
+     * @param array|null $accounts
+     */
+    public function setAccounts(mixed $accounts)
+    {
+        if (isset($accounts) && is_array($accounts)) {
+            $accData = $accounts;
         } else {
             $accModel = AccountModel::getInstance();
-            $accData = $accModel->getData([ "owner" => $this->id ]);
+            $accData = $accModel->getData(["owner" => $this->id]);
         }
 
         $this->accounts = [];

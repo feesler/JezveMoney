@@ -38,24 +38,11 @@ class CategoryModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return CategoryItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->parent_id = intval($row["parent_id"]);
-        $res->name = $row["name"];
-        $res->type = intval($row["type"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return CategoryItem::fromTableRow($row);
     }
 
     /**
@@ -280,7 +267,7 @@ class CategoryModel extends CachedTable
                 continue;
             }
 
-            $res[] = ($returnIds) ? $item->id : (new CategoryItem($item));
+            $res[] = ($returnIds) ? $item->id : $item;
         }
 
         return $res;

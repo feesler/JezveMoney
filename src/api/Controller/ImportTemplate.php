@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ImportTemplateModel;
-use JezveMoney\App\Item\ImportTemplateItem;
 
 /**
  * Import templates API controller
@@ -35,18 +34,6 @@ class ImportTemplate extends ApiListController
         $this->createErrorMsg = __("ERR_IMPTPL_CREATE");
         $this->updateErrorMsg = __("ERR_IMPTPL_UPDATE");
         $this->deleteErrorMsg = __("ERR_IMPTPL_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new ImportTemplateItem($item);
     }
 
     /**

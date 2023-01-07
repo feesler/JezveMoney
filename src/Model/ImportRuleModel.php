@@ -39,22 +39,11 @@ class ImportRuleModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return ImportRuleItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return ImportRuleItem::fromTableRow($row);
     }
 
     /**
@@ -190,7 +179,7 @@ class ImportRuleModel extends CachedTable
 
         $res = [];
         foreach ($itemsData as $item) {
-            $itemObj = new ImportRuleItem($item, $requestAll);
+            $itemObj = clone $item;
             if ($addExtended) {
                 $itemObj->conditions = $this->condModel->getRuleConditions($item->id);
                 $itemObj->actions = $this->actionModel->getRuleActions($item->id);

@@ -33,23 +33,11 @@ class CurrencyModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return CurrencyItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->name = $row["name"];
-        $res->sign = $row["sign"];
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return CurrencyItem::fromTableRow($row);
     }
 
     /**
@@ -249,8 +237,7 @@ class CurrencyModel extends CachedTable
         }
 
         foreach ($this->cache as $item) {
-            $currObj = new CurrencyItem($item);
-            $res[] = $currObj;
+            $res[] = $item;
         }
 
         return $res;

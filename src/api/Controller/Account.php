@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\AccountModel;
-use JezveMoney\App\Item\AccountItem;
 
 /**
  * Accounts API controller
@@ -24,18 +23,6 @@ class Account extends ApiListController
         $this->createErrorMsg = __("ERR_ACCOUNT_CREATE");
         $this->updateErrorMsg = __("ERR_ACCOUNT_UPDATE");
         $this->deleteErrorMsg = __("ERR_ACCOUNT_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new AccountItem($item);
     }
 
     /**

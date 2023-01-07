@@ -42,23 +42,11 @@ class PersonModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return PersonItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->name = $row["name"];
-        $res->user_id = intval($row["user_id"]);
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return PersonItem::fromTableRow($row);
     }
 
     /**
@@ -509,8 +497,8 @@ class PersonModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new PersonItem($item);
-            $itemObj->accounts = $accMod->getData(["owner" => $item->id]);
+            $itemObj = clone $item;
+            $itemObj->setAccounts($accMod->getData(["owner" => $item->id]));
 
             $res[] = $itemObj;
         }

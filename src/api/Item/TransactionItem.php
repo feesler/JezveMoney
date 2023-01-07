@@ -22,7 +22,6 @@ class TransactionItem
     public $createdate = 0;
     public $updatedate = 0;
 
-
     /**
      * Converts table row from database to TransactionItem object
      *

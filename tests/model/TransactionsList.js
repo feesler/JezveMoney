@@ -43,14 +43,6 @@ export class TransactionsList extends List {
         this.sort();
     }
 
-    /** Convert object to list item */
-    createItem(obj) {
-        const res = copyObject(obj);
-        delete res.createdate;
-        delete res.updatedate;
-        return res;
-    }
-
     getExpectedPos(params) {
         const pos = this.getLastestPos(params.date);
 

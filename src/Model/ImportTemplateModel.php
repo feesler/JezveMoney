@@ -41,33 +41,11 @@ class ImportTemplateModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return ImportTemplateItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->name = $row["name"];
-        $res->user_id = intval($row["user_id"]);
-        $res->type_id = intval($row["type_id"]);
-        $res->account_id = intval($row["account_id"]);
-        $res->first_row = intval($row["first_row"]);
-        $res->columns = [
-            "date" => intval($row["date_col"]),
-            "comment" => intval($row["comment_col"]),
-            "transactionCurrency" => intval($row["trans_curr_col"]),
-            "transactionAmount" => intval($row["trans_amount_col"]),
-            "accountCurrency" => intval($row["account_curr_col"]),
-            "accountAmount" => intval($row["account_amount_col"]),
-        ];
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return ImportTemplateItem::fromTableRow($row);
     }
 
     /**
@@ -277,7 +255,7 @@ class ImportTemplateModel extends CachedTable
                 continue;
             }
 
-            $res[] = ($returnIds) ? $item->id : (new ImportTemplateItem($item));
+            $res[] = ($returnIds) ? $item->id : $item;
         }
 
         return $res;

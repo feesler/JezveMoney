@@ -52,28 +52,11 @@ class AccountModel extends CachedTable
      *
      * @param array $row
      *
-     * @return object|null
+     * @return AccountItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->name = $row["name"];
-        $res->owner_id = intval($row["owner_id"]);
-        $res->curr_id = intval($row["curr_id"]);
-        $res->balance = floatval($row["balance"]);
-        $res->initbalance = floatval($row["initbalance"]);
-        $res->icon_id = intval($row["icon_id"]);
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return AccountItem::fromTableRow($row);
     }
 
     /**
@@ -647,9 +630,7 @@ class AccountModel extends CachedTable
                 continue;
             }
 
-            $accObj = new AccountItem($item);
-
-            $res[] = $accObj;
+            $res[] = $item;
         }
 
         if ($sortByVisibility) {

@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ImportConditionModel;
-use JezveMoney\App\Item\ImportConditionItem;
 
 /**
  * Import conditions API controller
@@ -31,18 +30,6 @@ class ImportCondition extends ApiListController
         $this->createErrorMsg = __("ERR_IMPORT_COND_CREATE");
         $this->updateErrorMsg = __("ERR_IMPORT_COND_UPDATE");
         $this->deleteErrorMsg = __("ERR_IMPORT_COND_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new ImportConditionItem($item);
     }
 
     /**

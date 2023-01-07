@@ -49,11 +49,7 @@ class State extends ApiController
         $res->transactions->autoincrement = $trModel->autoIncrement();
         // Persons
         $res->persons = new \stdClass();
-        $res->persons->data = [];
-        $items = $pModel->getData(["visibility" => "all"]);
-        foreach ($items as $item) {
-            $res->persons->data[] = new PersonItem($item);
-        }
+        $res->persons->data = $pModel->getData(["visibility" => "all"]);
         $res->persons->autoincrement = $pModel->autoIncrement();
         // Categories
         $res->categories = new \stdClass();

@@ -32,23 +32,11 @@ class IconModel extends CachedTable
      *
      * @param array $row array of table row fields
      *
-     * @return object|null
+     * @return IconItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->name = $row["name"];
-        $res->file = $row["file"];
-        $res->type = intval($row["type"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return IconItem::fromTableRow($row);
     }
 
     /**
@@ -235,9 +223,7 @@ class IconModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new IconItem($item);
-
-            $res[] = $itemObj;
+            $res[] = $item;
         }
 
         return $res;

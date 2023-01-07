@@ -6,7 +6,6 @@ use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\ImportActionModel;
-use JezveMoney\App\Item\ImportRuleItem;
 
 /**
  * Import rules API controller
@@ -35,18 +34,6 @@ class ImportRule extends ApiListController
         $this->createErrorMsg = __("ERR_IMPORT_RULE_CREATE");
         $this->updateErrorMsg = __("ERR_IMPORT_RULE_UPDATE");
         $this->deleteErrorMsg = __("ERR_IMPORT_RULE_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new ImportRuleItem($item);
     }
 
     /**

@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\CurrencyModel;
-use JezveMoney\App\Item\CurrencyItem;
 
 /**
  * Currencies API controller
@@ -25,18 +24,6 @@ class Currency extends ApiListController
         $this->createErrorMsg = __("ERR_CURRENCY_CREATE");
         $this->updateErrorMsg = __("ERR_CURRENCY_UPDATE");
         $this->deleteErrorMsg = __("ERR_CURRENCY_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new CurrencyItem($item);
     }
 
     /**

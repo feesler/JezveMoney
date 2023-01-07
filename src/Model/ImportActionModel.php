@@ -62,24 +62,11 @@ class ImportActionModel extends CachedTable
      *
      * @param array $row
      *
-     * @return object|null
+     * @return ImportActionItem|null
      */
     protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->rule_id = intval($row["rule_id"]);
-        $res->action_id = intval($row["action_id"]);
-        $res->value = $row["value"];
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return ImportActionItem::fromTableRow($row);
     }
 
     /**
@@ -320,8 +307,7 @@ class ImportActionModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new ImportActionItem($item, $requestAll);
-            $res[] = $itemObj;
+            $res[] = $item;
         }
 
         return $res;
