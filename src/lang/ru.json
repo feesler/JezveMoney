@@ -260,7 +260,7 @@
     "MSG_PROFILE_DELETE": "Вы действительно хотите удалить свой профиль?<br>Эта операция не может быть отменена.",
     "PROFILE_CHANGE_NAME": "Изменить имя",
     "PROFILE_NAME_NEW": "Имя",
-    "PROFILE_INVALID_NAME": "Введите имя.<br>Новое имя должно отличаться от старого.",
+    "PROFILE_INVALID_NAME": "Введите имя",
     "PROFILE_CHANGE_PASS": "Изменить пароль",
     "PROFILE_PASSWORD_CURRENT": "Текущий пароль",
     "PROFILE_INVALID_PASS_CURRENT": "Введите текущий пароль.",

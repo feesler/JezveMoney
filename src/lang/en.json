@@ -260,7 +260,7 @@
     "MSG_PROFILE_DELETE": "Are you sure to completely delete your profile?<br>This operation can not be undone.",
     "PROFILE_CHANGE_NAME": "Change name",
     "PROFILE_NAME_NEW": "New name",
-    "PROFILE_INVALID_NAME": "Input name.<br>New name must be different from the old.",
+    "PROFILE_INVALID_NAME": "Input name",
     "PROFILE_CHANGE_PASS": "Change password",
     "PROFILE_PASSWORD_CURRENT": "Current password",
     "PROFILE_INVALID_PASS_CURRENT": "Input current password",

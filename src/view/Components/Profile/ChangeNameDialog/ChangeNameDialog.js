@@ -74,11 +74,7 @@ export class ChangeNameDialog extends ProfileDialog {
             name: true,
         };
 
-        if (
-            !state.name
-            || state.name.length === 0
-            || state.name === window.app.model.profile.name
-        ) {
+        if (!state.name || state.name.length === 0) {
             res.name = false;
             res.valid = false;
         }
@@ -95,6 +91,15 @@ export class ChangeNameDialog extends ProfileDialog {
         }
 
         return result;
+    }
+
+    async handleFormRequest() {
+        if (this.state.name === window.app.model.profile.name) {
+            this.popup.close();
+            return;
+        }
+
+        await super.handleFormRequest();
     }
 
     /** Render component state */

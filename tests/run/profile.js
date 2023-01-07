@@ -95,7 +95,8 @@ export const changeName = async (newName) => {
     await test(`Change user name ('${newName}')`, async () => {
         await checkProfileNavigation();
 
-        const validInput = newName && newName.length > 0 && newName !== App.state.profile.name;
+        const validInput = newName && newName.length > 0;
+        const nameChanged = newName !== App.state.profile.name;
 
         await App.view.changeName(newName);
 
@@ -103,12 +104,21 @@ export const changeName = async (newName) => {
             App.state.changeName(newName);
 
             App.view.expectedState = {
-                msgPopup: { success: true, message: __('MSG_PROFILE_NAME', App.view.locale) },
                 header: { userBtn: { title: newName } },
             };
 
+            if (nameChanged) {
+                App.view.expectedState.msgPopup = {
+                    success: true,
+                    message: __('MSG_PROFILE_NAME', App.view.locale),
+                };
+            }
+
             App.view.checkState();
-            await App.view.closeNotification();
+
+            if (nameChanged) {
+                await App.view.closeNotification();
+            }
         }
 
         return App.state.fetchAndTest();

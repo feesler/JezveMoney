@@ -99,13 +99,16 @@ export class ProfileView extends AppView {
 
         assert(this.content.changeNamePopup?.visible, 'Change name popup not appear');
 
-        const validInput = (newName && newName !== this.content.name && newName.length > 0);
+        const validInput = (newName && newName.length > 0);
+        const nameChanged = newName !== App.state.profile.name;
 
         await this.performAction(() => this.content.changeNamePopup.newNameInp.input(newName));
         await this.performAction(() => click(this.content.changeNamePopup.okBtn));
 
         if (validInput) {
-            await this.performAction(() => wait('.popup.msg', { visible: true }));
+            if (nameChanged) {
+                await this.performAction(() => wait('.popup.msg', { visible: true }));
+            }
         } else {
             await this.performAction(() => click(this.content.changeNamePopup.closeBtn));
         }
