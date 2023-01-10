@@ -833,9 +833,8 @@ export class ImportTemplateManager extends Component {
             ? this.dataTable.scrollLeft
             : 0;
 
-        re(this.dataTable?.elem);
         if (state.id === TPL_UPDATE_STATE) {
-            this.dataTable = RawDataTable.create({
+            const dataTable = RawDataTable.create({
                 data: state.rawData,
                 rowsToShow: state.rowsToShow,
                 template: state.template,
@@ -843,8 +842,11 @@ export class ImportTemplateManager extends Component {
                 onSelectColumn: (index) => this.onDataColumnClick(index),
             });
 
-            this.rawDataTable.append(this.dataTable.elem);
-            this.dataTable.scrollLeft = scrollLeft;
+            this.rawDataTable.append(dataTable.elem);
+            dataTable.scrollLeft = scrollLeft;
+
+            re(this.dataTable?.elem);
+            this.dataTable = dataTable;
 
             window.app.setValidation(this.nameField, state.validation.name);
 
@@ -858,6 +860,8 @@ export class ImportTemplateManager extends Component {
             if (state.template.account_id !== 0) {
                 this.tplAccountDropDown.selectItem(state.template.account_id);
             }
+        } else {
+            re(this.dataTable?.elem);
         }
 
         let isValid = false;
