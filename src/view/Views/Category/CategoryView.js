@@ -203,8 +203,7 @@ class CategoryView extends View {
                 await API.category.create(data);
             }
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}categories/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -222,8 +221,7 @@ class CategoryView extends View {
         try {
             await API.category.del({ id: original.id });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}categories/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');

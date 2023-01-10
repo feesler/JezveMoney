@@ -83,6 +83,7 @@ class Categories extends TemplateController
 
         $data["category"] = $category;
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "categories" => $categories,
             "view" => [
@@ -125,6 +126,7 @@ class Categories extends TemplateController
 
         $categories = $this->model->getData();
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "categories" => $categories,
             "view" => [

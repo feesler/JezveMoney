@@ -71,6 +71,7 @@ class Persons extends TemplateController
         $pInfo->flags = 0;
         $data["pInfo"] = $pInfo;
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "persons" => $personsData,
             "view" => [
@@ -113,6 +114,7 @@ class Persons extends TemplateController
 
         $personsData = $this->personMod->getData(["visibility" => "all"]);
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "persons" => $personsData,
             "view" => [

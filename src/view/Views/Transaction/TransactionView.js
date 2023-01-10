@@ -847,10 +847,7 @@ class TransactionView extends View {
                 await API.transaction.create(request);
             }
 
-            const { baseURL } = window.app;
-            window.location = (state.isUpdate)
-                ? `${baseURL}transactions/`
-                : baseURL;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -868,8 +865,7 @@ class TransactionView extends View {
         try {
             await API.transaction.del({ id: state.transaction.id });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}transactions/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');

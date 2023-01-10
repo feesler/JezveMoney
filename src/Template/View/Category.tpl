@@ -51,7 +51,7 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>categories/"><?= __("CANCEL") ?></a>
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
                         </form>
                     </main>

@@ -68,6 +68,17 @@ abstract class TemplateController extends Controller
     }
 
     /**
+     * Returns URL to load after successfull submit or cancel
+     *
+     * @return string
+     */
+    protected function getNextAddress()
+    {
+        $referer = $_SERVER["HTTP_REFERER"] ?? null;
+        return (!is_null($referer) && strpos($referer, BASEURL) === 0) ? $referer : BASEURL;
+    }
+
+    /**
      * Renders template with specified data
      *
      * @param array $data

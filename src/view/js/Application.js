@@ -172,6 +172,15 @@ export class Application {
     }
 
     /**
+     * Navigates to the next URL
+     */
+    navigateNext() {
+        const { referrer } = document;
+        const nextURL = (referrer?.startsWith(this.baseURL)) ? referrer : this.baseURL;
+        window.location = nextURL;
+    }
+
+    /**
      * Create notification message
      * @param {string} message - notification text
      * @param {string} msgClass - CSS class for message box

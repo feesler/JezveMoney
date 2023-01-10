@@ -197,8 +197,7 @@ class AccountView extends View {
                 await API.account.create(account);
             }
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}accounts/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -224,8 +223,7 @@ class AccountView extends View {
         try {
             await API.account.del({ id: original.id });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}accounts/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');

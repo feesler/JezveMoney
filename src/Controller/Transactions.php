@@ -687,6 +687,7 @@ class Transactions extends TemplateController
         $data["headString"] = __("TR_CREATE");
         $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -964,6 +965,7 @@ class Transactions extends TemplateController
         $data["headString"] = __("TR_UPDATE");
         $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),

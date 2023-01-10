@@ -141,8 +141,7 @@ class PersonView extends View {
                 await API.person.create(data);
             }
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}persons/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -160,8 +159,7 @@ class PersonView extends View {
         try {
             await API.person.del({ id: original.id });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}persons/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');

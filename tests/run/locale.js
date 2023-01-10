@@ -144,8 +144,6 @@ export const changeLocale = async (locale) => {
         checkViewLocale(locale);
 
         await App.view.cancel();
-        assert.instanceOf(App.view, MainView, 'Invalid view');
-        await App.view.navigateToTransactions();
         assert.instanceOf(App.view, TransactionListView, 'Invalid view');
         await App.view.goToUpdateTransaction(0);
         assert.instanceOf(App.view, TransactionView, 'Invalid view');

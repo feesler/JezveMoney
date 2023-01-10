@@ -73,7 +73,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>accounts/"><?= __("CANCEL") ?></a>
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
                             <input id="flags" name="flags" type="hidden" value="<?= e($accInfo->flags) ?>">
                         </form>

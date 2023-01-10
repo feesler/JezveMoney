@@ -146,7 +146,7 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                             <div id="submitControls" class="form-controls" <?= hidden(!$trAvailable) ?>>
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>"><?= __("CANCEL") ?></a>
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
                         </form>
                     </main>
