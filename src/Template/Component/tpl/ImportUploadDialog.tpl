@@ -33,47 +33,49 @@
     </section>
 
     <section id="templateBlock" class="tpl-form" hidden>
-        <div id="tplHeading" class="tpl-form__heading" hidden>
-            <div id="tplFilename" class="tpl-form__file"></div>
-            <header class="tpl-form-header">
-                <label id="tplStateLbl"><?= __("TEMPLATE") ?></label>
-                <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
-            </header>
-            <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
-                <div id="tplField" class="tpl-form-field template-field">
-                    <select id="templateSel">
-                        <?php foreach ($importTemplates as $template) {     ?>
-                            <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
-                        <?php   }   ?>
-                    </select>
-                </div>
-                <div class="tpl-form__select-group-controls">
-                    <input id="updateTplBtn" class="btn link-btn" type="button" value="<?= __("UPDATE") ?>" hidden>
-                    <input id="deleteTplBtn" class="btn link-btn" type="button" value="<?= __("DELETE") ?>" hidden>
-                </div>
+        <div id="tplFilename" class="tpl-form__file"></div>
+        <header class="tpl-form-header">
+            <label id="tplStateLbl"><?= __("TEMPLATE") ?></label>
+            <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
+        </header>
+        <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
+            <div id="tplField" class="tpl-form-field template-field">
+                <select id="templateSel">
+                    <?php foreach ($importTemplates as $template) {     ?>
+                        <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
+                    <?php   }   ?>
+                </select>
             </div>
-            <div id="tplFormTop" class="tpl-form-fields">
-                <div id="nameField" class="tpl-form-field validation-block" hidden>
-                    <label for="tplNameInp"><?= __("TEMPLATE_NAME") ?></label>
-                    <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
-                    <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
+            <div class="tpl-form__select-group-controls">
+                <input id="updateTplBtn" class="btn link-btn" type="button" value="<?= __("UPDATE") ?>" hidden>
+                <input id="deleteTplBtn" class="btn link-btn" type="button" value="<?= __("DELETE") ?>" hidden>
+            </div>
+        </div>
+
+        <section id="templateForm">
+            <div id="nameField" class="tpl-form-field validation-block" hidden>
+                <label for="tplNameInp"><?= __("TEMPLATE_NAME") ?></label>
+                <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
+                <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
+            </div>
+            <div id="firstRowField" class="tpl-form-field first-row-field validation-block" hidden>
+                <label for="firstRowInp"><?= __("TEMPLATE_FIRST_ROW") ?></label>
+                <div class="input-group">
+                    <button id="decFirstRowBtn" class="input-group__btn" type="button">-</button>
+                    <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
+                    <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
                 </div>
-                <div id="firstRowField" class="tpl-form-field first-row-field validation-block" hidden>
-                    <label for="firstRowInp"><?= __("TEMPLATE_FIRST_ROW") ?></label>
-                    <div class="input-group">
-                        <button id="decFirstRowBtn" class="input-group__btn" type="button">-</button>
-                        <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
-                        <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
-                    </div>
-                    <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
-                </div>
+                <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
+            </div>
+            <div id="tplAccountSwitchField" class="tpl-form-field tpl-form-switch-field" hidden>
+                <span class="tpl-form-field__label"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></span>
+                <label id="tplAccountSwitch" class="switch">
+                    <input type="checkbox">
+                    <div class="switch-slider"></div>
+                </label>
             </div>
             <div id="tplAccountField" class="tpl-form-field tpl-account-field" hidden>
-                <label id="tplAccountCheck" class="checkbox">
-                    <input type="checkbox">
-                    <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                    <span class="checkbox__label"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></span>
-                </label>
+                <label><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></label>
             </div>
             <div id="columnField" class="tpl-form-field validation-block" hidden>
                 <label for="columnSel"><?= __("TEMPLATE_COLUMN") ?></label>
@@ -84,10 +86,11 @@
                 </select>
                 <div id="columnFeedback" class="invalid-feedback"></div>
             </div>
-        </div>
-        <div id="rawDataTable" class="tpl-form-field raw-data-field">
-            <label><?= __("TEMPLATE_COLUMN_MAP") ?></label>
-        </div>
+
+            <div id="rawDataTable" class="tpl-form-field raw-data-field">
+                <label><?= __("TEMPLATE_COLUMN_MAP") ?></label>
+            </div>
+        </section>
         <div id="tplFeedback" class="feedback" hidden></div>
         <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="<?= __("SAVE") ?>">

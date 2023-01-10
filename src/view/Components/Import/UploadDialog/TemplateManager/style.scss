@@ -3,7 +3,6 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  row-gap: 9px;
 }
 
 /* Uploaded file name */
@@ -28,35 +27,19 @@
   }
 }
 
-/* Heading controls */
-.tpl-form__heading {
-  display: flex;
-  flex-flow: column nowrap;
-  row-gap: 9px;
-}
-
-/* Raw data table field */
-.raw-data-field {
-  align-items: normal;
-}
-
 /* Template form fields: name, column type & etc. */
 .tpl-form-fields {
   display: flex;
   flex-flow: row wrap;
   column-gap: 18px;
-  row-gap: 9px;
 }
 
 .tpl-form-field {
   display: flex;
   flex-flow: column nowrap;
   align-items: baseline;
-  row-gap: 5px;
-
-  label {
-    margin-bottom: 0;
-  }
+  margin: 9px 0;
+  max-width: 300px;
 
   input {
     flex: 0 0 auto;
@@ -71,10 +54,39 @@
   overflow: hidden;
 }
 
+/* Template first row field */
 .first-row-field {
   max-width: 150px;
 }
 
+/* Default account switch */
+.tpl-form-switch-field {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--input-height);
+
+  .switch {
+    margin: 0;
+  }
+}
+
+.tpl-form-switch__label {
+  font-size: 1.15rem;
+  font-weight: 300;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+}
+
+/* Raw data table field */
+.raw-data-field {
+  align-items: normal;
+  max-width: none;
+}
+
+/* Template select */
 .tpl-form__select-group {
   display: flex;
   flex-flow: row nowrap;

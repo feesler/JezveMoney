@@ -4,14 +4,13 @@ import {
     copyObject,
     show,
     enable,
-    insertAfter,
     Component,
     re,
     setEvents,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Switch } from 'jezvejs/Switch';
 import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 import { ImportTemplateError } from '../../../../js/error/ImportTemplateError.js';
@@ -73,8 +72,6 @@ export class ImportTemplateManager extends Component {
 
         const elemIds = [
             'tplSelectGroup',
-            'tplFormTop',
-            'tplHeading',
             'tplFilename',
             'tplStateLbl',
             'tplField',
@@ -84,6 +81,8 @@ export class ImportTemplateManager extends Component {
             'firstRowInp',
             'decFirstRowBtn',
             'incFirstRowBtn',
+            'tplAccountSwitchField',
+            'tplAccountSwitch',
             'tplAccountField',
             'createTplBtn',
             'updateTplBtn',
@@ -115,7 +114,7 @@ export class ImportTemplateManager extends Component {
         this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
 
         // Template default account
-        this.tplAccountCheck = Checkbox.fromElement(ge('tplAccountCheck'), {
+        this.tplAccountSwitch = Switch.fromElement(this.tplAccountSwitch, {
             onChange: () => this.onTemplateAccountToggle(),
         });
 
@@ -123,7 +122,7 @@ export class ImportTemplateManager extends Component {
             onchange: (account) => this.onTemplateAccountChange(account),
         });
         window.app.initAccountsList(this.tplAccountDropDown);
-        insertAfter(this.tplAccountDropDown.elem, this.tplAccountCheck.elem);
+        this.tplAccountField.append(this.tplAccountDropDown.elem);
 
         setEvents(this.submitUploadedBtn, { click: () => this.onSubmit() });
 
@@ -777,7 +776,6 @@ export class ImportTemplateManager extends Component {
         } else if (state.id === RAW_DATA_STATE) {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
-            show(this.tplHeading, true);
             this.tplStateLbl.textContent = __('TEMPLATE');
 
             this.loadingIndicator.hide();
@@ -791,7 +789,6 @@ export class ImportTemplateManager extends Component {
                 : __('TEMPLATE_CREATE');
 
             show(this.noTplLabel, false);
-            show(this.tplHeading, true);
             this.loadingIndicator.hide();
             show(this.tplField, false);
             show(this.createTplBtn, false);
@@ -804,8 +801,8 @@ export class ImportTemplateManager extends Component {
         const isForm = (state.id === TPL_UPDATE_STATE);
         show(this.tplSelectGroup, isRawData);
         show(this.rawDataTable, isForm);
-        show(this.tplFormTop, isForm);
         show(this.nameField, isForm);
+        show(this.tplAccountSwitchField, isForm);
         show(this.tplAccountField, isForm);
         show(this.columnField, isForm);
         show(this.firstRowField, isForm);
@@ -855,8 +852,8 @@ export class ImportTemplateManager extends Component {
             window.app.setValidation(this.firstRowField, state.validation.firstRow);
 
             const useTplAccount = state.template.account_id !== 0;
-            this.tplAccountCheck.check(useTplAccount);
-            this.tplAccountDropDown.show(useTplAccount);
+            this.tplAccountSwitch.check(useTplAccount);
+            show(this.tplAccountField, useTplAccount);
             if (state.template.account_id !== 0) {
                 this.tplAccountDropDown.selectItem(state.template.account_id);
             }

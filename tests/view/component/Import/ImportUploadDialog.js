@@ -15,7 +15,7 @@ import {
     evaluate,
     asyncMap,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs-test';
+import { Checkbox, DropDown, Switch } from 'jezvejs-test';
 import { App } from '../../../Application.js';
 import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -67,11 +67,9 @@ export class ImportUploadDialog extends TestComponent {
 
         // Convert block
         res.templateBlock = { elem: await query('#templateBlock') };
-        res.tplHeading = { elem: await query('#tplHeading') };
         res.tplStateLbl = { elem: await query('#tplStateLbl') };
         assert(
             res.templateBlock.elem
-            && res.tplHeading.elem
             && res.tplStateLbl.elem,
             'Invalid convert block',
         );
@@ -125,9 +123,10 @@ export class ImportUploadDialog extends TestComponent {
         res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         // Template account field
+        res.tplAccountSwitch = await Switch.create(this, await query(this.elem, '#tplAccountSwitch'));
+
         res.tplAccountField = { elem: await query('#tplAccountField') };
-        res.tplAccountCheck = await Checkbox.create(this, await query(this.elem, '#tplAccountCheck'));
-        const tplAccountSelElem = await query(this.elem, '#tplAccountCheck + .dd__container');
+        const tplAccountSelElem = await query(res.tplAccountField.elem, '.dd__container');
         res.tplAccountSel = await DropDown.create(this, tplAccountSelElem);
         assert(res.tplAccountField.elem && res.tplAccountSel, 'Invalid template account field');
 
@@ -262,7 +261,7 @@ export class ImportUploadDialog extends TestComponent {
         ) {
             res.template.name = cont.tplNameInp.value;
             res.template.first_row = parseInt(cont.firstRowInp.value, 10);
-            res.template.account_id = (cont.tplAccountCheck.checked)
+            res.template.account_id = (cont.tplAccountSwitch.checked)
                 ? parseInt(cont.tplAccountSel.value, 10)
                 : 0;
 
@@ -394,7 +393,7 @@ export class ImportUploadDialog extends TestComponent {
             };
 
             const useAccount = !!model.template.account_id;
-            res.tplAccountCheck = {
+            res.tplAccountSwitch = {
                 visible: true,
                 checked: useAccount,
             };
@@ -746,7 +745,7 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => this.content.tplAccountCheck.toggle());
+        await this.performAction(() => this.content.tplAccountSwitch.toggle());
 
         return this.checkState();
     }
