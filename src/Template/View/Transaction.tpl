@@ -18,9 +18,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
                                     "id" => "deleteBtn",
-                                    "classNames" => "circle-icon",
+                                    "classNames" => "warning-iconbutton",
                                     "icon" => "del",
-                                    "title" => __("DELETE")
+                                    "title" => __("DELETE"),
                                 ]) ?>
                             </div>
                         <?php    }    ?>

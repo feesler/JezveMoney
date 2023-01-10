@@ -229,7 +229,7 @@ class TransactionListView extends View {
         // 'Done' button
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
-            className: 'no-icon',
+            className: 'action-button',
             title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });

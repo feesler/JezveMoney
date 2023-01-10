@@ -187,18 +187,40 @@ label {
   }
 }
 
-.iconbutton.circle-icon {
-  --iconbtn-hover-icon-color: #ffffff;
-
-  .iconbutton__icon {
-    border: 2px solid #000000;
-    border-radius: 50%;
+/* Action button */
+.iconbutton.action-button {
+  .iconbutton__content {
+    padding: 0;
+    text-decoration: underline;
   }
 }
 
-.iconbutton.no-icon {
+/* Show filters button */
+.iconbutton.filters-btn {
+  width: 150px;
+  justify-content: center;
+  border-radius: var(--action-btn-border-radius);
+
   .iconbutton__content {
-    padding: 0;
+    padding: 0 5px;
+    font-size: 14px;
+    font-weight: 200;
+    letter-spacing: 0.04rem;
+  }
+}
+
+/* Warning action button */
+.dark-theme,
+.white-theme {
+  .iconbutton.warning-iconbutton {
+    --iconbtn-title-color: var(--warning-color-alt);
+    --iconbtn-icon-color: var(--warning-color-alt);
+    --iconbtn-hover-title-color: var(--warning-color);
+    --iconbtn-hover-icon-color: var(--warning-color);
+
+    .iconbutton__content {
+      text-decoration: underline;
+    }
   }
 }
 
@@ -348,7 +370,10 @@ label {
 }
 
 .warning-btn {
-  background-color: #c60000;
+  padding: 0;
+  color: var(--warning-color-alt);
+  text-decoration: underline;
+  background: none;
 }
 
 .warning-btn:focus-visible {
@@ -581,6 +606,14 @@ label {
   --popupmenu-hover-background: var(--warning-color-alt);
 }
 
+/* Popup menu button */
+.popup-menu .icon.popup-menu-btn__icon {
+  --popupmenu-btn-icon-size: 20px;
+
+  width: var(--popupmenu-btn-icon-size);
+  height: var(--popupmenu-btn-icon-size);
+}
+
 /* Popup */
 .popup__content {
   background: none;
@@ -742,17 +775,6 @@ a.paginator-arrow:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
-/* Show filters button */
-.iconbutton.filters-btn {
-  width: 150px;
-  justify-content: center;
-  border-radius: var(--action-btn-border-radius);
-
-  .iconbutton__content {
-    padding: 0 5px;
-  }
-}
-
 /* Filters */
 .filter-item .link-menu {
   min-height: var(--input-height);
@@ -803,7 +825,8 @@ a.paginator-arrow:focus-visible {
   }
 
   .warning-btn:hover {
-    background-color: var(--warning-color-alt);
+    color: var(--warning-color);
+    background: none;
   }
 
   .link-btn:hover {

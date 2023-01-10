@@ -16,10 +16,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?= IconButton::render([
                                 "id" => "createBtn",
                                 "type" => "link",
-                                "classNames" => "circle-icon",
                                 "link" => BASEURL . "accounts/create/",
-                                "title" => __("CREATE"),
-                                "icon" => "plus"
+                                "icon" => "plus",
                             ]) ?>
                         </div>
                     </header>

@@ -57,8 +57,6 @@ class Import extends TemplateController
             "importRules" => $this->ruleModel->getData(["extended" => true]),
             "uploadBtn" => [
                 "id" => "uploadBtn",
-                "classNames" => "circle-icon",
-                "title" => __("IMPORT_UPLOAD_BUTTON"),
                 "icon" => "import",
             ],
         ];

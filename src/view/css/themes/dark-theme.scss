@@ -71,14 +71,6 @@
     --iconbtn-icon-color: var(--main-text-color);
     --iconbtn-hover-title-color: var(--main-text-color);
     --iconbtn-hover-icon-color: var(--main-text-color);
-
-    &.circle-icon {
-      --iconbtn-hover-icon-color: #202020;
-
-      .iconbutton__icon {
-        border-color: var(--main-text-color);
-      }
-    }
   }
 
   .icon {
@@ -446,14 +438,6 @@
 
     .nav-item__icon-btn:hover {
       background: var(--icon-btn-hover-bg);
-    }
-
-    .iconbutton:hover {
-      &.circle-icon {
-        .iconbutton__icon {
-          background-color: var(--main-text-color);
-        }
-      }
     }
 
     /* 'Show more' button */

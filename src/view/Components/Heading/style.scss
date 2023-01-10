@@ -29,26 +29,7 @@
 .header .heading-actions {
   margin-right: 9px;
 
-  .iconbutton.circle-icon {
-    --iconbtn-title-color: var(--header-color);
-    --iconbtn-icon-color: var(--header-color);
-    --iconbtn-hover-title-color: var(--header-color);
-    --iconbtn-hover-icon-color: var(--header-bg-color);
-
-    .iconbutton__icon {
-      border-color: var(--header-color);
-    }
-  }
-
   .popup-menu-btn__icon {
     fill: var(--header-color);
-  }
-}
-
-@media (hover: hover) {
-  .header .heading-actions {
-    .iconbutton:hover.circle-icon .iconbutton__icon {
-      background-color: var(--header-color);
-    }
   }
 }
