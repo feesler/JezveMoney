@@ -6,6 +6,11 @@
 
   .popup__header {
     margin-bottom: 0;
+    column-gap: 12px;
+
+    .close-btn {
+      flex-shrink: 0;
+    }
   }
 }
 
@@ -112,8 +117,6 @@
   flex-flow: row nowrap;
   align-items: center;
   column-gap: 12px;
-  position: relative;
-  left: -5px;
 }
 
 /* Back buton  */
@@ -124,7 +127,7 @@
   flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
-  align-self: flex-end;
+  align-self: flex-start;
   width: var(--back-btn-size);
   height: var(--back-btn-size);
   padding: 0;

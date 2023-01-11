@@ -25,9 +25,10 @@ const VALID_FEEDBACK_CLASS = 'valid-feedback';
 const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
 
 /** States */
-const LOADING_STATE = 1;
-const RAW_DATA_STATE = 2;
-const TPL_UPDATE_STATE = 3;
+export const LOADING_STATE = 1;
+export const RAW_DATA_STATE = 2;
+export const TPL_CREATE_STATE = 3;
+export const TPL_UPDATE_STATE = 4;
 
 /**
  * ImportTemplateManager component
@@ -73,7 +74,6 @@ export class ImportTemplateManager extends Component {
         const elemIds = [
             'tplSelectGroup',
             'tplFilename',
-            'tplStateLbl',
             'tplField',
             'nameField',
             'tplNameInp',
@@ -413,13 +413,14 @@ export class ImportTemplateManager extends Component {
             ...this.state,
             id: RAW_DATA_STATE,
         });
+        this.notifyStateChanged();
     }
 
     /** Set create template state */
     setCreateTemplateState() {
         this.setState({
             ...this.state,
-            id: TPL_UPDATE_STATE,
+            id: TPL_CREATE_STATE,
             template: new ImportTemplate({
                 name: '',
                 type_id: 0,
@@ -428,6 +429,7 @@ export class ImportTemplateManager extends Component {
                 columns: {},
             }),
         });
+        this.notifyStateChanged();
     }
 
     /** Update template button 'click' event handler */
@@ -436,6 +438,16 @@ export class ImportTemplateManager extends Component {
             ...this.state,
             id: TPL_UPDATE_STATE,
         });
+        this.notifyStateChanged();
+    }
+
+    /** Notifyes template form state changed */
+    notifyStateChanged() {
+        if (!isFunction(this.props.onChangeState)) {
+            return;
+        }
+
+        this.props.onChangeState(this.state.id);
     }
 
     /** Delete template button 'click' event handler */
@@ -606,7 +618,7 @@ export class ImportTemplateManager extends Component {
 
     /** Cancel template button 'click' event handler */
     onCancelTemplateClick() {
-        if (this.state.id !== TPL_UPDATE_STATE) {
+        if (this.state.id !== TPL_CREATE_STATE && this.state.id !== TPL_UPDATE_STATE) {
             return;
         }
 
@@ -617,7 +629,7 @@ export class ImportTemplateManager extends Component {
 
     /** Raw data table column 'click' event handler */
     onDataColumnClick(index) {
-        if (this.state.id !== TPL_UPDATE_STATE) {
+        if (this.state.id !== TPL_CREATE_STATE && this.state.id !== TPL_UPDATE_STATE) {
             return;
         }
 
@@ -677,18 +689,20 @@ export class ImportTemplateManager extends Component {
         if (!state) {
             throw new Error('Invalid state');
         }
-        if (typeof propName !== 'string'
+        if (
+            typeof propName !== 'string'
             || !propName.length
-            || !this.columnFeedback[propName]) {
+            || !this.columnFeedback[propName]
+        ) {
             throw new Error('Invalid property');
         }
 
-        if (state.id === TPL_UPDATE_STATE) {
-            this.setTemplateFeedback(this.columnFeedback[propName].msg, false);
-            this.columnDropDown.selectItem(propName);
+        if (state.id !== TPL_CREATE_STATE && state.id !== TPL_UPDATE_STATE) {
+            return;
         }
 
-        return false;
+        this.setTemplateFeedback(this.columnFeedback[propName].msg, false);
+        this.columnDropDown.selectItem(propName);
     }
 
     /** Validate current template on raw data */
@@ -776,18 +790,13 @@ export class ImportTemplateManager extends Component {
         } else if (state.id === RAW_DATA_STATE) {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
-            this.tplStateLbl.textContent = __('TEMPLATE');
 
             this.loadingIndicator.hide();
             window.app.setValidation(this.nameField, true);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);
-        } else if (state.id === TPL_UPDATE_STATE) {
-            this.tplStateLbl.textContent = (state.template && state.template.id)
-                ? __('TEMPLATE_UPDATE')
-                : __('TEMPLATE_CREATE');
-
+        } else if (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE) {
             show(this.noTplLabel, false);
             this.loadingIndicator.hide();
             show(this.tplField, false);
@@ -798,7 +807,7 @@ export class ImportTemplateManager extends Component {
         }
 
         const isRawData = (state.id === RAW_DATA_STATE);
-        const isForm = (state.id === TPL_UPDATE_STATE);
+        const isForm = (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE);
         show(this.tplSelectGroup, isRawData);
         show(this.rawDataTable, isForm);
         show(this.nameField, isForm);
@@ -826,11 +835,11 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
-        const scrollLeft = (state.id === TPL_UPDATE_STATE && this.dataTable)
+        const scrollLeft = (isForm && this.dataTable)
             ? this.dataTable.scrollLeft
             : 0;
 
-        if (state.id === TPL_UPDATE_STATE) {
+        if (isForm) {
             const dataTable = RawDataTable.create({
                 data: state.rawData,
                 rowsToShow: state.rowsToShow,

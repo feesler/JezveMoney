@@ -34,12 +34,12 @@
 
     <section id="templateBlock" class="tpl-form" hidden>
         <div id="tplFilename" class="tpl-form__file"></div>
-        <header class="tpl-form-header">
-            <label id="tplStateLbl"><?= __("TEMPLATE") ?></label>
-            <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
-        </header>
-        <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
+        <section id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
             <div id="tplField" class="tpl-form-field template-field">
+                <header class="template-field__header">
+                    <label for="templateSel"><?= __("TEMPLATE") ?></label>
+                    <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
+                </header>
                 <select id="templateSel">
                     <?php foreach ($importTemplates as $template) {     ?>
                         <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
@@ -50,7 +50,7 @@
                 <input id="updateTplBtn" class="btn link-btn" type="button" value="<?= __("UPDATE") ?>" hidden>
                 <input id="deleteTplBtn" class="btn link-btn" type="button" value="<?= __("DELETE") ?>" hidden>
             </div>
-        </div>
+        </section>
 
         <section id="templateForm">
             <div id="nameField" class="tpl-form-field validation-block" hidden>
@@ -68,7 +68,7 @@
                 <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
             </div>
             <div id="tplAccountSwitchField" class="tpl-form-field tpl-form-switch-field" hidden>
-                <span class="tpl-form-field__label"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></span>
+                <span class="tpl-form-field__label"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
                 <label id="tplAccountSwitch" class="switch">
                     <input type="checkbox">
                     <div class="switch-slider"></div>

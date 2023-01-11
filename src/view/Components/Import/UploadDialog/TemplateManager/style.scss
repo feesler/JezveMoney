@@ -11,15 +11,15 @@
   color: #7b7b7b;
 }
 
-/* Header */
-.tpl-form-header {
+/* Template field header */
+.template-field__header {
   display: flex;
   flex-flow: row;
   align-items: baseline;
   padding: 10px 0;
 
   label {
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 100;
     margin-right: 18px;
     margin-bottom: 0;
@@ -97,6 +97,9 @@
 .tpl-form__select-group-controls {
   display: flex;
   flex-flow: row nowrap;
+  align-self: flex-end;
+  height: var(--input-height);
+  margin: 10px 0;
 }
 
 .tpl-account-field {
