@@ -11,29 +11,7 @@
   color: #7b7b7b;
 }
 
-/* Template field header */
-.template-field__header {
-  display: flex;
-  flex-flow: row;
-  align-items: baseline;
-  padding: 10px 0;
-
-  label {
-    font-size: 16px;
-    font-weight: 100;
-    margin-right: 18px;
-    margin-bottom: 0;
-    margin-left: 0;
-  }
-}
-
-/* Template form fields: name, column type & etc. */
-.tpl-form-fields {
-  display: flex;
-  flex-flow: row wrap;
-  column-gap: 18px;
-}
-
+/* Template form field */
 .tpl-form-field {
   display: flex;
   flex-flow: column nowrap;
@@ -50,8 +28,29 @@
   }
 }
 
+/* Import template field */
 .template-field {
   overflow: hidden;
+  max-width: none;
+  width: 100%;
+}
+
+/* Template field header */
+.template-field__header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  width: 100%;
+
+  label {
+    font-size: 16px;
+    font-weight: 100;
+    margin-right: 18px;
+    margin-bottom: 0;
+    margin-left: 0;
+  }
 }
 
 /* Template first row field */
@@ -92,14 +91,6 @@
   flex-flow: row nowrap;
   align-items: baseline;
   overflow: hidden;
-}
-
-.tpl-form__select-group-controls {
-  display: flex;
-  flex-flow: row nowrap;
-  align-self: flex-end;
-  height: var(--input-height);
-  margin: 10px 0;
 }
 
 .tpl-account-field {

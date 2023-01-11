@@ -12,7 +12,7 @@ import { __ } from '../../../../js/utils.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import {
     ImportTemplateManager,
-    RAW_DATA_STATE,
+    TPL_SELECT_STATE,
     TPL_CREATE_STATE,
     TPL_UPDATE_STATE,
 } from '../TemplateManager/ImportTemplateManager.js';
@@ -123,7 +123,7 @@ export class ImportUploadDialog extends Component {
         this.setState({
             ...this.state,
             id: UPLOAD_STATE,
-            convertState: RAW_DATA_STATE,
+            convertState: TPL_SELECT_STATE,
             importedItems: null,
             loading: false,
         });
@@ -314,13 +314,13 @@ export class ImportUploadDialog extends Component {
         }
 
         const children = [];
-        if (state.convertState === RAW_DATA_STATE) {
+        if (state.convertState === TPL_SELECT_STATE) {
             const backButton = this.renderBackButton();
             children.push(backButton);
         }
 
         let title;
-        if (state.convertState === RAW_DATA_STATE) {
+        if (state.convertState === TPL_SELECT_STATE) {
             title = __('IMPORT_CONVERT');
         } else if (state.convertState === TPL_CREATE_STATE) {
             title = __('TEMPLATE_CREATE');
