@@ -641,7 +641,6 @@ export class ImportUploadDialog extends TestComponent {
         await this.performAction(() => this.content.deleteTplBtn.click());
 
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await click(this.content.delete_warning.content.okBtn);
         await waitForFunction(async () => {

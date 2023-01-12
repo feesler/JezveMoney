@@ -346,11 +346,10 @@ export class ImportRulesDialog extends TestComponent {
         await this.parse();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         const prevTime = this.model.renderTime;
 
-        await click(this.content.delete_warning.content.okBtn);
+        await this.content.delete_warning.clickOk();
         await wait(this.content.ruleDeletePopupId, { hidden: true });
         await waitForFunction(async () => {
             await this.parse();

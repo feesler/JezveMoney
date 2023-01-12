@@ -117,9 +117,8 @@ export class PersonView extends AppView {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await navigation(() => this.content.delete_warning.clickOk());
     }
 
     async inputName(val) {

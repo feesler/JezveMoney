@@ -331,6 +331,6 @@ export class CategoryListView extends AppView {
 
         assert(this.content.delete_warning?.content?.visible, 'Delete categories warning popup not appear');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 }

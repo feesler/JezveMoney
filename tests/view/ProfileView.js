@@ -1,5 +1,4 @@
 import {
-    TestComponent,
     assert,
     query,
     queryAll,
@@ -87,7 +86,6 @@ export class ProfileView extends AppView {
             res.resetDataPopup.closeBtn = await query(res.resetDataPopup.elem, '.close-btn');
         }
 
-        res.reset_warning = await WarningPopup.create(this, await query('#reset_warning'));
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
@@ -194,11 +192,10 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.deleteProfileBtn));
 
-        const warningVisible = await TestComponent.isVisible(this.content.delete_warning);
+        const warningVisible = this.content.delete_warning?.content?.visible;
         assert(warningVisible, 'Warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'Confirm button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await navigation(() => this.content.delete_warning.clickOk());
         assert.instanceOf(App.view, LoginView, 'Unexpected page');
     }
 }

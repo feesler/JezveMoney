@@ -1,16 +1,35 @@
-import { TestComponent, query, prop } from 'jezve-test';
+import {
+    TestComponent,
+    click,
+    query,
+    evaluate,
+    assert,
+} from 'jezve-test';
 
 export class WarningPopup extends TestComponent {
     async parseContent() {
         const res = {
             titleElem: await query(this.elem, '.popup__title'),
-            title: await prop(this.titleElem, 'textContent'),
             messageElem: await query(this.elem, '.popup__message > div'),
-            message: await prop(this.messageElem, 'textContent'),
             okBtn: await query(this.elem, '.popup__controls > .btn.submit-btn'),
             cancelBtn: await query(this.elem, '.popup__controls > .btn.cancel-btn'),
         };
 
+        [res.title, res.message] = await evaluate((titleEl, msgEl) => ([
+            titleEl?.textContent,
+            msgEl?.textContent,
+        ]), this.titleElem, this.messageElem);
+
         return res;
+    }
+
+    async clickOk() {
+        assert(this.content.okBtn, 'Ok button not found');
+        return click(this.content.okBtn);
+    }
+
+    async clickCancel() {
+        assert(this.content.cancelBtn, 'Cancel button not found');
+        return click(this.content.cancelBtn);
     }
 }

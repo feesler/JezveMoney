@@ -368,7 +368,7 @@ export class PersonListView extends AppView {
 
         assert(this.content.delete_warning?.content?.visible, 'Delete person(s) warning popup not appear');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Show secified persons */

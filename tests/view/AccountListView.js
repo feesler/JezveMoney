@@ -366,9 +366,8 @@ export class AccountListView extends AppView {
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete account warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Show secified accounts */
