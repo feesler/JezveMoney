@@ -29,6 +29,13 @@
 .header .heading-actions {
   margin-right: 9px;
 
+  .iconbutton {
+    --iconbtn-title-color: var(--header-color);
+    --iconbtn-icon-color: var(--header-color);
+    --iconbtn-hover-title-color: var(--header-color);
+    --iconbtn-hover-icon-color: var(--header-color);
+  }
+
   .popup-menu-btn__icon {
     fill: var(--header-color);
   }
