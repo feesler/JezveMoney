@@ -64,6 +64,7 @@ abstract class TemplateController extends Controller
         $themes = getThemes($this->themesPath);
         $this->template->themes = $themes;
         $this->template->themeStylesheet = $themes[$userTheme]["file"];
+        $this->template->themeColor = $themes[$userTheme]["color"];
         $this->template->themeClass = $themes[$userTheme]["className"];
     }
 

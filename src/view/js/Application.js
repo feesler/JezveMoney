@@ -139,6 +139,11 @@ export class Application {
             return;
         }
 
+        const themeColor = ge('themeColor');
+        if (themeColor) {
+            themeColor.content = theme.color;
+        }
+
         const linkElem = ge('theme-style');
         if (linkElem) {
             linkElem.href = `${baseURL}${themesPath}${theme.file}`;

@@ -291,14 +291,20 @@ function auto_version(string $file)
  */
 function getThemes(string $base)
 {
-    $themeFiles = [
-        WHITE_THEME => "white-theme",
-        DARK_THEME => "dark-theme"
+    $themes = [
+        WHITE_THEME => [
+            "name" => "white-theme",
+            "color" => "#fefefe",
+        ],
+        DARK_THEME => [
+            "name" => "dark-theme",
+            "color" => "#202020",
+        ],
     ];
 
     $res = [];
-    foreach ($themeFiles as $theme_id => $themeName) {
-        $fileName = $themeName . ".css";
+    foreach ($themes as $theme_id => $theme) {
+        $fileName = $theme["name"] . ".css";
         $mtime = getModifiedTime($base . $fileName);
         if ($mtime === false) {
             continue;
@@ -306,7 +312,8 @@ function getThemes(string $base)
 
         $res[$theme_id] = [
             "file" => $fileName . "?" . $mtime,
-            "className" => $themeName,
+            "color" => $theme["color"],
+            "className" => $theme["name"],
         ];
     }
 
