@@ -1,6 +1,5 @@
 import {
     createElement,
-    isFunction,
     show,
     copyObject,
     addChilds,
@@ -131,28 +130,6 @@ export class ImportRuleItem extends Component {
     /** Toggle expand/collapse button 'click' event handler */
     onToggle() {
         this.collapse.toggle();
-    }
-
-    /** Update button 'click' event handler */
-    onUpdate(e) {
-        e.stopPropagation();
-
-        if (!this.state.ruleId || !isFunction(this.props.onUpdate)) {
-            return;
-        }
-
-        this.props.onUpdate(this.state.ruleId);
-    }
-
-    /** Delete button 'click' event handler */
-    onDelete(e) {
-        e.stopPropagation();
-
-        if (!this.state.ruleId || !isFunction(this.props.onRemove)) {
-            return;
-        }
-
-        this.props.onRemove(this.state.ruleId);
     }
 
     /** Set data for list container */

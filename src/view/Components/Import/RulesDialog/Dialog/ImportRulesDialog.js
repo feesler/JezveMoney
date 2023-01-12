@@ -246,12 +246,14 @@ export class ImportRulesDialog extends Component {
     }
 
     onItemClick(itemId, e) {
-        if (this.state.id === this.LIST_STATE) {
-            if (!e.target.closest('.popup-menu-btn')) {
-                return;
-            }
-            this.showContextMenu(itemId);
+        if (
+            this.state.id !== this.LIST_STATE
+            || !e.target.closest('.popup-menu-btn')
+        ) {
+            return;
         }
+
+        this.showContextMenu(itemId);
     }
 
     showContextMenu(itemId) {
