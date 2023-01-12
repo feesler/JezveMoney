@@ -21,7 +21,7 @@ export const createImportRules = async () => {
             conditions.transactionAmount.is.value(80),
         ],
         actions: [
-            actions.setTransactionType('transferfrom'),
+            actions.setTransactionType('transfer_out'),
             actions.setAccount(App.scenario.ACC_EUR),
         ],
     }, {
@@ -32,7 +32,7 @@ export const createImportRules = async () => {
             conditions.transactionAmount.less.value(0),
         ],
         actions: [
-            actions.setTransactionType('transferto'),
+            actions.setTransactionType('transfer_in'),
             actions.setAccount(App.scenario.ACC_USD),
             actions.setComment('Local shop'),
         ],
@@ -44,7 +44,7 @@ export const createImportRules = async () => {
             conditions.transactionAmount.less.value(500),
         ],
         actions: [
-            actions.setTransactionType('debtfrom'),
+            actions.setTransactionType('debt_out'),
             actions.setPerson(App.scenario.MARIA),
             actions.setComment('Taxi for Maria'),
             actions.setCategory(App.scenario.TRANSPORT_CATEGORY),
@@ -55,7 +55,7 @@ export const createImportRules = async () => {
             conditions.comment.includes.value('MAGAZIN'),
         ],
         actions: [
-            actions.setTransactionType('debtto'),
+            actions.setTransactionType('debt_in'),
             actions.setPerson(App.scenario.IVAN),
         ],
     }, {

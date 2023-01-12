@@ -27,7 +27,7 @@ const create = async () => {
             conditions.comment.includes.value('BANK MESSAGE'),
         ],
         actions: [
-            actions.setTransactionType('transferfrom'),
+            actions.setTransactionType('transfer_out'),
             actions.setComment('Bank'),
         ],
     }, {
@@ -176,7 +176,7 @@ const update = async () => {
     setBlock('Update import rule', 2);
 
     const isDiffAmount = conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount);
-    const setDebtTo = actions.setTransactionType('debtto');
+    const setIncomingDebt = actions.setTransactionType('debt_in');
 
     const data = [{
         id: App.scenario.RULE_1,
@@ -192,20 +192,20 @@ const update = async () => {
             flags: 0,
         }],
         actions: [
-            actions.setTransactionType('transferto'),
+            actions.setTransactionType('transfer_in'),
         ],
     }, {
         id: App.scenario.RULE_2,
         conditions: null,
-        actions: [setDebtTo],
+        actions: [setIncomingDebt],
     }, {
         id: App.scenario.RULE_2,
         conditions: [],
-        actions: [setDebtTo],
+        actions: [setIncomingDebt],
     }, {
         id: App.scenario.RULE_2,
         conditions: [null],
-        actions: [setDebtTo],
+        actions: [setIncomingDebt],
     }, {
         id: App.scenario.RULE_2,
         conditions: [isDiffAmount],

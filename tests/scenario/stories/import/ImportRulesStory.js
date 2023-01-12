@@ -134,20 +134,20 @@ export class ImportRulesStory extends TestStory {
 
         setBlock('Check available actions', 2);
         // Check available actions if type of `Set transaction type` action is
-        // 'transferfrom' or 'transferto'
+        // 'transfer_out' or 'transfer_in'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'transferfrom' },
+            { action: 'changeTransactionType', data: 'transfer_out' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
         ]);
 
         // Check available actions if type of `Set transaction type` action is
-        // 'debtfrom' or 'debtto'
+        // 'debt_out' or 'debt_in'
         await ImportTests.updateRuleAction({
             pos: 0,
-            action: { action: 'changeTransactionType', data: 'debtfrom' },
+            action: { action: 'changeTransactionType', data: 'debt_out' },
         });
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
@@ -163,7 +163,7 @@ export class ImportRulesStory extends TestStory {
         // Check `Set account` action is removed if remove `Set transaction type` action
         await ImportTests.updateRuleAction({
             pos: 0,
-            action: { action: 'changeTransactionType', data: 'transferfrom' },
+            action: { action: 'changeTransactionType', data: 'transfer_out' },
         });
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
@@ -173,7 +173,7 @@ export class ImportRulesStory extends TestStory {
         // Check `Set person` action is removed if remove `Set transaction type` action
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'debtfrom' },
+            { action: 'changeTransactionType', data: 'debt_out' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
@@ -181,10 +181,10 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.deleteRuleAction(0);
 
         // Check `Set account` action is removed if change type of `Set transaction type` action to
-        // any value except 'transferfrom' and 'transferto'
+        // any value except 'transfer_out' and 'transfer_in'
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'transferfrom' },
+            { action: 'changeTransactionType', data: 'transfer_out' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
@@ -279,7 +279,7 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.deleteRuleAction(0);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'transferfrom' },
+            { action: 'changeTransactionType', data: 'transfer_out' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
@@ -338,7 +338,7 @@ export class ImportRulesStory extends TestStory {
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-            { action: 'changeTransactionType', data: 'debtfrom' },
+            { action: 'changeTransactionType', data: 'debt_out' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },

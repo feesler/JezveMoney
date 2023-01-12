@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 13;
+    protected $latestVersion = 14;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -204,6 +204,9 @@ class DBVersion
             }
             if ($current < 13) {
                 $current = $this->version13();
+            }
+            if ($current < 14) {
+                $current = $this->version14();
             }
 
             $this->setVersion($current);
@@ -523,6 +526,59 @@ class DBVersion
         }
 
         return 13;
+    }
+
+    /**
+     * Creates database version 14
+     *
+     * @return int
+     */
+    private function version14()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $this->createCategoriesTable();
+
+        $tableName = "import_act";
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["value" => "transfer_out"],
+            ["action_id=1", "value='transferfrom'"],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$tableName' table");
+        }
+
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["value" => "transfer_in"],
+            ["action_id=1", "value='transferto'"],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$tableName' table");
+        }
+
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["value" => "debt_out"],
+            ["action_id=1", "value='debtfrom'"],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$tableName' table");
+        }
+
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["value" => "debt_in"],
+            ["action_id=1", "value='debtto'"],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$tableName' table");
+        }
+
+        return 14;
     }
 
     /**

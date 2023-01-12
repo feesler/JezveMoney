@@ -247,8 +247,8 @@ export class ImportTransactionItem extends Component {
         const { transaction } = state;
         const isDiff = transaction.isDiff();
         const { userAccounts, persons, currency } = window.app.model;
-        const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
-        const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
+        const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
+        const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
 
@@ -267,14 +267,14 @@ export class ImportTransactionItem extends Component {
         // Account field
         this.accountField.show(isTransfer);
         if (isTransfer) {
-            const isTransferFrom = transaction.type === 'transferfrom';
-            const accountId = (isTransferFrom)
+            const isTransferOut = transaction.type === 'transfer_out';
+            const accountId = (isTransferOut)
                 ? transaction.destAccountId
                 : transaction.sourceAccountId;
             const account = userAccounts.getItem(accountId);
             this.accountTitle.textContent = account.name;
 
-            const accountTitle = (isTransferFrom)
+            const accountTitle = (isTransferOut)
                 ? __('TR_DEST_ACCOUNT')
                 : __('TR_SRC_ACCOUNT');
             this.accountField.setTitle(accountTitle);

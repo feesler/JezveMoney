@@ -137,10 +137,10 @@ class ImportActionModel extends CachedTable
         $importTransactionTypes = [
             "expense",
             "income",
-            "transferfrom",
-            "transferto",
-            "debtfrom",
-            "debtto"
+            "transfer_out",
+            "transfer_in",
+            "debt_out",
+            "debt_in"
         ];
 
         $action = intval($actionId);

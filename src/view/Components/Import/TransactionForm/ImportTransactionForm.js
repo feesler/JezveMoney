@@ -700,8 +700,8 @@ export class ImportTransactionForm extends Component {
         const isDiff = transaction.isDiff();
         const isExpense = transaction.type === 'expense';
         const isIncome = transaction.type === 'income';
-        const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
-        const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
+        const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
+        const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
 
@@ -765,14 +765,14 @@ export class ImportTransactionForm extends Component {
                 accountItem.id !== strMainAccountId,
             ));
 
-            const transferAccountId = (transaction.type === 'transferto')
+            const transferAccountId = (transaction.type === 'transfer_in')
                 ? transaction.sourceAccountId
                 : transaction.destAccountId;
             if (transferAccountId) {
                 this.transferAccDropDown.selectItem(transferAccountId);
             }
 
-            const accountLabel = (transaction.type === 'transferto')
+            const accountLabel = (transaction.type === 'transfer_in')
                 ? __('TR_SRC_ACCOUNT')
                 : __('TR_DEST_ACCOUNT');
             this.transferAccountField.setTitle(accountLabel);

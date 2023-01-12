@@ -57,10 +57,10 @@ export class ImportAction extends ListItem {
     static transactionTypes = [
         { id: 'expense', title: __('TR_EXPENSE') },
         { id: 'income', title: __('TR_INCOME') },
-        { id: 'transferfrom', title: __('TR_TRANSFER_FROM') },
-        { id: 'transferto', title: __('TR_TRANSFER_TO') },
-        { id: 'debtfrom', title: __('TR_DEBT_FROM') },
-        { id: 'debtto', title: __('TR_DEBT_TO') },
+        { id: 'transfer_out', title: __('TR_TRANSFER_OUT') },
+        { id: 'transfer_in', title: __('TR_TRANSFER_IN') },
+        { id: 'debt_out', title: __('TR_DEBT_OUT') },
+        { id: 'debt_in', title: __('TR_DEBT_IN') },
     ];
 
     /** Return array of available action types */
