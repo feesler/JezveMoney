@@ -51,6 +51,9 @@
 }
 
 .tile__subtitle {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-end;
   top: 2px;
   right: 0;
   padding-right: 5px;

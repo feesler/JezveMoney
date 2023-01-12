@@ -93,6 +93,12 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setEvents(readStateForm, { submit: (e) => this.onFormSubmit(e) });
+
+        const mainStateForm = document.querySelector('#mainStateForm > form');
+        if (!mainStateForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(mainStateForm, { submit: (e) => this.onFormSubmit(e) });
     }
 
     /** Initialization of forms for Account API controller */

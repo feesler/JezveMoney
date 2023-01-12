@@ -23,6 +23,7 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
+import { Field } from '../../Components/Field/Field.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -33,7 +34,6 @@ import { FiltersContainer } from '../../Components/FiltersContainer/FiltersConta
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './style.scss';
-import { Field } from '../../Components/Field/Field.js';
 
 const SEARCH_DELAY = 500;
 
@@ -287,7 +287,7 @@ class TransactionListView extends View {
             sortModeBtn: () => this.setListMode('sort'),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
-            setCategoryBtn: () => this.showCategoryDialog(true),
+            setCategoryBtn: () => this.showCategoryDialog(),
             deleteBtn: () => this.confirmDelete(),
         };
     }
@@ -304,7 +304,7 @@ class TransactionListView extends View {
             }, {
                 id: 'ctxSetCategoryBtn',
                 title: __('SET_CATEGORY'),
-                onClick: () => this.showCategoryDialog(true),
+                onClick: () => this.showCategoryDialog(),
             }, {
                 type: 'separator',
             }, {

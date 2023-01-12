@@ -294,6 +294,14 @@ abstract class Model
     }
 
     /**
+     * Returns array of items
+     */
+    public function getData()
+    {
+        return [];
+    }
+
+    /**
      * Returns current autoincrement value of table
      *
      * @return int

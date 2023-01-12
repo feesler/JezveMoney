@@ -258,6 +258,41 @@ export const update = async (type, pos) => {
     });
 };
 
+export const updateFromMainView = async (pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+
+    await test(`Initial state of update transaction [${index}] view`, async () => {
+        await App.goToMainView();
+        await App.view.goToUpdateTransactionByIndex(pos);
+
+        const origTransaction = App.view.getExpectedTransaction();
+        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
+        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
+            App.view.model.state = (isDiff) ? 2 : 0;
+        }
+
+        if (origTransaction.type === TRANSFER) {
+            App.view.model.state = (isDiff) ? 3 : 0;
+        }
+
+        if (origTransaction.type === DEBT) {
+            const { debtType, noAccount, isDiffCurr } = App.view.model;
+
+            if (isDiffCurr) {
+                App.view.model.state = (debtType) ? 10 : 16;
+            } else if (debtType) {
+                App.view.model.state = (noAccount) ? 6 : 0;
+            } else {
+                App.view.model.state = (noAccount) ? 7 : 3;
+            }
+        }
+
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
+    });
+};
+
 export const createFromAccountAndSubmit = async (pos, actions) => {
     setBlock(`Create transaction from account [${pos}]`, 2);
 
@@ -278,6 +313,14 @@ export const updateAndSubmit = async (type, pos, actions) => {
     setBlock(`Update ${Transaction.typeToString(type)} [${pos}]`, 2);
 
     await update(type, pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const updateFromMainViewAndSubmit = async (pos, actions) => {
+    setBlock(`Update transaction [${pos}] from main view`, 2);
+
+    await updateFromMainView(pos);
     await runActions(actions);
     await submit();
 };
@@ -365,6 +408,46 @@ export const delFromUpdate = async (type, pos) => {
 
     await test('Submit result', async () => {
         await App.goToMainView();
+        App.state.setState(expectedState);
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+        return App.state.fetchAndTest();
+    });
+};
+
+export const setTransactionCategory = async ({ index, category }) => {
+    await test('Set transaction category from main view', async () => {
+        await App.goToMainView();
+
+        const origItems = App.view.content.transactionsWidget.transList.getItems();
+
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(origItems, ind);
+        const { id } = origItems[ind];
+
+        App.state.setTransactionCategory({ id, category });
+
+        await App.view.setTransactionCategory(index, category);
+
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+
+        return App.state.fetchAndTest();
+    });
+};
+
+export const deleteFromMainView = async (pos) => {
+    const ind = parseInt(pos, 10);
+    assert(!Number.isNaN(ind) && ind >= 0, 'Position of transaction not specified');
+
+    await test(`Delete transaction [${ind}] from main view`, async () => {
+        const expectedState = App.state.clone();
+        const ids = expectedState.transactions.indexesToIds(ind);
+        expectedState.deleteTransactions(ids);
+
+        await App.goToMainView();
+        await App.view.deleteTransactionByIndex(ind);
+
         App.state.setState(expectedState);
         App.view.expectedState = MainView.render(App.state);
         App.view.checkState();

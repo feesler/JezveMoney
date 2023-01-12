@@ -63,6 +63,12 @@ export const API = {
         },
     },
 
+    state: {
+        async main() {
+            return apiGet('state/main');
+        },
+    },
+
     account: {
         async list(options = {}) {
             return apiGet('account/list', options);

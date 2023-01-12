@@ -36,8 +36,11 @@ export class TransactionsStory extends TestStory {
         await this.stateLoops();
         await this.create();
         await this.update();
+        await this.updateFromMainView();
+        await this.setCategoryFromMainView();
         await this.del();
         await this.deleteFromUpdate();
+        await this.deleteFromMainView();
         await this.createFromPersonAccount();
         await this.noAccountURL();
         await this.availability(false);
@@ -606,6 +609,35 @@ export class TransactionsStory extends TestStory {
         ]);
     }
 
+    async updateFromMainView() {
+        setBlock('Update transactions from main view', 2);
+
+        const { MARIA } = App.scenario;
+
+        await TransactionTests.updateFromMainViewAndSubmit(0, [
+            { action: 'changePerson', data: MARIA },
+            { action: 'inputSrcAmount', data: '105' },
+        ]);
+
+        await TransactionTests.updateFromMainViewAndSubmit(3, [
+            { action: 'inputSrcAmount', data: '555' },
+            { action: 'inputDate', data: App.datesFmt.yesterday },
+        ]);
+    }
+
+    async setCategoryFromMainView() {
+        setBlock('Set transaction category from main view', 2);
+
+        const { CAFE_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
+
+        const data = [
+            { index: 0, category: CAFE_CATEGORY },
+            { index: 2, category: TRANSPORT_CATEGORY },
+        ];
+
+        return App.scenario.runner.runGroup(TransactionTests.setTransactionCategory, data);
+    }
+
     async deleteExpense() {
         setBlock('Delete expense transactions', 2);
 
@@ -648,6 +680,17 @@ export class TransactionsStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
+    }
+
+    async deleteFromMainView() {
+        setBlock('Delete transactions from main view', 2);
+
+        const data = [
+            0,
+            1,
+        ];
+
+        await App.scenario.runner.runGroup(TransactionTests.deleteFromMainView, data);
     }
 
     async typeChangeLoop() {

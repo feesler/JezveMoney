@@ -139,17 +139,24 @@ export class ListContainer extends Component {
         });
     }
 
+    defaultNoDataMessage(message) {
+        return createElement('span', {
+            props: {
+                className: NO_DATA_CLASS,
+                textContent: message,
+            },
+        });
+    }
+
     renderNoDataMessage() {
         if (this.noDataMsg) {
             return;
         }
 
-        this.noDataMsg = createElement('span', {
-            props: {
-                className: NO_DATA_CLASS,
-                textContent: this.state.noItemsMessage,
-            },
-        });
+        this.noDataMsg = (isFunction(this.state.noItemsMessage))
+            ? this.state.noItemsMessage()
+            : this.defaultNoDataMessage(this.state.noItemsMessage);
+
         this.elem.append(this.noDataMsg);
     }
 

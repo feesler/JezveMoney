@@ -86,6 +86,7 @@ export const resetData = async (options = {}) => {
 
     await App.view.closeNotification();
     await App.goToMainView();
+    await App.view.waitForLoad();
 
     App.view.expectedState = MainView.render(App.state);
     await test('Main view update', () => App.view.checkState());
