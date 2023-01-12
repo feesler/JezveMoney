@@ -17,6 +17,7 @@ import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
     CENTS_DIGITS,
+    cutTime,
     EXCHANGE_DIGITS,
     normalizeExch,
     timeToDate,
@@ -92,11 +93,14 @@ class TransactionView extends View {
         window.app.checkUserAccountModels();
         window.app.checkPersonModels();
 
-        const { transaction } = this.props;
+        const transaction = {
+            ...this.props.transaction,
+            date: cutTime(this.props.transaction.date),
+        };
 
         const initialState = {
             id: 0,
-            transaction: { ...transaction },
+            transaction,
             form: {
                 sourceAmount: '',
                 destAmount: '',
@@ -1361,6 +1365,8 @@ class TransactionView extends View {
         }
 
         show(this.dateRow, state.isAvailable);
+        this.dateInput.value = state.form.date;
+
         show(this.categoryRow, state.isAvailable);
         show(this.commentRow, state.isAvailable);
         show(this.submitControls, state.isAvailable);
@@ -1495,7 +1501,6 @@ class TransactionView extends View {
         // Date field
         this.dateInput.enable(!state.submitStarted);
         enable(this.dateInputBtn, !state.submitStarted);
-        this.dateInput.value = state.form.date;
         window.app.setValidation(this.dateRow, state.validation.date);
 
         // Category field

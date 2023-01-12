@@ -391,14 +391,11 @@ class Transactions extends TemplateController
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
-        $targetDate = getdate();
-        $targetTime = mktime(0, 0, 0, $targetDate["mon"], $targetDate["mday"], $targetDate["year"]);
-
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
-            "date" => $targetTime,
+            "date" => time(),
             "category_id" => 0,
             "comment" => ""
         ];

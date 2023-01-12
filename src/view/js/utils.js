@@ -1,4 +1,6 @@
-import { isDate, isObject } from 'jezvejs';
+import { isDate, isObject, shiftDate } from 'jezvejs';
+
+export const MS_IN_SECOND = 1000;
 
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
@@ -78,7 +80,7 @@ export const timestampFromString = (str) => {
 /** Convert date string to Unix timestamp in seconds */
 export const dateStringToTime = (value) => {
     const res = fixDate(value);
-    return (res) ? (res / 1000) : null;
+    return (res) ? (res / MS_IN_SECOND) : null;
 };
 
 /** Convert Unix timestamp in seconds to date string */
@@ -88,7 +90,13 @@ export const timeToDate = (value) => {
         throw new Error('Invalid time value');
     }
 
-    return new Date(time * 1000);
+    return new Date(time * MS_IN_SECOND);
+};
+
+/** Returns time for start of the day */
+export const cutTime = (value) => {
+    const fixedDate = shiftDate(timeToDate(value), 0);
+    return fixedDate.getTime() / MS_IN_SECOND;
 };
 
 /**
