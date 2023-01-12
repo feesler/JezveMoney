@@ -43,7 +43,7 @@ export class AccountView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
-        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
+        res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
         res.name = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.name, 'Account name input not found');
@@ -96,22 +96,35 @@ export class AccountView extends AppView {
         res.fBalance = res.balance;
 
         // Currency
-        const selectedCurr = cont.currDropDown.content.textValue;
-        res.currObj = App.currency.findByName(selectedCurr);
-        assert(res.currObj, `Currency '${selectedCurr}' not found`);
-
-        res.curr_id = res.currObj.id;
+        this.setModelCurrency(cont.currDropDown.value, res);
 
         // Icon
-        let iconObj = App.icons.findByName(cont.iconDropDown.content.textValue);
-        if (!iconObj) {
-            iconObj = Icon.noIcon(this.locale);
-        }
-        res.tileIcon = iconObj;
-        res.icon_id = iconObj.id;
+        this.setModelIcon(cont.iconDropDown.value, res);
 
         // Flags
         res.flags = cont.flags;
+
+        return res;
+    }
+
+    setModelCurrency(value, model = this.model) {
+        const res = model;
+
+        res.curr_id = parseInt(value, 10);
+        res.currObj = App.currency.getItem(res.curr_id);
+        assert(res.currObj, `Currency '${value}' not found`);
+
+        return res;
+    }
+
+    setModelIcon(value, model = this.model) {
+        const res = model;
+
+        res.icon_id = parseInt(value, 10);
+        res.tileIcon = (res.icon_id !== 0)
+            ? App.icons.getItem(res.icon_id)
+            : Icon.noIcon();
+        assert(res.tileIcon, `Icon '${value}' not found`);
 
         return res;
     }
@@ -127,11 +140,8 @@ export class AccountView extends AppView {
         this.model.balance = account.balance.toString();
         this.model.fBalance = account.balance;
 
-        this.model.currObj = App.currency.getItem(account.curr_id);
-        assert(this.model.currObj, `Unexpected currency ${account.curr_id}`);
-
-        this.model.curr_id = this.model.currObj.id;
-        this.model.icon_id = account.icon_id;
+        this.setModelCurrency(account.curr_id);
+        this.setModelIcon(account.icon_id);
     }
 
     getExpectedAccount(model = this.model) {
@@ -178,7 +188,10 @@ export class AccountView extends AppView {
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
             currDropDown: { textValue: model.currObj.name, visible: true },
-            iconDropDown: { textValue: model.tileIcon.name, visible: true },
+            iconDropDown: {
+                textValue: __(model.tileIcon.name, this.locale),
+                visible: true,
+            },
         };
 
         return res;
@@ -259,7 +272,7 @@ export class AccountView extends AppView {
         }
 
         if (!val) {
-            iconObj = Icon.noIcon(this.locale);
+            iconObj = Icon.noIcon();
         }
 
         this.model.icon_id = iconObj.id;

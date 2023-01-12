@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 14;
+    protected $latestVersion = 15;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -207,6 +207,9 @@ class DBVersion
             }
             if ($current < 14) {
                 $current = $this->version14();
+            }
+            if ($current < 15) {
+                $current = $this->version15();
             }
 
             $this->setVersion($current);
@@ -539,46 +542,62 @@ class DBVersion
             throw new \Error("Invalid DB client");
         }
 
-        $this->createCategoriesTable();
-
         $tableName = "import_act";
-        $res = $this->dbClient->updateQ(
-            $tableName,
-            ["value" => "transfer_out"],
-            ["action_id=1", "value='transferfrom'"],
-        );
-        if (!$res) {
-            throw new \Error("Fail to update '$tableName' table");
-        }
+        $valuesMap = [
+            "transferfrom" => "transfer_out",
+            "transferto" => "transfer_in",
+            "debtfrom" => "debt_out",
+            "debtto" => "debt_in",
+        ];
 
-        $res = $this->dbClient->updateQ(
-            $tableName,
-            ["value" => "transfer_in"],
-            ["action_id=1", "value='transferto'"],
-        );
-        if (!$res) {
-            throw new \Error("Fail to update '$tableName' table");
-        }
-
-        $res = $this->dbClient->updateQ(
-            $tableName,
-            ["value" => "debt_out"],
-            ["action_id=1", "value='debtfrom'"],
-        );
-        if (!$res) {
-            throw new \Error("Fail to update '$tableName' table");
-        }
-
-        $res = $this->dbClient->updateQ(
-            $tableName,
-            ["value" => "debt_in"],
-            ["action_id=1", "value='debtto'"],
-        );
-        if (!$res) {
-            throw new \Error("Fail to update '$tableName' table");
+        foreach ($valuesMap as $currentType => $newType) {
+            $res = $this->dbClient->updateQ(
+                $tableName,
+                ["value" => $newType],
+                ["action_id=1", "value='$currentType'"],
+            );
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
         }
 
         return 14;
+    }
+
+    /**
+     * Creates database version 15
+     *
+     * @return int
+     */
+    private function version15()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "icon";
+
+        $valuesMap = [
+            "tile-purse" => "ICON_PURSE",
+            "tile-safe" => "ICON_SAFE",
+            "tile-card" => "ICON_CARD",
+            "tile-percent" => "ICON_PERCENT",
+            "tile-bank" => "ICON_BANK",
+            "tile-cash" => "ICON_CASH",
+        ];
+
+        foreach ($valuesMap as $file => $name) {
+            $res = $this->dbClient->updateQ(
+                $tableName,
+                ["name" => $name],
+                ["file=" . qnull($file)],
+            );
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 15;
     }
 
     /**
@@ -809,12 +828,12 @@ class DBVersion
         }
 
         $data = [
-            ["name" => "Purse", "file" => "tile-purse", "type" => ICON_TILE],
-            ["name" => "Safe", "file" => "tile-safe", "type" => ICON_TILE],
-            ["name" => "Card", "file" => "tile-card", "type" => ICON_TILE],
-            ["name" => "Percent", "file" => "tile-percent", "type" => ICON_TILE],
-            ["name" => "Bank", "file" => "tile-bank", "type" => ICON_TILE],
-            ["name" => "Cash", "file" => "tile-cash", "type" => ICON_TILE],
+            ["name" => "ICON_PURSE", "file" => "tile-purse", "type" => ICON_TILE],
+            ["name" => "ICON_SAFE", "file" => "tile-safe", "type" => ICON_TILE],
+            ["name" => "ICON_CARD", "file" => "tile-card", "type" => ICON_TILE],
+            ["name" => "ICON_PERCENT", "file" => "tile-percent", "type" => ICON_TILE],
+            ["name" => "ICON_BANK", "file" => "tile-bank", "type" => ICON_TILE],
+            ["name" => "ICON_CASH", "file" => "tile-cash", "type" => ICON_TILE],
         ];
 
         $iconModel = IconModel::getInstance();

@@ -25,6 +25,7 @@ import '../../Components/Heading/style.scss';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
+import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 
 /**
  * Create/update account view
@@ -62,6 +63,7 @@ class AccountView extends View {
     onStart() {
         this.loadElementsByIds([
             'accountForm',
+            'iconField',
             'currencySign',
             'balanceInp',
             'nameInp',
@@ -71,11 +73,13 @@ class AccountView extends View {
         ]);
 
         this.tile = AccountTile.fromElement('accountTile');
-        this.iconSelect = DropDown.create({
-            elem: 'icon',
-            onitemselect: (o) => this.onIconSelect(o),
+
+        this.iconSelect = IconSelect.create({
             className: 'dd_fullwidth',
+            onitemselect: (o) => this.onIconSelect(o),
         });
+        this.iconField.append(this.iconSelect.elem);
+
         this.currencySelect = DropDown.create({
             elem: 'currency',
             onitemselect: (o) => this.onCurrencySelect(o),
@@ -288,6 +292,7 @@ class AccountView extends View {
         enable(this.balanceInp, !state.submitStarted);
 
         // Icon select
+        this.iconSelect.selectItem(state.data.icon_id);
         this.iconSelect.enable(!state.submitStarted);
 
         // Currency select

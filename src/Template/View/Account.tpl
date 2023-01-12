@@ -33,24 +33,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div class="view-row std_margin">
                                 <?= Tile::render($tile) ?>
                             </div>
-                            <div id="icon-block" class="view-row std_margin">
-                                <label for="icon"><?= __("ACCOUNT_ICON") ?></label>
-                                <div>
-                                    <select id="icon" name="icon_id">
-                                        <?php if ($accInfo->icon_id == 0) {    ?>
-                                            <option value="0" selected><?= __("ACCOUNT_NO_ICON") ?></option>
-                                        <?php    } else {    ?>
-                                            <option value="0"><?= __("ACCOUNT_NO_ICON") ?></option>
-                                        <?php    }    ?>
-                                        <?php foreach ($icons as $icon) {
-                                            if ($icon->id == $accInfo->icon_id) {        ?>
-                                                <option value="<?= e($icon->id) ?>" selected><?= e($icon->name) ?></option>
-                                            <?php        } else {    ?>
-                                                <option value="<?= e($icon->id) ?>"><?= e($icon->name) ?></option>
-                                        <?php        }
-                                        }        ?>
-                                    </select>
-                                </div>
+                            <div id="iconField" class="view-row std_margin">
+                                <label><?= __("ACCOUNT_ICON") ?></label>
                             </div>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
                                 <label for="nameInp"><?= __("ACCOUNT_NAME") ?></label>

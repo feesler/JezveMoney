@@ -1,11 +1,9 @@
-import { __ } from './locale.js';
-
 /** Icon class */
 export class Icon {
-    static noIcon(locale) {
+    static noIcon() {
         return {
             id: 0,
-            name: __('ACCOUNT_NO_ICON', locale),
+            name: 'ACCOUNT_NO_ICON',
             file: null,
             type: null,
         };

@@ -102,13 +102,12 @@ class Accounts extends TemplateController
         ];
 
         $iconModel = IconModel::getInstance();
-        $data["icons"] = $iconModel->getData();
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
-            "icons" => $data["icons"],
+            "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,
             ],
@@ -176,13 +175,12 @@ class Accounts extends TemplateController
         ];
 
         $iconModel = IconModel::getInstance();
-        $data["icons"] = $iconModel->getData();
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
-            "icons" => $data["icons"],
+            "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,
             ],
