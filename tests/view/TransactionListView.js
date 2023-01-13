@@ -25,6 +25,8 @@ import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
+import { Counter } from './component/Counter.js';
+import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 import {
     dateToSeconds,
     fixDate,
@@ -32,7 +34,6 @@ import {
     secondsToDateString,
     urlJoin,
 } from '../common.js';
-import { Counter } from './component/Counter.js';
 import { __ } from '../model/locale.js';
 
 const modeButtons = {
@@ -53,6 +54,8 @@ const listMenuItems = [
 const contextMenuItems = [
     'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
+
+const categoryDialogSelector = '#selectCategoryDialog';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -133,27 +136,10 @@ export class TransactionListView extends AppView {
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
-        const categoryDialogElem = await query('#selectCategoryDialog');
-        res.selectCategoryDialog = { elem: categoryDialogElem };
-        if (categoryDialogElem) {
-            const dropDownElem = await query(categoryDialogElem, '.dd__container');
-            const categorySelect = await DropDown.create(this, dropDownElem);
-            categorySelect.visible = await isVisible(categorySelect.elem, true);
-
-            const okBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.submit-btn'),
-            };
-            okBtn.visible = await isVisible(okBtn.elem, true);
-
-            const cancelBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.cancel-btn'),
-            };
-            cancelBtn.visible = await isVisible(cancelBtn.elem, true);
-
-            res.selectCategoryDialog.categorySelect = categorySelect;
-            res.selectCategoryDialog.okBtn = okBtn;
-            res.selectCategoryDialog.cancelBtn = cancelBtn;
-        }
+        res.selectCategoryDialog = await SetCategoryDialog.create(
+            this,
+            await query(categoryDialogSelector),
+        );
 
         return res;
     }
@@ -244,9 +230,9 @@ export class TransactionListView extends AppView {
         const locURL = new URL(this.location);
         res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
 
-        res.showCategoryDialog = cont.selectCategoryDialog.visible;
         res.categoryDialog = {
-            categoryId: cont.selectCategoryDialog.categorySelect?.value,
+            show: !!(cont.selectCategoryDialog?.visible),
+            categoryId: cont.selectCategoryDialog?.value,
         };
 
         res.loading = cont.loadingIndicator.visible;
@@ -343,6 +329,23 @@ export class TransactionListView extends AppView {
         }
 
         return res;
+    }
+
+    getExpectedCategory(index, model = this.model) {
+        const indexes = asArray(index);
+        assert(indexes.length > 0, 'Not transactions specified');
+
+        if (indexes.length > 1) {
+            return 0;
+        }
+
+        const [ind] = indexes;
+        assert.arrayIndex(model.list.items, ind, `Invalid index of item: ${ind}`);
+        const { id } = model.list.items[ind];
+        const transaction = App.state.transactions.getItem(id);
+        assert(transaction, `Transaction not found: '${id}'`);
+
+        return transaction.category_id;
     }
 
     setModelPage(model, page) {
@@ -508,16 +511,13 @@ export class TransactionListView extends AppView {
         }
 
         // Set category dialog
-        res.selectCategoryDialog = {
-            visible: model.showCategoryDialog,
-        };
-        if (model.showCategoryDialog) {
-            res.selectCategoryDialog.categorySelect = {
+        if (model.categoryDialog.show) {
+            res.selectCategoryDialog = {
                 visible: true,
-                value: model.categoryDialog.categoryId.toString(),
-            };
-            res.selectCategoryDialog.okBtn = {
-                visible: true,
+                categorySelect: {
+                    visible: true,
+                    value: model.categoryDialog.categoryId.toString(),
+                },
             };
         }
 
@@ -1153,8 +1153,10 @@ export class TransactionListView extends AppView {
     async setTransactionCategory(index, category) {
         await this.openContextMenu(index);
 
-        this.model.showCategoryDialog = true;
-        this.model.categoryDialog = { categoryId: 0 };
+        this.model.categoryDialog = {
+            show: true,
+            categoryId: this.getExpectedCategory(index),
+        };
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
@@ -1162,11 +1164,9 @@ export class TransactionListView extends AppView {
         this.checkState(expected);
 
         const { selectCategoryDialog } = this.content;
-        const { categorySelect } = selectCategoryDialog;
-        await this.waitForList(async () => {
-            await categorySelect.setSelection(category);
-            await click(selectCategoryDialog.okBtn.elem);
-        });
+        assert(selectCategoryDialog, 'Select category dialog not found');
+
+        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
     }
 
     /** Set category for selected transactions */
@@ -1179,8 +1179,10 @@ export class TransactionListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.model.showCategoryDialog = true;
-        this.model.categoryDialog = { categoryId: 0 };
+        this.model.categoryDialog = {
+            show: true,
+            categoryId: this.getExpectedCategory(transactions),
+        };
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.setCategoryBtn.click());
@@ -1188,11 +1190,9 @@ export class TransactionListView extends AppView {
         this.checkState(expected);
 
         const { selectCategoryDialog } = this.content;
-        const { categorySelect } = selectCategoryDialog;
-        await this.waitForList(async () => {
-            await categorySelect.setSelection(category);
-            await click(selectCategoryDialog.okBtn.elem);
-        });
+        assert(selectCategoryDialog, 'Select category dialog not found');
+
+        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
     }
 
     /** Delete specified transactions */

@@ -23,7 +23,6 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
-import { Field } from '../../Components/Field/Field.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -31,6 +30,7 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './style.scss';
@@ -313,32 +313,6 @@ class TransactionListView extends View {
                 title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
-        });
-    }
-
-    createSetCategoryDialog() {
-        if (this.setCategoryDialog) {
-            return;
-        }
-
-        this.categorySelect = CategorySelect.create({
-            className: 'dd_fullwidth',
-            onchange: (category) => this.onChangeCategorySelect(category),
-        });
-        this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
-            content: this.categorySelect.elem,
-            className: 'view-row',
-        });
-
-        this.setCategoryDialog = ConfirmDialog.create({
-            id: 'selectCategoryDialog',
-            title: __('TR_SET_CATEGORY'),
-            content: this.categoryField.elem,
-            className: 'category-dialog',
-            destroyOnResult: false,
-            onconfirm: () => this.setItemsCategory(),
-            onreject: () => this.closeCategoryDialog(),
         });
     }
 
@@ -806,15 +780,23 @@ class TransactionListView extends View {
     }
 
     renderCategoryDialog(state, prevState) {
-        if (state.showCategoryDialog === prevState?.showCategoryDialog) {
+        if (state.categoryDialog === prevState?.categoryDialog) {
             return;
         }
 
-        if (state.showCategoryDialog) {
-            this.createSetCategoryDialog();
+        if (state.categoryDialog.show && !this.setCategoryDialog) {
+            this.setCategoryDialog = SetCategoryDialog.create({
+                onChange: (category) => this.onChangeCategorySelect(category),
+                onSubmit: () => this.setItemsCategory(),
+                onCancel: () => this.closeCategoryDialog(),
+            });
         }
-        this.setCategoryDialog?.show(state.showCategoryDialog);
-        this.categorySelect?.selectItem(state.categoryDialog.categoryId);
+        if (!this.setCategoryDialog) {
+            return;
+        }
+
+        this.setCategoryDialog.setCategory(state.categoryDialog.categoryId);
+        this.setCategoryDialog.show(state.categoryDialog.show);
     }
 
     render(state, prevState = {}) {

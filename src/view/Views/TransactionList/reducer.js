@@ -145,26 +145,44 @@ const slice = createSlice({
         contextItem: null,
     }),
 
-    showCategoryDialog: (state, ids) => ({
-        ...state,
-        showCategoryDialog: true,
-        categoryDialog: {
-            categoryId: 0,
-            ids,
-        },
-        contextItem: null,
-    }),
+    showCategoryDialog: (state, ids) => {
+        if (ids.length === 0) {
+            return state;
+        }
+
+        let categoryId = 0;
+        if (ids.length === 1) {
+            const [id] = ids;
+            const transaction = state.items.find((item) => item.id === id);
+            if (transaction) {
+                categoryId = transaction.category_id;
+            }
+        }
+
+        return {
+            ...state,
+            categoryDialog: {
+                show: true,
+                categoryId,
+                ids,
+            },
+            contextItem: null,
+        };
+    },
 
     closeCategoryDialog: (state) => ({
         ...state,
-        showCategoryDialog: false,
+        categoryDialog: {
+            ...state.categoryDialog,
+            show: false,
+        },
     }),
 
-    changeCategorySelect: (state, id) => ({
+    changeCategorySelect: (state, categoryId) => ({
         ...state,
         categoryDialog: {
             ...state.categoryDialog,
-            categoryId: id,
+            categoryId,
         },
     }),
 

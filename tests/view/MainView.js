@@ -1,13 +1,10 @@
 import {
     assert,
-    isVisible,
     navigation,
     prop,
     query,
-    click,
     waitForFunction,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
@@ -17,62 +14,39 @@ import { Widget } from './component/Widget/Widget.js';
 import { TilesWidget } from './component/Widget/TilesWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 
 /** Main view class */
 export class MainView extends AppView {
     async parseContent() {
-        const res = {};
-
-        res.accountsWidget = await TilesWidget.create(
-            this,
-            await query('.accounts-widget'),
-        );
-
-        res.totalsWidget = await Widget.create(
-            this,
-            await query('.total-widget'),
-        );
-
-        res.transactionsWidget = await TransactionsWidget.create(
-            this,
-            await query('.transactions-widget'),
-        );
-
-        res.personsWidget = await TilesWidget.create(
-            this,
-            await query('.persons-widget'),
-        );
-
-        res.statisticsWidget = await Widget.create(
-            this,
-            await query('.statistics-widget'),
-        );
-
-        res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
-
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
-
-        const categoryDialogElem = await query('#selectCategoryDialog');
-        res.selectCategoryDialog = { elem: categoryDialogElem };
-        if (categoryDialogElem) {
-            const dropDownElem = await query(categoryDialogElem, '.dd__container');
-            const categorySelect = await DropDown.create(this, dropDownElem);
-            categorySelect.visible = await isVisible(categorySelect.elem, true);
-
-            const okBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.submit-btn'),
-            };
-            okBtn.visible = await isVisible(okBtn.elem, true);
-
-            const cancelBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.cancel-btn'),
-            };
-            cancelBtn.visible = await isVisible(cancelBtn.elem, true);
-
-            res.selectCategoryDialog.categorySelect = categorySelect;
-            res.selectCategoryDialog.okBtn = okBtn;
-            res.selectCategoryDialog.cancelBtn = cancelBtn;
-        }
+        const res = {
+            accountsWidget: await TilesWidget.create(
+                this,
+                await query('.accounts-widget'),
+            ),
+            totalsWidget: await Widget.create(
+                this,
+                await query('.total-widget'),
+            ),
+            transactionsWidget: await TransactionsWidget.create(
+                this,
+                await query('.transactions-widget'),
+            ),
+            personsWidget: await TilesWidget.create(
+                this,
+                await query('.persons-widget'),
+            ),
+            statisticsWidget: await Widget.create(
+                this,
+                await query('.statistics-widget'),
+            ),
+            loadingIndicator: { elem: await query('#contentContainer .loading-indicator') },
+            delete_warning: await WarningPopup.create(this, await query('#delete_warning')),
+            selectCategoryDialog: await SetCategoryDialog.create(
+                this,
+                await query('#selectCategoryDialog'),
+            ),
+        };
 
         res.renderTime = await prop(res.accountsWidget?.tiles?.elem, 'dataset.time');
 
@@ -164,13 +138,10 @@ export class MainView extends AppView {
         assert(this.content.transactionsWidget, 'Transactions widget not found');
 
         await this.performAction(() => this.content.transactionsWidget.setCategoryByIndex(index));
-
         const { selectCategoryDialog } = this.content;
-        const { categorySelect } = selectCategoryDialog;
-        await this.waitForData(async () => {
-            await categorySelect.setSelection(category);
-            await click(selectCategoryDialog.okBtn.elem);
-        });
+        assert(selectCategoryDialog, 'Select category dialog not found');
+
+        await this.waitForData(() => selectCategoryDialog.selectCategoryAndSubmit(category));
     }
 
     async deleteTransactionByIndex(index) {

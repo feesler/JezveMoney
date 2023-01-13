@@ -169,6 +169,8 @@ export const setTransactionCategory = async ({ index, category }) => {
         assert.arrayIndex(origItems, ind);
         const { id } = origItems[ind];
 
+        await App.view.setTransactionCategory(index, category);
+
         App.state.setTransactionCategory({ id, category });
         const expectedItems = App.state.transactions.getItems(pageIds);
         const expected = {
@@ -176,8 +178,6 @@ export const setTransactionCategory = async ({ index, category }) => {
                 items: TransactionList.render(expectedItems, App.state),
             },
         };
-
-        await App.view.setTransactionCategory(index, category);
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
@@ -198,6 +198,8 @@ export const setCategory = async ({ items, category }) => {
             return origItems[ind].id;
         });
 
+        await App.view.setCategory(items, category);
+
         App.state.setTransactionCategory({
             id: ids,
             category,
@@ -208,8 +210,6 @@ export const setCategory = async ({ items, category }) => {
                 items: TransactionList.render(expectedItems, App.state),
             },
         };
-
-        await App.view.setCategory(items, category);
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();

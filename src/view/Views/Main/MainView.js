@@ -22,12 +22,10 @@ import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { Field } from '../../Components/Field/Field.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import '../../Components/Tile/style.scss';
+import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import { reducer, actions } from './reducer.js';
@@ -56,8 +54,8 @@ class MainView extends View {
                 visible: PersonList.create(window.app.model.visiblePersons),
             },
             chartData: this.props.chartData,
-            showCategoryDialog: false,
             categoryDialog: {
+                show: false,
                 categoryId: 0,
             },
             loading: true,
@@ -189,32 +187,6 @@ class MainView extends View {
         });
     }
 
-    createSetCategoryDialog() {
-        if (this.setCategoryDialog) {
-            return;
-        }
-
-        this.categorySelect = CategorySelect.create({
-            className: 'dd_fullwidth',
-            onchange: (category) => this.onChangeCategorySelect(category),
-        });
-        this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
-            content: this.categorySelect.elem,
-            className: 'view-row',
-        });
-
-        this.setCategoryDialog = ConfirmDialog.create({
-            id: 'selectCategoryDialog',
-            title: __('TR_SET_CATEGORY'),
-            content: this.categoryField.elem,
-            className: 'category-dialog',
-            destroyOnResult: false,
-            onconfirm: () => this.setItemsCategory(),
-            onreject: () => this.closeCategoryDialog(),
-        });
-    }
-
     /** Shows context menu for specified item */
     showContextMenu(itemId) {
         this.store.dispatch(actions.showTransactionContextMenu(itemId));
@@ -222,10 +194,6 @@ class MainView extends View {
 
     showCategoryDialog() {
         const ids = this.getContextIds();
-        if (ids.length === 0) {
-            return;
-        }
-
         this.store.dispatch(actions.showCategoryDialog(ids));
     }
 
@@ -529,15 +497,23 @@ class MainView extends View {
 
     /** Renders 'Set transaction category' dialog */
     renderCategoryDialog(state, prevState) {
-        if (state.showCategoryDialog === prevState?.showCategoryDialog) {
+        if (state.categoryDialog === prevState?.categoryDialog) {
             return;
         }
 
-        if (state.showCategoryDialog) {
-            this.createSetCategoryDialog();
+        if (state.categoryDialog.show && !this.setCategoryDialog) {
+            this.setCategoryDialog = SetCategoryDialog.create({
+                onChange: (category) => this.onChangeCategorySelect(category),
+                onSubmit: () => this.setItemsCategory(),
+                onCancel: () => this.closeCategoryDialog(),
+            });
         }
-        this.setCategoryDialog?.show(state.showCategoryDialog);
-        this.categorySelect?.selectItem(state.categoryDialog.categoryId);
+        if (!this.setCategoryDialog) {
+            return;
+        }
+
+        this.setCategoryDialog.setCategory(state.categoryDialog.categoryId);
+        this.setCategoryDialog.show(state.categoryDialog.show);
     }
 
     /** Renders view state */
