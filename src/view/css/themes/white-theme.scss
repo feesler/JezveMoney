@@ -283,6 +283,7 @@
 
     input[disabled] {
       color: var(--input-disabled-text-color);
+      -webkit-text-fill-color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
