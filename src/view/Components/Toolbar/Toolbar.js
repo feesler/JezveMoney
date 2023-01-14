@@ -16,14 +16,14 @@ export class Toolbar extends Component {
     constructor(...args) {
         super(...args);
 
-        if (isFunction(this.props.onshow)) {
-            this.onShowHandler = this.props.onshow;
+        if (isFunction(this.props.onShow)) {
+            this.onShowHandler = this.props.onShow;
         }
-        if (isFunction(this.props.onhide)) {
-            this.onHideHandler = this.props.onhide;
+        if (isFunction(this.props.onHide)) {
+            this.onHideHandler = this.props.onHide;
         }
-        if (isFunction(this.props.ondelete)) {
-            this.onDeleteHandler = this.props.ondelete;
+        if (isFunction(this.props.onDelete)) {
+            this.onDeleteHandler = this.props.onDelete;
         }
     }
 

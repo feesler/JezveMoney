@@ -104,7 +104,7 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
-            onchange: (account) => this.onMainAccChange(account),
+            onChange: (account) => this.onMainAccChange(account),
             className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -941,7 +941,7 @@ class ImportView extends View {
         const enabledList = this.getEnabledItems(state);
         const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
 
-        this.accountDropDown.selectItem(state.mainAccount.id);
+        this.accountDropDown.setSelection(state.mainAccount.id);
         this.accountDropDown.enable(isListMode);
 
         enable(this.submitBtn, (enabledList.length > 0 && isListMode));

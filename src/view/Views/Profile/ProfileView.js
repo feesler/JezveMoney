@@ -101,7 +101,7 @@ class ProfileView extends View {
             id: 'delete_warning',
             title: __('PROFILE_DELETE'),
             content: __('MSG_PROFILE_DELETE'),
-            onconfirm: () => this.requestDeleteProfile(),
+            onConfirm: () => this.requestDeleteProfile(),
         });
     }
 

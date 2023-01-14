@@ -320,7 +320,7 @@ class MainView extends View {
             id: 'delete_warning',
             title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
             content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
-            onconfirm: () => this.deleteItems(),
+            onConfirm: () => this.deleteItems(),
         });
     }
 

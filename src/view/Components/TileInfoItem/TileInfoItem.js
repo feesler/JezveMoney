@@ -24,8 +24,8 @@ export class TileInfoItem extends Component {
         this.labelElem = this.elem.firstElementChild;
 
         this.buttonElem = this.elem.querySelector('button');
-        if (this.buttonElem && isFunction(this.props.onclick)) {
-            setEvents(this.buttonElem, { click: this.props.onclick });
+        if (this.buttonElem && isFunction(this.props.onClick)) {
+            setEvents(this.buttonElem, { click: this.props.onClick });
         }
     }
 

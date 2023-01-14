@@ -334,7 +334,7 @@ class PersonListView extends View {
             id: 'delete_warning',
             title: (multiple) ? __('PERSON_DELETE_MULTIPLE') : __('PERSON_DELETE'),
             content: (multiple) ? __('MSG_PERSON_DELETE_MULTIPLE') : __('MSG_PERSON_DELETE'),
-            onconfirm: () => this.deleteItems(),
+            onConfirm: () => this.deleteItems(),
         });
     }
 

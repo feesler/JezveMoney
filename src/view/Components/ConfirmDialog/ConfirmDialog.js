@@ -13,8 +13,8 @@ const defaultProps = {
  * @param {Object} props
  * @param {string} props.title - popup title
  * @param {string} props.content - confirmation message
- * @param {Function} props.onconfirm - confirmation callback function
- * @param {Function} props.onreject - reject callback function
+ * @param {Function} props.onConfirm - confirmation callback function
+ * @param {Function} props.onReject - reject callback function
  */
 export class ConfirmDialog extends Component {
     static create(props) {
@@ -36,12 +36,12 @@ export class ConfirmDialog extends Component {
             ...props,
         });
 
-        if (!isFunction(this.props.onconfirm)) {
-            throw new Error('Invalid onconfirm callback');
+        if (!isFunction(this.props.onConfirm)) {
+            throw new Error('Invalid onConfirm callback');
         }
 
-        if ('onreject' in this.props && !isFunction(this.props.onreject)) {
-            throw new Error('Invalid onreject callback');
+        if ('onReject' in this.props && !isFunction(this.props.onReject)) {
+            throw new Error('Invalid onReject callback');
         }
 
         const popupProps = {
@@ -83,9 +83,9 @@ export class ConfirmDialog extends Component {
         }
 
         if (confirmResult) {
-            this.props.onconfirm();
-        } else if (isFunction(this.props.onreject)) {
-            this.props.onreject();
+            this.props.onConfirm();
+        } else if (isFunction(this.props.onReject)) {
+            this.props.onReject();
         }
     }
 }

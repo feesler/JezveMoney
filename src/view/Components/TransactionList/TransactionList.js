@@ -39,7 +39,7 @@ export class TransactionList extends ListContainer {
         }
 
         this.listSortable = new Sortable({
-            oninsertat: (elem, ref) => this.onSort(elem, ref),
+            onInsertAt: (elem, ref) => this.onSort(elem, ref),
             elem: this.elem,
             group: 'transactions',
             selector: state.itemSortSelector,

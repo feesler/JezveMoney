@@ -72,7 +72,7 @@ export class TemplateSelect extends Component {
         this.templateDropDown = DropDown.create({
             elem: this.contentElem,
             listAttach: true,
-            onchange: (tpl) => this.onChange(tpl),
+            onChange: (tpl) => this.onChange(tpl),
         });
     }
 
@@ -183,7 +183,7 @@ export class TemplateSelect extends Component {
         }
 
         if (state.template?.id) {
-            this.templateDropDown.selectItem(state.template?.id);
+            this.templateDropDown.setSelection(state.template?.id);
         }
     }
 

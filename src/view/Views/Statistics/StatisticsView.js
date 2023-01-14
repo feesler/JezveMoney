@@ -151,7 +151,7 @@ class StatisticsView extends View {
         // Currency filter
         this.currencyDropDown = DropDown.create({
             elem: 'curr_id',
-            onitemselect: (obj) => this.onCurrencySel(obj),
+            onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencyDropDown);
@@ -163,8 +163,8 @@ class StatisticsView extends View {
             placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
             noResultsMessage: __('ACCOUNTS_NOT_FOUND'),
-            onitemselect: (obj) => this.onAccountSel(obj),
-            onchange: (obj) => this.onAccountSel(obj),
+            onItemSelect: (obj) => this.onAccountSel(obj),
+            onChange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -176,15 +176,15 @@ class StatisticsView extends View {
             placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
             noResultsMessage: 'Nothing found',
-            onitemselect: (obj) => this.onCategorySel(obj),
-            onchange: (obj) => this.onCategorySel(obj),
+            onItemSelect: (obj) => this.onCategorySel(obj),
+            onChange: (obj) => this.onCategorySel(obj),
             className: 'dd_fullwidth',
         });
 
         // 'Group by' filter
         this.groupDropDown = DropDown.create({
             elem: 'groupsel',
-            onitemselect: (obj) => this.onGroupSel(obj),
+            onItemSelect: (obj) => this.onGroupSel(obj),
             className: 'dd_fullwidth',
         });
 
@@ -213,7 +213,7 @@ class StatisticsView extends View {
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
-            onitemclick: (target) => this.onSelectDataColumn(target),
+            onItemClick: (target) => this.onSelectDataColumn(target),
         });
         this.chart.append(this.histogram.elem);
 
@@ -223,9 +223,9 @@ class StatisticsView extends View {
             radius: 150,
             innerRadius: 120,
             offset: 10,
-            onitemover: (item) => this.onPieChartItemOver(item),
-            onitemout: (item) => this.onPieChartItemOut(item),
-            onitemclick: (item) => this.onPieChartItemClick(item),
+            onItemOver: (item) => this.onPieChartItemOver(item),
+            onItemOut: (item) => this.onPieChartItemOut(item),
+            onItemClick: (item) => this.onPieChartItemClick(item),
         });
         this.pieChartContainer.append(this.pieChart.elem);
 
@@ -534,6 +534,8 @@ class StatisticsView extends View {
 
     renderAccountsFilter(state) {
         const ids = state.form?.acc_id ?? [];
+        const selection = [];
+
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
@@ -543,22 +545,16 @@ class StatisticsView extends View {
             this.accountDropDown.enableItem(account.id, enable);
 
             if (enable && ids.includes(account.id)) {
-                this.accountDropDown.selectItem(account.id);
-            } else {
-                this.accountDropDown.deselectItem(account.id);
+                selection.push(account.id);
             }
         });
+
+        this.accountDropDown.setSelection(selection);
     }
 
     renderCategoriesFilter(state) {
         const ids = state.form?.category_id ?? [];
-        window.app.model.categories.forEach((category) => {
-            if (ids.includes(category.id)) {
-                this.categoryDropDown.selectItem(category.id);
-            } else {
-                this.categoryDropDown.deselectItem(category.id);
-            }
-        });
+        this.categoryDropDown.setSelection(ids);
     }
 
     renderFilters(state, prevState = {}) {
@@ -586,11 +582,11 @@ class StatisticsView extends View {
         this.renderCategoriesFilter(state);
 
         if (state.form.curr_id) {
-            this.currencyDropDown.selectItem(state.form.curr_id);
+            this.currencyDropDown.setSelection(state.form.curr_id);
         }
 
         const groupType = getGroupTypeByName(state.form.group);
-        this.groupDropDown.selectItem(groupType);
+        this.groupDropDown.setSelection(groupType);
 
         // Render date
         const dateFilter = {

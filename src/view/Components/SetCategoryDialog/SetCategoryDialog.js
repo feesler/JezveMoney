@@ -34,7 +34,7 @@ export class SetCategoryDialog extends Component {
     init() {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
-            onchange: (category) => this.onChangeCategory(category),
+            onChange: (category) => this.onChangeCategory(category),
         });
         this.categoryField = Field.create({
             title: __('TR_CATEGORY'),
@@ -48,8 +48,8 @@ export class SetCategoryDialog extends Component {
             content: this.categoryField.elem,
             className: 'category-dialog',
             destroyOnResult: false,
-            onconfirm: () => this.onSubmit(),
-            onreject: () => this.onCancel(),
+            onConfirm: () => this.onSubmit(),
+            onReject: () => this.onCancel(),
         });
         if (!this.dialog) {
             throw new Error('Failed to create dialog');
@@ -105,6 +105,6 @@ export class SetCategoryDialog extends Component {
             throw new Error('Invalid state');
         }
 
-        this.categorySelect?.selectItem(state.categoryId);
+        this.categorySelect?.setSelection(state.categoryId);
     }
 }

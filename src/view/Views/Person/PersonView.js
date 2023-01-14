@@ -177,7 +177,7 @@ class PersonView extends View {
             id: 'delete_warning',
             title: __('PERSON_DELETE'),
             content: __('MSG_PERSON_DELETE'),
-            onconfirm: () => this.deletePerson(),
+            onConfirm: () => this.deletePerson(),
         });
     }
 

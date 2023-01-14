@@ -76,13 +76,13 @@ class AccountView extends View {
 
         this.iconSelect = IconSelect.create({
             className: 'dd_fullwidth',
-            onitemselect: (o) => this.onIconSelect(o),
+            onItemSelect: (o) => this.onIconSelect(o),
         });
         this.iconField.append(this.iconSelect.elem);
 
         this.currencySelect = DropDown.create({
             elem: 'currency',
-            onitemselect: (o) => this.onCurrencySelect(o),
+            onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencySelect);
@@ -90,7 +90,7 @@ class AccountView extends View {
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
             digits: 2,
-            oninput: (e) => this.onInitBalanceInput(e),
+            onInput: (e) => this.onInitBalanceInput(e),
         });
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
@@ -245,7 +245,7 @@ class AccountView extends View {
             id: 'delete_warning',
             title: __('ACCOUNT_DELETE'),
             content: __('MSG_ACCOUNT_DELETE'),
-            onconfirm: () => this.deleteAccount(),
+            onConfirm: () => this.deleteAccount(),
         });
     }
 
@@ -292,11 +292,11 @@ class AccountView extends View {
         enable(this.balanceInp, !state.submitStarted);
 
         // Icon select
-        this.iconSelect.selectItem(state.data.icon_id);
+        this.iconSelect.setSelection(state.data.icon_id);
         this.iconSelect.enable(!state.submitStarted);
 
         // Currency select
-        this.currencySelect.selectItem(state.data.curr_id);
+        this.currencySelect.setSelection(state.data.curr_id);
         this.currencySelect.enable(!state.submitStarted);
 
         enable(this.submitBtn, !state.submitStarted);

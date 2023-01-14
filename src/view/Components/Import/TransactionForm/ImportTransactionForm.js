@@ -164,7 +164,7 @@ export class ImportTransactionForm extends Component {
             id: 'transactionFormPopup',
             content: this.elem,
             scrollMessage: true,
-            onclose: () => this.cancel(),
+            onClose: () => this.cancel(),
             btn: {
                 closeBtn: true,
             },
@@ -189,7 +189,7 @@ export class ImportTransactionForm extends Component {
 
         this.typeDropDown = DropDown.create({
             data: typeItems,
-            onchange: (type) => this.onTrTypeChanged(type),
+            onChange: (type) => this.onTrTypeChanged(type),
         });
 
         this.trTypeField = Field.create({
@@ -203,7 +203,7 @@ export class ImportTransactionForm extends Component {
     createAccountField() {
         this.transferAccDropDown = DropDown.create({
             disabled: true,
-            onchange: (account) => this.onTransferAccountChanged(account),
+            onChange: (account) => this.onTransferAccountChanged(account),
         });
         window.app.initAccountsList(this.transferAccDropDown);
 
@@ -218,7 +218,7 @@ export class ImportTransactionForm extends Component {
     createPersonField() {
         this.personDropDown = DropDown.create({
             disabled: true,
-            onchange: (person) => this.onPersonChanged(person),
+            onChange: (person) => this.onPersonChanged(person),
         });
         window.app.initPersonsList(this.personDropDown);
 
@@ -254,7 +254,7 @@ export class ImportTransactionForm extends Component {
         this.srcAmountDecimalInput = DecimalInput.create({
             elem: this.srcAmountInp,
             digits: 2,
-            oninput: () => this.onSrcAmountInput(),
+            onInput: () => this.onSrcAmountInput(),
         });
 
         this.srcCurrencySign = createElement('div', {
@@ -272,7 +272,7 @@ export class ImportTransactionForm extends Component {
         this.srcCurrencyDropDown = DropDown.create({
             elem: this.srcCurrencySign,
             listAttach: true,
-            onchange: (currency) => this.onSrcCurrChanged(currency),
+            onChange: (currency) => this.onSrcCurrChanged(currency),
         });
         window.app.initCurrencyList(this.srcCurrencyDropDown);
 
@@ -302,7 +302,7 @@ export class ImportTransactionForm extends Component {
         this.destAmountDecimalInput = DecimalInput.create({
             elem: this.destAmountInp,
             digits: 2,
-            oninput: () => this.onDestAmountInput(),
+            onInput: () => this.onDestAmountInput(),
         });
 
         this.destCurrencySign = createElement('div', {
@@ -320,7 +320,7 @@ export class ImportTransactionForm extends Component {
         this.destCurrencyDropDown = DropDown.create({
             elem: this.destCurrencySign,
             listAttach: true,
-            onchange: (currency) => this.onDestCurrChanged(currency),
+            onChange: (currency) => this.onDestCurrChanged(currency),
         });
         window.app.initCurrencyList(this.destCurrencyDropDown);
 
@@ -346,7 +346,7 @@ export class ImportTransactionForm extends Component {
             name: 'date[]',
             placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
-            oninput: () => this.onDateInput(),
+            onInput: () => this.onDateInput(),
         });
 
         const dateIcon = Icon.create({
@@ -377,7 +377,7 @@ export class ImportTransactionForm extends Component {
     createCategoryField() {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
-            onchange: (category) => this.onCategoryChanged(category),
+            onChange: (category) => this.onCategoryChanged(category),
         });
 
         this.categoryField = Field.create({
@@ -621,7 +621,7 @@ export class ImportTransactionForm extends Component {
         }
 
         signElem.textContent = curr.sign;
-        ddown?.selectItem(currencyId);
+        ddown?.setSelection(currencyId);
     }
 
     enableCurrency(currBtn, signElem, value) {
@@ -645,7 +645,7 @@ export class ImportTransactionForm extends Component {
             this.datePicker = DatePicker.create({
                 relparent: this.dateGroup.elem,
                 locales: window.app.getCurrrentLocale(),
-                ondateselect: (date) => this.onDateSelect(date),
+                onDateSelect: (date) => this.onDateSelect(date),
             });
             insertAfter(this.datePicker.elem, this.dateGroup.elem);
         }
@@ -707,7 +707,7 @@ export class ImportTransactionForm extends Component {
 
         // Type field
         this.typeDropDown.enable(transaction.enabled);
-        this.typeDropDown.selectItem(transaction.type);
+        this.typeDropDown.setSelection(transaction.type);
 
         // Source amount field
         const showSrcAmount = (!isExpense || isDiff);
@@ -769,7 +769,7 @@ export class ImportTransactionForm extends Component {
                 ? transaction.sourceAccountId
                 : transaction.destAccountId;
             if (transferAccountId) {
-                this.transferAccDropDown.selectItem(transferAccountId);
+                this.transferAccDropDown.setSelection(transferAccountId);
             }
 
             const accountLabel = (transaction.type === 'transfer_in')
@@ -782,7 +782,7 @@ export class ImportTransactionForm extends Component {
         // Person field
         this.personDropDown.enable(transaction.enabled && isDebt);
         if (transaction.personId) {
-            this.personDropDown.selectItem(transaction.personId);
+            this.personDropDown.setSelection(transaction.personId);
         }
         this.personField.show(isDebt);
 
@@ -794,7 +794,7 @@ export class ImportTransactionForm extends Component {
 
         // Category field
         this.categorySelect.enable(transaction.enabled);
-        this.categorySelect.selectItem(transaction.categoryId);
+        this.categorySelect.setSelection(transaction.categoryId);
 
         // Commend field
         enable(this.commInp, transaction.enabled);

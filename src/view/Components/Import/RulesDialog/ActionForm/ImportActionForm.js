@@ -97,7 +97,7 @@ export class ImportActionForm extends Component {
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
-            oninput: () => this.onValueChange(),
+            onInput: () => this.onValueChange(),
         });
         // Create value input element
         this.valueInput = createElement('input', {
@@ -161,7 +161,7 @@ export class ImportActionForm extends Component {
     createActionTypeField() {
         this.actionDropDown = DropDown.create({
             className: ACTION_FIELD_CLASS,
-            onchange: (action) => this.onActionTypeChange(action),
+            onChange: (action) => this.onActionTypeChange(action),
         });
     }
 
@@ -181,17 +181,17 @@ export class ImportActionForm extends Component {
 
         this.trTypeDropDown = DropDown.create({
             className: TRANS_TYPE_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         this.trTypeDropDown.append(items);
-        this.trTypeDropDown.selectItem(items[0].id);
+        this.trTypeDropDown.setSelection(items[0].id);
     }
 
     /** Create account field */
     createAccountField() {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
     }
@@ -200,7 +200,7 @@ export class ImportActionForm extends Component {
     createPersonField() {
         this.personDropDown = DropDown.create({
             className: PERSON_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         window.app.initPersonsList(this.personDropDown);
     }
@@ -209,7 +209,7 @@ export class ImportActionForm extends Component {
     createCategoryField() {
         this.categorySelect = CategorySelect.create({
             className: CATEGORY_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
     }
 
@@ -267,13 +267,13 @@ export class ImportActionForm extends Component {
         }
 
         if (state.actionType === IMPORT_ACTION_SET_TR_TYPE) {
-            this.trTypeDropDown.selectItem(state.value);
+            this.trTypeDropDown.setSelection(state.value);
         } else if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
-            this.accountDropDown.selectItem(parseInt(state.value, 10));
+            this.accountDropDown.setSelection(parseInt(state.value, 10));
         } else if (state.actionType === IMPORT_ACTION_SET_PERSON) {
-            this.personDropDown.selectItem(parseInt(state.value, 10));
+            this.personDropDown.setSelection(parseInt(state.value, 10));
         } else if (state.actionType === IMPORT_ACTION_SET_CATEGORY) {
-            this.categorySelect.selectItem(parseInt(state.value, 10));
+            this.categorySelect.setSelection(parseInt(state.value, 10));
         } else if (ImportAction.isAmountValue(state.actionType)) {
             this.decAmountInput.value = state.value;
         } else {
@@ -342,7 +342,7 @@ export class ImportActionForm extends Component {
         const isAmountTarget = ImportAction.isAmountValue(state.actionType);
 
         this.renderActionTypeField(state);
-        this.actionDropDown.selectItem(state.actionType);
+        this.actionDropDown.setSelection(state.actionType);
 
         this.trTypeDropDown.show(state.actionType === IMPORT_ACTION_SET_TR_TYPE);
         this.accountDropDown.show(state.actionType === IMPORT_ACTION_SET_ACCOUNT);

@@ -88,11 +88,11 @@ export class Header extends Component {
         this.localeSelect = DropDown.create({
             elem: 'localeSelect',
             className: 'dd_fullwidth',
-            onchange: (locale) => this.onLocaleChange(locale),
+            onChange: (locale) => this.onLocaleChange(locale),
             data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
         });
         const currentLocale = window.app.getCurrrentLocale();
-        this.localeSelect.selectItem(currentLocale);
+        this.localeSelect.setSelection(currentLocale);
 
         // Theme swtich
         this.themeSwitch = Switch.fromElement(ge('theme-check'), {

@@ -90,7 +90,7 @@ export class ImportRulesDialog extends Component {
             content: this.elem,
             title: this.headerElem,
             scrollMessage: true,
-            onclose: () => this.onClose(),
+            onClose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
@@ -293,7 +293,7 @@ export class ImportRulesDialog extends Component {
             id: 'rule_delete_warning',
             title: __('IMPORT_RULE_DELETE'),
             content: __('MSG_RULE_DELETE'),
-            onconfirm: () => this.deleteRule(ruleId),
+            onConfirm: () => this.deleteRule(ruleId),
         });
     }
 

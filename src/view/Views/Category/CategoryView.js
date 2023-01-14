@@ -89,7 +89,7 @@ class CategoryView extends View {
     createParentCategorySelect() {
         this.parentSelect = DropDown.create({
             elem: 'parent',
-            onitemselect: (o) => this.onParentSelect(o),
+            onItemSelect: (o) => this.onParentSelect(o),
             className: 'dd_fullwidth',
         });
         this.parentSelect.addItem({
@@ -106,7 +106,7 @@ class CategoryView extends View {
     createTransactionTypeSelect() {
         this.typeSelect = DropDown.create({
             elem: 'type',
-            onitemselect: (type) => this.onTypeSelect(type),
+            onItemSelect: (type) => this.onTypeSelect(type),
             className: 'dd_fullwidth',
         });
         this.typeSelect.append([
@@ -239,7 +239,7 @@ class CategoryView extends View {
             id: 'delete_warning',
             title: __('CATEGORY_DELETE'),
             content: __('MSG_CATEGORY_DELETE'),
-            onconfirm: () => this.deleteCategory(),
+            onConfirm: () => this.deleteCategory(),
         });
     }
 
@@ -261,11 +261,11 @@ class CategoryView extends View {
         enable(this.nameInp, !state.submitStarted);
 
         // Parent category select
-        this.parentSelect.selectItem(state.data.parent_id);
+        this.parentSelect.setSelection(state.data.parent_id);
         this.parentSelect.enable(!state.submitStarted);
 
         // Transaction type select
-        this.typeSelect.selectItem(state.data.type);
+        this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted);
 
         enable(this.submitBtn, !state.submitStarted);

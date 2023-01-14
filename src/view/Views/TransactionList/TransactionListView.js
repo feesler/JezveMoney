@@ -125,8 +125,8 @@ class TransactionListView extends View {
                 placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
                 noResultsMessage: 'Nothing found',
-                onitemselect: (obj) => this.onAccountChange(obj),
-                onchange: (obj) => this.onAccountChange(obj),
+                onItemSelect: (obj) => this.onAccountChange(obj),
+                onChange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
             });
 
@@ -161,8 +161,8 @@ class TransactionListView extends View {
                 placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
                 noResultsMessage: __('NOT_FOUND'),
-                onitemselect: (obj) => this.onCategoryChange(obj),
-                onchange: (obj) => this.onCategoryChange(obj),
+                onItemSelect: (obj) => this.onCategoryChange(obj),
+                onChange: (obj) => this.onCategoryChange(obj),
                 className: 'dd_fullwidth',
             });
         }
@@ -564,7 +564,7 @@ class TransactionListView extends View {
             id: 'delete_warning',
             title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
             content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
-            onconfirm: () => this.deleteItems(),
+            onConfirm: () => this.deleteItems(),
         });
     }
 
@@ -738,23 +738,12 @@ class TransactionListView extends View {
             return;
         }
 
-        const selectedItems = this.accountDropDown.getSelectedItems();
-        const selectedIds = [];
         const idsToSelect = [
             ...asArray(state.form.acc_id).map((id) => `a${id}`),
             ...asArray(state.form.person_id).map((id) => `p${id}`),
         ];
-        selectedItems.forEach(({ id }) => {
-            selectedIds.push(id);
-            if (!idsToSelect.includes(id)) {
-                this.accountDropDown.deselectItem(id);
-            }
-        });
-        idsToSelect.forEach((id) => {
-            if (!selectedIds.includes(id)) {
-                this.accountDropDown.selectItem(id.toString());
-            }
-        });
+
+        this.accountDropDown.setSelection(idsToSelect);
     }
 
     /** Render categories selection */
@@ -763,20 +752,7 @@ class TransactionListView extends View {
             return;
         }
 
-        const selectedItems = this.categoriesDropDown.getSelectedItems();
-        const selectedIds = [];
-        const idsToSelect = asArray(state.form.category_id);
-        selectedItems.forEach(({ id }) => {
-            selectedIds.push(id);
-            if (!idsToSelect.includes(id)) {
-                this.categoriesDropDown.deselectItem(id);
-            }
-        });
-        idsToSelect.forEach((id) => {
-            if (!selectedIds.includes(id)) {
-                this.categoriesDropDown.selectItem(id.toString());
-            }
-        });
+        this.categoriesDropDown.setSelection(state.form.category_id);
     }
 
     renderCategoryDialog(state, prevState) {

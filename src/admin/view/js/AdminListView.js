@@ -163,7 +163,7 @@ export class AdminListView extends AdminView {
         ConfirmDialog.create({
             title: 'Delete',
             content: popupContent,
-            onconfirm: async () => {
+            onConfirm: async () => {
                 const reqURL = `${window.app.baseURL}api/${this.apiController}/del`;
                 const response = await fetch(reqURL, {
                     method: 'POST',

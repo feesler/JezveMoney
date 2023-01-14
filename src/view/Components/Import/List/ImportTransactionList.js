@@ -32,7 +32,7 @@ export class ImportTransactionList extends ListContainer {
         }
 
         this.listSortable = new Sortable({
-            oninsertat: (orig, replaced) => this.onSort(orig, replaced),
+            onInsertAt: (orig, replaced) => this.onSort(orig, replaced),
             elem: this.elem,
             group: 'importTransactions',
             selector: state.itemSortSelector,

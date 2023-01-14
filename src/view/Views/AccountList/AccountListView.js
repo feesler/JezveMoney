@@ -352,7 +352,7 @@ class AccountListView extends View {
             id: 'delete_warning',
             title: (multiple) ? __('ACCOUNT_DELETE_MULTIPLE') : __('ACCOUNT_DELETE'),
             content: (multiple) ? __('MSG_ACCOUNT_DELETE_MULTIPLE') : __('MSG_ACCOUNT_DELETE'),
-            onconfirm: () => this.deleteItems(),
+            onConfirm: () => this.deleteItems(),
         });
     }
 

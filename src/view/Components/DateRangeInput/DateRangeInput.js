@@ -65,14 +65,14 @@ export class DateRangeInput extends Component {
             elem: this.elem.querySelector('input[name="stdate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
-            oninput: (e) => this.onStartDateInput(e),
+            onInput: (e) => this.onStartDateInput(e),
         });
 
         this.endDateInput = DateInput.create({
             elem: this.elem.querySelector('input[name="enddate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
-            oninput: (e) => this.onEndDateInput(e),
+            onInput: (e) => this.onEndDateInput(e),
         });
 
         this.clearBtn = this.elem.querySelector('.clear-btn');
@@ -207,8 +207,8 @@ export class DateRangeInput extends Component {
                 relparent: this.datePickerWrapper.parentNode,
                 locales: window.app.getCurrrentLocale(),
                 range: true,
-                onrangeselect: (range) => this.onRangeSelect(range),
-                onhide: () => this.onDatePickerHide(),
+                onRangeSelect: (range) => this.onRangeSelect(range),
+                onHide: () => this.onDatePickerHide(),
             });
             this.datePickerWrapper.append(this.datePicker.elem);
 
