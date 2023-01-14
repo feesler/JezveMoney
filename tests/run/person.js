@@ -54,7 +54,7 @@ export const update = async (pos) => {
 };
 
 export const inputName = async (value) => {
-    await test(`Input name (${value})`, () => App.view.inputName(value));
+    await test(`Input name '${value}'`, () => App.view.inputName(value));
 };
 
 export const submit = async () => {

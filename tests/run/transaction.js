@@ -84,9 +84,9 @@ export const runAction = async ({ action, data }) => {
         assert(curr, `Currency (${data}) not found`);
 
         if (action === 'changeSourceCurrency') {
-            testDescr = `Change source currency to ${curr.name}`;
+            testDescr = `Change source currency to '${curr.name}'`;
         } else {
-            testDescr = `Change destination currency to ${curr.name}`;
+            testDescr = `Change destination currency to '${curr.name}'`;
         }
     }
 
@@ -98,23 +98,23 @@ export const runAction = async ({ action, data }) => {
     }
 
     if (action === 'inputSrcAmount') {
-        testDescr = `Source amount (${data}) input`;
+        testDescr = `Input source amount '${data}'`;
     }
 
     if (action === 'inputDestAmount') {
-        testDescr = `Destination amount (${data}) input`;
+        testDescr = `Input destination amount '${data}'`;
     }
 
     if (action === 'inputResBalance') {
-        testDescr = `Source result balance (${data}) input`;
+        testDescr = `Input source result balance '${data}'`;
     }
 
     if (action === 'inputDestResBalance') {
-        testDescr = `Destination result balance (${data}) input`;
+        testDescr = `Input destination result balance '${data}'`;
     }
 
     if (action === 'inputExchRate') {
-        testDescr = `Input exchange rate (${data})`;
+        testDescr = `Input exchange rate '${data}'`;
     }
 
     if (action === 'toggleExchange') {

@@ -62,19 +62,25 @@ export const update = async (pos) => {
 };
 
 export const inputName = async (value) => {
-    await test(`Input name (${value})`, () => App.view.inputName(value));
+    await test(`Input name '${value}'`, () => App.view.inputName(value));
 };
 
 export const inputBalance = async (value) => {
-    await test(`Input initial balance (${value})`, () => App.view.inputBalance(value));
+    await test(`Input initial balance '${value}'`, () => App.view.inputBalance(value));
 };
 
 export const changeCurrency = async (value) => {
-    await test(`Change currency to (${value})`, () => App.view.changeCurrency(value));
+    const currency = App.currency.getItem(value);
+    const name = (currency) ? currency.name : `(${value})`;
+
+    await test(`Change currency to '${name}'`, () => App.view.changeCurrency(value));
 };
 
 export const changeIcon = async (value) => {
-    await test(`Change icon to (${value})`, () => App.view.changeIcon(value));
+    const icon = App.icons.getItem(value);
+    const name = (icon) ? __(icon.name, 'en') : `(${value})`;
+
+    await test(`Change icon to '${name}'`, () => App.view.changeIcon(value));
 };
 
 export const submit = async () => {

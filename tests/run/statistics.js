@@ -37,15 +37,32 @@ export const byCurrencies = async () => {
 };
 
 export const filterByCategories = async (ids) => {
-    await test(`Filter by categories [${ids}]`, () => App.view.filterByCategories(ids));
+    const names = asArray(ids).map((id) => {
+        if (parseInt(id, 10) === 0) {
+            return 'No category';
+        }
+
+        const item = App.state.categories.getItem(id);
+        return (item) ? item.name : `(${id})`;
+    });
+
+    await test(`Filter by categories [${names.join()}]`, () => App.view.filterByCategories(ids));
 };
 
 export const filterByAccounts = async (ids) => {
-    await test(`Filter by accounts [${ids}]`, () => App.view.filterByAccounts(ids));
+    const names = asArray(ids).map((accountId) => {
+        const item = App.state.accounts.getItem(accountId);
+        return (item) ? item.name : `(${accountId})`;
+    });
+
+    await test(`Filter by accounts [${names.join()}]`, () => App.view.filterByAccounts(ids));
 };
 
 export const selectCurrency = async (id) => {
-    await test(`Select currency [${id}]`, () => App.view.selectCurrency(id));
+    const currency = App.currency.getItem(id);
+    const name = (currency) ? currency.name : `(${id})`;
+
+    await test(`Select currency [${name}]`, () => App.view.selectCurrency(id));
 };
 
 export const groupByDay = async () => {

@@ -69,7 +69,7 @@ export const updateById = (id) => update(App.state.categories.getIndexById(id));
 
 /** Input category name */
 export const inputName = async (name) => {
-    await test(`Input name ${name}`, async () => {
+    await test(`Input name '${name}'`, async () => {
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
         return App.view.inputName(name);
     });
