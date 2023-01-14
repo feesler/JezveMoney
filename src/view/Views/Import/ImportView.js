@@ -11,7 +11,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { timestampFromString, __ } from '../../js/utils.js';
+import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
@@ -384,8 +384,8 @@ class ImportView extends View {
             const range = this.getImportedItemsDateRange(state);
             const result = await API.transaction.list({
                 count: 0,
-                stdate: window.app.formatDate(new Date(range.start)),
-                enddate: window.app.formatDate(new Date(range.end)),
+                stdate: range.start / MS_IN_SECOND,
+                enddate: range.end / MS_IN_SECOND,
                 acc_id: state.mainAccount.id,
             });
             return result.data.items;

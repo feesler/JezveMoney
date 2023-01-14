@@ -518,9 +518,7 @@ export class ImportTransactionItem extends TestComponent {
                 visible: isDebt,
             },
             dateField: {
-                value: (
-                    (typeof item.date === 'string') ? item.date : secondsToDateString(item.date)
-                ),
+                value: secondsToDateString(item.date),
                 visible: true,
             },
             commentField: {

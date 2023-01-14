@@ -53,11 +53,13 @@ export class ImportTransaction {
             modifiedByUser: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
-            date: data.date,
             category_id: 0,
             comment: data.comment,
             original: data,
         });
+
+        const isValidDate = convDate(data.date) !== null;
+        res.date = (isValidDate) ? dateStringToSeconds(data.date) : null;
 
         if (res.type === 'expense') {
             res.src_id = mainAccount.id;
@@ -454,7 +456,9 @@ export class ImportTransaction {
             }
         }
 
-        this.date = this.original.date;
+        const isValidDate = convDate(this.original.date) !== null;
+        this.date = (isValidDate) ? dateStringToSeconds(this.original.date) : null;
+
         this.category_id = 0;
         this.comment = this.original.comment;
 
@@ -468,15 +472,9 @@ export class ImportTransaction {
             src_curr: this.src_curr,
             dest_curr: this.dest_curr,
             category_id: this.category_id,
+            date: this.date,
             comment: this.comment,
         };
-
-        if (typeof this.date === 'number') {
-            res.date = this.date;
-        } else {
-            const isValidDate = convDate(this.date) !== null;
-            res.date = (isValidDate) ? dateStringToSeconds(this.date) : null;
-        }
 
         if (res.type !== DEBT) {
             res.src_id = this.src_id;
