@@ -14,6 +14,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --action-btn-border-radius: 6px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
+  --input-padding: 0 0.5rem;
   --header-size: 50px;
   --content-padding-bottom: 50px;
   --section-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
@@ -134,7 +135,7 @@ label {
   font-size: 0.9rem;
   border-width: 1px;
   border-style: solid;
-  padding: 0 0.5rem;
+  padding: var(--input-padding);
   border-radius: 5px;
   color: var(--main-text-color);
   border-color: var(--input-border-color);
@@ -530,6 +531,7 @@ label {
   --dd-active-list-item-text: #ffffff;
   --dd-active-list-item-bg: #3078e2;
   --dd-input-font-size: 0.9rem;
+  --dd-input-padding: var(--input-padding);
   --dd-selection-font-size: 15px;
   --dd-active-selection-bg: var(--dd-active-bg);
 }
