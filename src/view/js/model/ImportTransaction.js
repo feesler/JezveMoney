@@ -428,6 +428,15 @@ export class ImportTransaction {
         }
         state.type = value;
 
+        const { categories } = window.app.model;
+        if (state.categoryId !== 0) {
+            const category = categories.getItem(state.categoryId);
+            const realType = transTypeMap[state.type];
+            if (category.type !== 0 && category.type !== realType) {
+                state.categoryId = 0;
+            }
+        }
+
         return new ImportTransaction(state);
     }
 

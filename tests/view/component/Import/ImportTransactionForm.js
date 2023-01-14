@@ -261,6 +261,11 @@ export class ImportTransactionForm extends TestComponent {
         const showSrcAmount = (isExpense && model.isDifferent) || !isExpense;
         const showDestAmount = isExpense || (!isExpense && model.isDifferent);
 
+        const realType = ImportTransaction.typeFromString(model.type);
+        const visibleCategories = App.state
+            .getCategoriesForType(realType)
+            .map((item) => ({ id: item.id.toString() }));
+
         const res = {
             typeField: {
                 disabled: false,
@@ -310,6 +315,7 @@ export class ImportTransactionForm extends TestComponent {
                 value: model.categoryId.toString(),
                 disabled: false,
                 visible: true,
+                dropDown: { items: visibleCategories },
             },
             commentField: {
                 value: model.comment.toString(),
@@ -650,6 +656,17 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
         this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
+
+        if (this.model.categoryId !== 0) {
+            const category = App.state.categories.getItem(this.model.categoryId);
+            assert(category, `Category not found: '${this.model.categoryId}'`);
+
+            const realType = ImportTransaction.typeFromString(this.model.type);
+            if (category.type !== 0 && category.type !== realType) {
+                this.model.categoryId = 0;
+            }
+        }
+
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 

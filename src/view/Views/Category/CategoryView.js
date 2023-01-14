@@ -60,6 +60,7 @@ class CategoryView extends View {
             'categoryForm',
             'nameInp',
             'nameFeedback',
+            'parentCategoryField',
             'submitBtn',
             'cancelBtn',
         ]);
@@ -260,13 +261,20 @@ class CategoryView extends View {
         this.nameInp.value = state.data.name;
         enable(this.nameInp, !state.submitStarted);
 
-        // Parent category select
+        // Parent category field
+        const { categories } = window.app.model;
+        const isUpdate = state.original.id;
+        const minItems = (isUpdate) ? 1 : 0;
+
+        show(this.parentCategoryField, categories.length > minItems);
         this.parentSelect.setSelection(state.data.parent_id);
         this.parentSelect.enable(!state.submitStarted);
 
-        // Transaction type select
+        // Transaction type field
+        const parentId = parseInt(state.data.parent_id, 10);
+
         this.typeSelect.setSelection(state.data.type);
-        this.typeSelect.enable(!state.submitStarted);
+        this.typeSelect.enable(!state.submitStarted && parentId === 0);
 
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);

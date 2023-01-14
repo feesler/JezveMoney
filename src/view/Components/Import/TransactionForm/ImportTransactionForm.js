@@ -21,7 +21,7 @@ import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 import { CategorySelect } from '../../CategorySelect/CategorySelect.js';
-import { typeNames } from '../../../js/model/ImportTransaction.js';
+import { transTypeMap, typeNames } from '../../../js/model/ImportTransaction.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -698,6 +698,10 @@ export class ImportTransactionForm extends Component {
 
         const { transaction } = state;
         const isDiff = transaction.isDiff();
+        const realType = transTypeMap[transaction.type];
+        if (!realType) {
+            throw new Error(`Invalid type of import transaction: ${transaction.type}`);
+        }
         const isExpense = transaction.type === 'expense';
         const isIncome = transaction.type === 'income';
         const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
@@ -793,6 +797,7 @@ export class ImportTransactionForm extends Component {
         window.app.setValidation(this.dateField.elem, state.validation.date);
 
         // Category field
+        this.categorySelect.setType(realType);
         this.categorySelect.enable(transaction.enabled);
         this.categorySelect.setSelection(transaction.categoryId);
 

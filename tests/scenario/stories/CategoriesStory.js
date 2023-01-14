@@ -84,7 +84,6 @@ export class CategoriesStory extends TestStory {
         await CategoryTests.create();
         await CategoryTests.inputName('Cafe');
         await CategoryTests.selectParentCategory(App.scenario.FOOD_CATEGORY);
-        await CategoryTests.selectType(EXPENSE);
         await CategoryTests.submit();
 
         await CategoryTests.create();

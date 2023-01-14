@@ -15,6 +15,9 @@ import { availTransTypes } from '../model/Transaction.js';
 /** Create or update category test view */
 export class CategoryView extends AppView {
     static getExpectedState(model) {
+        const minParentItems = (model.isUpdate) ? 1 : 0;
+        const showParent = App.state.categories.length > minParentItems;
+
         const res = {
             header: {
                 localeSelect: { value: model.locale },
@@ -25,11 +28,12 @@ export class CategoryView extends AppView {
                 isInvalid: model.invalidated ?? false,
             },
             parentSelect: {
-                visible: true,
+                visible: showParent,
                 value: model.parent_id.toString(),
             },
             typeSelect: {
                 visible: true,
+                disabled: model.parent_id !== 0,
                 value: model.type.toString(),
             },
         };
@@ -155,9 +159,14 @@ export class CategoryView extends AppView {
     async selectParentCategory(val) {
         const categoryId = parseInt(val, 10);
         const category = App.state.categories.getItem(categoryId);
-        assert(category, `Invalid category: ${val}`);
+        if (categoryId !== 0) {
+            assert(category, `Invalid category: ${val}`);
+        }
 
-        this.model.parent_id = category.id;
+        this.model.parent_id = categoryId;
+        if (categoryId !== 0) {
+            this.model.type = category.type;
+        }
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.parentSelect.setSelection(val));

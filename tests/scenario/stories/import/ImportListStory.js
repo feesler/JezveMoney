@@ -278,7 +278,11 @@ export class ImportListStory extends TestStory {
     }
 
     async stateLoop() {
-        const { RUB, USD } = App.scenario;
+        const {
+            RUB,
+            USD,
+            TRANSPORT_CATEGORY,
+        } = App.scenario;
 
         setBlock('Import item state loop', 1);
 
@@ -288,6 +292,7 @@ export class ImportListStory extends TestStory {
             pos: 0,
             action: [
                 { action: 'changeType', data: 'expense' }, // 3-1
+                { action: 'changeCategory', data: TRANSPORT_CATEGORY },
                 { action: 'changeDestCurrency', data: USD }, // 1-2
                 { action: 'changeDestCurrency', data: RUB }, // 2-1
                 { action: 'changeType', data: 'income' }, // 1-3

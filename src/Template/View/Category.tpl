@@ -35,7 +35,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <div id="nameFeedback" class="invalid-feedback"></div>
                             </div>
 
-                            <div id="parent-block" class="view-row std_margin">
+                            <div id="parentCategoryField" class="view-row std_margin">
                                 <label for="parent"><?= __("CATEGORY_PARENT") ?></label>
                                 <div>
                                     <select id="parent" name="parent_id"></select>

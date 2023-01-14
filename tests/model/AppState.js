@@ -666,14 +666,19 @@ export class AppState {
         }
 
         // Check parent category
+        let parent = null;
         if (params.parent_id !== 0) {
-            const parent = this.categories.getItem(params.parent_id);
+            parent = this.categories.getItem(params.parent_id);
             if (!parent || parent.parent_id !== 0) {
                 return false;
             }
         }
 
         if (params.type !== 0 && !availTransTypes.includes(params.type)) {
+            return false;
+        }
+
+        if (parent && parent.type !== params.type) {
             return false;
         }
 
@@ -710,6 +715,16 @@ export class AppState {
         }
 
         this.categories.update(expItem);
+
+        // Update transaction type of children categories
+        const children = this.categories.findByParent(expItem.id);
+        children.forEach((item) => {
+            this.categories.update({
+                ...item,
+                type: expItem.type,
+            });
+        });
+
         this.categories.sortByParent();
 
         return true;
@@ -744,6 +759,34 @@ export class AppState {
             assert(item, `Category '${name}' not found`);
             return (returnIds) ? item.id : item;
         });
+    }
+
+    getCategoriesForType(type) {
+        const res = [{ id: 0 }];
+
+        this.categories.forEach((category) => {
+            if (
+                category.parent_id !== 0
+                || (
+                    category.type !== 0
+                    && type !== 0
+                    && category.type !== type
+                )
+            ) {
+                return;
+            }
+
+            res.push(category);
+
+            const children = this.categories.findByParent(category.id);
+            children.forEach((item) => {
+                assert(item.type === category.type, `Invalid transaction type: ${item.type}, ${category.type} is expected`);
+
+                res.push(item);
+            });
+        });
+
+        return res;
     }
 
     /**

@@ -572,8 +572,14 @@ export class TransactionView extends AppView {
                 visible: true,
                 value: this.model.date,
             };
+
+            const visibleCategories = this.appState()
+                .getCategoriesForType(this.model.type)
+                .map((item) => ({ id: item.id.toString() }));
+
             res.categorySelect = {
                 visible: true,
+                items: visibleCategories,
                 value: this.model.categoryId.toString(),
             };
             res.commentRow = {
@@ -1419,6 +1425,15 @@ export class TransactionView extends AppView {
             delete this.model.debtType;
             delete this.model.noAccount;
             delete this.model.lastAcc_id;
+        }
+
+        if (this.model.categoryId !== 0) {
+            const category = this.appState().categories.getItem(this.model.categoryId);
+            assert(category, `Category not found: '${this.model.categoryId}'`);
+
+            if (category.type !== 0 && category.type !== type) {
+                this.model.categoryId = 0;
+            }
         }
 
         this.expectedState = this.getExpectedState();

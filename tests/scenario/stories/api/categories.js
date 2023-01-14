@@ -41,6 +41,11 @@ const createInvalid = async () => {
         parent_id: 0,
         type: 0,
     }, {
+        // Try to create sub category with invalid type
+        name: 'Subcategory',
+        parent_id: App.scenario.FOOD_CATEGORY,
+        type: 0,
+    }, {
         // Invalid data tests
         name: 'Investments',
         parent_id: 0,
@@ -65,7 +70,7 @@ const createMultiple = async () => {
     }, {
         name: 'Bike rent',
         parent_id: App.scenario.TRANSPORT_CATEGORY,
-        type: 0,
+        type: EXPENSE,
     }, {
         name: 'Learning',
         parent_id: 0,
@@ -123,6 +128,7 @@ const updateInvalid = async () => {
         { id: App.scenario.FOOD_CATEGORY, name: '' },
         { id: App.scenario.FOOD_CATEGORY, parent_id: -1 },
         { id: App.scenario.FOOD_CATEGORY, type: 100 },
+        { id: App.scenario.CAFE_CATEGORY, type: INCOME },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);

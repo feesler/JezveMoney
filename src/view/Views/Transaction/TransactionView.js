@@ -1504,6 +1504,7 @@ class TransactionView extends View {
         window.app.setValidation(this.dateRow, state.validation.date);
 
         // Category field
+        this.categorySelect.setType(transaction.type);
         this.categorySelect.setSelection(transaction.category_id);
         this.categorySelect.enable(!state.submitStarted);
 

@@ -704,8 +704,12 @@ export class TransactionsStory extends TestStory {
         await App.goToMainView();
         await App.view.goToNewTransactionByAccount(0);
 
+        const { CAFE_CATEGORY } = App.scenario;
+
         // Start from Expense type
         await TransactionTests.runActions([
+            // Select Expense category to check state on change type of transaction
+            { action: 'changeCategory', data: CAFE_CATEGORY },
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeTransactionType', data: EXPENSE },
             { action: 'changeTransactionType', data: TRANSFER },

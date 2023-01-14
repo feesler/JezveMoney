@@ -1434,6 +1434,14 @@ const slice = createSlice({
             delete transaction.lastAcc_id;
         }
 
+        const { categories } = window.app.model;
+        if (transaction.category_id !== 0) {
+            const category = categories.getItem(transaction.category_id);
+            if (category.type !== 0 && category.type !== transaction.type) {
+                transaction.category_id = 0;
+            }
+        }
+
         return newState;
     },
 

@@ -80,6 +80,7 @@ class CategoryModel extends CachedTable
             }
         }
 
+        $parent = null;
         $res["parent_id"] = (isset($params["parent_id"])) ? intval($params["parent_id"]) : 0;
         if ($res["parent_id"] !== 0) {
             $parent = $this->getItem($res["parent_id"]);
@@ -97,6 +98,9 @@ class CategoryModel extends CachedTable
             if (is_null($typeName)) {
                 throw new \Error("Invalid type specified");
             }
+        }
+        if (!is_null($parent) && $parent->type !== $res["type"]) {
+            throw new \Error("Transaction type of child category must be the same as parent");
         }
 
         if ($this->isSameItemExist($res, $item_id)) {
@@ -163,6 +167,38 @@ class CategoryModel extends CachedTable
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
+    }
+
+    /**
+     * Performs final steps after item was successfully updated
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function postUpdate(int $item_id)
+    {
+        $this->cleanCache();
+
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+
+        // Update transaction type of children categories
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            ["type" => $item->type],
+            [
+                "user_id=" . self::$user_id,
+                "parent_id=" . $item_id,
+            ],
+        );
+        if (!$updRes) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

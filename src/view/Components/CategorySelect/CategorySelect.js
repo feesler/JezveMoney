@@ -1,23 +1,45 @@
 import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../js/utils.js';
 
+const defaultProps = {
+    transactionType: 0,
+};
+
 /**
  * Category DropDown component
  */
 export class CategorySelect extends DropDown {
-    constructor(props) {
-        super(props);
+    constructor(props = {}) {
+        super({
+            ...props,
+            ...defaultProps,
+        });
+
+        this.state = {
+            ...this.state,
+            transactionType: this.props.transactionType,
+        };
 
         this.initCategories();
     }
 
     initCategories() {
         const { categories } = window.app.model;
+        const { transactionType } = this.state;
+
+        this.removeAll();
 
         this.addItem({ id: 0, title: __('NO_CATEGORY') });
 
         categories.forEach((category) => {
-            if (category.parent_id !== 0) {
+            if (
+                category.parent_id !== 0
+                || (
+                    category.type !== 0
+                    && transactionType !== 0
+                    && category.type !== transactionType
+                )
+            ) {
                 return;
             }
 
@@ -33,5 +55,18 @@ export class CategorySelect extends DropDown {
             ));
             this.append(groupItems);
         });
+    }
+
+    setType(transactionType) {
+        if (this.state.transactionType === transactionType) {
+            return;
+        }
+
+        this.setState({
+            ...this.state,
+            transactionType,
+        });
+
+        this.initCategories();
     }
 }

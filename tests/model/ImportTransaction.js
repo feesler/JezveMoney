@@ -332,6 +332,16 @@ export class ImportTransaction {
             this.acc_id = this.mainAccount.id;
             this.op = (value === 'debt_in') ? 1 : 2;
         }
+
+        if (this.category_id !== 0) {
+            const category = App.state.categories.getItem(this.category_id);
+            assert(category, `Category not found: '${this.category_id}'`);
+
+            const realType = ImportTransaction.typeFromString(this.type);
+            if (category.type !== 0 && category.type !== realType) {
+                this.category_id = 0;
+            }
+        }
     }
 
     /** Change transaction type so source and destination are swapped */

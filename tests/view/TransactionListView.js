@@ -512,10 +512,15 @@ export class TransactionListView extends AppView {
 
         // Set category dialog
         if (model.categoryDialog.show) {
+            const visibleCategories = App.state
+                .getCategoriesForType(0)
+                .map((item) => ({ id: item.id.toString() }));
+
             res.selectCategoryDialog = {
                 visible: true,
                 categorySelect: {
                     visible: true,
+                    items: visibleCategories,
                     value: model.categoryDialog.categoryId.toString(),
                 },
             };
