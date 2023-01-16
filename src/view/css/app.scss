@@ -16,8 +16,16 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --input-height: 37px;
   --input-padding: 0 0.5rem;
   --header-size: 50px;
-  --content-padding-bottom: 50px;
+
+  /* Tiles */
+  --tile-gap: 10px;
+  --tile-size: 100px;
+  --tile-content-color: #ffffff;
+  --tile-bg-color: var(--accent-color-alt);
+
+  /* View content */
   --section-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  --content-padding-bottom: 50px;
 
   /* Popup menu, Chart popup & etc. */
   --popup-menu-backdrop-filter: blur(2px);
