@@ -125,9 +125,15 @@ const updateInvalid = async () => {
     const data = [
         // Try to update name of category to an existing one
         { id: App.scenario.FOOD_CATEGORY, name: 'Transpost' },
+        // Try to submit category with empty name
         { id: App.scenario.FOOD_CATEGORY, name: '' },
+        // Try to submit category with invalid parent
         { id: App.scenario.FOOD_CATEGORY, parent_id: -1 },
+        // Try to submit category with itself as parent
+        { id: App.scenario.FOOD_CATEGORY, parent_id: App.scenario.FOOD_CATEGORY },
+        // Try to submit category with invalid transaction type
         { id: App.scenario.FOOD_CATEGORY, type: 100 },
+        // Try to submit category with transaction type different than parent
         { id: App.scenario.CAFE_CATEGORY, type: INCOME },
     ];
 

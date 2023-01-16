@@ -88,6 +88,8 @@ class CategoryView extends View {
 
     /** Creates parent category select */
     createParentCategorySelect() {
+        const { original } = this.store.getState();
+
         this.parentSelect = DropDown.create({
             elem: 'parent',
             onItemSelect: (o) => this.onParentSelect(o),
@@ -98,8 +100,11 @@ class CategoryView extends View {
         });
 
         const { categories } = window.app.model;
-        const mainCategories = categories.findByParent(0)
+        const mainCategories = categories
+            .findByParent(0)
+            .filter((category) => category.id !== original.id)
             .map(({ id, name }) => ({ id, title: name }));
+
         this.parentSelect.append(mainCategories);
     }
 

@@ -666,10 +666,17 @@ export class AppState {
         }
 
         // Check parent category
+        // - If parent is set, it must refer to existing category
+        // - Parent category could be only top level category
+        // - Category can't be parent to itself
         let parent = null;
         if (params.parent_id !== 0) {
             parent = this.categories.getItem(params.parent_id);
-            if (!parent || parent.parent_id !== 0) {
+            if (
+                !parent
+                || parent.parent_id !== 0
+                || (params.id && parent.id === params.id)
+            ) {
                 return false;
             }
         }
@@ -678,6 +685,7 @@ export class AppState {
             return false;
         }
 
+        // Transaction type of subcategory must be the same as parent
         if (parent && parent.type !== params.type) {
             return false;
         }

@@ -90,6 +90,9 @@ class CategoryModel extends CachedTable
             if ($parent->parent_id !== 0) {
                 throw new \Error("Invalid parent category");
             }
+            if ($item_id !== 0 && $res["parent_id"] === $item_id) {
+                throw new \Error("Category can't be parent to itself");
+            }
         }
 
         $res["type"] = (isset($params["type"])) ? intval($params["type"]) : 0;

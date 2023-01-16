@@ -17,6 +17,11 @@ export class CategoryView extends AppView {
     static getExpectedState(model) {
         const minParentItems = (model.isUpdate) ? 1 : 0;
         const showParent = App.state.categories.length > minParentItems;
+        const topCategories = App.state.categories
+            .findByParent(0)
+            .filter((category) => category.id !== model.id)
+            .map((category) => ({ id: category.id.toString() }));
+        const availParentCategories = [{ id: '0' }, ...topCategories];
 
         const res = {
             header: {
@@ -30,6 +35,7 @@ export class CategoryView extends AppView {
             parentSelect: {
                 visible: showParent,
                 value: model.parent_id.toString(),
+                items: availParentCategories,
             },
             typeSelect: {
                 visible: true,
