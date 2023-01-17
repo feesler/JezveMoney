@@ -188,10 +188,17 @@ class CategoryModel extends CachedTable
             throw new \Error("Item not found");
         }
 
-        // Update transaction type of children categories
+        // Set same transaction type for children categories
+        $assignments = ["type" => $item->type];
+        // In case current item is subcategory then set same parent category for
+        // children categories to avoid third level of nesting
+        if ($item->parent_id !== 0) {
+            $assignments["parent_id"] = $item->parent_id;
+        }
+
         $updRes = $this->dbObj->updateQ(
             $this->tbl_name,
-            ["type" => $item->type],
+            $assignments,
             [
                 "user_id=" . self::$user_id,
                 "parent_id=" . $item_id,

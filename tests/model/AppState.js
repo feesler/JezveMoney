@@ -724,13 +724,20 @@ export class AppState {
 
         this.categories.update(expItem);
 
-        // Update transaction type of children categories
         const children = this.categories.findByParent(expItem.id);
         children.forEach((item) => {
-            this.categories.update({
+            // Update transaction type of children categories
+            const category = {
                 ...item,
                 type: expItem.type,
-            });
+            };
+            // In case current item is subcategory then set same parent category for
+            // children categories to avoid third level of nesting
+            if (expItem.parent_id !== 0) {
+                category.parent_id = expItem.parent_id;
+            }
+
+            this.categories.update(category);
         });
 
         this.categories.sortByParent();

@@ -22,6 +22,10 @@ const create = async () => {
         name: 'Transpost',
         parent_id: 0,
         type: EXPENSE,
+    }, {
+        name: 'Shop',
+        parent_id: 0,
+        type: EXPENSE,
     }];
 
     [
@@ -29,6 +33,7 @@ const create = async () => {
         App.scenario.INVEST_CATEGORY,
         App.scenario.TAXES_CATEGORY,
         App.scenario.TRANSPORT_CATEGORY,
+        App.scenario.SHOP_CATEGORY,
     ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
 };
 
@@ -112,8 +117,22 @@ const update = async () => {
     setBlock('Update categories', 2);
 
     const data = [
-        { id: App.scenario.FOOD_CATEGORY, name: 'Meal' },
-        { id: App.scenario.TAXES_CATEGORY, parent_id: App.scenario.INVEST_CATEGORY },
+        {
+            id: App.scenario.FOOD_CATEGORY,
+            name: 'Meal',
+        },
+        {
+            id: App.scenario.TAXES_CATEGORY,
+            parent_id: App.scenario.INVEST_CATEGORY,
+        },
+        {
+            id: App.scenario.INVEST_CATEGORY,
+            type: EXPENSE,
+        },
+        {
+            id: App.scenario.FOOD_CATEGORY,
+            parent_id: App.scenario.SHOP_CATEGORY,
+        },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
