@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "lint-php": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php ./src/",
+        "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
