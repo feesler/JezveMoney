@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportActionItem;
 
 // Action types
@@ -24,7 +23,6 @@ define("IMPORT_ACTION_SET_CATEGORY", 7);
 class ImportActionModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
 

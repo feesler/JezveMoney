@@ -4,7 +4,6 @@ namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\Singleton;
 use JezveMoney\App\Item\PersonItem;
 
@@ -18,7 +17,6 @@ define("PERSON_HIDDEN", 1);
 class PersonModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
     private static $owner_id = 0;
@@ -190,26 +188,6 @@ class PersonModel extends CachedTable
     }
 
     /**
-     * Removes specified persons of different user. Admin access is required
-     *
-     * @param int|int[]|null $items id or array of person ids to remove
-     *
-     * @return bool
-     */
-    public function adminDelete(mixed $items)
-    {
-        if (!UserModel::isAdminUser()) {
-            return false;
-        }
-
-        $this->adminForce = true;
-        $res = $this->del($items);
-        $this->adminForce = false;
-
-        return $res;
-    }
-
-    /**
      * Checks delete conditions and returns bool result
      *
      * @param array $items array of item ids to remove
@@ -313,11 +291,11 @@ class PersonModel extends CachedTable
         }
 
         // Check user not logged in or there is only user owner person
-        if (!self::$owner_id || count(self::$dcache) == 1) {
+        if (!self::$owner_id || count($this->cache) == 1) {
             return 0;
         }
 
-        $keys = array_keys(self::$dcache);
+        $keys = array_keys($this->cache);
         if (isset($keys[$pos])) {
             if ($keys[$pos] == self::$owner_id) {
                 return ($pos < count($keys) - 1) ? $keys[$pos + 1] : $keys[$pos - 1];

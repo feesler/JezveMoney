@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 
 /**
  * Transactions API controller

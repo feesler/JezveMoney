@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\CurrencyItem;
 
 use function JezveMoney\Core\orJoin;
@@ -16,7 +15,6 @@ use function JezveMoney\Core\orJoin;
 class CurrencyModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     protected $tbl_name = "currency";
 
@@ -226,9 +224,11 @@ class CurrencyModel extends CachedTable
     /**
      * Returns array of currencies
      *
+     * @param array $options data filter options
+     *
      * @return CurrencyItem[]
      */
-    public function getData()
+    public function getData(array $options = [])
     {
         $res = [];
 

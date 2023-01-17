@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\CategoryItem;
 
 define("NO_CATEGORY", 0);
@@ -16,7 +15,6 @@ define("NO_CATEGORY", 0);
 class CategoryModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
 

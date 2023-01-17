@@ -7,7 +7,6 @@ use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\IconModel;
 

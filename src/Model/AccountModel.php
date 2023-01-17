@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\AccountItem;
 
 use function JezveMoney\Core\inSetCondition;
@@ -18,7 +17,6 @@ define("ACCOUNT_HIDDEN", 1);
 class AccountModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
     private static $owner_id = 0;

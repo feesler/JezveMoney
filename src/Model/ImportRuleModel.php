@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportRuleItem;
 
 /**
@@ -14,7 +13,6 @@ use JezveMoney\App\Item\ImportRuleItem;
 class ImportRuleModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
     protected $tbl_name = "import_rule";

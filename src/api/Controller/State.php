@@ -18,15 +18,6 @@ use JezveMoney\App\Model\CurrencyModel;
 class State extends ApiController
 {
     /**
-     * Controller initialization
-     */
-    public function initAPI()
-    {
-        parent::initAPI();
-    }
-
-
-    /**
      * Returns list data for specified request
      *
      * @param array $options

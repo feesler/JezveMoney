@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ImportActionModel;
-use JezveMoney\App\Item\ImportActionItem;
 
 /**
  * Import actions API controller
@@ -28,18 +27,6 @@ class ImportAction extends ApiListController
         $this->createErrorMsg = __("ERR_IMPORT_ACT_CREATE");
         $this->updateErrorMsg = __("ERR_IMPORT_ACT_UPDATE");
         $this->deleteErrorMsg = __("ERR_IMPORT_ACT_DELETE");
-    }
-
-    /**
-     * Returns item object prepared for API response
-     *
-     * @param object $item
-     *
-     * @return object
-     */
-    protected function prepareItem(object $item)
-    {
-        return new ImportActionItem($item);
     }
 
     /**

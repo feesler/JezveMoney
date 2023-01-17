@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportConditionItem;
 
 // Rule field
@@ -32,7 +31,6 @@ define("IMPORT_COND_OP_FIELD_FLAG", 0x01);
 class ImportConditionModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
 

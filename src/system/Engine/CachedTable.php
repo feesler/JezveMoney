@@ -10,14 +10,6 @@ abstract class CachedTable extends Model
     protected $cache = null;
 
     /**
-     * Returns link to cache of derived class
-     */
-    protected function &getDerivedCache()
-    {
-        return static::$dcache;
-    }
-
-    /**
      * Query data from DB
      *
      * @return \mysqli_result|bool
@@ -51,8 +43,6 @@ abstract class CachedTable extends Model
      */
     protected function checkCache()
     {
-        $this->cache = &$this->getDerivedCache();
-
         if (is_null($this->cache)) {
             $this->updateCache();
         }

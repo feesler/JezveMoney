@@ -4,7 +4,6 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\IconModel;
-use JezveMoney\App\Item\IconItem;
 
 /**
  * Icons API controller

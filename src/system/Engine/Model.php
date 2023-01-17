@@ -295,8 +295,12 @@ abstract class Model
 
     /**
      * Returns array of items
+     *
+     * @param array $options data filter options
+     *
+     * @return array
      */
-    public function getData()
+    public function getData(array $options = [])
     {
         return [];
     }

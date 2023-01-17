@@ -4,7 +4,6 @@ namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\MySqlDB;
 
 use function JezveMoney\Core\qnull;
@@ -19,7 +18,6 @@ const SECONDS_IN_HOUR = 3600;
 class UserModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private $currentUser = null;
     protected $tbl_name = "users";
@@ -856,9 +854,11 @@ class UserModel extends CachedTable
     /**
      * Returns array of users. Admin access is required
      *
+     * @param array $options data filter options
+     *
      * @return \stdClass[]
      */
-    public function getData()
+    public function getData(array $options = [])
     {
         $res = [];
 

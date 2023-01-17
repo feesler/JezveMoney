@@ -5,7 +5,6 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\IconItem;
 
 /**
@@ -14,7 +13,6 @@ use JezveMoney\App\Item\IconItem;
 class IconModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     protected $tbl_name = "icon";
     protected $availTypes = [ICON_TILE => "Tile icon"];
