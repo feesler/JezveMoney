@@ -22,6 +22,7 @@ import {
 import { CategoryList } from '../../js/model/CategoryList.js';
 import '../../Components/Heading/style.scss';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
 import { __ } from '../../js/utils.js';
@@ -90,22 +91,13 @@ class CategoryView extends View {
     createParentCategorySelect() {
         const { original } = this.store.getState();
 
-        this.parentSelect = DropDown.create({
+        this.parentSelect = CategorySelect.create({
             elem: 'parent',
-            onItemSelect: (o) => this.onParentSelect(o),
             className: 'dd_fullwidth',
+            parentCategorySelect: true,
+            exclude: original.id,
+            onItemSelect: (o) => this.onParentSelect(o),
         });
-        this.parentSelect.addItem({
-            id: 0, title: __('CATEGORY_NO_PARENT'),
-        });
-
-        const { categories } = window.app.model;
-        const mainCategories = categories
-            .findByParent(0)
-            .filter((category) => category.id !== original.id)
-            .map(({ id, name }) => ({ id, title: name }));
-
-        this.parentSelect.append(mainCategories);
     }
 
     /** Creates transaction type select */
