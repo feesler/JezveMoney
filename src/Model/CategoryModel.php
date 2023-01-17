@@ -7,6 +7,8 @@ use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\App\Item\CategoryItem;
 
+use function JezveMoney\Core\inSetCondition;
+
 define("NO_CATEGORY", 0);
 
 /**
@@ -19,6 +21,7 @@ class CategoryModel extends CachedTable
     private static $user_id = 0;
 
     protected $tbl_name = "categories";
+    public $removeChild = true;
 
     /**
      * Model initialization
@@ -218,8 +221,7 @@ class CategoryModel extends CachedTable
      */
     protected function preDelete(array $items)
     {
-        $categoriesToDelete = [];
-
+        $childCategories = [];
         foreach ($items as $item_id) {
             $category = $this->getItem($item_id);
             if (!$category) {
@@ -228,11 +230,28 @@ class CategoryModel extends CachedTable
             // Add child categories to remove list
             $children = $this->findByParent($item_id);
             foreach ($children as $child) {
-                $categoriesToDelete[] = $child->id;
+                $childCategories[] = $child->id;
             }
         }
 
-        return $this->del($categoriesToDelete);
+        if (count($childCategories) === 0) {
+            return true;
+        }
+
+        if ($this->removeChild) {
+            return $this->del($childCategories);
+        }
+
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            ["parent_id" => 0],
+            [
+                "user_id=" . self::$user_id,
+                "id" . inSetCondition($childCategories),
+            ],
+        );
+
+        return $updRes;
     }
 
     /**

@@ -205,15 +205,23 @@ export class ListContainer extends Component {
 
         const { ItemComponent } = state;
         const listItems = [];
+
+        const prevItems = prevState?.items ?? [];
         let lastItem = null;
-        state.items.forEach((item) => {
+        state.items.forEach((item, index) => {
             const itemProps = this.getItemProps(item, state);
+            const indexBefore = prevItems.findIndex((prev) => prev.id === item.id);
 
             let listItem = this.getListItemById(item.id);
+            const insertNode = (index !== indexBefore) || !listItem;
+
             if (listItem) {
                 listItem.setState(itemProps);
             } else {
                 listItem = ItemComponent.create(itemProps);
+            }
+
+            if (insertNode) {
                 if (lastItem) {
                     insertAfter(listItem.elem, lastItem.elem);
                 } else {

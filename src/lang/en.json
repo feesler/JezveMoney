@@ -144,6 +144,7 @@
     "CATEGORY_DELETE_MULTIPLE": "Delete categories",
     "MSG_CATEGORY_DELETE": "Are you sure want to delete selected category?",
     "MSG_CATEGORY_DELETE_MULTIPLE": "Are you sure want to delete selected categories?",
+    "CATEGORY_DELETE_CHILDREN": "Delete child categories",
     "CATEGORY_NAME": "Name",
     "CATEGORY_INVALID_NAME": "Input name",
     "CATEGORY_EXISTING_NAME": "Category with this name already exist",

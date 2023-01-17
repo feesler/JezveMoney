@@ -127,15 +127,15 @@ export const update = async (params) => {
  * Delete specified categories and check expected state of app
  * @param {number[]} ids - array of category identificators
  */
-export const del = async (ids) => {
+export const del = async (ids, removeChildren = true) => {
     let deleteRes = false;
 
     await test(`Delete categories (${ids})`, async () => {
-        const resExpected = App.state.deleteCategories(ids);
+        const resExpected = App.state.deleteCategories(ids, removeChildren);
 
         // Send API sequest to server
         try {
-            deleteRes = await api.category.del(ids);
+            deleteRes = await api.category.del(ids, removeChildren);
             if (resExpected !== deleteRes) {
                 return false;
             }

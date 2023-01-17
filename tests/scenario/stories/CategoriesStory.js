@@ -141,12 +141,9 @@ export class CategoriesStory extends TestStory {
     async del() {
         setBlock('Delete categories', 1);
 
-        const data = [
-            [0],
-            [0, 2],
-        ];
-
-        await App.scenario.runner.runGroup(CategoryTests.del, data);
+        await CategoryTests.del(0);
+        await CategoryTests.del(2, false);
+        await CategoryTests.del([0, 2]);
     }
 
     async deleteFromUpdate() {

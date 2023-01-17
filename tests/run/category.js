@@ -126,17 +126,18 @@ export const submit = async () => {
     });
 };
 
-export const del = async (indexes) => {
+export const del = async (indexes, removeChildren = true) => {
     const categories = asArray(indexes);
     assert(categories.length > 0, 'Invalid category indexes');
 
-    await test(`Delete categories [${categories.join()}]`, async () => {
+    const options = (removeChildren) ? 'remove children' : 'keep children';
+    await test(`Delete categories [${categories.join()}] ${options}`, async () => {
         await checkNavigation();
 
-        await App.view.deleteCategories(categories);
+        await App.view.deleteCategories(categories, removeChildren);
 
         const ids = App.state.categories.indexesToIds(categories);
-        App.state.deleteCategories(ids);
+        App.state.deleteCategories(ids, removeChildren);
 
         const expected = CategoryListView.render(App.state);
         App.view.checkState(expected);
@@ -145,18 +146,19 @@ export const del = async (indexes) => {
     });
 };
 
-export const delFromUpdate = async (index) => {
-    await test(`Delete category from update view [${index}]`, async () => {
+export const delFromUpdate = async (index, removeChildren = true) => {
+    const options = (removeChildren) ? 'remove children' : 'keep children';
+    await test(`Delete category from update view [${index}] ${options}`, async () => {
         await checkNavigation();
 
         await App.view.goToUpdateCategory(index);
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
 
-        await App.view.deleteSelfItem();
+        await App.view.deleteSelfItem(removeChildren);
         assert.instanceOf(App.view, CategoryListView, 'Invalid view');
 
         const id = App.state.categories.indexToId(index);
-        App.state.deleteCategories(id);
+        App.state.deleteCategories(id, removeChildren);
         const expected = CategoryListView.render(App.state);
         App.view.checkState(expected);
 

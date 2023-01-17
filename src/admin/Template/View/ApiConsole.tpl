@@ -934,6 +934,11 @@
             <label for="delCategories">Categories (comma separated ids)</label>
             <input id="delCategories" class="stretch-input" type="text">
         </div>
+        <label id="delSubCategoriesCheck" class="checkbox std_margin">
+            <input type="checkbox" checked>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+            <span class="checkbox__label">Delete child categories</span>
+        </label>
         <div class="form-controls">
             <input id="delCategoriesBtn" class="btn submit-btn" type="submit" value="Submit">
         </div>

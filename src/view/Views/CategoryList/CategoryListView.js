@@ -14,7 +14,7 @@ import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
@@ -28,7 +28,7 @@ const SELECT_MODE_CLASS = 'categories-list_select';
 /**
  * List of persons view
  */
-class PersonListView extends View {
+class CategoryListView extends View {
     constructor(...args) {
         super(...args);
 
@@ -227,7 +227,7 @@ class PersonListView extends View {
         return this.getSelectedIds(state);
     }
 
-    async deleteItems() {
+    async deleteItems(removeChild = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
@@ -241,7 +241,7 @@ class PersonListView extends View {
         this.startLoading();
 
         try {
-            await API.category.del({ id: ids });
+            await API.category.del({ id: ids, removeChild });
             this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -270,12 +270,19 @@ class PersonListView extends View {
             return;
         }
 
+        const { categories } = window.app.model;
+        const showChildrenCheckbox = ids.some((id) => {
+            const category = categories.getItem(id);
+            return category?.parent_id === 0;
+        });
+
         const multiple = (ids.length > 1);
-        ConfirmDialog.create({
+        DeleteCategoryDialog.create({
             id: 'delete_warning',
             title: (multiple) ? __('CATEGORY_DELETE_MULTIPLE') : __('CATEGORY_DELETE'),
             content: (multiple) ? __('MSG_CATEGORY_DELETE_MULTIPLE') : __('MSG_CATEGORY_DELETE'),
-            onConfirm: () => this.deleteItems(),
+            showChildrenCheckbox,
+            onConfirm: (opt) => this.deleteItems(opt),
         });
     }
 
@@ -363,4 +370,4 @@ class PersonListView extends View {
 }
 
 window.app = new Application(window.appProps);
-window.app.createView(PersonListView);
+window.app.createView(CategoryListView);

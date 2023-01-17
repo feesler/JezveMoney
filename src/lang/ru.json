@@ -144,6 +144,7 @@
     "CATEGORY_DELETE_MULTIPLE": "Удалить категории",
     "MSG_CATEGORY_DELETE": "Вы действительно хотите удалить выбранную категорию?",
     "MSG_CATEGORY_DELETE_MULTIPLE": "Вы действительно хотите удалить выбранные категории?",
+    "CATEGORY_DELETE_CHILDREN": "Удалить дочерние категории",
     "CATEGORY_NAME": "Название",
     "CATEGORY_INVALID_NAME": "Введите название",
     "CATEGORY_EXISTING_NAME": "Категория c таким именем уже существует",

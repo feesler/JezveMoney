@@ -214,7 +214,9 @@ class AdminApiConsoleView extends AdminView {
         if (!delCategoriesBtn) {
             throw new Error('Fail to init view');
         }
-        setEvents(delCategoriesBtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delCategories', 'category/delete') });
+        setEvents(delCategoriesBtn, {
+            click: (e) => this.onDeleteCategoriesSubmit(e, 'delCategories', 'category/delete'),
+        });
     }
 
     /** Initialization of forms for Transaction API controller */
@@ -977,6 +979,30 @@ class AdminApiConsoleView extends AdminView {
             httpMethod: 'post',
             method: 'transaction/setCategory',
             data: frmData,
+        });
+    }
+
+    /** Send delete categories request */
+    onDeleteCategoriesSubmit(e, inputId, method) {
+        if (typeof method !== 'string') {
+            throw new Error('Invalid parameters');
+        }
+
+        e.preventDefault();
+        const itemsInp = ge(inputId);
+        if (!itemsInp) {
+            return;
+        }
+
+        const data = this.parseIds(itemsInp.value);
+
+        const checkbox = document.querySelector('#delSubCategoriesCheck > input');
+        data.removeChild = checkbox.checked;
+
+        this.apiRequest({
+            httpMethod: 'POST',
+            method,
+            data,
         });
     }
 }

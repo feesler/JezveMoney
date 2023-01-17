@@ -745,7 +745,7 @@ export class AppState {
         return true;
     }
 
-    deleteCategories(categoryIds) {
+    deleteCategories(categoryIds, removeChildren = true) {
         const ids = asArray(categoryIds);
         if (!ids.length) {
             return false;
@@ -755,15 +755,31 @@ export class AppState {
             return false;
         }
 
-        const categoriesToDelete = ids.flatMap((id) => ([
-            id,
-            ...this.categories.findByParent(id).map((item) => item.id),
-        ]));
+        const categoriesToDelete = [...ids];
+        const childrenCategories = ids.flatMap((id) => (
+            this.categories.findByParent(id).map((item) => item.id)
+        ));
+
+        if (removeChildren) {
+            categoriesToDelete.push(...childrenCategories);
+        } else {
+            childrenCategories.forEach((id) => {
+                const item = this.categories.getItem(id);
+
+                this.categories.update({
+                    ...item,
+                    parent_id: 0,
+                });
+            });
+        }
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteCategories(categoriesToDelete);
+        this.rules.deleteCategories(...categoriesToDelete);
 
         this.categories.deleteItems(categoriesToDelete);
+
+        this.categories.sortByParent();
 
         return true;
     }

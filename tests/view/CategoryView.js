@@ -8,7 +8,7 @@ import {
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
-import { WarningPopup } from './component/WarningPopup.js';
+import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { availTransTypes } from '../model/Transaction.js';
 
@@ -87,7 +87,10 @@ export class CategoryView extends AppView {
         res.cancelBtn = await query('#cancelBtn');
         assert(res.cancelBtn, 'Cancel button not found');
 
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+        res.delete_warning = await DeleteCategoryDialog.create(
+            this,
+            await query('#delete_warning'),
+        );
 
         return res;
     }
@@ -144,10 +147,14 @@ export class CategoryView extends AppView {
     }
 
     /** Click on delete button and confirm wanring popup */
-    async deleteSelfItem() {
+    async deleteSelfItem(removeChildren = true) {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete category warning popup not appear');
+
+        if (removeChildren !== this.content.delete_warning.removeChildren) {
+            await this.content.delete_warning.toggleDeleteChilds();
+        }
 
         await navigation(() => this.content.delete_warning.clickOk());
     }

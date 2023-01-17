@@ -13,19 +13,19 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../Components/Heading/style.scss';
-import './style.scss';
-import { actions, reducer } from './reducer.js';
-import { createStore } from '../../js/store.js';
 import {
     DEBT,
     EXPENSE,
     INCOME,
     TRANSFER,
 } from '../../js/model/Transaction.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
+import '../../Components/Heading/style.scss';
+import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { actions, reducer } from './reducer.js';
+import { createStore } from '../../js/store.js';
 import { __ } from '../../js/utils.js';
+import './style.scss';
 
 /**
  * Create/update category view
@@ -216,7 +216,7 @@ class CategoryView extends View {
         }
     }
 
-    async deleteCategory() {
+    async deleteCategory(removeChild = true) {
         const { submitStarted, original } = this.store.getState();
         if (submitStarted || !original.id) {
             return;
@@ -225,7 +225,7 @@ class CategoryView extends View {
         this.startSubmit();
 
         try {
-            await API.category.del({ id: original.id });
+            await API.category.del({ id: original.id, removeChild });
 
             window.app.navigateNext();
         } catch (e) {
@@ -241,11 +241,12 @@ class CategoryView extends View {
             return;
         }
 
-        ConfirmDialog.create({
+        DeleteCategoryDialog.create({
             id: 'delete_warning',
             title: __('CATEGORY_DELETE'),
             content: __('MSG_CATEGORY_DELETE'),
-            onConfirm: () => this.deleteCategory(),
+            showChildrenCheckbox: (data.parent_id === 0),
+            onConfirm: (opt) => this.deleteCategory(opt),
         });
     }
 

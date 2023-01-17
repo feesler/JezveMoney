@@ -308,8 +308,8 @@ export const api = {
             return true;
         },
 
-        async del(ids) {
-            await apiPost('category/delete', { id: asArray(ids) });
+        async del(ids, removeChild = true) {
+            await apiPost('category/delete', { id: asArray(ids), removeChild });
             return true;
         },
 

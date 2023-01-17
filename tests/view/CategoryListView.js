@@ -12,7 +12,7 @@ import {
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { WarningPopup } from './component/WarningPopup.js';
+import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { CategoryItem } from './component/CategoryItem.js';
@@ -73,7 +73,10 @@ export class CategoryListView extends AppView {
         res.renderTime = await prop(listContainer, 'dataset.time');
 
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+        res.delete_warning = await DeleteCategoryDialog.create(
+            this,
+            await query('#delete_warning'),
+        );
 
         return res;
     }
@@ -318,7 +321,7 @@ export class CategoryListView extends AppView {
         return this.checkState(expected);
     }
 
-    async deleteCategories(categories) {
+    async deleteCategories(categories, removeChildren = true) {
         await this.selectCategories(categories);
 
         await this.openListMenu();
@@ -330,6 +333,10 @@ export class CategoryListView extends AppView {
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete categories warning popup not appear');
+
+        if (removeChildren !== this.content.delete_warning.removeChildren) {
+            await this.content.delete_warning.toggleDeleteChilds();
+        }
 
         await this.waitForList(() => this.content.delete_warning.clickOk());
     }

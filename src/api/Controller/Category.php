@@ -24,4 +24,15 @@ class Category extends ApiListController
         $this->updateErrorMsg = __("ERR_CATEGORY_UPDATE");
         $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
     }
+
+    /**
+     * Removes categories
+     */
+    public function del()
+    {
+        $request = $this->getRequestData();
+        $this->model->removeChild = $request["removeChild"] ?? true;
+
+        parent::del();
+    }
 }

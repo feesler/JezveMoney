@@ -162,12 +162,16 @@ const updateInvalid = async () => {
 const del = async () => {
     setBlock('Delete categories', 2);
 
-    const data = [
-        [App.scenario.INVEST_CATEGORY],
-        [App.scenario.BIKE_CATEGORY, App.scenario.LEARN_CATEGORY],
-    ];
+    const {
+        INVEST_CATEGORY,
+        SHOP_CATEGORY,
+        BIKE_CATEGORY,
+        LEARN_CATEGORY,
+    } = App.scenario;
 
-    return App.scenario.runner.runGroup(CategoryApiTests.del, data);
+    await CategoryApiTests.del(INVEST_CATEGORY);
+    await CategoryApiTests.del(SHOP_CATEGORY, false);
+    await CategoryApiTests.del([BIKE_CATEGORY, LEARN_CATEGORY]);
 };
 
 const delInvalid = async () => {

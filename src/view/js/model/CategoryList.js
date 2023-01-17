@@ -35,7 +35,7 @@ export class CategoryList extends List {
 
     /** Sort categories by parent */
     sortByParent() {
-        const topLevelCategories = this.findByParent(0);
+        const topLevelCategories = this.findByParent(0).sort((a, b) => a.id - b.id);
         this.data = topLevelCategories.flatMap((item) => {
             const children = this.findByParent(item.id);
             return [item, ...children];
