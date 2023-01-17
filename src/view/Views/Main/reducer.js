@@ -37,11 +37,26 @@ const slice = createSlice({
             }
         }
 
+        // Check all transactions have same type, otherwise show only categories with type 'Any'
+        const type = ids.reduce((currentType, id) => {
+            const transaction = state.transactions.find((item) => item.id === id);
+            if (!transaction) {
+                throw new Error(`Transaction '${id}' not found`);
+            }
+
+            if (currentType === null) {
+                return transaction.type;
+            }
+
+            return (currentType === transaction.type) ? currentType : 0;
+        }, null);
+
         return {
             ...state,
             categoryDialog: {
                 show: true,
                 categoryId,
+                type,
                 ids,
             },
             transactionContextItem: null,

@@ -2,7 +2,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../js/utils.js';
 
 const defaultProps = {
-    transactionType: 0,
+    transactionType: null, // filter categories by type, null - show all
 };
 
 /**
@@ -36,7 +36,7 @@ export class CategorySelect extends DropDown {
                 category.parent_id !== 0
                 || (
                     category.type !== 0
-                    && transactionType !== 0
+                    && transactionType !== null
                     && category.type !== transactionType
                 )
             ) {

@@ -72,7 +72,7 @@ export class TransactionListItem extends TestComponent {
             if (srcAmountVisible && destAmountVisible) {
                 res.amountText = `${sign}${props.srcAmount} (${sign}${props.destAmount})`;
             } else {
-                res.amountText = `${sign}${props.srcAmount}`;
+                res.amountText = props.srcAmount;
             }
 
             res.dateFmt = props.dateFmt;

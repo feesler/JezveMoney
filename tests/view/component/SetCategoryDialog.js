@@ -26,6 +26,10 @@ export class SetCategoryDialog extends TestComponent {
         return this.categorySelect?.value;
     }
 
+    get items() {
+        return this.categorySelect?.model.items;
+    }
+
     get submitBtn() {
         return this.content.submitBtn;
     }

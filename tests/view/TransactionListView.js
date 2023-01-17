@@ -12,6 +12,7 @@ import {
     copyObject,
     isVisible,
     closest,
+    wait,
 } from 'jezve-test';
 import {
     DropDown,
@@ -233,6 +234,7 @@ export class TransactionListView extends AppView {
         res.categoryDialog = {
             show: !!(cont.selectCategoryDialog?.visible),
             categoryId: cont.selectCategoryDialog?.value,
+            items: cont.selectCategoryDialog?.items.map((item) => item.id),
         };
 
         res.loading = cont.loadingIndicator.visible;
@@ -512,15 +514,11 @@ export class TransactionListView extends AppView {
 
         // Set category dialog
         if (model.categoryDialog.show) {
-            const visibleCategories = App.state
-                .getCategoriesForType(0)
-                .map((item) => ({ id: item.id.toString() }));
-
             res.selectCategoryDialog = {
                 visible: true,
                 categorySelect: {
                     visible: true,
-                    items: visibleCategories,
+                    items: model.categoryDialog.items,
                     value: model.categoryDialog.categoryId.toString(),
                 },
             };
@@ -1154,18 +1152,39 @@ export class TransactionListView extends AppView {
         return navigation(() => this.content.ctxUpdateBtn.click());
     }
 
+    // Check all transactions have same type, otherwise show only categories with type 'Any'
+    getTypeOfSelected(ids) {
+        return asArray(ids).reduce((currentType, id) => {
+            const transaction = App.state.transactions.getItem(id);
+            assert(transaction, `Transaction '${id}' not found`);
+
+            if (currentType === null) {
+                return transaction.type;
+            }
+
+            return (currentType === transaction.type) ? currentType : 0;
+        }, null);
+    }
+
     /** Select category for specified transaction */
     async setTransactionCategory(index, category) {
         await this.openContextMenu(index);
 
+        const type = this.getTypeOfSelected(this.model.contextItem);
+
         this.model.categoryDialog = {
             show: true,
             categoryId: this.getExpectedCategory(index),
+            items: App.state
+                .getCategoriesForType(type)
+                .map((item) => ({ id: item.id.toString() })),
         };
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.ctxSetCategoryBtn.click());
+        await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
+
         this.checkState(expected);
 
         const { selectCategoryDialog } = this.content;
@@ -1183,14 +1202,21 @@ export class TransactionListView extends AppView {
 
         await this.openListMenu();
 
+        const selected = this.getSelectedItems().map((item) => item.id);
+        const type = this.getTypeOfSelected(selected);
+
         this.model.listMenuVisible = false;
         this.model.categoryDialog = {
             show: true,
             categoryId: this.getExpectedCategory(transactions),
+            items: App.state
+                .getCategoriesForType(type)
+                .map((item) => ({ id: item.id.toString() })),
         };
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.setCategoryBtn.click());
+        await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
 
         this.checkState(expected);
 

@@ -57,6 +57,7 @@ class TransactionListView extends View {
             showCategoryDialog: false,
             categoryDialog: {
                 categoryId: 0,
+                type: 0,
             },
             renderTime: Date.now(),
         };
@@ -771,7 +772,11 @@ class TransactionListView extends View {
             return;
         }
 
-        this.setCategoryDialog.setCategory(state.categoryDialog.categoryId);
+        this.setCategoryDialog.setState((dialogState) => ({
+            ...dialogState,
+            categoryId: state.categoryDialog.categoryId,
+            type: state.categoryDialog.type,
+        }));
         this.setCategoryDialog.show(state.categoryDialog.show);
     }
 

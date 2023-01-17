@@ -227,7 +227,7 @@ export const clearAllFilters = async (directNavigate = false) => {
     });
 };
 
-export const filterByType = async ({ type, directNavigate = false }) => {
+export const filterByType = async ({ type, directNavigate = false, iteratePages = true }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -240,7 +240,7 @@ export const filterByType = async ({ type, directNavigate = false }) => {
         : 'Show all types of transactions';
     await test(descr, async () => {
         await App.view.filterByType(type, directNavigate);
-        return App.view.iteratePages();
+        return (iteratePages) ? App.view.iteratePages() : true;
     });
 };
 

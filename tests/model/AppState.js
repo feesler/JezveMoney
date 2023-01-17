@@ -784,7 +784,7 @@ export class AppState {
                 category.parent_id !== 0
                 || (
                     category.type !== 0
-                    && type !== 0
+                    && type !== null
                     && category.type !== type
                 )
             ) {

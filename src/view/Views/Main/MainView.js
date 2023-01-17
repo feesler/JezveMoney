@@ -11,6 +11,7 @@ import { Histogram } from 'jezvejs/Histogram';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { API } from '../../js/api/index.js';
 import { formatValueShort, normalize, __ } from '../../js/utils.js';
+import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -25,10 +26,9 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import './style.scss';
 import { createStore } from '../../js/store.js';
 import { reducer, actions } from './reducer.js';
+import './style.scss';
 
 /**
  * Main view
@@ -57,6 +57,7 @@ class MainView extends View {
             categoryDialog: {
                 show: false,
                 categoryId: 0,
+                type: 0,
             },
             loading: true,
             transactionContextItem: null,
@@ -512,7 +513,11 @@ class MainView extends View {
             return;
         }
 
-        this.setCategoryDialog.setCategory(state.categoryDialog.categoryId);
+        this.setCategoryDialog.setState((dialogState) => ({
+            ...dialogState,
+            categoryId: state.categoryDialog.categoryId,
+            type: state.categoryDialog.type,
+        }));
         this.setCategoryDialog.show(state.categoryDialog.show);
     }
 

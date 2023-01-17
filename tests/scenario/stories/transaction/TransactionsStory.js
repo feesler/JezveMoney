@@ -628,11 +628,11 @@ export class TransactionsStory extends TestStory {
     async setCategoryFromMainView() {
         setBlock('Set transaction category from main view', 2);
 
-        const { CAFE_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
+        const { TAXES_CATEGORY } = App.scenario;
 
         const data = [
-            { index: 0, category: CAFE_CATEGORY },
-            { index: 2, category: TRANSPORT_CATEGORY },
+            { index: 0, category: TAXES_CATEGORY },
+            { index: 2, category: 0 },
         ];
 
         return App.scenario.runner.runGroup(TransactionTests.setTransactionCategory, data);

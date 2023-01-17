@@ -10,6 +10,7 @@ import './style.scss';
 
 const defaultProps = {
     categoryId: 0,
+    type: 0,
     onChange: null,
     onSubmit: null,
     onCancel: null,
@@ -65,6 +66,7 @@ export class SetCategoryDialog extends Component {
         this.setState({
             ...this.state,
             categoryId: 0,
+            type: 0,
         });
     }
 
@@ -105,6 +107,11 @@ export class SetCategoryDialog extends Component {
             throw new Error('Invalid state');
         }
 
-        this.categorySelect?.setSelection(state.categoryId);
+        if (!this.categorySelect) {
+            return;
+        }
+
+        this.categorySelect.setType(state.type);
+        this.categorySelect.setSelection(state.categoryId);
     }
 }
