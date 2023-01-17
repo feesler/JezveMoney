@@ -42,6 +42,8 @@ include(TPL_PATH . "Header.tpl"); ?>
                                 </button>
                             </header>
 
+                            <hr class="filters-separator">
+
                             <div class="filters-list">
                                 <div class="filters-row">
                                     <section class="filter-item trans-type-filter">

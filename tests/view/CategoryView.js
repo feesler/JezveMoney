@@ -75,7 +75,7 @@ export class CategoryView extends AppView {
 
         res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
 
-        res.nameInput = await InputRow.create(this, await query(res.formElem, 'div.view-row'));
+        res.nameInput = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.nameInput, 'Category name input not found');
 
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));

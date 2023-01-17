@@ -234,6 +234,15 @@ label {
   }
 }
 
+/* Horizontal form separator */
+.form-separator {
+  border: 0;
+  border-top: 1px solid var(--list-separator-color);
+  width: 100%;
+  margin: 0.25rem 0;
+  max-width: 300px;
+}
+
 /* Centered block */
 .centered {
   margin: 0 auto;
@@ -329,7 +338,7 @@ label {
 }
 
 .std_margin {
-  margin: 9px 0;
+  margin: 8px 0 12px;
 }
 
 /* buttons */
@@ -362,6 +371,7 @@ label {
 
 .submit-btn,
 .submit-btn:visited {
+  height: var(--input-height);
   border-radius: var(--action-btn-border-radius);
   background-color: var(--accent-color);
 }

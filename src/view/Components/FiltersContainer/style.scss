@@ -3,7 +3,6 @@
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
-  row-gap: 12px;
   background-color: var(--main-bg-color);
 }
 
@@ -61,6 +60,7 @@
   width: 100%;
   border: 0 none;
   border-top: 1px solid var(--list-separator-color);
+  margin: 0.25rem 0;
 }
 
 /* Horizontal group of filters, on screen smaller 576px become vertical */
