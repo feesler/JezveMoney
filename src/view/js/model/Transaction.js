@@ -6,7 +6,7 @@ export const INCOME = 2;
 export const TRANSFER = 3;
 export const DEBT = 4;
 
-const availTransTypes = {
+export const availTransTypes = {
     [EXPENSE]: 'expense',
     [INCOME]: 'income',
     [TRANSFER]: 'transfer',

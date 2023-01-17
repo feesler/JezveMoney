@@ -142,7 +142,7 @@ export class CategoriesStory extends TestStory {
         setBlock('Delete categories', 1);
 
         await CategoryTests.del(0);
-        await CategoryTests.del(2, false);
+        await CategoryTests.del(3, false);
         await CategoryTests.del([0, 2]);
     }
 

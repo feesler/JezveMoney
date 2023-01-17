@@ -48,7 +48,9 @@ export const update = async (index) => {
     await test(`Update category [${index}]`, async () => {
         await checkNavigation();
 
-        const category = App.state.categories.getItemByIndex(index);
+        const item = App.view.getItemByIndex(index);
+        assert(item, 'Invalid category index');
+        const category = App.state.categories.getItem(item.model.id);
         assert(category, 'Invalid category index');
 
         const expected = CategoryView.getExpectedState({
@@ -134,9 +136,13 @@ export const del = async (indexes, removeChildren = true) => {
     await test(`Delete categories [${categories.join()}] ${options}`, async () => {
         await checkNavigation();
 
+        const ids = categories.map((ind) => {
+            const item = App.view.getItemByIndex(ind);
+            return item.model.id;
+        });
+
         await App.view.deleteCategories(categories, removeChildren);
 
-        const ids = App.state.categories.indexesToIds(categories);
         App.state.deleteCategories(ids, removeChildren);
 
         const expected = CategoryListView.render(App.state);

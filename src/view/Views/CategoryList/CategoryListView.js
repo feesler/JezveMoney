@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     asArray,
+    createElement,
     insertAfter,
     isFunction,
     show,
@@ -21,9 +22,12 @@ import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './style.scss';
+import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
+
+const ANY_TYPE = 0;
 
 /**
  * List of persons view
@@ -41,6 +45,11 @@ class CategoryListView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+
+        this.transTypes = [
+            ...Object.keys(availTransTypes).map((type) => parseInt(type, 10)),
+            ANY_TYPE,
+        ];
 
         this.store = createStore(reducer, { initialState });
     }
@@ -78,8 +87,37 @@ class CategoryListView extends View {
             title: __('CATEGORIES'),
         });
 
-        this.list = ListContainer.create(listProps);
-        this.contentContainer.append(this.list.elem);
+        this.sections = {};
+
+        this.transTypes.forEach((type) => {
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const title = (type !== 0) ? Transaction.getTypeTitle(type) : __('TR_ANY');
+
+            const section = {
+                header: createElement('header', {
+                    props: {
+                        className: 'list-header',
+                        textContent: title,
+                    },
+                }),
+                list: ListContainer.create(listProps),
+            };
+
+            section.container = createElement('section', {
+                props: {
+                    className: 'list-section',
+                    dataset: { type },
+                },
+                children: [
+                    section.header,
+                    section.list.elem,
+                ],
+            });
+
+            this.sections[key] = section;
+
+            this.contentContainer.append(section.container);
+        });
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
@@ -286,6 +324,20 @@ class CategoryListView extends View {
         });
     }
 
+    getListItemById(id) {
+        for (let i = 0; i < this.transTypes.length; i += 1) {
+            const type = this.transTypes[i];
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const section = this.sections[key];
+            const listItem = section.list.getListItemById(id);
+            if (listItem) {
+                return listItem;
+            }
+        }
+
+        return null;
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu.detach();
@@ -299,7 +351,7 @@ class CategoryListView extends View {
             return;
         }
 
-        const listItem = this.list.getListItemById(itemId);
+        const listItem = this.getListItemById(itemId);
         const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             this.contextMenu.detach();
@@ -352,13 +404,22 @@ class CategoryListView extends View {
         this.selItemsCount.textContent = selected.length;
 
         // List of categories
-        this.list.setState((listState) => ({
-            ...listState,
-            items: state.items,
-            listMode: state.listMode,
-            renderTime: Date.now(),
-        }));
-        this.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+
+        this.transTypes.forEach((type) => {
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const section = this.sections[key];
+            const items = state.items.filter((item) => item.type === type);
+
+            section.list.setState((listState) => ({
+                ...listState,
+                items,
+                listMode: state.listMode,
+                renderTime: Date.now(),
+            }));
+            section.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+
+            show(section.container, items.length > 0);
+        });
 
         this.renderContextMenu(state);
         this.renderMenu(state);
