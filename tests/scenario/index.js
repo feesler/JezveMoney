@@ -30,11 +30,13 @@ import { StatisticsStory } from './stories/StatisticsStory.js';
 import { ImportListStory } from './stories/import/ImportListStory.js';
 import { ImportTemplateStory } from './stories/import/ImportTemplateStory.js';
 import { ImportRulesStory } from './stories/import/ImportRulesStory.js';
+import { LocalesStory } from './stories/LocalesStory.js';
 
 const storiesMap = {
     unitTests: UnitTestsStory,
     security: SecurityStory,
     api: ApiStory,
+    locales: LocalesStory,
     profile: ProfileStory,
     accounts: AccountsStory,
     persons: PersonsStory,

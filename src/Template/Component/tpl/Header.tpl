@@ -1,7 +1,7 @@
 <header class="header">
     <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
         <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-        <span class="header-logo__title">Jezve Money</span>
+        <span class="header-logo__title"><?= __("APP_NAME") ?></span>
     </a>
     <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
@@ -31,7 +31,7 @@
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>">
                 <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-                <span class="header-logo__title">Jezve Money</span>
+                <span class="header-logo__title"><?= __("APP_NAME") ?></span>
             </a>
         </div>
     </div>
@@ -39,34 +39,34 @@
     <ul class="nav-list">
         <?php if ($this->user_id != 0) {        ?>
             <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>accounts/">Accounts</a>
+                <a class="nav-item__link" href="<?= BASEURL ?>accounts/"><?= __("ACCOUNTS") ?></a>
                 <a class="nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
                     <?= useIcon("plus-light", "nav-item__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>persons/">Persons</a>
+                <a class="nav-item__link" href="<?= BASEURL ?>persons/"><?= __("PERSONS") ?></a>
                 <a class="nav-item__icon-btn" href="<?= BASEURL ?>persons/create/">
                     <?= useIcon("plus-light", "nav-item__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>categories/">Categories</a>
+                <a class="nav-item__link" href="<?= BASEURL ?>categories/"><?= __("CATEGORIES") ?></a>
                 <a class="nav-item__icon-btn" href="<?= BASEURL ?>categories/create/">
                     <?= useIcon("plus-light", "nav-item__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>transactions/">Transactions</a>
+                <a class="nav-item__link" href="<?= BASEURL ?>transactions/"><?= __("TRANSACTIONS") ?></a>
                 <a class="nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
                     <?= useIcon("plus-light", "nav-item__icon") ?>
                 </a>
             </li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/">Statistics</a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/">Import</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/"><?= __("STATISTICS") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/"><?= __("IMPORT") ?></a></li>
             <li class="nav-separator"></li>
         <?php    }        ?>
-        <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>about/">About</a></li>
+        <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>about/"><?= __("ABOUT") ?></a></li>
     </ul>
 </nav>
 
@@ -85,21 +85,23 @@
 
     <?php if ($this->user_id != 0) {        ?>
         <ul class="nav-list">
-            <li class="nav-item">
-                <div class="theme-switch">
-                    <span class="theme-switch__label">Dark theme</span>
-                    <label id="theme-check" class="switch">
-                        <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
-                        <div class="switch-slider"></div>
-                    </label>
-                </div>
+            <li class="nav-item locale-select">
+                <span class="nav-item__title"><?= __("LANGUAGE") ?></span>
+                <select id="localeSelect"></select>
+            </li>
+            <li class="nav-item theme-switch">
+                <span class="nav-item__title"><?= __("DARK_THEME") ?></span>
+                <label id="theme-check" class="switch">
+                    <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
+                    <div class="switch-slider"></div>
+                </label>
             </li>
             <li class="nav-separator"></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5">Profile</a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5"><?= __("PROFILE") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6"><?= __("LOGOUT") ?></a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7">Admin panel</a></li>
+                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7"><?= __("ADMIN_PANEL") ?></a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>

@@ -11,6 +11,7 @@ import { CategoryListView } from '../view/CategoryListView.js';
 import { CategoryView } from '../view/CategoryView.js';
 import { App } from '../Application.js';
 import { Transaction } from '../model/Transaction.js';
+import { __ } from '../model/locale.js';
 
 /** Navigate to categories list page */
 const checkNavigation = async () => {
@@ -28,6 +29,7 @@ export const create = async () => {
         await checkNavigation();
 
         const expected = CategoryView.getExpectedState({
+            locale: App.view.locale,
             isUpdate: false,
             name: '',
             parent_id: 0,
@@ -46,10 +48,13 @@ export const update = async (index) => {
     await test(`Update category [${index}]`, async () => {
         await checkNavigation();
 
-        const category = App.state.categories.getItemByIndex(index);
+        const item = App.view.getItemByIndex(index);
+        assert(item, 'Invalid category index');
+        const category = App.state.categories.getItem(item.model.id);
         assert(category, 'Invalid category index');
 
         const expected = CategoryView.getExpectedState({
+            locale: App.view.locale,
             ...category,
             isUpdate: true,
         });
@@ -66,7 +71,7 @@ export const updateById = (id) => update(App.state.categories.getIndexById(id));
 
 /** Input category name */
 export const inputName = async (name) => {
-    await test(`Input name ${name}`, async () => {
+    await test(`Input name '${name}'`, async () => {
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
         return App.view.inputName(name);
     });
@@ -116,46 +121,52 @@ export const submit = async () => {
             }
 
             const expected = CategoryListView.render(App.state);
-            await App.view.checkState(expected);
+            App.view.checkState(expected);
         }
 
         return App.state.fetchAndTest();
     });
 };
 
-export const del = async (indexes) => {
+export const del = async (indexes, removeChildren = true) => {
     const categories = asArray(indexes);
     assert(categories.length > 0, 'Invalid category indexes');
 
-    await test(`Delete categories [${categories.join()}]`, async () => {
+    const options = (removeChildren) ? 'remove children' : 'keep children';
+    await test(`Delete categories [${categories.join()}] ${options}`, async () => {
         await checkNavigation();
 
-        await App.view.deleteCategories(categories);
+        const ids = categories.map((ind) => {
+            const item = App.view.getItemByIndex(ind);
+            return item.model.id;
+        });
 
-        const ids = App.state.categories.indexesToIds(categories);
-        App.state.deleteCategories(ids);
+        await App.view.deleteCategories(categories, removeChildren);
+
+        App.state.deleteCategories(ids, removeChildren);
 
         const expected = CategoryListView.render(App.state);
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
 };
 
-export const delFromUpdate = async (index) => {
-    await test(`Delete category from update view [${index}]`, async () => {
+export const delFromUpdate = async (index, removeChildren = true) => {
+    const options = (removeChildren) ? 'remove children' : 'keep children';
+    await test(`Delete category from update view [${index}] ${options}`, async () => {
         await checkNavigation();
 
         await App.view.goToUpdateCategory(index);
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
 
-        await App.view.deleteSelfItem();
+        await App.view.deleteSelfItem(removeChildren);
         assert.instanceOf(App.view, CategoryListView, 'Invalid view');
 
         const id = App.state.categories.indexToId(index);
-        App.state.deleteCategories(id);
+        App.state.deleteCategories(id, removeChildren);
         const expected = CategoryListView.render(App.state);
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -203,9 +214,9 @@ export const securityTests = async () => {
         assert(!(App.view instanceof CategoryView), 'Invalid view');
 
         const expected = {
-            msgPopup: { success: false, message: 'Fail to update category.' },
+            msgPopup: { success: false, message: __('ERR_CATEGORY_UPDATE', App.view.locale) },
         };
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
         await App.view.closeNotification();
 
         return true;

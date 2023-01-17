@@ -1,16 +1,14 @@
 .heading {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   padding: 10px 0 0 0;
   column-gap: 24px;
 
   h1 {
-    font-size: 26px;
+    font-size: 1.4rem;
     font-weight: 300;
     line-height: 32px;
-    height: 32px;
     vertical-align: middle;
-    white-space: nowrap;
   }
 }
 
@@ -31,26 +29,14 @@
 .header .heading-actions {
   margin-right: 9px;
 
-  .iconbutton.circle-icon {
+  .iconbutton {
     --iconbtn-title-color: var(--header-color);
     --iconbtn-icon-color: var(--header-color);
     --iconbtn-hover-title-color: var(--header-color);
-    --iconbtn-hover-icon-color: var(--header-bg-color);
-
-    .iconbutton__icon {
-      border-color: var(--header-color);
-    }
+    --iconbtn-hover-icon-color: var(--header-color);
   }
 
   .popup-menu-btn__icon {
     fill: var(--header-color);
-  }
-}
-
-@media (hover: hover) {
-  .header .heading-actions {
-    .iconbutton:hover.circle-icon .iconbutton__icon {
-      background-color: var(--header-color);
-    }
   }
 }

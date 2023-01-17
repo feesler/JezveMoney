@@ -15,17 +15,27 @@ const slice = createSlice({
         },
     }),
 
-    changeParent: (state, value) => (
-        (state.data.parent_id === value)
-            ? state
-            : {
-                ...state,
-                data: {
-                    ...state.data,
-                    parent_id: value,
-                },
-            }
-    ),
+    changeParent: (state, value) => {
+        if (state.data.parent_id === value) {
+            return state;
+        }
+
+        const { categories } = window.app.model;
+        const parent = categories.getItem(value);
+        const parentId = parseInt(value, 10);
+        if (parentId !== 0 && !parent) {
+            return state;
+        }
+
+        return {
+            ...state,
+            data: {
+                ...state.data,
+                parent_id: value,
+                type: (parentId === 0) ? state.data.type : parent.type,
+            },
+        };
+    },
 
     changeType: (state, type) => (
         (state.data.type === type)

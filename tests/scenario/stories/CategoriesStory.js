@@ -69,6 +69,11 @@ export class CategoriesStory extends TestStory {
         await CategoryTests.selectType(EXPENSE);
         await CategoryTests.submit();
 
+        await CategoryTests.create();
+        await CategoryTests.inputName('Shop');
+        await CategoryTests.selectType(EXPENSE);
+        await CategoryTests.submit();
+
         setBlock('Create category with existing name', 2);
         await CategoryTests.create();
         await CategoryTests.inputName('Transpost');
@@ -79,12 +84,15 @@ export class CategoriesStory extends TestStory {
             App.scenario.INVEST_CATEGORY,
             App.scenario.TAXES_CATEGORY,
             App.scenario.TRANSPORT_CATEGORY,
-        ] = App.state.getCategoriesByNames(['Food', 'Investments', 'Taxes', 'Transpost'], true);
+            App.scenario.SHOP_CATEGORY,
+        ] = App.state.getCategoriesByNames(
+            ['Food', 'Investments', 'Taxes', 'Transpost', 'Shop'],
+            true,
+        );
 
         await CategoryTests.create();
         await CategoryTests.inputName('Cafe');
         await CategoryTests.selectParentCategory(App.scenario.FOOD_CATEGORY);
-        await CategoryTests.selectType(EXPENSE);
         await CategoryTests.submit();
 
         await CategoryTests.create();
@@ -96,21 +104,36 @@ export class CategoriesStory extends TestStory {
     async update() {
         setBlock('Update categories', 1);
 
-        await CategoryTests.updateById(App.scenario.FOOD_CATEGORY);
+        const {
+            FOOD_CATEGORY,
+            TAXES_CATEGORY,
+            INVEST_CATEGORY,
+            SHOP_CATEGORY,
+        } = App.scenario;
+
+        await CategoryTests.updateById(FOOD_CATEGORY);
         await CategoryTests.inputName('Meal');
         await CategoryTests.submit();
 
-        await CategoryTests.updateById(App.scenario.TAXES_CATEGORY);
-        await CategoryTests.selectParentCategory(App.scenario.INVEST_CATEGORY);
+        await CategoryTests.updateById(TAXES_CATEGORY);
+        await CategoryTests.selectParentCategory(INVEST_CATEGORY);
+        await CategoryTests.submit();
+
+        await CategoryTests.updateById(INVEST_CATEGORY);
+        await CategoryTests.selectType(EXPENSE);
+        await CategoryTests.submit();
+
+        await CategoryTests.updateById(FOOD_CATEGORY);
+        await CategoryTests.selectParentCategory(SHOP_CATEGORY);
         await CategoryTests.submit();
 
         setBlock('Update category with empty name', 2);
-        await CategoryTests.updateById(App.scenario.FOOD_CATEGORY);
+        await CategoryTests.updateById(FOOD_CATEGORY);
         await CategoryTests.inputName('');
         await CategoryTests.submit();
 
         setBlock('Update category with existing name', 2);
-        await CategoryTests.updateById(App.scenario.FOOD_CATEGORY);
+        await CategoryTests.updateById(FOOD_CATEGORY);
         await CategoryTests.inputName('Transpost');
         await CategoryTests.submit();
     }
@@ -118,12 +141,9 @@ export class CategoriesStory extends TestStory {
     async del() {
         setBlock('Delete categories', 1);
 
-        const data = [
-            [0],
-            [0, 2],
-        ];
-
-        await App.scenario.runner.runGroup(CategoryTests.del, data);
+        await CategoryTests.del(0);
+        await CategoryTests.del(3, false);
+        await CategoryTests.del([0, 2]);
     }
 
     async deleteFromUpdate() {

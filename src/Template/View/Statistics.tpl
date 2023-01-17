@@ -13,7 +13,7 @@ include(TPL_PATH . "Header.tpl");    ?>
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
-                        <h1>Statistics</h1>
+                        <h1><?= __("STATISTICS") ?></h1>
                     </header>
 
                     <header id="contentHeader" class="content-header">
@@ -21,12 +21,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                             "id" => "filtersBtn",
                             "classNames" => "filters-btn",
                             "icon" => "filter",
-                            "title" => "Filters"
+                            "title" => __("FILTERS"),
                         ]) ?>
 
                         <aside id="filtersContainer" class="filters-container">
                             <header class="filters-heading">
-                                <span class="filters-heading__title">Filters</span>
+                                <span class="filters-heading__title"><?= __("FILTERS") ?></span>
                                 <button id="closeFiltersBtn" class="btn icon-btn close-btn right-align" type="button">
                                     <svg class="icon close-icon">
                                         <use href="#close"></use>
@@ -34,10 +34,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 </button>
                             </header>
 
+                            <hr class="filters-separator">
+
                             <div class="filters-list">
                                 <div class="filters-row">
                                     <section class="filter-item trans-type-filter">
-                                        <header class="filter-item__title">Type</header>
+                                        <header class="filter-item__title"><?= __("FILTER_TYPE") ?></header>
                                         <?= LinkMenu::render([
                                             "id" => "typeMenu",
                                             "classNames" => "trtype-menu",
@@ -46,13 +48,17 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         ]) ?>
                                     </section>
 
+                                    <hr class="filters-separator">
+
                                     <section class="filter-item report-type-filter">
-                                        <header class="filter-item__title">Report type</header>
+                                        <header class="filter-item__title"><?= __("STAT_FILTER_REPORT") ?></header>
                                         <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
                                     </section>
 
+                                    <hr class="filters-separator">
+
                                     <section class="filter-item group-type-filter">
-                                        <header class="filter-item__title">Group by</header>
+                                        <header class="filter-item__title"><?= __("STAT_GROUP_BY") ?></header>
                                         <select id="groupsel">
                                             <?php foreach ($groupTypes as $val => $grtype) {    ?>
                                                 <?php if ($val == $groupType_id) {        ?>
@@ -65,38 +71,42 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     </section>
                                 </div>
 
+                                <hr class="filters-separator">
+
                                 <div class="filters-row">
                                     <section id="accountsFilter" class="filter-item accounts-filter" <?= hidden($report !== "account") ?>>
-                                        <header class="filter-item__title">Account</header>
+                                        <header class="filter-item__title"><?= __("STAT_FILTER_ACCOUNT") ?></header>
                                         <select id="acc_id" multiple></select>
                                     </section>
 
                                     <section id="categoriesFilter" class="filter-item category-filter" <?= hidden($report !== "category") ?>>
-                                        <header class="filter-item__title">Categories</header>
+                                        <header class="filter-item__title"><?= __("FILTER_CATEGORIES") ?></header>
                                         <select id="category_id" multiple></select>
                                     </section>
 
                                     <section id="currencyFilter" class="filter-item currency-filter" <?= hidden($report !== "currency") ?>>
-                                        <header class="filter-item__title">Currency</header>
+                                        <header class="filter-item__title"><?= __("STAT_FILTER_CURRENCY") ?></header>
                                         <select id="curr_id"></select>
                                     </section>
 
+                                    <hr class="filters-separator">
+
                                     <section id="dateFilter" class="filter-item date-range-filter">
-                                        <header class="filter-item__title">Date range</header>
+                                        <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
                                         <?= DateRangeInput::render($dateRange) ?>
                                     </section>
                                 </div>
                             </div>
 
                             <div class="form-controls filters-controls">
-                                <button id="applyFiltersBtn" class="btn submit-btn" type="button">Apply</button>
+                                <button id="applyFiltersBtn" class="btn submit-btn" type="button"><?= __("APPLY") ?></button>
                             </div>
                         </aside>
                     </header>
 
                     <main>
                         <div id="chart" class="stat-histogram">
-                            <span class="nodata-message" hidden>No results found</span>
+                            <span class="nodata-message" hidden><?= __("STAT_NO_DATA") ?></span>
                         </div>
 
                         <header class="piechart-header">
@@ -104,7 +114,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="pieChartHeaderDate" class="piechart-header__date"></div>
                         </header>
                         <div id="pieChartTotal" class="piechart-total">
-                            <div class="piechart-total__title">Total</div>
+                            <div class="piechart-total__title"><?= __("STAT_TOTAL") ?></div>
                             <div id="pieChartTotalValue" class="piechart-total__value"></div>
                         </div>
                         <div id="pieChartContainer" class="piechart-container">

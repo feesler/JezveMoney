@@ -6,11 +6,12 @@ import {
     baseUrl,
     goTo,
 } from 'jezve-test';
-import { formatProps, generateId } from '../common.js';
+import { generateId } from '../common.js';
 import { PersonListView } from '../view/PersonListView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {
@@ -19,92 +20,68 @@ const checkNavigation = async () => {
     }
 };
 
-const submitPerson = async (params) => {
-    assert.instanceOf(App.view, PersonView, 'Invalid view');
-
-    // Input account name
-    if ('name' in params) {
-        await App.view.inputName(params.name);
-    }
-
-    const validInput = App.view.isValid();
-    const res = (validInput) ? App.view.getExpectedPerson() : null;
-
-    await App.view.submit();
-
-    if (validInput) {
-        assert.instanceOf(App.view, PersonListView, 'Fail to submit person');
-    }
-
-    return res;
-};
-
-/**
- * From persons list view go to new person view, input name and submit
- * Next check name result and callback
- * @param {Object} params
- */
-export const create = async (params) => {
-    await test(`Create person ({${formatProps(params)} })`, async () => {
-        // Navigate to create person view
+/** Navigate to create person view */
+export const create = async () => {
+    await test('Create person', async () => {
         await checkNavigation();
         await App.view.goToCreatePerson();
 
-        const expPerson = await submitPerson(params);
-        if (expPerson) {
-            App.state.createPerson(expPerson);
-        } else {
-            await App.view.cancel();
-        }
-
-        App.view.expectedState = PersonListView.render(App.state);
-        await App.view.checkState();
-
-        return App.state.fetchAndTest();
+        const expectedPerson = {
+            name: '',
+        };
+        App.view.setExpectedPerson(expectedPerson);
+        App.view.expectedState = App.view.getExpectedState();
+        return App.view.checkState();
     });
 };
 
-export const update = async (params) => {
-    assert(params, 'No params specified');
-    const props = copyObject(params);
+/** Navigate to update person view */
+export const update = async (pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index), 'Position of person not specified');
 
-    let pos;
-    if ('id' in props) {
-        pos = App.state.persons.getIndexById(props.id);
-    } else {
-        pos = parseInt(props.pos, 10);
-        assert(!Number.isNaN(pos), 'Position of person not specified');
-        delete props.pos;
-    }
-
-    await test(`Update person [${pos}]`, async () => {
-        // Navigate to update person view
+    await test(`Update person [${index}]`, async () => {
         await checkNavigation();
-        await App.view.goToUpdatePerson(pos);
+        await App.view.goToUpdatePerson(index);
 
-        const [expectedPerson] = App.state.getPersonsByIndexes(pos);
+        const [expectedPerson] = App.state.getPersonsByIndexes(index);
         assert(expectedPerson, 'Can not find specified person');
 
-        // Check initial state of view
-        App.view.expectedState = {
-            name: {
-                value: expectedPerson.name,
-                visible: true,
-            },
-        };
-        await App.view.checkState();
+        App.view.setExpectedPerson(expectedPerson);
+        App.view.expectedState = App.view.getExpectedState();
+        return App.view.checkState();
+    });
+};
 
-        const expPerson = await submitPerson(props);
-        if (expPerson) {
-            // Check updates in the person tiles
-            Object.assign(expectedPerson, props);
-            App.state.updatePerson(expectedPerson);
+export const inputName = async (value) => {
+    await test(`Input name '${value}'`, () => App.view.inputName(value));
+};
+
+export const submit = async () => {
+    await test('Submit person', async () => {
+        assert.instanceOf(App.view, PersonView, 'Invalid view');
+
+        const validInput = App.view.isValid();
+        const expectedPerson = (validInput) ? App.view.getExpectedPerson() : null;
+
+        await App.view.submit();
+
+        if (validInput) {
+            assert.instanceOf(App.view, PersonListView, 'Fail to submit person');
+        }
+
+        if (expectedPerson) {
+            if (expectedPerson.id) {
+                App.state.updatePerson(expectedPerson);
+            } else {
+                App.state.createPerson(expectedPerson);
+            }
         } else {
             await App.view.cancel();
         }
 
         App.view.expectedState = PersonListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -112,16 +89,15 @@ export const update = async (params) => {
 
 export const del = async (persons) => {
     await test(`Delete persons [${persons.join()}]`, async () => {
-        // Navigate to persons list view
         await checkNavigation();
-        // Prepare expected state
+
         const ids = App.state.getPersonsByIndexes(persons, true);
         App.state.deletePersons(ids);
-        // Perform actions on view
+
         await App.view.deletePersons(persons);
 
         App.view.expectedState = PersonListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -132,22 +108,21 @@ export const delFromUpdate = async (pos) => {
     assert(!Number.isNaN(ind) && ind >= 0, 'Position of person not specified');
 
     await test(`Delete person from update view [${ind}]`, async () => {
-        // Navigate to persons list view
         await checkNavigation();
-        // Perform actions on view
+
         await App.view.goToUpdatePerson(ind);
         await App.view.deleteSelfItem();
-        // Prepare expected state
+
         const ids = App.state.getPersonsByIndexes(ind, true);
         App.state.deletePersons(ids);
-        // Check state of persons list view
+
         App.view.expectedState = PersonListView.render(App.state);
-        await App.view.checkState();
-        // Check state of main view
+        App.view.checkState();
+
         await App.goToMainView();
         App.view.expectedState = MainView.render(App.state);
-        await App.view.checkState();
-        // Check app state
+        App.view.checkState();
+
         return App.state.fetchAndTest();
     });
 };
@@ -157,19 +132,17 @@ export const show = async (persons, val = true) => {
 
     const actVerb = (val) ? 'Show' : 'Hide';
     await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
-        // Navigate to persons list view
         await checkNavigation();
 
-        // Check initial state
         await App.state.fetch();
         const ids = App.state.getPersonsByIndexes(itemIds, true);
         App.state.showPersons(ids, val);
-        // Perform actions on view
+
         await App.view.showPersons(itemIds, val);
-        // Check state of persons list view
+
         App.view.expectedState = PersonListView.render(App.state);
-        await App.view.checkState();
-        // Check app state
+        App.view.checkState();
+
         return App.state.fetchAndTest();
     });
 };
@@ -180,11 +153,10 @@ export const toggleSelect = async (persons) => {
     const itemIds = Array.isArray(persons) ? persons : [persons];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
-        // Navigate to persons list view
         await checkNavigation();
 
         const origItems = App.view.getItems();
-        // Check correctness of arguments
+
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
@@ -247,9 +219,9 @@ export const securityTests = async () => {
         assert(!(App.view instanceof PersonView), 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to update person.' },
+            msgPopup: { success: false, message: __('ERR_PERSON_UPDATE', App.view.locale) },
         };
-        await App.view.checkState();
+        App.view.checkState();
         await App.view.closeNotification();
 
         return true;

@@ -7,6 +7,7 @@ import {
     insertAfter,
     Component,
 } from 'jezvejs';
+import { __ } from '../../js/utils.js';
 
 /** CSS classes */
 const NO_DATA_CLASS = 'nodata-message';
@@ -17,7 +18,7 @@ const defaultProps = {
     getItemProps: null, // optional callback to map items to props
     isListChanged: null, // optional callback to verify list content was changed
     items: [],
-    noItemsMessage: 'No items',
+    noItemsMessage: __('LIST_NO_DATA'),
     listMode: 'list',
     onItemClick: null,
 };
@@ -138,17 +139,24 @@ export class ListContainer extends Component {
         });
     }
 
+    defaultNoDataMessage(message) {
+        return createElement('span', {
+            props: {
+                className: NO_DATA_CLASS,
+                textContent: message,
+            },
+        });
+    }
+
     renderNoDataMessage() {
         if (this.noDataMsg) {
             return;
         }
 
-        this.noDataMsg = createElement('span', {
-            props: {
-                className: NO_DATA_CLASS,
-                textContent: this.state.noItemsMessage,
-            },
-        });
+        this.noDataMsg = (isFunction(this.state.noItemsMessage))
+            ? this.state.noItemsMessage()
+            : this.defaultNoDataMessage(this.state.noItemsMessage);
+
         this.elem.append(this.noDataMsg);
     }
 
@@ -197,15 +205,23 @@ export class ListContainer extends Component {
 
         const { ItemComponent } = state;
         const listItems = [];
+
+        const prevItems = prevState?.items ?? [];
         let lastItem = null;
-        state.items.forEach((item) => {
+        state.items.forEach((item, index) => {
             const itemProps = this.getItemProps(item, state);
+            const indexBefore = prevItems.findIndex((prev) => prev.id === item.id);
 
             let listItem = this.getListItemById(item.id);
+            const insertNode = (index !== indexBefore) || !listItem;
+
             if (listItem) {
                 listItem.setState(itemProps);
             } else {
                 listItem = ItemComponent.create(itemProps);
+            }
+
+            if (insertNode) {
                 if (lastItem) {
                     insertAfter(listItem.elem, lastItem.elem);
                 } else {

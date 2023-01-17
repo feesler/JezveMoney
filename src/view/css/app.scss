@@ -14,7 +14,17 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --action-btn-border-radius: 6px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
+  --input-padding: 0 0.5rem;
   --header-size: 50px;
+
+  /* Tiles */
+  --tile-gap: 10px;
+  --tile-size: 100px;
+  --tile-content-color: #ffffff;
+  --tile-bg-color: var(--accent-color-alt);
+
+  /* View content */
+  --section-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
   --content-padding-bottom: 50px;
 
   /* Popup menu, Chart popup & etc. */
@@ -133,7 +143,7 @@ label {
   font-size: 0.9rem;
   border-width: 1px;
   border-style: solid;
-  padding: 0 0.5rem;
+  padding: var(--input-padding);
   border-radius: 5px;
   color: var(--main-text-color);
   border-color: var(--input-border-color);
@@ -146,6 +156,7 @@ label {
 
 .stretch-input[disabled] {
   color: var(--input-disabled-text-color);
+  -webkit-text-fill-color: var(--input-disabled-text-color);
   border-color: var(--input-disabled-border-color);
   background-color: var(--input-disabled-bg-color);
 }
@@ -186,19 +197,50 @@ label {
   }
 }
 
-.iconbutton.circle-icon {
-  --iconbtn-hover-icon-color: #ffffff;
-
-  .iconbutton__icon {
-    border: 2px solid #000000;
-    border-radius: 50%;
+/* Action button */
+.iconbutton.action-button {
+  .iconbutton__content {
+    padding: 0;
+    text-decoration: underline;
   }
 }
 
-.iconbutton.no-icon {
+/* Show filters button */
+.iconbutton.filters-btn {
+  width: 150px;
+  justify-content: center;
+  border-radius: var(--action-btn-border-radius);
+
   .iconbutton__content {
-    padding: 0;
+    padding: 0 5px;
+    font-size: 14px;
+    font-weight: 200;
+    letter-spacing: 0.04rem;
   }
+}
+
+/* Warning action button */
+.dark-theme,
+.white-theme {
+  .iconbutton.warning-iconbutton {
+    --iconbtn-title-color: var(--warning-color-alt);
+    --iconbtn-icon-color: var(--warning-color-alt);
+    --iconbtn-hover-title-color: var(--warning-color);
+    --iconbtn-hover-icon-color: var(--warning-color);
+
+    .iconbutton__content {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Horizontal form separator */
+.form-separator {
+  border: 0;
+  border-top: 1px solid var(--list-separator-color);
+  width: 100%;
+  margin: 0.25rem 0;
+  max-width: 300px;
 }
 
 /* Centered block */
@@ -296,7 +338,7 @@ label {
 }
 
 .std_margin {
-  margin: 9px 0;
+  margin: 8px 0 12px;
 }
 
 /* buttons */
@@ -329,6 +371,7 @@ label {
 
 .submit-btn,
 .submit-btn:visited {
+  height: var(--input-height);
   border-radius: var(--action-btn-border-radius);
   background-color: var(--accent-color);
 }
@@ -347,7 +390,10 @@ label {
 }
 
 .warning-btn {
-  background-color: #c60000;
+  padding: 0;
+  color: var(--warning-color-alt);
+  text-decoration: underline;
+  background: none;
 }
 
 .warning-btn:focus-visible {
@@ -453,7 +499,7 @@ label {
   display: flex;
   flex-flow: row wrap;
   gap: var(--tile-gap);
-  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  max-width: var(--section-width);
   padding: 0.25rem 0;
 }
 
@@ -503,6 +549,7 @@ label {
   --dd-active-list-item-text: #ffffff;
   --dd-active-list-item-bg: #3078e2;
   --dd-input-font-size: 0.9rem;
+  --dd-input-padding: var(--input-padding);
   --dd-selection-font-size: 15px;
   --dd-active-selection-bg: var(--dd-active-bg);
 }
@@ -580,6 +627,14 @@ label {
   --popupmenu-hover-background: var(--warning-color-alt);
 }
 
+/* Popup menu button */
+.popup-menu .icon.popup-menu-btn__icon {
+  --popupmenu-btn-icon-size: 20px;
+
+  width: var(--popupmenu-btn-icon-size);
+  height: var(--popupmenu-btn-icon-size);
+}
+
 /* Popup */
 .popup__content {
   background: none;
@@ -587,7 +642,7 @@ label {
 
 .popup__title {
   font-weight: 300;
-  font-size: 26px;
+  font-size: 1.4rem;
   margin: 0;
   padding: 0;
 }
@@ -741,17 +796,6 @@ a.paginator-arrow:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
-/* Show filters button */
-.iconbutton.filters-btn {
-  width: 150px;
-  justify-content: center;
-  border-radius: var(--action-btn-border-radius);
-
-  .iconbutton__content {
-    padding: 0 5px;
-  }
-}
-
 /* Filters */
 .filter-item .link-menu {
   min-height: var(--input-height);
@@ -802,7 +846,8 @@ a.paginator-arrow:focus-visible {
   }
 
   .warning-btn:hover {
-    background-color: var(--warning-color-alt);
+    color: var(--warning-color);
+    background: none;
   }
 
   .link-btn:hover {

@@ -1,10 +1,12 @@
+import { __ } from '../utils.js';
+
 /** Types of transactions */
 export const EXPENSE = 1;
 export const INCOME = 2;
 export const TRANSFER = 3;
 export const DEBT = 4;
 
-const availTransTypes = {
+export const availTransTypes = {
     [EXPENSE]: 'expense',
     [INCOME]: 'income',
     [TRANSFER]: 'transfer',
@@ -12,10 +14,10 @@ const availTransTypes = {
 };
 
 const transTitles = {
-    [EXPENSE]: 'Expense',
-    [INCOME]: 'Income',
-    [TRANSFER]: 'Transfer',
-    [DEBT]: 'Debt',
+    [EXPENSE]: __('TR_EXPENSE'),
+    [INCOME]: __('TR_INCOME'),
+    [TRANSFER]: __('TR_TRANSFER'),
+    [DEBT]: __('TR_DEBT'),
 };
 
 export class Transaction {

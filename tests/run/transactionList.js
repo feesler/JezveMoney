@@ -169,6 +169,8 @@ export const setTransactionCategory = async ({ index, category }) => {
         assert.arrayIndex(origItems, ind);
         const { id } = origItems[ind];
 
+        await App.view.setTransactionCategory(index, category);
+
         App.state.setTransactionCategory({ id, category });
         const expectedItems = App.state.transactions.getItems(pageIds);
         const expected = {
@@ -176,8 +178,6 @@ export const setTransactionCategory = async ({ index, category }) => {
                 items: TransactionList.render(expectedItems, App.state),
             },
         };
-
-        await App.view.setTransactionCategory(index, category);
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
@@ -198,6 +198,8 @@ export const setCategory = async ({ items, category }) => {
             return origItems[ind].id;
         });
 
+        await App.view.setCategory(items, category);
+
         App.state.setTransactionCategory({
             id: ids,
             category,
@@ -208,8 +210,6 @@ export const setCategory = async ({ items, category }) => {
                 items: TransactionList.render(expectedItems, App.state),
             },
         };
-
-        await App.view.setCategory(items, category);
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
@@ -227,69 +227,68 @@ export const clearAllFilters = async (directNavigate = false) => {
     });
 };
 
-export const filterByType = async ({ type, directNavigate = false }) => {
+export const filterByType = async ({ type, directNavigate = false, iteratePages = true }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    let types = Array.isArray(type) ? type : [type];
-    types = types.filter((item) => availTransTypes.includes(item));
-
-    const typeNames = types.map(Transaction.typeToString);
+    const types = asArray(type).filter((item) => availTransTypes.includes(item));
+    const names = types.map(Transaction.typeToString);
 
     const descr = (types.length)
-        ? `Filter by [${typeNames.join()}]`
+        ? `Filter by [${names.join()}]`
         : 'Show all types of transactions';
     await test(descr, async () => {
         await App.view.filterByType(type, directNavigate);
-        return App.view.iteratePages();
+        return (iteratePages) ? App.view.iteratePages() : true;
     });
 };
 
 export const filterByAccounts = async ({ accounts, directNavigate = false }) => {
-    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
-
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    const accountNames = itemIds.map((accountId) => {
+    const itemIds = asArray(accounts);
+    const names = itemIds.map((accountId) => {
         const item = App.state.accounts.getItem(accountId);
         return (item) ? item.name : `(${accountId})`;
     });
 
-    await test(`Filter by accounts [${accountNames.join()}]`, async () => {
+    await test(`Filter by accounts [${names.join()}]`, async () => {
         await App.view.filterByAccounts(itemIds, directNavigate);
         return App.view.iteratePages();
     });
 };
 
 export const filterByPersons = async ({ persons, directNavigate = false }) => {
-    const itemIds = asArray(persons);
-
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    const personsNames = itemIds.map((personId) => {
+    const itemIds = asArray(persons);
+    const names = itemIds.map((personId) => {
         const item = App.state.persons.getItem(personId);
         return (item) ? item.name : `(${personId})`;
     });
 
-    await test(`Filter by persons [${personsNames.join()}]`, async () => {
+    await test(`Filter by persons [${names.join()}]`, async () => {
         await App.view.filterByPersons(itemIds, directNavigate);
         return App.view.iteratePages();
     });
 };
 
 export const filterByCategories = async ({ categories, directNavigate = false }) => {
-    const itemIds = asArray(categories);
-
     if (!directNavigate) {
         await checkNavigation();
     }
 
+    const itemIds = asArray(categories);
     const names = itemIds.map((id) => {
+        if (parseInt(id, 10) === 0) {
+            return 'No category';
+        }
+
         const item = App.state.categories.getItem(id);
         return (item) ? item.name : `(${id})`;
     });

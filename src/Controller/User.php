@@ -6,17 +6,25 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * User controller
+ */
 class User extends TemplateController
 {
     public function index()
     {
     }
 
-
-    protected function fail($msg = null, $action = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     * @param string|null $action current action of controller
+     */
+    protected function fail(?string $msg = null, ?string $action = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         if ($action == "register") {
@@ -26,7 +34,10 @@ class User extends TemplateController
         }
     }
 
-
+    /**
+     * /login/ route handler
+     * Renders login view
+     */
     public function login()
     {
         if ($this->isPOST()) {
@@ -35,7 +46,7 @@ class User extends TemplateController
 
         $this->template = new Template(VIEW_TPL_PATH . "Login.tpl");
         $data = [
-            "titleString" => "Jezve Money | Log in"
+            "titleString" => __("APP_NAME") . " | " . __("LOG_IN"),
         ];
 
         $this->cssArr[] = "LoginView.css";
@@ -44,7 +55,9 @@ class User extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * Handles user login form submit
+     */
     protected function loginUser()
     {
         $loginFields = ["login", "password"];
@@ -65,15 +78,15 @@ class User extends TemplateController
             wlog("Login user error: " . $e->getMessage());
         }
         if (!$result) {
-            $this->fail(ERR_LOGIN_FAIL);
+            $this->fail(__("ERR_LOGIN_FAIL"));
         }
-
-        Message::set(MSG_LOGIN);
 
         setLocation(BASEURL);
     }
 
-
+    /**
+     * Handles user logout
+     */
     public function logout()
     {
         $this->uMod->logout();
@@ -81,7 +94,10 @@ class User extends TemplateController
         setLocation(BASEURL . "login/");
     }
 
-
+    /**
+     * /register/ route handler
+     * Renders registration view
+     */
     public function register()
     {
         if ($this->isPOST()) {
@@ -90,7 +106,7 @@ class User extends TemplateController
 
         $this->template = new Template(VIEW_TPL_PATH . "Register.tpl");
         $data = [
-            "titleString" => "Jezve Money | Registration"
+            "titleString" =>  __("APP_NAME") . " | " . __("REGISTRATION"),
         ];
 
         $this->cssArr[] = "RegisterView.css";
@@ -99,7 +115,9 @@ class User extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * Handles user registration form submit
+     */
     protected function registerUser()
     {
         $registerFields = ["login", "password", "name"];
@@ -119,12 +137,12 @@ class User extends TemplateController
             wlog("Create user error: " . $e->getMessage());
         }
         if (!$user_id) {
-            throw new \Error(ERR_REGISTER_FAIL);
+            throw new \Error(__("ERR_REGISTER_FAIL"));
         }
 
         $this->commit();
 
-        Message::set(MSG_REGISTER);
+        Message::setSuccess(__("MSG_REGISTER"));
         setLocation(BASEURL);
     }
 }

@@ -78,6 +78,32 @@ export class ImportRuleList extends List {
         this.deleteEmptyRules();
     }
 
+    deleteCategories(...ids) {
+        if (!ids.length) {
+            return;
+        }
+
+        const itemIds = ids.map((id) => parseInt(id, 10));
+        this.data = this.map((rule) => {
+            const res = rule;
+
+            res.actions.data = res.actions.filter(
+                (action) => {
+                    if (!action.isCategoryValue()) {
+                        return true;
+                    }
+
+                    const categoryId = parseInt(action.value, 10);
+                    return !itemIds.includes(categoryId);
+                },
+            );
+
+            return res;
+        });
+
+        this.deleteEmptyRules();
+    }
+
     deleteTemplate(...ids) {
         if (!ids.length) {
             return;

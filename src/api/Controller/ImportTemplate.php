@@ -3,10 +3,11 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportTemplateModel;
-use JezveMoney\App\Item\ImportTemplateItem;
 
+/**
+ * Import templates API controller
+ */
 class ImportTemplate extends ApiListController
 {
     protected $requiredFields = [
@@ -22,25 +23,27 @@ class ImportTemplate extends ApiListController
         "account_amount_col",
     ];
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
 
         $this->model = ImportTemplateModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_IMPTPL_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_IMPTPL_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_IMPTPL_DELETE);
+        $this->createErrorMsg = __("ERR_IMPTPL_CREATE");
+        $this->updateErrorMsg = __("ERR_IMPTPL_UPDATE");
+        $this->deleteErrorMsg = __("ERR_IMPTPL_DELETE");
     }
 
-
-    protected function prepareItem($item)
-    {
-        return new ImportTemplateItem($item);
-    }
-
-
-    protected function prepareListRequest($request)
+    /**
+     * Returns list request prepared for controller-specific model
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function prepareListRequest(array $request)
     {
         return [];
     }

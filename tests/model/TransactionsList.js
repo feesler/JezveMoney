@@ -5,10 +5,9 @@ import {
     asArray,
 } from 'jezve-test';
 import {
-    convDate,
     cutDate,
-    fixDate,
     getWeek,
+    MS_IN_SECOND,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -51,13 +50,11 @@ export class TransactionsList extends List {
     }
 
     getLastestPos(date = null) {
-        const cmpDate = convDate(date);
-        let checkList;
-        if (cmpDate) {
-            checkList = this.filter((item) => convDate(item.date) <= cmpDate);
-        } else {
-            checkList = this.data;
+        if (date) {
+            assert.isInteger(date, `Invalid date timestamp: ${date}`);
         }
+
+        const checkList = (date) ? this.filter((item) => item.date <= date) : this.data;
         const res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
 
         return res;
@@ -269,29 +266,22 @@ export class TransactionsList extends List {
             return list;
         }
 
-        let fStart = fixDate(start);
-        let fEnd = fixDate(end);
+        assert.isInteger(start, `Invalid start date timestamp: ${start}`);
+        assert.isInteger(end, `Invalid start date timestamp: ${end}`);
+
+        let fStart = start;
+        let fEnd = end;
         if (fStart > fEnd) {
             const tmp = fEnd;
             fEnd = fStart;
             fStart = tmp;
         }
 
-        return list.filter((item) => {
-            const date = convDate(item.date);
-            if (!date) {
-                return false;
-            }
-
-            if (fStart && date < fStart) {
-                return false;
-            }
-            if (fEnd && date > fEnd) {
-                return false;
-            }
-
-            return true;
-        });
+        return list.filter((item) => (
+            !!item.date
+            && (!fStart || item.date >= fStart)
+            && (!fEnd || item.date <= fEnd)
+        ));
     }
 
     filterByDate(start, end) {
@@ -773,7 +763,7 @@ export class TransactionsList extends List {
                 [category] = itemGroup;
             }
 
-            const time = convDate(item.date);
+            const time = item.date * MS_IN_SECOND;
             const dateInfo = this.getDateInfo(time, groupType);
             const amount = (isSource) ? item.src_amount : item.dest_amount;
             curDate = dateInfo;

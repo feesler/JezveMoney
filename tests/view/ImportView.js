@@ -23,6 +23,7 @@ import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { Counter } from './component/Counter.js';
 import { checkDate, fixFloat } from '../common.js';
+import { __ } from '../model/locale.js';
 
 const defaultPagination = {
     page: 1,
@@ -167,8 +168,9 @@ export class ImportView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
+            locale: cont.locale,
             enabled: !cont.notAvailMsg.visible,
             menuOpen: cont.listMenu.visible,
         };
@@ -217,6 +219,9 @@ export class ImportView extends AppView {
         const hasItems = this.items.length > 0;
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             notAvailMsg: { visible: !model.enabled },
             listMenuContainer: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
@@ -1113,7 +1118,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: App.dates.now,
+            date: App.datesFmt.now,
             comment: '',
         });
         this.formIndex = this.items.length;
@@ -1555,7 +1560,7 @@ export class ImportView extends AppView {
 
         expected.msgPopup = {
             success: true,
-            message: 'All transactions have been successfully imported',
+            message: __('MSG_IMPORT_SUCCESS', this.locale),
         };
 
         await this.checkState(expected);

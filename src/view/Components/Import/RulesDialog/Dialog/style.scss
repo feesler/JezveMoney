@@ -64,11 +64,17 @@
   row-gap: 4px;
 }
 
-.rules-list-container {
+.rules-content {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
   overflow-y: auto;
+}
+
+.rules-list-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
   padding-bottom: var(--content-padding-bottom);
 }
 

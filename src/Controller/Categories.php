@@ -7,20 +7,31 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
+/**
+ * Categories controller
+ */
 class Categories extends TemplateController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
+    protected $model = null;
 
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = CategoryModel::getInstance();
     }
 
+    /**
+     * /categories/ route handler
+     * Renders categories list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "CategoryList.tpl");
         $data = [
-            "titleString" => "Jezve Money | Categories",
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORIES"),
         ];
         $data["appProps"] = [
             "categories" => $this->model->getData()
@@ -32,27 +43,34 @@ class Categories extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "categories/");
     }
 
-
+    /**
+     * /categories/create/ route handler
+     * Renders create category view
+     */
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => "New category",
-            "titleString" => "Jezve Money | New category"
+            "headString" => __("CATEGORY_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_CREATE"),
         ];
 
         $categories = $this->model->getData();
@@ -65,6 +83,7 @@ class Categories extends TemplateController
 
         $data["category"] = $category;
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "categories" => $categories,
             "view" => [
@@ -78,32 +97,36 @@ class Categories extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /categories/update/ route handler
+     * Renders update category view
+     */
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => "Edit category",
-            "titleString" => "Jezve Money | Edit category"
+            "headString" => __("CATEGORY_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_UPDATE"),
         ];
 
         $itemId = intval($this->actionParam);
         if (!$itemId) {
-            $this->fail(ERR_CATEGORY_UPDATE);
+            $this->fail(__("ERR_CATEGORY_UPDATE"));
         }
 
         $category = $this->model->getItem($itemId);
         if (!$category) {
-            $this->fail(ERR_CATEGORY_UPDATE);
+            $this->fail(__("ERR_CATEGORY_UPDATE"));
         }
         $data["category"] = $category;
 
         $categories = $this->model->getData();
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "categories" => $categories,
             "view" => [

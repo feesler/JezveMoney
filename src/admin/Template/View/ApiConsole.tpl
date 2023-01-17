@@ -19,6 +19,7 @@
                 <button>Common</button>
                 <ul class="sub-menu-list">
                     <li data-target="readStateForm">Read state</li>
+                    <li data-target="mainStateForm">Main state</li>
                 </ul>
             </li>
 
@@ -173,7 +174,16 @@
     <div class="center-column">
         <div id="readStateForm" class="request-data-form">
         <h3>Read state</h3>
-        <form action="<?=BASEURL?>api/state" method="list">
+        <form action="<?=BASEURL?>api/state" method="get">
+            <div class="form-controls">
+                <input id="readstatebtn" class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="mainStateForm" class="request-data-form">
+        <h3>Read main state</h3>
+        <form action="<?=BASEURL?>api/state/main" method="get">
             <div class="form-controls">
                 <input id="readstatebtn" class="btn submit-btn" type="submit" value="Submit">
             </div>
@@ -182,7 +192,7 @@
 
         <div id="listAccForm" class="request-data-form active">
         <h3>List accounts</h3>
-        <form action="<?=BASEURL?>api/account/list" method="list">
+        <form action="<?=BASEURL?>api/account/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="owner">
@@ -306,7 +316,7 @@
 
         <div id="listPersonsForm" class="request-data-form">
         <h3>List persons</h3>
-        <form action="<?=BASEURL?>api/person/list" method="list">
+        <form action="<?=BASEURL?>api/person/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="visibility">
@@ -387,7 +397,7 @@
 
         <div id="listTrForm" class="request-data-form">
         <h3>List</h3>
-        <form action="<?=BASEURL?>api/transaction/list" method="list">
+        <form action="<?=BASEURL?>api/transaction/list" method="get">
             <div class="std_margin column-container">
                 <label class="checkbox">
                     <input type="checkbox" data-target="order">
@@ -846,7 +856,7 @@
 
         <div id="listCategoriesForm" class="request-data-form">
         <h3>List categories</h3>
-        <form action="<?=BASEURL?>api/category/list" method="list">
+        <form action="<?=BASEURL?>api/category/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="parent_id">
@@ -924,6 +934,11 @@
             <label for="delCategories">Categories (comma separated ids)</label>
             <input id="delCategories" class="stretch-input" type="text">
         </div>
+        <label id="delSubCategoriesCheck" class="checkbox std_margin">
+            <input type="checkbox" checked>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+            <span class="checkbox__label">Delete child categories</span>
+        </label>
         <div class="form-controls">
             <input id="delCategoriesBtn" class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -931,7 +946,7 @@
 
         <div id="listTplForm" class="request-data-form">
         <h3>List import templates</h3>
-        <form action="<?=BASEURL?>api/importtpl/list" method="list">
+        <form action="<?=BASEURL?>api/importtpl/list" method="get">
             <div class="form-controls">
                 <input class="btn submit-btn" type="submit" value="Submit">
             </div>
@@ -1029,7 +1044,7 @@
 
         <div id="listRuleForm" class="request-data-form">
         <h3>List import rules</h3>
-        <form action="<?=BASEURL?>api/importrule/list" method="list">
+        <form action="<?=BASEURL?>api/importrule/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
@@ -1104,7 +1119,7 @@
 
         <div id="listCondForm" class="request-data-form">
         <h3>List import conditions</h3>
-        <form action="<?=BASEURL?>api/importcond/list" method="list">
+        <form action="<?=BASEURL?>api/importcond/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
@@ -1212,7 +1227,7 @@
 
         <div id="listActForm" class="request-data-form">
         <h3>List import actions</h3>
-        <form action="<?=BASEURL?>api/importaction/list" method="list">
+        <form action="<?=BASEURL?>api/importaction/list" method="get">
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
@@ -1304,7 +1319,7 @@
 
         <div id="listCurrForm" class="request-data-form">
         <h3>Get currencies</h3>
-        <form action="<?=BASEURL?>api/currency/list" method="list">
+        <form action="<?=BASEURL?>api/currency/list" method="get">
             <div class="form-controls">
                 <input class="btn submit-btn" type="submit" value="Submit">
             </div>
@@ -1381,7 +1396,7 @@
 
         <div id="listIconForm" class="request-data-form">
         <h3>Get icons</h3>
-        <form action="<?=BASEURL?>api/icon/list" method="list">
+        <form action="<?=BASEURL?>api/icon/list" method="get">
             <div class="form-controls">
                 <input class="btn submit-btn" type="submit" value="Submit">
             </div>
@@ -1507,7 +1522,7 @@
 
         <div id="readProfileForm" class="request-data-form">
         <h3>Read profile</h3>
-        <form action="<?=BASEURL?>api/profile/read" method="list">
+        <form action="<?=BASEURL?>api/profile/read" method="get">
             <div class="form-controls">
                 <input class="btn submit-btn" type="submit" value="Submit">
             </div>

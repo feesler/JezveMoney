@@ -1,5 +1,5 @@
 import { copyObject, checkDate } from 'jezvejs';
-import { fixFloat } from '../utils.js';
+import { dateStringToTime, fixFloat, __ } from '../utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -7,14 +7,23 @@ import {
     DEBT,
 } from './Transaction.js';
 
-export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
-const transTypeMap = {
+export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
+export const transTypeMap = {
     expense: EXPENSE,
     income: INCOME,
-    transferfrom: TRANSFER,
-    transferto: TRANSFER,
-    debtfrom: DEBT,
-    debtto: DEBT,
+    transfer_out: TRANSFER,
+    transfer_in: TRANSFER,
+    debt_out: DEBT,
+    debt_in: DEBT,
+};
+
+export const typeNames = {
+    expense: __('TR_EXPENSE'),
+    income: __('TR_INCOME'),
+    transfer_out: __('TR_TRANSFER_OUT'),
+    transfer_in: __('TR_TRANSFER_IN'),
+    debt_out: __('TR_DEBT_OUT'),
+    debt_in: __('TR_DEBT_IN'),
 };
 
 const defaultProps = {
@@ -107,7 +116,7 @@ export class ImportTransaction {
                 this.destCurrId = mainAccount.curr_id;
             }
 
-            if (this.type === 'transferfrom') {
+            if (this.type === 'transfer_out') {
                 const account = this.getTransferAccount(this.destAccountId);
                 this.destAccountId = account.id;
                 this.destCurrId = account.curr_id;
@@ -119,14 +128,14 @@ export class ImportTransaction {
                 this.srcCurrId = mainAccount.curr_id;
             }
 
-            if (this.type === 'transferto') {
+            if (this.type === 'transfer_in') {
                 const account = this.getTransferAccount(this.sourceAccountId);
                 this.sourceAccountId = account.id;
                 this.srcCurrId = account.curr_id;
             }
         }
 
-        if (this.type === 'debtfrom' || this.type === 'debtto') {
+        if (this.type === 'debt_out' || this.type === 'debt_in') {
             if (!this.personId) {
                 const person = window.app.model.persons.getItemByIndex(0);
                 if (!person) {
@@ -362,7 +371,7 @@ export class ImportTransaction {
             if (state.type !== 'expense' || !isDiffBefore) {
                 state.srcCurrId = state.mainAccount.curr_id;
             }
-        } else if (value === 'transferfrom') {
+        } else if (value === 'transfer_out') {
             state.personId = 0;
             // Copy destination amount to source amount
             // if previous type was expense
@@ -370,7 +379,7 @@ export class ImportTransaction {
                 state.sourceAmount = this.destAmount;
             }
 
-            if (state.type === 'transferto') {
+            if (state.type === 'transfer_in') {
                 state.destAccountId = this.sourceAccountId;
                 state.destCurrId = this.srcCurrId;
             } else {
@@ -378,7 +387,7 @@ export class ImportTransaction {
                 state.destAccountId = account.id;
                 state.destCurrId = account.curr_id;
             }
-        } else if (value === 'transferto') {
+        } else if (value === 'transfer_in') {
             state.personId = 0;
             // Copy destination amount to source amount
             // if previous type was expense
@@ -386,7 +395,7 @@ export class ImportTransaction {
                 state.sourceAmount = this.destAmount;
             }
 
-            if (state.type === 'transferfrom') {
+            if (state.type === 'transfer_out') {
                 state.sourceAccountId = this.destAccountId;
                 state.srcCurrId = this.destCurrId;
             } else {
@@ -394,14 +403,14 @@ export class ImportTransaction {
                 state.sourceAccountId = account.id;
                 state.srcCurrId = account.curr_id;
             }
-        } else if (value === 'debtfrom' || value === 'debtto') {
+        } else if (value === 'debt_out' || value === 'debt_in') {
             // Copy destination amount to source amount
             // if previous type was expense
             if (state.type === 'expense') {
                 state.sourceAmount = this.destAmount;
             }
 
-            if (value === 'debtfrom') {
+            if (value === 'debt_out') {
                 state.destAccountId = 0;
             } else {
                 state.sourceAccountId = 0;
@@ -418,6 +427,15 @@ export class ImportTransaction {
             state.destCurrId = state.mainAccount.curr_id;
         }
         state.type = value;
+
+        const { categories } = window.app.model;
+        if (state.categoryId !== 0) {
+            const category = categories.getItem(state.categoryId);
+            const realType = transTypeMap[state.type];
+            if (category.type !== 0 && category.type !== realType) {
+                state.categoryId = 0;
+            }
+        }
 
         return new ImportTransaction(state);
     }
@@ -510,11 +528,11 @@ export class ImportTransaction {
                     state.destAmount = state.sourceAmount;
                 }
             }
-        } else if (state.type === 'transferfrom' || state.type === 'transferto') {
+        } else if (state.type === 'transfer_out' || state.type === 'transfer_in') {
             if (state.sourceAccountId === state.destAccountId) {
                 const { userAccounts } = window.app.model;
                 const nextAccount = userAccounts.getNextAccount(state.mainAccount.id);
-                if (state.type === 'transferfrom') {
+                if (state.type === 'transfer_out') {
                     state.destAccountId = nextAccount.id;
                     state.destCurrId = nextAccount.curr_id;
                 } else {
@@ -522,8 +540,8 @@ export class ImportTransaction {
                     state.srcCurrId = nextAccount.curr_id;
                 }
             }
-        } else if (state.type === 'debtfrom' || state.type === 'debtto') {
-            if (state.type === 'debtfrom') {
+        } else if (state.type === 'debt_out' || state.type === 'debt_in') {
+            if (state.type === 'debt_out') {
                 state.destCurrId = state.srcCurrId;
             } else {
                 state.srcCurrId = state.destCurrId;
@@ -539,7 +557,7 @@ export class ImportTransaction {
         if (!account) {
             throw new Error('Account not found');
         }
-        const transferAccountId = (this.type === 'transferfrom')
+        const transferAccountId = (this.type === 'transfer_out')
             ? this.destAccountId
             : this.sourceAccountId;
         if (transferAccountId === account.id) {
@@ -554,7 +572,7 @@ export class ImportTransaction {
         const state = {
             ...copyObject(this),
         };
-        if (state.type === 'transferfrom') {
+        if (state.type === 'transfer_out') {
             state.destAccountId = account.id;
             state.destCurrId = account.curr_id;
         } else {
@@ -698,7 +716,7 @@ export class ImportTransaction {
             res.dest_curr = this.destCurrId;
             res.src_amount = srcAmountVal;
             res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
-        } else if (this.type === 'transferfrom') {
+        } else if (this.type === 'transfer_out') {
             const transferAcc = accounts.getItem(this.destAccountId);
             if (!transferAcc) {
                 throw new Error('Invalid transaction: Account not found');
@@ -711,7 +729,7 @@ export class ImportTransaction {
             res.dest_curr = this.destCurrId;
             res.src_amount = srcAmountVal;
             res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
-        } else if (this.type === 'transferto') {
+        } else if (this.type === 'transfer_in') {
             const transferAcc = accounts.getItem(this.sourceAccountId);
             if (!transferAcc) {
                 throw new Error('Invalid transaction: Account not found');
@@ -724,14 +742,14 @@ export class ImportTransaction {
             res.dest_curr = this.destCurrId;
             res.src_amount = srcAmountVal;
             res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
-        } else if (this.type === 'debtfrom' || this.type === 'debtto') {
+        } else if (this.type === 'debt_out' || this.type === 'debt_in') {
             const person = persons.getItem(this.personId);
             if (!person) {
                 throw new Error('Invalid transaction: Person not found');
             }
 
             res.type = DEBT;
-            res.op = (this.type === 'debtto') ? 1 : 2;
+            res.op = (this.type === 'debt_in') ? 1 : 2;
             res.person_id = person.id;
             res.acc_id = this.mainAccount.id;
             res.src_curr = this.srcCurrId;
@@ -740,7 +758,7 @@ export class ImportTransaction {
             res.dest_amount = srcAmountVal;
         }
 
-        res.date = this.date;
+        res.date = dateStringToTime(this.date);
         res.category_id = this.categoryId;
         res.comment = this.comment;
 

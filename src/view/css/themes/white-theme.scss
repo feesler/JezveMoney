@@ -5,6 +5,9 @@
   --semitrans-bg-color: #ffffff66;
   --alt-bg-color: #f0f0f0;
 
+  /* List separator */
+  --list-separator-color: #ebebeb;
+
   /* Header */
   --header-bg-color: #404040;
   --header-hover-btn-bg-color: #606060;
@@ -15,6 +18,7 @@
   /* Buttons */
   --btn-bg: #e8e8e8;
   --btn-hover-bg: #c9c9c9;
+  --icon-btn-hover-bg: #dddddd;
 
   /* Inputs */
   --input-bg-color: #f2f2f2;
@@ -66,14 +70,6 @@
     --iconbtn-icon-color: var(--main-text-color);
     --iconbtn-hover-title-color: var(--main-text-color);
     --iconbtn-hover-icon-color: var(--main-text-color);
-
-    &.circle-icon {
-      --iconbtn-hover-icon-color: #ffffff;
-
-      .iconbutton__icon {
-        border-color: var(--main-text-color);
-      }
-    }
   }
 
   .icon {
@@ -287,6 +283,7 @@
 
     input[disabled] {
       color: var(--input-disabled-text-color);
+      -webkit-text-fill-color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
@@ -441,15 +438,7 @@
     }
 
     .nav-item__icon-btn:hover {
-      background: #dddddd;
-    }
-
-    .iconbutton:hover {
-      &.circle-icon {
-        .iconbutton__icon {
-          background-color: var(--main-text-color);
-        }
-      }
+      background: var(--icon-btn-hover-bg);
     }
 
     /* 'Show more' button */
@@ -488,6 +477,10 @@
     .import-form .icon-btn:hover .icon,
     .import-item .icon-btn:hover .icon {
       fill: var(--list-item-hover-icon-fill);
+    }
+
+    .back-btn:hover {
+      background: var(--icon-btn-hover-bg);
     }
 
     .tile_header .close-btn:hover .close-icon {

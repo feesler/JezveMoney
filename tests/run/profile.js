@@ -5,6 +5,7 @@ import { App } from '../Application.js';
 import { RegisterView } from '../view/RegisterView.js';
 import { ProfileView } from '../view/ProfileView.js';
 import { AboutView } from '../view/AboutView.js';
+import { __ } from '../model/locale.js';
 
 const checkLoginNavigation = async () => {
     if (App.view.isUserLoggedIn()) {
@@ -53,7 +54,7 @@ export const register = async ({ login, name, password }) => {
 
     if (validInput) {
         App.view.expectedState = {
-            msgPopup: { success: true, message: 'You successfully registered.' },
+            msgPopup: { success: true, message: __('MSG_REGISTER', App.view.locale) },
         };
 
         await test('User registration', () => App.view.checkState());
@@ -79,12 +80,13 @@ export const resetData = async (options = {}) => {
     await App.view.resetData(options);
 
     App.view.expectedState = {
-        msgPopup: { success: true, message: 'Data successfully reseted.' },
+        msgPopup: { success: true, message: __('MSG_PROFILE_RESET', App.view.locale) },
     };
     await test('Reset data', () => App.view.checkState());
 
     await App.view.closeNotification();
     await App.goToMainView();
+    await App.view.waitForLoad();
 
     App.view.expectedState = MainView.render(App.state);
     await test('Main view update', () => App.view.checkState());
@@ -94,7 +96,8 @@ export const changeName = async (newName) => {
     await test(`Change user name ('${newName}')`, async () => {
         await checkProfileNavigation();
 
-        const validInput = newName && newName.length > 0 && newName !== App.state.profile.name;
+        const validInput = newName && newName.length > 0;
+        const nameChanged = newName !== App.state.profile.name;
 
         await App.view.changeName(newName);
 
@@ -102,12 +105,21 @@ export const changeName = async (newName) => {
             App.state.changeName(newName);
 
             App.view.expectedState = {
-                msgPopup: { success: true, message: 'User name successfully updated.' },
                 header: { userBtn: { title: newName } },
             };
 
-            await App.view.checkState();
-            await App.view.closeNotification();
+            if (nameChanged) {
+                App.view.expectedState.msgPopup = {
+                    success: true,
+                    message: __('MSG_PROFILE_NAME', App.view.locale),
+                };
+            }
+
+            App.view.checkState();
+
+            if (nameChanged) {
+                await App.view.closeNotification();
+            }
         }
 
         return App.state.fetchAndTest();
@@ -127,10 +139,10 @@ export const changePass = async ({ oldPassword, newPassword }) => {
         await App.view.changePassword(oldPassword, newPassword);
         if (validInput) {
             App.view.expectedState = {
-                msgPopup: { success: true, message: 'Password successfully updated.' },
+                msgPopup: { success: true, message: __('MSG_PROFILE_PASSWORD', App.view.locale) },
             };
 
-            await App.view.checkState();
+            App.view.checkState();
             await App.view.closeNotification();
 
             await App.view.logoutUser();
@@ -150,7 +162,7 @@ export const deleteProfile = async () => {
 
     await App.view.deleteProfile();
     App.view.expectedState = {
-        msgPopup: { success: true, message: 'Your profile is successfully deleted.' },
+        msgPopup: { success: true, message: __('MSG_PROFILE_DELETED', App.view.locale) },
     };
     await test('Delete profile', () => App.view.checkState());
 

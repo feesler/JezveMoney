@@ -13,6 +13,7 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../js/model/ImportCondition.js';
+import { __ } from '../../../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
@@ -30,8 +31,6 @@ const COND_FIELDS_CLASS = 'cond-form__fields';
 const CONTROLS_CLASS = 'cond-form__controls';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
-/** Strings */
-const LABEL_PROPERTY_CMP = 'Compare with another property';
 
 const defaultProps = {
     properties: null,
@@ -104,7 +103,7 @@ export class ImportConditionForm extends Component {
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
-            oninput: () => this.onValueChange(),
+            onInput: () => this.onValueChange(),
         });
         // Create text value input element
         this.valueInput = createElement('input', {
@@ -114,7 +113,7 @@ export class ImportConditionForm extends Component {
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
-            label: LABEL_PROPERTY_CMP,
+            label: __('CONDITION_COMPARE_PROPERTY'),
             onChange: () => this.onFieldValueChecked(),
         });
 
@@ -180,11 +179,11 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown = DropDown.create({
             className: PROP_FIELD_CLASS,
-            onchange: (property) => this.onPropertyChange(property),
+            onChange: (property) => this.onPropertyChange(property),
         });
 
         this.propertyDropDown.append(items);
-        this.propertyDropDown.selectItem(items[0].id);
+        this.propertyDropDown.setSelection(items[0].id);
     }
 
     /** Create operator field */
@@ -194,17 +193,17 @@ export class ImportConditionForm extends Component {
 
         this.operatorDropDown = DropDown.create({
             className: OPERATOR_FILED_CLASS,
-            onchange: (operator) => this.onOperatorChange(operator),
+            onChange: (operator) => this.onOperatorChange(operator),
         });
         this.operatorDropDown.append(operatorItems);
-        this.operatorDropDown.selectItem(operatorItems[0].id);
+        this.operatorDropDown.setSelection(operatorItems[0].id);
     }
 
     /** Create account field */
     createAccountField() {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
     }
@@ -217,11 +216,11 @@ export class ImportConditionForm extends Component {
 
         this.templateDropDown = DropDown.create({
             className: TEMPLATE_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         this.templateDropDown.append(templateItems);
         if (templateItems.length > 0) {
-            this.templateDropDown.selectItem(templateItems[0].id);
+            this.templateDropDown.setSelection(templateItems[0].id);
         }
     }
 
@@ -229,7 +228,7 @@ export class ImportConditionForm extends Component {
     createCurrencyField() {
         this.currencyDropDown = DropDown.create({
             className: CURRENCY_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
         window.app.initCurrencyList(this.currencyDropDown);
     }
@@ -238,7 +237,7 @@ export class ImportConditionForm extends Component {
     createValuePropField() {
         this.valuePropDropDown = DropDown.create({
             className: VALUE_PROP_FIELD_CLASS,
-            onchange: () => this.onValueChange(),
+            onChange: () => this.onValueChange(),
         });
     }
 
@@ -357,13 +356,13 @@ export class ImportConditionForm extends Component {
         }
 
         if (state.isFieldValue) {
-            this.valuePropDropDown.selectItem(value);
+            this.valuePropDropDown.setSelection(value);
         } else if (ImportCondition.isAccountField(state.fieldType)) {
-            this.accountDropDown.selectItem(value);
+            this.accountDropDown.setSelection(value);
         } else if (ImportCondition.isTemplateField(state.fieldType)) {
-            this.templateDropDown.selectItem(value);
+            this.templateDropDown.setSelection(value);
         } else if (ImportCondition.isCurrencyField(state.fieldType)) {
-            this.currencyDropDown.selectItem(value);
+            this.currencyDropDown.setSelection(value);
         } else if (ImportCondition.isAmountField(state.fieldType)) {
             this.decAmountInput.value = state.value;
         } else {
@@ -451,7 +450,7 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown.removeAll();
         this.propertyDropDown.append(items);
-        this.propertyDropDown.selectItem(state.fieldType);
+        this.propertyDropDown.setSelection(state.fieldType);
     }
 
     /** Render operator select */
@@ -465,7 +464,7 @@ export class ImportConditionForm extends Component {
 
         this.operatorDropDown.removeAll();
         this.operatorDropDown.append(items);
-        this.operatorDropDown.selectItem(state.operator);
+        this.operatorDropDown.setSelection(state.operator);
     }
 
     getValuePropertyItems(state) {
@@ -501,7 +500,7 @@ export class ImportConditionForm extends Component {
 
         this.valuePropDropDown.removeAll();
         this.valuePropDropDown.append(items);
-        this.valuePropDropDown.selectItem(items[0].id);
+        this.valuePropDropDown.setSelection(items[0].id);
     }
 
     /** Render component state */

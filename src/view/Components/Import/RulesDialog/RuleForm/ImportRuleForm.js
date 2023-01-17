@@ -14,22 +14,13 @@ import {
 } from '../../../../js/model/ImportAction.js';
 import { ImportCondition } from '../../../../js/model/ImportCondition.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
+import { __ } from '../../../../js/utils.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import './style.scss';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
-
-/** Strings */
-const BTN_CREATE_CONDITION = 'Create';
-const TITLE_CONDITIONS = 'Conditions';
-const BTN_CREATE_ACTION = 'Create';
-const TITLE_ACTIONS = 'Actions';
-const BTN_SAVE = 'Submit';
-const BTN_CANCEL = 'Cancel';
-const MSG_NO_ACTIONS = 'No actions';
-const MSG_NO_CONDITIONS = 'No conditions';
 
 const defaultProps = {
     onSubmit: null,
@@ -75,7 +66,7 @@ export class ImportRuleForm extends Component {
             props: {
                 className: 'btn link-btn create-btn',
                 type: 'button',
-                textContent: BTN_CREATE_CONDITION,
+                textContent: __('CREATE'),
             },
             events: { click: (e) => this.onCreateConditionClick(e) },
         });
@@ -86,7 +77,7 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportConditionForm,
             className: 'conditions-list',
             itemSelector: '.cond-form',
-            noItemsMessage: MSG_NO_CONDITIONS,
+            noItemsMessage: __('IMPORT_CONDITIONS_NO_DATA'),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (
@@ -98,7 +89,7 @@ export class ImportRuleForm extends Component {
         this.conditionsCollapse = Collapsible.create({
             className: 'rule-form-collapse',
             header: [
-                createElement('label', { props: { textContent: TITLE_CONDITIONS } }),
+                createElement('label', { props: { textContent: __('IMPORT_CONDITIONS') } }),
                 this.createCondBtn,
                 this.toggleCondBtn.elem,
             ],
@@ -108,7 +99,7 @@ export class ImportRuleForm extends Component {
 
         // Actions
         this.createActionBtn = createElement('button', {
-            props: { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
+            props: { className: 'btn link-btn create-btn', type: 'button', textContent: __('CREATE') },
             events: { click: (e) => this.onCreateActionClick(e) },
         });
 
@@ -118,7 +109,7 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportActionForm,
             className: 'actions-list',
             itemSelector: '.action-form',
-            noItemsMessage: MSG_NO_ACTIONS,
+            noItemsMessage: __('IMPORT_ACTIONS_NO_DATA'),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (
@@ -130,7 +121,7 @@ export class ImportRuleForm extends Component {
         this.actionsCollapse = new Collapsible({
             className: 'rule-form-collapse',
             header: [
-                createElement('label', { props: { textContent: TITLE_ACTIONS } }),
+                createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
                 this.createActionBtn,
                 this.toggleActionsBtn.elem,
             ],
@@ -140,11 +131,11 @@ export class ImportRuleForm extends Component {
 
         // Controls
         this.saveBtn = createElement('button', {
-            props: { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
+            props: { className: 'btn submit-btn', type: 'button', textContent: __('SUBMIT') },
             events: { click: () => this.onSubmit() },
         });
         this.cancelBtn = createElement('button', {
-            props: { className: 'btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
+            props: { className: 'btn cancel-btn', type: 'button', textContent: __('CANCEL') },
             events: { click: () => this.onCancel() },
         });
 
@@ -316,6 +307,10 @@ export class ImportRuleForm extends Component {
             }
 
             return item.id;
+        }
+
+        if (ImportAction.isCategoryValue(actionType)) {
+            return 0;
         }
 
         return '';

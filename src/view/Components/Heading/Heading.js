@@ -1,4 +1,4 @@
-import { Component } from 'jezvejs';
+import { Component, px } from 'jezvejs';
 import './style.scss';
 
 const defaultProps = {
@@ -59,8 +59,10 @@ export class Heading extends Component {
                 window.app.view.header.showUserMenu(() => {
                     this.titleElem.textContent = this.state.title;
                     this.elem.append(this.actionsContainer);
+                    this.elem.style.height = '';
                 });
             } else {
+                this.elem.style.height = px(this.elem.offsetHeight);
                 window.app.view.header.showActions(this.actionsContainer);
                 this.titleElem.textContent = null;
             }

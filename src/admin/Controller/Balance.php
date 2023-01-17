@@ -7,8 +7,15 @@ use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 
+/**
+ * Balance admin controller
+ */
 class Balance extends AdminController
 {
+    /**
+     * /admin/balance/ route handler
+     * Renders balance admin view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Balance.tpl");

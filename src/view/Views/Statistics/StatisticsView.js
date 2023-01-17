@@ -13,7 +13,7 @@ import { IconButton } from 'jezvejs/IconButton';
 import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { formatValueShort, normalize } from '../../js/utils.js';
+import { formatValueShort, normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -48,14 +48,6 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
-
-/** Strings */
-const STR_TITLE = 'Statistics';
-const PAGE_TITLE = 'Jezve Money | Statistics';
-const TITLE_NO_CATEGORY = 'No category';
-/* Date range input */
-const START_DATE_PLACEHOLDER = 'From';
-const END_DATE_PLACEHOLDER = 'To';
 
 const defaultProps = {
     filter: {},
@@ -128,7 +120,7 @@ class StatisticsView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('STATISTICS'),
         });
 
         // Filters
@@ -159,7 +151,7 @@ class StatisticsView extends View {
         // Currency filter
         this.currencyDropDown = DropDown.create({
             elem: 'curr_id',
-            onitemselect: (obj) => this.onCurrencySel(obj),
+            onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencyDropDown);
@@ -168,11 +160,11 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
-            placeholder: 'Type to filter accounts',
+            placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
-            noResultsMessage: 'Nothing found',
-            onitemselect: (obj) => this.onAccountSel(obj),
-            onchange: (obj) => this.onAccountSel(obj),
+            noResultsMessage: __('ACCOUNTS_NOT_FOUND'),
+            onItemSelect: (obj) => this.onAccountSel(obj),
+            onChange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -181,25 +173,25 @@ class StatisticsView extends View {
         this.categoryDropDown = CategorySelect.create({
             elem: 'category_id',
             multiple: true,
-            placeholder: 'Type to filter categories',
+            placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
             noResultsMessage: 'Nothing found',
-            onitemselect: (obj) => this.onCategorySel(obj),
-            onchange: (obj) => this.onCategorySel(obj),
+            onItemSelect: (obj) => this.onCategorySel(obj),
+            onChange: (obj) => this.onCategorySel(obj),
             className: 'dd_fullwidth',
         });
 
         // 'Group by' filter
         this.groupDropDown = DropDown.create({
             elem: 'groupsel',
-            onitemselect: (obj) => this.onGroupSel(obj),
+            onItemSelect: (obj) => this.onGroupSel(obj),
             className: 'dd_fullwidth',
         });
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
-            startPlaceholder: START_DATE_PLACEHOLDER,
-            endPlaceholder: END_DATE_PLACEHOLDER,
+            startPlaceholder: __('DATE_RANGE_FROM'),
+            endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
@@ -221,7 +213,7 @@ class StatisticsView extends View {
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
-            onitemclick: (target) => this.onSelectDataColumn(target),
+            onItemClick: (target) => this.onSelectDataColumn(target),
         });
         this.chart.append(this.histogram.elem);
 
@@ -231,9 +223,9 @@ class StatisticsView extends View {
             radius: 150,
             innerRadius: 120,
             offset: 10,
-            onitemover: (item) => this.onPieChartItemOver(item),
-            onitemout: (item) => this.onPieChartItemOut(item),
-            onitemclick: (item) => this.onPieChartItemClick(item),
+            onItemOver: (item) => this.onPieChartItemOver(item),
+            onItemOut: (item) => this.onPieChartItemOut(item),
+            onItemClick: (item) => this.onPieChartItemClick(item),
         });
         this.pieChartContainer.append(this.pieChart.elem);
 
@@ -400,7 +392,8 @@ class StatisticsView extends View {
 
     replaceHistory(state) {
         const url = this.getFilterURL(state);
-        window.history.replaceState({}, PAGE_TITLE, url);
+        const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
+        window.history.replaceState({}, pageTitle, url);
     }
 
     async requestData(options) {
@@ -508,7 +501,7 @@ class StatisticsView extends View {
 
         if (state.filter.report === 'category') {
             if (categoryId === 0) {
-                return TITLE_NO_CATEGORY;
+                return __('NO_CATEGORY');
             }
 
             const category = window.app.model.categories.getItem(categoryId);
@@ -541,6 +534,8 @@ class StatisticsView extends View {
 
     renderAccountsFilter(state) {
         const ids = state.form?.acc_id ?? [];
+        const selection = [];
+
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
@@ -550,22 +545,16 @@ class StatisticsView extends View {
             this.accountDropDown.enableItem(account.id, enable);
 
             if (enable && ids.includes(account.id)) {
-                this.accountDropDown.selectItem(account.id);
-            } else {
-                this.accountDropDown.deselectItem(account.id);
+                selection.push(account.id);
             }
         });
+
+        this.accountDropDown.setSelection(selection);
     }
 
     renderCategoriesFilter(state) {
         const ids = state.form?.category_id ?? [];
-        window.app.model.categories.forEach((category) => {
-            if (ids.includes(category.id)) {
-                this.categoryDropDown.selectItem(category.id);
-            } else {
-                this.categoryDropDown.deselectItem(category.id);
-            }
-        });
+        this.categoryDropDown.setSelection(ids);
     }
 
     renderFilters(state, prevState = {}) {
@@ -593,11 +582,11 @@ class StatisticsView extends View {
         this.renderCategoriesFilter(state);
 
         if (state.form.curr_id) {
-            this.currencyDropDown.selectItem(state.form.curr_id);
+            this.currencyDropDown.setSelection(state.form.curr_id);
         }
 
         const groupType = getGroupTypeByName(state.form.group);
-        this.groupDropDown.selectItem(groupType);
+        this.groupDropDown.setSelection(groupType);
 
         // Render date
         const dateFilter = {

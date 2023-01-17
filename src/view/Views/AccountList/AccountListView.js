@@ -11,6 +11,7 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
@@ -23,14 +24,6 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';
-
-/** Strings */
-const STR_TITLE = 'Accounts';
-const TITLE_SINGLE_ACC_DELETE = 'Delete account';
-const TITLE_MULTI_ACC_DELETE = 'Delete accounts';
-const MSG_MULTI_ACC_DELETE = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
-const MSG_SINGLE_ACC_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
-const MSG_NO_ACCOUNTS = 'You have no one account. Please create one.';
 
 /**
  * List of accounts view
@@ -74,7 +67,7 @@ class AccountListView extends View {
             className: 'tiles',
             itemSelector: '.tile',
             listMode: 'list',
-            noItemsMessage: MSG_NO_ACCOUNTS,
+            noItemsMessage: __('ACCOUNTS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
@@ -91,7 +84,7 @@ class AccountListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('ACCOUNTS'),
         });
 
         this.visibleTiles = ListContainer.create(listProps);
@@ -102,8 +95,8 @@ class AccountListView extends View {
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
-            className: 'no-icon',
-            title: 'Done',
+            className: 'action-button',
+            title: __('DONE'),
             onClick: () => this.toggleSelectMode(),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -127,15 +120,15 @@ class AccountListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
@@ -144,22 +137,22 @@ class AccountListView extends View {
                 id: 'exportBtn',
                 type: 'link',
                 icon: 'export',
-                title: 'Export to CSV',
+                title: __('ACCOUNT_EXPORT_CSV'),
                 onClick: () => this.onMenuClick('exportBtn'),
             }, {
                 id: 'showBtn',
                 icon: 'show',
-                title: 'Restore',
+                title: __('SHOW'),
                 onClick: () => this.onMenuClick('showBtn'),
             }, {
                 id: 'hideBtn',
                 icon: 'hide',
-                title: 'Hide',
+                title: __('HIDE'),
                 onClick: () => this.onMenuClick('hideBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -182,26 +175,26 @@ class AccountListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxExportBtn',
                 type: 'link',
                 icon: 'export',
-                title: 'Export to CSV',
+                title: __('ACCOUNT_EXPORT_CSV'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
-                title: 'Restore',
+                title: __('SHOW'),
                 onClick: () => this.showItems(),
             }, {
                 id: 'ctxHideBtn',
                 icon: 'hide',
-                title: 'Hide',
+                title: __('HIDE'),
                 onClick: () => this.showItems(false),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
         });
@@ -357,9 +350,9 @@ class AccountListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? TITLE_MULTI_ACC_DELETE : TITLE_SINGLE_ACC_DELETE,
-            content: (multiple) ? MSG_MULTI_ACC_DELETE : MSG_SINGLE_ACC_DELETE,
-            onconfirm: () => this.deleteItems(),
+            title: (multiple) ? __('ACCOUNT_DELETE_MULTIPLE') : __('ACCOUNT_DELETE'),
+            content: (multiple) ? __('MSG_ACCOUNT_DELETE_MULTIPLE') : __('MSG_ACCOUNT_DELETE'),
+            onConfirm: () => this.deleteItems(),
         });
     }
 

@@ -107,24 +107,17 @@
   }
 
   .account-field,
-  .person-field {
+  .person-field,
+  .comment-field {
     flex-shrink: 1;
     flex-grow: 1;
     overflow: hidden;
-  }
 
-  .comment-field,
-  .comment-field div {
-    overflow: hidden;
-    flex-grow: 1;
-    flex-shrink: 1;
-  }
-
-  .account-field div,
-  .person-field div,
-  .comment-field div {
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
 
   .import-item__date {
@@ -209,6 +202,10 @@
 
     .type-col {
       width: 35%;
+    }
+
+    .type-field {
+      width: 200px;
     }
 
     .amount-col {

@@ -6,6 +6,9 @@
   --semitrans-bg-color: #20202066;
   --alt-bg-color: #2a2a2a;
 
+  /* List separator */
+  --list-separator-color: #2a2a2a;
+
   /* Header */
   --header-bg-color: #181818;
   --header-hover-btn-bg-color: #303030;
@@ -16,6 +19,7 @@
   /* Buttons */
   --btn-bg: #3c3c3c;
   --btn-hover-bg: #4a4a4a;
+  --icon-btn-hover-bg: #323232;
 
   /* Inputs */
   --input-bg-color: #181818;
@@ -67,14 +71,6 @@
     --iconbtn-icon-color: var(--main-text-color);
     --iconbtn-hover-title-color: var(--main-text-color);
     --iconbtn-hover-icon-color: var(--main-text-color);
-
-    &.circle-icon {
-      --iconbtn-hover-icon-color: #202020;
-
-      .iconbutton__icon {
-        border-color: var(--main-text-color);
-      }
-    }
   }
 
   .icon {
@@ -270,7 +266,7 @@
   .popup-menu,
   .popup-menu-list {
     --popupmenu-border-color: #444444;
-    --popupmenu-separator-color: #2a2a2a;
+    --popupmenu-separator-color: var(--list-separator-color);
     --popupmenu-background: var(--popup-menu-bg);
     --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
@@ -288,6 +284,7 @@
 
     input[disabled] {
       color: var(--input-disabled-text-color);
+      -webkit-text-fill-color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
@@ -441,15 +438,7 @@
     }
 
     .nav-item__icon-btn:hover {
-      background: #323232;
-    }
-
-    .iconbutton:hover {
-      &.circle-icon {
-        .iconbutton__icon {
-          background-color: var(--main-text-color);
-        }
-      }
+      background: var(--icon-btn-hover-bg);
     }
 
     /* 'Show more' button */
@@ -481,6 +470,10 @@
     .import-form .icon-btn:hover .icon,
     .import-item .icon-btn:hover .icon {
       fill: var(--list-item-hover-icon-fill);
+    }
+
+    .back-btn:hover {
+      background: var(--icon-btn-hover-bg);
     }
 
     .tile_header .close-btn:hover .close-icon {

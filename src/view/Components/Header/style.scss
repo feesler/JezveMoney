@@ -125,7 +125,7 @@
 .user-navigation {
   --offcanvas-bg: var(--alt-bg-color);
 
-  width: 200px;
+  max-width: 100%;
   z-index: 2110;
 }
 
@@ -184,7 +184,8 @@
   fill: var(--header-color);
 }
 
-/* Theme switch */
+/* Locale select, theme switch */
+.locale-select,
 .theme-switch {
   display: flex;
   flex-flow: row nowrap;
@@ -193,11 +194,8 @@
   width: 100%;
 }
 
-.theme-switch__label {
-  white-space: nowrap;
-  padding: 0.5rem 0.75rem;
-  font-size: 1.15rem;
-  font-weight: 300;
+.locale-select {
+  padding-right: 0.75rem;
 }
 
 .theme-switch .switch {
@@ -291,6 +289,13 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+}
+
+.nav-item__title {
+  white-space: nowrap;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 300;
 }
 
 a.nav-item__link,

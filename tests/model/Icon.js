@@ -3,7 +3,7 @@ export class Icon {
     static noIcon() {
         return {
             id: 0,
-            name: 'No icon',
+            name: 'ACCOUNT_NO_ICON',
             file: null,
             type: null,
         };

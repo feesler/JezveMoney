@@ -7,6 +7,8 @@ import {
     click,
     asyncMap,
     isObject,
+    copyObject,
+    formatDate,
 } from 'jezve-test';
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -20,6 +22,7 @@ import {
     trimToDigitsLimit,
     EXCHANGE_DIGITS,
     CENTS_DIGITS,
+    dateStringToSeconds,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
@@ -36,6 +39,8 @@ import {
     availTransTypes,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
+import { AccountsList } from '../model/AccountsList.js';
+import { __ } from '../model/locale.js';
 
 const infoItemSelectors = [
     '#srcAmountInfo',
@@ -155,8 +160,26 @@ export class TransactionView extends AppView {
         return res;
     }
 
+    createCancelledState(transactionId) {
+        this.cancelledState = App.state.clone();
+        const origTransaction = this.cancelledState.transactions.getItem(transactionId);
+        const originalAccounts = copyObject(this.cancelledState.accounts.data);
+        const canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
+        this.cancelledState.accounts.data = canceled;
+    }
+
+    appState(model = this.model) {
+        if (model.isUpdate && !this.cancelledState) {
+            this.createCancelledState(model.id);
+        }
+
+        return (model.isUpdate) ? this.cancelledState : App.state;
+    }
+
     buildModel(cont) {
         const res = this.model;
+
+        res.locale = cont.locale;
 
         res.type = cont.typeMenu.value;
         assert(availTransTypes.includes(res.type), 'Invalid type selected');
@@ -168,11 +191,13 @@ export class TransactionView extends AppView {
             res.id = cont.id;
         }
 
+        const appState = this.appState(res);
+
         res.srcAccount = (cont.sourceContainer)
-            ? App.state.accounts.getItem(cont.sourceContainer.content.id)
+            ? appState.accounts.getItem(cont.sourceContainer.content.id)
             : null;
         res.destAccount = (cont.destContainer)
-            ? App.state.accounts.getItem(cont.destContainer.content.id)
+            ? appState.accounts.getItem(cont.destContainer.content.id)
             : null;
 
         res.src_curr_id = (cont.srcAmountRow)
@@ -301,7 +326,7 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === DEBT) {
-            res.person = App.state.persons.getItem(cont.personContainer.content.id);
+            res.person = appState.persons.getItem(cont.personContainer.content.id);
             if (res.isAvailable) {
                 assert(res.person, 'Person not found');
             }
@@ -314,7 +339,7 @@ export class TransactionView extends AppView {
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
             res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
-            res.account = App.state.accounts.getItem(cont.debtAccountContainer.content.id);
+            res.account = appState.accounts.getItem(cont.debtAccountContainer.content.id);
             if (res.isAvailable && !res.noAccount) {
                 assert(res.account, 'Account not found');
                 const accountCurrency = (res.debtType) ? res.dest_curr_id : res.src_curr_id;
@@ -450,7 +475,7 @@ export class TransactionView extends AppView {
         res.dest_amount = this.model.fDestAmount;
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
-        res.date = this.model.date;
+        res.date = dateStringToSeconds(this.model.date);
         res.category_id = this.model.categoryId;
         res.comment = this.model.comment;
 
@@ -466,8 +491,12 @@ export class TransactionView extends AppView {
         const isTransfer = this.model.type === TRANSFER;
         const isDebt = this.model.type === DEBT;
         const { isAvailable, isDiffCurr } = this.model;
+        const { locale } = this;
 
         const res = {
+            header: {
+                localeSelect: { value: this.model.locale },
+            },
             typeMenu: { value: this.model.type },
             personContainer: {
                 tile: {},
@@ -514,10 +543,7 @@ export class TransactionView extends AppView {
         };
 
         if (this.model.isUpdate) {
-            res.deleteBtn = {
-                title: 'Delete',
-                visible: true,
-            };
+            res.deleteBtn = { visible: true };
         }
 
         if (isAvailable) {
@@ -546,8 +572,14 @@ export class TransactionView extends AppView {
                 visible: true,
                 value: this.model.date,
             };
+
+            const visibleCategories = this.appState()
+                .getCategoriesForType(this.model.type)
+                .map((item) => ({ id: item.id.toString() }));
+
             res.categorySelect = {
                 visible: true,
+                items: visibleCategories,
                 value: this.model.categoryId.toString(),
             };
             res.commentRow = {
@@ -605,15 +637,17 @@ export class TransactionView extends AppView {
         }
 
         if (isAvailable) {
-            res.srcAmountRow.label = (isDiffCurr) ? 'Source amount' : 'Amount';
-            res.destAmountRow.label = (isDiffCurr) ? 'Destination amount' : 'Amount';
+            res.srcAmountRow.label = (isDiffCurr) ? __('TR_SRC_AMOUNT', locale) : __('TR_AMOUNT', locale);
+            res.destAmountRow.label = (isDiffCurr) ? __('TR_DEST_AMOUNT', locale) : __('TR_AMOUNT', locale);
         }
+
+        const resultBalanceTok = __('TR_RESULT', locale);
 
         if (isExpense) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (isAvailable) {
-                res.srcResBalanceRow.label = 'Result balance';
+                res.srcResBalanceRow.label = resultBalanceTok;
             }
 
             res.srcAmountInfo.visible = false;
@@ -656,7 +690,7 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (isAvailable) {
-                res.destResBalanceRow.label = 'Result balance';
+                res.destResBalanceRow.label = resultBalanceTok;
             }
 
             this.hideInputRow(res, 'srcResBalance');
@@ -698,8 +732,8 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
             if (isAvailable) {
-                res.srcResBalanceRow.label = 'Result balance (Source)';
-                res.destResBalanceRow.label = 'Result balance (Destination)';
+                res.srcResBalanceRow.label = `${resultBalanceTok} (${__('TR_SOURCE', locale)})`;
+                res.destResBalanceRow.label = `${resultBalanceTok} (${__('TR_DESTINATION', locale)})`;
             }
 
             if (state === -1) {
@@ -769,7 +803,7 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 21, 'Invalid state specified');
 
             const { debtType, noAccount } = this.model;
-            const userAccounts = App.state.getUserAccounts();
+            const userAccounts = this.appState().getUserAccounts();
             const accountsAvailable = userAccounts.length > 0;
 
             res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
@@ -777,12 +811,15 @@ export class TransactionView extends AppView {
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
             if (isAvailable) {
+                const personTok = __('TR_PERSON', locale);
+                const accountTok = __('TR_ACCOUNT', locale);
+
                 res.srcResBalanceRow.label = (debtType)
-                    ? 'Result balance (Person)'
-                    : 'Result balance (Account)';
+                    ? `${resultBalanceTok} (${personTok})`
+                    : `${resultBalanceTok} (${accountTok})`;
                 res.destResBalanceRow.label = (debtType)
-                    ? 'Result balance (Account)'
-                    : 'Result balance (Person)';
+                    ? `${resultBalanceTok} (${accountTok})`
+                    : `${resultBalanceTok} (${personTok})`;
             }
 
             if (debtType) {
@@ -1014,7 +1051,7 @@ export class TransactionView extends AppView {
             return 0;
         }
 
-        const account = App.state.accounts.getItem(this.model.lastAccount_id);
+        const account = this.appState().accounts.getItem(this.model.lastAccount_id);
         assert(account, 'Last account not found');
 
         return account.balance;
@@ -1118,8 +1155,8 @@ export class TransactionView extends AppView {
     }
 
     setNextSourceAccount(accountId) {
-        const nextAccountId = App.state.getNextAccount(accountId);
-        const newSrcAcc = App.state.accounts.getItem(nextAccountId);
+        const nextAccountId = this.appState().getNextAccount(accountId);
+        const newSrcAcc = this.appState().accounts.getItem(nextAccountId);
         assert(newSrcAcc, 'Next account not found');
 
         this.model.srcAccount = newSrcAcc;
@@ -1130,10 +1167,10 @@ export class TransactionView extends AppView {
     }
 
     setNextDestAccount(accountId) {
-        const nextAccountId = App.state.getNextAccount(accountId);
+        const nextAccountId = this.appState().getNextAccount(accountId);
         assert(nextAccountId, 'Next account not found');
 
-        this.model.destAccount = App.state.accounts.getItem(nextAccountId);
+        this.model.destAccount = this.appState().accounts.getItem(nextAccountId);
         this.model.dest_curr_id = this.model.destAccount.curr_id;
         this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
@@ -1146,7 +1183,7 @@ export class TransactionView extends AppView {
             return null;
         }
 
-        const personAccount = App.state.getPersonAccount(personId, currencyId);
+        const personAccount = this.appState().getPersonAccount(personId, currencyId);
         if (personAccount) {
             return personAccount;
         }
@@ -1170,7 +1207,7 @@ export class TransactionView extends AppView {
         }
 
         this.model.type = type;
-        this.model.isAvailable = App.state.isAvailableTransactionType(type);
+        this.model.isAvailable = this.appState().isAvailableTransactionType(type);
 
         if (type === EXPENSE) {
             if (!this.model.isAvailable) {
@@ -1199,7 +1236,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = App.state.getFirstAccount();
+                    fromAccount = this.appState().getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1248,7 +1285,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = App.state.getFirstAccount();
+                    fromAccount = this.appState().getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1287,7 +1324,7 @@ export class TransactionView extends AppView {
                 } else {
                     let scrAccount = this.model.account;
                     if (!scrAccount) {
-                        scrAccount = App.state.getFirstAccount();
+                        scrAccount = this.appState().getFirstAccount();
                     }
 
                     this.model.srcAccount = scrAccount;
@@ -1348,7 +1385,7 @@ export class TransactionView extends AppView {
             }
 
             if (this.model.isAvailable) {
-                this.model.person = App.state.getFirstPerson();
+                this.model.person = this.appState().getFirstPerson();
                 this.model.personAccount = this.getPersonAccount(
                     this.model.person?.id,
                     this.model.src_curr_id,
@@ -1390,6 +1427,15 @@ export class TransactionView extends AppView {
             delete this.model.lastAcc_id;
         }
 
+        if (this.model.categoryId !== 0) {
+            const category = this.appState().categories.getItem(this.model.categoryId);
+            assert(category, `Category not found: '${this.model.categoryId}'`);
+
+            if (category.type !== 0 && category.type !== type) {
+                this.model.categoryId = 0;
+            }
+        }
+
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.typeMenu.select(type));
@@ -1408,9 +1454,8 @@ export class TransactionView extends AppView {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await navigation(() => this.content.delete_warning.clickOk());
     }
 
     async submit() {
@@ -1433,7 +1478,7 @@ export class TransactionView extends AppView {
             'Unexpected action: can\'t change source account',
         );
 
-        const newAcc = App.state.accounts.getItem(val);
+        const newAcc = this.appState().accounts.getItem(val);
         if (!this.model.srcAccount || !newAcc || newAcc.id === this.model.srcAccount.id) {
             return true;
         }
@@ -1517,15 +1562,11 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async changeSrcAccountByPos(pos) {
-        return this.changeSrcAccount(this.content.sourceContainer.dropDown.items[pos].id);
-    }
-
     async changeDestAccount(val) {
         const availTypes = [INCOME, TRANSFER];
         assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination account');
 
-        const newAcc = App.state.accounts.getItem(val);
+        const newAcc = this.appState().accounts.getItem(val);
         if (!this.model.destAccount || !newAcc || newAcc.id === this.model.destAccount.id) {
             return true;
         }
@@ -1607,12 +1648,6 @@ export class TransactionView extends AppView {
         await this.performAction(() => this.content.destContainer.selectAccount(val));
 
         return this.checkState();
-    }
-
-    async changeDestAccountByPos(pos) {
-        return this.changeDestAccount(
-            this.content.destContainer.dropDown.items[pos].id,
-        );
     }
 
     async inputSrcAmount(val) {
@@ -2195,7 +2230,7 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async changeDate(val) {
+    async inputDate(val) {
         this.model.date = val.toString();
         this.expectedState = this.getExpectedState();
 
@@ -2204,8 +2239,19 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
+    async selectDate(val) {
+        assert.isDate(val, 'Invalid date');
+
+        this.model.date = formatDate(val);
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.datePicker.selectDate(val));
+
+        return this.checkState();
+    }
+
     async changeCategory(val) {
-        const category = App.state.categories.getItem(val);
+        const category = this.appState().categories.getItem(val);
         const categoryId = category?.id ?? 0;
         if (this.model.categoryId === categoryId) {
             return true;
@@ -2229,7 +2275,7 @@ export class TransactionView extends AppView {
     }
 
     async changePerson(val) {
-        this.model.person = App.state.persons.getItem(val);
+        this.model.person = this.appState().persons.getItem(val);
 
         const personAccCurrencyId = (this.model.debtType)
             ? this.model.srcCurr.id
@@ -2252,10 +2298,6 @@ export class TransactionView extends AppView {
         await this.performAction(() => this.content.personContainer.selectAccount(val));
 
         return this.checkState();
-    }
-
-    async changePersonByPos(pos) {
-        return this.changePerson(this.content.personContainer.dropDown.items[pos].id);
     }
 
     async toggleAccount() {
@@ -2299,9 +2341,9 @@ export class TransactionView extends AppView {
             });
         } else {
             if (this.model.lastAccount_id) {
-                this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
+                this.model.account = this.appState().accounts.getItem(this.model.lastAccount_id);
             } else {
-                this.model.account = App.state.getFirstAccount();
+                this.model.account = this.appState().getFirstAccount();
             }
             assert(this.model.account, 'Account not found');
 
@@ -2350,7 +2392,7 @@ export class TransactionView extends AppView {
     }
 
     async changeAccount(accountId) {
-        const newAcc = App.state.accounts.getItem(accountId);
+        const newAcc = this.appState().accounts.getItem(accountId);
 
         if (!this.model.account || !newAcc || newAcc.id === this.model.account.id) {
             return true;
@@ -2405,10 +2447,6 @@ export class TransactionView extends AppView {
         await this.performAction(() => this.content.debtAccountContainer.selectAccount(accountId));
 
         return this.checkState();
-    }
-
-    changeAccountByPos(pos) {
-        return this.changeAccount(this.content.debtAccountContainer.dropDown.items[pos].id);
     }
 
     async swapSourceAndDest() {

@@ -139,7 +139,7 @@ export class ImportRule {
             ruleActionTypes.push(action.action_id);
 
             // In case action type is 'Set account' check action 'Set transaction type'
-            // with value 'transferto' or 'transferfrom' is also exist
+            // with value 'transfer_in' or 'transfer_out' is also exist
             if (action.isAccountValue()
                 && !this.actions.hasSetTransfer()) {
                 return false;
@@ -155,7 +155,7 @@ export class ImportRule {
             }
 
             // In case action type is 'Set person' check action 'Set transaction type'
-            // with value 'debtto' or 'debtfrom' is also exist
+            // with value 'debt_in' or 'debt_out' is also exist
             if (action.isPersonValue()
                 && !this.actions.hasSetDebt()) {
                 return false;

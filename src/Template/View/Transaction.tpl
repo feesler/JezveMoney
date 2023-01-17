@@ -18,9 +18,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
                                     "id" => "deleteBtn",
-                                    "classNames" => "circle-icon",
+                                    "classNames" => "warning-iconbutton",
                                     "icon" => "del",
-                                    "title" => "Delete"
+                                    "title" => __("DELETE"),
                                 ]) ?>
                             </div>
                         <?php    }    ?>
@@ -74,7 +74,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback">Input correct amount.</div>
+                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="srcCurrInp" name="src_curr" type="hidden" value="<?= e($tr["src_curr"]) ?>">
                             </div>
 
@@ -92,12 +92,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback">Input correct amount.</div>
+                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="destCurrInp" name="dest_curr" type="hidden" value="<?= e($tr["dest_curr"]) ?>">
                             </div>
 
                             <div id="exchangeRow" class="view-row std_margin" hidden>
-                                <label for="exchangeInput">Exchange rate</label>
+                                <label for="exchangeInput"><?= __("TR_EXCHANGE_RATE") ?></label>
                                 <div class="input-group">
                                     <input id="exchangeInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
                                     <button id="exchangeSign" class="input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
@@ -121,7 +121,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
 
                             <div id="dateRow" class="validation-block view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="dateInput">Date</label>
+                                <label for="dateInput"><?= __("TR_DATE") ?></label>
                                 <div class="column-container">
                                     <div class="input-group">
                                         <input id="dateInput" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
@@ -131,22 +131,22 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     </div>
                                     <div id="datePickerWrapper" class="calendar"></div>
                                 </div>
-                                <div class="invalid-feedback">Input correct date.</div>
+                                <div class="invalid-feedback"><?= __("TR_INVALID_DATE") ?></div>
                             </div>
 
                             <div id="categoryRow" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="categorySelect">Category</label>
+                                <label for="categorySelect"><?= __("TR_CATEGORY") ?></label>
                                 <select id="categorySelect" name="category_id"></select>
                             </div>
 
                             <div id="commentRow" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="commentInput">Comment</label>
+                                <label for="commentInput"><?= __("TR_COMMENT") ?></label>
                                 <input id="commentInput" class="stretch-input" name="comment" type="text" value="<?= e($tr["comment"]) ?>">
                             </div>
 
                             <div id="submitControls" class="form-controls" <?= hidden(!$trAvailable) ?>>
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>">Cancel</a>
+                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
                         </form>
                     </main>

@@ -4,7 +4,6 @@ namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\Core\Singleton;
 use JezveMoney\App\Item\PersonItem;
 
@@ -12,20 +11,23 @@ use function JezveMoney\Core\inSetCondition;
 
 define("PERSON_HIDDEN", 1);
 
+/**
+ * Person model
+ */
 class PersonModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
-    private static $owner_id = 0;        // person of user
+    private static $owner_id = 0;
     protected $adminForce = false;
     protected $tbl_name = "persons";
 
-
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
-        // find owner person
         $uMod = UserModel::getInstance();
         self::$user_id = $uMod->getUser();
         self::$owner_id = $uMod->getOwner();
@@ -33,34 +35,37 @@ class PersonModel extends CachedTable
         $this->dbObj = MySqlDB::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row array of table row fields
+     *
+     * @return PersonItem|null
+     */
+    protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->name = $row["name"];
-        $res->user_id = intval($row["user_id"]);
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return PersonItem::fromTableRow($row);
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return \mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = ["name", "flags"];
         $res = [];
@@ -103,9 +108,15 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
@@ -115,9 +126,15 @@ class PersonModel extends CachedTable
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -125,8 +142,15 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    public function adminUpdate($item_id, $params)
+    /**
+     * Updates specified person of different user. Admin access is required
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return bool
+     */
+    public function adminUpdate(int $item_id, array $params)
     {
         if (!UserModel::isAdminUser()) {
             return false;
@@ -139,9 +163,15 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -157,23 +187,14 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    public function adminDelete($items)
-    {
-        if (!UserModel::isAdminUser()) {
-            return false;
-        }
-
-        $this->adminForce = true;
-        $res = $this->del($items);
-        $this->adminForce = false;
-
-        return $res;
-    }
-
-
-    // Preparations for items delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         foreach ($items as $item_id) {
             // check person is exist
@@ -197,8 +218,15 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    public function show($items, $val = true)
+    /**
+     * Shows or hides specified persons
+     *
+     * @param int|int[]|null $items id or array of person ids to show/hide
+     * @param bool $val show if true, hide otherwise
+     *
+     * @return bool
+     */
+    public function show(mixed $items, bool $val = true)
     {
         if (!is_array($items)) {
             $items = [$items];
@@ -237,26 +265,37 @@ class PersonModel extends CachedTable
         return true;
     }
 
-
-    public function hide($items)
+    /**
+     * Hides specified persons
+     *
+     * @param int|int[]|null $items id or array of account ids to hide
+     *
+     * @return bool
+     */
+    public function hide(mixed $items)
     {
         return $this->show($items, false);
     }
 
-
-    // Return person id by specified position
-    public function getIdByPos($pos)
+    /**
+     * Returns id of item at specified position
+     *
+     * @param int $pos item position
+     *
+     * @return int
+     */
+    public function getIdByPos(int $pos)
     {
         if (!$this->checkCache()) {
             return 0;
         }
 
         // Check user not logged in or there is only user owner person
-        if (!self::$owner_id || count(self::$dcache) == 1) {
+        if (!self::$owner_id || count($this->cache) == 1) {
             return 0;
         }
 
-        $keys = array_keys(self::$dcache);
+        $keys = array_keys($this->cache);
         if (isset($keys[$pos])) {
             if ($keys[$pos] == self::$owner_id) {
                 return ($pos < count($keys) - 1) ? $keys[$pos + 1] : $keys[$pos - 1];
@@ -268,20 +307,26 @@ class PersonModel extends CachedTable
         return 0;
     }
 
-
-    // Search person with specified name and return id if success
-    public function findByName($p_name, $caseSens = false)
+    /**
+     * Search for person with specified name
+     *
+     * @param string $name name of person to find
+     * @param bool $caseSens case sensitive flag
+     *
+     * @return object|null
+     */
+    public function findByName(string $name, bool $caseSens = false)
     {
-        if (is_empty($p_name)) {
+        if (is_empty($name)) {
             return null;
         }
 
         if (!$this->checkCache()) {
-            return 0;
+            return null;
         }
 
         if (!$caseSens) {
-            $p_name = strtolower($p_name);
+            $name = strtolower($name);
         }
         foreach ($this->cache as $p_id => $item) {
             // Skip person of user
@@ -290,18 +335,21 @@ class PersonModel extends CachedTable
             }
 
             if (
-                ($caseSens && $item->name == $p_name) ||
-                (!$caseSens && strtolower($item->name) == $p_name)
+                ($caseSens && $item->name == $name) ||
+                (!$caseSens && strtolower($item->name) == $name)
             ) {
                 return $item;
             }
         }
 
-        return 0;
+        return null;
     }
 
-
-    // Delete all persons except owner of user
+    /**
+     * Removes all persons of user except owner of user
+     *
+     * @return bool
+     */
     public function reset()
     {
         if (!self::$user_id || !self::$owner_id) {
@@ -331,8 +379,14 @@ class PersonModel extends CachedTable
         return true;
     }
 
-
-    public function getItem($obj_id)
+    /**
+     * Return specified item from cache
+     *
+     * @param int $obj_id item id
+     *
+     * @return object|null
+     */
+    public function getItem(int $obj_id)
     {
         $item = parent::getItem($obj_id);
         if (is_null($item) && intval($obj_id) && UserModel::isAdminUser()) {
@@ -344,14 +398,16 @@ class PersonModel extends CachedTable
         return $item;
     }
 
-
-    // Return count of objects
-    public function getCount($params = null)
+    /**
+     * Returns count of persons
+     *
+     * @param array $params array of options:
+     *     - 'user' => (int) - select persons by user. Admin access is required
+     *
+     * @return int
+     */
+    public function getCount(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $userRequest = isset($params["user"]) ? intval($params["user"]) : 0;
 
         if ($userRequest && UserModel::isAdminUser()) {
@@ -373,25 +429,18 @@ class PersonModel extends CachedTable
         }
     }
 
-
     /**
-     * Return array of persons
+     * Returns array of persons
      *
-     * @param array{string} $params
-     *      Query parameters
-     *      - full (boolean): if set to true and current user have admin rights method
-     *                        will return persons of all users ;
-     *      - visibility (string): visibility filter. Possible values: "all", "visible", "hidden" ;
-     *      - sort (string): sort result array. Possible value: "visibility" ;
+     * @param array $params array of options:
+     *     - 'full' => (bool): return persons of all users. Admin access is required
+     *     - 'visibility' => (string): select persons by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'sort' => (string): sort result array. Possible value: "visibility"
      *
-     * @return array of person objects
+     * @return PersonItem[]
      */
-    public function getData($params = [])
+    public function getData(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $accMod = AccountModel::getInstance();
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $requestedVisibility = isset($params["visibility"]) ? $params["visibility"] : "visible";
@@ -426,8 +475,8 @@ class PersonModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new PersonItem($item);
-            $itemObj->accounts = $accMod->getData(["owner" => $item->id]);
+            $itemObj = clone $item;
+            $itemObj->setAccounts($accMod->getData(["owner" => $item->id]));
 
             $res[] = $itemObj;
         }
@@ -441,9 +490,14 @@ class PersonModel extends CachedTable
         return $res;
     }
 
-
-    // Check item is hidden
-    public function isHidden($item)
+    /**
+     * Returns true if specified item is hidden
+     *
+     * @param object|int|null $item id or item object
+     *
+     * @return bool
+     */
+    public function isHidden(mixed $item)
     {
         if (is_int($item)) {
             $item = $this->getItem($item);

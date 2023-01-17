@@ -18,12 +18,8 @@ export class IconsList extends List {
 
     findByName(name) {
         const qName = name.toUpperCase();
-        const currObj = this.find((item) => item.name.toUpperCase() === qName);
-        if (!currObj) {
-            return null;
-        }
-
-        return currObj;
+        const icon = this.find((item) => item.name.toUpperCase() === qName);
+        return icon ?? null;
     }
 
     findByFile(val) {

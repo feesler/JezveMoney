@@ -16,9 +16,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
                                     "id" => "deleteBtn",
-                                    "classNames" => "circle-icon",
-                                    "title" => "Delete",
-                                    "icon" => "del"
+                                    "classNames" => "warning-iconbutton",
+                                    "title" => __("DELETE"),
+                                    "icon" => "del",
                                 ]) ?>
                             </div>
                         <?php    }    ?>
@@ -29,29 +29,31 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?php if ($this->action == "update") {        ?>
                                 <input id="categoryId" name="id" type="hidden" value="<?= e($category->id) ?>">
                             <?php    }    ?>
-                            <div id="name-inp-block" class="validation-block view-row std_margin">
-                                <label for="nameInp">Name</label>
-                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
-                                <div id="nameFeedback" class="invalid-feedback"></div>
-                            </div>
-
-                            <div id="parent-block" class="view-row std_margin">
-                                <label for="parent">Parent category</label>
+                            <div id="parentCategoryField" class="view-row std_margin">
+                                <label for="parent"><?= __("CATEGORY_PARENT") ?></label>
                                 <div>
                                     <select id="parent" name="parent_id"></select>
                                 </div>
                             </div>
 
+                            <hr class="form-separator">
+
+                            <div id="name-inp-block" class="validation-block view-row std_margin">
+                                <label for="nameInp"><?= __("CATEGORY_NAME") ?></label>
+                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
+                                <div id="nameFeedback" class="invalid-feedback"></div>
+                            </div>
+
                             <div id="type-block" class="view-row std_margin">
-                                <label for="type">Transaction type</label>
+                                <label for="type"><?= __("CATEGORY_TR_TYPE") ?></label>
                                 <div>
                                     <select id="type" name="type"></select>
                                 </div>
                             </div>
 
                             <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>categories/">Cancel</a>
+                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
                         </form>
                     </main>

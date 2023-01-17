@@ -6,8 +6,15 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\ApiResponse;
 
+/**
+ * Tests controller
+ */
 class Tests extends AdminController
 {
+    /**
+     * /admin/tests/ route handler
+     * Renders browser tests view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Tests.tpl");
@@ -22,7 +29,10 @@ class Tests extends AdminController
         $this->render($data);
     }
 
-
+    /**
+     * /admin/tests/upload/ route handler
+     * Creates import file in the upload directory
+     */
     public function upload()
     {
         $res = new ApiResponse();
@@ -50,15 +60,20 @@ class Tests extends AdminController
                 throw new \Error("Failed to write file");
             }
 
-            $res->data = new \stdClass();
-            $res->data->filename = basename($filePath);
+            $respData = new \stdClass();
+            $respData->filename = basename($filePath);
+
+            $res->setData($respData);
+            $res->ok();
         } catch (\Error $e) {
             $res->fail($e->getMessage());
         }
-
-        $res->ok();
     }
 
+    /**
+     * /admin/tests/remove/ route handler
+     * Removes previously uploaded files
+     */
     public function remove()
     {
         $res = new ApiResponse();
@@ -79,10 +94,10 @@ class Tests extends AdminController
                     throw new \Error("Fail to remove file");
                 }
             }
+
+            $res->ok();
         } catch (\Error $e) {
             $res->fail($e->getMessage());
         }
-
-        $res->ok();
     }
 }

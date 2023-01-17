@@ -12,6 +12,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    Transaction,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 
@@ -71,7 +72,7 @@ export class TransactionListItem extends TestComponent {
             if (srcAmountVisible && destAmountVisible) {
                 res.amountText = `${sign}${props.srcAmount} (${sign}${props.destAmount})`;
             } else {
-                res.amountText = `${sign}${props.srcAmount}`;
+                res.amountText = props.srcAmount;
             }
 
             res.dateFmt = props.dateFmt;
@@ -171,7 +172,7 @@ export class TransactionListItem extends TestComponent {
             }
         }
 
-        res.dateFmt = transaction.date;
+        res.dateFmt = Transaction.formatDate(transaction.date);
         res.comment = transaction.comment;
 
         return res;

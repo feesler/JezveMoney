@@ -5,32 +5,32 @@
         <header class="logo-container">
             <div class="login-logo row-container">
                 <span class="logo"><?= svgIcon("logo_u", "logo-icon") ?></span>
-                <span class="title">Jezve Money</span>
+                <span class="title"><?= __("APP_NAME") ?></span>
             </div>
         </header>
         <main class="form-container">
             <form id="form" class="login-form" action="<?= BASEURL ?>login/" method="post">
-                <h1>Log in</h1>
+                <h1><?= __("LOG_IN") ?></h1>
                 <div id="login-inp-block" class="validation-block std_margin">
-                    <label for="loginInp">Username</label>
+                    <label for="loginInp"><?= __("LOG_IN_USERNAME") ?></label>
                     <input id="loginInp" class="stretch-input" name="login" type="text" autocomplete="off">
-                    <div class="invalid-feedback">Input your login.</div>
+                    <div class="invalid-feedback"><?= __("LOG_IN_INVALID_USERNAME") ?></div>
                 </div>
                 <div id="pwd-inp-block" class="validation-block std_margin">
-                    <label for="passwordInp">Password</label>
+                    <label for="passwordInp"><?= __("LOG_IN_PASSWORD") ?></label>
                     <input id="passwordInp" class="stretch-input" name="password" type="password" autocomplete="off">
-                    <div class="invalid-feedback">Input correct password.</div>
+                    <div class="invalid-feedback"><?= __("LOG_IN_INVALID_PASSWORD") ?></div>
                 </div>
                 <div class="std_margin">
                     <label id="rememberCheck" class="checkbox">
                         <input type="checkbox" name="remember" checked>
                         <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                        <span class="checkbox__label">Remember me</span>
+                        <span class="checkbox__label"><?= __("LOG_IN_REMEMBER") ?></span>
                     </label>
                 </div>
                 <div class="form-controls std_margin">
-                    <input class="btn submit-btn" type="submit" value="Log in">
-                    <a class="alter-link" href="<?= BASEURL ?>register/">Register</a>
+                    <input class="btn submit-btn" type="submit" value="<?= __("LOG_IN_BUTTON") ?>">
+                    <a class="alter-link" href="<?= BASEURL ?>register/"><?= __("REGISTRATION") ?></a>
                 </div>
             </form>
         </main>

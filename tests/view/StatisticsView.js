@@ -15,7 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { fixDate } from '../common.js';
+import { dateToSeconds, fixDate, secondsToDateString } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -94,6 +94,7 @@ export class StatisticsView extends AppView {
 
     buildModel(cont) {
         const res = {
+            locale: cont.locale,
             filtersVisible: cont.filtersContainer.visible,
         };
 
@@ -105,8 +106,11 @@ export class StatisticsView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            res.filter.startDate = dateRange.startDate;
-            res.filter.endDate = dateRange.endDate;
+            const startDate = new Date(fixDate(dateRange.startDate));
+            const endDate = new Date(fixDate(dateRange.endDate));
+
+            res.filter.startDate = dateToSeconds(startDate);
+            res.filter.endDate = dateToSeconds(endDate);
         }
 
         if (res.filter.report === 'currency') {
@@ -154,6 +158,9 @@ export class StatisticsView extends AppView {
         const { report } = model.filter;
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             typeMenu: {
                 visible: filtersVisible,
                 value: model.filter.type,
@@ -165,8 +172,12 @@ export class StatisticsView extends AppView {
             dateFilter: {
                 visible: filtersVisible,
                 value: {
-                    startDate: model.filter.startDate,
-                    endDate: model.filter.endDate,
+                    startDate: (model.filter.startDate)
+                        ? secondsToDateString(model.filter.startDate)
+                        : null,
+                    endDate: (model.filter.endDate)
+                        ? secondsToDateString(model.filter.endDate)
+                        : null,
                 },
             },
             noDataMessage: {},
@@ -478,12 +489,13 @@ export class StatisticsView extends AppView {
     async selectDateRange(start, end) {
         await this.openFilters();
 
-        this.model.filter.startDate = start;
-        this.model.filter.endDate = end;
-        const expected = this.getExpectedState();
-
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
+
+        this.model.filter.startDate = dateToSeconds(startDate);
+        this.model.filter.endDate = dateToSeconds(endDate);
+        const expected = this.getExpectedState();
+
         await this.waitForData(() => this.content.dateFilter.selectRange(startDate, endDate));
 
         return App.view.checkState(expected);

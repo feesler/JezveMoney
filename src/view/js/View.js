@@ -20,6 +20,7 @@ export class View {
      * Document ready event handler
      */
     onReady() {
+        window.app.setupLocale();
         window.app.setupTheme();
 
         const headerElem = document.querySelector('.header');

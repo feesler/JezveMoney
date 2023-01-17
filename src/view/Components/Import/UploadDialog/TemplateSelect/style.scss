@@ -1,0 +1,80 @@
+/* Import template select */
+.template-select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  flex: 1 1 auto;
+  width: 100%;
+  font-size: 16px;
+  color: var(--main-text-color);
+  background-color: var(--list-item-bg-color);
+  cursor: pointer;
+
+  .dd__container_attached {
+    width: 100%;
+  }
+}
+
+.template-select__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px 4px 8px 8px;
+  flex: 1 1 auto;
+  width: 100%;
+
+  /* Menu */
+  .popup-menu-btn {
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    background: none;
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .popup-menu-btn__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .popup-menu {
+    position: static;
+    margin: 0 4px;
+  }
+
+  .popup-menu-list {
+    right: auto;
+  }
+
+  /* Menu and toggle expand/collapse button */
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    flex-flow: row nowrap;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+  }
+
+  .toggle-icon {
+    height: 18px;
+  }
+}
+
+.template-select__title {
+  display: inline-block;
+  flex-grow: 1;
+  font-weight: 200;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+/* Controls */
+.template-select__controls {
+  display: flex;
+  flex-flow: row nowrap;
+}

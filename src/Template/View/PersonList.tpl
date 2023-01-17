@@ -11,30 +11,28 @@ include(TPL_PATH . "Header.tpl");    ?>
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
-                        <h1>Persons</h1>
+                        <h1><?= __("PERSONS") ?></h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
                                 "id" => "createBtn",
                                 "type" => "link",
-                                "classNames" => "circle-icon",
                                 "link" => BASEURL . "persons/create/",
-                                "title" => "Create",
-                                "icon" => "plus"
+                                "icon" => "plus",
                             ]) ?>
                         </div>
                     </header>
                     <header id="contentHeader" class="content-header">
                         <div class="counters">
                             <div id="itemsCounter" class="counter">
-                                <span class="counter__title">Items</span>
+                                <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
                                 <span id="itemsCount" class="counter__value"></span>
                             </div>
                             <div id="hiddenCounter" class="counter">
-                                <span class="counter__title">Hidden</span>
+                                <span class="counter__title"><?= __("LIST_HIDDEN") ?></span>
                                 <span id="hiddenCount" class="counter__value"></span>
                             </div>
                             <div id="selectedCounter" class="counter" hidden>
-                                <span class="counter__title">Selected</span>
+                                <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
                                 <span id="selItemsCount" class="counter__value"></span>
                             </div>
                         </div>
@@ -42,7 +40,7 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                     <main id="contentContainer" class="content-container">
                         <div id="hiddenTilesHeading" class="heading" hidden>
-                            <h1>Hidden</h1>
+                            <h1><?= __("LIST_HIDDEN") ?></h1>
                         </div>
                     </main>
                 </div>

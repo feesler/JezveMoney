@@ -3,14 +3,14 @@ import {
     show,
     isFunction,
     Component,
+    setEvents,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
+import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 
 /** CSS classes */
 const FILE_NAME_CLASS = 'upload-form__filename';
-/** Strings */
-const MSG_UPLOAD_FAIL = 'Fail to process file';
 
 /**
  * ImportFileUploader component
@@ -34,7 +34,7 @@ export class ImportFileUploader extends Component {
             throw new Error('Failed to initialize import file uploader');
         }
 
-        this.inputElem.addEventListener('change', () => this.onChangeUploadFile());
+        setEvents(this.inputElem, { change: () => this.onChangeUploadFile() });
 
         this.initUploadExtras();
     }
@@ -85,7 +85,7 @@ export class ImportFileUploader extends Component {
     onImportSuccess(data) {
         try {
             if (!Array.isArray(data)) {
-                throw new Error(MSG_UPLOAD_FAIL);
+                throw new Error(__('ERR_UPLOAD'));
             }
 
             if (isFunction(this.props.onUploaded)) {
@@ -140,8 +140,8 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        this.serverAddressInput.addEventListener('input', () => this.onInputServerAddress());
-        this.uploadBtn.addEventListener('click', () => this.uploadFromServer());
+        setEvents(this.serverAddressInput, { input: () => this.onInputServerAddress() });
+        setEvents(this.uploadBtn, { click: () => this.uploadFromServer() });
 
         this.state = {
             ...this.state,

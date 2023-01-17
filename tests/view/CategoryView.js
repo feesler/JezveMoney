@@ -8,25 +8,38 @@ import {
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
-import { WarningPopup } from './component/WarningPopup.js';
+import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { availTransTypes } from '../model/Transaction.js';
 
 /** Create or update category test view */
 export class CategoryView extends AppView {
     static getExpectedState(model) {
+        const minParentItems = (model.isUpdate) ? 1 : 0;
+        const showParent = App.state.categories.length > minParentItems;
+        const topCategories = App.state.categories
+            .findByParent(0)
+            .filter((category) => category.id !== model.id)
+            .map((category) => ({ id: category.id.toString() }));
+        const availParentCategories = [{ id: '0' }, ...topCategories];
+
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             nameInput: {
                 visible: true,
                 value: model.name.toString(),
                 isInvalid: model.invalidated ?? false,
             },
             parentSelect: {
-                visible: true,
+                visible: showParent,
                 value: model.parent_id.toString(),
+                items: availParentCategories,
             },
             typeSelect: {
                 visible: true,
+                disabled: model.parent_id !== 0,
                 value: model.type.toString(),
             },
         };
@@ -62,7 +75,7 @@ export class CategoryView extends AppView {
 
         res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
 
-        res.nameInput = await InputRow.create(this, await query(res.formElem, 'div.view-row'));
+        res.nameInput = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.nameInput, 'Category name input not found');
 
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));
@@ -74,13 +87,17 @@ export class CategoryView extends AppView {
         res.cancelBtn = await query('#cancelBtn');
         assert(res.cancelBtn, 'Cancel button not found');
 
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+        res.delete_warning = await DeleteCategoryDialog.create(
+            this,
+            await query('#delete_warning'),
+        );
 
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
+            locale: cont.locale,
             isUpdate: cont.isUpdate,
             name: cont.nameInput.value,
             parent_id: parseInt(cont.parentSelect.value, 10),
@@ -130,13 +147,16 @@ export class CategoryView extends AppView {
     }
 
     /** Click on delete button and confirm wanring popup */
-    async deleteSelfItem() {
+    async deleteSelfItem(removeChildren = true) {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete category warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        if (removeChildren !== this.content.delete_warning.removeChildren) {
+            await this.content.delete_warning.toggleDeleteChilds();
+        }
+
+        await navigation(() => this.content.delete_warning.clickOk());
     }
 
     async inputName(val) {
@@ -152,9 +172,14 @@ export class CategoryView extends AppView {
     async selectParentCategory(val) {
         const categoryId = parseInt(val, 10);
         const category = App.state.categories.getItem(categoryId);
-        assert(category, `Invalid category: ${val}`);
+        if (categoryId !== 0) {
+            assert(category, `Invalid category: ${val}`);
+        }
 
-        this.model.parent_id = category.id;
+        this.model.parent_id = categoryId;
+        if (categoryId !== 0) {
+            this.model.type = category.type;
+        }
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.parentSelect.setSelection(val));

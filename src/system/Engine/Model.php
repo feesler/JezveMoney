@@ -2,45 +2,88 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Base model class
+ */
 abstract class Model
 {
     protected $dbObj = null;
     protected $tbl_name = null;
     protected $useTransactions = true;
 
-    // Starts transaction
+    /**
+     * Starts transaction
+     *
+     * @return bool
+     */
     public static function begin()
     {
         $dbInstance = MySqlDB::getInstance();
         return $dbInstance->startTransaction();
     }
 
-    // Commits current transaction
+    /**
+     * Commits current transaction
+     *
+     * @return bool
+     */
     public static function commit()
     {
         $dbInstance = MySqlDB::getInstance();
         return $dbInstance->commitTransaction();
     }
 
-    // Rolls back current transaction
+    /**
+     * Rolls back current transaction
+     *
+     * @return bool
+     */
     public static function rollback()
     {
         $dbInstance = MySqlDB::getInstance();
         return $dbInstance->rollbackTransaction();
     }
 
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row array of table row fields
+     *
+     * @return object|null
+     */
+    abstract protected function rowToObj(array $row);
 
-    abstract protected function rowToObj($row);
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
+    abstract protected function preCreate(array $params, bool $isMultiple = false);
 
-    abstract protected function preCreate($params, $isMultiple = false);
-    // Perform model-specific actions after new item successfully created
-    protected function postCreate($item_id)
+    /**
+     * Performs model-specific actions after new item successfully created
+     *
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
+     */
+    protected function postCreate(mixed $items)
     {
+        return true;
     }
 
-
-    // Prepare data of single row for new item insert query
-    private function prepareRow($params, $isMultiple = false)
+    /**
+     * Prepares data of single row for new item insert query
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
+    private function prepareRow(array $params, bool $isMultiple = false)
     {
         if (!is_array($params)) {
             return null;
@@ -56,9 +99,14 @@ abstract class Model
         return $res;
     }
 
-
-    // Create new item and return id
-    public function create($params)
+    /**
+     * Creates new item and returns id
+     *
+     * @param array $params item data
+     *
+     * @return int
+     */
+    public function create(array $params)
     {
         $prepared = $this->prepareRow($params, false);
         if (!is_array($prepared)) {
@@ -71,15 +119,22 @@ abstract class Model
         $item_id = $this->dbObj->insertId();
         wlog("item_id: " . $item_id);
 
-        $this->postCreate($item_id);
+        $postCreateResult = $this->postCreate($item_id);
+        if (!$postCreateResult) {
+            throw new \Error("postCreate failed");
+        }
 
         return $item_id;
     }
 
-
-    // Create multiple items
-    // Return list of ids if succeeded or NULL otherwise
-    public function createMultiple($params)
+    /**
+     * Creates multiple items and returns array of ids
+     *
+     * @param array $params array of items to create
+     *
+     * @return int[]
+     */
+    public function createMultiple(array $params)
     {
         if (!is_array($params)) {
             throw new \Error("Invalid params");
@@ -112,22 +167,45 @@ abstract class Model
             $res[] = $item_id++;
         }
 
-        $this->postCreate($res);
+        $postCreateResult = $this->postCreate($res);
+        if (!$postCreateResult) {
+            throw new \Error("postCreate failed");
+        }
 
         return $res;
     }
 
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return array
+     */
+    abstract protected function preUpdate(int $item_id, array $params);
 
-    // Check update conditions and return array of expressions as result
-    abstract protected function preUpdate($item_id, $params);
-    // Perform model-specific actions after update successfully completed
-    protected function postUpdate($item_id)
+    /**
+     * Performs model-specific actions after update successfully completed
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function postUpdate(int $item_id)
     {
+        return true;
     }
 
-
-    // Update specified item and return boolean result
-    public function update($item_id, $params)
+    /**
+     * Updates specified item and returns bool result
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return bool
+     */
+    public function update(int $item_id, array $params)
     {
         $item_id = intval($item_id);
         if (!$item_id || !is_array($params)) {
@@ -149,22 +227,43 @@ abstract class Model
             throw new \Error("updateQ failed");
         }
 
-        $this->postUpdate($item_id);
+        $postUpdateRes = $this->postUpdate($item_id);
+        if (!$postUpdateRes) {
+            throw new \Error("postUpdate failed");
+        }
 
         return true;
     }
 
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
+    abstract protected function preDelete(array $items);
 
-    // Check delete conditions and return boolean result
-    abstract protected function preDelete($items);
-    // Perform model-specific actions after delete successfully completed
-    protected function postDelete($items)
+    /**
+     * Performs model-specific actions after delete successfully completed
+     *
+     * @param array $items ids array of removed items
+     *
+     * @return bool
+     */
+    protected function postDelete(array $items)
     {
+        return true;
     }
 
-
-    // Delete specified item
-    public function del($items)
+    /**
+     * Removes specified item(s)
+     *
+     * @param int|int[]|null $items id or array of item ids to remove
+     *
+     * @return bool
+     */
+    public function del(mixed $items)
     {
         $items = asArray($items);
         if (!count($items)) {
@@ -186,13 +285,31 @@ abstract class Model
             throw new \Error("deleteQ failed");
         }
 
-        $this->postDelete($items);
+        $postDeleteRes = $this->postDelete($items);
+        if (!$postDeleteRes) {
+            throw new \Error("postDelete failed");
+        }
 
         return true;
     }
 
+    /**
+     * Returns array of items
+     *
+     * @param array $options data filter options
+     *
+     * @return array
+     */
+    public function getData(array $options = [])
+    {
+        return [];
+    }
 
-    // Return currenct autoincrement value of table
+    /**
+     * Returns current autoincrement value of table
+     *
+     * @return int
+     */
     public function autoIncrement()
     {
         return $this->dbObj->getAutoIncrement($this->tbl_name);

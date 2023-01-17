@@ -4,6 +4,9 @@ namespace JezveMoney\Core;
 
 use JezveMoney\App\Model\UserModel;
 
+/**
+ * Base API controller class
+ */
 class ApiController extends Controller
 {
     protected $response = null;
@@ -12,8 +15,12 @@ class ApiController extends Controller
     protected $owner_id = 0;
     public $authRequired = true;
 
-
-    public function runAction($action)
+    /**
+     * Runs specified action on controller instance
+     *
+     * @param string $action controller method to run
+     */
+    public function runAction(string $action)
     {
         if (!method_exists($this, $action)) {
             return;
@@ -34,11 +41,7 @@ class ApiController extends Controller
             throw new \Error("Invalid response object");
         }
 
-        if (is_null($msg)) {
-            unset($this->response->msg);
-        } else {
-            $this->response->msg = $msg;
-        }
+        $this->response->setMessage($msg);
     }
 
 
@@ -48,11 +51,7 @@ class ApiController extends Controller
             throw new \Error("Invalid response object");
         }
 
-        if (is_null($data)) {
-            unset($this->response->data);
-        } else {
-            $this->response->data = $data;
-        }
+        $this->response->setData($data);
     }
 
 

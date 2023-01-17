@@ -6,6 +6,11 @@
 
   .popup__header {
     margin-bottom: 0;
+    column-gap: 12px;
+
+    .close-btn {
+      flex-shrink: 0;
+    }
   }
 }
 
@@ -116,15 +121,16 @@
 
 /* Back buton  */
 .back-btn {
+  --back-btn-size: 32px;
+
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
-  align-self: flex-end;
-  width: 24px;
-  height: 24px;
+  align-self: flex-start;
+  width: var(--back-btn-size);
+  height: var(--back-btn-size);
   padding: 0;
-  margin-bottom: 5px;
   cursor: pointer;
   background: none;
   border: 0 none;

@@ -12,6 +12,7 @@ import {
     copyObject,
     isVisible,
     closest,
+    wait,
 } from 'jezve-test';
 import {
     DropDown,
@@ -25,8 +26,16 @@ import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
-import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { Counter } from './component/Counter.js';
+import { SetCategoryDialog } from './component/SetCategoryDialog.js';
+import {
+    dateToSeconds,
+    fixDate,
+    isEmpty,
+    secondsToDateString,
+    urlJoin,
+} from '../common.js';
+import { __ } from '../model/locale.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -47,8 +56,7 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
 
-const TITLE_SHOW_MAIN = 'Show main';
-const TITLE_SHOW_DETAILS = 'Show details';
+const categoryDialogSelector = '#selectCategoryDialog';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -129,27 +137,10 @@ export class TransactionListView extends AppView {
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
-        const categoryDialogElem = await query('#selectCategoryDialog');
-        res.selectCategoryDialog = { elem: categoryDialogElem };
-        if (categoryDialogElem) {
-            const dropDownElem = await query(categoryDialogElem, '.dd__container');
-            const categorySelect = await DropDown.create(this, dropDownElem);
-            categorySelect.visible = await isVisible(categorySelect.elem, true);
-
-            const okBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.submit-btn'),
-            };
-            okBtn.visible = await isVisible(okBtn.elem, true);
-
-            const cancelBtn = {
-                elem: await query(categoryDialogElem, '.popup__controls .btn.cancel-btn'),
-            };
-            cancelBtn.visible = await isVisible(cancelBtn.elem, true);
-
-            res.selectCategoryDialog.categorySelect = categorySelect;
-            res.selectCategoryDialog.okBtn = okBtn;
-            res.selectCategoryDialog.cancelBtn = cancelBtn;
-        }
+        res.selectCategoryDialog = await SetCategoryDialog.create(
+            this,
+            await query(categoryDialogSelector),
+        );
 
         return res;
     }
@@ -188,6 +179,7 @@ export class TransactionListView extends AppView {
 
     buildModel(cont) {
         const res = {
+            locale: cont.locale,
             contextItem: cont.contextMenu.itemId,
             listMode: (cont.transList) ? cont.transList.listMode : 'list',
             listMenuVisible: cont.listMenu.visible,
@@ -207,8 +199,11 @@ export class TransactionListView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            res.filter.startDate = dateRange.startDate;
-            res.filter.endDate = dateRange.endDate;
+            const startDate = new Date(fixDate(dateRange.startDate));
+            const endDate = new Date(fixDate(dateRange.endDate));
+
+            res.filter.startDate = dateToSeconds(startDate);
+            res.filter.endDate = dateToSeconds(endDate);
         }
 
         res.filtered = res.data.applyFilter(res.filter);
@@ -233,17 +228,13 @@ export class TransactionListView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = cont.modeSelector?.content?.visible;
-        if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.title === TITLE_SHOW_MAIN;
-        } else {
-            const locURL = new URL(this.location);
-            res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
-        }
+        const locURL = new URL(this.location);
+        res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
 
-        res.showCategoryDialog = cont.selectCategoryDialog.visible;
         res.categoryDialog = {
-            categoryId: cont.selectCategoryDialog.categorySelect?.value,
+            show: !!(cont.selectCategoryDialog?.visible),
+            categoryId: cont.selectCategoryDialog?.value,
+            items: cont.selectCategoryDialog?.items.map((item) => item.id),
         };
 
         res.loading = cont.loadingIndicator.visible;
@@ -342,6 +333,23 @@ export class TransactionListView extends AppView {
         return res;
     }
 
+    getExpectedCategory(index, model = this.model) {
+        const indexes = asArray(index);
+        assert(indexes.length > 0, 'Not transactions specified');
+
+        if (indexes.length > 1) {
+            return 0;
+        }
+
+        const [ind] = indexes;
+        assert.arrayIndex(model.list.items, ind, `Invalid index of item: ${ind}`);
+        const { id } = model.list.items[ind];
+        const transaction = App.state.transactions.getItem(id);
+        assert(transaction, `Transaction not found: '${id}'`);
+
+        return transaction.category_id;
+    }
+
     setModelPage(model, page) {
         assert(page >= 1 && page <= model.list.pages, `Invalid page number ${page}`);
 
@@ -414,6 +422,9 @@ export class TransactionListView extends AppView {
         const pageNum = this.currentPage(model);
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,
@@ -427,8 +438,12 @@ export class TransactionListView extends AppView {
             dateFilter: {
                 visible: filtersVisible,
                 value: {
-                    startDate: model.filter.startDate,
-                    endDate: model.filter.endDate,
+                    startDate: (model.filter.startDate)
+                        ? secondsToDateString(model.filter.startDate)
+                        : null,
+                    endDate: (model.filter.endDate)
+                        ? secondsToDateString(model.filter.endDate)
+                        : null,
                 },
             },
             searchForm: {
@@ -492,20 +507,20 @@ export class TransactionListView extends AppView {
                 active: pageNum,
             };
 
-            res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
+            res.modeSelector.title = (model.detailsMode)
+                ? __('TR_LIST_SHOW_MAIN', model.locale)
+                : __('TR_LIST_SHOW_DETAILS', model.locale);
         }
 
         // Set category dialog
-        res.selectCategoryDialog = {
-            visible: model.showCategoryDialog,
-        };
-        if (model.showCategoryDialog) {
-            res.selectCategoryDialog.categorySelect = {
+        if (model.categoryDialog.show) {
+            res.selectCategoryDialog = {
                 visible: true,
-                value: model.categoryDialog.categoryId.toString(),
-            };
-            res.selectCategoryDialog.okBtn = {
-                visible: true,
+                categorySelect: {
+                    visible: true,
+                    items: model.categoryDialog.items,
+                    value: model.categoryDialog.categoryId.toString(),
+                },
             };
         }
 
@@ -767,12 +782,12 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        this.model.filter.startDate = start;
-        this.model.filter.endDate = end;
-        const expected = this.onFilterUpdate();
-
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
+
+        this.model.filter.startDate = dateToSeconds(startDate);
+        this.model.filter.endDate = dateToSeconds(endDate);
+        const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
@@ -1137,24 +1152,45 @@ export class TransactionListView extends AppView {
         return navigation(() => this.content.ctxUpdateBtn.click());
     }
 
+    // Check all transactions have same type, otherwise show only categories with type 'Any'
+    getTypeOfSelected(ids) {
+        return asArray(ids).reduce((currentType, id) => {
+            const transaction = App.state.transactions.getItem(id);
+            assert(transaction, `Transaction '${id}' not found`);
+
+            if (currentType === null) {
+                return transaction.type;
+            }
+
+            return (currentType === transaction.type) ? currentType : 0;
+        }, null);
+    }
+
     /** Select category for specified transaction */
     async setTransactionCategory(index, category) {
         await this.openContextMenu(index);
 
-        this.model.showCategoryDialog = true;
-        this.model.categoryDialog = { categoryId: 0 };
+        const type = this.getTypeOfSelected(this.model.contextItem);
+
+        this.model.categoryDialog = {
+            show: true,
+            categoryId: this.getExpectedCategory(index),
+            items: App.state
+                .getCategoriesForType(type)
+                .map((item) => ({ id: item.id.toString() })),
+        };
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.ctxSetCategoryBtn.click());
+        await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
+
         this.checkState(expected);
 
         const { selectCategoryDialog } = this.content;
-        const { categorySelect } = selectCategoryDialog;
-        await this.waitForList(async () => {
-            await categorySelect.setSelection(category);
-            await click(selectCategoryDialog.okBtn.elem);
-        });
+        assert(selectCategoryDialog, 'Select category dialog not found');
+
+        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
     }
 
     /** Set category for selected transactions */
@@ -1166,21 +1202,28 @@ export class TransactionListView extends AppView {
 
         await this.openListMenu();
 
+        const selected = this.getSelectedItems().map((item) => item.id);
+        const type = this.getTypeOfSelected(selected);
+
         this.model.listMenuVisible = false;
-        this.model.showCategoryDialog = true;
-        this.model.categoryDialog = { categoryId: 0 };
+        this.model.categoryDialog = {
+            show: true,
+            categoryId: this.getExpectedCategory(transactions),
+            items: App.state
+                .getCategoriesForType(type)
+                .map((item) => ({ id: item.id.toString() })),
+        };
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.setCategoryBtn.click());
+        await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
 
         this.checkState(expected);
 
         const { selectCategoryDialog } = this.content;
-        const { categorySelect } = selectCategoryDialog;
-        await this.waitForList(async () => {
-            await categorySelect.setSelection(category);
-            await click(selectCategoryDialog.okBtn.elem);
-        });
+        assert(selectCategoryDialog, 'Select category dialog not found');
+
+        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
     }
 
     /** Delete specified transactions */
@@ -1199,8 +1242,7 @@ export class TransactionListView extends AppView {
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 }

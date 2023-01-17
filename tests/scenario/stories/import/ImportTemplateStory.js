@@ -72,6 +72,10 @@ export class ImportTemplateStory extends TestStory {
         await ImportTests.selectTemplateAccountByIndex(1);
         await ImportTests.submitTemplate();
 
+        setBlock('Cancel template create', 2);
+        await ImportTests.createTemplate();
+        await ImportTests.cancelTemplate();
+
         setBlock('Create second template', 2);
         await ImportTests.addTemplate({
             name: 'Template_dup',

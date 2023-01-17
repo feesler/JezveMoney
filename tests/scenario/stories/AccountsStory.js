@@ -26,7 +26,7 @@ export class AccountsStory extends TestStory {
         setBlock('Accounts', 1);
 
         await AccountTests.securityTests();
-        await AccountTests.stateLoop();
+        await this.stateLoop();
 
         await this.create();
         await this.del();
@@ -42,66 +42,108 @@ export class AccountsStory extends TestStory {
         await this.deleteFromUpdate();
     }
 
+    async stateLoop() {
+        setBlock('View state loop', 2);
+
+        const { RUB, USD, EUR } = App.scenario;
+
+        await AccountTests.create();
+        await AccountTests.changeCurrency(EUR);
+        await AccountTests.inputBalance('100.01');
+        await AccountTests.changeIcon(1);
+        await AccountTests.inputName('acc_1');
+        await AccountTests.changeCurrency(USD);
+        await AccountTests.inputBalance('100000.01');
+        await AccountTests.inputBalance('100000.012');
+        // Change currency back to RUB
+        await AccountTests.changeCurrency(RUB);
+
+        // Input empty value for initial balance
+        await AccountTests.inputBalance('');
+        await AccountTests.inputBalance('.');
+        await AccountTests.inputBalance('.01');
+        await AccountTests.inputBalance('10000000.01');
+
+        // Change icon to safe
+        await AccountTests.changeIcon(2);
+        await AccountTests.inputBalance('1000.01');
+
+        await App.view.cancel();
+    }
+
     async create() {
-        setBlock('Create accounts', 2);
+        setBlock('Create accounts', 1);
 
         const { RUB, EUR } = App.scenario;
 
-        const data = [{
-            name: 'acc_1',
-            initbalance: 1000.01,
-            curr_id: RUB,
-        }, {
-            name: 'acc_2',
-            initbalance: '1000.01',
-            curr_id: EUR,
-        }, {
-            // Try to submit account with empty name
-            name: '',
-            initbalance: '100',
-        }, {
-            // Try to submit account with existing name
-            name: 'Acc_1',
-            initbalance: '1000',
-        }, {
-            // Try to submit account with empty initial balance
-            name: 'acc',
-            initbalance: '',
-        }];
+        setBlock('Create account with point at initial balance', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('acc_1');
+        await AccountTests.changeCurrency(RUB);
+        await AccountTests.inputBalance(1000.01);
+        await AccountTests.submit();
 
-        await App.scenario.runner.runGroup(AccountTests.create, data);
+        setBlock('Create account with comma at initial balance', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('acc_2');
+        await AccountTests.changeCurrency(EUR);
+        await AccountTests.inputBalance('1000,01');
+        await AccountTests.submit();
+
+        setBlock('Create account with empty name', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('');
+        await AccountTests.inputBalance('100');
+        await AccountTests.submit();
+
+        setBlock('Create account with existing name', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('Acc_1');
+        await AccountTests.inputBalance('1000');
+        await AccountTests.submit();
+
+        setBlock('Create account with empty initial balance', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('acc');
+        await AccountTests.inputBalance('');
+        await AccountTests.submit();
     }
 
     async update() {
-        setBlock('Update accounts', 2);
+        setBlock('Update accounts', 1);
 
         const { RUB, USD } = App.scenario;
-        const data = [{
-            pos: 0,
-            icon_id: 1,
-            curr_id: USD,
-        }, {
-            pos: 0,
-            curr_id: RUB,
-        }, {
-            // Try to submit account with empty name
-            pos: 0,
-            name: '',
-        }, {
-            // Try to submit account with existing name
-            pos: 1,
-            name: 'Acc_1',
-        }, {
-            // Try to update case in account name
-            pos: 0,
-            name: 'Acc_1',
-        }];
 
-        await App.scenario.runner.runGroup(AccountTests.update, data);
+        setBlock('Change icon and currency of account', 2);
+        await AccountTests.update(0);
+        await AccountTests.changeIcon(1);
+        await AccountTests.changeCurrency(USD);
+        await AccountTests.submit();
+
+        setBlock('Update account with comma at initial balance', 2);
+        await AccountTests.update(0);
+        await AccountTests.changeCurrency(RUB);
+        await AccountTests.inputBalance('555,55');
+        await AccountTests.submit();
+
+        setBlock('Submit account with empty name', 2);
+        await AccountTests.update(0);
+        await AccountTests.inputName('');
+        await AccountTests.submit();
+
+        setBlock('Submit account with existing name', 2);
+        await AccountTests.update(1);
+        await AccountTests.inputName('Acc_1');
+        await AccountTests.submit();
+
+        setBlock('Update case in account name', 2);
+        await AccountTests.update(0);
+        await AccountTests.inputName('Acc_1');
+        await AccountTests.submit();
     }
 
     async del() {
-        setBlock('Delete accounts', 2);
+        setBlock('Delete accounts', 1);
 
         const data = [
             [0, 1],
@@ -111,7 +153,7 @@ export class AccountsStory extends TestStory {
     }
 
     async deleteFromUpdate() {
-        setBlock('Delete account from update view', 2);
+        setBlock('Delete account from update view', 1);
 
         const data = [
             0,
@@ -121,7 +163,7 @@ export class AccountsStory extends TestStory {
     }
 
     async hide() {
-        setBlock('Hide accounts', 2);
+        setBlock('Hide accounts', 1);
 
         const data = [
             [0],
@@ -132,7 +174,7 @@ export class AccountsStory extends TestStory {
     }
 
     async show() {
-        setBlock('Show accounts', 2);
+        setBlock('Show accounts', 1);
 
         const data = [
             [5],
@@ -143,7 +185,7 @@ export class AccountsStory extends TestStory {
     }
 
     async exportCSV() {
-        setBlock('Export accounts', 2);
+        setBlock('Export accounts', 1);
 
         const data = [
             [0],

@@ -8,20 +8,32 @@ class ImportActionItem
     public $rule_id = 0;
     public $action_id = 0;
     public $value = 0;
+    public $user_id = 0;
+    public $createdate = 0;
+    public $updatedate = 0;
 
-
-    public function __construct($obj, $userField = false)
+    /**
+     * Converts table row from database to ImportActionItem object
+     *
+     * @param array $row
+     *
+     * @return ImportActionItem|null
+     */
+    public static function fromTableRow(array $row)
     {
-        if (is_null($obj)) {
-            throw new \Error("Invalid object");
+        if (is_null($row)) {
+            return null;
         }
 
-        $this->id = $obj->id;
-        $this->rule_id = $obj->rule_id;
-        $this->action_id = $obj->action_id;
-        $this->value = $obj->value;
-        if ($userField) {
-            $this->user_id = $obj->user_id;
-        }
+        $res = new static();
+        $res->id = intval($row["id"]);
+        $res->user_id = intval($row["user_id"]);
+        $res->rule_id = intval($row["rule_id"]);
+        $res->action_id = intval($row["action_id"]);
+        $res->value = $row["value"];
+        $res->createdate = strtotime($row["createdate"]);
+        $res->updatedate = strtotime($row["updatedate"]);
+
+        return $res;
     }
 }

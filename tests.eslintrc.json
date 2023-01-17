@@ -7,18 +7,43 @@
     "parser": "@babel/eslint-parser",
     "parserOptions": {
         "ecmaVersion": 2022,
-        "sourceType": "module"
+        "sourceType": "module",
+        "requireConfigFile": false,
+        "babelOptions": {
+            "plugins": [
+                "@babel/plugin-syntax-import-assertions"
+            ]
+        }
     },
     "rules": {
-        "indent": ["error", 4],
-        "no-continue": ["warn"],
-        "no-console": ["error"],
-        "class-methods-use-this": ["warn"],
-        "import/prefer-default-export": ["warn"],
-        "import/extensions": ["off"],
-        "import/no-cycle": ["warn"],
-        "no-restricted-syntax": ["warn"],
-        "no-await-in-loop": ["warn"]
+        "indent": [
+            "error",
+            4
+        ],
+        "no-continue": [
+            "warn"
+        ],
+        "no-console": [
+            "error"
+        ],
+        "class-methods-use-this": [
+            "warn"
+        ],
+        "import/prefer-default-export": [
+            "warn"
+        ],
+        "import/extensions": [
+            "off"
+        ],
+        "import/no-cycle": [
+            "warn"
+        ],
+        "no-restricted-syntax": [
+            "warn"
+        ],
+        "no-await-in-loop": [
+            "warn"
+        ]
     },
     "settings": {
         "import/resolver": "webpack"

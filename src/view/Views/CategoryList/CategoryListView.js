@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     asArray,
+    createElement,
     insertAfter,
     isFunction,
     show,
@@ -10,31 +11,28 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './style.scss';
+import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
-/** Strings */
-const STR_TITLE = 'Categories';
-const TITLE_SINGLE_CATEGORY_DELETE = 'Delete category';
-const TITLE_MULTI_CATEGORY_DELETE = 'Delete categories';
-const MSG_MULTI_CATEGORY_DELETE = 'Are you sure want to delete selected categories?';
-const MSG_SINGLE_CATEGORY_DELETE = 'Are you sure want to delete selected category?';
-const MSG_NO_DATA = 'No categories';
+
+const ANY_TYPE = 0;
 
 /**
  * List of persons view
  */
-class PersonListView extends View {
+class CategoryListView extends View {
     constructor(...args) {
         super(...args);
 
@@ -47,6 +45,11 @@ class PersonListView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+
+        this.transTypes = [
+            ...Object.keys(availTransTypes).map((type) => parseInt(type, 10)),
+            ANY_TYPE,
+        ];
 
         this.store = createStore(reducer, { initialState });
     }
@@ -66,7 +69,7 @@ class PersonListView extends View {
             className: 'categories-list',
             itemSelector: '.category-item',
             listMode: 'list',
-            noItemsMessage: MSG_NO_DATA,
+            noItemsMessage: __('CATEGORIES_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
@@ -81,16 +84,45 @@ class PersonListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('CATEGORIES'),
         });
 
-        this.list = ListContainer.create(listProps);
-        this.contentContainer.append(this.list.elem);
+        this.sections = {};
+
+        this.transTypes.forEach((type) => {
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const title = (type !== 0) ? Transaction.getTypeTitle(type) : __('TR_ANY');
+
+            const section = {
+                header: createElement('header', {
+                    props: {
+                        className: 'list-header',
+                        textContent: title,
+                    },
+                }),
+                list: ListContainer.create(listProps),
+            };
+
+            section.container = createElement('section', {
+                props: {
+                    className: 'list-section',
+                    dataset: { type },
+                },
+                children: [
+                    section.header,
+                    section.list.elem,
+                ],
+            });
+
+            this.sections[key] = section;
+
+            this.contentContainer.append(section.container);
+        });
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
-            className: 'no-icon',
-            title: 'Done',
+            className: 'action-button',
+            title: __('DONE'),
             onClick: () => this.toggleSelectMode(),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -114,15 +146,15 @@ class PersonListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
@@ -130,7 +162,7 @@ class PersonListView extends View {
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -151,11 +183,11 @@ class PersonListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
         });
@@ -233,7 +265,7 @@ class PersonListView extends View {
         return this.getSelectedIds(state);
     }
 
-    async deleteItems() {
+    async deleteItems(removeChild = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
@@ -247,7 +279,7 @@ class PersonListView extends View {
         this.startLoading();
 
         try {
-            await API.category.del({ id: ids });
+            await API.category.del({ id: ids, removeChild });
             this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -276,13 +308,34 @@ class PersonListView extends View {
             return;
         }
 
-        const multiple = (ids.length > 1);
-        ConfirmDialog.create({
-            id: 'delete_warning',
-            title: (multiple) ? TITLE_MULTI_CATEGORY_DELETE : TITLE_SINGLE_CATEGORY_DELETE,
-            content: (multiple) ? MSG_MULTI_CATEGORY_DELETE : MSG_SINGLE_CATEGORY_DELETE,
-            onconfirm: () => this.deleteItems(),
+        const { categories } = window.app.model;
+        const showChildrenCheckbox = ids.some((id) => {
+            const category = categories.getItem(id);
+            return category?.parent_id === 0;
         });
+
+        const multiple = (ids.length > 1);
+        DeleteCategoryDialog.create({
+            id: 'delete_warning',
+            title: (multiple) ? __('CATEGORY_DELETE_MULTIPLE') : __('CATEGORY_DELETE'),
+            content: (multiple) ? __('MSG_CATEGORY_DELETE_MULTIPLE') : __('MSG_CATEGORY_DELETE'),
+            showChildrenCheckbox,
+            onConfirm: (opt) => this.deleteItems(opt),
+        });
+    }
+
+    getListItemById(id) {
+        for (let i = 0; i < this.transTypes.length; i += 1) {
+            const type = this.transTypes[i];
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const section = this.sections[key];
+            const listItem = section.list.getListItemById(id);
+            if (listItem) {
+                return listItem;
+            }
+        }
+
+        return null;
     }
 
     renderContextMenu(state) {
@@ -298,7 +351,7 @@ class PersonListView extends View {
             return;
         }
 
-        const listItem = this.list.getListItemById(itemId);
+        const listItem = this.getListItemById(itemId);
         const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             this.contextMenu.detach();
@@ -351,13 +404,22 @@ class PersonListView extends View {
         this.selItemsCount.textContent = selected.length;
 
         // List of categories
-        this.list.setState((listState) => ({
-            ...listState,
-            items: state.items,
-            listMode: state.listMode,
-            renderTime: Date.now(),
-        }));
-        this.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+
+        this.transTypes.forEach((type) => {
+            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const section = this.sections[key];
+            const items = state.items.filter((item) => item.type === type);
+
+            section.list.setState((listState) => ({
+                ...listState,
+                items,
+                listMode: state.listMode,
+                renderTime: Date.now(),
+            }));
+            section.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+
+            show(section.container, items.length > 0);
+        });
 
         this.renderContextMenu(state);
         this.renderMenu(state);
@@ -369,4 +431,4 @@ class PersonListView extends View {
 }
 
 window.app = new Application(window.appProps);
-window.app.createView(PersonListView);
+window.app.createView(CategoryListView);

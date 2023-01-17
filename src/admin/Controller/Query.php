@@ -6,18 +6,26 @@ use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\MySqlDB;
 
+/**
+ * DB queries controller
+ */
 class Query extends AdminController
 {
     protected $db = null;
     protected $tableName = "admin_query";
 
-
+    /**
+     * Controller initialization
+     */
     public function onStart()
     {
         $this->db = MySqlDB::getInstance();
     }
 
-
+    /**
+     * /admin/query/ route handler
+     * Renders queries view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Query.tpl");
@@ -65,8 +73,12 @@ class Query extends AdminController
         $this->render($data);
     }
 
-
-    protected function saveQuery($query)
+    /**
+     * Saves query to database
+     *
+     * @param string $query
+     */
+    protected function saveQuery(string $query)
     {
         if (!is_string($query) || is_empty($query)) {
             return;
@@ -87,7 +99,13 @@ class Query extends AdminController
         ]);
     }
 
-
+    /**
+     * Returns array of latest queries
+     *
+     * @param int $limit count of queries to return
+     *
+     * @return string[]
+     */
     protected function getLatestQueries($limit = 10)
     {
         $limit = intval($limit);

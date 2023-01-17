@@ -6,8 +6,15 @@ use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 
+/**
+ * API console controller
+ */
 class ApiConsole extends AdminController
 {
+    /**
+     * /admin/apiconsole/ route handler
+     * Renders API console view
+     */
     public function index()
     {
         $this->template = new Template(ADMIN_VIEW_TPL_PATH . "ApiConsole.tpl");

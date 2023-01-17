@@ -15,15 +15,21 @@ import {
     evaluate,
     asyncMap,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs-test';
+import {
+    Checkbox,
+    DropDown,
+    IconButton,
+    Switch,
+} from 'jezvejs-test';
 import { App } from '../../../Application.js';
 import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
+import { __ } from '../../../model/locale.js';
 
 export const BROWSE_FILE_STATE = 1;
 export const LOADING_STATE = 2;
-export const RAW_DATA_STATE = 3;
+export const CONVERT_STATE = 3;
 export const CREATE_TPL_STATE = 4;
 export const UPDATE_TPL_STATE = 5;
 
@@ -33,135 +39,82 @@ export class ImportUploadDialog extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import upload dialog element');
 
-        const res = {};
+        const res = {
+            closeBtn: { elem: await query(this.elem, '.close-btn') },
+            // Upload form
+            fileBlock: { elem: await query('#fileBlock') },
+            uploadFormBrowser: { elem: await query(this.elem, '.upload-form__browser') },
+            fileNameElem: { elem: await query(this.elem, '.upload-form__filename') },
+            isEncodeCheck: await Checkbox.create(this, await query(this.elem, '#isEncodeCheck')),
+            // Server address input
+            useServerCheck: await Checkbox.create(this, await query('#useServerCheck')),
+            serverAddressBlock: { elem: await query('#serverAddressBlock') },
+            serverAddressInput: { elem: await query('#serverAddress') },
+            serverUploadBtn: { elem: await query('#serverUploadBtn') },
+            // Convert block
+            templateBlock: { elem: await query('#templateBlock') },
+            tplSelectGroup: { elem: await query('#tplSelectGroup') },
+            templateForm: { elem: await query('#templateForm') },
+            // Template select field
+            tplField: { elem: await query('#tplField') },
+            templateSelect: {
+                elem: await query(this.elem, '.template-select'),
+                titleElem: await query(this.elem, '.template-select .template-select__title'),
+                menuBtn: await query(this.elem, '.template-select .popup-menu-btn'),
+            },
+            templateDropDown: await DropDown.create(
+                this,
+                await query(this.elem, '#tplField .dd__container_attached'),
+            ),
+            tplFeedback: { elem: await query('#tplFeedback') },
+            // Template name field
+            nameField: { elem: await query('#nameField') },
+            tplNameInp: { elem: await query('#tplNameInp') },
+            // First row field
+            firstRowField: { elem: await query('#firstRowField') },
+            firstRowInp: { elem: await query('#firstRowInp') },
+            decFirstRowBtn: { elem: await query('#decFirstRowBtn') },
+            incFirstRowBtn: { elem: await query('#incFirstRowBtn') },
+            // Template account field
+            tplAccountSwitch: await Switch.create(this, await query(this.elem, '#tplAccountSwitch')),
+            tplAccountField: { elem: await query('#tplAccountField') },
+            tplAccountSel: await DropDown.create(this, await query('#tplAccountField .dd__container')),
+            // Template column field
+            columnField: { elem: await query('#columnField') },
+            columnSel: { elem: await query('#columnSel') },
+            // Template form
+            rawDataTable: { elem: await query('#rawDataTable') },
+            createTplBtn: { elem: await query('#createTplBtn') },
+            submitTplBtn: { elem: await query('#submitTplBtn') },
+            cancelTplBtn: { elem: await query('#cancelTplBtn') },
+            tplFormFeedback: { elem: await query('#tplFormFeedback') },
+            initialAccount: await DropDown.createFromChild(this, await query('#initialAccount')),
+            submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },
+        };
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of ImportUploadDialog: ${child} component not found`)
+        ));
 
-        res.closeBtn = await query(this.elem, '.close-btn');
-        assert(res.closeBtn, 'Invalid popup: cllose button not found');
+        // Template select
+        res.templateSelect.titleElem = await query(res.templateSelect.elem, '.template-select__title');
+        // Template select context menu
+        res.tplContextMenu = { elem: await query(this.elem, '.popup-menu-list') };
+        if (res.tplContextMenu.elem) {
+            res.updateTplBtn = await IconButton.create(
+                this,
+                await query(res.tplContextMenu.elem, '.update-btn'),
+            );
+            res.deleteTplBtn = await IconButton.create(
+                this,
+                await query(res.tplContextMenu.elem, '.delete-btn'),
+            );
+        }
 
-        // Upload form
-        res.fileBlock = { elem: await query('#fileBlock') };
-        res.uploadFormBrowser = { elem: await query(this.elem, '.upload-form__browser') };
-        res.fileNameElem = { elem: await query(this.elem, '.upload-form__filename') };
-        res.isEncodeCheck = await Checkbox.create(this, await query(this.elem, '#isEncodeCheck'));
         res.uploadProgress = { elem: await query(this.elem, ':scope > .loading-indicator') };
-        // Server address input
-        res.useServerCheck = await Checkbox.create(this, await query('#useServerCheck'));
-        res.serverAddressBlock = { elem: await query('#serverAddressBlock') };
-        res.serverAddressInput = { elem: await query('#serverAddress') };
-        res.serverUploadBtn = { elem: await query('#serverUploadBtn') };
-        assert(
-            res.fileBlock.elem
-            && res.uploadFormBrowser.elem
-            && res.fileNameElem.elem
-            && res.isEncodeCheck.elem
-            && res.useServerCheck.elem
-            && res.serverAddressBlock.elem
-            && res.serverAddressInput.elem
-            && res.serverUploadBtn.elem,
-            'Invalid file upload form',
-        );
+        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
 
         res.useServerAddress = res.useServerCheck.checked;
         res.encode = res.isEncodeCheck.checked;
-
-        // Convert block
-        res.templateBlock = { elem: await query('#templateBlock') };
-        res.tplHeading = { elem: await query('#tplHeading') };
-        res.tplStateLbl = { elem: await query('#tplStateLbl') };
-        assert(
-            res.templateBlock.elem
-            && res.tplHeading.elem
-            && res.tplStateLbl.elem,
-            'Invalid convert block',
-        );
-
-        // Template select field
-        res.tplField = { elem: await query('#tplField') };
-        res.templateSel = await DropDown.createFromChild(this, await query(this.elem, '#templateSel'));
-        assert(res.tplField.elem && res.templateSel, 'Invalid template select field');
-
-        // Template name field
-        res.nameField = { elem: await query('#nameField') };
-        res.tplNameInp = { elem: await query('#tplNameInp') };
-        assert(res.nameField.elem && res.tplNameInp.elem, 'Invalid template name field');
-
-        // First row field
-        res.firstRowField = { elem: await query('#firstRowField') };
-        res.firstRowInp = { elem: await query('#firstRowInp') };
-        res.decFirstRowBtn = { elem: await query('#decFirstRowBtn') };
-        res.incFirstRowBtn = { elem: await query('#incFirstRowBtn') };
-        assert(
-            res.firstRowField.elem
-            && res.firstRowInp.elem
-            && res.decFirstRowBtn.elem
-            && res.incFirstRowBtn.elem,
-            'Invalid first row field',
-        );
-
-        [
-            res.fileName,
-            res.serverAddress,
-            res.tplNameInp.value,
-            res.firstRowInp.value,
-            res.decFirstRowBtn.disabled,
-            res.incFirstRowBtn.disabled,
-        ] = await evaluate(
-            (fileNameEl, serverEl, tplNameEl, inputEl, decBtn, incBtn) => ([
-                fileNameEl.value,
-                serverEl.value,
-                tplNameEl.value,
-                inputEl.value,
-                decBtn.disabled,
-                incBtn.disabled,
-            ]),
-            res.fileNameElem.elem,
-            res.serverAddressInput.elem,
-            res.tplNameInp.elem,
-            res.firstRowInp.elem,
-            res.decFirstRowBtn.elem,
-            res.incFirstRowBtn.elem,
-        );
-        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
-
-        // Template account field
-        res.tplAccountField = { elem: await query('#tplAccountField') };
-        res.tplAccountCheck = await Checkbox.create(this, await query(this.elem, '#tplAccountCheck'));
-        const tplAccountSelElem = await query(this.elem, '#tplAccountCheck + .dd__container');
-        res.tplAccountSel = await DropDown.create(this, tplAccountSelElem);
-        assert(res.tplAccountField.elem && res.tplAccountSel, 'Invalid template account field');
-
-        // Template column field
-        res.columnField = { elem: await query('#columnField') };
-        res.columnSel = { elem: await query('#columnSel') };
-        assert(res.columnField.elem && res.columnSel.elem, 'Invalid template column field');
-
-        // Template form
-        res.rawDataTable = { elem: await query('#rawDataTable') };
-        res.createTplBtn = { elem: await query('#createTplBtn') };
-        res.updateTplBtn = { elem: await query('#updateTplBtn') };
-        res.deleteTplBtn = { elem: await query('#deleteTplBtn') };
-        res.submitTplBtn = { elem: await query('#submitTplBtn') };
-        res.cancelTplBtn = { elem: await query('#cancelTplBtn') };
-        res.tplFeedback = { elem: await query('#tplFeedback') };
-        res.initialAccount = await DropDown.createFromChild(this, await query('#initialAccount'));
-        res.submitBtn = { elem: await query(this.elem, '#submitUploadedBtn') };
-        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
-
-        assert(
-            res.rawDataTable.elem
-            && res.createTplBtn.elem
-            && res.updateTplBtn.elem
-            && res.deleteTplBtn.elem
-            && res.submitTplBtn.elem
-            && res.cancelTplBtn.elem
-            && res.tplFeedback.elem
-            && res.initialAccount
-            && res.submitBtn.elem,
-            'Invalid template form',
-        );
-
-        res.isTplLoading = res.templateSel.disabled;
-
         res.templateBlock.visible = await isVisible(res.templateBlock.elem);
         res.uploadProgress.visible = await isVisible(res.uploadProgress.elem);
         res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem);
@@ -169,6 +122,56 @@ export class ImportUploadDialog extends TestComponent {
             res.uploadProgress.visible
             || (res.templateBlock.visible && res.loadingIndicator.visible)
         );
+
+        res.tplFormTitle = {};
+        if (res.templateBlock.visible && !res.isLoading) {
+            res.tplFormTitle.elem = await query(this.elem, '.template-form-title');
+            assert(res.tplFormTitle.elem, 'Invalid state');
+        }
+
+        [
+            res.fileName,
+            res.serverAddress,
+            res.templateSelect.title,
+            res.tplNameInp.value,
+            res.firstRowInp.value,
+            res.decFirstRowBtn.disabled,
+            res.incFirstRowBtn.disabled,
+            res.tplFeedback.title,
+            res.tplFeedback.isValid,
+            res.tplFormFeedback.title,
+            res.tplFormFeedback.isValid,
+            res.tplFormTitle.title,
+        ] = await evaluate(
+            (fileEl, serverEl, tplEl, nameEl, inpEl, decBtn, incBtn, fbEl, formFbEl, titleEl) => ([
+                fileEl.value,
+                serverEl.value,
+                tplEl.textContent,
+                nameEl.value,
+                inpEl.value,
+                decBtn.disabled,
+                incBtn.disabled,
+                fbEl.textContent,
+                fbEl.classList.contains('valid-feedback'),
+                formFbEl.textContent,
+                formFbEl.classList.contains('valid-feedback'),
+                titleEl?.textContent,
+            ]),
+            res.fileNameElem.elem,
+            res.serverAddressInput.elem,
+            res.templateSelect.titleElem,
+            res.tplNameInp.elem,
+            res.firstRowInp.elem,
+            res.decFirstRowBtn.elem,
+            res.incFirstRowBtn.elem,
+            res.tplFeedback.elem,
+            res.tplFormFeedback.elem,
+            res.tplFormTitle.elem,
+        );
+
+        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
+        res.isTplLoading = res.templateDropDown.disabled;
+
         res.columns = null;
         if (res.templateBlock.visible && !res.isLoading) {
             res.columns = await asyncMap(
@@ -184,24 +187,15 @@ export class ImportUploadDialog extends TestComponent {
             res.rowNumbers = await this.parseRawDataTableColumn(rowNumbersColumn);
         }
 
-        [
-            res.tplFeedback.title,
-            res.tplFeedback.isValid,
-        ] = await evaluate((feedbackEl) => ([
-            feedbackEl.textContent,
-            feedbackEl.classList.contains('valid-feedback'),
-        ]), res.tplFeedback.elem);
-
         if (res.isLoading) {
             res.state = LOADING_STATE;
         } else if (res.templateBlock.visible) {
-            const stateLabel = await prop(res.tplStateLbl.elem, 'textContent');
-            if (stateLabel === 'Create template') {
+            if (res.tplFormTitle.title === __('TEMPLATE_CREATE', App.view.locale)) {
                 res.state = CREATE_TPL_STATE;
-            } else if (stateLabel === 'Update template') {
+            } else if (res.tplFormTitle.title === __('TEMPLATE_UPDATE', App.view.locale)) {
                 res.state = UPDATE_TPL_STATE;
             } else {
-                res.state = RAW_DATA_STATE;
+                res.state = CONVERT_STATE;
             }
         } else {
             res.state = BROWSE_FILE_STATE;
@@ -237,23 +231,26 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {};
 
         res.state = cont.state;
         res.uploadInProgress = cont.uploadProgress.visible;
         res.isTplLoading = cont.isTplLoading;
         res.isValid = cont.tplFeedback.isValid;
+        res.isFormValid = cont.tplFormFeedback.isValid;
 
         res.useServerAddress = cont.useServerAddress;
         res.filename = cont.uploadFilename;
         res.fileData = cont.fileData;
 
-        if (cont.state === CREATE_TPL_STATE) {
-            res.template = {};
-        } else {
-            res.template = App.state.templates.getItem(cont.templateSel.value);
-        }
+        res.templateMenuVisible = res.tplContextMenu?.visible ?? false;
+
+        res.selectedTemplateId = cont.templateDropDown?.value ?? 0;
+
+        res.template = (cont.state === CREATE_TPL_STATE)
+            ? {}
+            : App.state.templates.getItem(res.selectedTemplateId);
 
         if (
             (cont.state === CREATE_TPL_STATE || cont.state === UPDATE_TPL_STATE)
@@ -261,22 +258,22 @@ export class ImportUploadDialog extends TestComponent {
         ) {
             res.template.name = cont.tplNameInp.value;
             res.template.first_row = parseInt(cont.firstRowInp.value, 10);
-            res.template.account_id = (cont.tplAccountCheck.checked)
+            res.template.account_id = (cont.tplAccountSwitch.checked)
                 ? parseInt(cont.tplAccountSel.value, 10)
                 : 0;
 
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
-                cont.columns.forEach((column, ind) => {
-                    const propTitleMap = {
-                        accountAmount: 'Account amount',
-                        transactionAmount: 'Transaction amount',
-                        accountCurrency: 'Account currency',
-                        transactionCurrency: 'Transaction currency',
-                        date: 'Date',
-                        comment: 'Comment',
-                    };
+                const propTitleMap = {
+                    accountAmount: __('COLUMN_ACCOUNT_AMOUNT', App.view.locale),
+                    transactionAmount: __('COLUMN_TR_AMOUNT', App.view.locale),
+                    accountCurrency: __('COLUMN_ACCOUNT_CURRENCY', App.view.locale),
+                    transactionCurrency: __('COLUMN_TR_CURRENCY', App.view.locale),
+                    date: __('COLUMN_DATE', App.view.locale),
+                    comment: __('COLUMN_COMMENT', App.view.locale),
+                };
 
+                cont.columns.forEach((column, ind) => {
                     for (const propName in propTitleMap) {
                         if (!Object.prototype.hasOwnProperty.call(propTitleMap, propName)) {
                             continue;
@@ -316,11 +313,15 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     checkRawDataState() {
-        this.assertStateId(RAW_DATA_STATE);
+        this.assertStateId(CONVERT_STATE);
     }
 
-    checkTplFormState() {
-        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
+    isTemplateFormState(model = this.model) {
+        return TPL_FORM_STATES.includes(model.state);
+    }
+
+    checkTplFormState(model = this.model) {
+        assert(this.isTemplateFormState(model), `Invalid state: ${model.state}`);
     }
 
     getColumn(data, index) {
@@ -348,6 +349,9 @@ export class ImportUploadDialog extends TestComponent {
 
     getExpectedState(model) {
         const isBrowseState = model.state === BROWSE_FILE_STATE;
+        const isLoadingState = model.state === LOADING_STATE;
+        const isConvertState = model.state === CONVERT_STATE;
+        const isFormState = this.isTemplateFormState(model);
         const res = {
             uploadFormBrowser: { visible: isBrowseState },
             isEncodeCheck: { visible: isBrowseState },
@@ -356,26 +360,34 @@ export class ImportUploadDialog extends TestComponent {
             initialAccount: { value: model.initialAccount.id.toString() },
         };
 
-        if (model.state === CREATE_TPL_STATE || model.state === UPDATE_TPL_STATE) {
+        res.templateBlock = { visible: !isBrowseState };
+        // Select template block
+        res.tplSelectGroup = { visible: isConvertState };
+        res.tplField = { visible: isConvertState };
+        res.tplFeedback = { visible: isConvertState };
+        // Template form
+        res.templateForm = { visible: isFormState };
+        res.rawDataTable = { visible: isFormState };
+        res.nameField = { visible: isFormState };
+        res.firstRowField = { visible: isFormState };
+        res.columnField = { visible: isFormState };
+        res.tplFormFeedback = { visible: isFormState };
+        res.submitTplBtn = { visible: isFormState };
+
+        const showCancelBtn = (model.state === CREATE_TPL_STATE)
+            ? (App.state.templates.length > 0)
+            : isFormState;
+        res.cancelTplBtn = { visible: showCancelBtn };
+
+        if (!isLoadingState) {
+            res.fileBlock = { visible: isBrowseState };
+        }
+
+        res.loadingIndicator = { visible: isLoadingState };
+
+        if (isFormState) {
             assert(model.template, 'Invalid model: expected template');
 
-            res.fileBlock = { visible: false };
-            res.templateBlock = { visible: true };
-            res.loadingIndicator = { visible: false };
-            res.tplField = { visible: false };
-            res.nameField = { visible: true };
-            res.firstRowField = { visible: true };
-            res.columnField = { visible: true };
-            res.rawDataTable = { visible: true };
-            res.updateTplBtn = { visible: false };
-            res.deleteTplBtn = { visible: false };
-            res.submitTplBtn = { visible: true };
-            res.tplFeedback = { visible: true };
-
-            const showCancelBtn = (model.state === CREATE_TPL_STATE)
-                ? (App.state.templates.length > 0)
-                : true;
-            res.cancelTplBtn = { visible: showCancelBtn };
             res.tplNameInp = { value: model.template.name };
 
             const firstRow = (!Number.isNaN(model.template.first_row))
@@ -393,7 +405,7 @@ export class ImportUploadDialog extends TestComponent {
             };
 
             const useAccount = !!model.template.account_id;
-            res.tplAccountCheck = {
+            res.tplAccountSwitch = {
                 visible: true,
                 checked: useAccount,
             };
@@ -403,49 +415,13 @@ export class ImportUploadDialog extends TestComponent {
             if (useAccount) {
                 res.tplAccountSel.value = model.template.account_id.toString();
             }
-        } else if (model.state === RAW_DATA_STATE) {
-            res.fileBlock = { visible: false };
-            res.templateBlock = { visible: true };
-            res.loadingIndicator = { visible: false };
-            res.tplField = { visible: true };
-            res.nameField = { visible: false };
-            res.firstRowField = { visible: false };
-            res.columnField = { visible: false };
-            res.rawDataTable = { visible: false };
-            res.updateTplBtn = { visible: true };
-            res.deleteTplBtn = { visible: true };
-            res.submitTplBtn = { visible: false };
-            res.cancelTplBtn = { visible: false };
-            res.tplFeedback = { visible: true };
-        } else if (model.state === LOADING_STATE) {
-            res.templateBlock = { visible: true };
-            res.loadingIndicator = { visible: true };
-            res.nameField = { visible: false };
-            res.firstRowField = { visible: false };
-            res.columnField = { visible: false };
-            res.rawDataTable = { visible: false };
-            res.updateTplBtn = { visible: true };
-            res.deleteTplBtn = { visible: true };
-            res.submitTplBtn = { visible: false };
-            res.cancelTplBtn = { visible: false };
-        } else if (model.state === BROWSE_FILE_STATE) {
-            res.uploadFilename = model.filename;
-
-            res.fileBlock = { visible: true };
-            res.templateBlock = { visible: false };
-            res.loadingIndicator = { visible: false };
-            res.nameField = { visible: false };
-            res.firstRowField = { visible: false };
-            res.columnField = { visible: false };
-            res.rawDataTable = { visible: false };
-            res.updateTplBtn = { visible: false };
-            res.deleteTplBtn = { visible: false };
-            res.submitTplBtn = { visible: false };
-            res.cancelTplBtn = { visible: false };
-            res.tplFeedback = { visible: false };
         }
 
-        res.submitBtn = { visible: model.state === RAW_DATA_STATE && model.isValid };
+        if (isBrowseState) {
+            res.uploadFilename = model.filename;
+        }
+
+        res.submitBtn = { visible: isConvertState && model.isValid };
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE].includes(model.state)) {
             const [rawDataHeader] = this.parent.fileData.slice(0, 1);
@@ -516,7 +492,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async close() {
-        await click(this.content.closeBtn);
+        await click(this.content.closeBtn.elem);
     }
 
     async toggleServerAddress() {
@@ -546,7 +522,7 @@ export class ImportUploadDialog extends TestComponent {
         assert(this.model.filename?.length, 'File name not set');
 
         if (App.state.templates.length > 0) {
-            this.model.state = RAW_DATA_STATE;
+            this.model.state = CONVERT_STATE;
 
             const template = App.state.templates.findValidTemplate(this.parent.fileData);
             if (template) {
@@ -588,7 +564,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.isValid = this.isValidTemplate();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => this.content.templateSel.selectItem(val));
+        await this.performAction(() => this.content.templateDropDown.selectItem(val));
 
         return this.checkState();
     }
@@ -614,14 +590,23 @@ export class ImportUploadDialog extends TestComponent {
         return this.checkState();
     }
 
+    async openTemplateMenu() {
+        if (this.model.templateMenuVisible) {
+            return;
+        }
+
+        await this.performAction(() => click(this.content.templateSelect.menuBtn));
+    }
+
     async updateTemplate() {
         this.checkRawDataState();
 
         this.model.state = UPDATE_TPL_STATE;
-        this.model.template = App.state.templates.getItem(this.content.templateSel.value);
+        this.model.template = App.state.templates.getItem(this.content.templateDropDown.value);
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => click(this.content.updateTplBtn.elem));
+        await this.openTemplateMenu();
+        await this.performAction(() => this.content.updateTplBtn.click());
 
         return this.checkState();
     }
@@ -629,7 +614,7 @@ export class ImportUploadDialog extends TestComponent {
     async deleteTemplate() {
         this.checkRawDataState();
 
-        if (this.content.templateSel.items.length === 1) {
+        if (this.content.templateDropDown.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
             this.model.template = {
                 name: '',
@@ -637,12 +622,12 @@ export class ImportUploadDialog extends TestComponent {
                 columns: {},
             };
         } else {
-            this.model.state = RAW_DATA_STATE;
-            const currentInd = this.content.templateSel.items.findIndex(
-                (item) => item.id === this.content.templateSel.value,
+            this.model.state = CONVERT_STATE;
+            const currentInd = this.content.templateDropDown.items.findIndex(
+                (item) => item.id === this.content.templateDropDown.value,
             );
             const newInd = (currentInd > 0) ? 0 : 1;
-            const newTplId = this.content.templateSel.items[newInd].id;
+            const newTplId = this.content.templateDropDown.items[newInd].id;
             const template = App.state.templates.getItem(newTplId);
             this.model.template = template;
             if (template?.account_id) {
@@ -652,10 +637,10 @@ export class ImportUploadDialog extends TestComponent {
 
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => click(this.content.deleteTplBtn.elem));
+        await this.openTemplateMenu();
+        await this.performAction(() => this.content.deleteTplBtn.click());
 
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await click(this.content.delete_warning.content.okBtn);
         await waitForFunction(async () => {
@@ -745,7 +730,7 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => this.content.tplAccountCheck.toggle());
+        await this.performAction(() => this.content.tplAccountSwitch.toggle());
 
         return this.checkState();
     }
@@ -774,7 +759,7 @@ export class ImportUploadDialog extends TestComponent {
         const { template } = this.model;
         this.model.isValid = this.isValidTemplate(template);
         if (this.model.isValid) {
-            this.model.state = RAW_DATA_STATE;
+            this.model.state = CONVERT_STATE;
 
             if (template.account_id) {
                 this.model.initialAccount = App.state.accounts.getItem(template.account_id);
@@ -811,7 +796,15 @@ export class ImportUploadDialog extends TestComponent {
         const disabled = await prop(this.content.cancelTplBtn.elem, 'disabled');
         assert(visible && !disabled, 'Cancel template button is invisible or disabled');
 
-        this.model.state = RAW_DATA_STATE;
+        this.model.state = CONVERT_STATE;
+
+        const template = App.state.templates.getItem(this.model.selectedTemplateId);
+        this.model.template = template;
+        if (template?.account_id) {
+            this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+        }
+        this.model.isValid = this.isValidTemplate(template);
+
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => click(this.content.cancelTplBtn.elem));

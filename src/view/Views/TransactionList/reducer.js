@@ -145,26 +145,59 @@ const slice = createSlice({
         contextItem: null,
     }),
 
-    showCategoryDialog: (state, ids) => ({
-        ...state,
-        showCategoryDialog: true,
-        categoryDialog: {
-            categoryId: 0,
-            ids,
-        },
-        contextItem: null,
-    }),
+    showCategoryDialog: (state, ids) => {
+        if (ids.length === 0) {
+            return state;
+        }
+
+        let categoryId = 0;
+        if (ids.length === 1) {
+            const [id] = ids;
+            const transaction = state.items.find((item) => item.id === id);
+            if (transaction) {
+                categoryId = transaction.category_id;
+            }
+        }
+
+        // Check all transactions have same type, otherwise show only categories with type 'Any'
+        const type = ids.reduce((currentType, id) => {
+            const transaction = state.items.find((item) => item.id === id);
+            if (!transaction) {
+                throw new Error(`Transaction '${id}' not found`);
+            }
+
+            if (currentType === null) {
+                return transaction.type;
+            }
+
+            return (currentType === transaction.type) ? currentType : 0;
+        }, null);
+
+        return {
+            ...state,
+            categoryDialog: {
+                show: true,
+                categoryId,
+                type,
+                ids,
+            },
+            contextItem: null,
+        };
+    },
 
     closeCategoryDialog: (state) => ({
         ...state,
-        showCategoryDialog: false,
+        categoryDialog: {
+            ...state.categoryDialog,
+            show: false,
+        },
     }),
 
-    changeCategorySelect: (state, id) => ({
+    changeCategorySelect: (state, categoryId) => ({
         ...state,
         categoryDialog: {
             ...state.categoryDialog,
-            categoryId: id,
+            categoryId,
         },
     }),
 

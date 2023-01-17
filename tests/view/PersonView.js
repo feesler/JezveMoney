@@ -49,8 +49,10 @@ export class PersonView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
-        const res = {};
+    buildModel(cont) {
+        const res = {
+            locale: cont.locale,
+        };
 
         res.isUpdate = cont.isUpdate;
         if (res.isUpdate) {
@@ -63,6 +65,10 @@ export class PersonView extends AppView {
         return res;
     }
 
+    setExpectedPerson(person) {
+        this.model.name = person.name.toString();
+    }
+
     getExpectedPerson() {
         const res = {
             name: this.model.name,
@@ -72,6 +78,20 @@ export class PersonView extends AppView {
         if (this.model.isUpdate) {
             res.id = this.model.id;
         }
+
+        return res;
+    }
+
+    getExpectedState(model = this.model) {
+        const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
+            name: {
+                visible: true,
+                value: model.name.toString(),
+            },
+        };
 
         return res;
     }
@@ -97,13 +117,16 @@ export class PersonView extends AppView {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await navigation(() => this.content.delete_warning.clickOk());
     }
 
     async inputName(val) {
-        return this.performAction(() => this.content.name.input(val));
+        this.model.name = val;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.name.input(val));
+        return this.checkState();
     }
 
     async submit() {

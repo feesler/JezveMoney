@@ -260,7 +260,7 @@ export class ImportListStory extends TestStory {
 
         // Correct date
         await ImportTests.runFormActions(
-            { action: 'inputDate', data: App.dates.now },
+            { action: 'inputDate', data: App.datesFmt.now },
         );
         await ImportTests.saveItem();
         await ImportTests.submit();
@@ -278,7 +278,11 @@ export class ImportListStory extends TestStory {
     }
 
     async stateLoop() {
-        const { RUB, USD } = App.scenario;
+        const {
+            RUB,
+            USD,
+            TRANSPORT_CATEGORY,
+        } = App.scenario;
 
         setBlock('Import item state loop', 1);
 
@@ -288,65 +292,66 @@ export class ImportListStory extends TestStory {
             pos: 0,
             action: [
                 { action: 'changeType', data: 'expense' }, // 3-1
+                { action: 'changeCategory', data: TRANSPORT_CATEGORY },
                 { action: 'changeDestCurrency', data: USD }, // 1-2
                 { action: 'changeDestCurrency', data: RUB }, // 2-1
                 { action: 'changeType', data: 'income' }, // 1-3
                 { action: 'changeType', data: 'expense' }, // 3-1
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeType', data: 'transfer_out' }, // 1-5
                 { action: 'changeType', data: 'expense' }, // 5-1
-                { action: 'changeType', data: 'transferto' }, // 1-7
+                { action: 'changeType', data: 'transfer_in' }, // 1-7
                 { action: 'changeType', data: 'expense' }, // 7-1
-                { action: 'changeType', data: 'debtfrom' }, // 1-9
+                { action: 'changeType', data: 'debt_out' }, // 1-9
                 { action: 'changeType', data: 'expense' }, // 9-1
-                { action: 'changeType', data: 'debtto' }, // 1-10
+                { action: 'changeType', data: 'debt_in' }, // 1-10
                 { action: 'changeType', data: 'expense' }, // 10-1
                 { action: 'changeType', data: 'income' }, // 1-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
                 { action: 'changeType', data: 'expense' }, // 4-2
                 { action: 'changeType', data: 'income' }, // 2-4
                 { action: 'changeSourceCurrency', data: RUB }, // 4-3
-                { action: 'changeType', data: 'transferfrom' }, // 3-5
+                { action: 'changeType', data: 'transfer_out' }, // 3-5
                 { action: 'changeType', data: 'income' }, // 5-3
-                { action: 'changeType', data: 'transferto' }, // 3-7
+                { action: 'changeType', data: 'transfer_in' }, // 3-7
                 { action: 'changeType', data: 'income' }, // 7-3
-                { action: 'changeType', data: 'debtfrom' }, // 3-9
+                { action: 'changeType', data: 'debt_out' }, // 3-9
                 { action: 'changeType', data: 'income' }, // 9-3
-                { action: 'changeType', data: 'debtto' }, // 3-10
+                { action: 'changeType', data: 'debt_in' }, // 3-10
                 { action: 'changeType', data: 'income' }, // 10-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
                 { action: 'changeType', data: 'expense' }, // 4-2
-                { action: 'changeType', data: 'transferfrom' }, // 2-5
-                { action: 'changeType', data: 'transferto' }, // 5-7
-                { action: 'changeType', data: 'transferfrom' }, // 7-5
-                { action: 'changeType', data: 'debtfrom' }, // 5-9
-                { action: 'changeType', data: 'transferfrom' }, // 9-5
-                { action: 'changeType', data: 'debtto' }, // 5-10
-                { action: 'changeType', data: 'transferfrom' }, // 10-5
+                { action: 'changeType', data: 'transfer_out' }, // 2-5
+                { action: 'changeType', data: 'transfer_in' }, // 5-7
+                { action: 'changeType', data: 'transfer_out' }, // 7-5
+                { action: 'changeType', data: 'debt_out' }, // 5-9
+                { action: 'changeType', data: 'transfer_out' }, // 9-5
+                { action: 'changeType', data: 'debt_in' }, // 5-10
+                { action: 'changeType', data: 'transfer_out' }, // 10-5
                 { action: 'changeType', data: 'expense' }, // 5-1
                 { action: 'changeDestCurrency', data: USD }, // 1-2
-                { action: 'changeType', data: 'transferto' }, // 2-7
-                { action: 'changeType', data: 'debtfrom' }, // 7-9
-                { action: 'changeType', data: 'transferto' }, // 9-7
-                { action: 'changeType', data: 'debtto' }, // 7-10
+                { action: 'changeType', data: 'transfer_in' }, // 2-7
+                { action: 'changeType', data: 'debt_out' }, // 7-9
+                { action: 'changeType', data: 'transfer_in' }, // 9-7
+                { action: 'changeType', data: 'debt_in' }, // 7-10
                 { action: 'changeType', data: 'income' }, // 10-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
-                { action: 'changeType', data: 'transferfrom' }, // 4-5
+                { action: 'changeType', data: 'transfer_out' }, // 4-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
                 { action: 'changeType', data: 'expense' }, // 6-1
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeType', data: 'transfer_out' }, // 1-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
                 { action: 'changeType', data: 'income' }, // 6-3
-                { action: 'changeType', data: 'transferfrom' }, // 3-5
+                { action: 'changeType', data: 'transfer_out' }, // 3-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
                 { action: 'changeTransferAccount', data: App.scenario.ACC_RUB }, // 6-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
-                { action: 'changeType', data: 'transferto' }, // 6-8
+                { action: 'changeType', data: 'transfer_in' }, // 6-8
                 { action: 'changeType', data: 'expense' }, // 8-1
-                { action: 'changeType', data: 'transferto' }, // 1-7
+                { action: 'changeType', data: 'transfer_in' }, // 1-7
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
                 { action: 'changeType', data: 'income' }, // 8-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
-                { action: 'changeType', data: 'transferto' }, // 4-7
+                { action: 'changeType', data: 'transfer_in' }, // 4-7
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
                 { action: 'inputSourceAmount', data: '100' },
                 { action: 'inputDestAmount', data: '6000' },
@@ -380,13 +385,13 @@ export class ImportListStory extends TestStory {
 
         await ImportTests.updateItemAndSave({
             pos: 4,
-            action: { action: 'changeType', data: 'transferfrom' }, // 1-5
+            action: { action: 'changeType', data: 'transfer_out' }, // 1-5
         });
 
         await ImportTests.updateItemAndSave({
             pos: 5,
             action: [
-                { action: 'changeType', data: 'transferfrom' }, // 1-5
+                { action: 'changeType', data: 'transfer_out' }, // 1-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
                 { action: 'inputDestAmount', data: '0.9' },
                 { action: 'inputSourceAmount', data: '50.03' },
@@ -395,20 +400,20 @@ export class ImportListStory extends TestStory {
 
         await ImportTests.updateItemAndSave({
             pos: 6,
-            action: { action: 'changeType', data: 'transferto' }, // 1-7
+            action: { action: 'changeType', data: 'transfer_in' }, // 1-7
         });
 
         await ImportTests.updateItemAndSave({
             pos: 7,
             action: [
-                { action: 'changeType', data: 'debtfrom' }, // 1-9
+                { action: 'changeType', data: 'debt_out' }, // 1-9
                 { action: 'changePerson', data: App.scenario.IVAN },
             ],
         });
 
         await ImportTests.updateItemAndSave({
             pos: 8,
-            action: { action: 'changeType', data: 'debtto' }, // 1-10
+            action: { action: 'changeType', data: 'debt_in' }, // 1-10
         });
 
         await ImportTests.changeMainAccount(App.scenario.ACC_EUR);
@@ -426,38 +431,38 @@ export class ImportListStory extends TestStory {
             pos: 0,
             action: [
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
-                { action: 'changeType', data: 'transferfrom' }, // 8-6
-                { action: 'changeType', data: 'debtfrom' }, // 6-9
-                { action: 'changeType', data: 'debtto' }, // 9-10
-                { action: 'changeType', data: 'transferto' }, // 10-7
+                { action: 'changeType', data: 'transfer_out' }, // 8-6
+                { action: 'changeType', data: 'debt_out' }, // 6-9
+                { action: 'changeType', data: 'debt_in' }, // 9-10
+                { action: 'changeType', data: 'transfer_in' }, // 10-7
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
-                { action: 'changeType', data: 'debtfrom' }, // 8-9
+                { action: 'changeType', data: 'debt_out' }, // 8-9
                 { action: 'changeType', data: 'income' }, // 9-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
-                { action: 'changeType', data: 'debtfrom' }, // 4-9
+                { action: 'changeType', data: 'debt_out' }, // 4-9
                 { action: 'changeType', data: 'income' }, // 9-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
-                { action: 'changeType', data: 'debtto' }, // 4-10
-                { action: 'changeType', data: 'debtfrom' }, // 10-9
-                { action: 'changeType', data: 'transferfrom' }, // 9-5
+                { action: 'changeType', data: 'debt_in' }, // 4-10
+                { action: 'changeType', data: 'debt_out' }, // 10-9
+                { action: 'changeType', data: 'transfer_out' }, // 9-5
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
-                { action: 'changeType', data: 'debtto' }, // 6-10
-                { action: 'changeType', data: 'transferto' }, // 10-7
+                { action: 'changeType', data: 'debt_in' }, // 6-10
+                { action: 'changeType', data: 'transfer_in' }, // 10-7
                 { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
-                { action: 'changeType', data: 'debtto' }, // 8-10
+                { action: 'changeType', data: 'debt_in' }, // 8-10
                 { action: 'changeType', data: 'expense' }, // 10-1
                 { action: 'changeDestCurrency', data: USD }, // 1-2
-                { action: 'changeType', data: 'debtfrom' }, // 2-9
+                { action: 'changeType', data: 'debt_out' }, // 2-9
                 { action: 'changeType', data: 'expense' }, // 9-1
                 { action: 'changeDestCurrency', data: USD }, // 1-2
-                { action: 'changeType', data: 'debtto' }, // 2-10
+                { action: 'changeType', data: 'debt_in' }, // 2-10
             ],
         });
 
         await ImportTests.updateItemAndSave({
             pos: 7,
             action: [
-                { action: 'changeType', data: 'debtto' },
+                { action: 'changeType', data: 'debt_in' },
                 { action: 'changePerson', data: App.scenario.MARIA },
             ],
         });

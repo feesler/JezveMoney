@@ -127,7 +127,7 @@ export class ImportActionForm extends TestComponent {
         return model[actionValue];
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             actionType: parseInt(cont.actionField.value, 10),
             actionsAvailable: cont.actionField.dropDown.items.map(({ id }) => id),

@@ -2,9 +2,21 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * JSON encoder/decoder class
+ */
 class JSON
 {
-    public static function decode($jsonData, $asArray = false, $depth = 512)
+    /**
+     * Returns object decoded JSON string
+     *
+     * @param string $jsonData
+     * @param bool $asArray if true converts result to array
+     * @param int $depth
+     *
+     * @return mixed
+     */
+    public static function decode(string $jsonData, bool $asArray = false, int $depth = 512)
     {
         if (is_null($jsonData) || $jsonData == "") {
             return null;
@@ -25,9 +37,14 @@ class JSON
         return $decodedData;
     }
 
-
-    // Fixed json_encode function
-    public static function encode($obj)
+    /**
+     * Returns JSON string encoded from specified object
+     *
+     * @param mixed $obj
+     *
+     * @return string
+     */
+    public static function encode(mixed $obj)
     {
         if (PHP_VERSION_ID >= 50400) {
             return json_encode($obj, JSON_UNESCAPED_UNICODE);
@@ -40,5 +57,27 @@ class JSON
                 json_encode($obj)
             );
         }
+    }
+
+    /**
+     * Returns file decoded as JSON
+     *
+     * @param string $fileName
+     * @param bool $asArray if true converts result to array
+     *
+     * @return mixed
+     */
+    public static function fromFile(string $fileName, bool $asArray = false)
+    {
+        $res = null;
+
+        try {
+            $rawData = file_get_contents($fileName);
+            $res = JSON::decode($rawData, $asArray);
+        } catch (\Error $e) {
+            wlog($e->getMessage());
+        }
+
+        return $res;
     }
 }

@@ -1,15 +1,20 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { INCOME } from '../../../model/Transaction.js';
-import * as TransactionTests from '../../../run/transaction/index.js';
+import * as TransactionTests from '../../../run/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();
 
-    const [RUB, USD, EUR] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR']);
-    const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountIndexesByNames([
-        'ACC_3', 'ACC_RUB', 'ACC_USD', 'ACC_EUR',
-    ]);
+    const {
+        RUB,
+        USD,
+        EUR,
+        ACC_3,
+        ACC_RUB,
+        ACC_USD,
+        ACC_EUR,
+    } = App.scenario;
 
     // Navigate to create income view
     await App.goToMainView();
@@ -39,8 +44,8 @@ export const stateLoop = async () => {
         // Transition 2: Click on destination result balance block and move from State 0 to State 1
         { action: 'clickDestResultBalance' },
         // Transition 23: Change account to another one with different currency and stay on State 1
-        { action: 'changeDestAccountByPos', data: ACC_EUR },
-        { action: 'changeDestAccountByPos', data: ACC_3 },
+        { action: 'changeDestAccount', data: ACC_EUR },
+        { action: 'changeDestAccount', data: ACC_3 },
     ]);
 
     // Input result balance
@@ -59,8 +64,8 @@ export const stateLoop = async () => {
         { action: 'changeSourceCurrency', data: USD },
         // Transition 5: Change account to another one with currency different than current source
         //  currency and stay on State 2
-        { action: 'changeDestAccountByPos', data: ACC_EUR },
-        { action: 'changeDestAccountByPos', data: ACC_3 },
+        { action: 'changeDestAccount', data: ACC_EUR },
+        { action: 'changeDestAccount', data: ACC_3 },
     ]);
 
     // Input destination amount
@@ -80,8 +85,8 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' },
         // Transition 17: Change account to another one with currency different than current
         //  source currency and stay on State 4
-        { action: 'changeDestAccountByPos', data: ACC_EUR },
-        { action: 'changeDestAccountByPos', data: ACC_3 },
+        { action: 'changeDestAccount', data: ACC_EUR },
+        { action: 'changeDestAccount', data: ACC_3 },
         // Transition 21: Change source currency to different than currency of account and stay
         //  on State 4
         { action: 'changeSourceCurrency', data: EUR },
@@ -129,10 +134,10 @@ export const stateLoop = async () => {
         //  currest source currency
         { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
         { action: 'clickExchRate' }, // move from State 2 to State 3
-        { action: 'changeDestAccountByPos', data: ACC_EUR },
+        { action: 'changeDestAccount', data: ACC_EUR },
         // Transition 12: Change destination account to another one with same currency as
         //  currest source currency
-        { action: 'changeDestAccountByPos', data: ACC_USD },
+        { action: 'changeDestAccount', data: ACC_USD },
         // Transition 15: Change source currency to different than currency of account and
         //  stay on State 3
         { action: 'changeSourceCurrency', data: RUB }, // move from State 0 to State 2
@@ -145,15 +150,15 @@ export const stateLoop = async () => {
         //  source currency and move from State 4 to State 1
         { action: 'changeSourceCurrency', data: RUB }, // move from State 0 to State 2
         { action: 'clickDestResultBalance' }, // move from State 2 to State 4
-        { action: 'changeDestAccountByPos', data: ACC_RUB },
+        { action: 'changeDestAccount', data: ACC_RUB },
         // Transition 6: Change destination account to another one with same currency as currest
         //  source currency
         { action: 'clickSrcAmount' }, // move from State 1 to State 0
         { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
-        { action: 'changeDestAccountByPos', data: ACC_USD },
+        { action: 'changeDestAccount', data: ACC_USD },
         // Transition 1: Change destination account to another one with same currency as currest
         //  source currency
-        { action: 'changeDestAccountByPos', data: ACC_3 },
+        { action: 'changeDestAccount', data: ACC_3 },
         // Transition 22: Change source currency to the same as currency of account and move from
         //  State 4 to State 1
         { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2

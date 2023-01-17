@@ -13,30 +13,20 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../Components/Heading/style.scss';
-import './style.scss';
-import { actions, reducer } from './reducer.js';
-import { createStore } from '../../js/store.js';
 import {
     DEBT,
     EXPENSE,
     INCOME,
     TRANSFER,
 } from '../../js/model/Transaction.js';
-
-const TITLE_CATEGORY_DELETE = 'Delete category';
-const MSG_CATEGORY_DELETE = 'Are you sure want to delete selected category?';
-const MSG_EMPTY_NAME = 'Input name.';
-const MSG_EXISTING_NAME = 'Category with this name already exist.';
-const NO_PARENT_TITLE = 'No parent';
-
-const TITLE_ANY_TYPE = 'Any';
-const TITLE_EXPENSE = 'Expense';
-const TITLE_INCOME = 'Income';
-const TITLE_TRANSFER = 'Transfer';
-const TITLE_DEBT = 'Debt';
+import { CategoryList } from '../../js/model/CategoryList.js';
+import '../../Components/Heading/style.scss';
+import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import { actions, reducer } from './reducer.js';
+import { createStore } from '../../js/store.js';
+import { __ } from '../../js/utils.js';
+import './style.scss';
 
 /**
  * Create/update category view
@@ -71,6 +61,7 @@ class CategoryView extends View {
             'categoryForm',
             'nameInp',
             'nameFeedback',
+            'parentCategoryField',
             'submitBtn',
             'cancelBtn',
         ]);
@@ -98,34 +89,31 @@ class CategoryView extends View {
 
     /** Creates parent category select */
     createParentCategorySelect() {
-        this.parentSelect = DropDown.create({
-            elem: 'parent',
-            onitemselect: (o) => this.onParentSelect(o),
-            className: 'dd_fullwidth',
-        });
-        this.parentSelect.addItem({
-            id: 0, title: NO_PARENT_TITLE,
-        });
+        const { original } = this.store.getState();
 
-        const { categories } = window.app.model;
-        const mainCategories = categories.findByParent(0)
-            .map(({ id, name }) => ({ id, title: name }));
-        this.parentSelect.append(mainCategories);
+        this.parentSelect = CategorySelect.create({
+            elem: 'parent',
+            className: 'dd_fullwidth',
+            parentCategorySelect: true,
+            exclude: original.id,
+            enableFilter: true,
+            onItemSelect: (o) => this.onParentSelect(o),
+        });
     }
 
     /** Creates transaction type select */
     createTransactionTypeSelect() {
         this.typeSelect = DropDown.create({
             elem: 'type',
-            onitemselect: (type) => this.onTypeSelect(type),
+            onItemSelect: (type) => this.onTypeSelect(type),
             className: 'dd_fullwidth',
         });
         this.typeSelect.append([
-            { id: 0, title: TITLE_ANY_TYPE },
-            { id: EXPENSE, title: TITLE_EXPENSE },
-            { id: INCOME, title: TITLE_INCOME },
-            { id: TRANSFER, title: TITLE_TRANSFER },
-            { id: DEBT, title: TITLE_DEBT },
+            { id: 0, title: __('TR_ANY') },
+            { id: EXPENSE, title: __('TR_EXPENSE') },
+            { id: INCOME, title: __('TR_INCOME') },
+            { id: TRANSFER, title: __('TR_TRANSFER') },
+            { id: DEBT, title: __('TR_DEBT') },
         ]);
     }
 
@@ -164,12 +152,12 @@ class CategoryView extends View {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
+            this.store.dispatch(actions.invalidateNameField(__('CATEGORY_INVALID_NAME')));
             this.nameInp.focus();
         } else {
             const category = window.app.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
-                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
+                this.store.dispatch(actions.invalidateNameField(__('CATEGORY_EXISTING_NAME')));
                 this.nameInp.focus();
             }
         }
@@ -214,15 +202,14 @@ class CategoryView extends View {
                 await API.category.create(data);
             }
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}categories/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
         }
     }
 
-    async deleteCategory() {
+    async deleteCategory(removeChild = true) {
         const { submitStarted, original } = this.store.getState();
         if (submitStarted || !original.id) {
             return;
@@ -231,10 +218,9 @@ class CategoryView extends View {
         this.startSubmit();
 
         try {
-            await API.category.del({ id: original.id });
+            await API.category.del({ id: original.id, removeChild });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}categories/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -248,11 +234,12 @@ class CategoryView extends View {
             return;
         }
 
-        ConfirmDialog.create({
+        DeleteCategoryDialog.create({
             id: 'delete_warning',
-            title: TITLE_CATEGORY_DELETE,
-            content: MSG_CATEGORY_DELETE,
-            onconfirm: () => this.deleteCategory(),
+            title: __('CATEGORY_DELETE'),
+            content: __('MSG_CATEGORY_DELETE'),
+            showChildrenCheckbox: (data.parent_id === 0),
+            onConfirm: (opt) => this.deleteCategory(opt),
         });
     }
 
@@ -273,13 +260,20 @@ class CategoryView extends View {
         this.nameInp.value = state.data.name;
         enable(this.nameInp, !state.submitStarted);
 
-        // Parent category select
-        this.parentSelect.selectItem(state.data.parent_id);
+        // Parent category field
+        const { categories } = window.app.model;
+        const isUpdate = state.original.id;
+        const minItems = (isUpdate) ? 1 : 0;
+
+        show(this.parentCategoryField, categories.length > minItems);
+        this.parentSelect.setSelection(state.data.parent_id);
         this.parentSelect.enable(!state.submitStarted);
 
-        // Transaction type select
-        this.typeSelect.selectItem(state.data.type);
-        this.typeSelect.enable(!state.submitStarted);
+        // Transaction type field
+        const parentId = parseInt(state.data.parent_id, 10);
+
+        this.typeSelect.setSelection(state.data.type);
+        this.typeSelect.enable(!state.submitStarted && parentId === 0);
 
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);

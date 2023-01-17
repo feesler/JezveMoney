@@ -102,8 +102,9 @@ export class AccountListView extends AppView {
         return 'list';
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
+            locale: cont.locale,
             tiles: cont.tiles.getItems(),
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
@@ -126,6 +127,9 @@ export class AccountListView extends AppView {
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
@@ -362,9 +366,8 @@ export class AccountListView extends AppView {
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete account warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Show secified accounts */

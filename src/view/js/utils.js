@@ -1,4 +1,6 @@
-import { isDate } from 'jezvejs';
+import { isDate, isObject, shiftDate } from 'jezvejs';
+
+export const MS_IN_SECOND = 1000;
 
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
@@ -78,7 +80,7 @@ export const timestampFromString = (str) => {
 /** Convert date string to Unix timestamp in seconds */
 export const dateStringToTime = (value) => {
     const res = fixDate(value);
-    return (res) ? (res / 1000) : null;
+    return (res) ? (res / MS_IN_SECOND) : null;
 };
 
 /** Convert Unix timestamp in seconds to date string */
@@ -88,7 +90,13 @@ export const timeToDate = (value) => {
         throw new Error('Invalid time value');
     }
 
-    return new Date(time * 1000);
+    return new Date(time * MS_IN_SECOND);
+};
+
+/** Returns time for start of the day */
+export const cutTime = (value) => {
+    const fixedDate = shiftDate(timeToDate(value), 0);
+    return fixedDate.getTime() / MS_IN_SECOND;
 };
 
 /**
@@ -193,3 +201,37 @@ export const formatValueShort = (value) => {
     const fmtValue = formatValue(val);
     return `${fmtValue}${size}`;
 };
+
+/** Formats token string with specified arguments */
+export const formatTokenString = (value, ...args) => (
+    value.replace(/\$\{(\d+)\}/g, (_, num) => {
+        const argNum = parseInt(num, 10);
+        if (!argNum) {
+            throw new Error(`Invalid argument: ${num}`);
+        }
+        if (args.length < argNum) {
+            throw new Error(`Argument ${num} not defined`);
+        }
+
+        return args[argNum - 1];
+    })
+);
+
+/* eslint-disable no-underscore-dangle */
+/** Returns locale string for specified token */
+export const __ = (token, ...args) => {
+    const { localeTokens } = window;
+
+    if (!isObject(localeTokens)) {
+        throw new Error('Locale not loaded');
+    }
+    if (typeof token !== 'string') {
+        throw new Error('Invalid token');
+    }
+    if (typeof localeTokens[token] !== 'string') {
+        throw new Error(`Token ${token} not found`);
+    }
+
+    return formatTokenString(localeTokens[token], args);
+};
+/* eslint-enable no-underscore-dangle */

@@ -5,6 +5,7 @@ import {
     asArray,
 } from 'jezve-test';
 import { App } from '../../Application.js';
+import { __ } from '../../model/locale.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
 import { ImportAction } from '../../model/ImportAction.js';
@@ -125,12 +126,12 @@ const runOnRuleCondition = async (params) => {
             const property = ImportCondition.getFieldTypeById(action.data);
             assert(property, `Property (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${property.title}'`;
+            descr = `${actDescr[action.action]} to '${__(property.titleToken)}'`;
         } else if (action.action === 'changeOperator') {
             const operator = ImportCondition.getOperatorById(action.data);
             assert(operator, `Operator (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${operator.title}'`;
+            descr = `${actDescr[action.action]} to '${__(operator.titleToken)}'`;
         } else if (action.action === 'changeTemplate') {
             const template = App.state.templates.getItem(action.data);
             assert(template, `Template (${action.data}) not found`);
@@ -222,12 +223,12 @@ const runOnRuleAction = async (params) => {
             const actionType = ImportAction.getActionById(action.data);
             assert(actionType, `Property (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${actionType.title}'`;
+            descr = `${actDescr[action.action]} to '${__(actionType.titleToken)}'`;
         } else if (action.action === 'changeTransactionType') {
             const transType = ImportTransaction.getTypeById(action.data);
             assert(transType, `Transaction type (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${transType.title}'`;
+            descr = `${actDescr[action.action]} to '${__(transType.titleToken)}'`;
         } else if (action.action === 'changeAccount') {
             const userAccounts = App.state.accounts.getUserVisible();
             const account = userAccounts.getItem(action.data);

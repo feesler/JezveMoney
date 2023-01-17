@@ -60,7 +60,7 @@
         <ul class="nav-list">
             <li class="nav-item">
                 <div class="theme-switch">
-                    <span class="theme-switch__label">Dark theme</span>
+                    <span class="nav-item__title">Dark theme</span>
                     <label id="theme-check" class="switch">
                         <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
                         <div class="switch-slider"></div>
@@ -71,7 +71,7 @@
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5">Profile</a></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
             <li class="nav-separator"></li>
-            <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>" tabindex="7">Back</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>" tabindex="7">Back</a></li>
         </ul>
     <?php    }        ?>
 </div>

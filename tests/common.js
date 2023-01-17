@@ -3,7 +3,10 @@ import {
     isNum,
     isObject,
     assert,
+    formatDate,
 } from 'jezve-test';
+
+export const MS_IN_SECOND = 1000;
 
 /** Check object is empty */
 export const isEmpty = (obj) => {
@@ -48,6 +51,28 @@ export const fixDate = (date) => {
     }
 
     return convDate(date);
+};
+
+/** Converts Date instance to seconds */
+export const dateToSeconds = (date) => {
+    const ms = cutDate(date);
+    assert(ms, 'Invalid date');
+    return ms / MS_IN_SECOND;
+};
+
+/** Converts date string to seconds */
+export const dateStringToSeconds = (date) => dateToSeconds(new Date(convDate(date)));
+
+/** Converts seconds to Date instance */
+export const secondsToDate = (seconds) => {
+    assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
+    return new Date(seconds * MS_IN_SECOND);
+};
+
+/** Converts seconds to date string */
+export const secondsToDateString = (seconds) => {
+    assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
+    return formatDate(secondsToDate(seconds));
 };
 
 /** Check string is correct date in dd.mm.yyyy format */

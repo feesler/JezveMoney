@@ -131,7 +131,10 @@ export class List {
 
     /** Convert object to list item */
     createItem(obj) {
-        return copyObject(obj);
+        const res = copyObject(obj);
+        delete res.createdate;
+        delete res.updatedate;
+        return res;
     }
 
     /**

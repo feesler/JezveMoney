@@ -55,24 +55,24 @@ export class ImportActionList extends List {
         return !!this.findAction(action);
     }
 
-    /** Check list has `Set transaction type` action with 'transferfrom' or 'transferto' value */
+    /** Check list has `Set transaction type` action with 'transfer_out' or 'transfer_in' value */
     hasSetTransfer() {
         return !!this.find((item) => (
             item.action_id === IMPORT_ACTION_SET_TR_TYPE
             && (
-                item.value === 'transferfrom'
-                || item.value === 'transferto'
+                item.value === 'transfer_out'
+                || item.value === 'transfer_in'
             )
         ));
     }
 
-    /** Check list has `Set transaction type` action with 'debtfrom' or 'debtto' value */
+    /** Check list has `Set transaction type` action with 'debt_out' or 'debt_in' value */
     hasSetDebt() {
         return !!this.find((item) => (
             item.action_id === IMPORT_ACTION_SET_TR_TYPE
             && (
-                item.value === 'debtfrom'
-                || item.value === 'debtto'
+                item.value === 'debt_out'
+                || item.value === 'debt_in'
             )
         ));
     }

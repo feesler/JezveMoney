@@ -7,6 +7,7 @@ import {
 } from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -20,14 +21,6 @@ import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-
-/** Strings */
-const STR_TITLE = 'Persons';
-const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
-const TITLE_MULTI_PERSON_DELETE = 'Delete persons';
-const MSG_MULTI_PERSON_DELETE = 'Are you sure want to delete selected persons?<br>Debt operations will be converted into expense or income.';
-const MSG_SINGLE_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
-const MSG_NO_PERSONS = 'You have no one person. Please create one.';
 
 /**
  * List of persons view
@@ -69,7 +62,7 @@ class PersonListView extends View {
             className: 'tiles',
             itemSelector: '.tile',
             listMode: 'list',
-            noItemsMessage: MSG_NO_PERSONS,
+            noItemsMessage: __('PERSONS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
@@ -86,7 +79,7 @@ class PersonListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('PERSONS'),
         });
 
         this.visibleTiles = ListContainer.create(listProps);
@@ -97,8 +90,8 @@ class PersonListView extends View {
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
-            className: 'no-icon',
-            title: 'Done',
+            className: 'action-button',
+            title: __('DONE'),
             onClick: () => this.toggleSelectMode(),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -122,15 +115,15 @@ class PersonListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
@@ -138,17 +131,17 @@ class PersonListView extends View {
             }, {
                 id: 'showBtn',
                 icon: 'show',
-                title: 'Restore',
+                title: __('SHOW'),
                 onClick: () => this.onMenuClick('showBtn'),
             }, {
                 id: 'hideBtn',
                 icon: 'hide',
-                title: 'Hide',
+                title: __('HIDE'),
                 onClick: () => this.onMenuClick('hideBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -171,21 +164,21 @@ class PersonListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
-                title: 'Restore',
+                title: __('SHOW'),
                 onClick: () => this.showItems(),
             }, {
                 id: 'ctxHideBtn',
                 icon: 'hide',
-                title: 'Hide',
+                title: __('HIDE'),
                 onClick: () => this.showItems(false),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
         });
@@ -339,9 +332,9 @@ class PersonListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? TITLE_MULTI_PERSON_DELETE : TITLE_SINGLE_PERSON_DELETE,
-            content: (multiple) ? MSG_MULTI_PERSON_DELETE : MSG_SINGLE_PERSON_DELETE,
-            onconfirm: () => this.deleteItems(),
+            title: (multiple) ? __('PERSON_DELETE_MULTIPLE') : __('PERSON_DELETE'),
+            content: (multiple) ? __('MSG_PERSON_DELETE_MULTIPLE') : __('MSG_PERSON_DELETE'),
+            onConfirm: () => this.deleteItems(),
         });
     }
 

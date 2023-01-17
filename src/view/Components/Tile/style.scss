@@ -1,11 +1,9 @@
-:root {
+.tile {
   --tile-gap: 10px;
   --tile-size: 100px;
   --tile-content-color: #ffffff;
   --tile-bg-color: var(--accent-color-alt);
-}
 
-.tile {
   width: var(--tile-size);
   height: var(--tile-size);
   background-color: var(--tile-bg-color);
@@ -51,6 +49,9 @@
 }
 
 .tile__subtitle {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-end;
   top: 2px;
   right: 0;
   padding-right: 5px;

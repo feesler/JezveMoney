@@ -1,5 +1,6 @@
 import {
     assert,
+    click,
     query,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
@@ -19,8 +20,17 @@ export class DatePickerRow extends InputRow {
         return res;
     }
 
+    async toggleDatePicker() {
+        return this.performAction(() => click(this.content.datePickerBtn));
+    }
+
     async selectDate(date) {
         assert.isDate(date, 'Invalid parameter');
+
+        if (!this.content.datePicker) {
+            await this.toggleDatePicker();
+        }
+
         assert(this.content.datePicker, 'Date picker component not found');
 
         await this.content.datePicker.selectDate(date);

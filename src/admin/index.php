@@ -25,12 +25,11 @@ $router->setActionsMap([
     "chpwd" => "changePassword"
 ]);
 
-$router->onStart(function ($controller, $contrStr) {
-    setLogs($contrStr != "log");
+$router->onStart(function ($controller) {
     $controller->checkUser(true, true);
 });
 
-$router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
+$router->onBeforeAction(function ($controller) {
 
     $controller->initDefResources();
 });

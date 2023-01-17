@@ -42,42 +42,58 @@ export class PersonsStory extends TestStory {
     async create() {
         setBlock('Create persons', 2);
 
-        const data = [
-            { name: '&&<div>' },
-            { name: 'Alex' },
-            { name: 'Maria' },
-            { name: 'Johnny' },
-            { name: 'Иван' },
-            // Try to submit person with empty name
-            { name: '' },
-            // Try to submit person with existing name
-            { name: 'Alex' },
-        ];
+        await PersonTests.create();
+        await PersonTests.inputName('&&<div>');
+        await PersonTests.submit();
 
-        await App.scenario.runner.runGroup(PersonTests.create, data);
+        await PersonTests.create();
+        await PersonTests.inputName('Alex');
+        await PersonTests.submit();
+
+        await PersonTests.create();
+        await PersonTests.inputName('Maria');
+        await PersonTests.submit();
+
+        await PersonTests.create();
+        await PersonTests.inputName('Johnny');
+        await PersonTests.submit();
+
+        await PersonTests.create();
+        await PersonTests.inputName('Иван');
+        await PersonTests.submit();
+
+        // Try to submit person with empty name
+        await PersonTests.create();
+        await PersonTests.inputName('');
+        await PersonTests.submit();
+
+        // Try to submit person with existing name
+        await PersonTests.create();
+        await PersonTests.inputName('Alex');
+        await PersonTests.submit();
     }
 
     async update() {
         setBlock('Update persons', 2);
 
-        const data = [{
-            pos: 4,
-            name: 'Ivan<',
-        }, {
-            // Try to submit person with empty name
-            pos: 0,
-            name: '',
-        }, {
-            // Try to submit person with existing name
-            pos: 0,
-            name: 'Alex',
-        }, {
-            // Try to update case in person name
-            pos: 2,
-            name: 'MARIA',
-        }];
+        await PersonTests.update(4);
+        await PersonTests.inputName('Ivan<');
+        await PersonTests.submit();
 
-        await App.scenario.runner.runGroup(PersonTests.update, data);
+        // Try to submit person with empty name
+        await PersonTests.update(0);
+        await PersonTests.inputName('');
+        await PersonTests.submit();
+
+        // Try to submit person with existing name
+        await PersonTests.update(0);
+        await PersonTests.inputName('Alex');
+        await PersonTests.submit();
+
+        // Update case in person name
+        await PersonTests.update(2);
+        await PersonTests.inputName('MARIA');
+        await PersonTests.submit();
     }
 
     async del() {

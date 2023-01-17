@@ -1,4 +1,4 @@
-import { fixFloat } from '../utils.js';
+import { fixFloat, __ } from '../utils.js';
 import { ListItem } from './ListItem.js';
 import {
     IMPORT_COND_OP_EQUAL,
@@ -10,24 +10,6 @@ import { ImportConditionList } from './ImportConditionList.js';
 import { ImportActionList } from './ImportActionList.js';
 import { ImportConditionValidationError } from '../error/ImportConditionValidationError.js';
 import { ImportActionValidationError } from '../error/ImportActionValidationError.js';
-
-/** Validation messages */
-const MSG_NO_CONDITIONS = 'Rule must contain at least one condition';
-const MSG_DUP_CONDITION = 'Duplicate condition';
-const MSG_INCORRECT_AMOUNT = 'Input correct amount';
-const MSG_INVALID_DATE = 'Input correct date in DD.MM.YYYY format';
-const MSG_NO_EMPTY_VALUE = 'Input value';
-const MSG_PROPERTY_COMPARE_UNAVAIL = 'Compare with another property not available';
-const MSG_SAME_PROPERTY_COMPARE = 'Can not compare property with itself';
-const MSG_EQUAL_CONDITION = '\'Equal\' condition can not be combined with other conditions for same property';
-const MSG_DUP_LESS = 'Duplicate \'less\' condition';
-const MSG_NOT_OVEPLAP = 'Condition ranges do not overlap';
-const MSG_DUP_GREATER = 'Duplicate \'greater\' condition';
-const MSG_NO_ACTIONS = 'Rule must contain at least one action';
-const MSG_DUP_ACTION = 'Duplicate action type';
-const MSG_SET_ACCOUNT_GUARD = 'Guard condition for main account is required(main account must be different from the selected)';
-const MSG_TRANSFER_REQUIRED = 'Transfer transaction type is required';
-const MSG_DEBT_REQUIRED = 'Debt transaction type is required';
 
 /**
  * Import rule class
@@ -85,7 +67,7 @@ export class ImportRule extends ListItem {
 
         // Check conditions
         if (!this.conditions.length) {
-            result.message = MSG_NO_CONDITIONS;
+            result.message = __('ERR_RULE_NO_CONDITIONS');
             return result;
         }
 
@@ -97,24 +79,24 @@ export class ImportRule extends ListItem {
             this.conditions.forEach((condition, ind) => {
                 const validation = condition.validate();
                 if (!validation.amount) {
-                    throw new ImportConditionValidationError(MSG_INCORRECT_AMOUNT, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_INVALID_AMOUNT'), ind);
                 }
                 if (!validation.date) {
-                    throw new ImportConditionValidationError(MSG_INVALID_DATE, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_INVALID_DATE'), ind);
                 }
                 if (!validation.emptyValue) {
-                    throw new ImportConditionValidationError(MSG_NO_EMPTY_VALUE, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_EMPTY_VALUE'), ind);
                 }
                 if (!validation.propValue) {
-                    throw new ImportConditionValidationError(MSG_PROPERTY_COMPARE_UNAVAIL, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_COMPARE_PROPERTY'), ind);
                 }
                 if (!validation.sameProperty) {
-                    throw new ImportConditionValidationError(MSG_SAME_PROPERTY_COMPARE, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_COMPARE_SAME'), ind);
                 }
 
                 // Check full duplicates of condition
                 if (this.conditions.hasSameCondition(condition)) {
-                    throw new ImportConditionValidationError(MSG_DUP_CONDITION, ind);
+                    throw new ImportConditionValidationError(__('ERR_RULE_DUP_CONDITION'), ind);
                 }
 
                 // Check 'equal' conditions for each field type present only once
@@ -122,20 +104,20 @@ export class ImportRule extends ListItem {
                 // the same result, so it is meaningless
                 if (condition.operator === IMPORT_COND_OP_EQUAL) {
                     if (this.conditions.hasSameFieldCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_EQUAL_CONDITION, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_EQUAL'), ind);
                     }
                 }
 
                 if (condition.operator === IMPORT_COND_OP_LESS) {
                     // Check 'less' condition for each field type present only once
                     if (lessConds.hasSameFieldCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_DUP_LESS, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_DUP_LESS'), ind);
                     }
                     // Check value regions of 'greater' and 'not equal' conditions is intersected
                     // with value region of current condition
                     if (greaterConds.hasNotLessCondition(condition)
                         || notEqConds.hasNotLessCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_NOT_OVEPLAP, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
                     lessConds.addItem(condition);
@@ -144,13 +126,13 @@ export class ImportRule extends ListItem {
                 if (condition.operator === IMPORT_COND_OP_GREATER) {
                     // Check 'greater' condition for each field type present only once
                     if (greaterConds.hasSameFieldCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_DUP_GREATER, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_DUP_GREATER'), ind);
                     }
                     // Check value regions of 'less' and 'not equal' conditions is intersected
                     // with value region of current condition
                     if (lessConds.hasNotGreaterCondition(condition)
                         || notEqConds.hasNotGreaterCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_NOT_OVEPLAP, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
                     greaterConds.addItem(condition);
@@ -161,7 +143,7 @@ export class ImportRule extends ListItem {
                     // with current value
                     if (lessConds.hasNotGreaterCondition(condition)
                         || greaterConds.hasNotLessCondition(condition)) {
-                        throw new ImportConditionValidationError(MSG_NOT_OVEPLAP, ind);
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
                     notEqConds.addItem(condition);
@@ -180,27 +162,27 @@ export class ImportRule extends ListItem {
         // Check actions
         const ruleActionTypes = [];
         if (!this.actions.length) {
-            result.message = MSG_NO_ACTIONS;
+            result.message = __('ERR_RULE_NO_ACTIONS');
             return result;
         }
         try {
             this.actions.forEach((action, ind) => {
                 // Check each type of action is used only once
                 if (ruleActionTypes.includes(action.action_id)) {
-                    throw new ImportActionValidationError(MSG_DUP_ACTION, ind);
+                    throw new ImportActionValidationError(__('ERR_RULE_DUP_ACTION'), ind);
                 }
 
                 ruleActionTypes.push(action.action_id);
                 // Amount value
                 if (action.isAmountValue()
                     && !this.isValidActionAmount(action.value)) {
-                    throw new ImportActionValidationError(MSG_INCORRECT_AMOUNT, ind);
+                    throw new ImportActionValidationError(__('ERR_RULE_INVALID_AMOUNT'), ind);
                 }
 
                 // Account value
                 if (action.isAccountValue()
                     && !this.actions.hasSetTransfer()) {
-                    throw new ImportActionValidationError(MSG_TRANSFER_REQUIRED, ind);
+                    throw new ImportActionValidationError(__('ERR_RULE_TRANSFER'), ind);
                 }
 
                 // Check main account guard condition for 'Set account' action
@@ -208,14 +190,14 @@ export class ImportRule extends ListItem {
                     const accountId = parseInt(action.value, 10);
                     const found = this.conditions.hasAccountGuardCondition(accountId);
                     if (!found) {
-                        throw new ImportActionValidationError(MSG_SET_ACCOUNT_GUARD, ind);
+                        throw new ImportActionValidationError(__('ERR_RULE_ACCOUNT_GUARD'), ind);
                     }
                 }
 
                 // Person value
                 if (action.isPersonValue()
                     && !this.actions.hasSetDebt()) {
-                    throw new ImportActionValidationError(MSG_DEBT_REQUIRED, ind);
+                    throw new ImportActionValidationError(__('ERR_RULE_DEBT'), ind);
                 }
             });
         } catch (e) {

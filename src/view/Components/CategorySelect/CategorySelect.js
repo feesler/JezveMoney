@@ -1,28 +1,62 @@
+import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
+import { __ } from '../../js/utils.js';
 
-const TITLE_NO_CATEGORY = 'No category';
+const defaultProps = {
+    transactionType: null, // filter categories by type, null - show all
+    parentCategorySelect: false,
+    exclude: null, // id or array of category ids to exclude from list
+};
 
 /**
  * Category DropDown component
  */
 export class CategorySelect extends DropDown {
-    constructor(props) {
-        super(props);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
+
+        this.state = {
+            ...this.state,
+            transactionType: this.props.transactionType,
+            parentCategorySelect: this.props.parentCategorySelect,
+            exclude: this.props.exclude,
+        };
 
         this.initCategories();
     }
 
     initCategories() {
         const { categories } = window.app.model;
+        const { transactionType, parentCategorySelect } = this.state;
 
-        this.addItem({ id: 0, title: TITLE_NO_CATEGORY });
+        this.removeAll();
+
+        const noCategoryTitle = (parentCategorySelect) ? 'CATEGORY_NO_PARENT' : 'NO_CATEGORY';
+        this.addItem({ id: 0, title: __(noCategoryTitle) });
+
+        const excludeIds = asArray(this.state.exclude).map((id) => parseInt(id, 10));
 
         categories.forEach((category) => {
-            if (category.parent_id !== 0) {
+            if (category.parent_id !== 0 || excludeIds.includes(category.id)) {
+                return;
+            }
+            if (
+                category.type !== 0
+                && transactionType !== null
+                && category.type !== transactionType
+            ) {
                 return;
             }
 
             this.addItem({ id: category.id, title: category.name });
+
+            if (parentCategorySelect) {
+                return;
+            }
+
             // Search for children categories
             const children = categories.findByParent(category.id);
             if (children.length === 0) {
@@ -34,5 +68,18 @@ export class CategorySelect extends DropDown {
             ));
             this.append(groupItems);
         });
+    }
+
+    setType(transactionType) {
+        if (this.state.transactionType === transactionType) {
+            return;
+        }
+
+        this.setState({
+            ...this.state,
+            transactionType,
+        });
+
+        this.initCategories();
     }
 }

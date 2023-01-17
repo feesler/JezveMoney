@@ -7,16 +7,23 @@ use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\IconModel;
 
+/**
+ * Main controller
+ */
 class Main extends TemplateController
 {
+    /**
+     * / route handler
+     * Renders main view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "Main.tpl");
         $data = [
-            "titleString" => "Jezve Money"
+            "titleString" => __("APP_NAME")
         ];
 
         $accMod = AccountModel::getInstance();
@@ -24,60 +31,9 @@ class Main extends TemplateController
         $currMod = CurrencyModel::getInstance();
         $catModel = CategoryModel::getInstance();
 
-        $accounts = $accMod->getData();
-        $data["tilesArr"] = [];
-        foreach ($accounts as $account) {
-            $data["tilesArr"][] = [
-                "type" => "link",
-                "link" => BASEURL . "transactions/create/?acc_id=" . ($account->id),
-                "title" => $account->name,
-                "subtitle" => $currMod->format($account->balance, $account->curr_id),
-                "icon" => $accMod->getIconFile($account->id)
-            ];
-        }
-
-        $totalsArr = $accMod->getTotalsArray();
-        foreach ($totalsArr as $curr_id => $balance) {
-            $currObj = $currMod->getItem($curr_id);
-            if (!$currObj) {
-                throw new \Error('Wrong currency id: ' . $curr_id);
-            }
-
-            $balfmt = $currMod->format($balance, $curr_id);
-
-            $totalsArr[$curr_id] = ["bal" => $balance, "balfmt" => $balfmt, "name" => $currObj->name];
-        }
-        $data["totalsArr"] = $totalsArr;
-
         // Prepare data of transaction list items
-        $latestArr = $transMod->getData(["desc" => true, "onPage" => 5]);
-        $transactions = [];
-        foreach ($latestArr as $trans) {
-            $transactions[] = new TransactionItem($trans);
-        }
-        $data["transactions"] = $transactions;
-
-        $persArr = $this->personMod->getData();
-        $data["persons"] = [];
-        foreach ($persArr as $person) {
-            $pBalance = [];
-            if (isset($person->accounts) && is_array($person->accounts)) {
-                foreach ($person->accounts as $pAcc) {
-                    if ($pAcc->balance != 0.0) {
-                        $pBalance[] = $currMod->format($pAcc->balance, $pAcc->curr_id);
-                    }
-                }
-            }
-
-            $subtitle = (count($pBalance) > 0) ? $pBalance : "No debts";
-
-            $data["persons"][] = [
-                "type" => "link",
-                "link" => BASEURL . "transactions/create/?type=debt&person_id=" . ($person->id),
-                "title" => $person->name,
-                "subtitle" => $subtitle,
-            ];
-        }
+        $transactions = $transMod->getData(["desc" => true, "onPage" => 5]);
+        $data["transactionsCount"] = count($transactions);
 
         // Find most frequent currency of latest transactions
         $currencies = [];
@@ -114,12 +70,20 @@ class Main extends TemplateController
             "limit" => 5
         ]);
 
+        $iconModel = IconModel::getInstance();
+
+        $accounts = $accMod->getData(["visibility" => "all", "owner" => "all"]);
+        $persons = $this->personMod->getData(["visibility" => "all"]);
+        $data["accountsCount"] = count($accounts);
+        $data["personsCount"] = count($persons);
+
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $accMod->getData(["visibility" => "all", "owner" => "all"]),
-            "persons" => $this->personMod->getData(["visibility" => "all"]),
+            "accounts" => $accounts,
+            "persons" => $persons,
             "categories" => $catModel->getData(),
             "currency" => $currMod->getData(),
+            "icons" => $iconModel->getData(),
             "view" => [
                 "transactions" => $transactions,
                 "chartData" => $data["statArr"]
@@ -132,11 +96,15 @@ class Main extends TemplateController
         $this->render($data);
     }
 
+    /**
+     * /about/ route handler
+     * Renders about view
+     */
     public function about()
     {
         $this->template = new Template(VIEW_TPL_PATH . "About.tpl");
         $data = [
-            "titleString" => "Jezve Money"
+            "titleString" => __("APP_NAME")
         ];
 
         $data["year"] = date("Y");

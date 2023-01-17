@@ -7,13 +7,13 @@ import {
 } from 'jezve-test';
 
 const navLinksMap = {
-    accountsLink: 'Accounts',
-    personsLink: 'Persons',
-    categoriesLink: 'Categories',
-    transactionsLink: 'Transactions',
-    statisticsLink: 'Statistics',
-    importLink: 'Import',
-    aboutLink: 'About',
+    accountsLink: '/accounts/',
+    personsLink: '/persons/',
+    categoriesLink: '/categories/',
+    transactionsLink: '/transactions/',
+    statisticsLink: '/statistics/',
+    importLink: '/import/',
+    aboutLink: '/about/',
 };
 
 export class Navigation extends TestComponent {
@@ -27,11 +27,11 @@ export class Navigation extends TestComponent {
         const navElems = await queryAll(this.elem, '.nav-item__link');
         const navLinks = await asyncMap(navElems, async (elem) => ({
             elem,
-            title: await prop(elem, 'textContent'),
+            href: await prop(elem, 'href'),
         }));
         navLinks.forEach((link) => {
             for (const name in navLinksMap) {
-                if (navLinksMap[name] === link.title) {
+                if (link.href.endsWith(navLinksMap[name])) {
                     res[name] = link;
                     break;
                 }

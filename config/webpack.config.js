@@ -13,6 +13,16 @@ export default {
             filename: 'view/js/polyfill/index.js',
         },
 
+        locale_en: {
+            import: './src/view/js/locale/en.js',
+            filename: 'view/js/locale/en.js',
+        },
+
+        locale_ru: {
+            import: './src/view/js/locale/ru.js',
+            filename: 'view/js/locale/ru.js',
+        },
+
         MainView: {
             import: './src/view/Views/Main/MainView.js',
             filename: 'view/js/[name].js',

@@ -9,21 +9,21 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
-const MSG_ACCOUNT_NOT_AVAILABLE = "You have no accounts. Please create one.";
-const MSG_DEBT_ACCOUNT_NOT_AVAILABLE = "No accounts available";
-const MSG_TRANSFER_NOT_AVAILABLE = "You need at least two accounts for transfer.";
-const MSG_DEBT_NOT_AVAILABLE = "You have no persons. Please create one for debts.";
-
+/**
+ * Transactions controller
+ */
 class Transactions extends TemplateController
 {
     protected $model = null;
     protected $accModel = null;
     protected $currModel = null;
+    protected $catModel = null;
 
-
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = TransactionModel::getInstance();
@@ -32,13 +32,16 @@ class Transactions extends TemplateController
         $this->catModel = CategoryModel::getInstance();
     }
 
-
+    /**
+     * /transactions/ route handler
+     * Renders transactions list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
         $baseUrl = BASEURL . "transactions/";
         $data = [
-            "titleString" => "Jezve Money | Transactions",
+            "titleString" => __("APP_NAME") . " | " . __("TRANSACTIONS"),
             "clearAllURL" => $baseUrl
         ];
 
@@ -72,13 +75,13 @@ class Transactions extends TemplateController
         }
         $data["showDetails"] = $showDetails;
 
-        $transArr = $this->model->getData($trParams);
+        $transactions = $this->model->getData($trParams);
 
         $transCount = $this->model->getTransCount($trParams);
         $pagination["total"] = $transCount;
 
         // Prepare transaction types menu
-        $trTypes = [0 => "Show all"];
+        $trTypes = [0 => __("SHOW_ALL")];
         $availTypes = TransactionModel::getTypeNames();
         array_push($trTypes, ...$availTypes);
 
@@ -123,12 +126,6 @@ class Transactions extends TemplateController
             $pagination["page"] = $page_num + 1;
         }
 
-        // Prepare data of transaction list items
-        $trItems = [];
-        foreach ($transArr as $trans) {
-            $trItems[] = new TransactionItem($trans);
-        }
-
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -136,7 +133,7 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "categories" => $this->catModel->getData(),
             "view" => [
-                "transArr" => $trItems,
+                "transArr" => $transactions,
                 "filter" => (object)$filterObj,
                 "pagination" => $pagination,
                 "mode" => $showDetails ? "details" : "classic",
@@ -149,18 +146,28 @@ class Transactions extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL);
     }
 
-
-    protected function getHiddenAccountTileData($tileId)
+    /**
+     * Returns properties for hidden Tile
+     *
+     * @param string $tileId tile id
+     *
+     * @return array
+     */
+    protected function getHiddenAccountTileData(string $tileId)
     {
         return [
             "id" => $tileId,
@@ -170,8 +177,16 @@ class Transactions extends TemplateController
         ];
     }
 
-
-    protected function getAccountTileData($account, $tileId, $balanceDiff = 0)
+    /**
+     * Returns properties for account Tile
+     *
+     * @param object $account
+     * @param string $tileId tile id
+     * @param float $balanceDiff difference to add to account balance
+     *
+     * @return array
+     */
+    protected function getAccountTileData(object $account, string $tileId, float $balanceDiff = 0)
     {
         return [
             "id" => $tileId,
@@ -181,8 +196,15 @@ class Transactions extends TemplateController
         ];
     }
 
-
-    protected function getRequestedType($request, $default)
+    /**
+     * Returns transaction type from request
+     *
+     * @param array $request request data
+     * @param int $default default transaction type
+     *
+     * @return int
+     */
+    protected function getRequestedType(array $request, int $default)
     {
         if (!is_array($request) || !isset($request["type"])) {
             return $default;
@@ -192,14 +214,22 @@ class Transactions extends TemplateController
             $res = TransactionModel::stringToType($request["type"]);
         }
         if (!$res) {
-            $this->fail("Invalid transaction type");
+            $this->fail(__("ERR_TRANSACTION_TYPE"));
         }
 
         return $res;
     }
 
-
-    protected function getTypeMenu($baseUrl, $selectedType, $params = [])
+    /**
+     * Retunrs properties for transaction type menu
+     *
+     * @param string $baseUrl
+     * @param int $selectedType
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getTypeMenu(string $baseUrl, int $selectedType, array $params = [])
     {
         $trTypes = TransactionModel::getTypeNames();
         $acc_id = (is_array($params) && isset($params["acc_id"])) ? intval($params["acc_id"]) : 0;
@@ -225,14 +255,23 @@ class Transactions extends TemplateController
         return $res;
     }
 
-
-    protected function getContainersData($data)
+    /**
+     * Returns properties for accounts and person containers
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function getContainersData(array $data)
     {
         $trAvailable = $data["trAvailable"];
         $tr = $data["tr"];
         $debtType = $data["debtType"];
         $noAccount = $data["noAccount"];
         $acc_count = $data["acc_count"];
+        if (!is_array($tr) || !isset($tr["type"])) {
+            throw new \Error("Invalid parameters");
+        }
 
         $personContainer = [
             "id" => "personContainer",
@@ -247,7 +286,7 @@ class Transactions extends TemplateController
         if ($noAccount) {
             $debtAccountLabel = "No account";
         } else {
-            $debtAccountLabel = ($debtType) ? "Destination account" : "Source account";
+            $debtAccountLabel = ($debtType) ? __("TR_DEST_ACCOUNT") : __("TR_SRC_ACCOUNT");
         }
         $debtAccountContainer = [
             "id" => "debtAccountContainer",
@@ -258,7 +297,7 @@ class Transactions extends TemplateController
             "baseHidden" => $noAccount,
             "closeButton" => $noAccount,
             "accountToggler" => (!$noAccount || !$acc_count),
-            "noAccountsMsg" => MSG_DEBT_ACCOUNT_NOT_AVAILABLE,
+            "noAccountsMsg" => __("TR_DEBT_NO_ACCOUNTS"),
             "noAccountsMsgHidden" => ($acc_count > 0),
             "tile" => $data["debtAccountTile"],
             "infoItems" => [],
@@ -284,7 +323,7 @@ class Transactions extends TemplateController
             "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
             "inputId" => "srcIdInp",
             "inputValue" => $tr["src_id"],
-            "title" => "Source account",
+            "title" => __("TR_SRC_ACCOUNT"),
             "tile" => $data["srcAccountTile"],
             "infoItems" => [],
         ];
@@ -307,7 +346,7 @@ class Transactions extends TemplateController
             "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
             "inputId" => "destIdInp",
             "inputValue" => $tr["dest_id"],
-            "title" => "Destination account",
+            "title" => __("TR_DEST_ACCOUNT"),
             "tile" => $data["destAccountTile"],
             "infoItems" => [],
         ];
@@ -328,11 +367,14 @@ class Transactions extends TemplateController
         return $data;
     }
 
-
+    /**
+     * /transactions/create/ route handler
+     * Renders create transaction view
+     */
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -347,28 +389,29 @@ class Transactions extends TemplateController
 
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = ERR_TRANS_CREATE;
+        $defMsg = __("ERR_TRANS_CREATE");
 
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
-            "date" => strtotime(date("d.m.Y")),
+            "date" => time(),
             "category_id" => 0,
             "comment" => ""
         ];
 
         // Check availability of selected type of transaction
         $notAvailMessage = null;
+        $trAvailable = false;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
             $trAvailable = $acc_count > 0;
-            $notAvailMessage = MSG_ACCOUNT_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_NO_ACCOUNTS");
         } elseif ($tr["type"] == TRANSFER) {
             $trAvailable = $acc_count > 1;
-            $notAvailMessage = MSG_TRANSFER_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_TRANSFER_NO_ACCOUNTS");
         } elseif ($tr["type"] == DEBT) {
             $trAvailable = is_array($persons) && count($persons) > 0;
-            $notAvailMessage = MSG_DEBT_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_DEBT_NO_PERSONS");
         }
         $data["trAvailable"] = $trAvailable;
         $data["notAvailMessage"] = $notAvailMessage;
@@ -514,11 +557,11 @@ class Transactions extends TemplateController
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
-        $srcBalTitle = "Result balance";
+        $srcBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (Source)";
+            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (Person)" : " (Account)";
+            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
         }
         $data["srcBalTitle"] = $srcBalTitle;
 
@@ -528,11 +571,11 @@ class Transactions extends TemplateController
             $src->icon = $this->accModel->getIconFile($src->id);
         }
 
-        $destBalTitle = "Result balance";
+        $destBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (Destination)";
+            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (Account)" : " (Person)";
+            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
         }
         $data["destBalTitle"] = $destBalTitle;
 
@@ -548,6 +591,8 @@ class Transactions extends TemplateController
          * Meanwhile source amount for expense and destination amount for income are
          * always have the same currency as account.
          */
+        $showSrcAmount = false;
+        $showDestAmount = false;
         if ($tr["type"] == EXPENSE) {
             $showSrcAmount = $isDiffCurr;
             $showDestAmount = true;
@@ -566,8 +611,8 @@ class Transactions extends TemplateController
         $data["showDestAmount"] = $showDestAmount;
 
         $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
-        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
+        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
 
         $currObj = $this->currModel->getItem($tr["src_curr"]);
         $srcAmountSign = $currObj ? $currObj->sign : null;
@@ -615,19 +660,19 @@ class Transactions extends TemplateController
         ];
         $data["srcResultInfo"] = [
             "id" => "srcResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
             "id" => "destResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
             "id" => "exchangeInfo",
-            "title" => "Exchange rate",
+            "title" => __("TR_EXCHANGE_RATE"),
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
         ];
@@ -636,9 +681,10 @@ class Transactions extends TemplateController
 
         $data["dateFmt"] = date("d.m.Y");
 
-        $data["headString"] = "Create transaction";
-        $data["titleString"] = "Jezve Money | " . $data["headString"];
+        $data["headString"] = __("TR_CREATE");
+        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -659,11 +705,14 @@ class Transactions extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /transactions/update/ route handler
+     * Renders update transaction view
+     */
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -674,7 +723,7 @@ class Transactions extends TemplateController
 
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = ERR_TRANS_UPDATE;
+        $defMsg = __("ERR_TRANS_UPDATE");
 
         $trans_id = intval($this->actionParam);
         if (!$trans_id) {
@@ -726,6 +775,8 @@ class Transactions extends TemplateController
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
+        $showSrcAmount = false;
+        $showDestAmount = false;
         if ($tr["type"] == EXPENSE) {
             $showSrcAmount = $isDiffCurr;
             $showDestAmount = true;
@@ -740,7 +791,7 @@ class Transactions extends TemplateController
         if ($tr["type"] == DEBT) {
             $uObj = $this->uMod->getItem($this->user_id);
             if (!$uObj) {
-                throw new \Error("User not found");
+                throw new \Error(__("ERR_USER_NOT_FOUND"));
             }
 
             $debtType = (!is_null($src) && $src->owner_id != $uObj->owner_id);
@@ -749,7 +800,7 @@ class Transactions extends TemplateController
 
             $pObj = $this->personMod->getItem($person_id);
             if (!$pObj) {
-                throw new \Error("Person not found");
+                throw new \Error(__("ERR_PERSON_NOT_FOUND"));
             }
 
             $person_acc_id = ($debtType) ? $tr["src_id"] : $tr["dest_id"];
@@ -791,18 +842,18 @@ class Transactions extends TemplateController
             $person_balance = $person_res_balance;
         }
 
-        $srcBalTitle = "Result balance";
+        $srcBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (Source)";
+            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (Person)" : " (Account)";
+            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
         }
 
-        $destBalTitle = "Result balance";
+        $destBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (Destination)";
+            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (Account)" : " (Person)";
+            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
         }
 
         $form["src_amount"] = $tr["src_amount"];
@@ -826,8 +877,8 @@ class Transactions extends TemplateController
         $data["tr"] = $tr;
 
         $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
-        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
+        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
 
         if ($tr["type"] == DEBT && $debtAcc) {
             $balanceDiff = 0;
@@ -887,19 +938,19 @@ class Transactions extends TemplateController
         ];
         $data["srcResultInfo"] = [
             "id" => "srcResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
             "id" => "destResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
             "id" => "exchangeInfo",
-            "title" => "Exchange rate",
+            "title" => __("TR_EXCHANGE_RATE"),
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
         ];
@@ -908,9 +959,10 @@ class Transactions extends TemplateController
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
 
-        $data["headString"] = "Edit transaction";
-        $data["titleString"] = "Jezve Money | " . $data["headString"];
+        $data["headString"] = __("TR_UPDATE");
+        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),

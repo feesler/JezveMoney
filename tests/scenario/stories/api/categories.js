@@ -22,6 +22,10 @@ const create = async () => {
         name: 'Transpost',
         parent_id: 0,
         type: EXPENSE,
+    }, {
+        name: 'Shop',
+        parent_id: 0,
+        type: EXPENSE,
     }];
 
     [
@@ -29,6 +33,7 @@ const create = async () => {
         App.scenario.INVEST_CATEGORY,
         App.scenario.TAXES_CATEGORY,
         App.scenario.TRANSPORT_CATEGORY,
+        App.scenario.SHOP_CATEGORY,
     ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
 };
 
@@ -39,6 +44,11 @@ const createInvalid = async () => {
         // Try to create category with existing name
         name: 'Food',
         parent_id: 0,
+        type: 0,
+    }, {
+        // Try to create sub category with invalid type
+        name: 'Subcategory',
+        parent_id: App.scenario.FOOD_CATEGORY,
         type: 0,
     }, {
         // Invalid data tests
@@ -65,7 +75,7 @@ const createMultiple = async () => {
     }, {
         name: 'Bike rent',
         parent_id: App.scenario.TRANSPORT_CATEGORY,
-        type: 0,
+        type: EXPENSE,
     }, {
         name: 'Learning',
         parent_id: 0,
@@ -107,8 +117,22 @@ const update = async () => {
     setBlock('Update categories', 2);
 
     const data = [
-        { id: App.scenario.FOOD_CATEGORY, name: 'Meal' },
-        { id: App.scenario.TAXES_CATEGORY, parent_id: App.scenario.INVEST_CATEGORY },
+        {
+            id: App.scenario.FOOD_CATEGORY,
+            name: 'Meal',
+        },
+        {
+            id: App.scenario.TAXES_CATEGORY,
+            parent_id: App.scenario.INVEST_CATEGORY,
+        },
+        {
+            id: App.scenario.INVEST_CATEGORY,
+            type: EXPENSE,
+        },
+        {
+            id: App.scenario.FOOD_CATEGORY,
+            parent_id: App.scenario.SHOP_CATEGORY,
+        },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
@@ -120,9 +144,16 @@ const updateInvalid = async () => {
     const data = [
         // Try to update name of category to an existing one
         { id: App.scenario.FOOD_CATEGORY, name: 'Transpost' },
+        // Try to submit category with empty name
         { id: App.scenario.FOOD_CATEGORY, name: '' },
+        // Try to submit category with invalid parent
         { id: App.scenario.FOOD_CATEGORY, parent_id: -1 },
+        // Try to submit category with itself as parent
+        { id: App.scenario.FOOD_CATEGORY, parent_id: App.scenario.FOOD_CATEGORY },
+        // Try to submit category with invalid transaction type
         { id: App.scenario.FOOD_CATEGORY, type: 100 },
+        // Try to submit category with transaction type different than parent
+        { id: App.scenario.CAFE_CATEGORY, type: INCOME },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
@@ -131,12 +162,16 @@ const updateInvalid = async () => {
 const del = async () => {
     setBlock('Delete categories', 2);
 
-    const data = [
-        [App.scenario.INVEST_CATEGORY],
-        [App.scenario.BIKE_CATEGORY, App.scenario.LEARN_CATEGORY],
-    ];
+    const {
+        INVEST_CATEGORY,
+        SHOP_CATEGORY,
+        BIKE_CATEGORY,
+        LEARN_CATEGORY,
+    } = App.scenario;
 
-    return App.scenario.runner.runGroup(CategoryApiTests.del, data);
+    await CategoryApiTests.del(INVEST_CATEGORY);
+    await CategoryApiTests.del(SHOP_CATEGORY, false);
+    await CategoryApiTests.del([BIKE_CATEGORY, LEARN_CATEGORY]);
 };
 
 const delInvalid = async () => {

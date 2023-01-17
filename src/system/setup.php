@@ -1,5 +1,8 @@
 <?php
 
+use JezveMoney\Core\Locale;
+use JezveMoney\Core\MySqlDB;
+
 $noLogs = true;
 
 defineHostConstants();
@@ -10,12 +13,12 @@ require_once(APP_ROOT . "system/common.php");
 if (PRODUCTION) {
     ini_set("display_errors", "0");
     ini_set("display_startup_errors", "0");
-    ini_set("error_reporting", 0);
+    ini_set("error_reporting", "0");
     error_reporting(0);
 } else {
     ini_set("display_errors", "1");
     ini_set("display_startup_errors", "1");
-    ini_set('error_reporting', E_ALL & ~E_STRICT);
+    ini_set('error_reporting', strval(E_ALL & ~E_STRICT));
     error_reporting(E_ALL & ~E_STRICT);
 }
 
@@ -31,11 +34,12 @@ require_once(APP_ROOT . "vendor/autoload.php");
 setupLogs();
 
 $dbConfig = (require_once(APP_ROOT . "system/dbsetup.php"));
-JezveMoney\Core\MySqlDB::setup($dbConfig);
+MySqlDB::setup($dbConfig);
 
-date_default_timezone_set("Europe/Moscow");
+date_default_timezone_set("UTC");
+
+Locale::loadUserLocale();
 
 require_once(APP_ROOT . "system/Engine/Message.php");
-require_once(APP_ROOT . "system/msg_defines.php");
-require_once(APP_ROOT . "system/messages.php");
+
 wlog("==================================================");

@@ -14,23 +14,31 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
+/**
+ * Accounts controller
+ */
 class Accounts extends TemplateController
 {
     protected $model = null;
     protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
 
-
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->model = AccountModel::getInstance();
     }
 
-
+    /**
+     * /accounts/ route handler
+     * Renders accounts list view
+     */
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
-            "titleString" => "Jezve Money | Accounts",
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNTS"),
             "tilesArr" => [],
             "hiddenTilesArr" => []
         ];
@@ -51,17 +59,20 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
+    /**
+     * /accounts/create/ route handler
+     * Renders create account view
+     */
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => "Create account",
-            "titleString" => "Jezve Money | Create account"
+            "headString" => __("ACCOUNT_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_CREATE"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -71,32 +82,32 @@ class Accounts extends TemplateController
         $accInfo->name = "";
         $accInfo->curr_id = $currMod->getIdByPos(0);
         $accInfo->balance = 0;
-        $accInfo->initbalance = 0;
+        $accInfo->initbalance = "";
         $accInfo->icon_id = 0;
         $accInfo->icon = null;
         $accInfo->flags = 0;
 
         $currObj = $currMod->getItem($accInfo->curr_id);
         if (!$currObj) {
-            throw new \Error("Currency not found");
+            throw new \Error(__("ERR_CURR_NOT_FOUND"));
         }
 
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
         $data["tile"] = [
             "id" => "accountTile",
-            "title" => "New account",
+            "title" => __("ACCOUNT_NAME_NEW"),
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
-            "icon" => $accInfo->icon
+            "icon" => $accInfo->icon,
         ];
 
         $iconModel = IconModel::getInstance();
-        $data["icons"] = $iconModel->getData();
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
-            "icons" => $data["icons"],
+            "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,
             ],
@@ -108,27 +119,34 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
-    protected function fail($msg = null)
+    /**
+     * Controller error handler
+     *
+     * @param string|null $msg message string
+     */
+    protected function fail(?string $msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "accounts/");
     }
 
-
+    /**
+     * /accounts/update/ route handler
+     * Renders update account view
+     */
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => "Edit account",
-            "titleString" => "Jezve Money | Edit account"
+            "headString" => __("ACCOUNT_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_UPDATE"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -141,7 +159,7 @@ class Accounts extends TemplateController
 
         $accInfo = $this->model->getItem($acc_id);
         if (!$accInfo) {
-            $this->fail(ERR_ACCOUNT_UPDATE);
+            $this->fail(__("ERR_ACCOUNT_UPDATE"));
         }
 
         $currObj = $currMod->getItem($accInfo->curr_id);
@@ -157,12 +175,12 @@ class Accounts extends TemplateController
         ];
 
         $iconModel = IconModel::getInstance();
-        $data["icons"] = $iconModel->getData();
 
+        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
-            "icons" => $data["icons"],
+            "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,
             ],
@@ -174,14 +192,22 @@ class Accounts extends TemplateController
         $this->render($data);
     }
 
-
-    // Short alias for Coordinate::stringFromColumnIndex() method
-    private static function columnStr($ind)
+    /**
+     * Short alias for Coordinate::stringFromColumnIndex() method
+     *
+     * @param int $ind column index
+     *
+     * @return string
+     */
+    private static function columnStr(int $ind)
     {
         return Coordinate::stringFromColumnIndex($ind);
     }
 
-
+    /**
+     * /accounts/export/ route handler
+     * Prepares CSV file and sends it to user
+     */
     public function export()
     {
         $transMod = TransactionModel::getInstance();
@@ -204,13 +230,13 @@ class Accounts extends TemplateController
 
         $columns = [
             "id" => "ID",
-            "type" => "Type",
-            "src_amount" => "Source amount",
-            "dest_amount" => "Destination amount",
-            "src_result" => "Source result",
-            "dest_result" => "Destination result",
-            "date" => "Date",
-            "comment" => "Comment"
+            "type" => __("TR_TYPE"),
+            "src_amount" => __("TR_SRC_AMOUNT"),
+            "dest_amount" => __("TR_DEST_AMOUNT"),
+            "src_result" => __("TR_SRC_RESULT"),
+            "dest_result" => __("TR_DEST_RESULT"),
+            "date" => __("TR_DATE"),
+            "comment" => __("TR_COMMENT"),
         ];
 
         $colStr = [];

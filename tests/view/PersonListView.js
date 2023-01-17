@@ -100,9 +100,10 @@ export class PersonListView extends AppView {
         return 'list';
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
+            locale: cont.locale,
             tiles: cont.tiles.getItems(),
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
@@ -130,6 +131,9 @@ export class PersonListView extends AppView {
         );
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
@@ -364,7 +368,7 @@ export class PersonListView extends AppView {
 
         assert(this.content.delete_warning?.content?.visible, 'Delete person(s) warning popup not appear');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Show secified persons */

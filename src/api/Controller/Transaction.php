@@ -3,12 +3,11 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
-use JezveMoney\App\Model\AccountModel;
-use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Item\TransactionItem;
 
+/**
+ * Transactions API controller
+ */
 class Transaction extends ApiListController
 {
     protected $requiredFields = [
@@ -37,25 +36,27 @@ class Transaction extends ApiListController
         "comment"
     ];
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
 
         $this->model = TransactionModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_TRANS_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_TRANS_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_TRANS_DELETE);
+        $this->createErrorMsg = __("ERR_TRANS_CREATE");
+        $this->updateErrorMsg = __("ERR_TRANS_UPDATE");
+        $this->deleteErrorMsg = __("ERR_TRANS_DELETE");
     }
 
-
-    protected function prepareItem($item)
-    {
-        return new TransactionItem($item);
-    }
-
-
-    protected function prepareListRequest($request)
+    /**
+     * Returns list request prepared for controller-specific model
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function prepareListRequest(array $request)
     {
         $defaultParams = [
             "onPage" => 10,
@@ -80,7 +81,9 @@ class Transaction extends ApiListController
         return $res;
     }
 
-
+    /**
+     * Read items list
+     */
     public function getList()
     {
         $res = new \stdClass();
@@ -113,16 +116,28 @@ class Transaction extends ApiListController
         $this->ok($res);
     }
 
-
-    protected function getExpectedFields($request)
+    /**
+     * Returns array of mandatory fields
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function getExpectedFields(array $request)
     {
         $trans_type = intval($request["type"]);
 
         return ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
     }
 
-
-    protected function preCreate($request)
+    /**
+     * Performs controller-specific preparation of create request data
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function preCreate(array $request)
     {
         $trans_type = intval($request["type"]);
         if ($trans_type == DEBT) {
@@ -132,29 +147,37 @@ class Transaction extends ApiListController
         }
     }
 
-
-    protected function preUpdate($request)
+    /**
+     * Performs controller-specific preparation of update request data
+     *
+     * @param array $request update request data
+     *
+     * @return array
+     */
+    protected function preUpdate(array $request)
     {
         return $this->preCreate($request);
     }
 
-
+    /**
+     * Set category of transaction(s)
+     */
     public function setCategory()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, ["id", "category_id"]);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         if (!$this->model->setCategory($reqData["id"], $reqData["category_id"])) {
-            throw new \Error(Message::get(ERR_TRANS_SET_CATEGORY));
+            throw new \Error(__("ERR_TRANS_SET_CATEGORY"));
         }
 
         $this->commit();
@@ -162,23 +185,25 @@ class Transaction extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Sets position of transaction
+     */
     public function setPos()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, ["id", "pos"]);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         if (!$this->model->updatePosition($reqData["id"], $reqData["pos"])) {
-            throw new \Error(Message::get(ERR_TRANS_CHANGE_POS));
+            throw new \Error(__("ERR_TRANS_CHANGE_POS"));
         }
 
         $this->commit();
@@ -186,7 +211,9 @@ class Transaction extends ApiListController
         $this->ok();
     }
 
-
+    /**
+     * Returns statistics data
+     */
     public function statistics()
     {
         $res = new \stdClass();

@@ -27,7 +27,11 @@ export class TransactionListStory extends TestStory {
     }
 
     async runTests(directNavigate = false) {
-        const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
+        const {
+            FOOD_CATEGORY,
+            TRANSPORT_CATEGORY,
+            TAXES_CATEGORY,
+        } = App.scenario;
 
         if (directNavigate) {
             setBlock('Transaction List view: direct navigation', 1);
@@ -67,16 +71,24 @@ export class TransactionListStory extends TestStory {
             await TransactionListTests.goToFirstPage();
             await TransactionListTests.setCategory({
                 items: [0, 1],
-                category: FOOD_CATEGORY,
+                category: TAXES_CATEGORY,
             });
+
+            await TransactionListTests.filterByType({ type: EXPENSE, iteratePages: false });
             await TransactionListTests.setTransactionCategory({
-                index: 2,
+                index: 1,
                 category: FOOD_CATEGORY,
             });
             await TransactionListTests.setCategory({
-                items: [1],
+                items: [3, 5],
+                category: FOOD_CATEGORY,
+            });
+            await TransactionListTests.setCategory({
+                items: [1, 2],
                 category: 0,
             });
+            // Show all types
+            await TransactionListTests.filterByType({ type: 0, iteratePages: false });
         }
 
         await App.scenario.runner.runGroup(
@@ -113,10 +125,10 @@ export class TransactionListStory extends TestStory {
             },
         }, {
             action: TransactionListTests.filterByDate,
-            data: { start: App.dates.weekAgo, end: App.dates.now, directNavigate },
+            data: { start: App.datesFmt.weekAgo, end: App.datesFmt.now, directNavigate },
         }, {
             action: TransactionListTests.filterByDate,
-            data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+            data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
         }]);
 
         const searchData = [
@@ -133,7 +145,7 @@ export class TransactionListStory extends TestStory {
             { action: TransactionListTests.search, data: { text: '1', directNavigate } },
             {
                 action: TransactionListTests.filterByDate,
-                data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+                data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
             },
             { action: TransactionListTests.clearAllFilters, directNavigate },
         ]);

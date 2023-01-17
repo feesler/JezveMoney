@@ -8,7 +8,7 @@ import {
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { fixDate } from '../../js/utils.js';
+import { dateStringToTime, fixDate, timeToDate } from '../../js/utils.js';
 
 const defaultValidation = {
     stdate: true,
@@ -43,7 +43,9 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const { stdate, enddate } = data;
+        const stdate = (data.stdate) ? window.app.formatDate(timeToDate(data.stdate)) : null;
+        const enddate = (data.enddate) ? window.app.formatDate(timeToDate(data.enddate)) : null;
+
         this.setState({
             form: { stdate, enddate },
             filter: { stdate, enddate },
@@ -63,14 +65,14 @@ export class DateRangeInput extends Component {
             elem: this.elem.querySelector('input[name="stdate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
-            oninput: (e) => this.onStartDateInput(e),
+            onInput: (e) => this.onStartDateInput(e),
         });
 
         this.endDateInput = DateInput.create({
             elem: this.elem.querySelector('input[name="enddate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
-            oninput: (e) => this.onEndDateInput(e),
+            onInput: (e) => this.onEndDateInput(e),
         });
 
         this.clearBtn = this.elem.querySelector('.clear-btn');
@@ -92,9 +94,14 @@ export class DateRangeInput extends Component {
     }
 
     notifyChanged(data) {
-        if (isFunction(this.props.onChange)) {
-            this.props.onChange(data);
+        if (!isFunction(this.props.onChange)) {
+            return;
         }
+
+        this.props.onChange({
+            stdate: dateStringToTime(data.stdate),
+            enddate: dateStringToTime(data.enddate),
+        });
     }
 
     /**
@@ -198,10 +205,10 @@ export class DateRangeInput extends Component {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
+                locales: window.app.getCurrrentLocale(),
                 range: true,
-                onrangeselect: (range) => this.onRangeSelect(range),
-                onhide: () => this.onDatePickerHide(),
+                onRangeSelect: (range) => this.onRangeSelect(range),
+                onHide: () => this.onDatePickerHide(),
             });
             this.datePickerWrapper.append(this.datePicker.elem);
 

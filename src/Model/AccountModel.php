@@ -5,17 +5,18 @@ namespace JezveMoney\App\Model;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
-use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\AccountItem;
 
 use function JezveMoney\Core\inSetCondition;
 
 define("ACCOUNT_HIDDEN", 1);
 
+/**
+ * Accounts model
+ */
 class AccountModel extends CachedTable
 {
     use Singleton;
-    use CachedInstance;
 
     private static $user_id = 0;
     private static $owner_id = 0;
@@ -28,7 +29,9 @@ class AccountModel extends CachedTable
     protected $balanceUpdated = false;
     protected $removedItems = null;
 
-
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $uMod = UserModel::getInstance();
@@ -42,39 +45,37 @@ class AccountModel extends CachedTable
         $this->iconModel = IconModel::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row
+     *
+     * @return AccountItem|null
+     */
+    protected function rowToObj(array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->user_id = intval($row["user_id"]);
-        $res->name = $row["name"];
-        $res->owner_id = intval($row["owner_id"]);
-        $res->curr_id = intval($row["curr_id"]);
-        $res->balance = floatval($row["balance"]);
-        $res->initbalance = floatval($row["initbalance"]);
-        $res->icon_id = intval($row["icon_id"]);
-        $res->flags = intval($row["flags"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return AccountItem::fromTableRow($row);
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return \mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = ["owner_id", "name", "initbalance", "curr_id", "icon_id", "flags"];
         $res = [];
@@ -127,9 +128,15 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
@@ -139,9 +146,15 @@ class AccountModel extends CachedTable
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params item fields
+     * @param bool $isMultiple flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -152,9 +165,15 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id item id
+     * @param array $params item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -184,8 +203,14 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    protected function postUpdate($item_id)
+    /**
+     * Performs final steps after item was successfully updated
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function postUpdate(int $item_id)
     {
         $this->cleanCache();
 
@@ -197,11 +222,18 @@ class AccountModel extends CachedTable
 
         $this->currencyUpdated = false;
         $this->balanceUpdated = false;
+
+        return true;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         $this->removedItems = [];
 
@@ -223,8 +255,14 @@ class AccountModel extends CachedTable
         return true;
     }
 
-
-    protected function postDelete($items)
+    /**
+     * Performs final steps after items were successfully removed
+     *
+     * @param array $items ids array of removed items
+     *
+     * @return bool
+     */
+    protected function postDelete(array $items)
     {
         $this->cleanCache();
 
@@ -240,12 +278,17 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    public function show($items, $val = true)
+    /**
+     * Shows or hides specified accounts
+     *
+     * @param array|int|null $items id or array of account ids to show/hide
+     * @param bool $val show if true, hide otherwise
+     *
+     * @return bool
+     */
+    public function show(mixed $items, bool $val = true)
     {
-        if (!is_array($items)) {
-            $items = [$items];
-        }
+        $items = asArray($items);
 
         foreach ($items as $item_id) {
             // check account is exist
@@ -276,15 +319,27 @@ class AccountModel extends CachedTable
         return true;
     }
 
-
-    public function hide($items)
+    /**
+     * Hides specified accounts
+     *
+     * @param int|int[]|null $items id or array of account ids to hide
+     *
+     * @return bool
+     */
+    public function hide(mixed $items)
     {
         return $this->show($items, false);
     }
 
-
-    // Return account of person with specified currency if exist
-    public function getPersonAccount($person_id, $curr_id)
+    /**
+     * Returns account of person with specified currency if exist
+     *
+     * @param int $person_id person id
+     * @param int $curr_id currency id
+     *
+     * @return object|null
+     */
+    public function getPersonAccount(int $person_id, int $curr_id)
     {
         $person_id = intval($person_id);
         if ($person_id == self::$owner_id || !$this->personMod->isExist($person_id)) {
@@ -299,7 +354,7 @@ class AccountModel extends CachedTable
         }
 
         if (!$this->checkCache()) {
-            return false;
+            return null;
         }
 
         foreach ($this->cache as $item) {
@@ -311,9 +366,15 @@ class AccountModel extends CachedTable
         return null;
     }
 
-
-    // Create account with specified currency for person
-    public function createPersonAccount($person_id, $curr_id)
+    /**
+     * Creates account with specified currency for person
+     *
+     * @param int $person_id person id
+     * @param int $curr_id currency id
+     *
+     * @return object|null
+     */
+    public function createPersonAccount(int $person_id, int $curr_id)
     {
         $person_id = intval($person_id);
         if ($person_id == self::$owner_id || !$this->personMod->isExist($person_id)) {
@@ -339,16 +400,20 @@ class AccountModel extends CachedTable
         return $this->getItem($createRes);
     }
 
-
-    // Remove accounts of specified person(s)
-    public function onPersonDelete($persons)
+    /**
+     * Handles person(s) delete event
+     * Removes accounts of removed person(s)
+     *
+     * @param mixed $persons id or array of removed person ids
+     *
+     * @return bool
+     */
+    public function onPersonDelete(mixed $persons)
     {
         if (is_null($persons)) {
-            return;
+            return false;
         }
-        if (!is_array($persons)) {
-            $persons = [$persons];
-        }
+        $persons = asArray($persons);
 
         if (!$this->checkCache()) {
             return false;
@@ -364,43 +429,19 @@ class AccountModel extends CachedTable
         return $this->del($accToDel);
     }
 
-
-    // Set new value of account
-    private function setValue($acc_id, $field, $newValue)
-    {
-        if (!$acc_id || is_null($field) || $field == "") {
-            return false;
-        }
-
-        $newValue = $this->dbObj->escape($newValue);
-
-        if (
-            !$this->update(
-                $acc_id,
-                [
-                    $field => $newValue,
-                    "updatedate" => date("Y-m-d H:i:s")
-                ]
-            )
-        ) {
-            return false;
-        }
-
-        $this->cleanCache();
-
-        return true;
-    }
-
-
-    // Delete all accounts of user
-    public function reset($params = null)
+    /**
+     * Removes all accounts of user
+     *
+     * @param array $params array of options:
+     *     - 'deletePersons' => (bool) - remove person accounts flag, default is true
+     *     - 'users' => (int|array) - id or array of user ids to reset accounts, admin only
+     *
+     * @return bool
+     */
+    public function reset(array $params = [])
     {
         if (!$this->checkCache()) {
             return false;
-        }
-
-        if (!is_array($params)) {
-            $params = [];
         }
 
         $users = isset($params["users"]) ? $params["users"] : null;
@@ -409,9 +450,7 @@ class AccountModel extends CachedTable
         if (is_null($users)) {
             $users = self::$user_id;
         }
-        if (!is_array($users)) {
-            $users = [$users];
-        }
+        $users = asArray($users);
 
         // Normal user may reset only self data
         if (!UserModel::isAdminUser() && (count($users) != 1 || $users[0] != self::$user_id)) {
@@ -463,13 +502,19 @@ class AccountModel extends CachedTable
         return true;
     }
 
-
-    // Set balance of account
-    public function setBalance($acc_id, $balance)
+    /**
+     * Sets balance of account
+     *
+     * @param int $acc_id account id
+     * @param float $balance new balance
+     *
+     * @return bool
+     */
+    public function setBalance(int $acc_id, float $balance)
     {
         $accObj = $this->getItem($acc_id);
         if (!$accObj) {
-            return null;
+            return false;
         }
 
         if (!$this->dbObj->updateQ($this->tbl_name, ["balance" => $balance], "id=" . $acc_id)) {
@@ -481,8 +526,15 @@ class AccountModel extends CachedTable
         return true;
     }
 
-
-    public function updateBalances($balanceChanges, $updateInitial = false)
+    /**
+     * Updates balances of multiple accounts
+     *
+     * @param array $balanceChanges associative array of 'id' => 'balance' pairs
+     * @param bool $updateInitial copy balance to initial balance, default is false
+     *
+     * @return bool
+     */
+    public function updateBalances(array $balanceChanges, bool $updateInitial = false)
     {
         if (!is_array($balanceChanges)) {
             return false;
@@ -496,7 +548,7 @@ class AccountModel extends CachedTable
         foreach ($balanceChanges as $acc_id => $balance) {
             $accObj = $this->getItem($acc_id);
             if (!$accObj) {
-                return null;
+                return false;
             }
 
             if ($updateInitial) {
@@ -524,47 +576,20 @@ class AccountModel extends CachedTable
         return true;
     }
 
-
-    // Return name of account if owner is user or name of person else
-    public function getNameOrPerson($acc_id)
-    {
-        $accObj = $this->getItem($acc_id);
-        if (!$accObj || !isset($accObj->owner_id)) {
-            return null;
-        }
-
-        if (self::$owner_id == $accObj->owner_id) {
-            return $accObj->name;
-        } else {
-            $pObj = $this->personMod->getItem($accObj->owner_id);
-            if (!$pObj) {
-                return null;
-            }
-
-            return $pObj->name;
-        }
-    }
-
     /**
      * Returns array of accounts
      *
-     * @param array $params - array of parameters
-     *    $params = [
-     *      visibility - select accounts by visibility. Possible values: "all", "visible", "hidden"
-     *      owner - select accounts by owner. Possible values: "all", "user" or (int) for id
-     *      sort - sort result array. Possible value: "visibility"
-     *    ]
+     * @param array $params array of options:
+     *     - 'visibility' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'owner' => (string|int) - select accounts by owner. Possible values: "all", "user" or (int) for id
+     *     - 'sort' => (string) - sort result array. Possible value: "visibility"
      *
-     * @return [AccountItem]
+     * @return AccountItem[]
      */
-    public function getData($params = [])
+    public function getData(array $params = [])
     {
         if (!$this->checkCache()) {
             return [];
-        }
-
-        if (!is_array($params)) {
-            $params = [];
         }
 
         $includePersons = (isset($params["owner"]) && $params["owner"] == "all");
@@ -603,9 +628,7 @@ class AccountModel extends CachedTable
                 continue;
             }
 
-            $accObj = new AccountItem($item);
-
-            $res[] = $accObj;
+            $res[] = $item;
         }
 
         if ($sortByVisibility) {
@@ -617,9 +640,14 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    // Check item is hidden
-    public function isHidden($item)
+    /**
+     * Returns true if specified item is hidden
+     *
+     * @param object|int|null $item id or item object
+     *
+     * @return bool
+     */
+    public function isHidden(mixed $item)
     {
         if (is_int($item)) {
             $item = $this->getItem($item);
@@ -631,18 +659,21 @@ class AccountModel extends CachedTable
         return $item && ($item->flags & ACCOUNT_HIDDEN) == ACCOUNT_HIDDEN;
     }
 
-
-    // Return count of objects
-    public function getCount($params = null)
+    /**
+     * Returns count of accounts
+     *
+     * @param array $params array of options:
+     *     - 'type' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'full' => (bool) - include person accounts, default is false
+     *
+     * @return int
+     */
+    public function getCount(array $params = [])
     {
         $res = 0;
 
         if (!$this->checkCache()) {
             return $res;
-        }
-
-        if (!is_array($params)) {
-            $params = [];
         }
 
         $includePersons = (isset($params["full"]) && $params["full"] == true);
@@ -665,9 +696,14 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    // Return icon file name of specified account
-    public function getIconFile($item_id)
+    /**
+     * Returns icon file name of specified account
+     *
+     * @param int $item_id account id
+     *
+     * @return string|null
+     */
+    public function getIconFile(int $item_id)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -682,8 +718,11 @@ class AccountModel extends CachedTable
         return $icon->file;
     }
 
-
-    // Return array of total sums per each currency
+    /**
+     * Returns array of total sums per each currency
+     *
+     * @return array|null
+     */
     public function getTotalsArray()
     {
         $res = [];
@@ -712,16 +751,24 @@ class AccountModel extends CachedTable
         return $res;
     }
 
-
-    // Returns array of user accounts sorted by visibility
+    /**
+     * Returns array of user accounts sorted by visibility
+     *
+     * @return array
+     */
     public function getUserAccounts()
     {
         return $this->getData(["visibility" => "all", "sort" => "visibility"]);
     }
 
-
-    // Try to find account of user different from specified
-    public function getAnother($acc_id = 0)
+    /**
+     * Try to find account of user different from specified
+     *
+     * @param int $acc_id account id, default is 0
+     *
+     * @return int
+     */
+    public function getAnother(int $acc_id = 0)
     {
         $acc_id = intval($acc_id);
         $items = $this->getUserAccounts();
@@ -734,10 +781,17 @@ class AccountModel extends CachedTable
         return 0;
     }
 
-
-    public function findByName($acc_name, $caseSens = false)
+    /**
+     * Search for account with specified name
+     *
+     * @param string $name name of account to find
+     * @param bool $caseSens case sensitive flag, default is false
+     *
+     * @return object|null
+     */
+    public function findByName(string $name, bool $caseSens = false)
     {
-        if (is_empty($acc_name)) {
+        if (is_empty($name)) {
             return null;
         }
 
@@ -746,7 +800,7 @@ class AccountModel extends CachedTable
         }
 
         if (!$caseSens) {
-            $acc_name = strtolower($acc_name);
+            $name = strtolower($name);
         }
         foreach ($this->cache as $item) {
             // Skip accounts of persons
@@ -755,8 +809,8 @@ class AccountModel extends CachedTable
             }
 
             if (
-                ($caseSens && $item->name == $acc_name) ||
-                (!$caseSens && strtolower($item->name) == $acc_name)
+                ($caseSens && $item->name == $name) ||
+                (!$caseSens && strtolower($item->name) == $name)
             ) {
                 return $item;
             }

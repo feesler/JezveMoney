@@ -3,10 +3,11 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportConditionModel;
-use JezveMoney\App\Item\ImportConditionItem;
 
+/**
+ * Import conditions API controller
+ */
 class ImportCondition extends ApiListController
 {
     protected $requiredFields = [
@@ -18,25 +19,27 @@ class ImportCondition extends ApiListController
     ];
     protected $model = null;
 
-
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
 
         $this->model = ImportConditionModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_IMPORT_COND_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_IMPORT_COND_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_IMPORT_COND_DELETE);
+        $this->createErrorMsg = __("ERR_IMPORT_COND_CREATE");
+        $this->updateErrorMsg = __("ERR_IMPORT_COND_UPDATE");
+        $this->deleteErrorMsg = __("ERR_IMPORT_COND_DELETE");
     }
 
-
-    protected function prepareItem($item)
-    {
-        return new ImportConditionItem($item);
-    }
-
-
-    protected function prepareListRequest($request)
+    /**
+     * Returns list request prepared for controller-specific model
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function prepareListRequest(array $request)
     {
         $res = [];
         if (isset($request["full"]) && $request["full"] == true) {
@@ -49,34 +52,48 @@ class ImportCondition extends ApiListController
         return $res;
     }
 
-
-    protected function getListItems($request)
+    /**
+     * Returns array of items for specified request
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    protected function getListItems(array $request = [])
     {
         return $this->model->getData($request);
     }
 
-
+    /**
+     * Creates new item
+     */
     public function create()
     {
         $this->checkAdminAccess();
         parent::create();
     }
 
-
+    /**
+     * Creates multiple items
+     */
     public function createMultiple()
     {
         $this->checkAdminAccess();
         parent::createMultiple();
     }
 
-
+    /**
+     * Updates item
+     */
     public function update()
     {
         $this->checkAdminAccess();
         parent::update();
     }
 
-
+    /**
+     * Removes item(s)
+     */
     public function del()
     {
         $this->checkAdminAccess();

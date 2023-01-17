@@ -8,6 +8,7 @@ import {
     re,
     isFunction,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
@@ -74,6 +75,8 @@ export class Header extends Component {
             content: this.userNavContent,
             placement: 'right',
             className: 'user-navigation',
+            onOpened: () => this.onUserNavigationOpened(),
+            onClosed: () => this.onUserNavigationClosed(),
         });
         show(this.userNavContent, false);
 
@@ -81,6 +84,17 @@ export class Header extends Component {
         this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
         setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
 
+        // Locale select
+        this.localeSelect = DropDown.create({
+            elem: 'localeSelect',
+            className: 'dd_fullwidth',
+            onChange: (locale) => this.onLocaleChange(locale),
+            data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
+        });
+        const currentLocale = window.app.getCurrrentLocale();
+        this.localeSelect.setSelection(currentLocale);
+
+        // Theme swtich
         this.themeSwitch = Switch.fromElement(ge('theme-check'), {
             onChange: (checked) => this.onToggleTheme(checked),
         });
@@ -132,22 +146,38 @@ export class Header extends Component {
     }
 
     /** Show user navigation */
-    showUserNavigation(e) {
-        e.stopPropagation();
-
+    showUserNavigation() {
         this.hideNavigation();
         show(this.userNavContent, true);
         this.userNavigation.open();
-
-        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
     }
 
     /** Hide user navigation */
     hideUserNavigation() {
         this.userNavigation.close();
-        show(this.userNavContent, false);
+    }
 
+    /** User navigation 'opened' event handler */
+    onUserNavigationOpened() {
+        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
+    }
+
+    /** User navigation 'closed' event handler */
+    onUserNavigationClosed() {
+        show(this.userNavContent, false);
         removeEmptyClick(this.userNavEmptyClick);
+    }
+
+    /**
+     * Locale select 'change' event handler
+     * @param {Object} locale - selected locale
+     */
+    onLocaleChange(locale) {
+        if (!locale) {
+            return;
+        }
+
+        window.app.setLocale(locale.id);
     }
 
     /**

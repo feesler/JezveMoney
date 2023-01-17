@@ -36,7 +36,7 @@ export const createCategories = async () => {
     }, {
         name: 'Bike rent',
         parent_id: App.scenario.TRANSPORT_CATEGORY,
-        type: 0,
+        type: EXPENSE,
     }];
 
     const childRes = await api.category.createMultiple(childCategories);

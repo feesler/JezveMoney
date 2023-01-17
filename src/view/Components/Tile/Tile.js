@@ -3,6 +3,7 @@ import {
     svg,
     setAttributes,
     Component,
+    removeChilds,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import './style.scss';
@@ -147,7 +148,16 @@ export class Tile extends Component {
         }
 
         const subtitle = state.subtitle ?? '';
-        this.subTitleElem.textContent = subtitle;
+        removeChilds(this.subTitleElem);
+        if (Array.isArray(subtitle)) {
+            const subTitleElems = subtitle.map((textContent) => (
+                createElement('span', { props: { textContent } })
+            ));
+
+            this.subTitleElem.append(...subTitleElems);
+        } else {
+            this.subTitleElem.textContent = subtitle;
+        }
 
         this.elem.classList.toggle(WIDE_CLASS, (subtitle.length > SUBTITLE_LIMIT));
     }

@@ -11,10 +11,19 @@ use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 
-const MSG_NO_ACCOUNTS_AVAILABLE = "You have no one account. To start the import create one.";
-
+/**
+ * Import controller
+ */
 class Import extends TemplateController
 {
+    protected $templateModel = null;
+    protected $ruleModel = null;
+    protected $actionModel = null;
+    protected $catModel = null;
+
+    /**
+     * Controller initialization
+     */
     protected function onStart()
     {
         $this->templateModel = ImportTemplateModel::getInstance();
@@ -23,30 +32,32 @@ class Import extends TemplateController
         $this->catModel = CategoryModel::getInstance();
     }
 
-
+    /**
+     * /import/ route handler
+     * Renders import view
+     */
     public function index()
     {
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
 
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
-        $this->template->testerUser =  $this->uMod->isTester($this->user_id);
 
         $accounts = $accMod->getData(["visibility" => "all"]);
         $importAvailable = count($accounts) > 0;
 
         $data = [
+            "titleString" => __("APP_NAME") . " | " . __("IMPORT"),
             "accounts" => $accounts,
+            "testerUser" => $this->uMod->isTester($this->user_id),
             "importAvailable" => $importAvailable,
-            "importNotAvailableMessage" => MSG_NO_ACCOUNTS_AVAILABLE,
+            "importNotAvailableMessage" => __("IMPORT_NO_ACCOUNTS_MSG"),
             "importTemplates" => $this->templateModel->getData(),
             "tplColumnTypes" => $this->templateModel->getColumnTypes(),
             "importRules" => $this->ruleModel->getData(["extended" => true]),
             "uploadBtn" => [
                 "id" => "uploadBtn",
-                "classNames" => "circle-icon",
-                "title" => "Upload",
-                "icon" => "import"
+                "icon" => "import",
             ],
         ];
 
@@ -66,8 +77,6 @@ class Import extends TemplateController
 
         $this->cssArr[] = "ImportView.css";
         $this->jsArr[] = "ImportView.js";
-
-        $data["titleString"] = "Jezve Money | Import";
 
         $this->render($data);
     }

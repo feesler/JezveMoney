@@ -9,13 +9,16 @@ import {
     waitForFunction,
     click,
     queryAll,
+    evaluate,
+    isVisible,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { WarningPopup } from './component/WarningPopup.js';
+import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { CategoryItem } from './component/CategoryItem.js';
+import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -28,11 +31,34 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxDeleteBtn',
 ];
 
+const ANY_TYPE = 0;
+const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
+
+const getTypeString = (type) => (
+    (type !== 0)
+        ? Transaction.typeToString(type).toLowerCase()
+        : 'any'
+);
+
 /** List of categories view class */
 export class CategoryListView extends AppView {
     static render(state) {
         return {
-            items: state.categories.map((item) => CategoryItem.render(item)),
+            sections: transTypes.map((type) => {
+                const items = state.categories.filter((item) => item.type === type);
+                const visible = items.length > 0;
+                const section = {
+                    visible,
+                    name: getTypeString(type),
+                };
+                if (visible) {
+                    section.items = items.map((item) => ({
+                        content: CategoryItem.render(item),
+                    }));
+                }
+
+                return section;
+            }),
         };
     }
 
@@ -67,13 +93,37 @@ export class CategoryListView extends AppView {
         }
 
         // Categories list
-        const listContainer = await query('#contentContainer .categories-list');
-        const listItems = await queryAll(listContainer, '.category-item');
-        res.items = await asyncMap(listItems, (item) => CategoryItem.create(this, item));
-        res.renderTime = await prop(listContainer, 'dataset.time');
+        const sectionElems = await queryAll('#contentContainer .list-section');
+
+        res.sections = await asyncMap(sectionElems, async (elem) => {
+            const listContainer = await query(elem, '.categories-list');
+            const [
+                type,
+                renderTime,
+            ] = await evaluate((el, listEl) => ([
+                parseInt(el.dataset.type, 10),
+                parseInt(listEl.dataset.time, 10),
+            ]), elem, listContainer);
+
+            const listItems = await queryAll(listContainer, '.category-item');
+
+            return {
+                elem,
+                type,
+                visible: await isVisible(elem),
+                name: getTypeString(type),
+                renderTime,
+                items: await asyncMap(listItems, (item) => CategoryItem.create(this, item)),
+            };
+        });
+
+        res.renderTime = res.sections[0].renderTime;
 
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+        res.delete_warning = await DeleteCategoryDialog.create(
+            this,
+            await query('#delete_warning'),
+        );
 
         return res;
     }
@@ -109,14 +159,26 @@ export class CategoryListView extends AppView {
     buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
-            items: cont.items.map((item) => item.model),
+            locale: cont.locale,
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
             contextItem: cont.contextMenu.itemId,
             mode: this.getViewMode(cont),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
+            items: [],
         };
+
+        cont.sections.forEach((section) => {
+            const items = section.items.map((item) => {
+                const category = App.state.categories.getItem(item.model.id);
+                return {
+                    ...item.model,
+                    ...category,
+                };
+            });
+            res.items.push(...items);
+        });
 
         return res;
     }
@@ -134,6 +196,9 @@ export class CategoryListView extends AppView {
         );
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
@@ -150,6 +215,30 @@ export class CategoryListView extends AppView {
             },
             deleteBtn: { visible: showSelectItems && totalSelected > 0 },
         };
+
+        const categories = model.items.map((item) => {
+            const category = App.state.categories.getItem(item.id);
+            return {
+                ...item,
+                ...category,
+            };
+        });
+
+        res.sections = transTypes.map((type) => {
+            const items = categories.filter((item) => item.type === type);
+            const visible = items.length > 0;
+            const section = {
+                visible,
+                name: getTypeString(type),
+            };
+            if (visible) {
+                section.items = items.map((item) => ({
+                    content: CategoryItem.render(item),
+                }));
+            }
+
+            return section;
+        });
 
         if (model.contextMenuVisible) {
             const ctxCategory = App.state.categories.getItem(model.contextItem);
@@ -204,6 +293,21 @@ export class CategoryListView extends AppView {
         await this.parse();
     }
 
+    getItemByIndex(index) {
+        const { sections } = this.content;
+        let remain = index;
+        for (let i = 0; i < sections.length; i += 1) {
+            const section = sections[i];
+            if (remain < section.items.length) {
+                return section.items[remain];
+            }
+
+            remain -= section.items.length;
+        }
+
+        return null;
+    }
+
     async openContextMenu(index) {
         assert.arrayIndex(this.model.items, index, 'Invalid category index');
 
@@ -214,7 +318,9 @@ export class CategoryListView extends AppView {
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        const categoryItem = this.content.items[index];
+        const categoryItem = this.getItemByIndex(index);
+        assert(categoryItem, `Failed to obtain item [${index}]`);
+
         await this.performAction(() => categoryItem.clickMenu());
 
         return this.checkState(expected);
@@ -271,14 +377,18 @@ export class CategoryListView extends AppView {
 
         const indexes = asArray(data);
         for (const index of indexes) {
-            assert.arrayIndex(this.model.items, index, 'Invalid category index');
+            const categoryItem = this.getItemByIndex(index);
+            assert(categoryItem, `Failed to obtain item [${index}]`);
 
-            const item = this.model.items[index];
+            const item = this.model.items.find((category) => (
+                category.id === categoryItem.model.id
+            ));
+            assert(item, `Category '${categoryItem.model.id}' not found`);
+
             item.selected = !item.selected;
 
             const expected = this.getExpectedState();
 
-            const categoryItem = this.content.items[index];
             await this.waitForList(() => categoryItem.click());
 
             this.checkState(expected);
@@ -314,7 +424,7 @@ export class CategoryListView extends AppView {
         return this.checkState(expected);
     }
 
-    async deleteCategories(categories) {
+    async deleteCategories(categories, removeChildren = true) {
         await this.selectCategories(categories);
 
         await this.openListMenu();
@@ -327,6 +437,10 @@ export class CategoryListView extends AppView {
 
         assert(this.content.delete_warning?.content?.visible, 'Delete categories warning popup not appear');
 
-        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
+        if (removeChildren !== this.content.delete_warning.removeChildren) {
+            await this.content.delete_warning.toggleDeleteChilds();
+        }
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 }

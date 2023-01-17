@@ -14,6 +14,7 @@ import { Tile } from './component/Tiles/Tile.js';
 import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 
 /** Account view class */
 export class AccountView extends AppView {
@@ -42,7 +43,7 @@ export class AccountView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
-        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
+        res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
         res.name = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.name, 'Account name input not found');
@@ -66,8 +67,10 @@ export class AccountView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
-        const res = {};
+    buildModel(cont) {
+        const res = {
+            locale: cont.locale,
+        };
 
         res.isUpdate = cont.isUpdate;
         if (res.isUpdate) {
@@ -93,22 +96,35 @@ export class AccountView extends AppView {
         res.fBalance = res.balance;
 
         // Currency
-        const selectedCurr = cont.currDropDown.content.textValue;
-        res.currObj = App.currency.findByName(selectedCurr);
-        assert(res.currObj, `Currency '${selectedCurr}' not found`);
-
-        res.curr_id = res.currObj.id;
+        this.setModelCurrency(cont.currDropDown.value, res);
 
         // Icon
-        let iconObj = App.icons.findByName(cont.iconDropDown.content.textValue);
-        if (!iconObj) {
-            iconObj = Icon.noIcon();
-        }
-        res.tileIcon = iconObj;
-        res.icon_id = iconObj.id;
+        this.setModelIcon(cont.iconDropDown.value, res);
 
         // Flags
         res.flags = cont.flags;
+
+        return res;
+    }
+
+    setModelCurrency(value, model = this.model) {
+        const res = model;
+
+        res.curr_id = parseInt(value, 10);
+        res.currObj = App.currency.getItem(res.curr_id);
+        assert(res.currObj, `Currency '${value}' not found`);
+
+        return res;
+    }
+
+    setModelIcon(value, model = this.model) {
+        const res = model;
+
+        res.icon_id = parseInt(value, 10);
+        res.tileIcon = (res.icon_id !== 0)
+            ? App.icons.getItem(res.icon_id)
+            : Icon.noIcon();
+        assert(res.tileIcon, `Icon '${value}' not found`);
 
         return res;
     }
@@ -124,30 +140,27 @@ export class AccountView extends AppView {
         this.model.balance = account.balance.toString();
         this.model.fBalance = account.balance;
 
-        this.model.currObj = App.currency.getItem(account.curr_id);
-        assert(this.model.currObj, `Unexpected currency ${account.curr_id}`);
-
-        this.model.curr_id = this.model.currObj.id;
-        this.model.icon_id = account.icon_id;
+        this.setModelCurrency(account.curr_id);
+        this.setModelIcon(account.icon_id);
     }
 
-    getExpectedAccount() {
+    getExpectedAccount(model = this.model) {
         const res = {
-            name: this.model.name,
-            initbalance: this.model.fInitBalance,
-            curr_id: this.model.curr_id,
-            icon_id: this.model.icon_id,
-            flags: this.model.flags,
+            name: model.name,
+            initbalance: model.fInitBalance,
+            curr_id: model.curr_id,
+            icon_id: model.icon_id,
+            flags: model.flags,
         };
 
-        if (this.model.isUpdate) {
-            res.id = this.model.id;
+        if (model.isUpdate) {
+            res.id = model.id;
         }
 
-        const origBalance = (this.model.isUpdate && this.origAccount)
+        const origBalance = (model.isUpdate && this.origAccount)
             ? this.origAccount.balance
             : 0;
-        const origInitBalance = (this.model.isUpdate && this.origAccount)
+        const origInitBalance = (model.isUpdate && this.origAccount)
             ? this.origAccount.initbalance
             : 0;
 
@@ -156,23 +169,29 @@ export class AccountView extends AppView {
         return res;
     }
 
-    getExpectedState() {
-        const account = this.getExpectedAccount();
+    getExpectedState(model = this.model) {
+        const account = this.getExpectedAccount(model);
         const accTile = Tile.renderAccount(account);
 
-        if (!this.model.nameTyped && !this.model.isUpdate) {
-            accTile.title = 'New account';
+        if (!model.nameTyped && !model.isUpdate) {
+            accTile.title = __('ACCOUNT_NAME_NEW', this.locale);
         }
 
         accTile.visible = true;
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             heading: { visible: true },
             tile: accTile,
-            name: { value: this.model.name.toString(), visible: true },
-            balance: { value: this.model.initbalance.toString(), visible: true },
-            currDropDown: { textValue: this.model.currObj.name, visible: true },
-            iconDropDown: { textValue: this.model.tileIcon.name, visible: true },
+            name: { value: model.name.toString(), visible: true },
+            balance: { value: model.initbalance.toString(), visible: true },
+            currDropDown: { textValue: model.currObj.name, visible: true },
+            iconDropDown: {
+                textValue: __(model.tileIcon.name, this.locale),
+                visible: true,
+            },
         };
 
         return res;
@@ -206,9 +225,8 @@ export class AccountView extends AppView {
         await this.clickDeleteButton();
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
-        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await navigation(() => this.content.delete_warning.clickOk());
     }
 
     async inputName(val) {

@@ -7,6 +7,7 @@ import {
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';
+import { __ } from '../../../model/locale.js';
 
 export class ImportActionItem extends TestComponent {
     async parseContent() {
@@ -38,13 +39,13 @@ export class ImportActionItem extends TestComponent {
         const res = {};
 
         const actionName = cont.typeTitle.value;
-        const actionType = ImportAction.findActionByName(actionName);
+        const actionType = ImportAction.findActionByName(actionName, App.view.locale);
         assert(actionType, `Unknown action: '${actionName}'`);
         res.actionType = actionType.id;
 
         const { value } = cont.valueTitle;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
-            const transactionType = ImportTransaction.findTypeByName(value);
+            const transactionType = ImportTransaction.findTypeByName(value, App.view.locale);
             assert(transactionType, `Unknown transaction type: '${value}'`);
 
             res.value = transactionType.id;
@@ -95,7 +96,7 @@ export class ImportActionItem extends TestComponent {
             const transactionType = ImportTransaction.getTypeById(model.value);
             assert(transactionType, `Unknown transaction type: '${model.value}'`);
 
-            value = transactionType.title;
+            value = __(transactionType.titleToken, App.view.locale);
         } else if (ImportAction.isAccountValue(actionType.id)) {
             const account = App.state.accounts.getItem(model.value);
             assert(account, `Account not found: '${model.value}'`);

@@ -5,12 +5,13 @@ import {
     formatDate,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
-import { parseCookies, setCookie } from './utils.js';
+import { parseCookies, setCookie, __ } from './utils.js';
 
 /** CSS classes */
 const INVALID_BLOCK_CLASS = 'invalid-block';
-/** Strings */
-const HIDDEN_GROUP_TITLE = 'Hidden';
+
+export const DEFAULT_LOCALE = 'en';
+
 /** Theme constants */
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
@@ -26,7 +27,6 @@ export class Application {
         }
 
         this.config = {
-            datePickerLocale: 'en',
             dateFormatLocale: 'ru',
         };
 
@@ -67,12 +67,16 @@ export class Application {
         return this.props.themes;
     }
 
-    get message() {
-        return this.props.message;
+    get locale() {
+        return this.props.locale;
     }
 
-    get datePickerLocale() {
-        return this.config.datePickerLocale;
+    get locales() {
+        return this.props.locales;
+    }
+
+    get message() {
+        return this.props.message;
     }
 
     get dateFormatLocale() {
@@ -90,6 +94,11 @@ export class Application {
     getThemeCookie() {
         const cookies = parseCookies();
         return cookies.find((item) => item.name === 'theme');
+    }
+
+    getLocaleCookie() {
+        const cookies = parseCookies();
+        return cookies.find((item) => item.name === 'locale');
     }
 
     isPrefersDarkTheme() {
@@ -130,6 +139,11 @@ export class Application {
             return;
         }
 
+        const themeColor = ge('themeColor');
+        if (themeColor) {
+            themeColor.content = theme.color;
+        }
+
         const linkElem = ge('theme-style');
         if (linkElem) {
             linkElem.href = `${baseURL}${themesPath}${theme.file}`;
@@ -138,6 +152,37 @@ export class Application {
         document.body.className = theme.className;
 
         setCookie('theme', themeId);
+    }
+
+    getCurrrentLocale() {
+        return this.locale ?? DEFAULT_LOCALE;
+    }
+
+    setupLocale() {
+        const localeCookie = this.getLocaleCookie();
+        if (localeCookie?.value === this.locale) {
+            return;
+        }
+
+        setCookie('locale', this.locale);
+    }
+
+    setLocale(locale) {
+        if (this.getCurrrentLocale() === locale) {
+            return;
+        }
+
+        setCookie('locale', locale);
+        window.location.reload();
+    }
+
+    /**
+     * Navigates to the next URL
+     */
+    navigateNext() {
+        const { referrer } = document;
+        const nextURL = (referrer?.startsWith(this.baseURL)) ? referrer : this.baseURL;
+        window.location = nextURL;
     }
 
     /**
@@ -276,12 +321,12 @@ export class Application {
         }
 
         this.appendAccounts(ddlist, { visible: true });
-        this.appendAccounts(ddlist, { visible: false, group: HIDDEN_GROUP_TITLE });
+        this.appendAccounts(ddlist, { visible: false, group: __('LIST_HIDDEN') });
     }
 
     /** Initialize DropDown for debt account tile */
     initPersonsList(ddlist) {
         this.appendPersons(ddlist, { visible: true });
-        this.appendPersons(ddlist, { visible: false, group: HIDDEN_GROUP_TITLE });
+        this.appendPersons(ddlist, { visible: false, group: __('LIST_HIDDEN') });
     }
 }

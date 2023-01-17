@@ -25,7 +25,7 @@ export class ProfileDialog extends Component {
             className: [DIALOG_CLASS, className],
             content: this.elem,
             btn: { closeBtn: true },
-            onclose: () => this.onClose(),
+            onClose: () => this.onClose(),
         });
         show(this.elem, true);
 

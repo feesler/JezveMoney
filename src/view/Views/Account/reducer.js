@@ -24,6 +24,7 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             initbalance: true,
+            valid: true,
         },
         data: {
             ...state.data,
@@ -38,6 +39,7 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             name: true,
+            valid: true,
         },
         data: {
             ...state.data,

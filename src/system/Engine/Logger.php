@@ -2,12 +2,18 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Logger class
+ */
 class Logger
 {
     private static $filename = LOGS_PATH . "log.txt";
 
-
-    // Return total count of log files
+    /**
+     * Returns total count of log files
+     *
+     * @return int
+     */
     protected static function getLogsCount()
     {
         $files = glob(LOGS_PATH . "log*.txt");
@@ -25,8 +31,11 @@ class Logger
         return $res;
     }
 
-
-    // Write string to log file
+    /**
+     * Checks size of current log file and performs rotation if needed
+     *
+     * @return bool
+     */
     protected static function checkSize()
     {
         if (!file_exists(self::$filename)) {
@@ -64,8 +73,12 @@ class Logger
         return true;
     }
 
-    // Write string to log file
-    public static function write($str)
+    /**
+     * Writes string to log file
+     *
+     * @param string $str
+     */
+    public static function write(string $str)
     {
         if (file_exists(self::$filename) && !is_writable(self::$filename)) {
             return;
@@ -81,7 +94,11 @@ class Logger
         file_put_contents(self::$filename, $str . "\r\n", FILE_APPEND);
     }
 
-
+    /**
+     * Returns content of current log file
+     *
+     * @return string
+     */
     public static function read()
     {
         if (!file_exists(self::$filename) || !is_readable(self::$filename)) {
@@ -91,8 +108,9 @@ class Logger
         return file_get_contents(self::$filename);
     }
 
-
-    // Clean log file
+    /**
+     * Cleans current log file
+     */
     public static function clean()
     {
         if (!file_exists(self::$filename) || !is_writable(self::$filename)) {

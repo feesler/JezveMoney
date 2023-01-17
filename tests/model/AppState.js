@@ -5,10 +5,7 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import {
-    checkDate,
-    isValidValue,
-} from '../common.js';
+import { isValidValue } from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -185,21 +182,17 @@ export class AppState {
         return res;
     }
 
+    compareLists(local, expected) {
+        assert(local.length === expected.length);
+        assert.deepMeet(local.data, expected.data);
+    }
+
     meetExpectation(expected) {
-        assert(this.accounts.length === expected.accounts.length);
-        assert.deepMeet(this.accounts.data, expected.accounts.data);
-
-        assert(this.transactions.length === expected.transactions.length);
-        assert.deepMeet(this.transactions.data, expected.transactions.data);
-
-        assert(this.persons.length === expected.persons.length);
-        assert.deepMeet(this.persons.data, expected.persons.data);
-
-        assert(this.categories.length === expected.categories.length);
-        assert.deepMeet(this.categories.data, expected.categories.data);
-
-        assert(this.templates.length === expected.templates.length);
-        assert.deepMeet(this.templates.data, expected.templates.data);
+        this.compareLists(this.accounts, expected.accounts);
+        this.compareLists(this.transactions, expected.transactions);
+        this.compareLists(this.persons, expected.persons);
+        this.compareLists(this.categories, expected.categories);
+        this.compareLists(this.templates, expected.templates);
 
         assert(this.rules.length === expected.rules.length);
         this.rules.forEach((rule, index) => {
@@ -439,17 +432,6 @@ export class AppState {
         });
     }
 
-    getAccountIndexesByNames(names) {
-        this.cacheUserAccounts();
-
-        return asArray(names).map((name) => {
-            const acc = this.userAccountsCache.findByName(name);
-            assert(acc, `Account '${name}' not found`);
-
-            return this.userAccountsCache.getIndexById(acc.id);
-        });
-    }
-
     getFirstAccount() {
         const [account] = this.getAccountsByIndexes(0);
         return account;
@@ -659,17 +641,6 @@ export class AppState {
         });
     }
 
-    getPersonIndexesByNames(names) {
-        this.cachePersons();
-
-        return asArray(names).map((name) => {
-            const person = this.personsCache.findByName(name);
-            assert(person, `Person '${name}' not found`);
-
-            return this.personsCache.getIndexById(person.id);
-        });
-    }
-
     getFirstPerson() {
         const [person] = this.getPersonsByIndexes(0);
         return person;
@@ -695,14 +666,27 @@ export class AppState {
         }
 
         // Check parent category
+        // - If parent is set, it must refer to existing category
+        // - Parent category could be only top level category
+        // - Category can't be parent to itself
+        let parent = null;
         if (params.parent_id !== 0) {
-            const parent = this.categories.getItem(params.parent_id);
-            if (!parent || parent.parent_id !== 0) {
+            parent = this.categories.getItem(params.parent_id);
+            if (
+                !parent
+                || parent.parent_id !== 0
+                || (params.id && parent.id === params.id)
+            ) {
                 return false;
             }
         }
 
         if (params.type !== 0 && !availTransTypes.includes(params.type)) {
+            return false;
+        }
+
+        // Transaction type of subcategory must be the same as parent
+        if (parent && parent.type !== params.type) {
             return false;
         }
 
@@ -739,12 +723,29 @@ export class AppState {
         }
 
         this.categories.update(expItem);
+
+        const children = this.categories.findByParent(expItem.id);
+        children.forEach((item) => {
+            // Update transaction type of children categories
+            const category = {
+                ...item,
+                type: expItem.type,
+            };
+            // In case current item is subcategory then set same parent category for
+            // children categories to avoid third level of nesting
+            if (expItem.parent_id !== 0) {
+                category.parent_id = expItem.parent_id;
+            }
+
+            this.categories.update(category);
+        });
+
         this.categories.sortByParent();
 
         return true;
     }
 
-    deleteCategories(categoryIds) {
+    deleteCategories(categoryIds, removeChildren = true) {
         const ids = asArray(categoryIds);
         if (!ids.length) {
             return false;
@@ -754,15 +755,31 @@ export class AppState {
             return false;
         }
 
-        const categoriesToDelete = ids.flatMap((id) => ([
-            id,
-            ...this.categories.findByParent(id).map((item) => item.id),
-        ]));
+        const categoriesToDelete = [...ids];
+        const childrenCategories = ids.flatMap((id) => (
+            this.categories.findByParent(id).map((item) => item.id)
+        ));
+
+        if (removeChildren) {
+            categoriesToDelete.push(...childrenCategories);
+        } else {
+            childrenCategories.forEach((id) => {
+                const item = this.categories.getItem(id);
+
+                this.categories.update({
+                    ...item,
+                    parent_id: 0,
+                });
+            });
+        }
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteCategories(categoriesToDelete);
+        this.rules.deleteCategories(...categoriesToDelete);
 
         this.categories.deleteItems(categoriesToDelete);
+
+        this.categories.sortByParent();
 
         return true;
     }
@@ -773,6 +790,34 @@ export class AppState {
             assert(item, `Category '${name}' not found`);
             return (returnIds) ? item.id : item;
         });
+    }
+
+    getCategoriesForType(type) {
+        const res = [{ id: 0 }];
+
+        this.categories.forEach((category) => {
+            if (
+                category.parent_id !== 0
+                || (
+                    category.type !== 0
+                    && type !== null
+                    && category.type !== type
+                )
+            ) {
+                return;
+            }
+
+            res.push(category);
+
+            const children = this.categories.findByParent(category.id);
+            children.forEach((item) => {
+                assert(item.type === category.type, `Invalid transaction type: ${item.type}, ${category.type} is expected`);
+
+                res.push(item);
+            });
+        });
+
+        return res;
     }
 
     /**
@@ -875,7 +920,7 @@ export class AppState {
             }
         }
 
-        if ('date' in params && !checkDate(params.date)) {
+        if ('date' in params && !isInt(params.date)) {
             return false;
         }
 
@@ -921,7 +966,7 @@ export class AppState {
     getExpectedTransaction(params) {
         const res = copyObject(params);
         if (!res.date) {
-            res.date = App.dates.now;
+            res.date = App.datesSec.now;
         }
         if (typeof res.category_id !== 'number') {
             res.category_id = 0;

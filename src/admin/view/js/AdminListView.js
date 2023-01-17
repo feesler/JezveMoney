@@ -5,6 +5,7 @@ import {
     addChilds,
     removeChilds,
     show,
+    setEvents,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
@@ -54,13 +55,13 @@ export class AdminListView extends AdminView {
             || !this.itemForm) {
             throw new Error('Failed to initialize view');
         }
-        this.itemsListElem.addEventListener('click', this.onRowClick.bind(this));
-        this.createBtn.addEventListener('click', this.createItem.bind(this));
-        this.updateBtn.addEventListener('click', this.updateItem.bind(this));
-        this.deleteBtn.addEventListener('click', this.deleteItem.bind(this));
+        setEvents(this.itemsListElem, { click: (e) => this.onRowClick(e) });
+        setEvents(this.createBtn, { click: (e) => this.createItem(e) });
+        setEvents(this.updateBtn, { click: (e) => this.updateItem(e) });
+        setEvents(this.deleteBtn, { click: (e) => this.deleteItem(e) });
 
         /* popup initialization */
-        this.itemForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        setEvents(this.itemForm, { submit: (e) => this.onFormSubmit(e) });
         this.dialogPopup = Popup.create({
             id: this.elements.dialogPopup,
             content: this.itemForm,
@@ -162,7 +163,7 @@ export class AdminListView extends AdminView {
         ConfirmDialog.create({
             title: 'Delete',
             content: popupContent,
-            onconfirm: async () => {
+            onConfirm: async () => {
                 const reqURL = `${window.app.baseURL}api/${this.apiController}/del`;
                 const response = await fetch(reqURL, {
                     method: 'POST',

@@ -2,6 +2,9 @@
 
 namespace JezveMoney\Core;
 
+/**
+ * Controllers router class
+ */
 class Router
 {
     protected $routeNamespace = "";
@@ -12,63 +15,93 @@ class Router
     protected $onBeforeActionHandler = null;
     protected $onAfterActionHandler = null;
 
-
-    public function setNamespace($namespace)
+    /**
+     * Sets controllers namespace
+     *
+     * @param string $namespace
+     */
+    public function setNamespace(string $namespace)
     {
         if (is_string($namespace)) {
             $this->routeNamespace = $namespace;
         }
     }
 
-
-    public function setRoutes($map)
+    /**
+     * Sets routes map
+     *
+     * @param array $map
+     */
+    public function setRoutes(array $map)
     {
         if (is_array($map)) {
             $this->routes = $map;
         }
     }
 
-
-    public function setAliases($map)
+    /**
+     * Sets route aliases
+     *
+     * @param array $map
+     */
+    public function setAliases(array $map)
     {
         if (is_array($map)) {
             $this->aliasMap = $map;
         }
     }
 
-
-    public function setActionsMap($map)
+    /**
+     * Sets actions map
+     *
+     * @param array $map
+     */
+    public function setActionsMap(array $map)
     {
         if (is_array($map)) {
             $this->actionsMap = $map;
         }
     }
 
-
-    public function onStart($handler)
+    /**
+     * Sets 'controller initialization' callback
+     *
+     * @param callable $handler
+     */
+    public function onStart(callable $handler)
     {
         if (is_callable($handler)) {
             $this->onStartHandler = $handler;
         }
     }
 
-
-    public function onBeforeAction($handler)
+    /**
+     * Sets 'before action' callback
+     *
+     * @param callable $handler
+     */
+    public function onBeforeAction(callable $handler)
     {
         if (is_callable($handler)) {
             $this->onBeforeActionHandler = $handler;
         }
     }
 
-
-    public function onAfterAction($handler)
+    /**
+     * Sets 'after action' callback
+     *
+     * @param callable $handler
+     */
+    public function onAfterAction(callable $handler)
     {
         if (is_callable($handler)) {
             $this->onAfterActionHandler = $handler;
         }
     }
 
-
+    /**
+     * Handles routes
+     */
     public function route()
     {
         $controller = null;

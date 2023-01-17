@@ -4,6 +4,7 @@ import {
     url,
     navigation,
     query,
+    prop,
 } from 'jezve-test';
 import { Header } from './component/Header.js';
 import { Navigation } from './component/Navigation.js';
@@ -16,8 +17,15 @@ export class AppView extends TestView {
         return loggedOutLocations.every((item) => !this.location.includes(`/${item}`));
     }
 
+    get locale() {
+        return this.content.locale;
+    }
+
     async postParse() {
         this.location = await url();
+
+        const documentElem = await query('html');
+        this.content.locale = await prop(documentElem, 'lang');
 
         this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
         this.content.nav = await Navigation.create(this, await query('.offcanvas.navigation'));
@@ -32,6 +40,10 @@ export class AppView extends TestView {
         }
 
         await this.performAction(() => this.content.msgPopup.close());
+    }
+
+    async changeLocale(value) {
+        await navigation(() => this.content.header.selectLocale(value));
     }
 
     async goToProfile() {

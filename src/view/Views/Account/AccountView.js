@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import 'jezvejs/style/InputGroup';
 import {
     ge,
-    isNum,
     setEvents,
     insertAfter,
     enable,
@@ -12,7 +11,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
-import { normalize } from '../../js/utils.js';
+import { normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -26,12 +25,7 @@ import '../../Components/Heading/style.scss';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-
-const TITLE_ACCOUNT_DELETE = 'Delete account';
-const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
-const TITLE_NEW_ACCOUNT = 'New account';
-const MSG_EMPTY_NAME = 'Input name.';
-const MSG_EXISTING_NAME = 'Account with this name already exist.';
+import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 
 /**
  * Create/update account view
@@ -69,6 +63,7 @@ class AccountView extends View {
     onStart() {
         this.loadElementsByIds([
             'accountForm',
+            'iconField',
             'currencySign',
             'balanceInp',
             'nameInp',
@@ -78,14 +73,16 @@ class AccountView extends View {
         ]);
 
         this.tile = AccountTile.fromElement('accountTile');
-        this.iconSelect = DropDown.create({
-            elem: 'icon',
-            onitemselect: (o) => this.onIconSelect(o),
+
+        this.iconSelect = IconSelect.create({
             className: 'dd_fullwidth',
+            onItemSelect: (o) => this.onIconSelect(o),
         });
+        this.iconField.append(this.iconSelect.elem);
+
         this.currencySelect = DropDown.create({
             elem: 'currency',
-            onitemselect: (o) => this.onCurrencySelect(o),
+            onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencySelect);
@@ -93,11 +90,8 @@ class AccountView extends View {
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
             digits: 2,
-            oninput: (e) => this.onInitBalanceInput(e),
+            onInput: (e) => this.onInitBalanceInput(e),
         });
-        if (!this.initBalanceDecimalInput) {
-            throw new Error('Failed to initialize Account view');
-        }
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
@@ -158,17 +152,17 @@ class AccountView extends View {
 
         const { name, initbalance } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
+            this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_INVALID_NAME')));
             this.nameInp.focus();
         } else {
             const account = window.app.model.accounts.findByName(name);
             if (account && state.original.id !== account.id) {
-                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
+                this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_EXISTING_NAME')));
                 this.nameInp.focus();
             }
         }
 
-        if (initbalance.length === 0 || !isNum(initbalance)) {
+        if (initbalance.length === 0) {
             this.store.dispatch(actions.invalidateInitialBalanceField());
             this.balanceInp.focus();
         }
@@ -190,7 +184,7 @@ class AccountView extends View {
         const { data, original } = state;
         const account = {
             name: data.name,
-            initbalance: data.initbalance,
+            initbalance: data.fInitBalance,
             curr_id: data.curr_id,
             icon_id: data.icon_id,
             flags: original.flags,
@@ -202,13 +196,12 @@ class AccountView extends View {
 
         try {
             if (isUpdate) {
-                await API.account.update(data);
+                await API.account.update(account);
             } else {
-                await API.account.create(data);
+                await API.account.create(account);
             }
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}accounts/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -234,8 +227,7 @@ class AccountView extends View {
         try {
             await API.account.del({ id: original.id });
 
-            const { baseURL } = window.app;
-            window.location = `${baseURL}accounts/`;
+            window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
             window.app.createMessage(e.message, 'msg_error');
@@ -251,9 +243,9 @@ class AccountView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: TITLE_ACCOUNT_DELETE,
-            content: MSG_ACCOUNT_DELETE,
-            onconfirm: () => this.deleteAccount(),
+            title: __('ACCOUNT_DELETE'),
+            content: __('MSG_ACCOUNT_DELETE'),
+            onConfirm: () => this.deleteAccount(),
         });
     }
 
@@ -267,7 +259,7 @@ class AccountView extends View {
             + state.data.fInitBalance - state.original.initbalance;
 
         const name = (!state.original.id && !state.nameChanged)
-            ? TITLE_NEW_ACCOUNT
+            ? __('ACCOUNT_NAME_NEW')
             : state.data.name;
 
         this.tile.setState((tileState) => ({
@@ -283,7 +275,7 @@ class AccountView extends View {
         // Currency sign
         const currencyObj = window.app.model.currency.getItem(state.data.curr_id);
         if (!currencyObj) {
-            throw new Error('Currency not found');
+            throw new Error(__('ERR_CURR_NOT_FOUND'));
         }
 
         this.currencySign.textContent = currencyObj.sign;
@@ -300,10 +292,11 @@ class AccountView extends View {
         enable(this.balanceInp, !state.submitStarted);
 
         // Icon select
+        this.iconSelect.setSelection(state.data.icon_id);
         this.iconSelect.enable(!state.submitStarted);
 
         // Currency select
-        this.currencySelect.selectItem(state.data.curr_id);
+        this.currencySelect.setSelection(state.data.curr_id);
         this.currencySelect.enable(!state.submitStarted);
 
         enable(this.submitBtn, !state.submitStarted);

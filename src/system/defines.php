@@ -6,7 +6,7 @@ APP_DOMAIN - application domain
 APP_PROTOCOL - http:// or https://
 APP_ROOT - path to the root directory
 APP_PATH - relative path for cookies
-PRODUCTION - is production (boolean)
+PRODUCTION - is production (bool)
 LOCAL_DEV - is local development environment
 BASEURL - base URL for project
 TPL_PATH - path to the templates directory
@@ -15,18 +15,27 @@ UPLOAD_PATH - path to the uploads directory
 LOGS_PATH - path to the logs directory
 */
 
-define("APP_VERSION", "1.43.0");
+define("APP_VERSION", "1.44.0");
 define("APP_PROTOCOL", "https://");
 
 define("PROD_HOST", "jezvemoney.ru");
 define("DEV_HOST", "jezve.net");
 define("LOCAL_DEV_HOST", "testsrv");
 
+define("DEFAULT_LOCALE", "en");
+
 define("MAX_LOG_SIZE", 1024 * 1024);
 define("MAX_LOG_FILES", 10);
 
 
-function domainFromHost($host)
+/**
+ * Returns domain name from specified host string
+ *
+ * @param string $host
+ *
+ * @return string
+ */
+function domainFromHost(string $host)
 {
     $pos = strpos($host, ":");
     if ($pos !== false) {
@@ -36,7 +45,11 @@ function domainFromHost($host)
     }
 }
 
-
+/**
+ * Checks current host is valid
+ *
+ * @return string
+ */
 function verifyHost()
 {
     $avHosts = [PROD_HOST, DEV_HOST, LOCAL_DEV_HOST];
@@ -49,7 +62,11 @@ function verifyHost()
     return $_SERVER["HTTP_HOST"];
 }
 
-
+/**
+ * Return application root directory
+ *
+ * @return string
+ */
 function getRootDir()
 {
     $res = $_SERVER['DOCUMENT_ROOT'];
@@ -60,7 +77,13 @@ function getRootDir()
     return $res;
 }
 
-
+/**
+ * Returns string of joined path segments
+ *
+ * @param mixed ...$segments
+ *
+ * @return string
+ */
 function pathJoin(...$segments)
 {
     if (!is_array($segments) || !count($segments)) {
@@ -78,7 +101,9 @@ function pathJoin(...$segments)
     return $res;
 }
 
-
+/**
+ * Initializes host specific constants
+ */
 function defineHostConstants()
 {
     $host = verifyHost();

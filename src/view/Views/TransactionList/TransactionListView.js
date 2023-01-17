@@ -12,6 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { __ } from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { Application } from '../../js/Application.js';
@@ -29,38 +30,10 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './style.scss';
-import { Field } from '../../Components/Field/Field.js';
-
-/* Strings */
-const STR_TITLE = 'Transactions';
-const PAGE_TITLE = 'Jezve Money | Transactions';
-const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
-/* Delete transactions confirm dialog */
-const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
-const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
-const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
-const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
-/* */
-const TITLE_BTN_SET_CATEGORY = 'Set category...';
-/* Select category dialog */
-const TITLE_DIALOG_SET_CATEGORY = 'Set category';
-const TITLE_CATEGORY = 'Category';
-/* Mode selector items */
-const TITLE_SHOW_MAIN = 'Show main';
-const TITLE_SHOW_DETAILS = 'Show details';
-/* Date range input */
-const START_DATE_PLACEHOLDER = 'From';
-const END_DATE_PLACEHOLDER = 'To';
-/* 'Show more' button */
-const TITLE_SHOW_MORE = 'Show more...';
-/* Accounts and persons filter */
-const ACCOUNTS_GROUP_TITLE = 'Accounts';
-const PERSONS_GROUP_TITLE = 'Persons';
-const HIDDEN_ACCOUNTS_GROUP_TITLE = 'Hidden accounts';
-const HIDDEN_PERSONS_GROUP_TITLE = 'Hidden persons';
 
 const SEARCH_DELAY = 500;
 
@@ -84,6 +57,7 @@ class TransactionListView extends View {
             showCategoryDialog: false,
             categoryDialog: {
                 categoryId: 0,
+                type: 0,
             },
             renderTime: Date.now(),
         };
@@ -120,7 +94,7 @@ class TransactionListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('TRANSACTIONS'),
         });
 
         // Filters
@@ -149,33 +123,33 @@ class TransactionListView extends View {
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
-                placeholder: 'Type to filter',
+                placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
                 noResultsMessage: 'Nothing found',
-                onitemselect: (obj) => this.onAccountChange(obj),
-                onchange: (obj) => this.onAccountChange(obj),
+                onItemSelect: (obj) => this.onAccountChange(obj),
+                onChange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
             });
 
             window.app.appendAccounts(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'a',
-                group: ACCOUNTS_GROUP_TITLE,
+                group: __('ACCOUNTS'),
             });
             window.app.appendAccounts(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'a',
-                group: HIDDEN_ACCOUNTS_GROUP_TITLE,
+                group: __('ACCOUNTS_HIDDEN'),
             });
             window.app.appendPersons(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'p',
-                group: PERSONS_GROUP_TITLE,
+                group: __('PERSONS'),
             });
             window.app.appendPersons(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'p',
-                group: HIDDEN_PERSONS_GROUP_TITLE,
+                group: __('PERSONS_HIDDEN'),
             });
         }
 
@@ -185,25 +159,25 @@ class TransactionListView extends View {
         } else {
             this.categoriesDropDown = CategorySelect.create({
                 elem: 'category_id',
-                placeholder: 'Type to filter',
+                placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
-                noResultsMessage: 'Nothing found',
-                onitemselect: (obj) => this.onCategoryChange(obj),
-                onchange: (obj) => this.onCategoryChange(obj),
+                noResultsMessage: __('NOT_FOUND'),
+                onItemSelect: (obj) => this.onCategoryChange(obj),
+                onChange: (obj) => this.onCategoryChange(obj),
                 className: 'dd_fullwidth',
             });
         }
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
-            startPlaceholder: START_DATE_PLACEHOLDER,
-            endPlaceholder: END_DATE_PLACEHOLDER,
+            startPlaceholder: __('DATE_RANGE_FROM'),
+            endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
         // Search input
         this.searchInput = SearchInput.create({
-            placeholder: 'Type to filter',
+            placeholder: __('TYPE_TO_FILTER'),
             onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);
@@ -239,7 +213,7 @@ class TransactionListView extends View {
             props: {
                 className: 'btn show-more-btn',
                 type: 'button',
-                textContent: TITLE_SHOW_MORE,
+                textContent: __('SHOW_MORE'),
             },
             events: { click: (e) => this.showMore(e) },
         });
@@ -256,8 +230,8 @@ class TransactionListView extends View {
         // 'Done' button
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
-            className: 'no-icon',
-            title: 'Done',
+            className: 'action-button',
+            title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -276,35 +250,35 @@ class TransactionListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: 'Sort',
+                title: __('SORT'),
                 onClick: () => this.onMenuClick('sortModeBtn'),
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'setCategoryBtn',
-                title: TITLE_BTN_SET_CATEGORY,
+                title: __('SET_CATEGORY'),
                 onClick: () => this.onMenuClick('setCategoryBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -314,7 +288,7 @@ class TransactionListView extends View {
             sortModeBtn: () => this.setListMode('sort'),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
-            setCategoryBtn: () => this.showCategoryDialog(true),
+            setCategoryBtn: () => this.showCategoryDialog(),
             deleteBtn: () => this.confirmDelete(),
         };
     }
@@ -327,45 +301,19 @@ class TransactionListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxSetCategoryBtn',
-                title: TITLE_BTN_SET_CATEGORY,
-                onClick: () => this.showCategoryDialog(true),
+                title: __('SET_CATEGORY'),
+                onClick: () => this.showCategoryDialog(),
             }, {
                 type: 'separator',
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
-        });
-    }
-
-    createSetCategoryDialog() {
-        if (this.setCategoryDialog) {
-            return;
-        }
-
-        this.categorySelect = CategorySelect.create({
-            className: 'dd_fullwidth',
-            onchange: (category) => this.onChangeCategorySelect(category),
-        });
-        this.categoryField = Field.create({
-            title: TITLE_CATEGORY,
-            content: this.categorySelect.elem,
-            className: 'view-row',
-        });
-
-        this.setCategoryDialog = ConfirmDialog.create({
-            id: 'selectCategoryDialog',
-            title: TITLE_DIALOG_SET_CATEGORY,
-            content: this.categoryField.elem,
-            className: 'category-dialog',
-            destroyOnResult: false,
-            onconfirm: () => this.setItemsCategory(),
-            onreject: () => this.closeCategoryDialog(),
         });
     }
 
@@ -471,7 +419,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(MSG_SET_POS_FAIL, 'msg_error');
+        window.app.createMessage(__('ERR_TR_SET_POS'), 'msg_error');
     }
 
     /** Returns URL for filter of specified state */
@@ -615,9 +563,9 @@ class TransactionListView extends View {
         const multi = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
-            content: (multi) ? MSG_MULTI_TRANS_DELETE : MSG_SINGLE_TRANS_DELETE,
-            onconfirm: () => this.deleteItems(),
+            title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
+            content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
+            onConfirm: () => this.deleteItems(),
         });
     }
 
@@ -708,7 +656,8 @@ class TransactionListView extends View {
 
     replaceHistory() {
         const url = this.getFilterURL(this.store.getState());
-        window.history.replaceState({}, PAGE_TITLE, url);
+        const pageTitle = `${__('APP_NAME')} ${__('TRANSACTIONS')}`;
+        window.history.replaceState({}, pageTitle, url);
     }
 
     async requestTransactions(options) {
@@ -790,23 +739,12 @@ class TransactionListView extends View {
             return;
         }
 
-        const selectedItems = this.accountDropDown.getSelectedItems();
-        const selectedIds = [];
         const idsToSelect = [
             ...asArray(state.form.acc_id).map((id) => `a${id}`),
             ...asArray(state.form.person_id).map((id) => `p${id}`),
         ];
-        selectedItems.forEach(({ id }) => {
-            selectedIds.push(id);
-            if (!idsToSelect.includes(id)) {
-                this.accountDropDown.deselectItem(id);
-            }
-        });
-        idsToSelect.forEach((id) => {
-            if (!selectedIds.includes(id)) {
-                this.accountDropDown.selectItem(id.toString());
-            }
-        });
+
+        this.accountDropDown.setSelection(idsToSelect);
     }
 
     /** Render categories selection */
@@ -815,32 +753,31 @@ class TransactionListView extends View {
             return;
         }
 
-        const selectedItems = this.categoriesDropDown.getSelectedItems();
-        const selectedIds = [];
-        const idsToSelect = asArray(state.form.category_id);
-        selectedItems.forEach(({ id }) => {
-            selectedIds.push(id);
-            if (!idsToSelect.includes(id)) {
-                this.categoriesDropDown.deselectItem(id);
-            }
-        });
-        idsToSelect.forEach((id) => {
-            if (!selectedIds.includes(id)) {
-                this.categoriesDropDown.selectItem(id.toString());
-            }
-        });
+        this.categoriesDropDown.setSelection(state.form.category_id);
     }
 
     renderCategoryDialog(state, prevState) {
-        if (state.showCategoryDialog === prevState?.showCategoryDialog) {
+        if (state.categoryDialog === prevState?.categoryDialog) {
             return;
         }
 
-        if (state.showCategoryDialog) {
-            this.createSetCategoryDialog();
+        if (state.categoryDialog.show && !this.setCategoryDialog) {
+            this.setCategoryDialog = SetCategoryDialog.create({
+                onChange: (category) => this.onChangeCategorySelect(category),
+                onSubmit: () => this.setItemsCategory(),
+                onCancel: () => this.closeCategoryDialog(),
+            });
         }
-        this.setCategoryDialog?.show(state.showCategoryDialog);
-        this.categorySelect?.selectItem(state.categoryDialog.categoryId);
+        if (!this.setCategoryDialog) {
+            return;
+        }
+
+        this.setCategoryDialog.setState((dialogState) => ({
+            ...dialogState,
+            categoryId: state.categoryDialog.categoryId,
+            type: state.categoryDialog.type,
+        }));
+        this.setCategoryDialog.show(state.categoryDialog.show);
     }
 
     render(state, prevState = {}) {
@@ -909,7 +846,7 @@ class TransactionListView extends View {
         this.modeSelector.setState((modeSelectorState) => ({
             ...modeSelectorState,
             icon: (isDetails) ? 'mode-list' : 'mode-details',
-            title: (isDetails) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS,
+            title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
             url: filterUrl.toString(),
         }));
 

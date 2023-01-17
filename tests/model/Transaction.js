@@ -1,5 +1,6 @@
 import { assert } from 'jezve-test';
 import { App } from '../Application.js';
+import { secondsToDateString } from '../common.js';
 
 /** Types of transactions */
 export const EXPENSE = 1;
@@ -25,15 +26,13 @@ export class Transaction {
     }
 
     static strToType(str) {
-        /* eslint-disable quote-props */
         const strToType = {
-            'ALL': 0,
-            'EXPENSE': EXPENSE,
-            'INCOME': INCOME,
-            'TRANSFER': TRANSFER,
-            'DEBT': DEBT,
+            ALL: 0,
+            EXPENSE,
+            INCOME,
+            TRANSFER,
+            DEBT,
         };
-        /* eslint-enable quote-props */
 
         if (!str) {
             return null;
@@ -41,6 +40,11 @@ export class Transaction {
 
         const key = str.toUpperCase();
         return (key in strToType) ? strToType[key] : null;
+    }
+
+    /** Converts transaction date in seconds to date string */
+    static formatDate(date) {
+        return secondsToDateString(date);
     }
 
     // Try to convert specified short declaration of transaction to full object
@@ -57,7 +61,7 @@ export class Transaction {
         const extractor = extractMap[params.type];
         const res = extractor(params, state);
         if (!res.date) {
-            res.date = App.dates.now;
+            res.date = App.datesSec.now;
         }
         if (typeof res.category_id === 'undefined') {
             res.category_id = 0;

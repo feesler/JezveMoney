@@ -1,8 +1,8 @@
-/* Main view */
-.main-view {
+.content-container {
   display: inline-flex;
   flex-flow: row wrap;
   width: 100%;
+  position: relative;
 }
 
 /* Main page widgets */

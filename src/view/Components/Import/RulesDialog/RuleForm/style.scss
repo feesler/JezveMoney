@@ -51,10 +51,6 @@
     height: 18px;
   }
 
-  &.collapsible__expanded .toggle-icon {
-    transform: rotate(180deg);
-  }
-
   /* Conditions/Actions list container */
   .collapsible-content {
     display: block;
@@ -68,20 +64,31 @@
     border-bottom-right-radius: 5px;
   }
 
-  &.collapsible__expanded > .collapsible-content {
-    height: auto;
-    min-height: 48px;
-    max-height: none;
-    padding: 6px;
-    margin: 0 1px;
-  }
-
   .link-btn {
     display: none;
   }
 
-  &.collapsible__expanded .link-btn {
-    display: inline-block;
+  &.collapsible__expanded {
+    .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .collapsible-header {
+      box-shadow: 0 2px 5px -2px #00000088;
+      z-index: 2;
+    }
+
+    .collapsible-content {
+      height: auto;
+      min-height: 48px;
+      max-height: none;
+      padding: 6px;
+      margin: 0 1px;
+    }
+
+    .link-btn {
+      display: inline-block;
+    }
   }
 }
 

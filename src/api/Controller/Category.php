@@ -3,27 +3,36 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
 use JezveMoney\App\Model\CategoryModel;
-use JezveMoney\App\Item\CategoryItem;
 
+/**
+ * Categories API controller
+ */
 class Category extends ApiListController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
 
+    /**
+     * Controller initialization
+     */
     public function initAPI()
     {
         parent::initAPI();
 
         $this->model = CategoryModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_CATEGORY_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_CATEGORY_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_CATEGORY_DELETE);
+        $this->createErrorMsg = __("ERR_CATEGORY_CREATE");
+        $this->updateErrorMsg = __("ERR_CATEGORY_UPDATE");
+        $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
     }
 
-
-    protected function prepareItem($item)
+    /**
+     * Removes categories
+     */
+    public function del()
     {
-        return new CategoryItem($item);
+        $request = $this->getRequestData();
+        $this->model->removeChild = $request["removeChild"] ?? true;
+
+        parent::del();
     }
 }

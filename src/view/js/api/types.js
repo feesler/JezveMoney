@@ -134,7 +134,7 @@ export const isTransaction = (obj) => verifyObject(obj, {
     dest_curr: isInt,
     src_result: isNum,
     dest_result: isNum,
-    date: isDateString,
+    date: isInt,
     category_id: isInt,
     comment: isString,
     pos: isInt,

@@ -1,14 +1,11 @@
 import { createElement, Component } from 'jezvejs';
+import { __ } from '../../../js/utils.js';
 import './style.scss';
 
 /* CSS classes */
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
 const SIMILAR_LINK_CLASS = 'similar__link';
-
-/* Strings */
-const STR_SIMILAR_FOUND = 'Similar transaction found: ';
-const STR_SIMILAR_LINK = 'Edit';
 
 export class SimilarTransactionInfo extends Component {
     constructor(props) {
@@ -32,14 +29,14 @@ export class SimilarTransactionInfo extends Component {
                 createElement('div', {
                     props: {
                         className: SIMILAR_TITLE_CLASS,
-                        textContent: STR_SIMILAR_FOUND,
+                        textContent: __('IMPORT_SIMILAR_FOUND'),
                     },
                 }),
                 createElement('a', {
                     props: {
                         className: SIMILAR_LINK_CLASS,
                         href: url,
-                        textContent: STR_SIMILAR_LINK,
+                        textContent: __('UPDATE'),
                     },
                 }),
             ],
