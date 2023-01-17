@@ -377,6 +377,7 @@ export class ImportTransactionForm extends Component {
     createCategoryField() {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
+            enableFilter: true,
             onChange: (category) => this.onCategoryChanged(category),
         });
 

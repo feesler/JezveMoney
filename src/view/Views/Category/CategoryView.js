@@ -96,6 +96,7 @@ class CategoryView extends View {
             className: 'dd_fullwidth',
             parentCategorySelect: true,
             exclude: original.id,
+            enableFilter: true,
             onItemSelect: (o) => this.onParentSelect(o),
         });
     }

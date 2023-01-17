@@ -350,6 +350,7 @@ class TransactionView extends View {
         this.categorySelect = CategorySelect.create({
             elem: this.categorySelect,
             className: 'dd_fullwidth',
+            enableFilter: true,
             onChange: (category) => this.onCategoryChanged(category),
         });
 

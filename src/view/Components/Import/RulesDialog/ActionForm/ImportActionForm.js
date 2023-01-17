@@ -191,6 +191,7 @@ export class ImportActionForm extends Component {
     createAccountField() {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
+            enableFilter: true,
             onChange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -200,6 +201,7 @@ export class ImportActionForm extends Component {
     createPersonField() {
         this.personDropDown = DropDown.create({
             className: PERSON_FIELD_CLASS,
+            enableFilter: true,
             onChange: () => this.onValueChange(),
         });
         window.app.initPersonsList(this.personDropDown);
@@ -209,6 +211,7 @@ export class ImportActionForm extends Component {
     createCategoryField() {
         this.categorySelect = CategorySelect.create({
             className: CATEGORY_FIELD_CLASS,
+            enableFilter: true,
             onChange: () => this.onValueChange(),
         });
     }
