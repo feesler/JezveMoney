@@ -507,18 +507,18 @@ label {
 .total-list {
   display: flex;
   flex-flow: row wrap;
-  gap: 10px;
+  gap: 12px;
   min-width: 220px;
   max-width: 300px;
 }
 
 .total-list__item {
   display: inline-flex;
-  padding: 5px;
-  font-size: 14px;
+  font-size: 1rem;
+  padding: 5px 0;
   white-space: nowrap;
-  color: #000000;
-  background-color: #d0d0d0;
+  border: 0;
+  border-bottom: 2px solid var(--accent-color-alt);
 }
 
 /* Radio */
