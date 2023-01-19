@@ -138,7 +138,9 @@ export class Heading extends Component {
         if (state.inHeader) {
             this.elem.style.height = px(this.elem.offsetHeight);
         } else {
-            this.elem.append(this.actionsContainer);
+            if (this.actionsContainer) {
+                this.elem.append(this.actionsContainer);
+            }
             this.elem.style.height = '';
         }
     }
