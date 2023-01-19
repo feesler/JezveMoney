@@ -10,8 +10,8 @@ import { generateId } from '../common.js';
 import { CategoryListView } from '../view/CategoryListView.js';
 import { CategoryView } from '../view/CategoryView.js';
 import { App } from '../Application.js';
-import { Transaction } from '../model/Transaction.js';
 import { __ } from '../model/locale.js';
+import { Category } from '../model/Category.js';
 
 /** Navigate to categories list page */
 const checkNavigation = async () => {
@@ -69,6 +69,25 @@ export const update = async (index) => {
 /** Navigate to update category view by id */
 export const updateById = (id) => update(App.state.categories.getIndexById(id));
 
+export const showDetails = async ({ index, directNavigate = false }) => {
+    await App.state.fetch();
+
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Position of category not specified');
+
+    await test(`Show details of category [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.showDetails(index, directNavigate);
+    });
+};
+
+export const closeDetails = async (directNavigate = false) => {
+    await test('Close category details', async () => {
+        await checkNavigation();
+        return App.view.closeDetails(directNavigate);
+    });
+};
+
 /** Input category name */
 export const inputName = async (name) => {
     await test(`Input name '${name}'`, async () => {
@@ -90,9 +109,7 @@ export const selectParentCategory = async (id) => {
 
 /** Select transaction type */
 export const selectType = async (type) => {
-    const typeName = (type === 0)
-        ? 'Any'
-        : Transaction.typeToString(type);
+    const typeName = Category.typeToString(type);
 
     await test(`Change transaction type to '${typeName}'`, async () => {
         assert.instanceOf(App.view, CategoryView, 'Invalid view');

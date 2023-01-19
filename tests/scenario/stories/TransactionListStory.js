@@ -69,6 +69,15 @@ export class TransactionListStory extends TestStory {
             await TransactionListTests.showMore();
 
             await TransactionListTests.goToFirstPage();
+
+            await TransactionListTests.showDetails({ index: 0 });
+            await TransactionListTests.closeDetails();
+            await TransactionListTests.showDetails({ index: 1 });
+            await TransactionListTests.closeDetails();
+            await TransactionListTests.showDetails({ index: 0, directNavigate: true });
+            await TransactionListTests.showDetails({ index: 1, directNavigate: true });
+            await TransactionListTests.closeDetails();
+
             await TransactionListTests.setCategory({
                 items: [0, 1],
                 category: TAXES_CATEGORY,

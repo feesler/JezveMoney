@@ -1,7 +1,12 @@
+main {
+  flex: 1 1 auto;
+  max-width: var(--section-width);
+}
+
 .heading,
 .content-header,
 .content-container {
-  max-width: 430px;
+  max-width: var(--section-width);
 }
 
 .content-container {

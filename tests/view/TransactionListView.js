@@ -36,6 +36,7 @@ import {
     urlJoin,
 } from '../common.js';
 import { __ } from '../model/locale.js';
+import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -53,7 +54,10 @@ const listMenuItems = [
 ];
 
 const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
+    'ctxDetailsBtn',
+    'ctxUpdateBtn',
+    'ctxSetCategoryBtn',
+    'ctxDeleteBtn',
 ];
 
 const categoryDialogSelector = '#selectCategoryDialog';
@@ -135,6 +139,11 @@ export class TransactionListView extends AppView {
         assert(transList, 'List of transactions not found');
         res.transList = await TransactionList.create(this, transList);
 
+        res.itemInfo = await TransactionDetails.create(
+            this,
+            await query('.transaction-details .list-item-details'),
+        );
+
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         res.selectCategoryDialog = await SetCategoryDialog.create(
@@ -186,6 +195,7 @@ export class TransactionListView extends AppView {
             contextMenuVisible: cont.contextMenu.visible,
             filtersVisible: cont.filtersContainer.visible,
             data: App.state.transactions.clone(),
+            detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
         res.filter = {
@@ -228,8 +238,13 @@ export class TransactionListView extends AppView {
             };
         }
 
-        const locURL = new URL(this.location);
-        res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
+        if (cont.modeSelector?.link) {
+            const modeURL = new URL(cont.modeSelector.link);
+            res.detailsMode = !this.hasDetailsModeParam(modeURL);
+        } else {
+            const locURL = new URL(this.location);
+            res.detailsMode = this.hasDetailsModeParam(locURL);
+        }
 
         res.categoryDialog = {
             show: !!(cont.selectCategoryDialog?.visible),
@@ -240,6 +255,10 @@ export class TransactionListView extends AppView {
         res.loading = cont.loadingIndicator.visible;
 
         return res;
+    }
+
+    hasDetailsModeParam(url) {
+        return url?.searchParams?.get('mode') === 'details';
     }
 
     cloneModel(model) {
@@ -289,40 +308,68 @@ export class TransactionListView extends AppView {
         return this.getExpectedState();
     }
 
-    getExpectedURL() {
+    getDetailsId() {
+        const viewPath = '/transactions/';
+        const { pathname } = new URL(this.location);
+        assert(pathname.startsWith(viewPath), `Invalid location path: ${pathname}`);
+
+        if (pathname.length === viewPath.length) {
+            return 0;
+        }
+
+        const param = pathname.substring(viewPath.length);
+        return parseInt(param, 10) ?? 0;
+    }
+
+    getDetailsItem(itemId) {
+        return App.state.transactions.getItem(itemId);
+    }
+
+    getDetailsURL(model = this.model) {
         let res = `${baseUrl()}transactions/`;
+
+        if (model.detailsItem) {
+            res += model.detailsItem.id.toString();
+        }
+
+        return res;
+    }
+
+    getExpectedURL(model = this.model) {
+        let res = `${baseUrl()}transactions/`;
+
         const params = {};
 
-        if (this.model.filter.type.length > 0) {
-            params.type = this.model.filter.type;
+        if (model.filter.type.length > 0) {
+            params.type = model.filter.type;
         }
 
-        if (this.model.filter.accounts.length > 0) {
-            params.acc_id = this.model.filter.accounts;
+        if (model.filter.accounts.length > 0) {
+            params.acc_id = model.filter.accounts;
         }
 
-        if (this.model.filter.persons.length > 0) {
-            params.person_id = this.model.filter.persons;
+        if (model.filter.persons.length > 0) {
+            params.person_id = model.filter.persons;
         }
 
-        if (this.model.filter.categories.length > 0) {
-            params.category_id = this.model.filter.categories;
+        if (model.filter.categories.length > 0) {
+            params.category_id = model.filter.categories;
         }
 
-        if (this.model.filter.search.length > 0) {
-            params.search = this.model.filter.search;
+        if (model.filter.search.length > 0) {
+            params.search = model.filter.search;
         }
 
-        if (this.model.filter.startDate && this.model.filter.endDate) {
-            params.stdate = this.model.filter.startDate;
-            params.enddate = this.model.filter.endDate;
+        if (model.filter.startDate && model.filter.endDate) {
+            params.stdate = model.filter.startDate;
+            params.enddate = model.filter.endDate;
         }
 
-        if (this.model.list.page !== 0) {
-            params.page = this.model.list.page;
+        if (model.list.page !== 0) {
+            params.page = model.list.page;
         }
 
-        if (this.model.detailsMode) {
+        if (model.detailsMode) {
             params.mode = 'details';
         }
 
@@ -476,6 +523,11 @@ export class TransactionListView extends AppView {
             deleteBtn: { visible: showSelectItems && selected.length > 0 },
         };
 
+        if (model.detailsItem) {
+            res.itemInfo = TransactionDetails.render(model.detailsItem, App.state);
+            res.itemInfo.visible = true;
+        }
+
         if (model.contextMenuVisible) {
             const ctxTransaction = model.filtered.getItem(model.contextItem);
             assert(ctxTransaction, 'Invalid state');
@@ -485,6 +537,7 @@ export class TransactionListView extends AppView {
                 itemId: model.contextItem,
             };
 
+            res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxSetCategoryBtn = { visible: true };
             res.ctxDeleteBtn = { visible: true };
@@ -1143,6 +1196,51 @@ export class TransactionListView extends AppView {
         await this.performAction(() => this.content.deselectAllBtn.click());
 
         return this.checkState(expected);
+    }
+
+    /** Clicks by 'Show details' context menu item of specified transaction */
+    async showDetails(num, directNavigate = false) {
+        if (!directNavigate) {
+            assert(!this.model.detailsItem, 'Details already opened');
+            await this.openContextMenu(num);
+        }
+
+        const item = this.content.transList.items[num];
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        this.model.detailsItem = this.getDetailsItem(item.id);
+        assert(this.model.detailsItem, 'Item not found');
+        if (directNavigate) {
+            this.model.detailsMode = false;
+        }
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getDetailsURL());
+        } else {
+            await this.performAction(() => this.content.ctxDetailsBtn.click());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    /** Closes item details */
+    async closeDetails(directNavigate = false) {
+        assert(this.model.detailsItem, 'Details already closed');
+
+        this.model.detailsItem = null;
+        if (directNavigate) {
+            this.model.detailsMode = false;
+        }
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getDetailsURL());
+        } else {
+            await this.performAction(() => this.content.itemInfo.close());
+        }
+
+        return App.view.checkState(expected);
     }
 
     /** Select specified transaction, click on edit button */

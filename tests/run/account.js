@@ -61,6 +61,25 @@ export const update = async (pos) => {
     });
 };
 
+export const showDetails = async ({ index, directNavigate = false }) => {
+    await App.state.fetch();
+
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Position of account not specified');
+
+    await test(`Show details of account [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.showDetails(index, directNavigate);
+    });
+};
+
+export const closeDetails = async (directNavigate = false) => {
+    await test('Close account details', async () => {
+        await checkNavigation();
+        return App.view.closeDetails(directNavigate);
+    });
+};
+
 export const inputName = async (value) => {
     await test(`Input name '${value}'`, () => App.view.inputName(value));
 };
@@ -158,7 +177,7 @@ export const delFromUpdate = async (pos) => {
 };
 
 export const show = async (accounts, val = true) => {
-    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
+    const itemIds = asArray(accounts);
     const actVerb = (val) ? 'Show' : 'Hide';
 
     await test(`${actVerb} account(s) [${itemIds.join()}]`, async () => {
@@ -184,7 +203,7 @@ export const show = async (accounts, val = true) => {
 export const hide = async (accounts) => show(accounts, false);
 
 export const exportTest = async (accounts) => {
-    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
+    const itemIds = asArray(accounts);
 
     await test(`Export accounts [${itemIds.join()}]`, async () => {
         await checkNavigation();

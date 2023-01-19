@@ -10,7 +10,12 @@ import 'jezvejs/style/IconButton';
 import { Histogram } from 'jezvejs/Histogram';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { API } from '../../js/api/index.js';
-import { formatValueShort, normalize, __ } from '../../js/utils.js';
+import {
+    formatPersonDebts,
+    formatValueShort,
+    normalize,
+    __,
+} from '../../js/utils.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -121,7 +126,7 @@ class MainView extends View {
                 link: `${baseURL}transactions/create/?type=debt&person_id=${person.id}`,
                 attrs: { 'data-id': person.id },
                 title: person.name,
-                subtitle: this.formatPersonDebts(person),
+                subtitle: formatPersonDebts(person),
                 selected: person.selected,
                 selectMode: listMode === 'select',
             }),
@@ -416,19 +421,6 @@ class MainView extends View {
         const elems = Object.values(totals).map((item) => this.renderTotalsListItem(item));
         removeChilds(this.totalList);
         this.totalList.append(...elems);
-    }
-
-    /** Returns array of formatted debts of person or 'No debts' string */
-    formatPersonDebts(person) {
-        const debtAccounts = person.accounts.filter((account) => account.balance !== 0);
-        if (debtAccounts.length === 0) {
-            return __('PERSON_NO_DEBTS');
-        }
-
-        const { currency } = window.app.model;
-        return debtAccounts.map((account) => (
-            currency.formatCurrency(account.balance, account.curr_id)
-        ));
     }
 
     /** Renders persons widget */

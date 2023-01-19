@@ -16,6 +16,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --input-height: 37px;
   --input-padding: 0 0.5rem;
   --header-size: 50px;
+  --std-field-margin: 8px 0 12px;
 
   /* Tiles */
   --tile-gap: 10px;
@@ -338,7 +339,7 @@ label {
 }
 
 .std_margin {
-  margin: 8px 0 12px;
+  margin: var(--std-field-margin);
 }
 
 /* buttons */
@@ -801,6 +802,26 @@ a.paginator-arrow:focus-visible {
   min-height: var(--input-height);
 }
 
+/* List view */
+.list-view__content {
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+}
+
+/* List view details */
+.item-details {
+  max-width: var(--section-width);
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  position: absolute;
+  left: 0;
+  background-color: var(--main-bg-color);
+  z-index: 1500;
+  padding: 0 12px;
+}
+
 /* Histogram */
 .histogram {
   --chart-text-color: var(--main-text-color);
@@ -826,11 +847,25 @@ a.paginator-arrow:focus-visible {
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
   }
+
+  .list-view__content {
+    column-gap: 24px;
+  }
+
+  .item-details {
+    position: static;
+    width: auto;
+  }
 }
 
 /* Desktop */
 @media (min-width: 768px) {
   .content_wrap {
+    padding-left: 212px;
+  }
+
+  .list-view__content {
+    column-gap: 48px;
     padding-left: 212px;
   }
 }

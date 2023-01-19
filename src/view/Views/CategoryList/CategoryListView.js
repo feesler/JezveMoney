@@ -23,6 +23,8 @@ import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './style.scss';
 import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
+import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
+import { Category } from '../../js/model/Category.js';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
@@ -39,6 +41,7 @@ class CategoryListView extends View {
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         const initialState = {
+            ...this.props,
             items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
@@ -81,6 +84,7 @@ class CategoryListView extends View {
             'heading',
             'createBtn',
             'contentContainer',
+            'itemInfo',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -90,14 +94,11 @@ class CategoryListView extends View {
         this.sections = {};
 
         this.transTypes.forEach((type) => {
-            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
-            const title = (type !== 0) ? Transaction.getTypeTitle(type) : __('TR_ANY');
-
             const section = {
                 header: createElement('header', {
                     props: {
                         className: 'list-header',
-                        textContent: title,
+                        textContent: Category.getTypeTitle(type),
                     },
                 }),
                 list: ListContainer.create(listProps),
@@ -114,6 +115,7 @@ class CategoryListView extends View {
                 ],
             });
 
+            const key = Category.getTypeString(type);
             this.sections[key] = section;
 
             this.contentContainer.append(section.container);
@@ -180,6 +182,13 @@ class CategoryListView extends View {
             id: 'contextMenu',
             attached: true,
             items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('OPEN_ITEM'),
+                onClick: (e) => this.showDetails(e),
+            }, {
+                type: 'placeholder',
+            }, {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
@@ -218,6 +227,15 @@ class CategoryListView extends View {
 
             this.toggleSelectItem(itemId);
         }
+    }
+
+    showDetails(e) {
+        e?.preventDefault();
+        this.store.dispatch(actions.showDetails());
+    }
+
+    closeDetails() {
+        this.store.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
@@ -327,7 +345,7 @@ class CategoryListView extends View {
     getListItemById(id) {
         for (let i = 0; i < this.transTypes.length; i += 1) {
             const type = this.transTypes[i];
-            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const key = Category.getTypeString(type);
             const section = this.sections[key];
             const listItem = section.list.getListItemById(id);
             if (listItem) {
@@ -360,6 +378,7 @@ class CategoryListView extends View {
 
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
+        items.ctxDetailsBtn.setURL(`${baseURL}categories/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${itemId}`);
 
         this.contextMenu.attachAndShow(menuContainer);
@@ -386,15 +405,53 @@ class CategoryListView extends View {
         items.deleteBtn.show(selCount > 0);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    renderDetails(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
         }
 
-        if (state.loading) {
-            this.loadingIndicator.show();
+        if (!state.detailsId) {
+            show(this.itemInfo, false);
+            return;
         }
 
+        const { categories } = window.app.model;
+        const item = categories.getItem(state.detailsId);
+        if (!item) {
+            throw new Error('Category not found');
+        }
+
+        if (!this.categoryDetails) {
+            this.categoryDetails = CategoryDetails.create({
+                item,
+                onClose: () => this.closeDetails(),
+            });
+            this.itemInfo.append(this.categoryDetails.elem);
+        } else {
+            this.categoryDetails.setItem(item);
+        }
+
+        show(this.itemInfo, true);
+    }
+
+    /** Returns URL for specified state */
+    getURL(state) {
+        const { baseURL } = window.app;
+        const itemPart = (state.detailsId) ? state.detailsId : '';
+        return new URL(`${baseURL}categories/${itemPart}`);
+    }
+
+    renderHistory(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
+        }
+
+        const url = this.getURL(state);
+        const pageTitle = `${__('APP_NAME')} | ${__('CATEGORIES')}`;
+        window.history.replaceState({}, pageTitle, url);
+    }
+
+    renderList(state) {
         // Counters
         const itemsCount = state.items.length;
         this.itemsCount.textContent = itemsCount;
@@ -404,7 +461,6 @@ class CategoryListView extends View {
         this.selItemsCount.textContent = selected.length;
 
         // List of categories
-
         this.transTypes.forEach((type) => {
             const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
             const section = this.sections[key];
@@ -420,9 +476,23 @@ class CategoryListView extends View {
 
             show(section.container, items.length > 0);
         });
+    }
 
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.renderHistory(state, prevState);
+
+        if (state.loading) {
+            this.loadingIndicator.show();
+        }
+
+        this.renderList(state);
         this.renderContextMenu(state);
         this.renderMenu(state);
+        this.renderDetails(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

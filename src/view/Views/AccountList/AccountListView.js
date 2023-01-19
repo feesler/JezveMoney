@@ -18,6 +18,7 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
+import { AccountDetails } from '../../Components/AccountDetails/AccountDetails.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -38,6 +39,7 @@ class AccountListView extends View {
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         const initialState = {
+            ...this.props,
             items: {
                 visible: AccountList.create(window.app.model.visibleUserAccounts),
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
@@ -81,6 +83,7 @@ class AccountListView extends View {
             'contentContainer',
             'hiddenTilesHeading',
             'createBtn',
+            'itemInfo',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -172,6 +175,13 @@ class AccountListView extends View {
             id: 'contextMenu',
             attached: true,
             items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('OPEN_ITEM'),
+                onClick: (e) => this.showDetails(e),
+            }, {
+                type: 'placeholder',
+            }, {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
@@ -222,6 +232,15 @@ class AccountListView extends View {
 
             this.toggleSelectItem(itemId);
         }
+    }
+
+    showDetails(e) {
+        e?.preventDefault();
+        this.store.dispatch(actions.showDetails());
+    }
+
+    closeDetails() {
+        this.store.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
@@ -374,6 +393,7 @@ class AccountListView extends View {
 
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
+        items.ctxDetailsBtn.setURL(`${baseURL}accounts/${account.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
         items.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
         items.ctxShowBtn.show(!account.isVisible());
@@ -422,15 +442,53 @@ class AccountListView extends View {
         }
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    renderDetails(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
         }
 
-        if (state.loading) {
-            this.loadingIndicator.show();
+        if (!state.detailsId) {
+            show(this.itemInfo, false);
+            return;
         }
 
+        const { userAccounts } = window.app.model;
+        const item = userAccounts.getItem(state.detailsId);
+        if (!item) {
+            throw new Error('Account not found');
+        }
+
+        if (!this.accountDetails) {
+            this.accountDetails = AccountDetails.create({
+                item,
+                onClose: () => this.closeDetails(),
+            });
+            this.itemInfo.append(this.accountDetails.elem);
+        } else {
+            this.accountDetails.setItem(item);
+        }
+
+        show(this.itemInfo, true);
+    }
+
+    /** Returns URL for specified state */
+    getURL(state) {
+        const { baseURL } = window.app;
+        const itemPart = (state.detailsId) ? state.detailsId : '';
+        return new URL(`${baseURL}accounts/${itemPart}`);
+    }
+
+    renderHistory(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
+        }
+
+        const url = this.getURL(state);
+        const pageTitle = `${__('APP_NAME')} | ${__('ACCOUNTS')}`;
+        window.history.replaceState({}, pageTitle, url);
+    }
+
+    renderList(state) {
         // Counters
         const itemsCount = state.items.visible.length + state.items.hidden.length;
         this.itemsCount.textContent = itemsCount;
@@ -458,9 +516,23 @@ class AccountListView extends View {
         const hiddenItemsAvailable = (state.items.hidden.length > 0);
         this.hiddenTiles.show(hiddenItemsAvailable);
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
+    }
 
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.renderHistory(state, prevState);
+
+        if (state.loading) {
+            this.loadingIndicator.show();
+        }
+
+        this.renderList(state);
         this.renderContextMenu(state);
         this.renderMenu(state);
+        this.renderDetails(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

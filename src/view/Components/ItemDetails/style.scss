@@ -1,0 +1,13 @@
+/* List item details base */
+.list-item-details {
+  display: flex;
+  flex-flow: column nowrap;
+
+  .field {
+    margin: var(--std-field-margin);
+  }
+
+  .field__title {
+    color: var(--dimmed-text-color);
+  }
+}

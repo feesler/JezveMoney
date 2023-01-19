@@ -31,6 +31,7 @@ export class CategoriesStory extends TestStory {
 
         await this.create();
         await this.select();
+        await this.details();
         await this.update();
         await this.del();
 
@@ -170,5 +171,18 @@ export class CategoriesStory extends TestStory {
         setBlock('Select/deselect all categories', 2);
         await CategoryTests.selectAll();
         await CategoryTests.deselectAll();
+    }
+
+    async details() {
+        setBlock('Category details', 1);
+
+        await CategoryTests.showDetails({ index: 0 });
+        await CategoryTests.closeDetails();
+        await CategoryTests.showDetails({ index: 1 });
+        await CategoryTests.showDetails({ index: 2 });
+        await CategoryTests.closeDetails();
+        await CategoryTests.showDetails({ index: 0, directNavigate: true });
+        await CategoryTests.showDetails({ index: 1, directNavigate: true });
+        await CategoryTests.closeDetails();
     }
 }

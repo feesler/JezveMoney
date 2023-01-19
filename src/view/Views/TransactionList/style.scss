@@ -1,3 +1,12 @@
+/* Transaction details */
+.transaction-details {
+  --offcanvas-bg: var(--main-bg-color);
+
+  padding: 0 12px;
+  width: 100%;
+  max-width: var(--section-width);
+}
+
 /* Filters */
 .trans-type-filter {
   max-width: 500px;
@@ -51,6 +60,26 @@
     --iconbtn-icon-color: var(--accent-color);
     --iconbtn-hover-icon-color: var(--accent-color);
     --iconbtn-hover-title-color: var(--accent-hover-color);
+  }
+}
+
+.transaction-view-view {
+  main {
+    width: 100%;
+  }
+
+  .item-details {
+    position: absolute;
+    width: 100%;
+    left: auto;
+    right: 0;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .transaction-details {
+    padding-top: var(--header-size);
   }
 }
 

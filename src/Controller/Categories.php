@@ -3,17 +3,16 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\App\Model\CategoryModel;
-use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
 /**
  * Categories controller
  */
-class Categories extends TemplateController
+class Categories extends ListViewController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
-    protected $model = null;
 
     /**
      * Controller initialization
@@ -34,7 +33,10 @@ class Categories extends TemplateController
             "titleString" => __("APP_NAME") . " | " . __("CATEGORIES"),
         ];
         $data["appProps"] = [
-            "categories" => $this->model->getData()
+            "categories" => $this->model->getData(),
+            "view" => [
+                "detailsId" => $this->getRequestedItem(),
+            ],
         ];
 
         $this->cssArr[] = "CategoryListView.css";

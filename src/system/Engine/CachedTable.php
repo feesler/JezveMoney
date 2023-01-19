@@ -51,16 +51,16 @@ abstract class CachedTable extends Model
     }
 
     /**
-     * Return specified item from cache
+     * Returns specified item from cache
      *
-     * @param int $obj_id item id
+     * @param mixed $item_id item id
      *
      * @return object|null
      */
-    public function getItem(int $obj_id)
+    public function getItem(mixed $item_id)
     {
-        $obj_id = intval($obj_id);
-        if (!$obj_id) {
+        $item_id = intval($item_id);
+        if (!$item_id) {
             return null;
         }
 
@@ -68,11 +68,11 @@ abstract class CachedTable extends Model
             return null;
         }
 
-        if (!isset($this->cache[$obj_id])) {
+        if (!isset($this->cache[$item_id])) {
             return null;
         }
 
-        return $this->cache[$obj_id];
+        return $this->cache[$item_id];
     }
 
     /**
@@ -119,14 +119,14 @@ abstract class CachedTable extends Model
     /**
      * Returns true if specified item is exist
      *
-     * @param int $obj_id item id
+     * @param mixed $item_id item id
      *
      * @return bool
      */
-    public function isExist(int $obj_id)
+    public function isExist(mixed $item_id)
     {
-        $obj_id = intval($obj_id);
-        if (!$obj_id) {
+        $item_id = intval($item_id);
+        if (!$item_id) {
             return false;
         }
 
@@ -134,7 +134,7 @@ abstract class CachedTable extends Model
             return false;
         }
 
-        return isset($this->cache[$obj_id]);
+        return isset($this->cache[$item_id]);
     }
 
     /**

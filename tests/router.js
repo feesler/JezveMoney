@@ -75,14 +75,11 @@ export async function route(env, url) {
 
     if (listViews.includes(part)) {
         const actPart = parts.shift();
-        if (!actPart) {
-            return view.list;
-        }
         if (actPart === 'create' || actPart === 'update') {
             return view.item;
         }
 
-        throw new Error(`Unknown route: ${reqUrl.pathname}`);
+        return view.list;
     }
 
     return view;

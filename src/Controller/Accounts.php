@@ -2,7 +2,7 @@
 
 namespace JezveMoney\App\Controller;
 
-use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Message;
 use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
@@ -17,9 +17,8 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 /**
  * Accounts controller
  */
-class Accounts extends TemplateController
+class Accounts extends ListViewController
 {
-    protected $model = null;
     protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
 
     /**
@@ -39,8 +38,6 @@ class Accounts extends TemplateController
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
             "titleString" => __("APP_NAME") . " | " . __("ACCOUNTS"),
-            "tilesArr" => [],
-            "hiddenTilesArr" => []
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -51,6 +48,9 @@ class Accounts extends TemplateController
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "icons" => $iconModel->getData(),
+            "view" => [
+                "detailsId" => $this->getRequestedItem(),
+            ],
         ];
 
         $this->cssArr[] = "AccountListView.css";

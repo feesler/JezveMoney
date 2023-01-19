@@ -53,6 +53,25 @@ export const update = async (pos) => {
     });
 };
 
+export const showDetails = async ({ index, directNavigate = false }) => {
+    await App.state.fetch();
+
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Position of person not specified');
+
+    await test(`Show details of person [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.showDetails(index, directNavigate);
+    });
+};
+
+export const closeDetails = async (directNavigate = false) => {
+    await test('Close person details', async () => {
+        await checkNavigation();
+        return App.view.closeDetails(directNavigate);
+    });
+};
+
 export const inputName = async (value) => {
     await test(`Input name '${value}'`, () => App.view.inputName(value));
 };

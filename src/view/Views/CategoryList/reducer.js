@@ -20,6 +20,22 @@ const reduceDeselectAll = (state) => ({
 });
 
 const slice = createSlice({
+    showDetails: (state) => (
+        (state.detailsId === state.contextItem)
+            ? state
+            : {
+                ...state,
+                detailsId: state.contextItem,
+                contextItem: null,
+            }
+    ),
+
+    closeDetails: (state) => (
+        (state.detailsId)
+            ? { ...state, detailsId: null }
+            : state
+    ),
+
     showContextMenu: (state, itemId) => (
         (state.contextItem === itemId)
             ? state

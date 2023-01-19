@@ -380,17 +380,17 @@ class PersonModel extends CachedTable
     }
 
     /**
-     * Return specified item from cache
+     * Returns specified item from cache
      *
-     * @param int $obj_id item id
+     * @param mixed $item_id item id
      *
      * @return object|null
      */
-    public function getItem(int $obj_id)
+    public function getItem(mixed $item_id)
     {
-        $item = parent::getItem($obj_id);
-        if (is_null($item) && intval($obj_id) && UserModel::isAdminUser()) {
-            $qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=" . intval($obj_id));
+        $item = parent::getItem($item_id);
+        if (is_null($item) && intval($item_id) && UserModel::isAdminUser()) {
+            $qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=" . intval($item_id));
             $row = $this->dbObj->fetchRow($qResult);
             $item = $this->rowToObj($row);
         }
