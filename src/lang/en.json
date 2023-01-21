@@ -30,6 +30,7 @@
     "HIDE": "Hide",
     "SHOW_MORE": "Show more...",
     "SHOW_ALL": "Show all",
+    "SHOW_VISIBLE": "Hide",
     "LOADING": "Loading...",
     "SET_CATEGORY": "Set category...",
     "TYPE_TO_FILTER": "Type to filter",

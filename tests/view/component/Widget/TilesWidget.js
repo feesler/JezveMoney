@@ -1,4 +1,9 @@
-import { assert, query, navigation } from 'jezve-test';
+import {
+    assert,
+    query,
+    navigation,
+    click,
+} from 'jezve-test';
 import { Widget } from './Widget.js';
 import { TilesList } from '../Tiles/TilesList.js';
 
@@ -7,12 +12,28 @@ export class TilesWidget extends Widget {
         const res = await super.parseContent();
 
         res.tiles = await TilesList.create(this, await query(this.elem, '.tiles'));
+        res.hiddenTiles = await TilesList.create(this, await query(this.elem, '.tiles + .tiles'));
+
+        res.toggleHiddenBtn = { elem: await query(this.elem, '.link-btn') };
 
         return res;
     }
 
     get tiles() {
         return this.content.tiles;
+    }
+
+    get hiddenTiles() {
+        return this.content.hiddenTiles;
+    }
+
+    get toggleHiddenBtn() {
+        return this.content.toggleHiddenBtn;
+    }
+
+    async toggleHidden() {
+        assert(this.toggleHiddenBtn.visible, 'Toggle hidden tile button not visible');
+        await click(this.toggleHiddenBtn.elem);
     }
 
     async clickTileByIndex(index) {

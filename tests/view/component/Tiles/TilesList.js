@@ -86,12 +86,12 @@ export class TilesList extends TestComponent {
         };
     }
 
-    static renderHiddenPersons(personsList) {
+    static renderHiddenPersons(personsList, withDebts) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
 
         const hiddenPersons = personsList.getHidden(true);
         return {
-            items: hiddenPersons.map((p) => Tile.renderPerson(p, false)),
+            items: hiddenPersons.map((p) => Tile.renderPerson(p, withDebts)),
         };
     }
 }

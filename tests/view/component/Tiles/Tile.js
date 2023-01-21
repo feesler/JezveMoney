@@ -18,12 +18,24 @@ export class Tile extends TestComponent {
         const subtitleElem = await query(this.elem, '.tile__subtitle');
         const titleElem = await query(this.elem, '.tile__title');
 
-        const res = await evaluate((elem, titleEl, subtitleEl) => ({
-            id: parseInt(elem.dataset.id, 10),
-            title: titleEl.textContent,
-            subtitle: (subtitleEl) ? subtitleEl.innerText.split('\r\n').join('\n') : '',
-            isActive: elem.classList.contains('tile_selected'),
-        }), this.elem, titleElem, subtitleElem);
+        const res = await evaluate((elem, titleEl, subtitleEl) => {
+            const props = {
+                id: parseInt(elem.dataset.id, 10),
+                title: titleEl.textContent,
+                subtitle: '',
+                isActive: elem.classList.contains('tile_selected'),
+            };
+
+            if (subtitleEl) {
+                props.subtitle = (subtitleEl?.childElementCount > 0)
+                    ? Array.from(subtitleEl.children)
+                        .map((el) => el.textContent.trim())
+                        .join('\n')
+                    : subtitleEl.textContent;
+            }
+
+            return props;
+        }, this.elem, titleElem, subtitleElem);
 
         res.iconElem = await query(this.elem, '.tile__icon > svg');
         if (res.iconElem) {

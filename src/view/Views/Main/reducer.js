@@ -4,6 +4,30 @@ import { createSlice } from '../../js/store.js';
 
 // Reducers
 const slice = createSlice({
+    toggleHiddenAccounts: (state) => (
+        (state.accounts.hidden.length === 0)
+            ? state
+            : {
+                ...state,
+                accounts: {
+                    ...state.accounts,
+                    showHidden: !state.accounts.showHidden,
+                },
+            }
+    ),
+
+    toggleHiddenPersons: (state) => (
+        (state.persons.hidden.length === 0)
+            ? state
+            : {
+                ...state,
+                persons: {
+                    ...state.persons,
+                    showHidden: !state.persons.showHidden,
+                },
+            }
+    ),
+
     showTransactionContextMenu: (state, itemId) => (
         (state.transactionContextItem === itemId)
             ? state
@@ -83,10 +107,14 @@ const slice = createSlice({
         ...state,
         transactions: data.transactions.data,
         accounts: {
+            ...state.accounts,
             visible: AccountList.create(window.app.model.visibleUserAccounts),
+            hidden: AccountList.create(window.app.model.hiddenUserAccounts),
         },
         persons: {
+            ...state.persons,
             visible: PersonList.create(window.app.model.visiblePersons),
+            hidden: PersonList.create(window.app.model.hiddenPersons),
         },
         chartData: data.histogram,
         transactionContextItem: null,

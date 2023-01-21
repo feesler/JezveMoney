@@ -20,6 +20,7 @@ import { UnitTestsStory } from './stories/UnitTestsStory.js';
 import { SecurityStory } from './stories/SecurityStory.js';
 import { ApiStory } from './stories/api/ApiStory.js';
 import { ProfileStory } from './stories/ProfileStory.js';
+import { MainStory } from './stories/MainStory.js';
 import { AccountsStory } from './stories/AccountsStory.js';
 import { PersonsStory } from './stories/PersonsStory.js';
 import { CategoriesStory } from './stories/CategoriesStory.js';
@@ -38,6 +39,7 @@ const storiesMap = {
     api: ApiStory,
     locales: LocalesStory,
     profile: ProfileStory,
+    main: MainStory,
     accounts: AccountsStory,
     persons: PersonsStory,
     categories: CategoriesStory,

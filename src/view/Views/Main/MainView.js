@@ -5,6 +5,7 @@ import {
     asArray,
     createElement,
     removeChilds,
+    isFunction,
 } from 'jezvejs';
 import 'jezvejs/style/IconButton';
 import { Histogram } from 'jezvejs/Histogram';
@@ -54,9 +55,13 @@ class MainView extends View {
             transactions: [...this.props.transactions],
             accounts: {
                 visible: AccountList.create(window.app.model.visibleUserAccounts),
+                hidden: AccountList.create(window.app.model.hiddenUserAccounts),
+                showHidden: false,
             },
             persons: {
                 visible: PersonList.create(window.app.model.visiblePersons),
+                hidden: PersonList.create(window.app.model.hiddenPersons),
+                showHidden: false,
             },
             chartData: this.props.chartData,
             categoryDialog: {
@@ -90,8 +95,7 @@ class MainView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
         this.loadingIndicator.show(state.loading);
 
-        // Accounts widget
-        this.visibleAccounts = ListContainer.create({
+        const accountsProps = {
             ItemComponent: AccountTile,
             getItemProps: (account, { listMode }) => ({
                 type: 'link',
@@ -104,10 +108,26 @@ class MainView extends View {
             className: 'tiles',
             itemSelector: '.tile',
             listMode: 'list',
-            items: state.accounts.visible,
             noItemsMessage: () => this.renderAccountsNoData(),
+        };
+
+        // Accounts widget
+        this.visibleAccounts = ListContainer.create({
+            ...accountsProps,
+            items: state.accounts.visible,
         });
         this.accountsWidget.append(this.visibleAccounts.elem);
+
+        this.hiddenAccounts = ListContainer.create({
+            ...accountsProps,
+            items: state.accounts.hidden,
+        });
+        this.accountsWidget.append(this.hiddenAccounts.elem);
+
+        this.toggleAccountsBtn = this.createToggleShowAllButton({
+            onClick: () => this.toggleHiddenAccounts(),
+        });
+        this.accountsWidget.append(this.toggleAccountsBtn);
 
         // Totals widget
         this.totalWidget = ge('totalWidget');
@@ -119,7 +139,7 @@ class MainView extends View {
         }
 
         // Persons widget
-        this.visiblePersons = ListContainer.create({
+        const personProps = {
             ItemComponent: Tile,
             getItemProps: (person, { listMode }) => ({
                 type: 'link',
@@ -133,10 +153,25 @@ class MainView extends View {
             className: 'tiles',
             itemSelector: '.tile',
             listMode: 'list',
-            items: state.persons.visible,
             noItemsMessage: () => this.renderPersonsNoData(),
+        };
+
+        this.visiblePersons = ListContainer.create({
+            ...personProps,
+            items: state.persons.visible,
         });
         this.personsWidget.append(this.visiblePersons.elem);
+
+        this.hiddenPersons = ListContainer.create({
+            ...personProps,
+            items: state.persons.hidden,
+        });
+        this.personsWidget.append(this.hiddenPersons.elem);
+
+        this.togglePersonsBtn = this.createToggleShowAllButton({
+            onClick: () => this.toggleHiddenPersons(),
+        });
+        this.personsWidget.append(this.togglePersonsBtn);
 
         // Latest transactions widget
         this.transactionsWidget = ge('transactionsWidget');
@@ -168,6 +203,22 @@ class MainView extends View {
         this.stopLoading();
     }
 
+    createToggleShowAllButton(props = {}) {
+        const events = {};
+        if (isFunction(props?.onClick)) {
+            events.click = props.onClick;
+        }
+
+        return createElement('button', {
+            props: {
+                className: 'btn link-btn',
+                type: 'button',
+                textContent: __('SHOW_ALL'),
+            },
+            events,
+        });
+    }
+
     /** Creates context menu for latest transactions list */
     createTransactionContextMenu() {
         this.transactionContextMenu = PopupMenu.create({
@@ -191,6 +242,16 @@ class MainView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    /** Toggle shows/hides hidden accounts */
+    toggleHiddenAccounts() {
+        this.store.dispatch(actions.toggleHiddenAccounts());
+    }
+
+    /** Toggle shows/hides hidden persons */
+    toggleHiddenPersons() {
+        this.store.dispatch(actions.toggleHiddenPersons());
     }
 
     /** Shows context menu for specified item */
@@ -372,16 +433,32 @@ class MainView extends View {
     renderAccountsWidget(state, prevState) {
         if (
             state.accounts.visible === prevState?.accounts?.visible
+            && state.accounts.hidden === prevState?.accounts?.hidden
+            && state.accounts.showHidden === prevState?.accounts?.showHidden
             && state.renderTime === prevState?.renderTime
         ) {
             return;
         }
 
-        this.visibleAccounts.setState((visibleState) => ({
-            ...visibleState,
+        this.visibleAccounts.setState((listState) => ({
+            ...listState,
             items: state.accounts.visible,
             renderTime: state.renderTime,
         }));
+
+        const hiddenAvailable = state.accounts.hidden.length > 0;
+
+        show(this.toggleAccountsBtn, hiddenAvailable);
+        this.toggleAccountsBtn.textContent = (state.accounts.showHidden)
+            ? __('SHOW_VISIBLE')
+            : __('SHOW_ALL');
+
+        this.hiddenAccounts.setState((listState) => ({
+            ...listState,
+            items: state.accounts.hidden,
+            renderTime: state.renderTime,
+        }));
+        this.hiddenAccounts.show(hiddenAvailable && state.accounts.showHidden);
     }
 
     /** Renders list item of totals widget */
@@ -427,16 +504,32 @@ class MainView extends View {
     renderPersonsWidget(state, prevState) {
         if (
             state.persons.visible === prevState?.persons?.visible
+            && state.persons.hidden === prevState?.persons?.hidden
+            && state.persons.showHidden === prevState?.persons?.showHidden
             && state.renderTime === prevState?.renderTime
         ) {
             return;
         }
 
-        this.visiblePersons.setState((visibleState) => ({
-            ...visibleState,
+        this.visiblePersons.setState((listState) => ({
+            ...listState,
             items: state.persons.visible,
             renderTime: state.renderTime,
         }));
+
+        const hiddenAvailable = state.persons.hidden.length > 0;
+
+        show(this.togglePersonsBtn, hiddenAvailable);
+        this.togglePersonsBtn.textContent = (state.persons.showHidden)
+            ? __('SHOW_VISIBLE')
+            : __('SHOW_ALL');
+
+        this.hiddenPersons.setState((listState) => ({
+            ...listState,
+            items: state.persons.hidden,
+            renderTime: state.renderTime,
+        }));
+        this.hiddenPersons.show(hiddenAvailable && state.persons.showHidden);
     }
 
     /** Renders transaction context menu */
