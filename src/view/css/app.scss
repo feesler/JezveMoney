@@ -811,7 +811,6 @@ a.paginator-arrow:focus-visible {
 
 /* List view details */
 .item-details {
-  max-width: var(--section-width);
   width: 100%;
   height: 100%;
   flex: 1 1 auto;
@@ -855,6 +854,7 @@ a.paginator-arrow:focus-visible {
   .item-details {
     position: static;
     width: auto;
+    max-width: var(--section-width);
   }
 }
 
