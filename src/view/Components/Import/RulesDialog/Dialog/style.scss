@@ -13,6 +13,14 @@
     width: 100%;
   }
 
+  .popup__header {
+    column-gap: 24px;
+
+    .popup__title {
+      flex: 1 1 auto;
+    }
+  }
+
   &.popup_scroll-message .popup__message {
     overflow-y: hidden;
     display: flex;
@@ -28,13 +36,6 @@
   min-height: 100px;
   overflow: hidden;
 
-  /* Create button */
-  .link-btn {
-    pointer-events: all;
-    padding: 0;
-    cursor: pointer;
-  }
-
   .search-field {
     margin-bottom: 1rem;
   }
@@ -48,13 +49,19 @@
 .rules-header {
   display: flex;
   flex-flow: row wrap;
-  align-items: baseline;
+  align-items: flex-start;
+  column-gap: 24px;
 
   label {
-    font-size: 24px;
+    font-size: 1.4rem;
     font-weight: 300;
-    margin-right: 16px;
-    margin-bottom: 0;
+    line-height: 32px;
+    margin: 0;
+  }
+
+  /* Create button */
+  .create-btn {
+    margin-left: auto;
   }
 }
 

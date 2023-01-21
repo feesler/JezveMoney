@@ -34,17 +34,23 @@
   margin-bottom: 9px;
 
   .collapsible-header {
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     align-items: center;
+    column-gap: 24px;
     flex: none;
     padding: 2px 8px 2px 8px;
     border: 0;
     cursor: pointer;
-  }
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-  .collapsible-header label {
-    font-size: 18px;
-    margin: 0 12px 0 0;
+    label {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .toggle-btn {
+      margin-left: 0;
+    }
   }
 
   .toggle-icon {

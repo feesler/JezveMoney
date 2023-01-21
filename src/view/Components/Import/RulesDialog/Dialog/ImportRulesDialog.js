@@ -4,10 +4,10 @@ import {
     insertAfter,
     isFunction,
     Component,
-    setEvents,
     createElement,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
 import { __ } from '../../../../js/utils.js';
@@ -43,15 +43,21 @@ export class ImportRulesDialog extends Component {
 
         this.headerElem = this.elem.querySelector('.rules-header');
         this.titleElem = this.headerElem?.querySelector('label');
-        this.createRuleBtn = this.headerElem?.querySelector('.create-btn');
         this.rulesContent = this.elem.querySelector('.rules-content');
         if (
-            !this.createRuleBtn
-            || !this.titleElem
+            !this.titleElem
             || !this.rulesContent
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
+
+        this.createRuleBtn = IconButton.create({
+            id: 'createRuleBtn',
+            className: 'create-btn',
+            icon: 'plus',
+            onClick: () => this.onCreateRuleClick(),
+        });
+        this.headerElem.append(this.createRuleBtn.elem);
 
         this.rulesList = ListContainer.create({
             ItemComponent: ImportRuleItem,
@@ -97,8 +103,6 @@ export class ImportRulesDialog extends Component {
             className: IMPORT_RULES_POPUP_CLASS,
         });
         show(this.elem, true);
-
-        setEvents(this.createRuleBtn, { click: () => this.onCreateRuleClick() });
 
         this.createContextMenu();
 
@@ -414,7 +418,7 @@ export class ImportRulesDialog extends Component {
         this.searchInput.show(true);
         this.rulesList.show(true);
         show(this.listContainer, true);
-        show(this.createRuleBtn, true);
+        this.createRuleBtn.show(true);
         if (this.formContainer) {
             re(this.formContainer.elem);
             this.formContainer = null;
@@ -436,7 +440,7 @@ export class ImportRulesDialog extends Component {
 
         this.searchInput.show(false);
         show(this.listContainer, false);
-        show(this.createRuleBtn, false);
+        this.createRuleBtn.show(false);
         show(this.formContainer.elem, true);
     }
 

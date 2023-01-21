@@ -38,8 +38,8 @@
 /* Template field header */
 .template-field__header {
   display: flex;
-  flex-flow: row wrap;
-  align-items: baseline;
+  flex-flow: row nowrap;
+  align-items: flex-end;
   justify-content: space-between;
   margin-bottom: 5px;
   width: 100%;
@@ -50,6 +50,14 @@
     margin-right: 18px;
     margin-bottom: 0;
     margin-left: 0;
+  }
+
+  .create-btn {
+    --iconbtn-size: 24px;
+
+    .iconbutton__icon {
+      padding: 0;
+    }
   }
 }
 
