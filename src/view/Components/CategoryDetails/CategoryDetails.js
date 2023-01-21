@@ -1,4 +1,5 @@
 import { createElement } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { Category } from '../../js/model/Category.js';
 import { __ } from '../../js/utils.js';
 import { Field } from '../Field/Field.js';
@@ -7,7 +8,10 @@ import { ItemDetails } from '../ItemDetails/ItemDetails.js';
 /** CSS classes */
 const PARENT_FIELD_CLASS = 'parent-field';
 const TYPE_FIELD_CLASS = 'type-field';
-const TR_COUNT_FIELD_CLASS = 'trans-count-field';
+const TR_COUNT_FIELD_CLASS = 'trans-count-field inline-field';
+const SUBCATEGORIES_FIELD_CLASS = 'subcategories-field inline-field';
+const SUBCATEGORIES_LIST_CLASS = 'subcategories-list';
+const SUBCATEGORY_ITEM_CLASS = 'subcategory-item';
 const VHIDDEN_CLASS = 'vhidden';
 
 /**
@@ -26,6 +30,25 @@ export class CategoryDetails extends ItemDetails {
             className: TYPE_FIELD_CLASS,
         });
 
+        this.subcategoriesField = Field.create({
+            title: __('CATEGORY_SUBCATEGORIES_COUNT'),
+            className: SUBCATEGORIES_FIELD_CLASS,
+        });
+
+        this.toggleSubcategoriesBtn = createElement('button', {
+            props: {
+                className: 'btn link-btn',
+                type: 'button',
+                textContent: __('SHOW'),
+            },
+        });
+
+        this.subcategoriesList = Collapsible.create({
+            className: SUBCATEGORIES_LIST_CLASS,
+            header: this.toggleSubcategoriesBtn,
+            onStateChange: (exp) => this.onToggleSubcategories(exp),
+        });
+
         this.transactionsField = Field.create({
             title: __('ITEM_TRANSACTIONS_COUNT'),
             className: TR_COUNT_FIELD_CLASS,
@@ -41,6 +64,8 @@ export class CategoryDetails extends ItemDetails {
         return [
             this.parentField.elem,
             this.typeField.elem,
+            this.subcategoriesField.elem,
+            this.subcategoriesList.elem,
             this.transactionsField.elem,
             this.transactionsLink,
         ];
@@ -52,6 +77,30 @@ export class CategoryDetails extends ItemDetails {
         const res = new URL(`${baseURL}transactions/`);
         res.searchParams.set('category_id', item.id);
         return res;
+    }
+
+    onToggleSubcategories(expanded) {
+        const title = (expanded) ? __('HIDE_SUBCATEGORIES') : __('SHOW_SUBCATEGORIES');
+        this.toggleSubcategoriesBtn.textContent = title;
+    }
+
+    renderSubcategories(item) {
+        const { categories } = window.app.model;
+        const subcategories = categories.findByParent(item.id);
+
+        this.subcategoriesField.setContent(subcategories.length.toString());
+        this.subcategoriesField.show(item.parent_id === 0);
+
+        const content = subcategories.map((category) => (
+            createElement('div', {
+                props: {
+                    className: SUBCATEGORY_ITEM_CLASS,
+                    textContent: category.name,
+                },
+            })
+        ));
+        this.subcategoriesList.setContent(content);
+        this.subcategoriesList.show(subcategories.length > 0);
     }
 
     /**
@@ -76,6 +125,9 @@ export class CategoryDetails extends ItemDetails {
 
         // Transaction type
         this.typeField.setContent(Category.getTypeTitle(item.type));
+
+        // Subcategories
+        this.renderSubcategories(item);
 
         // Transactions count
         const trCountLoaded = (typeof item.transactionsCount === 'number');

@@ -6,7 +6,7 @@ import { ItemDetails } from '../ItemDetails/ItemDetails.js';
 /** CSS classes */
 const DEBTS_FIELD_CLASS = 'debts-field';
 const VISIBILITY_FIELD_CLASS = 'visibility-field';
-const TR_COUNT_FIELD_CLASS = 'trans-count-field';
+const TR_COUNT_FIELD_CLASS = 'trans-count-field inline-field';
 const VHIDDEN_CLASS = 'vhidden';
 
 /**

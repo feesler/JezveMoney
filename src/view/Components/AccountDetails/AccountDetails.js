@@ -7,7 +7,7 @@ import { ItemDetails } from '../ItemDetails/ItemDetails.js';
 const BALANCE_FIELD_CLASS = 'balance-field';
 const INITIAL_BALANCE_FIELD_CLASS = 'initbalance-field';
 const VISIBILITY_FIELD_CLASS = 'visibility-field';
-const TR_COUNT_FIELD_CLASS = 'trans-count-field';
+const TR_COUNT_FIELD_CLASS = 'trans-count-field inline-field';
 const VHIDDEN_CLASS = 'vhidden';
 
 /**

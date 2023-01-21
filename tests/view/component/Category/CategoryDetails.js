@@ -5,6 +5,8 @@ import {
     assert,
     evaluate,
     asyncMap,
+    queryAll,
+    prop,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { secondsToDateString } from '../../../common.js';
@@ -14,6 +16,7 @@ import { __ } from '../../../model/locale.js';
 const fieldSelectors = [
     '.parent-field',
     '.type-field',
+    '.subcategories-field',
     '.trans-count-field',
     '.create-date-field',
     '.update-date-field',
@@ -28,8 +31,12 @@ export class CategoryDetails extends TestComponent {
         const res = {
             closeBtn: { elem: await query(this.elem, '.close-btn') },
             title: { elem: await query(this.elem, '.heading h1') },
+            subcategoriesList: { elem: await query(this.elem, '.subcategories-list') },
             transactionsLink: { elem: await query(this.elem, '.transactions-link') },
         };
+
+        const childElems = await queryAll(this.elem, '.subcategory-item');
+        res.subcategories = await asyncMap(childElems, (el) => prop(el, 'textContent'));
 
         [
             res.title.value,
@@ -42,6 +49,7 @@ export class CategoryDetails extends TestComponent {
         [
             res.parentField,
             res.typeField,
+            res.subcategoriesField,
             res.transactionsField,
             res.createDateField,
             res.updateDateField,
@@ -76,6 +84,8 @@ export class CategoryDetails extends TestComponent {
         const parent = state.categories.getItem(item.parent_id);
         const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT', App.view.locale);
 
+        const subcategories = state.categories.findByParent(item.id);
+
         const itemTransactions = state.transactions.applyFilter({
             categories: item.id,
         });
@@ -93,6 +103,14 @@ export class CategoryDetails extends TestComponent {
                 visible: true,
                 value: Category.typeToString(item.type, App.view.locale),
             },
+            subcategoriesField: {
+                value: subcategories.length.toString(),
+                visible: !parent,
+            },
+            subcategoriesList: {
+                visible: subcategories.length > 0,
+            },
+            subcategories: subcategories.map((category) => category.name),
             transactionsField: {
                 value: itemTransactions.length.toString(),
                 visible: true,

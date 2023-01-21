@@ -11,15 +11,34 @@
     color: var(--dimmed-text-color);
   }
 
-  .trans-count-field {
+  .inline-field {
     flex-flow: row wrap;
     column-gap: 2rem;
+  }
+
+  .subcategories-field,
+  .trans-count-field {
     margin-bottom: 0;
   }
 
+  .subcategories-list,
   .transactions-link {
     margin: var(--std-field-margin);
     margin-top: 0;
+  }
+
+  .subcategories-list {
+    .collapsible-header {
+      align-items: flex-start;
+    }
+
+    .link-btn {
+      padding: 0;
+    }
+
+    .collapsible-content {
+      flex-flow: column nowrap;
+    }
   }
 }
 
