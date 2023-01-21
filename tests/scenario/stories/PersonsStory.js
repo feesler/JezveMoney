@@ -163,6 +163,7 @@ export class PersonsStory extends TestStory {
         await PersonTests.closeDetails();
         await PersonTests.showDetails({ index: 1 });
         await PersonTests.showDetails({ index: 2 });
+        await PersonTests.showDetails({ index: 2 });
         await PersonTests.closeDetails();
         await PersonTests.showDetails({ index: 0, directNavigate: true });
         await PersonTests.showDetails({ index: 1, directNavigate: true });

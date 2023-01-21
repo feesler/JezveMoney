@@ -4,6 +4,7 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\TransactionModel;
 
 /**
  * Persons API controller
@@ -11,6 +12,7 @@ use JezveMoney\App\Model\PersonModel;
 class Person extends ApiListController
 {
     protected $requiredFields = ["name", "flags"];
+    protected $transModel = null;
 
     /**
      * Controller initialization
@@ -20,9 +22,32 @@ class Person extends ApiListController
         parent::initAPI();
 
         $this->model = PersonModel::getInstance();
+        $this->transModel = TransactionModel::getInstance();
         $this->createErrorMsg = __("ERR_PERSON_CREATE");
         $this->updateErrorMsg = __("ERR_PERSON_UPDATE");
         $this->deleteErrorMsg = __("ERR_PERSON_DELETE");
+    }
+
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item item object from model
+     * @param bool $isList list item flag. Default is false
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item, bool $isList = false)
+    {
+        if ($isList) {
+            return $item;
+        }
+
+        $res = $item;
+        $res->transactionsCount = $this->transModel->getTransCount([
+            "persons" => $item->id,
+        ]);
+
+        return $res;
     }
 
     /**

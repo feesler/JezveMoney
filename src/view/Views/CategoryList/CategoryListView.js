@@ -13,18 +13,18 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
+import { Category } from '../../js/model/Category.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
+import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
+import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './style.scss';
-import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
-import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
-import { Category } from '../../js/model/Category.js';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
@@ -42,6 +42,7 @@ class CategoryListView extends View {
 
         const initialState = {
             ...this.props,
+            detailsItem: null,
             items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
@@ -140,6 +141,10 @@ class CategoryListView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
 
         this.subscribeToStore(this.store);
+
+        if (this.props.detailsId) {
+            this.requestItem();
+        }
     }
 
     createMenu() {
@@ -232,6 +237,8 @@ class CategoryListView extends View {
     showDetails(e) {
         e?.preventDefault();
         this.store.dispatch(actions.showDetails());
+
+        this.requestItem();
     }
 
     closeDetails() {
@@ -316,6 +323,22 @@ class CategoryListView extends View {
         }
 
         this.stopLoading();
+    }
+
+    async requestItem() {
+        const state = this.store.getState();
+        if (!state.detailsId) {
+            return;
+        }
+
+        try {
+            const { data } = await API.category.read(state.detailsId);
+            const [item] = data;
+
+            this.store.dispatch(actions.itemDetailsLoaded(item));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
     }
 
     /** Show person(s) delete confirmation popup */
@@ -406,7 +429,10 @@ class CategoryListView extends View {
     }
 
     renderDetails(state, prevState) {
-        if (state.detailsId === prevState?.detailsId) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.detailsItem === prevState?.detailsItem
+        ) {
             return;
         }
 
@@ -416,7 +442,7 @@ class CategoryListView extends View {
         }
 
         const { categories } = window.app.model;
-        const item = categories.getItem(state.detailsId);
+        const item = state.detailsItem ?? categories.getItem(state.detailsId);
         if (!item) {
             throw new Error('Category not found');
         }

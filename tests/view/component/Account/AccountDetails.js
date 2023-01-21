@@ -4,7 +4,6 @@ import {
     click,
     assert,
     evaluate,
-    prop,
     asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
@@ -15,22 +14,36 @@ const fieldSelectors = [
     '.balance-field',
     '.initbalance-field',
     '.visibility-field',
+    '.trans-count-field',
     '.create-date-field',
     '.update-date-field',
 ];
 
 export class AccountDetails extends TestComponent {
+    get loading() {
+        return this.content.loading;
+    }
+
     async parseContent() {
         const res = {
             closeBtn: { elem: await query(this.elem, '.close-btn') },
             title: { elem: await query(this.elem, '.heading h1') },
+            transactionsLink: { elem: await query(this.elem, '.transactions-link') },
         };
-        res.title.value = await prop(res.title.elem, 'textContent');
+
+        [
+            res.title.value,
+            res.loading,
+        ] = await evaluate((titleEl, linkEl) => ([
+            titleEl.textContent,
+            linkEl.classList.contains('vhidden'),
+        ]), res.title.elem, res.transactionsLink.elem);
 
         [
             res.balanceField,
             res.initialBalanceField,
             res.visibilityField,
+            res.transactionsField,
             res.createDateField,
             res.updateDateField,
         ] = await asyncMap(fieldSelectors, async (selector) => (
@@ -67,6 +80,10 @@ export class AccountDetails extends TestComponent {
         const hidden = state.accounts.isHidden(item);
         const visibilityToken = (hidden) ? 'ITEM_HIDDEN' : 'ITEM_VISIBLE';
 
+        const itemTransactions = state.transactions.applyFilter({
+            accounts: item.id,
+        });
+
         const res = {
             title: {
                 visible: true,
@@ -84,6 +101,11 @@ export class AccountDetails extends TestComponent {
                 visible: true,
                 value: __(visibilityToken, App.view.locale),
             },
+            transactionsField: {
+                value: itemTransactions.length.toString(),
+                visible: true,
+            },
+            transactionsLink: { visible: true },
             createDateField: {
                 value: secondsToDateString(item.createdate),
                 visible: true,

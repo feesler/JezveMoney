@@ -4,7 +4,6 @@ import {
     click,
     assert,
     evaluate,
-    prop,
     asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
@@ -15,21 +14,35 @@ import { __ } from '../../../model/locale.js';
 const fieldSelectors = [
     '.parent-field',
     '.type-field',
+    '.trans-count-field',
     '.create-date-field',
     '.update-date-field',
 ];
 
 export class CategoryDetails extends TestComponent {
+    get loading() {
+        return this.content.loading;
+    }
+
     async parseContent() {
         const res = {
             closeBtn: { elem: await query(this.elem, '.close-btn') },
             title: { elem: await query(this.elem, '.heading h1') },
+            transactionsLink: { elem: await query(this.elem, '.transactions-link') },
         };
-        res.title.value = await prop(res.title.elem, 'textContent');
+
+        [
+            res.title.value,
+            res.loading,
+        ] = await evaluate((titleEl, linkEl) => ([
+            titleEl.textContent,
+            linkEl.classList.contains('vhidden'),
+        ]), res.title.elem, res.transactionsLink.elem);
 
         [
             res.parentField,
             res.typeField,
+            res.transactionsField,
             res.createDateField,
             res.updateDateField,
         ] = await asyncMap(fieldSelectors, async (selector) => (
@@ -63,6 +76,10 @@ export class CategoryDetails extends TestComponent {
         const parent = state.categories.getItem(item.parent_id);
         const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT', App.view.locale);
 
+        const itemTransactions = state.transactions.applyFilter({
+            categories: item.id,
+        });
+
         const res = {
             title: {
                 visible: true,
@@ -76,6 +93,11 @@ export class CategoryDetails extends TestComponent {
                 visible: true,
                 value: Category.typeToString(item.type, App.view.locale),
             },
+            transactionsField: {
+                value: itemTransactions.length.toString(),
+                visible: true,
+            },
+            transactionsLink: { visible: true },
             createDateField: {
                 value: secondsToDateString(item.createdate),
                 visible: true,

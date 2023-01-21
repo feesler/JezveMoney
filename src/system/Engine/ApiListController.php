@@ -16,11 +16,12 @@ class ApiListController extends ApiController
     /**
      * Returns item object prepared for API response
      *
-     * @param object $item
+     * @param object $item item object from model
+     * @param bool $isList list item flag. Default is false
      *
      * @return object
      */
-    protected function prepareItem(object $item)
+    protected function prepareItem(object $item, bool $isList = false)
     {
         return $item;
     }
@@ -72,7 +73,7 @@ class ApiListController extends ApiController
         $items = $this->model->getData($request);
         $res = [];
         foreach ($items as $item) {
-            $res[] = $this->prepareItem($item);
+            $res[] = $this->prepareItem($item, true);
         }
         return $res;
     }

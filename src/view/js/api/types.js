@@ -113,10 +113,11 @@ export const isAccount = (obj) => verifyObject(obj, {
     name: isString,
     icon_id: isInt,
     flags: isInt,
-}, {
-    user_id: isInt,
     createdate: isInt,
     updatedate: isInt,
+}, {
+    transactionsCount: isInt,
+    user_id: isInt,
 });
 
 /** Verify object is array of accounts */
@@ -348,11 +349,12 @@ export const isPerson = (obj) => verifyObject(obj, {
     id: isInt,
     name: isString,
     flags: isInt,
-}, {
-    accounts: isPersonAccountsArray,
-    user_id: isInt,
     createdate: isInt,
     updatedate: isInt,
+}, {
+    user_id: isInt,
+    accounts: isPersonAccountsArray,
+    transactionsCount: isInt,
 });
 
 /** Verify object is array of persons */
@@ -364,10 +366,11 @@ export const isCategory = (obj) => verifyObject(obj, {
     name: isString,
     parent_id: isInt,
     type: isInt,
-}, {
-    user_id: isInt,
     createdate: isInt,
     updatedate: isInt,
+}, {
+    user_id: isInt,
+    transactionsCount: isInt,
 });
 
 /** Verify object is array of categories */

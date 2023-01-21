@@ -10,4 +10,19 @@
   .field__title {
     color: var(--dimmed-text-color);
   }
+
+  .trans-count-field {
+    flex-flow: row wrap;
+    column-gap: 2rem;
+    margin-bottom: 0;
+  }
+
+  .transactions-link {
+    margin: var(--std-field-margin);
+    margin-top: 0;
+  }
+}
+
+.vhidden {
+  visibility: hidden;
 }

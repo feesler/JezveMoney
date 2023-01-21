@@ -40,6 +40,7 @@ class AccountListView extends View {
 
         const initialState = {
             ...this.props,
+            detailsItem: null,
             items: {
                 visible: AccountList.create(window.app.model.visibleUserAccounts),
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
@@ -115,6 +116,10 @@ class AccountListView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
 
         this.subscribeToStore(this.store);
+
+        if (this.props.detailsId) {
+            this.requestItem();
+        }
     }
 
     createMenu() {
@@ -237,6 +242,8 @@ class AccountListView extends View {
     showDetails(e) {
         e?.preventDefault();
         this.store.dispatch(actions.showDetails());
+
+        this.requestItem();
     }
 
     closeDetails() {
@@ -356,6 +363,22 @@ class AccountListView extends View {
         this.stopLoading();
     }
 
+    async requestItem() {
+        const state = this.store.getState();
+        if (!state.detailsId) {
+            return;
+        }
+
+        try {
+            const { data } = await API.account.read(state.detailsId);
+            const [item] = data;
+
+            this.store.dispatch(actions.itemDetailsLoaded(item));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
     /**
      * Show account(s) delete confirmation popup
      */
@@ -443,7 +466,10 @@ class AccountListView extends View {
     }
 
     renderDetails(state, prevState) {
-        if (state.detailsId === prevState?.detailsId) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.detailsItem === prevState?.detailsItem
+        ) {
             return;
         }
 
@@ -453,7 +479,7 @@ class AccountListView extends View {
         }
 
         const { userAccounts } = window.app.model;
-        const item = userAccounts.getItem(state.detailsId);
+        const item = state.detailsItem ?? userAccounts.getItem(state.detailsId);
         if (!item) {
             throw new Error('Account not found');
         }

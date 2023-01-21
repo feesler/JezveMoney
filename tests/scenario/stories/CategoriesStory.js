@@ -180,6 +180,7 @@ export class CategoriesStory extends TestStory {
         await CategoryTests.closeDetails();
         await CategoryTests.showDetails({ index: 1 });
         await CategoryTests.showDetails({ index: 2 });
+        await CategoryTests.showDetails({ index: 2 });
         await CategoryTests.closeDetails();
         await CategoryTests.showDetails({ index: 0, directNavigate: true });
         await CategoryTests.showDetails({ index: 1, directNavigate: true });

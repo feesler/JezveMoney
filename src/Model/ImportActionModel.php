@@ -58,11 +58,11 @@ class ImportActionModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row
+     * @param array|null $row
      *
      * @return ImportActionItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return ImportActionItem::fromTableRow($row);
     }

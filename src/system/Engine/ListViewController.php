@@ -16,7 +16,7 @@ abstract class ListViewController extends TemplateController
             return null;
         }
 
-        $account = $this->model->getItem($ids[0]);
-        return ($account) ? $account->id : null;
+        $item = $this->model->getItem($ids[0]);
+        return ($item) ? $item->id : null;
     }
 }

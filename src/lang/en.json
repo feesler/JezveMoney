@@ -52,6 +52,8 @@
     "ITEM_VISIBILITY": "Visibility",
     "ITEM_VISIBLE": "Visible",
     "ITEM_HIDDEN": "Hidden",
+    "ITEM_TRANSACTIONS_COUNT": "Transactions:",
+    "ITEM_GO_TO_TRANSACTIONS": "Show list",
     "CREATE_DATE": "Created",
     "UPDATE_DATE": "Updated",
     "TOTAL": "Total",

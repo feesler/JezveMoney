@@ -25,11 +25,11 @@ class TransactionItem
     /**
      * Converts table row from database to TransactionItem object
      *
-     * @param array $row
+     * @param array|null $row
      *
      * @return TransactionItem|null
      */
-    public static function fromTableRow(array $row)
+    public static function fromTableRow(?array $row)
     {
         if (is_null($row)) {
             return null;

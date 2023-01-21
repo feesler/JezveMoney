@@ -219,6 +219,7 @@ export class AccountsStory extends TestStory {
         await AccountTests.closeDetails();
         await AccountTests.showDetails({ index: 1 });
         await AccountTests.showDetails({ index: 2 });
+        await AccountTests.showDetails({ index: 2 });
         await AccountTests.closeDetails();
         await AccountTests.showDetails({ index: 0, directNavigate: true });
         await AccountTests.showDetails({ index: 1, directNavigate: true });

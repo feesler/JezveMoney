@@ -17,11 +17,11 @@ class ImportConditionItem
     /**
      * Converts table row from database to ImportConditionItem object
      *
-     * @param array $row
+     * @param array|null $row
      *
      * @return ImportConditionItem|null
      */
-    public static function fromTableRow(array $row)
+    public static function fromTableRow(?array $row)
     {
         if (is_null($row)) {
             return null;

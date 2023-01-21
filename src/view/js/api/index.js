@@ -1,3 +1,5 @@
+import { asArray } from 'jezvejs';
+
 /** Strings */
 const MSG_REQUEST_FAIL = 'API request failed';
 
@@ -41,6 +43,22 @@ const apiGet = (...args) => apiRequest('GET', ...args);
 /** Send GET API request */
 const apiPost = (...args) => apiRequest('POST', ...args);
 
+/** Send GET request for items by ids */
+const idsRequest = (path, val) => {
+    if (!path) {
+        throw new Error('Invalid request path');
+    }
+
+    const ids = asArray(val);
+    if (ids.length === 0) {
+        throw new Error('Invalid request ids');
+    }
+
+    return (ids.length === 1)
+        ? apiGet(`${path}${ids[0]}`)
+        : apiGet(path, { id: ids });
+};
+
 export const API = {
     profile: {
         async changePassword(currentPassword, newPassword) {
@@ -74,6 +92,10 @@ export const API = {
             return apiGet('account/list', options);
         },
 
+        async read(data) {
+            return idsRequest('account/', data);
+        },
+
         async create(data) {
             return apiPost('account/create', data);
         },
@@ -100,6 +122,10 @@ export const API = {
             return apiGet('person/list', options);
         },
 
+        async read(data) {
+            return idsRequest('person/', data);
+        },
+
         async create(data) {
             return apiPost('person/create', data);
         },
@@ -124,6 +150,10 @@ export const API = {
     category: {
         async list(options = {}) {
             return apiGet('category/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('category/', data);
         },
 
         async create(data) {
@@ -155,6 +185,10 @@ export const API = {
             };
 
             return apiGet('transaction/list', requestOptions);
+        },
+
+        async read(data) {
+            return idsRequest('transaction/', data);
         },
 
         async create(data) {
@@ -189,6 +223,10 @@ export const API = {
     },
 
     importTemplate: {
+        async read(data) {
+            return idsRequest('importtpl/', data);
+        },
+
         async create(data) {
             return apiPost('importtpl/create', data);
         },
@@ -207,6 +245,10 @@ export const API = {
     },
 
     importRule: {
+        async read(data) {
+            return idsRequest('importrule/', data);
+        },
+
         async create(data) {
             return apiPost('importrule/create', data);
         },

@@ -37,6 +37,7 @@ class PersonListView extends View {
 
         const initialState = {
             ...this.props,
+            detailsItem: null,
             items: {
                 visible: PersonList.create(window.app.model.visiblePersons),
                 hidden: PersonList.create(window.app.model.hiddenPersons),
@@ -112,6 +113,10 @@ class PersonListView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
 
         this.subscribeToStore(this.store);
+
+        if (this.props.detailsId) {
+            this.requestItem();
+        }
     }
 
     createMenu() {
@@ -223,6 +228,8 @@ class PersonListView extends View {
     showDetails(e) {
         e?.preventDefault();
         this.store.dispatch(actions.showDetails());
+
+        this.requestItem();
     }
 
     closeDetails() {
@@ -342,6 +349,22 @@ class PersonListView extends View {
         this.stopLoading();
     }
 
+    async requestItem() {
+        const state = this.store.getState();
+        if (!state.detailsId) {
+            return;
+        }
+
+        try {
+            const { data } = await API.person.read(state.detailsId);
+            const [item] = data;
+
+            this.store.dispatch(actions.itemDetailsLoaded(item));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
@@ -412,7 +435,10 @@ class PersonListView extends View {
     }
 
     renderDetails(state, prevState) {
-        if (state.detailsId === prevState?.detailsId) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.detailsItem === prevState?.detailsItem
+        ) {
             return;
         }
 
@@ -422,7 +448,7 @@ class PersonListView extends View {
         }
 
         const { persons } = window.app.model;
-        const item = persons.getItem(state.detailsId);
+        const item = state.detailsItem ?? persons.getItem(state.detailsId);
         if (!item) {
             throw new Error('Person not found');
         }

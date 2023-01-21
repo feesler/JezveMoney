@@ -52,6 +52,8 @@
     "ITEM_VISIBILITY": "Видимость",
     "ITEM_VISIBLE": "Отображается",
     "ITEM_HIDDEN": "Скрыто",
+    "ITEM_TRANSACTIONS_COUNT": "Транзакций:",
+    "ITEM_GO_TO_TRANSACTIONS": "Перейти к списку",
     "CREATE_DATE": "Дата создания",
     "UPDATE_DATE": "Дата изменения",
     "TOTAL": "Всего на счетах",

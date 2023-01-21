@@ -87,11 +87,11 @@ class TransactionModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row
+     * @param array|null $row array of table row fields
      *
      * @return TransactionItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return TransactionItem::fromTableRow($row);
     }

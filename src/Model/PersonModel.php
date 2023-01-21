@@ -38,11 +38,11 @@ class PersonModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row array of table row fields
+     * @param array|null $row array of table row fields
      *
      * @return PersonItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return PersonItem::fromTableRow($row);
     }
@@ -393,6 +393,11 @@ class PersonModel extends CachedTable
             $qResult = $this->dbObj->selectQ("*", $this->tbl_name, "id=" . intval($item_id));
             $row = $this->dbObj->fetchRow($qResult);
             $item = $this->rowToObj($row);
+        }
+
+        if (!is_null($item)) {
+            $accMod = AccountModel::getInstance();
+            $item->setAccounts($accMod->getData(["owner" => $item->id]));
         }
 
         return $item;

@@ -9,6 +9,7 @@ const availFields = [
     'type',
     'createdate',
     'updatedate',
+    'transactionsCount',
 ];
 
 /**

@@ -263,6 +263,11 @@ export class PersonListView extends AppView {
             await this.performAction(() => this.content.ctxDetailsBtn.click());
         }
 
+        await waitForFunction(async () => {
+            await this.parse();
+            return (!this.content.itemInfo.loading);
+        });
+
         return App.view.checkState(expected);
     }
 
