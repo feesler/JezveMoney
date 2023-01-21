@@ -811,14 +811,16 @@ a.paginator-arrow:focus-visible {
 
 /* List view details */
 .item-details {
+  position: fixed;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
-  flex: 1 1 auto;
-  position: absolute;
-  left: 0;
-  background-color: var(--main-bg-color);
-  z-index: 1500;
   padding: 0 12px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  background-color: var(--main-bg-color);
+  z-index: 2100;
 }
 
 /* Histogram */
@@ -852,7 +854,8 @@ a.paginator-arrow:focus-visible {
   }
 
   .item-details {
-    position: static;
+    position: sticky;
+    top: var(--header-size);
     width: auto;
     max-width: var(--section-width);
   }
