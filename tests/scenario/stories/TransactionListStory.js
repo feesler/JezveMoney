@@ -143,7 +143,7 @@ export class TransactionListStory extends TestStory {
         const searchData = [
             { text: '1', directNavigate },
             { text: 'la', directNavigate },
-            { text: 'кк', directNavigate },
+            { text: 'кк ', directNavigate },
         ];
 
         await App.scenario.runner.runGroup(TransactionListTests.search, searchData);

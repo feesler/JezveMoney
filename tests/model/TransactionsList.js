@@ -298,7 +298,7 @@ export class TransactionsList extends List {
             return list;
         }
 
-        const lcQuery = query.toLowerCase();
+        const lcQuery = query.toLowerCase().trim();
 
         return list.filter((item) => item.comment.toLowerCase().includes(lcQuery));
     }

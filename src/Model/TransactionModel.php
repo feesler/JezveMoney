@@ -1728,7 +1728,7 @@ class TransactionModel extends CachedTable
 
         // Search condition
         if (isset($params["search"]) && !is_null($params["search"])) {
-            $sReq = $this->dbObj->escape($params["search"]);
+            $sReq = $this->dbObj->escape(trim($params["search"]));
             if (!is_empty($sReq)) {
                 $res[] = "comment LIKE '%" . $sReq . "%'";
             }
