@@ -11,6 +11,7 @@ import {
     asArray,
     asyncMap,
     evaluate,
+    formatDate,
 } from 'jezve-test';
 import { DropDown, Checkbox, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -1118,7 +1119,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: App.datesFmt.now,
+            date: formatDate(new Date()),
             comment: '',
         });
         this.formIndex = this.items.length;
