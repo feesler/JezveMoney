@@ -1,11 +1,11 @@
 import {
     createElement,
-    enable,
     isFunction,
     copyObject,
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { IconButton } from 'jezvejs/IconButton';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
@@ -62,16 +62,14 @@ export class ImportRuleForm extends Component {
         // Hidden id input
         this.idInput = createElement('input', { props: { type: 'hidden' } });
         // Conditions
-        this.createCondBtn = createElement('button', {
-            props: {
-                className: 'btn link-btn create-btn',
-                type: 'button',
-                textContent: __('CREATE'),
-            },
-            events: { click: (e) => this.onCreateConditionClick(e) },
+        this.createCondBtn = IconButton.create({
+            id: 'createCondBtn',
+            className: 'create-btn right-align',
+            icon: 'plus',
+            onClick: (e) => this.onCreateConditionClick(e),
         });
 
-        this.toggleCondBtn = ToggleButton.create({ className: 'right-align' });
+        this.toggleCondBtn = ToggleButton.create();
 
         this.conditionsList = ListContainer.create({
             ItemComponent: ImportConditionForm,
@@ -90,7 +88,7 @@ export class ImportRuleForm extends Component {
             className: 'rule-form-collapse',
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_CONDITIONS') } }),
-                this.createCondBtn,
+                this.createCondBtn.elem,
                 this.toggleCondBtn.elem,
             ],
             content: this.conditionsList.elem,
@@ -98,12 +96,14 @@ export class ImportRuleForm extends Component {
         });
 
         // Actions
-        this.createActionBtn = createElement('button', {
-            props: { className: 'btn link-btn create-btn', type: 'button', textContent: __('CREATE') },
-            events: { click: (e) => this.onCreateActionClick(e) },
+        this.createActionBtn = IconButton.create({
+            id: 'createActionBtn',
+            className: 'create-btn right-align',
+            icon: 'plus',
+            onClick: (e) => this.onCreateActionClick(e),
         });
 
-        this.toggleActionsBtn = ToggleButton.create({ className: 'right-align' });
+        this.toggleActionsBtn = ToggleButton.create();
 
         this.actionsList = ListContainer.create({
             ItemComponent: ImportActionForm,
@@ -122,7 +122,7 @@ export class ImportRuleForm extends Component {
             className: 'rule-form-collapse',
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
-                this.createActionBtn,
+                this.createActionBtn.elem,
                 this.toggleActionsBtn.elem,
             ],
             content: this.actionsList.elem,
@@ -623,14 +623,12 @@ export class ImportRuleForm extends Component {
 
     validateConditionsAvail(state) {
         const isAvail = this.getNextAvailProperty(state);
-
-        enable(this.createCondBtn, !!isAvail);
+        this.createCondBtn.enable(!!isAvail);
     }
 
     validateActionsAvail(state) {
         const isAvail = this.getNextAvailAction(state);
-
-        enable(this.createActionBtn, !!isAvail);
+        this.createActionBtn.enable(!!isAvail);
     }
 
     /** Render component state */

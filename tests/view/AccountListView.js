@@ -9,6 +9,8 @@ import {
     closest,
     asArray,
     asyncMap,
+    goTo,
+    baseUrl,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -16,6 +18,7 @@ import { TilesList } from './component/Tiles/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
+import { AccountDetails } from './component/Account/AccountDetails.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -28,7 +31,12 @@ const listMenuItems = [
 ];
 
 const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxExportBtn', 'ctxShowBtn', 'ctxHideBtn', 'ctxDeleteBtn',
+    'ctxDetailsBtn',
+    'ctxUpdateBtn',
+    'ctxExportBtn',
+    'ctxShowBtn',
+    'ctxHideBtn',
+    'ctxDeleteBtn',
 ];
 
 /** List of accounts view class */
@@ -68,6 +76,8 @@ export class AccountListView extends AppView {
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+
+        res.itemInfo = await AccountDetails.create(this, await query('#itemInfo .list-item-details'));
 
         res.renderTime = await prop(res.tiles.elem, 'dataset.time');
 
@@ -113,7 +123,35 @@ export class AccountListView extends AppView {
             mode: this.getViewMode(cont),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible: cont.contextMenu.visible,
+            detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
+
+        return res;
+    }
+
+    getDetailsId() {
+        const viewPath = '/accounts/';
+        const { pathname } = new URL(this.location);
+        assert(pathname.startsWith(viewPath), `Invalid location path: ${pathname}`);
+
+        if (pathname.length === viewPath.length) {
+            return 0;
+        }
+
+        const param = pathname.substring(viewPath.length);
+        return parseInt(param, 10) ?? 0;
+    }
+
+    getDetailsItem(itemId) {
+        return App.state.getUserAccounts().getItem(itemId);
+    }
+
+    getExpectedURL(model = this.model) {
+        let res = `${baseUrl()}accounts/`;
+
+        if (model.detailsItem) {
+            res += model.detailsItem.id.toString();
+        }
 
         return res;
     }
@@ -151,6 +189,11 @@ export class AccountListView extends AppView {
             deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
         };
 
+        if (model.detailsItem) {
+            res.itemInfo = AccountDetails.render(model.detailsItem, App.state);
+            res.itemInfo.visible = true;
+        }
+
         if (model.contextMenuVisible) {
             const ctxAccount = App.state.accounts.getItem(model.contextItem);
             assert(ctxAccount, 'Invalid state');
@@ -161,6 +204,7 @@ export class AccountListView extends AppView {
                 tileId: model.contextItem,
             };
 
+            res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxExportBtn = { visible: true };
             res.ctxShowBtn = { visible: isHidden };
@@ -198,7 +242,51 @@ export class AccountListView extends AppView {
         await navigation(() => this.content.addBtn.click());
     }
 
-    /** Select specified account, click on edit button and return navigation promise */
+    /** Clicks by 'Show details' context menu item of specified account */
+    async showDetails(num, directNavigate = false) {
+        const item = this.getItemByIndex(num);
+
+        if (!directNavigate) {
+            await this.openContextMenu(num);
+        }
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        this.model.detailsItem = this.getDetailsItem(item.id);
+        assert(this.model.detailsItem, 'Item not found');
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.ctxDetailsBtn.click());
+        }
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (!this.content.itemInfo.loading);
+        });
+
+        return App.view.checkState(expected);
+    }
+
+    /** Closes item details */
+    async closeDetails(directNavigate = false) {
+        assert(this.model.detailsItem, 'Details already closed');
+
+        this.model.detailsItem = null;
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.itemInfo.close());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    /** Clicks by 'Edit' context menu item of specified account */
     async goToUpdateAccount(num) {
         await this.openContextMenu(num);
 
@@ -222,27 +310,40 @@ export class AccountListView extends AppView {
         await this.parse();
     }
 
+    getItemByIndex(index, model = this.model) {
+        const visibleTiles = model.tiles.length;
+        const hiddenTiles = model.hiddenTiles.length;
+        const totalTiles = visibleTiles + hiddenTiles;
+
+        assert(index >= 0 && index < totalTiles, 'Invalid account number');
+
+        return (index < visibleTiles)
+            ? model.tiles[index]
+            : model.hiddenTiles[index - visibleTiles];
+    }
+
+    getTileByIndex(index, model = this.model) {
+        const visibleTiles = model.tiles.length;
+        const hiddenTiles = model.hiddenTiles.length;
+        const totalTiles = visibleTiles + hiddenTiles;
+
+        assert(index >= 0 && index < totalTiles, 'Invalid account number');
+
+        return (index < visibleTiles)
+            ? this.content.tiles.items[index]
+            : this.content.hiddenTiles.items[index - visibleTiles];
+    }
+
     async openContextMenu(num) {
         await this.cancelSelectMode();
 
-        const visibleTiles = this.model.tiles.length;
-        const hiddenTiles = this.model.hiddenTiles.length;
-        const totalTiles = visibleTiles + hiddenTiles;
-
-        assert(num >= 0 && num < totalTiles, 'Invalid account number');
-
-        const item = (num < visibleTiles)
-            ? this.model.tiles[num]
-            : this.model.hiddenTiles[num - visibleTiles];
+        const item = this.getItemByIndex(num);
 
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        const tile = (num < visibleTiles)
-            ? this.content.tiles.items[num]
-            : this.content.hiddenTiles.items[num - visibleTiles];
-
+        const tile = this.getTileByIndex(num);
         await this.performAction(() => tile.click());
 
         return this.checkState(expected);
@@ -298,25 +399,13 @@ export class AccountListView extends AppView {
         await this.setSelectMode();
 
         const accounts = asArray(data);
-
-        const visibleTiles = this.model.tiles.length;
-        const hiddenTiles = this.model.hiddenTiles.length;
-        const totalTiles = visibleTiles + hiddenTiles;
         for (const num of accounts) {
-            assert(num >= 0 && num < totalTiles, 'Invalid account number');
-
-            const item = (num < visibleTiles)
-                ? this.model.tiles[num]
-                : this.model.hiddenTiles[num - visibleTiles];
-
+            const item = this.getItemByIndex(num);
             item.isActive = !item.isActive;
 
             const expected = this.getExpectedState();
 
-            const tile = (num < visibleTiles)
-                ? this.content.tiles.items[num]
-                : this.content.hiddenTiles.items[num - visibleTiles];
-
+            const tile = this.getTileByIndex(num);
             await this.performAction(() => tile.click());
 
             this.checkState(expected);

@@ -1,7 +1,6 @@
-.heading,
-.content-header,
-.content-container {
-  max-width: 430px;
+main {
+  flex: 1 1 auto;
+  max-width: var(--section-width);
 }
 
 .content-container {

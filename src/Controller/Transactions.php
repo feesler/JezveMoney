@@ -2,7 +2,7 @@
 
 namespace JezveMoney\App\Controller;
 
-use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
@@ -14,7 +14,7 @@ use JezveMoney\App\Model\CategoryModel;
 /**
  * Transactions controller
  */
-class Transactions extends TemplateController
+class Transactions extends ListViewController
 {
     protected $model = null;
     protected $accModel = null;
@@ -126,6 +126,8 @@ class Transactions extends TemplateController
             $pagination["page"] = $page_num + 1;
         }
 
+        $detailsId = $this->getRequestedItem();
+
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -133,10 +135,12 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "categories" => $this->catModel->getData(),
             "view" => [
-                "transArr" => $transactions,
+                "items" => $transactions,
                 "filter" => (object)$filterObj,
                 "pagination" => $pagination,
                 "mode" => $showDetails ? "details" : "classic",
+                "detailsId" => $detailsId,
+                "detailsItem" => $this->model->getItem($detailsId),
             ],
         ];
 

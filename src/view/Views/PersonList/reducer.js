@@ -1,3 +1,4 @@
+import { Person } from '../../js/model/Person.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { createSlice } from '../../js/store.js';
 
@@ -17,6 +18,28 @@ const reduceDeselectAll = (state) => ({
 });
 
 const slice = createSlice({
+    showDetails: (state) => ({
+        ...state,
+        detailsId: state.contextItem,
+        detailsItem: (state.detailsId === state.contextItem) ? state.detailsItem : null,
+        contextItem: null,
+    }),
+
+    closeDetails: (state) => (
+        (state.detailsId)
+            ? { ...state, detailsId: null }
+            : state
+    ),
+
+    itemDetailsLoaded: (state, item) => (
+        (state.detailsId !== item?.id)
+            ? state
+            : {
+                ...state,
+                detailsItem: new Person(item),
+            }
+    ),
+
     showContextMenu: (state, itemId) => (
         (state.contextItem === itemId)
             ? state

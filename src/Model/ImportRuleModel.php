@@ -35,11 +35,11 @@ class ImportRuleModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row array of table row fields
+     * @param array|null $row array of table row fields
      *
      * @return ImportRuleItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return ImportRuleItem::fromTableRow($row);
     }

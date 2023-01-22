@@ -12,6 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { Offcanvas } from 'jezvejs/Offcanvas';
 import { __ } from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -30,6 +31,7 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { TransactionDetails } from '../../Components/TransactionDetails/TransactionDetails.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
@@ -45,11 +47,8 @@ class TransactionListView extends View {
         super(...args);
 
         const initialState = {
-            items: [...this.props.transArr],
-            filter: { ...this.props.filter },
+            ...this.props,
             form: { ...this.props.filter },
-            pagination: { ...this.props.pagination },
-            mode: this.props.mode,
             loading: false,
             listMode: 'list',
             contextItem: null,
@@ -95,6 +94,13 @@ class TransactionListView extends View {
 
         this.heading = Heading.fromElement(this.heading, {
             title: __('TRANSACTIONS'),
+        });
+
+        // Transaction details
+        this.itemInfo = Offcanvas.create({
+            placement: 'right',
+            className: 'transaction-details',
+            onClosed: () => this.closeDetails(),
         });
 
         // Filters
@@ -298,6 +304,13 @@ class TransactionListView extends View {
             id: 'contextMenu',
             attached: true,
             items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('OPEN_ITEM'),
+                onClick: (e) => this.showDetails(e),
+            }, {
+                type: 'placeholder',
+            }, {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
@@ -332,6 +345,15 @@ class TransactionListView extends View {
     isAvailable() {
         const { accounts, persons } = window.app.model;
         return (accounts.length > 0 || persons.length > 0);
+    }
+
+    showDetails(e) {
+        e?.preventDefault();
+        this.store.dispatch(actions.showDetails());
+    }
+
+    closeDetails() {
+        this.store.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
@@ -634,7 +656,6 @@ class TransactionListView extends View {
         e.preventDefault();
 
         this.store.dispatch(actions.toggleMode());
-        this.replaceHistory();
         this.setRenderTime();
     }
 
@@ -652,12 +673,6 @@ class TransactionListView extends View {
 
             this.toggleSelectItem(itemId);
         }
-    }
-
-    replaceHistory() {
-        const url = this.getFilterURL(this.store.getState());
-        const pageTitle = `${__('APP_NAME')} ${__('TRANSACTIONS')}`;
-        window.history.replaceState({}, pageTitle, url);
     }
 
     async requestTransactions(options) {
@@ -678,7 +693,6 @@ class TransactionListView extends View {
             this.store.dispatch(actions.listRequestError());
         }
 
-        this.replaceHistory();
         this.stopLoading();
         this.setRenderTime();
     }
@@ -702,6 +716,7 @@ class TransactionListView extends View {
 
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
+        items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
         this.contextMenu.attachAndShow(menuContainer);
@@ -780,14 +795,65 @@ class TransactionListView extends View {
         this.setCategoryDialog.show(state.categoryDialog.show);
     }
 
+    renderDetails(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
+        }
+
+        if (!state.detailsId) {
+            this.itemInfo.close();
+            return;
+        }
+
+        const id = parseInt(state.detailsId, 10);
+        const item = (state.detailsItem?.id === id)
+            ? state.detailsItem
+            : state.items.find((transaction) => transaction.id === id);
+        if (!item) {
+            throw new Error('Transaction not found');
+        }
+
+        if (!this.transactionDetails) {
+            this.transactionDetails = TransactionDetails.create({
+                item,
+                onClose: () => this.closeDetails(),
+            });
+            this.itemInfo.setContent(this.transactionDetails.elem);
+        } else {
+            this.transactionDetails.setItem(item);
+        }
+
+        this.itemInfo.open();
+    }
+
+    renderHistory(state, prevState) {
+        if (
+            state.filter === prevState?.filter
+            && state.mode === prevState?.mode
+            && state.detailsId === prevState?.detailsId
+        ) {
+            return;
+        }
+
+        const { baseURL } = window.app;
+        const url = (state.detailsId)
+            ? new URL(`${baseURL}transactions/${state.detailsId}`)
+            : this.getFilterURL(state);
+
+        const pageTitle = `${__('APP_NAME')} | ${__('TRANSACTIONS')}`;
+        window.history.replaceState({}, pageTitle, url);
+    }
+
     render(state, prevState = {}) {
+        this.renderHistory(state, prevState);
+
         if (state.loading) {
             this.loadingIndicator.show();
         }
 
-        const filterUrl = this.getFilterURL(state, false);
+        const filterURL = this.getFilterURL(state, false);
 
-        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setURL(filterURL);
         this.typeMenu.setSelection(state.form.type);
 
         this.renderAccountsFilter(state);
@@ -827,7 +893,7 @@ class TransactionListView extends View {
             this.paginator.show(state.items.length > 0);
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
-                url: filterUrl,
+                url: filterURL.toString(),
                 pagesCount: state.pagination.pagesCount,
                 pageNum,
             }));
@@ -840,19 +906,21 @@ class TransactionListView extends View {
         );
 
         const isDetails = (state.mode === 'details');
-        filterUrl.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
-        filterUrl.searchParams.set('page', state.pagination.page);
+
+        const modeURL = this.getFilterURL(state);
+        modeURL.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
+
         this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setState((modeSelectorState) => ({
             ...modeSelectorState,
             icon: (isDetails) ? 'mode-list' : 'mode-details',
             title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
-            url: filterUrl.toString(),
+            url: modeURL.toString(),
         }));
 
         this.renderContextMenu(state);
         this.renderMenu(state);
-
+        this.renderDetails(state, prevState);
         this.renderCategoryDialog(state, prevState);
 
         if (!state.loading) {

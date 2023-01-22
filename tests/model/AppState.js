@@ -183,8 +183,16 @@ export class AppState {
     }
 
     compareLists(local, expected) {
-        assert(local.length === expected.length);
-        assert.deepMeet(local.data, expected.data);
+        assert(local.data.length === expected.data.length);
+
+        const noDatesData = expected.data.map((item) => {
+            const res = item;
+            delete res.createdate;
+            delete res.updatedate;
+            return res;
+        });
+
+        assert.deepMeet(local.data, noDatesData);
     }
 
     meetExpectation(expected) {
@@ -197,9 +205,9 @@ export class AppState {
         assert(this.rules.length === expected.rules.length);
         this.rules.forEach((rule, index) => {
             const expectedRule = expected.rules.data[index];
-            assert(rule.conditions.data.length === expectedRule.conditions.data.length);
-            assert(rule.actions.data.length === expectedRule.actions.data.length);
-            assert.deepMeet(rule, expectedRule);
+
+            this.compareLists(rule.conditions, expectedRule.conditions);
+            this.compareLists(rule.actions, expectedRule.actions);
         });
 
         assert.deepMeet(this.profile, expected.profile);

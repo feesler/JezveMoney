@@ -9,13 +9,13 @@
 .widget {
   display: inline-flex;
   flex-flow: column nowrap;
+  align-items: flex-start;
   min-width: 200px;
   margin: 0 20px 20px 0;
 }
 
 @media screen and (max-width: 500px) {
   .widget {
-    display: block;
     margin: 0;
     padding: 0 0 20px 0;
     overflow: hidden;
@@ -59,12 +59,25 @@
   height: 24px;
 }
 
-/* Main page accounts widget */
+/* Accounts widget */
 .accounts-widget {
   max-width: 440px;
 }
 
-/* main page latest transactions widget */
+.accounts-widget,
+.persons-widget {
+  .tiles + .tiles {
+    border-top: 1px solid var(--list-separator-color);
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .link-btn {
+    padding: 0.5rem 0;
+  }
+}
+
+/* Latest transactions widget */
 .transactions-widget {
   flex-basis: 350px;
 }

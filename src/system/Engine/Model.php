@@ -47,11 +47,11 @@ abstract class Model
     /**
      * Converts table row from database to object
      *
-     * @param array $row array of table row fields
+     * @param array|null $row array of table row fields
      *
      * @return object|null
      */
-    abstract protected function rowToObj(array $row);
+    abstract protected function rowToObj(?array $row);
 
     /**
      * Checks item create conditions and returns array of expressions

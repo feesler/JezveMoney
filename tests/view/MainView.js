@@ -58,7 +58,48 @@ export class MainView extends AppView {
             locale: cont.locale,
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
+            showHiddenAccounts: !!cont.accountsWidget.hiddenTiles?.content?.visible,
+            showHiddenPersons: !!cont.personsWidget.hiddenTiles?.content?.visible,
         };
+
+        return res;
+    }
+
+    getExpectedState(model = this.model) {
+        const userAccounts = App.state.getUserAccounts();
+        const hiddenUserAccounts = userAccounts.getHidden(true);
+        const hiddenPersons = App.state.persons.getHidden(true);
+        const hasHiddenAccounts = hiddenUserAccounts.length > 0;
+        const hasHiddenPersons = hiddenPersons.length > 0;
+
+        const res = {
+            accountsWidget: {
+                visible: true,
+                title: __('ACCOUNTS', App.view.locale),
+                tiles: TilesList.renderAccounts(userAccounts),
+                hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
+                toggleHiddenBtn: { visible: hasHiddenAccounts },
+            },
+            personsWidget: {
+                visible: true,
+                title: __('PERSONS', App.view.locale),
+                tiles: TilesList.renderPersons(App.state.persons, true),
+                hiddenTiles: TilesList.renderHiddenPersons(App.state.persons, true),
+                toggleHiddenBtn: { visible: hasHiddenPersons },
+            },
+        };
+
+        res.accountsWidget.hiddenTiles.visible = hasHiddenAccounts && model.showHiddenAccounts;
+        res.personsWidget.hiddenTiles.visible = hasHiddenPersons && model.showHiddenPersons;
+
+        // Transactions widget
+        if (userAccounts.length > 0 || App.state.persons.length > 0) {
+            const latest = App.state.transactions.slice(
+                0,
+                App.config.latestTransactions,
+            );
+            res.transactionsWidget = TransactionList.renderWidget(latest, App.state);
+        }
 
         return res;
     }
@@ -97,6 +138,20 @@ export class MainView extends AppView {
         await navigation(() => this.content.accountsWidget.clickByTitle());
     }
 
+    async toggleHiddenAccounts() {
+        assert(this.content.accountsWidget, 'Accounts widget not found');
+
+        const hiddenUserAccounts = App.state.getUserAccounts().getHidden(true);
+        assert(hiddenUserAccounts.length > 0, 'No hidden accounts');
+
+        this.model.showHiddenAccounts = !this.model.showHiddenAccounts;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.accountsWidget.toggleHidden());
+
+        return this.checkState(expected);
+    }
+
     async goToNewTransactionByAccount(index) {
         assert(this.content.accountsWidget, 'Accounts widget not found');
 
@@ -113,6 +168,20 @@ export class MainView extends AppView {
         assert(this.content.personsWidget, 'Persons widget not found');
 
         await navigation(() => this.content.personsWidget.clickByTitle());
+    }
+
+    async toggleHiddenPersons() {
+        assert(this.content.personsWidget, 'Persons widget not found');
+
+        const hiddenPersons = App.state.persons.getHidden(true);
+        assert(hiddenPersons.length > 0, 'No hidden persons');
+
+        this.model.showHiddenPersons = !this.model.showHiddenPersons;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.personsWidget.toggleHidden());
+
+        return this.checkState(expected);
     }
 
     async goToNewTransactionByPerson(index) {
@@ -161,6 +230,7 @@ export class MainView extends AppView {
         res.accountsWidget = {
             title: __('ACCOUNTS', App.view.locale),
             tiles: TilesList.renderAccounts(userAccounts),
+            hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
         };
 
         // Transactions widget
@@ -176,6 +246,7 @@ export class MainView extends AppView {
         res.personsWidget = {
             title: __('PERSONS', App.view.locale),
             tiles: TilesList.renderPersons(state.persons, true),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons, true),
         };
 
         return res;

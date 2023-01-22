@@ -120,6 +120,25 @@ export const toggleSelect = async (transactions) => {
     });
 };
 
+export const showDetails = async ({ index, directNavigate = false }) => {
+    await App.state.fetch();
+
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Position of transaction not specified');
+
+    await test(`Show details of transaction [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.showDetails(index, directNavigate);
+    });
+};
+
+export const closeDetails = async (directNavigate = false) => {
+    await test('Close transaction details', async () => {
+        await checkNavigation();
+        return App.view.closeDetails(directNavigate);
+    });
+};
+
 /** Set list mode */
 export const setListMode = async () => {
     await test('Set list mode', async () => {
@@ -233,7 +252,7 @@ export const filterByType = async ({ type, directNavigate = false, iteratePages 
     }
 
     const types = asArray(type).filter((item) => availTransTypes.includes(item));
-    const names = types.map(Transaction.typeToString);
+    const names = types.map((item) => Transaction.typeToString(item));
 
     const descr = (types.length)
         ? `Filter by [${names.join()}]`

@@ -34,11 +34,11 @@ class UserModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row array of table row fields
+     * @param array|null $row array of table row fields
      *
      * @return object|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         if (is_null($row)) {
             return null;

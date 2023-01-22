@@ -2,16 +2,25 @@
 
 namespace JezveMoney\App\Controller;
 
-use JezveMoney\Core\TemplateController;
+use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
 /**
  * Persons controller
  */
-class Persons extends TemplateController
+class Persons extends ListViewController
 {
     protected $requiredFields = ["name", "flags"];
+
+    /**
+     * Controller initialization
+     */
+    protected function onStart()
+    {
+        $this->model = $this->personMod;
+    }
 
     /**
      * /persons/ route handler
@@ -23,8 +32,15 @@ class Persons extends TemplateController
         $data = [
             "titleString" => __("APP_NAME") . " | " . __("PERSONS"),
         ];
+
+        $currMod = CurrencyModel::getInstance();
+
         $data["appProps"] = [
-            "persons" => $this->personMod->getData(["visibility" => "all"])
+            "currency" => $currMod->getData(),
+            "persons" => $this->model->getData(["visibility" => "all"]),
+            "view" => [
+                "detailsId" => $this->getRequestedItem(),
+            ],
         ];
 
         $this->cssArr[] = "PersonListView.css";
@@ -63,7 +79,7 @@ class Persons extends TemplateController
             "titleString" => __("APP_NAME") . " | " . __("PERSON_CREATE"),
         ];
 
-        $personsData = $this->personMod->getData(["visibility" => "all"]);
+        $personsData = $this->model->getData(["visibility" => "all"]);
 
         $pInfo = new \stdClass();
         $pInfo->id = 0;
@@ -106,13 +122,13 @@ class Persons extends TemplateController
             $this->fail(__("ERR_PERSON_UPDATE"));
         }
 
-        $pInfo = $this->personMod->getItem($p_id);
+        $pInfo = $this->model->getItem($p_id);
         if (!$pInfo) {
             $this->fail(__("ERR_PERSON_UPDATE"));
         }
         $data["pInfo"] = $pInfo;
 
-        $personsData = $this->personMod->getData(["visibility" => "all"]);
+        $personsData = $this->model->getData(["visibility" => "all"]);
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [

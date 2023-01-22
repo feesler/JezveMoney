@@ -11,6 +11,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { IconButton } from 'jezvejs/IconButton';
 import { Switch } from 'jezvejs/Switch';
 import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
@@ -80,7 +81,6 @@ export class ImportTemplateManager extends Component {
             'tplAccountSwitchField',
             'tplAccountSwitch',
             'tplAccountField',
-            'createTplBtn',
             'columnField',
             'tplControls',
             'submitTplBtn',
@@ -105,6 +105,14 @@ export class ImportTemplateManager extends Component {
             onDelete: () => this.onDeleteTemplate(),
         });
         insertAfter(this.templateSelect.elem, this.tplFieldHeader);
+
+        this.createTplBtn = IconButton.create({
+            id: 'createTplBtn',
+            className: 'create-btn',
+            icon: 'plus',
+            onClick: () => this.onCreateTemplateClick(),
+        });
+        this.tplFieldHeader.append(this.createTplBtn.elem);
 
         this.columnDropDown = DropDown.create({
             elem: 'columnSel',
@@ -141,7 +149,6 @@ export class ImportTemplateManager extends Component {
         setEvents(this.decFirstRowBtn, { click: () => this.onFirstRowDecrease() });
         setEvents(this.incFirstRowBtn, { click: () => this.onFirstRowIncrease() });
 
-        setEvents(this.createTplBtn, { click: () => this.onCreateTemplateClick() });
         setEvents(this.submitTplBtn, { click: () => this.onSubmitTemplateClick() });
         setEvents(this.cancelTplBtn, { click: () => this.onCancelTemplateClick() });
 
@@ -800,12 +807,12 @@ export class ImportTemplateManager extends Component {
 
             this.loadingIndicator.hide();
             window.app.setValidation(this.nameField, true);
-            show(this.createTplBtn, templateAvail);
+            this.createTplBtn.show(templateAvail);
         } else if (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE) {
             show(this.noTplLabel, false);
             this.loadingIndicator.hide();
             show(this.tplField, false);
-            show(this.createTplBtn, false);
+            this.createTplBtn.show(false);
             show(this.cancelTplBtn, templateAvail);
         }
 
@@ -817,7 +824,7 @@ export class ImportTemplateManager extends Component {
         this.templateSelect.enable(!state.listLoading);
         this.columnDropDown.enable(!state.listLoading);
         enable(this.tplNameInp, !state.listLoading);
-        enable(this.createTplBtn, !state.listLoading);
+        this.createTplBtn.enable(!state.listLoading);
         enable(this.submitTplBtn, !state.listLoading);
         enable(this.cancelTplBtn, !state.listLoading);
 

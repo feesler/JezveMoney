@@ -5,6 +5,7 @@ import {
     setBlock,
     baseUrl,
     goTo,
+    asArray,
 } from 'jezve-test';
 import { generateId } from '../common.js';
 import { PersonListView } from '../view/PersonListView.js';
@@ -50,6 +51,25 @@ export const update = async (pos) => {
         App.view.setExpectedPerson(expectedPerson);
         App.view.expectedState = App.view.getExpectedState();
         return App.view.checkState();
+    });
+};
+
+export const showDetails = async ({ index, directNavigate = false }) => {
+    await App.state.fetch();
+
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Position of person not specified');
+
+    await test(`Show details of person [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.showDetails(index, directNavigate);
+    });
+};
+
+export const closeDetails = async (directNavigate = false) => {
+    await test('Close person details', async () => {
+        await checkNavigation();
+        return App.view.closeDetails(directNavigate);
     });
 };
 
@@ -128,7 +148,7 @@ export const delFromUpdate = async (pos) => {
 };
 
 export const show = async (persons, val = true) => {
-    const itemIds = Array.isArray(persons) ? persons : [persons];
+    const itemIds = asArray(persons);
 
     const actVerb = (val) ? 'Show' : 'Hide';
     await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
@@ -150,7 +170,7 @@ export const show = async (persons, val = true) => {
 export const hide = async (persons) => show(persons, false);
 
 export const toggleSelect = async (persons) => {
-    const itemIds = Array.isArray(persons) ? persons : [persons];
+    const itemIds = asArray(persons);
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
         await checkNavigation();

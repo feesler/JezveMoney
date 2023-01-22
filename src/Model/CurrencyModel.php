@@ -29,11 +29,11 @@ class CurrencyModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row array of table row fields
+     * @param array|null $row array of table row fields
      *
      * @return CurrencyItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return CurrencyItem::fromTableRow($row);
     }

@@ -9,32 +9,35 @@ include(TPL_PATH . "Header.tpl");    ?>
         <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
         <div class="container">
             <div class="content">
-                <div class="content_wrap">
-                    <header id="heading" class="heading">
-                        <h1><?= __("CATEGORIES") ?></h1>
-                        <div class="heading-actions">
-                            <?= IconButton::render([
-                                "id" => "createBtn",
-                                "type" => "link",
-                                "link" => BASEURL . "categories/create/",
-                                "icon" => "plus",
-                            ]) ?>
-                        </div>
-                    </header>
-                    <header id="contentHeader" class="content-header">
-                        <div class="counters">
-                            <div id="itemsCounter" class="counter">
-                                <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
-                                <span id="itemsCount" class="counter__value"></span>
+                <div class="content_wrap list-view__content">
+                    <main>
+                        <header id="heading" class="heading">
+                            <h1><?= __("CATEGORIES") ?></h1>
+                            <div class="heading-actions">
+                                <?= IconButton::render([
+                                    "id" => "createBtn",
+                                    "type" => "link",
+                                    "link" => BASEURL . "categories/create/",
+                                    "icon" => "plus",
+                                ]) ?>
                             </div>
-                            <div id="selectedCounter" class="counter" hidden>
-                                <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
-                                <span id="selItemsCount" class="counter__value"></span>
+                        </header>
+                        <header id="contentHeader" class="content-header">
+                            <div class="counters">
+                                <div id="itemsCounter" class="counter">
+                                    <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
+                                    <span id="itemsCount" class="counter__value"></span>
+                                </div>
+                                <div id="selectedCounter" class="counter" hidden>
+                                    <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
+                                    <span id="selItemsCount" class="counter__value"></span>
+                                </div>
                             </div>
-                        </div>
-                    </header>
+                        </header>
+                        <section id="contentContainer" class="content-container"></section>
+                    </main>
 
-                    <main id="contentContainer" class="content-container"></main>
+                    <aside id="itemInfo" class="item-details" hidden></aside>
                 </div>
             </div>
         </div>

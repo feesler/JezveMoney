@@ -16,6 +16,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --input-height: 37px;
   --input-padding: 0 0.5rem;
   --header-size: 50px;
+  --std-field-margin: 8px 0 12px;
 
   /* Tiles */
   --tile-gap: 10px;
@@ -338,7 +339,7 @@ label {
 }
 
 .std_margin {
-  margin: 8px 0 12px;
+  margin: var(--std-field-margin);
 }
 
 /* buttons */
@@ -507,18 +508,18 @@ label {
 .total-list {
   display: flex;
   flex-flow: row wrap;
-  gap: 10px;
+  gap: 12px;
   min-width: 220px;
   max-width: 300px;
 }
 
 .total-list__item {
   display: inline-flex;
-  padding: 5px;
-  font-size: 14px;
+  font-size: 1rem;
+  padding: 5px 0;
   white-space: nowrap;
-  color: #000000;
-  background-color: #d0d0d0;
+  border: 0;
+  border-bottom: 2px solid var(--accent-color-alt);
 }
 
 /* Radio */
@@ -801,6 +802,27 @@ a.paginator-arrow:focus-visible {
   min-height: var(--input-height);
 }
 
+/* List view */
+.list-view__content {
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+}
+
+/* List view details */
+.item-details {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  background-color: var(--main-bg-color);
+  z-index: 2100;
+}
+
 /* Histogram */
 .histogram {
   --chart-text-color: var(--main-text-color);
@@ -826,11 +848,27 @@ a.paginator-arrow:focus-visible {
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
   }
+
+  .list-view__content {
+    column-gap: 24px;
+  }
+
+  .item-details {
+    position: sticky;
+    top: var(--header-size);
+    width: auto;
+    max-width: var(--section-width);
+  }
 }
 
 /* Desktop */
 @media (min-width: 768px) {
   .content_wrap {
+    padding-left: 212px;
+  }
+
+  .list-view__content {
+    column-gap: 48px;
     padding-left: 212px;
   }
 }

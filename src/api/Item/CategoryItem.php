@@ -15,11 +15,11 @@ class CategoryItem
     /**
      * Converts table row from database to CategoryItem object
      *
-     * @param array $row
+     * @param array|null $row
      *
      * @return CategoryItem|null
      */
-    public static function fromTableRow(array $row)
+    public static function fromTableRow(?array $row)
     {
         if (is_null($row)) {
             return null;

@@ -235,3 +235,20 @@ export const __ = (token, ...args) => {
     return formatTokenString(localeTokens[token], args);
 };
 /* eslint-enable no-underscore-dangle */
+
+/** Returns array of formatted debts of person or 'No debts' string */
+export const formatPersonDebts = (person) => {
+    if (!Array.isArray(person?.accounts)) {
+        return null;
+    }
+
+    const debtAccounts = person.accounts.filter((account) => account.balance !== 0);
+    if (debtAccounts.length === 0) {
+        return __('PERSON_NO_DEBTS');
+    }
+
+    const { currency } = window.app.model;
+    return debtAccounts.map((account) => (
+        currency.formatCurrency(account.balance, account.curr_id)
+    ));
+};

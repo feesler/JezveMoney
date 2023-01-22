@@ -4,6 +4,7 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\TransactionModel;
 
 /**
  * Categories API controller
@@ -11,6 +12,7 @@ use JezveMoney\App\Model\CategoryModel;
 class Category extends ApiListController
 {
     protected $requiredFields = ["name", "parent_id", "type"];
+    protected $transModel = null;
 
     /**
      * Controller initialization
@@ -20,9 +22,32 @@ class Category extends ApiListController
         parent::initAPI();
 
         $this->model = CategoryModel::getInstance();
+        $this->transModel = TransactionModel::getInstance();
         $this->createErrorMsg = __("ERR_CATEGORY_CREATE");
         $this->updateErrorMsg = __("ERR_CATEGORY_UPDATE");
         $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
+    }
+
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item item object from model
+     * @param bool $isList list item flag. Default is false
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item, bool $isList = false)
+    {
+        if ($isList) {
+            return $item;
+        }
+
+        $res = $item;
+        $res->transactionsCount = $this->transModel->getTransCount([
+            "categories" => $item->id,
+        ]);
+
+        return $res;
     }
 
     /**

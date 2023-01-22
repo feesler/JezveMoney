@@ -55,8 +55,14 @@
 }
 
 /* Select state */
-.categories-list_select .category-item__select {
-  width: 32px;
+.categories-list_select {
+  .category-item {
+    cursor: pointer;
+  }
+
+  .category-item__select {
+    width: 32px;
+  }
 }
 
 /* Menu controls */

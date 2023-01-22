@@ -38,7 +38,6 @@
             <div id="tplField" class="tpl-form-field template-field">
                 <header id="tplFieldHeader" class="template-field__header">
                     <label><?= __("TEMPLATE") ?></label>
-                    <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
                 </header>
                 <div id="tplFeedback" class="feedback" hidden></div>
             </div>

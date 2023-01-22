@@ -13,12 +13,6 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
-import {
-    DEBT,
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-} from '../../js/model/Transaction.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import '../../Components/Heading/style.scss';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
@@ -27,6 +21,7 @@ import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
 import { __ } from '../../js/utils.js';
 import './style.scss';
+import { Category } from '../../js/model/Category.js';
 
 /**
  * Create/update category view
@@ -103,18 +98,17 @@ class CategoryView extends View {
 
     /** Creates transaction type select */
     createTransactionTypeSelect() {
+        const data = Category.getAvailTypes().map((id) => ({
+            id,
+            title: Category.getTypeTitle(id),
+        }));
+
         this.typeSelect = DropDown.create({
             elem: 'type',
             onItemSelect: (type) => this.onTypeSelect(type),
             className: 'dd_fullwidth',
+            data,
         });
-        this.typeSelect.append([
-            { id: 0, title: __('TR_ANY') },
-            { id: EXPENSE, title: __('TR_EXPENSE') },
-            { id: INCOME, title: __('TR_INCOME') },
-            { id: TRANSFER, title: __('TR_TRANSFER') },
-            { id: DEBT, title: __('TR_DEBT') },
-        ]);
     }
 
     /** Name input event handler */

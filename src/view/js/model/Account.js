@@ -3,6 +3,20 @@ import { ListItem } from './ListItem.js';
 
 /** Account flags */
 export const ACCOUNT_HIDDEN = 1;
+/** Available account fields */
+const availFields = [
+    'id',
+    'owner_id',
+    'name',
+    'balance',
+    'initbalance',
+    'curr_id',
+    'icon_id',
+    'flags',
+    'createdate',
+    'updatedate',
+    'transactionsCount',
+];
 
 /**
  * Account class
@@ -14,10 +28,6 @@ export class Account extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = [
-            'id', 'owner_id', 'name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags',
-        ];
-
         return typeof field === 'string' && availFields.includes(field);
     }
 

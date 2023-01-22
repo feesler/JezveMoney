@@ -8,6 +8,8 @@ import {
     navigation,
     waitForFunction,
     click,
+    baseUrl,
+    goTo,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -15,6 +17,7 @@ import { TilesList } from './component/Tiles/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
+import { PersonDetails } from './component/Person/PersonDetails.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -26,7 +29,11 @@ const listMenuItems = [
 ];
 
 const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxShowBtn', 'ctxHideBtn', 'ctxDeleteBtn',
+    'ctxDetailsBtn',
+    'ctxUpdateBtn',
+    'ctxShowBtn',
+    'ctxHideBtn',
+    'ctxDeleteBtn',
 ];
 
 /** List of persons view class */
@@ -66,6 +73,8 @@ export class PersonListView extends AppView {
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+
+        res.itemInfo = await PersonDetails.create(this, await query('#itemInfo .list-item-details'));
 
         res.renderTime = await prop(res.tiles.elem, 'dataset.time');
 
@@ -112,7 +121,35 @@ export class PersonListView extends AppView {
             mode: this.getViewMode(cont),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
+            detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
+
+        return res;
+    }
+
+    getDetailsId() {
+        const viewPath = '/persons/';
+        const { pathname } = new URL(this.location);
+        assert(pathname.startsWith(viewPath), `Invalid location path: ${pathname}`);
+
+        if (pathname.length === viewPath.length) {
+            return 0;
+        }
+
+        const param = pathname.substring(viewPath.length);
+        return parseInt(param, 10) ?? 0;
+    }
+
+    getDetailsItem(itemId) {
+        return App.state.persons.getItem(itemId);
+    }
+
+    getExpectedURL(model = this.model) {
+        let res = `${baseUrl()}persons/`;
+
+        if (model.detailsItem) {
+            res += model.detailsItem.id.toString();
+        }
 
         return res;
     }
@@ -154,6 +191,11 @@ export class PersonListView extends AppView {
             deleteBtn: { visible: showSelectItems && totalSelected > 0 },
         };
 
+        if (model.detailsItem) {
+            res.itemInfo = PersonDetails.render(model.detailsItem, App.state);
+            res.itemInfo.visible = true;
+        }
+
         if (model.contextMenuVisible) {
             const ctxPerson = App.state.persons.getItem(model.contextItem);
             assert(ctxPerson, 'Invalid state');
@@ -164,6 +206,7 @@ export class PersonListView extends AppView {
                 tileId: model.contextItem,
             };
 
+            res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxShowBtn = { visible: isHidden };
             res.ctxHideBtn = { visible: !isHidden };
@@ -200,6 +243,50 @@ export class PersonListView extends AppView {
         await navigation(() => this.content.addBtn.click());
     }
 
+    /** Clicks by 'Show details' context menu item of specified person */
+    async showDetails(num, directNavigate = false) {
+        const item = this.getItemByIndex(num);
+
+        if (!directNavigate) {
+            await this.openContextMenu(num);
+        }
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        this.model.detailsItem = this.getDetailsItem(item.id);
+        assert(this.model.detailsItem, 'Item not found');
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.ctxDetailsBtn.click());
+        }
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (!this.content.itemInfo.loading);
+        });
+
+        return App.view.checkState(expected);
+    }
+
+    /** Closes item details */
+    async closeDetails(directNavigate = false) {
+        assert(this.model.detailsItem, 'Details already closed');
+
+        this.model.detailsItem = null;
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.itemInfo.close());
+        }
+
+        return App.view.checkState(expected);
+    }
+
     /** Select specified person, click on edit button */
     async goToUpdatePerson(num) {
         await this.openContextMenu(num);
@@ -224,27 +311,40 @@ export class PersonListView extends AppView {
         await this.parse();
     }
 
+    getItemByIndex(index, model = this.model) {
+        const visibleTiles = model.tiles.length;
+        const hiddenTiles = model.hiddenTiles.length;
+        const totalTiles = visibleTiles + hiddenTiles;
+
+        assert(index >= 0 && index < totalTiles, 'Invalid account number');
+
+        return (index < visibleTiles)
+            ? model.tiles[index]
+            : model.hiddenTiles[index - visibleTiles];
+    }
+
+    getTileByIndex(index, model = this.model) {
+        const visibleTiles = model.tiles.length;
+        const hiddenTiles = model.hiddenTiles.length;
+        const totalTiles = visibleTiles + hiddenTiles;
+
+        assert(index >= 0 && index < totalTiles, 'Invalid account number');
+
+        return (index < visibleTiles)
+            ? this.content.tiles.items[index]
+            : this.content.hiddenTiles.items[index - visibleTiles];
+    }
+
     async openContextMenu(num) {
         await this.cancelSelectMode();
 
-        const visibleTiles = this.model.tiles.length;
-        const hiddenTiles = this.model.hiddenTiles.length;
-        const totalTiles = visibleTiles + hiddenTiles;
-
-        assert(num >= 0 && num < totalTiles, 'Invalid person number');
-
-        const item = (num < visibleTiles)
-            ? this.model.tiles[num]
-            : this.model.hiddenTiles[num - visibleTiles];
+        const item = this.getItemByIndex(num);
 
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        const tile = (num < visibleTiles)
-            ? this.content.tiles.items[num]
-            : this.content.hiddenTiles.items[num - visibleTiles];
-
+        const tile = this.getTileByIndex(num);
         await this.performAction(() => tile.click());
 
         return this.checkState(expected);
@@ -299,26 +399,14 @@ export class PersonListView extends AppView {
 
         await this.setSelectMode();
 
-        const persons = Array.isArray(data) ? data : [data];
-
-        const visibleTiles = this.model.tiles.length;
-        const hiddenTiles = this.model.hiddenTiles.length;
-        const totalTiles = visibleTiles + hiddenTiles;
+        const persons = asArray(data);
         for (const num of persons) {
-            assert(num >= 0 && num < totalTiles, 'Invalid person number');
-
-            const item = (num < visibleTiles)
-                ? this.model.tiles[num]
-                : this.model.hiddenTiles[num - visibleTiles];
-
+            const item = this.getItemByIndex(num);
             item.isActive = !item.isActive;
 
             const expected = this.getExpectedState();
 
-            const tile = (num < visibleTiles)
-                ? this.content.tiles.items[num]
-                : this.content.hiddenTiles.items[num - visibleTiles];
-
+            const tile = this.getTileByIndex(num);
             await this.waitForList(() => tile.click());
 
             this.checkState(expected);
@@ -392,7 +480,7 @@ export class PersonListView extends AppView {
     static render(state) {
         const res = {
             tiles: TilesList.renderPersons(state.persons, false),
-            hiddenTiles: TilesList.renderHiddenPersons(state.persons),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons, false),
         };
 
         return res;

@@ -231,7 +231,6 @@ class ImportView extends View {
                 onChange: () => this.onMenuClick('rulesCheck'),
             }, {
                 id: 'rulesBtn',
-                icon: 'update',
                 title: __('IMPORT_RULES_UPDATE'),
                 onClick: () => this.onMenuClick('rulesBtn'),
             }, {

@@ -87,11 +87,11 @@ class TransactionModel extends CachedTable
     /**
      * Converts table row from database to object
      *
-     * @param array $row
+     * @param array|null $row array of table row fields
      *
      * @return TransactionItem|null
      */
-    protected function rowToObj(array $row)
+    protected function rowToObj(?array $row)
     {
         return TransactionItem::fromTableRow($row);
     }
@@ -1728,7 +1728,7 @@ class TransactionModel extends CachedTable
 
         // Search condition
         if (isset($params["search"]) && !is_null($params["search"])) {
-            $sReq = $this->dbObj->escape($params["search"]);
+            $sReq = $this->dbObj->escape(trim($params["search"]));
             if (!is_empty($sReq)) {
                 $res[] = "comment LIKE '%" . $sReq . "%'";
             }
@@ -1883,6 +1883,25 @@ class TransactionModel extends CachedTable
     }
 
     /**
+     * Returns fixed year for week number
+     *
+     * @param mixed $info
+     *
+     * @return int
+     */
+    protected function getFixedWeekYear(mixed $info)
+    {
+        $fixedYear = $info["year"];
+        if ($info["mon"] === 1 && $info["week"] >= WEEKS_IN_YEAR - 2) {
+            $fixedYear--;
+        } elseif ($info["mon"] === MONTHS_IN_YEAR && $info["week"] === 1) {
+            $fixedYear++;
+        }
+
+        return $fixedYear;
+    }
+
+    /**
      * Returns date info for specified timestamp and group type
      *
      * @param int $time timestamp
@@ -1902,7 +1921,8 @@ class TransactionModel extends CachedTable
         if ($groupType == GROUP_BY_DAY) {
             $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_WEEK) {
-            $res["id"] = $info["week"] . "." . $info["year"];
+            $fixedYear = $this->getFixedWeekYear($info);
+            $res["id"] = $info["week"] . "." . $fixedYear;
         } elseif ($groupType == GROUP_BY_MONTH) {
             $res["id"] = $info["mon"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_YEAR) {
@@ -1921,7 +1941,7 @@ class TransactionModel extends CachedTable
      *
      * @return int
      */
-    protected function getDateDiff($itemA, $itemB, $groupType)
+    protected function getDateDiff(mixed $itemA, mixed $itemB, $groupType)
     {
         if (!is_array($itemA) || !is_array($itemB)) {
             throw new \Error("Invalid parameters");
@@ -1937,9 +1957,14 @@ class TransactionModel extends CachedTable
         }
 
         if ($groupType == GROUP_BY_WEEK) {
+            $yearA = $this->getFixedWeekYear($itemA["info"]);
+            $yearB = $this->getFixedWeekYear($itemB["info"]);
+            $weekA = $itemA["info"]["week"];
+            $weekB = $itemB["info"]["week"];
+
             return (
-                ($itemB["info"]["year"] - $itemA["info"]["year"]) * WEEKS_IN_YEAR
-                + ($itemB["info"]["week"] - $itemA["info"]["week"])
+                ($yearB - $yearA) * WEEKS_IN_YEAR
+                + ($weekB - $weekA)
             );
         }
 

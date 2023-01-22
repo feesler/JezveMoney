@@ -30,6 +30,7 @@ export class PersonsStory extends TestStory {
         await this.create();
         await this.hide();
         await this.select();
+        await this.details();
         await this.show();
         await this.update();
         await this.del();
@@ -153,5 +154,19 @@ export class PersonsStory extends TestStory {
         setBlock('Select/deselect all persons', 2);
         await PersonTests.selectAll();
         await PersonTests.deselectAll();
+    }
+
+    async details() {
+        setBlock('Person details', 1);
+
+        await PersonTests.showDetails({ index: 0 });
+        await PersonTests.closeDetails();
+        await PersonTests.showDetails({ index: 1 });
+        await PersonTests.showDetails({ index: 2 });
+        await PersonTests.showDetails({ index: 2 });
+        await PersonTests.closeDetails();
+        await PersonTests.showDetails({ index: 0, directNavigate: true });
+        await PersonTests.showDetails({ index: 1, directNavigate: true });
+        await PersonTests.closeDetails();
     }
 }

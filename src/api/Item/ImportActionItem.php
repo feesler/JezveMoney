@@ -15,11 +15,11 @@ class ImportActionItem
     /**
      * Converts table row from database to ImportActionItem object
      *
-     * @param array $row
+     * @param array|null $row
      *
      * @return ImportActionItem|null
      */
-    public static function fromTableRow(array $row)
+    public static function fromTableRow(?array $row)
     {
         if (is_null($row)) {
             return null;

@@ -12,15 +12,17 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { Heading } from '../../Components/Heading/Heading.js';
+import { PersonDetails } from '../../Components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
-import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import './style.scss';
 
 /**
  * List of persons view
@@ -29,10 +31,13 @@ class PersonListView extends View {
     constructor(...args) {
         super(...args);
 
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.checkPersonModels();
 
         const initialState = {
+            ...this.props,
+            detailsItem: null,
             items: {
                 visible: PersonList.create(window.app.model.visiblePersons),
                 hidden: PersonList.create(window.app.model.hiddenPersons),
@@ -76,6 +81,7 @@ class PersonListView extends View {
             'contentContainer',
             'hiddenTilesHeading',
             'createBtn',
+            'itemInfo',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -107,6 +113,10 @@ class PersonListView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
 
         this.subscribeToStore(this.store);
+
+        if (this.props.detailsId) {
+            this.requestItem();
+        }
     }
 
     createMenu() {
@@ -161,6 +171,13 @@ class PersonListView extends View {
             id: 'contextMenu',
             attached: true,
             items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('OPEN_ITEM'),
+                onClick: (e) => this.showDetails(e),
+            }, {
+                type: 'placeholder',
+            }, {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
@@ -206,6 +223,17 @@ class PersonListView extends View {
 
             this.toggleSelectItem(itemId);
         }
+    }
+
+    showDetails(e) {
+        e?.preventDefault();
+        this.store.dispatch(actions.showDetails());
+
+        this.requestItem();
+    }
+
+    closeDetails() {
+        this.store.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
@@ -321,6 +349,22 @@ class PersonListView extends View {
         this.stopLoading();
     }
 
+    async requestItem() {
+        const state = this.store.getState();
+        if (!state.detailsId) {
+            return;
+        }
+
+        try {
+            const { data } = await API.person.read(state.detailsId);
+            const [item] = data;
+
+            this.store.dispatch(actions.itemDetailsLoaded(item));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
@@ -356,6 +400,7 @@ class PersonListView extends View {
 
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
+        items.ctxDetailsBtn.setURL(`${baseURL}persons/${person.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
         items.ctxShowBtn.show(!person.isVisible());
         items.ctxHideBtn.show(person.isVisible());
@@ -389,15 +434,56 @@ class PersonListView extends View {
         items.deleteBtn.show(totalSelCount > 0);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    renderDetails(state, prevState) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.detailsItem === prevState?.detailsItem
+        ) {
+            return;
         }
 
-        if (state.loading) {
-            this.loadingIndicator.show();
+        if (!state.detailsId) {
+            show(this.itemInfo, false);
+            return;
         }
 
+        const { persons } = window.app.model;
+        const item = state.detailsItem ?? persons.getItem(state.detailsId);
+        if (!item) {
+            throw new Error('Person not found');
+        }
+
+        if (!this.personDetails) {
+            this.personDetails = PersonDetails.create({
+                item,
+                onClose: () => this.closeDetails(),
+            });
+            this.itemInfo.append(this.personDetails.elem);
+        } else {
+            this.personDetails.setItem(item);
+        }
+
+        show(this.itemInfo, true);
+    }
+
+    /** Returns URL for specified state */
+    getURL(state) {
+        const { baseURL } = window.app;
+        const itemPart = (state.detailsId) ? state.detailsId : '';
+        return new URL(`${baseURL}persons/${itemPart}`);
+    }
+
+    renderHistory(state, prevState) {
+        if (state.detailsId === prevState?.detailsId) {
+            return;
+        }
+
+        const url = this.getURL(state);
+        const pageTitle = `${__('APP_NAME')} | ${__('PERSONS')}`;
+        window.history.replaceState({}, pageTitle, url);
+    }
+
+    renderList(state) {
         // Counters
         const itemsCount = state.items.visible.length + state.items.hidden.length;
         this.itemsCount.textContent = itemsCount;
@@ -425,9 +511,23 @@ class PersonListView extends View {
         const hiddenItemsAvailable = (state.items.hidden.length > 0);
         this.hiddenTiles.show(hiddenItemsAvailable);
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
+    }
 
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.renderHistory(state, prevState);
+
+        if (state.loading) {
+            this.loadingIndicator.show();
+        }
+
+        this.renderList(state);
         this.renderContextMenu(state);
         this.renderMenu(state);
+        this.renderDetails(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

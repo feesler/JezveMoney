@@ -187,11 +187,56 @@ export const createTransactions = async () => {
 
     // Add transaction year after latest for statistics tests
     const now = new Date();
-    const yearAfter = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    const yearAfter = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
     multi.push({
         ...lastExpense,
         date: dateToSeconds(yearAfter),
     });
+
+    // Statistics group by week tests
+    const w1date1 = new Date(2012, 11, 30);
+    const w1date2 = new Date(2012, 11, 31);
+
+    // Week changed before year: 2012-12-30 (52) -> 2012-12-31 (1)
+    const extracted1 = Transaction.extract({
+        type: EXPENSE,
+        src_id: ACC_3,
+        src_amount: '444',
+        comment: 'week 52',
+        date: dateToSeconds(w1date1),
+    }, App.state);
+
+    const extracted2 = Transaction.extract({
+        type: EXPENSE,
+        src_id: ACC_3,
+        src_amount: '555',
+        comment: 'week 1',
+        date: dateToSeconds(w1date2),
+    }, App.state);
+
+    multi.push(extracted1, extracted2);
+
+    // Week not changed: 2022-12-30 (52) -> 2023-1-1 (52)
+    const w2date1 = new Date(2022, 11, 30);
+    const w2date2 = new Date(2023, 0, 1);
+
+    const extracted21 = Transaction.extract({
+        type: EXPENSE,
+        src_id: ACC_3,
+        src_amount: '777',
+        comment: 'week 52',
+        date: dateToSeconds(w2date1),
+    }, App.state);
+
+    const extracted22 = Transaction.extract({
+        type: EXPENSE,
+        src_id: ACC_3,
+        src_amount: '888',
+        comment: 'week 52 in next year',
+        date: dateToSeconds(w2date2),
+    }, App.state);
+
+    multi.push(extracted21, extracted22);
 
     await api.transaction.createMultiple(multi);
 

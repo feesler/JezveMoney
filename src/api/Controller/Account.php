@@ -4,6 +4,7 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\TransactionModel;
 
 /**
  * Accounts API controller
@@ -11,6 +12,7 @@ use JezveMoney\App\Model\AccountModel;
 class Account extends ApiListController
 {
     protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
+    protected $transModel = null;
 
     /**
      * Controller initialization
@@ -20,9 +22,32 @@ class Account extends ApiListController
         parent::initAPI();
 
         $this->model = AccountModel::getInstance();
+        $this->transModel = TransactionModel::getInstance();
         $this->createErrorMsg = __("ERR_ACCOUNT_CREATE");
         $this->updateErrorMsg = __("ERR_ACCOUNT_UPDATE");
         $this->deleteErrorMsg = __("ERR_ACCOUNT_DELETE");
+    }
+
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item item object from model
+     * @param bool $isList list item flag. Default is false
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item, bool $isList = false)
+    {
+        if ($isList) {
+            return $item;
+        }
+
+        $res = $item;
+        $res->transactionsCount = $this->transModel->getTransCount([
+            "accounts" => $item->id,
+        ]);
+
+        return $res;
     }
 
     /**

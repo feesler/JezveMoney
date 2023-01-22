@@ -1,6 +1,7 @@
 import { assert } from 'jezve-test';
 import { App } from '../Application.js';
 import { secondsToDateString } from '../common.js';
+import { __ } from './locale.js';
 
 /** Types of transactions */
 export const EXPENSE = 1;
@@ -12,17 +13,17 @@ export const availTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 
 export class Transaction {
     /** Return string for specified type of transaction */
-    static typeToString(type) {
+    static typeToString(type, locale = 'en') {
         const typesMap = {
-            [EXPENSE]: 'Expense',
-            [INCOME]: 'Income',
-            [TRANSFER]: 'Transfer',
-            [DEBT]: 'Debt',
+            [EXPENSE]: 'TR_EXPENSE',
+            [INCOME]: 'TR_INCOME',
+            [TRANSFER]: 'TR_TRANSFER',
+            [DEBT]: 'TR_DEBT',
         };
 
         assert(type && (type in typesMap), `Unknown transaction type ${type}`);
 
-        return typesMap[type];
+        return __(typesMap[type], locale);
     }
 
     static strToType(str) {

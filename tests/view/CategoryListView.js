@@ -11,6 +11,8 @@ import {
     queryAll,
     evaluate,
     isVisible,
+    goTo,
+    baseUrl,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -18,7 +20,9 @@ import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { CategoryItem } from './component/CategoryItem.js';
-import { availTransTypes, Transaction } from '../model/Transaction.js';
+import { availTransTypes } from '../model/Transaction.js';
+import { CategoryDetails } from './component/Category/CategoryDetails.js';
+import { Category } from '../model/Category.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -28,17 +32,13 @@ const listMenuItems = [
 ];
 
 const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxDeleteBtn',
+    'ctxDetailsBtn',
+    'ctxUpdateBtn',
+    'ctxDeleteBtn',
 ];
 
 const ANY_TYPE = 0;
 const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
-
-const getTypeString = (type) => (
-    (type !== 0)
-        ? Transaction.typeToString(type).toLowerCase()
-        : 'any'
-);
 
 /** List of categories view class */
 export class CategoryListView extends AppView {
@@ -49,7 +49,7 @@ export class CategoryListView extends AppView {
                 const visible = items.length > 0;
                 const section = {
                     visible,
-                    name: getTypeString(type),
+                    name: Category.typeToString(type, App.view.locale),
                 };
                 if (visible) {
                     section.items = items.map((item) => ({
@@ -96,14 +96,18 @@ export class CategoryListView extends AppView {
         const sectionElems = await queryAll('#contentContainer .list-section');
 
         res.sections = await asyncMap(sectionElems, async (elem) => {
+            const listHeader = await query(elem, '.list-header');
             const listContainer = await query(elem, '.categories-list');
+
             const [
                 type,
+                name,
                 renderTime,
-            ] = await evaluate((el, listEl) => ([
+            ] = await evaluate((el, hrdEl, listEl) => ([
                 parseInt(el.dataset.type, 10),
+                hrdEl.textContent,
                 parseInt(listEl.dataset.time, 10),
-            ]), elem, listContainer);
+            ]), elem, listHeader, listContainer);
 
             const listItems = await queryAll(listContainer, '.category-item');
 
@@ -111,13 +115,15 @@ export class CategoryListView extends AppView {
                 elem,
                 type,
                 visible: await isVisible(elem),
-                name: getTypeString(type),
+                name,
                 renderTime,
                 items: await asyncMap(listItems, (item) => CategoryItem.create(this, item)),
             };
         });
 
         res.renderTime = res.sections[0].renderTime;
+
+        res.itemInfo = await CategoryDetails.create(this, await query('#itemInfo .list-item-details'));
 
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
         res.delete_warning = await DeleteCategoryDialog.create(
@@ -167,6 +173,7 @@ export class CategoryListView extends AppView {
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
             items: [],
+            detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
         cont.sections.forEach((section) => {
@@ -179,6 +186,33 @@ export class CategoryListView extends AppView {
             });
             res.items.push(...items);
         });
+
+        return res;
+    }
+
+    getDetailsId() {
+        const viewPath = '/categories/';
+        const { pathname } = new URL(this.location);
+        assert(pathname.startsWith(viewPath), `Invalid location path: ${pathname}`);
+
+        if (pathname.length === viewPath.length) {
+            return 0;
+        }
+
+        const param = pathname.substring(viewPath.length);
+        return parseInt(param, 10) ?? 0;
+    }
+
+    getDetailsItem(itemId) {
+        return App.state.categories.getItem(itemId);
+    }
+
+    getExpectedURL(model = this.model) {
+        let res = `${baseUrl()}categories/`;
+
+        if (model.detailsItem) {
+            res += model.detailsItem.id.toString();
+        }
 
         return res;
     }
@@ -229,7 +263,7 @@ export class CategoryListView extends AppView {
             const visible = items.length > 0;
             const section = {
                 visible,
-                name: getTypeString(type),
+                name: Category.typeToString(type, model.locale),
             };
             if (visible) {
                 section.items = items.map((item) => ({
@@ -240,6 +274,11 @@ export class CategoryListView extends AppView {
             return section;
         });
 
+        if (model.detailsItem) {
+            res.itemInfo = CategoryDetails.render(model.detailsItem, App.state);
+            res.itemInfo.visible = true;
+        }
+
         if (model.contextMenuVisible) {
             const ctxCategory = App.state.categories.getItem(model.contextItem);
             assert(ctxCategory, 'Invalid state');
@@ -249,6 +288,7 @@ export class CategoryListView extends AppView {
                 itemId: model.contextItem,
             };
 
+            res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxDeleteBtn = { visible: true };
         }
@@ -267,6 +307,48 @@ export class CategoryListView extends AppView {
     /** Click on add button */
     async goToCreateCategory() {
         await navigation(() => this.content.createBtn.click());
+    }
+
+    /** Clicks by 'Show details' context menu item of specified category */
+    async showDetails(num, directNavigate = false) {
+        if (!directNavigate) {
+            await this.openContextMenu(num);
+        }
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        this.model.detailsItem = this.model.items[num];
+        assert(this.model.detailsItem, 'Item not found');
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.ctxDetailsBtn.click());
+        }
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (!this.content.itemInfo.loading);
+        });
+
+        return App.view.checkState(expected);
+    }
+
+    /** Closes item details */
+    async closeDetails(directNavigate = false) {
+        assert(this.model.detailsItem, 'Details already closed');
+
+        this.model.detailsItem = null;
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.content.itemInfo.close());
+        }
+
+        return App.view.checkState(expected);
     }
 
     /** Select specified category, click on edit button */

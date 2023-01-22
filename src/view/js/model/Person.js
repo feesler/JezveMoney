@@ -3,6 +3,16 @@ import { ListItem } from './ListItem.js';
 
 /** Person flags */
 export const PERSON_HIDDEN = 1;
+/** Available person fields */
+const availFields = [
+    'id',
+    'name',
+    'flags',
+    'accounts',
+    'createdate',
+    'updatedate',
+    'transactionsCount',
+];
 
 /**
  * @constructor Person class
@@ -14,8 +24,6 @@ export class Person extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = ['id', 'name', 'flags', 'accounts'];
-
         return typeof field === 'string' && availFields.includes(field);
     }
 
