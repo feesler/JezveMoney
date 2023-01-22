@@ -549,6 +549,21 @@ export class TransactionsList extends List {
         return TransactionsList.create(res);
     }
 
+    getFixedWeekYear(date) {
+        const res = date.getFullYear();
+        const month = date.getMonth();
+        const week = getWeek(date.getTime());
+
+        if (month === 0 && week >= WEEKS_IN_YEAR - 2) {
+            return res - 1;
+        }
+        if (month === MONTHS_IN_YEAR - 1 && week === 1) {
+            return res - 1;
+        }
+
+        return res;
+    }
+
     getDateInfo(time, groupType) {
         const date = new Date(time);
         const res = { time, date };
@@ -557,8 +572,8 @@ export class TransactionsList extends List {
             res.id = formatDate(date);
         } else if (groupType === 'week') {
             const week = getWeek(time);
-            const year = date.getFullYear();
-            res.id = `${week}.${year}`;
+            const fixedYear = this.getFixedWeekYear(date);
+            res.id = `${week}.${fixedYear}`;
         } else if (groupType === 'month') {
             const month = date.getMonth();
             const year = date.getFullYear();
@@ -579,8 +594,11 @@ export class TransactionsList extends List {
         }
 
         if (groupType === 'week') {
+            const yearA = this.getFixedWeekYear(dateA);
+            const yearB = this.getFixedWeekYear(dateB);
+
             return (
-                (dateB.getFullYear() - dateA.getFullYear()) * WEEKS_IN_YEAR
+                (yearB - yearA) * WEEKS_IN_YEAR
                 + (getWeek(dateB) - getWeek(dateA))
             );
         }

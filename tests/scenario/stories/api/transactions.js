@@ -24,6 +24,9 @@ const create = async () => {
         FOOD_CATEGORY,
     } = App.scenario;
 
+    const weekDate1 = new Date(2022, 11, 30);
+    const weekDate2 = new Date(2023, 0, 1);
+
     const data = [{
         type: EXPENSE,
         src_id: ACC_RUB,
@@ -124,6 +127,16 @@ const create = async () => {
         src_curr: USD,
         dest_amount: 91,
         dest_curr: EUR,
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 123,
+        date: dateToSeconds(weekDate1),
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 456,
+        date: dateToSeconds(weekDate2),
     }];
 
     [
@@ -735,6 +748,11 @@ const statistics = async () => {
             report: 'category',
             category_id: [FOOD_CATEGORY, BIKE_CATEGORY],
             group: 'day',
+            type: EXPENSE,
+        },
+        {
+            report: 'category',
+            group: 'week',
             type: EXPENSE,
         },
     ];
