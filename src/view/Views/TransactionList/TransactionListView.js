@@ -676,12 +676,18 @@ class TransactionListView extends View {
     }
 
     async requestTransactions(options) {
-        this.startLoading();
-
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+        this.abortController = new AbortController();
+        const { signal } = this.abortController;
+        let aborted = false;
         const { keepState = false, ...request } = options;
 
+        this.startLoading();
+
         try {
-            const result = await API.transaction.list(request);
+            const result = await API.transaction.list(request, { signal });
             const payload = {
                 ...result.data,
                 keepState,
@@ -689,12 +695,18 @@ class TransactionListView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(payload));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
-            this.store.dispatch(actions.listRequestError());
+            aborted = e.name === 'AbortError';
+            if (!aborted) {
+                window.app.createMessage(e.message, 'msg_error');
+                this.store.dispatch(actions.listRequestError());
+            }
         }
 
-        this.stopLoading();
-        this.setRenderTime();
+        if (!aborted) {
+            this.stopLoading();
+            this.setRenderTime();
+            this.abortController = null;
+        }
     }
 
     renderContextMenu(state) {

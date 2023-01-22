@@ -4,18 +4,22 @@ import { asArray } from 'jezvejs';
 const MSG_REQUEST_FAIL = 'API request failed';
 
 /** Send API request */
-const apiRequest = async (method, path, data = null, headers = {}) => {
+const apiRequest = async (method, path, data = null, options = {}) => {
     const { baseURL } = window.app;
     const isPOST = method.toLowerCase() === 'post';
     const url = new URL(`${baseURL}api/${path}`);
-    const options = { method, headers };
+    const reqOptions = {
+        method,
+        headers: {},
+        ...options,
+    };
 
     if (isPOST) {
         if (data instanceof FormData) {
-            options.body = data;
+            reqOptions.body = data;
         } else {
-            options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(data);
+            reqOptions.headers['Content-Type'] = 'application/json';
+            reqOptions.body = JSON.stringify(data);
         }
     } else if (data) {
         Object.entries(data).forEach(([name, value]) => {
@@ -28,7 +32,7 @@ const apiRequest = async (method, path, data = null, headers = {}) => {
         });
     }
 
-    const response = await fetch(url, options);
+    const response = await fetch(url, reqOptions);
     const apiResult = await response.json();
     if (apiResult?.result !== 'ok') {
         const errorMessage = (apiResult?.msg) ? apiResult.msg : MSG_REQUEST_FAIL;
@@ -178,13 +182,13 @@ export const API = {
             return apiPost('transaction/createMultiple', data);
         },
 
-        async list(options = {}) {
-            const requestOptions = {
+        async list(options = {}, requestOptions = {}) {
+            const data = {
                 order: 'desc',
                 ...options,
             };
 
-            return apiGet('transaction/list', requestOptions);
+            return apiGet('transaction/list', data, requestOptions);
         },
 
         async read(data) {
@@ -211,8 +215,8 @@ export const API = {
             return apiPost('transaction/setpos', { id, pos });
         },
 
-        async statistics(options = {}) {
-            return apiGet('transaction/statistics', options);
+        async statistics(options = {}, requestOptions = {}) {
+            return apiGet('transaction/statistics', options, requestOptions);
         },
     },
 
