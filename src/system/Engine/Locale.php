@@ -2,6 +2,8 @@
 
 namespace JezveMoney\Core;
 
+use Aura\Accept\AcceptFactory;
+
 /**
  * Locale class
  */
@@ -18,11 +20,12 @@ class Locale
     {
         if (!isset($_COOKIE["locale"])) {
             $availLocales = self::getAvailable();
-            $locale = isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])
-                ? locale_accept_from_http($_SERVER["HTTP_ACCEPT_LANGUAGE"])
-                : "";
-            $locale = locale_lookup($availLocales, $locale, false, DEFAULT_LOCALE);
-            return locale_get_primary_language($locale);
+
+            $factory = new AcceptFactory($_SERVER);
+            $accept = $factory->newInstance();
+
+            $language = $accept->negotiateLanguage($availLocales);
+            return $language->getValue();
         }
 
         $locale = $_COOKIE["locale"];

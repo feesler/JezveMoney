@@ -1,13 +1,14 @@
 {
     "name": "henryfeesler/jezvemoney",
-    "version": "1.44.0",
+    "version": "1.45.0",
     "description": "",
 	"config": {
 		"vendor-dir": "vendor",
 		"classmap-authoritative": true
 	},
 	"require": {
-		"phpoffice/phpspreadsheet": "^1.10"
+		"phpoffice/phpspreadsheet": "^1.10",
+        "aura/accept": "^4.0"
 	},
 	"autoload": {
 		"psr-4": {
