@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { urlJoin, isEmpty } from 'jezvejs';
+import { urlJoin, isEmpty, asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
@@ -38,7 +38,7 @@ class AdminBalanceView extends View {
      */
     onAccountChange(obj) {
         // Check all accounts from the new selection present in current selection
-        const data = Array.isArray(obj) ? obj : [obj];
+        const data = asArray(obj);
         let reloadNeeded = data.some((item) => {
             const id = parseInt(item.id, 10);
 
@@ -73,10 +73,7 @@ class AdminBalanceView extends View {
         const locFilter = { ...state.filter };
 
         if ('accounts' in locFilter) {
-            if (!Array.isArray(locFilter.accounts)) {
-                locFilter.accounts = [locFilter.accounts];
-            }
-
+            locFilter.accounts = asArray(locFilter.accounts);
             if (!locFilter.accounts.length) {
                 delete locFilter.accounts;
             }

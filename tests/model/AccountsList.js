@@ -1,4 +1,9 @@
-import { copyObject, hasFlag, assert } from 'jezve-test';
+import {
+    copyObject,
+    hasFlag,
+    assert,
+    asArray,
+} from 'jezve-test';
 import { normalize } from '../common.js';
 import { api } from './api.js';
 import { List } from './List.js';
@@ -81,7 +86,7 @@ export class AccountsList extends List {
     }
 
     deleteTransactions(transactions, returnRaw = false) {
-        const transList = Array.isArray(transactions) ? transactions : [transactions];
+        const transList = asArray(transactions);
 
         const res = transList.reduce((data, transaction) => (
             AccountsList.cancelTransaction(data, transaction)

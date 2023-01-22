@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { asArray, assert } from 'jezve-test';
 import { Currency } from './Currency.js';
 import { List } from './List.js';
 import { api } from './api.js';
@@ -31,7 +31,7 @@ export class CurrencyList extends List {
     }
 
     getItemsByNames(names) {
-        const itemNames = Array.isArray(names) ? names : [names];
+        const itemNames = asArray(names);
 
         return itemNames.map((name) => {
             const item = this.findByName(name);

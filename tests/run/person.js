@@ -5,6 +5,7 @@ import {
     setBlock,
     baseUrl,
     goTo,
+    asArray,
 } from 'jezve-test';
 import { generateId } from '../common.js';
 import { PersonListView } from '../view/PersonListView.js';
@@ -147,7 +148,7 @@ export const delFromUpdate = async (pos) => {
 };
 
 export const show = async (persons, val = true) => {
-    const itemIds = Array.isArray(persons) ? persons : [persons];
+    const itemIds = asArray(persons);
 
     const actVerb = (val) ? 'Show' : 'Hide';
     await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
@@ -169,7 +170,7 @@ export const show = async (persons, val = true) => {
 export const hide = async (persons) => show(persons, false);
 
 export const toggleSelect = async (persons) => {
-    const itemIds = Array.isArray(persons) ? persons : [persons];
+    const itemIds = asArray(persons);
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
         await checkNavigation();

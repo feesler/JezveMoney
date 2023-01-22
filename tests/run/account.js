@@ -133,7 +133,7 @@ export const submit = async () => {
 };
 
 export const del = async (accounts) => {
-    const indexes = Array.isArray(accounts) ? accounts : [accounts];
+    const indexes = asArray(accounts);
 
     await test(`Delete account(s) [${indexes.join()}]`, async () => {
         await checkNavigation();
