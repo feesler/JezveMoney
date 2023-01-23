@@ -194,7 +194,7 @@ export class ImportFileUploader extends Component {
         }
 
         try {
-            const result = await API.import.upload(data, headers);
+            const result = await API.import.upload(data, { headers });
             this.onImportSuccess(result.data);
         } catch (e) {
             this.onImportError(e.message);

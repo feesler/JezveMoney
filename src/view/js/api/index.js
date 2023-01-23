@@ -221,8 +221,8 @@ export const API = {
     },
 
     import: {
-        async upload(data, headers = {}) {
-            return apiPost('import/upload', data, headers);
+        async upload(data, requestOptions = {}) {
+            return apiPost('import/upload', data, requestOptions);
         },
     },
 
