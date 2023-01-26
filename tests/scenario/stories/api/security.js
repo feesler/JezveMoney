@@ -93,7 +93,7 @@ const categoriesTests = async () => {
         parent_id: 0,
         type: EXPENSE,
     });
-    await PersonApiTests.del(App.scenario.API_USER_CATEGORY);
+    await CategoryApiTests.del(API_USER_CATEGORY);
 };
 
 const createTransaction = async () => {
