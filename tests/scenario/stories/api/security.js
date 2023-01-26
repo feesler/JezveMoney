@@ -60,35 +60,39 @@ const prepareTests = async () => {
 const accountsTests = async () => {
     setBlock('Accounts security', 2);
 
-    const { EUR } = App.scenario;
+    const { EUR, API_USER_ACC_RUB } = App.scenario;
 
     await AccountApiTests.update({
-        id: App.scenario.API_USER_ACC_RUB,
+        id: API_USER_ACC_RUB,
         name: 'EUR',
         curr_id: EUR,
         initbalance: 10,
         icon_id: 2,
         flags: 0,
     });
-    await AccountApiTests.del(App.scenario.API_USER_ACC_RUB);
+    await AccountApiTests.del(API_USER_ACC_RUB);
 };
 
 const personsTests = async () => {
     setBlock('Persons security', 2);
 
+    const { API_USER_PERSON } = App.scenario;
+
     await PersonApiTests.update({
-        id: App.scenario.API_USER_PERSON,
+        id: API_USER_PERSON,
         name: 'API Person',
         flags: 0,
     });
-    await PersonApiTests.del(App.scenario.API_USER_PERSON);
+    await PersonApiTests.del(API_USER_PERSON);
 };
 
 const categoriesTests = async () => {
     setBlock('Categories security', 2);
 
+    const { API_USER_CATEGORY } = App.scenario;
+
     await CategoryApiTests.update({
-        id: App.scenario.API_USER_CATEGORY,
+        id: API_USER_CATEGORY,
         name: 'API Category',
         parent_id: 0,
         type: EXPENSE,
@@ -99,10 +103,18 @@ const categoriesTests = async () => {
 const createTransaction = async () => {
     setBlock('Create', 3);
 
-    const { RUB } = App.scenario;
+    const {
+        RUB,
+        ACC_RUB,
+        CASH_RUB,
+        API_USER_ACC_RUB,
+        API_USER_CATEGORY,
+        API_USER_PERSON,
+    } = App.scenario;
+
     const data = [{
         type: EXPENSE,
-        src_id: App.scenario.API_USER_ACC_RUB,
+        src_id: API_USER_ACC_RUB,
         dest_id: 0,
         src_curr: RUB,
         dest_curr: RUB,
@@ -110,25 +122,25 @@ const createTransaction = async () => {
         dest_amount: 100,
     }, {
         type: EXPENSE,
-        src_id: App.scenario.ACC_RUB,
+        src_id: ACC_RUB,
         dest_id: 0,
         src_curr: RUB,
         dest_curr: RUB,
         src_amount: 100,
         dest_amount: 100,
-        category_id: App.scenario.API_USER_CATEGORY,
+        category_id: API_USER_CATEGORY,
     }, {
         type: INCOME,
         src_id: 0,
-        dest_id: App.scenario.API_USER_ACC_RUB,
+        dest_id: API_USER_ACC_RUB,
         src_curr: RUB,
         dest_curr: RUB,
         src_amount: 100,
         dest_amount: 100,
     }, {
         type: TRANSFER,
-        src_id: App.scenario.CASH_RUB,
-        dest_id: App.scenario.API_USER_ACC_RUB,
+        src_id: CASH_RUB,
+        dest_id: API_USER_ACC_RUB,
         src_curr: RUB,
         dest_curr: RUB,
         src_amount: 100,
@@ -136,7 +148,7 @@ const createTransaction = async () => {
     }, {
         type: DEBT,
         op: 1,
-        person_id: App.scenario.API_USER_PERSON,
+        person_id: API_USER_PERSON,
         acc_id: 0,
         src_curr: RUB,
         dest_curr: RUB,
@@ -150,26 +162,40 @@ const createTransaction = async () => {
 const updateTransaction = async () => {
     setBlock('Update', 3);
 
-    const { RUB } = App.scenario;
+    const {
+        RUB,
+        CASH_RUB,
+        TR_EXPENSE_1,
+        TR_INCOME_1,
+        TR_TRANSFER_1,
+        TR_DEBT_1,
+        TR_DEBT_2,
+        TR_DEBT_3,
+        API_USER_ACC_RUB,
+        API_USER_ACC_USD,
+        API_USER_PERSON,
+        API_USER_CATEGORY,
+        API_USER_TRANSACTION,
+    } = App.scenario;
 
     const data = [{
-        id: App.scenario.TR_EXPENSE_1,
-        src_id: App.scenario.API_USER_ACC_RUB,
+        id: TR_EXPENSE_1,
+        src_id: API_USER_ACC_RUB,
     }, {
-        id: App.scenario.TR_EXPENSE_1,
-        category_id: App.scenario.API_USER_CATEGORY,
+        id: TR_EXPENSE_1,
+        category_id: API_USER_CATEGORY,
     }, {
-        id: App.scenario.TR_INCOME_1,
-        dest_id: App.scenario.API_USER_ACC_RUB,
+        id: TR_INCOME_1,
+        dest_id: API_USER_ACC_RUB,
     }, {
-        id: App.scenario.TR_TRANSFER_1,
-        src_id: App.scenario.API_USER_ACC_RUB,
-        dest_id: App.scenario.API_USER_ACC_USD,
+        id: TR_TRANSFER_1,
+        src_id: API_USER_ACC_RUB,
+        dest_id: API_USER_ACC_USD,
     }, {
         // Trying to update transaction of another user
-        id: App.scenario.API_USER_TRANSACTION,
+        id: API_USER_TRANSACTION,
         type: EXPENSE,
-        src_id: App.scenario.CASH_RUB,
+        src_id: CASH_RUB,
         dest_id: 0,
         src_curr: RUB,
         dest_curr: RUB,
@@ -177,17 +203,17 @@ const updateTransaction = async () => {
         dest_amount: 100,
     }, {
         // Trying to set person of another user
-        id: App.scenario.TR_DEBT_1,
-        person_id: App.scenario.API_USER_PERSON,
+        id: TR_DEBT_1,
+        person_id: API_USER_PERSON,
     }, {
         // Trying to set account of another user
-        id: App.scenario.TR_DEBT_2,
-        acc_id: App.scenario.API_USER_ACC_RUB,
+        id: TR_DEBT_2,
+        acc_id: API_USER_ACC_RUB,
     }, {
         // Trying to set both person and account of another user
-        id: App.scenario.TR_DEBT_3,
-        person_id: App.scenario.API_USER_PERSON,
-        acc_id: App.scenario.API_USER_ACC_RUB,
+        id: TR_DEBT_3,
+        person_id: API_USER_PERSON,
+        acc_id: API_USER_ACC_RUB,
     }];
 
     await App.scenario.runner.runGroup(TransactionApiTests.update, data);
