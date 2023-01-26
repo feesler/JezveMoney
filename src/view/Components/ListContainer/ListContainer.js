@@ -148,16 +148,20 @@ export class ListContainer extends Component {
         });
     }
 
-    renderNoDataMessage() {
-        if (this.noDataMsg) {
+    renderNoDataMessage(state, prevState) {
+        if (state.noItemsMessage === prevState.noItemsMessage) {
             return;
         }
 
-        this.noDataMsg = (isFunction(this.state.noItemsMessage))
-            ? this.state.noItemsMessage()
-            : this.defaultNoDataMessage(this.state.noItemsMessage);
-
-        this.elem.append(this.noDataMsg);
+        if (state.noItemsMessage) {
+            this.noDataMsg = (isFunction(state.noItemsMessage))
+                ? this.state.noItemsMessage()
+                : this.defaultNoDataMessage(state.noItemsMessage);
+            this.elem.append(this.noDataMsg);
+        } else if (this.noDataMsg) {
+            re(this.noDataMsg);
+            this.noDataMsg = null;
+        }
     }
 
     getListItemById(id) {
@@ -199,7 +203,7 @@ export class ListContainer extends Component {
         }
 
         if (emptyList) {
-            this.renderNoDataMessage();
+            this.renderNoDataMessage(state, prevState);
             return;
         }
 
