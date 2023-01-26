@@ -11,7 +11,6 @@ import {
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
-import { List } from './List.js';
 import {
     EXPENSE,
     INCOME,
@@ -20,6 +19,7 @@ import {
     availTransTypes,
 } from './Transaction.js';
 import { AccountsList } from './AccountsList.js';
+import { SortableList } from './SortableList.js';
 
 const WEEKS_IN_YEAR = 52;
 const MONTHS_IN_YEAR = 12;
@@ -32,7 +32,7 @@ const defaultReportType = 'category';
 const defaultTransactionType = EXPENSE;
 const defaultGroupType = 'week';
 
-export class TransactionsList extends List {
+export class TransactionsList extends SortableList {
     async fetch() {
         return api.transaction.list();
     }
@@ -60,59 +60,6 @@ export class TransactionsList extends List {
         return res;
     }
 
-    updatePosById(itemId, pos) {
-        const ind = this.getIndexById(itemId);
-        assert(ind !== -1, `Transaction ${itemId} not found`);
-
-        return this.updatePos(ind, pos);
-    }
-
-    updatePos(ind, pos) {
-        assert(ind >= 0 && ind < this.length, `Wrong transaction index: ${ind}`);
-
-        const trObj = this.data[ind];
-        assert(trObj, 'Transaction not found');
-
-        const oldPos = trObj.pos;
-        if (oldPos === pos) {
-            return;
-        }
-
-        if (this.find((item) => item.pos === pos)) {
-            for (const item of this.data) {
-                if (oldPos === 0) { // insert with specified position
-                    if (item.pos >= pos) {
-                        item.pos += 1;
-                    }
-                } else if (pos < oldPos) { // moving up
-                    if (item.pos >= pos && item.pos < oldPos) {
-                        item.pos += 1;
-                    }
-                } else if (pos > oldPos) { // moving down
-                    if (item.pos > oldPos && item.pos <= pos) {
-                        item.pos -= 1;
-                    }
-                }
-            }
-        }
-
-        trObj.pos = pos;
-    }
-
-    create(data) {
-        const item = data;
-        item.pos = 0;
-
-        const ind = super.create(item);
-        const transObj = this.data[ind];
-        const expPos = this.getExpectedPos(transObj);
-        this.updatePos(ind, expPos);
-
-        this.sort();
-
-        return this.getIndexById(transObj.id);
-    }
-
     update(data) {
         if (!data?.id) {
             return false;
@@ -138,7 +85,7 @@ export class TransactionsList extends List {
 
             transObj.pos = 0;
             const newPos = this.getExpectedPos(transObj);
-            this.updatePosById(transObj.id, newPos);
+            this.updatePos(transObj.id, newPos);
 
             this.sort();
         }
@@ -158,13 +105,6 @@ export class TransactionsList extends List {
                 category_id: categoryId,
             });
         });
-
-        return true;
-    }
-
-    setPos(id, pos) {
-        this.updatePosById(id, pos);
-        this.sort();
 
         return true;
     }

@@ -1,5 +1,12 @@
 import { List } from './List.js';
 import { Category } from './Category.js';
+import {
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../utils.js';
 
 /**
  * @constructor CategoryList class
@@ -33,12 +40,37 @@ export class CategoryList extends List {
         ));
     }
 
-    /** Sort categories by parent */
-    sortByParent() {
-        const topLevelCategories = this.findByParent(0).sort((a, b) => a.id - b.id);
-        this.data = topLevelCategories.flatMap((item) => {
-            const children = this.findByParent(item.id);
-            return [item, ...children];
-        });
+    sortBy(sortMode) {
+        if (sortMode === SORT_BY_CREATEDATE_ASC) {
+            this.sortByCreateDateAsc();
+        } else if (sortMode === SORT_BY_CREATEDATE_DESC) {
+            this.sortByCreateDateDesc();
+        } else if (sortMode === SORT_BY_NAME_ASC) {
+            this.sortByNameAsc();
+        } else if (sortMode === SORT_BY_NAME_DESC) {
+            this.sortByNameDesc();
+        } else if (sortMode === SORT_MANUALLY) {
+            this.sortByPos();
+        }
+    }
+
+    sortByPos() {
+        this.sort((a, b) => a.pos - b.pos);
+    }
+
+    sortByNameAsc() {
+        this.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+    }
+
+    sortByNameDesc() {
+        this.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+    }
+
+    sortByCreateDateAsc() {
+        this.sort((a, b) => a.id - b.id);
+    }
+
+    sortByCreateDateDesc() {
+        this.sort((a, b) => b.id - a.id);
     }
 }

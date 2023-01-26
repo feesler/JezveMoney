@@ -3,6 +3,7 @@ import {
     queryAll,
     assert,
     asyncMap,
+    prop,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../../model/AccountsList.js';
@@ -13,12 +14,24 @@ export class TilesList extends TestComponent {
         return this.content.items;
     }
 
+    get listMode() {
+        return this.content.listMode;
+    }
+
     async parseContent() {
         const res = {};
 
+        const className = await prop(this.elem, 'className');
+        if (className.includes('tiles_select')) {
+            res.listMode = 'select';
+        } else if (className.includes('tiles_sort')) {
+            res.listMode = 'sort';
+        } else {
+            res.listMode = 'list';
+        }
+
         const listItems = await queryAll(this.elem, '.tile');
         res.items = await asyncMap(listItems, (item) => Tile.create(this.parent, item));
-        res.items.sort((a, b) => a.id - b.id);
 
         return res;
     }
@@ -59,37 +72,41 @@ export class TilesList extends TestComponent {
             .map((item) => this.content.items.indexOf(item));
     }
 
-    static renderAccounts(accountsList) {
+    static renderAccounts(accountsList, sortMode) {
         assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
-        const visibleAccounts = accountsList.getVisible(true);
+        const visibleAccounts = accountsList.getVisible();
+        visibleAccounts.sortBy(sortMode);
         return {
             items: visibleAccounts.map(Tile.renderAccount),
         };
     }
 
-    static renderHiddenAccounts(accountsList) {
+    static renderHiddenAccounts(accountsList, sortMode) {
         assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
-        const hiddenAccounts = accountsList.getHidden(true);
+        const hiddenAccounts = accountsList.getHidden();
+        hiddenAccounts.sortBy(sortMode);
         return {
             items: hiddenAccounts.map(Tile.renderAccount),
         };
     }
 
-    static renderPersons(personsList, withDebts) {
+    static renderPersons(personsList, withDebts, sortMode) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
 
-        const visiblePersons = personsList.getVisible(true);
+        const visiblePersons = personsList.getVisible();
+        visiblePersons.sortBy(sortMode);
         return {
             items: visiblePersons.map((p) => Tile.renderPerson(p, withDebts)),
         };
     }
 
-    static renderHiddenPersons(personsList, withDebts) {
+    static renderHiddenPersons(personsList, withDebts, sortMode) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
 
-        const hiddenPersons = personsList.getHidden(true);
+        const hiddenPersons = personsList.getHidden();
+        hiddenPersons.sortBy(sortMode);
         return {
             items: hiddenPersons.map((p) => Tile.renderPerson(p, withDebts)),
         };

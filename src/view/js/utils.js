@@ -2,6 +2,12 @@ import { isDate, isObject, shiftDate } from 'jezvejs';
 
 export const MS_IN_SECOND = 1000;
 
+export const SORT_BY_CREATEDATE_ASC = 1;
+export const SORT_BY_CREATEDATE_DESC = 2;
+export const SORT_BY_NAME_ASC = 3;
+export const SORT_BY_NAME_DESC = 4;
+export const SORT_MANUALLY = 5;
+
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
     const entries = document.cookie.split(';');
@@ -251,4 +257,39 @@ export const formatPersonDebts = (person) => {
     return debtAccounts.map((account) => (
         currency.formatCurrency(account.balance, account.curr_id)
     ));
+};
+
+/** Returns selected item object */
+export const reduceSelectItem = (item) => (
+    (item.selected)
+        ? item
+        : { ...item, selected: true }
+);
+
+/** Returns deselected item object */
+export const reduceDeselectItem = (item) => (
+    (item.selected)
+        ? { ...item, selected: false }
+        : item
+);
+
+/** Returns reducer for toggle select item by id */
+export const reduceToggleItem = (id) => (item) => (
+    (item.id === id)
+        ? { ...item, selected: !item.selected }
+        : item
+);
+
+export const getSortByNameIcon = (sortMode) => {
+    if (sortMode === SORT_BY_NAME_ASC) {
+        return 'sort-asc';
+    }
+    return (sortMode === SORT_BY_NAME_DESC) ? 'sort-desc' : null;
+};
+
+export const getSortByDateIcon = (sortMode) => {
+    if (sortMode === SORT_BY_CREATEDATE_ASC) {
+        return 'sort-asc';
+    }
+    return (sortMode === SORT_BY_CREATEDATE_DESC) ? 'sort-desc' : null;
 };

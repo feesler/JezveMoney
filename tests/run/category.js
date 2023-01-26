@@ -215,6 +215,28 @@ export const deselectAll = async () => {
     });
 };
 
+export const toggleSortByName = async () => {
+    await test('Toggle sort by name', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByName();
+    });
+};
+
+export const toggleSortByDate = async () => {
+    await test('Toggle sort by date', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByDate();
+    });
+};
+
+export const sortManually = async () => {
+    await test('Sort manually', async () => {
+        await checkNavigation();
+        await App.view.setSortMode();
+        return App.view.setListMode();
+    });
+};
+
 /** Check navigation to update not existing category */
 export const securityTests = async () => {
     setBlock('Category security', 2);

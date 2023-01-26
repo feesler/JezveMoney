@@ -1,4 +1,4 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
@@ -149,4 +149,27 @@ export const del = async (ids, removeChildren = true) => {
     });
 
     return deleteRes;
+};
+
+/** Set new position for specified category */
+export const setPos = async (params) => {
+    let result;
+
+    await test(`Set position of category (${formatProps(params)})`, async () => {
+        const resExpected = App.state.setCategoryPos(params);
+
+        // Send API sequest to server
+        try {
+            result = await api.category.setPos(params);
+            assert.equal(result, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+
+    return result;
 };

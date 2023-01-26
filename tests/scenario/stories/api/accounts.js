@@ -182,6 +182,37 @@ const updateInvalid = async () => {
     await App.scenario.runner.runGroup(AccountApiTests.update, data);
 };
 
+const setPos = async () => {
+    setBlock('Set position', 2);
+
+    const { ACC_RUB, CASH_RUB } = App.scenario;
+
+    const data = [
+        { id: ACC_RUB, pos: 5 },
+        { id: CASH_RUB, pos: 10 },
+        { id: ACC_RUB, pos: 1 },
+    ];
+
+    await App.scenario.runner.runGroup(AccountApiTests.setPos, data);
+};
+
+const setPosInvalid = async () => {
+    setBlock('Set position with invalid data', 2);
+
+    const { CASH_RUB } = App.scenario;
+
+    const data = [
+        { id: 0, pos: 5 },
+        { id: CASH_RUB, pos: 0 },
+        { id: CASH_RUB },
+        { pos: 1 },
+        {},
+        null,
+    ];
+
+    await App.scenario.runner.runGroup(AccountApiTests.setPos, data);
+};
+
 const del = async () => {
     setBlock('Delete accounts', 2);
 
@@ -215,6 +246,8 @@ export const apiAccountsTests = {
     async updateAndDeleteTests() {
         await update();
         await updateInvalid();
+        await setPos();
+        await setPosInvalid();
         await del();
         await delInvalid();
     },

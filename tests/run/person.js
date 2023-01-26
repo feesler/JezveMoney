@@ -45,7 +45,7 @@ export const update = async (pos) => {
         await checkNavigation();
         await App.view.goToUpdatePerson(index);
 
-        const [expectedPerson] = App.state.getPersonsByIndexes(index);
+        const [expectedPerson] = App.state.getSortedPersonsByIndexes(index);
         assert(expectedPerson, 'Can not find specified person');
 
         App.view.setExpectedPerson(expectedPerson);
@@ -111,7 +111,7 @@ export const del = async (persons) => {
     await test(`Delete persons [${persons.join()}]`, async () => {
         await checkNavigation();
 
-        const ids = App.state.getPersonsByIndexes(persons, true);
+        const ids = App.state.getSortedPersonsByIndexes(persons, true);
         App.state.deletePersons(ids);
 
         await App.view.deletePersons(persons);
@@ -133,7 +133,7 @@ export const delFromUpdate = async (pos) => {
         await App.view.goToUpdatePerson(ind);
         await App.view.deleteSelfItem();
 
-        const ids = App.state.getPersonsByIndexes(ind, true);
+        const ids = App.state.getSortedPersonsByIndexes(ind, true);
         App.state.deletePersons(ids);
 
         App.view.expectedState = PersonListView.render(App.state);
@@ -155,7 +155,7 @@ export const show = async (persons, val = true) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getPersonsByIndexes(itemIds, true);
+        const ids = App.state.getSortedPersonsByIndexes(itemIds, true);
         App.state.showPersons(ids, val);
 
         await App.view.showPersons(itemIds, val);
@@ -219,6 +219,28 @@ export const deselectAll = async () => {
     await test('Deselect all persons', async () => {
         await checkNavigation();
         return App.view.deselectAll();
+    });
+};
+
+export const toggleSortByName = async () => {
+    await test('Toggle sort by name', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByName();
+    });
+};
+
+export const toggleSortByDate = async () => {
+    await test('Toggle sort by date', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByDate();
+    });
+};
+
+export const sortManually = async () => {
+    await test('Sort manually', async () => {
+        await checkNavigation();
+        await App.view.setSortMode();
+        return App.view.setListMode();
     });
 };
 

@@ -28,7 +28,7 @@ export class CategoryItem extends TestComponent {
             id: parseInt(elem.dataset.id, 10),
             title: titleEl.textContent,
             selected: elem.classList.contains('category-item_selected'),
-            isChild: elem.classList.contains('category-item_child'),
+            isChild: !!elem.closest('.category-item__children'),
         }), this.elem, titleElem);
 
         res.menuBtn = await query(this.elem, '.popup-menu-btn');

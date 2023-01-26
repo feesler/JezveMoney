@@ -1,19 +1,20 @@
 import { Account } from '../../js/model/Account.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { createSlice } from '../../js/store.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
+
+export const createList = (items, sortMode) => {
+    const res = AccountList.create(items);
+    res.sortBy(sortMode);
+    return res;
+};
 
 // Reducers
-const deselectItem = (item) => (
-    (item.selected)
-        ? { ...item, selected: false }
-        : item
-);
-
 const reduceDeselectAll = (state) => ({
     ...state,
     items: {
-        visible: state.items.visible.map(deselectItem),
-        hidden: state.items.hidden.map(deselectItem),
+        visible: state.items.visible.map(reduceDeselectItem),
+        hidden: state.items.hidden.map(reduceDeselectItem),
     },
 });
 
@@ -52,11 +53,7 @@ const slice = createSlice({
             return state;
         }
 
-        const toggleItem = (item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        );
+        const toggleItem = reduceToggleItem(itemId);
 
         const { visible, hidden } = state.items;
         return {
@@ -68,33 +65,28 @@ const slice = createSlice({
         };
     },
 
-    selectAllItems: (state) => {
-        const selectItem = (item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(selectItem),
-                hidden: state.items.hidden.map(selectItem),
-            },
-        };
-    },
+    selectAllItems: (state) => ({
+        ...state,
+        items: {
+            visible: state.items.visible.map(reduceSelectItem),
+            hidden: state.items.hidden.map(reduceSelectItem),
+        },
+    }),
 
     deselectAllItems: (state) => reduceDeselectAll(state),
 
-    toggleSelectMode: (state) => {
+    changeListMode: (state, listMode) => {
+        if (state.listMode === listMode) {
+            return state;
+        }
+
         const newState = {
             ...state,
-            listMode: (state.listMode === 'list') ? 'select' : 'list',
+            listMode,
             contextItem: null,
         };
-        return (newState.listMode === 'list')
-            ? reduceDeselectAll(newState)
-            : newState;
+
+        return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
     startLoading: (state) => (
@@ -109,13 +101,26 @@ const slice = createSlice({
             : state
     ),
 
-    listRequestLoaded: (state) => ({
+    changeSortMode: (state, sortMode) => (
+        (state.sortMode === sortMode)
+            ? state
+            : {
+                ...state,
+                items: {
+                    visible: createList(state.items.visible, sortMode),
+                    hidden: createList(state.items.hidden, sortMode),
+                },
+                sortMode,
+            }
+    ),
+
+    listRequestLoaded: (state, keepState) => ({
         ...state,
         items: {
-            visible: AccountList.create(window.app.model.visibleUserAccounts),
-            hidden: AccountList.create(window.app.model.hiddenUserAccounts),
+            visible: createList(window.app.model.visibleUserAccounts, state.sortMode),
+            hidden: createList(window.app.model.hiddenUserAccounts, state.sortMode),
         },
-        listMode: 'list',
+        listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
     }),
 });

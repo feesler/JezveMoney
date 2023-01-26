@@ -831,7 +831,7 @@ class TransactionModel extends CachedTable
     }
 
     /**
-     * Updates position of specified transaction and fix position of transactions between old and new position
+     * Updates position of item and fix position of items between old and new position
      *
      * @param int $trans_id transaction id
      * @param int $new_pos position
@@ -903,14 +903,18 @@ class TransactionModel extends CachedTable
     /**
      * Updates position of transaction and commit affected transactions
      *
-     * @param int $trans_id
-     * @param int $new_pos
+     * @param array $request
      *
      * @return bool
      */
-    public function updatePosition(int $trans_id, int $new_pos)
+    public function updatePosition(array $request)
     {
-        $res = $this->updatePos($trans_id, $new_pos);
+        $changePosFields = ["id", "pos"];
+        checkFields($request, $changePosFields, true);
+
+        $item_id = intval($request["id"]);
+        $new_pos = intval($request["pos"]);
+        $res = $this->updatePos($item_id, $new_pos);
         if ($res) {
             $this->commitAffected();
         }

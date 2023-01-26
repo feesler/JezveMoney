@@ -436,12 +436,11 @@ class TransactionListView extends View {
 
     /**
      * Cancel local changes on transaction position update fail
-     * @param {number} trans_id - identifier of transaction
      */
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_TR_SET_POS'), 'msg_error');
+        window.app.createMessage(__('ERR_TRANS_CHANGE_POS'), 'msg_error');
     }
 
     /** Returns URL for filter of specified state */
@@ -676,12 +675,18 @@ class TransactionListView extends View {
     }
 
     async requestTransactions(options) {
-        this.startLoading();
-
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+        this.abortController = new AbortController();
+        const { signal } = this.abortController;
+        let aborted = false;
         const { keepState = false, ...request } = options;
 
+        this.startLoading();
+
         try {
-            const result = await API.transaction.list(request);
+            const result = await API.transaction.list(request, { signal });
             const payload = {
                 ...result.data,
                 keepState,
@@ -689,12 +694,18 @@ class TransactionListView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(payload));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
-            this.store.dispatch(actions.listRequestError());
+            aborted = e.name === 'AbortError';
+            if (!aborted) {
+                window.app.createMessage(e.message, 'msg_error');
+                this.store.dispatch(actions.listRequestError());
+            }
         }
 
-        this.stopLoading();
-        this.setRenderTime();
+        if (!aborted) {
+            this.stopLoading();
+            this.setRenderTime();
+            this.abortController = null;
+        }
     }
 
     renderContextMenu(state) {
@@ -725,14 +736,15 @@ class TransactionListView extends View {
     renderMenu(state) {
         const itemsCount = state.items.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = (state.listMode === 'select');
+        const isSelectMode = state.listMode === 'select';
+        const isSortMode = state.listMode === 'sort';
         const selectedItems = this.list.getSelectedItems();
         const selCount = selectedItems.length;
 
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0);
+        this.menu.show(itemsCount > 0 && !isSortMode);
 
         const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);

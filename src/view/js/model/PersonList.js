@@ -1,5 +1,12 @@
 import { List } from './List.js';
 import { Person } from './Person.js';
+import {
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../utils.js';
 
 /**
  * @constructor PersonList class
@@ -38,5 +45,39 @@ export class PersonList extends List {
                 ? (person.name === lookupName)
                 : (person.name.toLowerCase() === lookupName)
         ));
+    }
+
+    sortBy(sortMode) {
+        if (sortMode === SORT_BY_CREATEDATE_ASC) {
+            this.sortByCreateDateAsc();
+        } else if (sortMode === SORT_BY_CREATEDATE_DESC) {
+            this.sortByCreateDateDesc();
+        } else if (sortMode === SORT_BY_NAME_ASC) {
+            this.sortByNameAsc();
+        } else if (sortMode === SORT_BY_NAME_DESC) {
+            this.sortByNameDesc();
+        } else if (sortMode === SORT_MANUALLY) {
+            this.sortByPos();
+        }
+    }
+
+    sortByPos() {
+        this.sort((a, b) => a.pos - b.pos);
+    }
+
+    sortByNameAsc() {
+        this.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+    }
+
+    sortByNameDesc() {
+        this.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+    }
+
+    sortByCreateDateAsc() {
+        this.sort((a, b) => a.id - b.id);
+    }
+
+    sortByCreateDateDesc() {
+        this.sort((a, b) => b.id - a.id);
     }
 }

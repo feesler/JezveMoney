@@ -242,7 +242,10 @@ abstract class Model
      *
      * @return bool
      */
-    abstract protected function preDelete(array $items);
+    protected function preDelete(array $items)
+    {
+        return true;
+    }
 
     /**
      * Performs model-specific actions after delete successfully completed

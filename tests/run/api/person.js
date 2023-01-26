@@ -134,3 +134,28 @@ export const del = async (ids) => {
 
     return deleteRes;
 };
+
+/** Set new position for specified person */
+export const setPos = async (params) => {
+    let result;
+
+    await test(`Set position of person (${formatProps(params)})`, async () => {
+        const resExpected = App.state.setPersonPos(params);
+
+        // Send API sequest to server
+        try {
+            result = await api.person.setPos(params);
+            if (resExpected !== result) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+
+    return result;
+};

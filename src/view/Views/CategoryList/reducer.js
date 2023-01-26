@@ -1,23 +1,18 @@
 import { Category } from '../../js/model/Category.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { createSlice } from '../../js/store.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
 
 /** Prepare data from categories list model for list component */
 export const createItemsFromModel = () => {
     const { categories } = window.app.model;
-    const res = CategoryList.create(categories);
-    res.sortByParent();
-    return res;
+    return CategoryList.create(categories);
 };
 
 // Reducers
 const reduceDeselectAll = (state) => ({
     ...state,
-    items: state.items.map((item) => (
-        (item.selected)
-            ? { ...item, selected: false }
-            : item
-    )),
+    items: state.items.map(reduceDeselectItem),
 });
 
 const slice = createSlice({
@@ -49,42 +44,30 @@ const slice = createSlice({
             : { ...state, contextItem: itemId }
     ),
 
-    toggleSelectItem: (state, itemId) => {
-        const category = window.app.model.categories.getItem(itemId);
-        if (!category) {
-            return state;
-        }
-
-        return {
-            ...state,
-            items: state.items.map((item) => (
-                (item.id === itemId)
-                    ? { ...item, selected: !item.selected }
-                    : item
-            )),
-        };
-    },
+    toggleSelectItem: (state, itemId) => ({
+        ...state,
+        items: state.items.map(reduceToggleItem(itemId)),
+    }),
 
     selectAllItems: (state) => ({
         ...state,
-        items: state.items.map((item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        )),
+        items: state.items.map(reduceSelectItem),
     }),
 
     deselectAllItems: (state) => reduceDeselectAll(state),
 
-    toggleSelectMode: (state) => {
+    changeListMode: (state, listMode) => {
+        if (state.listMode === listMode) {
+            return state;
+        }
+
         const newState = {
             ...state,
-            listMode: (state.listMode === 'list') ? 'select' : 'list',
+            listMode,
             contextItem: null,
         };
-        return (newState.listMode === 'list')
-            ? reduceDeselectAll(newState)
-            : newState;
+
+        return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
     startLoading: (state) => (
@@ -99,10 +82,16 @@ const slice = createSlice({
             : state
     ),
 
-    listRequestLoaded: (state) => ({
+    changeSortMode: (state, sortMode) => (
+        (state.sortMode === sortMode)
+            ? state
+            : { ...state, sortMode }
+    ),
+
+    listRequestLoaded: (state, keepState) => ({
         ...state,
         items: createItemsFromModel(),
-        listMode: 'list',
+        listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
     }),
 });

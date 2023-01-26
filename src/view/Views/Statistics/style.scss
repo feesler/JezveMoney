@@ -44,6 +44,10 @@
 .stat-histogram {
   position: relative;
   width: 100%;
+
+  .loading-indicator {
+    z-index: auto;
+  }
 }
 
 /* Bar chart information popup */

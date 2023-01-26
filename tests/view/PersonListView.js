@@ -18,9 +18,24 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { PersonDetails } from './component/Person/PersonDetails.js';
+import {
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../common.js';
+
+const modeButtons = {
+    list: 'listModeBtn',
+    select: 'selectModeBtn',
+    sort: 'sortModeBtn',
+};
 
 const listMenuItems = [
     'selectModeBtn',
+    'sortModeBtn',
+    'sortByNameBtn',
+    'sortByDateBtn',
     'selectAllBtn',
     'deselectAllBtn',
     'showBtn',
@@ -97,18 +112,6 @@ export class PersonListView extends AppView {
         return res;
     }
 
-    getViewMode(cont) {
-        if (!cont.listMenuContainer.visible) {
-            return 'nodata';
-        }
-
-        if (!cont.addBtn.content.visible) {
-            return 'select';
-        }
-
-        return 'list';
-    }
-
     buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
@@ -118,7 +121,8 @@ export class PersonListView extends AppView {
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
             contextItem: cont.contextMenu.tileId,
-            mode: this.getViewMode(cont),
+            mode: cont.tiles.listMode,
+            sortMode: App.state.getPersonsSortMode(),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
@@ -160,6 +164,8 @@ export class PersonListView extends AppView {
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
         const isListMode = model.mode === 'list';
+        const isSortMode = model.mode === 'sort';
+        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
 
         const showSelectItems = (
             itemsCount > 0
@@ -177,9 +183,12 @@ export class PersonListView extends AppView {
             totalCounter: { visible: true, value: itemsCount },
             hiddenCounter: { visible: true, value: model.hiddenTiles.length },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            listMenuContainer: { visible: itemsCount > 0 },
+            listMenuContainer: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible && isListMode },
+            selectModeBtn: { visible: model.listMenuVisible && isListMode && itemsCount > 0 },
+            sortModeBtn: { visible: showSortItems },
+            sortByNameBtn: { visible: showSortItems },
+            sortByDateBtn: { visible: showSortItems },
             selectAllBtn: {
                 visible: showSelectItems && totalSelected < itemsCount,
             },
@@ -336,7 +345,7 @@ export class PersonListView extends AppView {
     }
 
     async openContextMenu(num) {
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         const item = this.getItemByIndex(num);
 
@@ -361,37 +370,105 @@ export class PersonListView extends AppView {
         return this.checkState(expected);
     }
 
-    async toggleSelectMode() {
-        const isListMode = (this.model.mode === 'list');
-        if (isListMode) {
+    async changeListMode(listMode) {
+        if (this.model.mode === listMode) {
+            return true;
+        }
+
+        assert(
+            this.model.mode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.mode} to ${listMode}.`,
+        );
+
+        if (listMode === 'list') {
             await this.openListMenu();
         }
 
         this.model.listMenuVisible = false;
-        this.model.mode = (isListMode) ? 'select' : 'list';
+        this.model.mode = listMode;
         this.onDeselectAll();
+        if (listMode === 'sort') {
+            this.model.sortMode = SORT_MANUALLY;
+            App.state.updateSettings({
+                sort_persons: this.model.sortMode,
+            });
+        }
+
         const expected = this.getExpectedState();
 
-        const buttonName = (isListMode) ? 'selectModeBtn' : 'listModeBtn';
-        await this.performAction(() => this.content[buttonName].click());
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+
+        if (listMode === 'sort') {
+            await this.waitForList(() => button.click());
+        } else {
+            await this.performAction(() => button.click());
+        }
 
         return this.checkState(expected);
     }
 
-    async setSelectMode() {
-        if (this.model.mode === 'select') {
-            return true;
-        }
-
-        return this.toggleSelectMode();
+    async setListMode() {
+        return this.changeListMode('list');
     }
 
-    async cancelSelectMode() {
-        if (this.model.mode === 'list') {
-            return true;
-        }
+    async setSelectMode() {
+        return this.changeListMode('select');
+    }
 
-        return this.toggleSelectMode();
+    async setSortMode() {
+        return this.changeListMode('sort');
+    }
+
+    async toggleSortByName() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_NAME_ASC)
+            ? SORT_BY_NAME_DESC
+            : SORT_BY_NAME_ASC;
+
+        App.state.updateSettings({
+            sort_persons: this.model.sortMode,
+        });
+
+        const expList = PersonListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByNameBtn;
+        assert(button, 'Sort by name button not found');
+
+        await this.performAction(() => button.click());
+
+        return this.checkState(expected);
+    }
+
+    async toggleSortByDate() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_CREATEDATE_ASC)
+            ? SORT_BY_CREATEDATE_DESC
+            : SORT_BY_CREATEDATE_ASC;
+
+        App.state.updateSettings({
+            sort_persons: this.model.sortMode,
+        });
+
+        const expList = PersonListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByDateBtn;
+        assert(button, 'Sort by date button not found');
+
+        await this.performAction(() => button.click());
+
+        return this.checkState(expected);
     }
 
     async selectPersons(data) {
@@ -478,9 +555,10 @@ export class PersonListView extends AppView {
     }
 
     static render(state) {
+        const sortMode = state.profile.settings.sort_persons;
         const res = {
-            tiles: TilesList.renderPersons(state.persons, false),
-            hiddenTiles: TilesList.renderHiddenPersons(state.persons, false),
+            tiles: TilesList.renderPersons(state.persons, false, sortMode),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons, false, sortMode),
         };
 
         return res;

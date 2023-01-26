@@ -11,6 +11,7 @@ use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\UserSettingsModel;
 
 /**
  * State API controller
@@ -150,6 +151,10 @@ class State extends ApiController
         $res->user_id = $this->user_id;
         $res->owner_id = $this->owner_id;
         $res->name = $person->name;
+
+        $settingsModel = UserSettingsModel::getInstance();
+        $settings = $settingsModel->getSettings();
+        $res->settings = $settings->getUserData();
 
         return $res;
     }

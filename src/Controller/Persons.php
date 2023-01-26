@@ -36,6 +36,7 @@ class Persons extends ListViewController
         $currMod = CurrencyModel::getInstance();
 
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "currency" => $currMod->getData(),
             "persons" => $this->model->getData(["visibility" => "all"]),
             "view" => [

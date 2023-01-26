@@ -397,18 +397,30 @@ class StatisticsView extends View {
     }
 
     async requestData(options) {
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+        this.abortController = new AbortController();
+        const { signal } = this.abortController;
+        let aborted = false;
+
         this.startLoading();
 
         try {
-            const result = await API.transaction.statistics(options);
+            const result = await API.transaction.statistics(options, { signal });
             this.store.dispatch(actions.dataRequestLoaded(result.data));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
-            this.store.dispatch(actions.dataRequestError());
+            aborted = e.name === 'AbortError';
+            if (!aborted) {
+                window.app.createMessage(e.message, 'msg_error');
+                this.store.dispatch(actions.dataRequestError());
+            }
         }
 
-        this.stopLoading();
-        this.store.dispatch(actions.setRenderTime());
+        if (!aborted) {
+            this.stopLoading();
+            this.store.dispatch(actions.setRenderTime());
+        }
     }
 
     formatValue(value) {

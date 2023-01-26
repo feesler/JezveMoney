@@ -16,6 +16,7 @@ const availFields = [
     'createdate',
     'updatedate',
     'transactionsCount',
+    'pos',
 ];
 
 /**

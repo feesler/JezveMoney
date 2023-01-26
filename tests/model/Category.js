@@ -22,6 +22,7 @@ export class Category {
         this.name = data.name;
         this.type = data.type;
         this.parent_id = data.parent_id;
+        this.pos = data.pos;
         this.createdate = data.createdate;
         this.updatedate = data.updatedate;
     }

@@ -181,6 +181,11 @@ export const api = {
             return true;
         },
 
+        async updateSettings(options) {
+            await apiPost('profile/updateSettings', options);
+            return true;
+        },
+
         /** Delete current user and all related data */
         async del() {
             await apiPost('profile/delete');
@@ -232,6 +237,11 @@ export const api = {
             return true;
         },
 
+        async setPos(options) {
+            await apiPost('account/setpos', options);
+            return true;
+        },
+
         async list(full) {
             let reqUrl = 'account/list';
             if (full) {
@@ -280,6 +290,11 @@ export const api = {
             return true;
         },
 
+        async setPos(options) {
+            await apiPost('person/setpos', options);
+            return true;
+        },
+
         async list() {
             const { data } = await apiGet('person/list');
             return data;
@@ -310,6 +325,11 @@ export const api = {
 
         async del(ids, removeChild = true) {
             await apiPost('category/delete', { id: asArray(ids), removeChild });
+            return true;
+        },
+
+        async setPos(options) {
+            await apiPost('category/setpos', options);
             return true;
         },
 

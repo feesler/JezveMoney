@@ -8,6 +8,20 @@ import {
 
 export const MS_IN_SECOND = 1000;
 
+export const SORT_BY_CREATEDATE_ASC = 1;
+export const SORT_BY_CREATEDATE_DESC = 2;
+export const SORT_BY_NAME_ASC = 3;
+export const SORT_BY_NAME_DESC = 4;
+export const SORT_MANUALLY = 5;
+
+export const availSortTypes = [
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+];
+
 /** Check object is empty */
 export const isEmpty = (obj) => {
     if (typeof obj === 'object') {
@@ -251,6 +265,14 @@ export const urlJoin = (obj) => {
 };
 
 export const formatProps = (params) => {
+    if (typeof params === 'undefined') {
+        return 'undefined';
+    }
+
+    if (!isObject(params)) {
+        return `${params}`;
+    }
+
     const res = Object.keys(params).map((key) => `${key}: ${params[key]}`);
 
     return res.join(', ');

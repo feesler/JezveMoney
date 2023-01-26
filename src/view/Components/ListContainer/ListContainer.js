@@ -16,6 +16,7 @@ const defaultProps = {
     ItemComponent: null,
     itemSelector: null, // mandatory item CSS selector
     getItemProps: null, // optional callback to map items to props
+    getItemById: null, // optional callback to obtain item by id
     isListChanged: null, // optional callback to verify list content was changed
     items: [],
     noItemsMessage: __('LIST_NO_DATA'),
@@ -75,7 +76,7 @@ export class ListContainer extends Component {
 
     /** Returns array of selected items */
     getSelectedItems() {
-        return this.state.items.filter((item) => item.selected);
+        return this.getItems().filter((item) => item.selected);
     }
 
     /**
@@ -83,7 +84,9 @@ export class ListContainer extends Component {
      * @param {number} id - identifier of item
      */
     getItemById(id) {
-        return this.state.items.find((item) => item && item.id === id);
+        return (isFunction(this.state.getItemById))
+            ? this.state.getItemById(id)
+            : this.state.items.find((item) => item && item.id === id);
     }
 
     /**
@@ -148,16 +151,20 @@ export class ListContainer extends Component {
         });
     }
 
-    renderNoDataMessage() {
-        if (this.noDataMsg) {
+    renderNoDataMessage(state, prevState) {
+        if (state.noItemsMessage === prevState.noItemsMessage) {
             return;
         }
 
-        this.noDataMsg = (isFunction(this.state.noItemsMessage))
-            ? this.state.noItemsMessage()
-            : this.defaultNoDataMessage(this.state.noItemsMessage);
-
-        this.elem.append(this.noDataMsg);
+        if (state.noItemsMessage) {
+            this.noDataMsg = (isFunction(state.noItemsMessage))
+                ? this.state.noItemsMessage()
+                : this.defaultNoDataMessage(state.noItemsMessage);
+            this.elem.append(this.noDataMsg);
+        } else if (this.noDataMsg) {
+            re(this.noDataMsg);
+            this.noDataMsg = null;
+        }
     }
 
     getListItemById(id) {
@@ -199,12 +206,13 @@ export class ListContainer extends Component {
         }
 
         if (emptyList) {
-            this.renderNoDataMessage();
+            this.renderNoDataMessage(state, prevState);
             return;
         }
 
         const { ItemComponent } = state;
         const listItems = [];
+        const listElems = [];
 
         const prevItems = prevState?.items ?? [];
         let lastItem = null;
@@ -231,12 +239,14 @@ export class ListContainer extends Component {
 
             lastItem = listItem;
             listItems.push(listItem);
+            listElems.push(listItem.elem);
         });
 
         // Remove items not included in new state
-        this.listItems.forEach((item) => {
-            if (!listItems.includes(item)) {
-                re(item.elem);
+        const childElems = Array.from(this.elem.children);
+        childElems.forEach((elem) => {
+            if (!listElems.includes(elem)) {
+                re(elem);
             }
         });
 
@@ -249,6 +259,10 @@ export class ListContainer extends Component {
         }
 
         this.renderList(state, prevState);
+        if (state.selectModeClass) {
+            this.elem.classList.toggle(state.selectModeClass, state.listMode === 'select');
+        }
+
         this.elem.dataset.time = state.renderTime;
     }
 }

@@ -53,7 +53,7 @@ export const update = async (pos) => {
         await checkNavigation();
         await App.view.goToUpdateAccount(index);
 
-        const [expAccount] = App.state.getAccountsByIndexes(index);
+        const [expAccount] = App.state.getSortedAccountsByIndexes(index);
         assert(expAccount, 'Can not find specified account');
         App.view.setExpectedAccount(expAccount);
         App.view.expectedState = App.view.getExpectedState();
@@ -139,7 +139,7 @@ export const del = async (accounts) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(indexes, true);
+        const ids = App.state.getSortedAccountsByIndexes(indexes, true);
         App.state.deleteAccounts(ids);
 
         await App.view.deleteAccounts(indexes);
@@ -162,7 +162,7 @@ export const delFromUpdate = async (pos) => {
 
         await App.view.deleteSelfItem();
 
-        const ids = App.state.getAccountsByIndexes(ind, true);
+        const ids = App.state.getSortedAccountsByIndexes(ind, true);
         App.state.deleteAccounts(ids);
 
         App.view.expectedState = AccountListView.render(App.state);
@@ -184,7 +184,7 @@ export const show = async (accounts, val = true) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(itemIds, true);
+        const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
         App.state.showAccounts(ids, val);
 
         if (val) {
@@ -209,7 +209,7 @@ export const exportTest = async (accounts) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(itemIds, true);
+        const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
         const trList = App.state.transactions.filterByAccounts(ids);
         const transactions = trList.sortAsc();
 
@@ -291,6 +291,28 @@ export const deselectAll = async () => {
     await test('Deselect all accounts', async () => {
         await checkNavigation();
         return App.view.deselectAll();
+    });
+};
+
+export const toggleSortByName = async () => {
+    await test('Toggle sort by name', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByName();
+    });
+};
+
+export const toggleSortByDate = async () => {
+    await test('Toggle sort by date', async () => {
+        await checkNavigation();
+        return App.view.toggleSortByDate();
+    });
+};
+
+export const sortManually = async () => {
+    await test('Sort manually', async () => {
+        await checkNavigation();
+        await App.view.setSortMode();
+        return App.view.setListMode();
     });
 };
 

@@ -1,7 +1,5 @@
-import { isFunction } from 'jezvejs';
-import { Sortable } from 'jezvejs/Sortable';
 import { __ } from '../../js/utils.js';
-import { ListContainer } from '../ListContainer/ListContainer.js';
+import { SortableListContainer } from '../SortableListContainer/SortableListContainer.js';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
 import './style.scss';
 
@@ -10,12 +8,16 @@ const LIST_CLASS = 'trans-list';
 const SELECT_MODE_CLASS = 'trans-list_select';
 const SORT_MODE_CLASS = 'trans-list_sort';
 const DETAILS_CLASS = 'trans-list_details';
+const ITEM_PLACEHOLDER_CLASS = 'trans-item_placeholder';
 
 const defaultProps = {
     ItemComponent: TransactionListItem,
     itemSelector: '.trans-item',
     itemSortSelector: '.trans-item.trans-item_sort',
     className: LIST_CLASS,
+    placeholderClass: ITEM_PLACEHOLDER_CLASS,
+    sortModeClass: SORT_MODE_CLASS,
+    sortGroup: 'transactions',
     noItemsMessage: __('TRANSACTIONS_NO_DATA'),
     mode: 'classic',
     showControls: true,
@@ -25,26 +27,11 @@ const defaultProps = {
 /**
  * Transaction list component
  */
-export class TransactionList extends ListContainer {
-    constructor(props) {
+export class TransactionList extends SortableListContainer {
+    constructor(props = {}) {
         super({
             ...defaultProps,
             ...props,
-        });
-    }
-
-    createSortable(state = this.state) {
-        if (state.listMode !== 'sort' || this.listSortable) {
-            return;
-        }
-
-        this.listSortable = new Sortable({
-            onInsertAt: (elem, ref) => this.onSort(elem, ref),
-            elem: this.elem,
-            group: 'transactions',
-            selector: state.itemSortSelector,
-            placeholderClass: 'trans-item_placeholder',
-            copyWidth: true,
         });
     }
 
@@ -175,30 +162,6 @@ export class TransactionList extends ListContainer {
         }
     }
 
-    /**
-     * Transaction item drop callback
-     * @param {number} trans_id - identifier of moving transaction
-     * @param {number} retrans_id - identifier of replaced transaction
-     */
-    onSort(elem, refElem) {
-        const transactionId = this.itemIdFromElem(elem);
-        const refId = this.itemIdFromElem(refElem);
-        if (!transactionId || !refId) {
-            return;
-        }
-
-        const replacedItem = this.getItemById(refId);
-        if (!replacedItem) {
-            return;
-        }
-
-        this.state.items = [...this.state.items];
-
-        if (isFunction(this.props.onSort)) {
-            this.props.onSort(transactionId, replacedItem.pos);
-        }
-    }
-
     getItemProps(item, state) {
         return {
             mode: state.mode,
@@ -221,10 +184,7 @@ export class TransactionList extends ListContainer {
     render(state, prevState = {}) {
         super.render(state, prevState);
 
-        this.createSortable(state);
-
         this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
         this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
-        this.elem.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 }

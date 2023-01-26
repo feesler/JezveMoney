@@ -12,6 +12,7 @@ import './style.scss';
 export const TILE_CLASS = 'tile';
 const WIDE_CLASS = 'tile_wide';
 const SELECTED_CLASS = 'tile_selected';
+const SORT_CLASS = 'tile_sort';
 const TITLE_CLASS = 'tile__title';
 const SUBTITLE_CLASS = 'tile__subtitle';
 const ICON_CLASS = 'tile__icon';
@@ -28,7 +29,7 @@ const defaultProps = {
     subtitle: null,
     icon: null,
     selected: false,
-    selectMode: false,
+    listMode: 'list',
 };
 
 /**
@@ -183,13 +184,15 @@ export class Tile extends Component {
 
     renderSelectControls(state, prevState) {
         if (
-            state.selectMode === prevState.selectMode
+            state.listMode === prevState.listMode
             && state.selected === prevState.selected
         ) {
             return;
         }
 
-        if (state.selectMode && !this.checkbox) {
+        const selectMode = state.listMode === 'select';
+
+        if (selectMode && !this.checkbox) {
             this.checkbox = Checkbox.create({
                 className: CHECKBOX_CLASS,
             });
@@ -197,9 +200,9 @@ export class Tile extends Component {
             this.elem.append(this.checkbox.elem);
         }
 
-        this.checkbox?.show(state.selectMode);
+        this.checkbox?.show(selectMode);
 
-        const selected = state.selectMode && !!state.selected;
+        const selected = selectMode && !!state.selected;
         this.elem.classList.toggle(SELECTED_CLASS, selected);
         this.checkbox?.check(selected);
     }
@@ -218,5 +221,7 @@ export class Tile extends Component {
         this.renderSubTitle(state, prevState);
         this.renderIcon(state, prevState);
         this.renderSelectControls(state, prevState);
+
+        this.elem.classList.toggle(SORT_CLASS, state.listMode === 'sort');
     }
 }

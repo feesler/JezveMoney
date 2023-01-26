@@ -105,6 +105,37 @@ const updateInvalid = async () => {
     return App.scenario.runner.runGroup(PersonApiTests.update, data);
 };
 
+const setPos = async () => {
+    setBlock('Set position', 2);
+
+    const { PERSON_X, PERSON_Y } = App.scenario;
+
+    const data = [
+        { id: PERSON_X, pos: 5 },
+        { id: PERSON_Y, pos: 10 },
+        { id: PERSON_X, pos: 1 },
+    ];
+
+    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+};
+
+const setPosInvalid = async () => {
+    setBlock('Set position with invalid data', 2);
+
+    const { PERSON_X } = App.scenario;
+
+    const data = [
+        { id: 0, pos: 5 },
+        { id: PERSON_X, pos: 0 },
+        { id: PERSON_X },
+        { pos: 1 },
+        {},
+        null,
+    ];
+
+    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+};
+
 const del = async () => {
     setBlock('Delete persons', 2);
 
@@ -138,6 +169,8 @@ export const apiPersonsTests = {
     async updateAndDeleteTests() {
         await update();
         await updateInvalid();
+        await setPos();
+        await setPosInvalid();
         await del();
         await delInvalid();
     },

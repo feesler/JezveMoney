@@ -5,7 +5,7 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { isValidValue } from '../common.js';
+import { isValidValue, availSortTypes } from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -23,29 +23,25 @@ import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 
-/**
- * Accounts
- */
+/** Settings */
+const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
+const availSettings = sortSettings;
+
+/** Accounts */
 const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
 
-/**
- * Persons
- */
+/** Persons */
 const pReqFields = ['name', 'flags'];
 
-/**
- * Categories
- */
+/** Categories */
 const catReqFields = ['name', 'parent_id', 'type'];
+const ANY_TYPE = 0;
+const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
 
-/**
- * Transactions
- */
+/** Transactions */
 const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
 
-/**
- * Import templates
- */
+/** Import templates */
 const tplReqFields = [
     'name',
     'type_id',
@@ -61,9 +57,7 @@ const tplReqColumns = {
     comment_col: 'comment',
 };
 
-/**
- * Import rules
- */
+/** Import rules */
 const ruleReqFields = ['flags', 'conditions', 'actions'];
 
 /**
@@ -101,8 +95,10 @@ export class AppState {
     constructor() {
         this.accounts = null;
         this.userAccountsCache = null;
+        this.sortedAccountsCache = null;
         this.persons = null;
         this.personsCache = null;
+        this.sortedPersonsCache = null;
         this.transactions = null;
         this.templates = null;
         this.rules = null;
@@ -121,6 +117,7 @@ export class AppState {
         this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
         this.userAccountsCache = null;
+        this.sortedAccountsCache = null;
 
         if (!this.persons) {
             this.persons = PersonsList.create();
@@ -128,6 +125,7 @@ export class AppState {
         this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
         this.personsCache = null;
+        this.sortedPersonsCache = null;
 
         if (!this.transactions) {
             this.transactions = TransactionsList.create();
@@ -182,6 +180,7 @@ export class AppState {
         return res;
     }
 
+    /* eslint-disable no-console */
     compareLists(local, expected) {
         assert(local.data.length === expected.data.length);
 
@@ -192,8 +191,16 @@ export class AppState {
             return res;
         });
 
-        assert.deepMeet(local.data, noDatesData);
+        try {
+            assert.deepMeet(local.data, noDatesData);
+        } catch (e) {
+            console.log('Local: ', local.data);
+            console.log('Expected: ', noDatesData);
+
+            throw e;
+        }
     }
+    /* eslint-enable no-console */
 
     meetExpectation(expected) {
         this.compareLists(this.accounts, expected.accounts);
@@ -269,9 +276,11 @@ export class AppState {
     resetAll() {
         this.accounts?.reset();
         this.userAccountsCache = null;
+        this.sortedAccountsCache = null;
         this.persons?.reset();
         this.categories?.reset();
         this.personsCache = null;
+        this.sortedPersonsCache = null;
         this.transactions?.reset();
         this.templates?.reset();
         this.rules?.reset();
@@ -284,6 +293,29 @@ export class AppState {
     deleteProfile() {
         this.resetAll();
         delete this.profile;
+    }
+
+    isValidSettings(settings) {
+        if (!isObject(settings)) {
+            return false;
+        }
+
+        return sortSettings.every((prop) => (
+            (prop in settings)
+                ? availSortTypes.includes(settings[prop])
+                : true
+        ));
+    }
+
+    updateSettings(params) {
+        if (!this.isValidSettings(params)) {
+            return false;
+        }
+
+        const data = copyFields(params, availSettings);
+        Object.assign(this.profile.settings, data);
+
+        return true;
     }
 
     /**
@@ -416,6 +448,19 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
+    setAccountPos(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        const { id, pos } = params;
+        if (!parseInt(id, 10) || !parseInt(pos, 10)) {
+            return false;
+        }
+
+        return this.accounts.setPos(id, pos);
+    }
+
     cacheUserAccounts() {
         if (this.userAccountsCache) {
             return;
@@ -430,11 +475,42 @@ export class AppState {
         return this.userAccountsCache;
     }
 
+    getSortedUserAccounts() {
+        if (!this.sortedAccountsCache) {
+            const sortMode = this.getAccountsSortMode();
+            const userAccounts = this.getUserAccounts();
+            const visible = userAccounts.getVisible();
+            visible.sortBy(sortMode);
+            const hidden = userAccounts.getHidden();
+            hidden.sortBy(sortMode);
+            this.sortedAccountsCache = AccountsList.create([
+                ...visible.data,
+                ...hidden.data,
+            ]);
+        }
+
+        return this.sortedAccountsCache;
+    }
+
+    getAccountsSortMode() {
+        return this.profile.settings.sort_accounts;
+    }
+
     getAccountsByIndexes(indexes, returnIds = false) {
-        this.cacheUserAccounts();
+        const userAccounts = this.getUserAccounts();
 
         return asArray(indexes).map((ind) => {
-            const item = this.userAccountsCache.getItemByIndex(ind);
+            const item = userAccounts.getItemByIndex(ind);
+            assert(item, `Invalid account index ${ind}`);
+            return (returnIds) ? item.id : item;
+        });
+    }
+
+    getSortedAccountsByIndexes(indexes, returnIds = false) {
+        const sortedAccounts = this.getSortedUserAccounts();
+
+        return asArray(indexes).map((ind) => {
+            const item = sortedAccounts.getItemByIndex(ind);
             assert(item, `Invalid account index ${ind}`);
             return (returnIds) ? item.id : item;
         });
@@ -576,6 +652,19 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
+    setPersonPos(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        const { id, pos } = params;
+        if (!parseInt(id, 10) || !parseInt(pos, 10)) {
+            return false;
+        }
+
+        return this.persons.setPos(id, pos);
+    }
+
     getPersonAccounts(personId) {
         const person = this.persons.getItem(personId);
         if (Array.isArray(person?.accounts)) {
@@ -639,11 +728,41 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
+    getSortedPersons() {
+        if (!this.sortedPersonsCache) {
+            const sortMode = this.getPersonsSortMode();
+            const visible = this.persons.getVisible();
+            visible.sortBy(sortMode);
+            const hidden = this.persons.getHidden();
+            hidden.sortBy(sortMode);
+            this.sortedPersonsCache = PersonsList.create([
+                ...visible.data,
+                ...hidden.data,
+            ]);
+        }
+
+        return this.sortedPersonsCache;
+    }
+
+    getPersonsSortMode() {
+        return this.profile.settings.sort_persons;
+    }
+
     getPersonsByIndexes(indexes, returnIds = false) {
         this.cachePersons();
 
         return asArray(indexes).map((ind) => {
             const item = this.personsCache.getItemByIndex(ind);
+            assert(item, `Invalid person index ${ind}`);
+            return (returnIds) ? item.id : item;
+        });
+    }
+
+    getSortedPersonsByIndexes(indexes, returnIds = false) {
+        const sortedPersons = this.getSortedPersons();
+
+        return asArray(indexes).map((ind) => {
+            const item = sortedPersons.getItemByIndex(ind);
             assert(item, `Invalid person index ${ind}`);
             return (returnIds) ? item.id : item;
         });
@@ -790,6 +909,45 @@ export class AppState {
         this.categories.sortByParent();
 
         return true;
+    }
+
+    setCategoryPos(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        const { id, pos } = params;
+        if (!parseInt(id, 10) || !parseInt(pos, 10)) {
+            return false;
+        }
+
+        return this.categories.setPos(id, pos, params.parent_id);
+    }
+
+    getSortedCategories() {
+        if (!this.sortedCategoriesCache) {
+            const sortMode = this.getCategoriesSortMode();
+
+            const sortedItems = transTypes.flatMap((type) => {
+                const typeItems = this.categories.filter((item) => item.type === type);
+                const items = CategoryList.create(typeItems);
+                items.sortBy(sortMode);
+
+                const mainCategories = items.findByParent(0);
+                return mainCategories.flatMap((item) => {
+                    const children = items.findByParent(item.id);
+                    return [item, ...children];
+                });
+            });
+
+            this.sortedCategoriesCache = CategoryList.create(sortedItems);
+        }
+
+        return this.sortedCategoriesCache;
+    }
+
+    getCategoriesSortMode() {
+        return this.profile.settings.sort_categories;
     }
 
     getCategoriesByNames(names, returnIds = false) {

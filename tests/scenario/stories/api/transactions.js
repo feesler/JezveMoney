@@ -599,7 +599,7 @@ const setCategory = async () => {
         { id: [TR_EXPENSE_2], category_id: 0 },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
 };
 
 const setCategoryInvalid = async () => {
@@ -618,11 +618,11 @@ const setCategoryInvalid = async () => {
         { id: [TR_EXPENSE_1], category_id: -1 },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
 };
 
 const setPos = async () => {
-    setBlock('Set position of transaction', 2);
+    setBlock('Set position', 2);
 
     const data = [
         { id: App.scenario.TR_EXPENSE_2, pos: 5 },

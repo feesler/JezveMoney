@@ -2,14 +2,14 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiListController;
+use JezveMoney\Core\ApiSortableListController;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 
 /**
  * Persons API controller
  */
-class Person extends ApiListController
+class Person extends ApiSortableListController
 {
     protected $requiredFields = ["name", "flags"];
     protected $transModel = null;
@@ -26,6 +26,7 @@ class Person extends ApiListController
         $this->createErrorMsg = __("ERR_PERSON_CREATE");
         $this->updateErrorMsg = __("ERR_PERSON_UPDATE");
         $this->deleteErrorMsg = __("ERR_PERSON_DELETE");
+        $this->changePosErrorMsg = __("ERR_PERSON_CHANGE_POS");
     }
 
     /**

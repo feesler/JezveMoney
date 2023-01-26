@@ -23,9 +23,25 @@ import { CategoryItem } from './component/CategoryItem.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { CategoryDetails } from './component/Category/CategoryDetails.js';
 import { Category } from '../model/Category.js';
+import {
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../common.js';
+import { CategoryList } from '../model/CategoryList.js';
+
+const modeButtons = {
+    list: 'listModeBtn',
+    select: 'selectModeBtn',
+    sort: 'sortModeBtn',
+};
 
 const listMenuItems = [
     'selectModeBtn',
+    'sortModeBtn',
+    'sortByNameBtn',
+    'sortByDateBtn',
     'selectAllBtn',
     'deselectAllBtn',
     'deleteBtn',
@@ -43,16 +59,27 @@ const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TY
 /** List of categories view class */
 export class CategoryListView extends AppView {
     static render(state) {
+        const sortMode = state.getCategoriesSortMode();
+
         return {
             sections: transTypes.map((type) => {
-                const items = state.categories.filter((item) => item.type === type);
-                const visible = items.length > 0;
+                const typeItems = state.categories.filter((item) => item.type === type);
+                const items = CategoryList.create(typeItems);
+                items.sortBy(sortMode);
+
+                const mainCategories = items.findByParent(0);
+                const expectedItems = mainCategories.flatMap((item) => {
+                    const children = items.findByParent(item.id);
+                    return [item, ...children];
+                });
+
+                const visible = expectedItems.length > 0;
                 const section = {
                     visible,
                     name: Category.typeToString(type, App.view.locale),
                 };
                 if (visible) {
-                    section.items = items.map((item) => ({
+                    section.items = expectedItems.map((item) => ({
                         content: CategoryItem.render(item),
                     }));
                 }
@@ -103,25 +130,38 @@ export class CategoryListView extends AppView {
                 type,
                 name,
                 renderTime,
+                isSelectMode,
+                isSortMode,
             ] = await evaluate((el, hrdEl, listEl) => ([
                 parseInt(el.dataset.type, 10),
                 hrdEl.textContent,
                 parseInt(listEl.dataset.time, 10),
+                listEl.classList.contains('categories-list_select'),
+                listEl.classList.contains('categories-list_sort'),
             ]), elem, listHeader, listContainer);
 
             const listItems = await queryAll(listContainer, '.category-item');
+
+            let listMode = 'list';
+            if (isSelectMode) {
+                listMode = 'select';
+            } else if (isSortMode) {
+                listMode = 'sort';
+            }
 
             return {
                 elem,
                 type,
                 visible: await isVisible(elem),
                 name,
+                listMode,
                 renderTime,
                 items: await asyncMap(listItems, (item) => CategoryItem.create(this, item)),
             };
         });
 
         res.renderTime = res.sections[0].renderTime;
+        res.listMode = res.sections[0].listMode;
 
         res.itemInfo = await CategoryDetails.create(this, await query('#itemInfo .list-item-details'));
 
@@ -150,18 +190,6 @@ export class CategoryListView extends AppView {
         return res;
     }
 
-    getViewMode(cont) {
-        if (!cont.listMenuContainer.visible) {
-            return 'nodata';
-        }
-
-        if (!cont.createBtn.content.visible) {
-            return 'select';
-        }
-
-        return 'list';
-    }
-
     buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
@@ -169,7 +197,8 @@ export class CategoryListView extends AppView {
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
             contextItem: cont.contextMenu.itemId,
-            mode: this.getViewMode(cont),
+            mode: cont.listMode,
+            sortMode: App.state.getCategoriesSortMode(),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
             items: [],
@@ -222,6 +251,8 @@ export class CategoryListView extends AppView {
         const selectedItems = this.getSelectedItems(model);
         const totalSelected = selectedItems.length;
         const isListMode = model.mode === 'list';
+        const isSortMode = model.mode === 'sort';
+        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
 
         const showSelectItems = (
             itemsCount > 0
@@ -238,9 +269,12 @@ export class CategoryListView extends AppView {
             loadingIndicator: { visible: model.loading },
             totalCounter: { visible: true, value: itemsCount },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            listMenuContainer: { visible: itemsCount > 0 },
+            listMenuContainer: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible && isListMode },
+            sortModeBtn: { visible: showSortItems },
+            sortByNameBtn: { visible: showSortItems },
+            sortByDateBtn: { visible: showSortItems },
             selectAllBtn: {
                 visible: showSelectItems && totalSelected < itemsCount,
             },
@@ -393,7 +427,7 @@ export class CategoryListView extends AppView {
     async openContextMenu(index) {
         assert.arrayIndex(this.model.items, index, 'Invalid category index');
 
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         const item = this.model.items[index];
         this.model.contextMenuVisible = true;
@@ -419,37 +453,107 @@ export class CategoryListView extends AppView {
         return this.checkState(expected);
     }
 
-    async toggleSelectMode() {
-        const isListMode = (this.model.mode === 'list');
-        if (isListMode) {
+    async changeListMode(listMode) {
+        if (this.model.mode === listMode) {
+            return true;
+        }
+
+        assert(
+            this.model.mode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.mode} to ${listMode}.`,
+        );
+
+        if (listMode === 'list') {
             await this.openListMenu();
         }
 
         this.model.listMenuVisible = false;
-        this.model.mode = (isListMode) ? 'select' : 'list';
+        this.model.mode = listMode;
         this.onDeselectAll();
+        if (listMode === 'sort') {
+            this.model.sortMode = SORT_MANUALLY;
+            App.state.updateSettings({
+                sort_categories: this.model.sortMode,
+            });
+
+            this.model.items = App.state.getSortedCategories();
+        }
+
         const expected = this.getExpectedState();
 
-        const buttonName = (isListMode) ? 'selectModeBtn' : 'listModeBtn';
-        await this.performAction(() => this.content[buttonName].click());
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+
+        if (listMode === 'sort') {
+            await this.waitForList(() => button.click());
+        } else {
+            await this.performAction(() => button.click());
+        }
 
         return this.checkState(expected);
     }
 
-    async setSelectMode() {
-        if (this.model.mode === 'select') {
-            return true;
-        }
-
-        return this.toggleSelectMode();
+    async setListMode() {
+        return this.changeListMode('list');
     }
 
-    async cancelSelectMode() {
-        if (this.model.mode === 'list') {
-            return true;
-        }
+    async setSelectMode() {
+        return this.changeListMode('select');
+    }
 
-        return this.toggleSelectMode();
+    async setSortMode() {
+        return this.changeListMode('sort');
+    }
+
+    async toggleSortByName() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_NAME_ASC)
+            ? SORT_BY_NAME_DESC
+            : SORT_BY_NAME_ASC;
+
+        App.state.updateSettings({
+            sort_categories: this.model.sortMode,
+        });
+
+        const expList = CategoryListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByNameBtn;
+        assert(button, 'Sort by name button not found');
+
+        await this.performAction(() => button.click());
+
+        return this.checkState(expected);
+    }
+
+    async toggleSortByDate() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_CREATEDATE_ASC)
+            ? SORT_BY_CREATEDATE_DESC
+            : SORT_BY_CREATEDATE_ASC;
+
+        App.state.updateSettings({
+            sort_categories: this.model.sortMode,
+        });
+
+        const expList = CategoryListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByDateBtn;
+        assert(button, 'Sort by date button not found');
+
+        await this.performAction(() => button.click());
+
+        return this.checkState(expected);
     }
 
     async selectCategories(data) {

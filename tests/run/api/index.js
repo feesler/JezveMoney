@@ -94,6 +94,23 @@ export const changePassword = async ({ user, newPassword }) => {
     });
 };
 
+export const updateSettings = async (options) => {
+    await test('Update settings', async () => {
+        const resExpected = App.state.updateSettings(options);
+
+        try {
+            const result = await api.profile.updateSettings(options);
+            assert.equal(result, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const resetData = async (options = {}) => {
     await test('Reset data', async () => {
         await api.profile.resetData(options);

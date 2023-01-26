@@ -19,9 +19,24 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { AccountDetails } from './component/Account/AccountDetails.js';
+import {
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../common.js';
+
+const modeButtons = {
+    list: 'listModeBtn',
+    select: 'selectModeBtn',
+    sort: 'sortModeBtn',
+};
 
 const listMenuItems = [
     'selectModeBtn',
+    'sortModeBtn',
+    'sortByNameBtn',
+    'sortByDateBtn',
     'selectAllBtn',
     'deselectAllBtn',
     'exportBtn',
@@ -100,18 +115,6 @@ export class AccountListView extends AppView {
         return res;
     }
 
-    getViewMode(cont) {
-        if (!cont.listMenuContainer.visible) {
-            return 'nodata';
-        }
-
-        if (!cont.addBtn.content.visible) {
-            return 'select';
-        }
-
-        return 'list';
-    }
-
     buildModel(cont) {
         const res = {
             locale: cont.locale,
@@ -120,7 +123,8 @@ export class AccountListView extends AppView {
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
             contextItem: cont.contextMenu.tileId,
-            mode: this.getViewMode(cont),
+            mode: cont.tiles.listMode,
+            sortMode: App.state.getAccountsSortMode(),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible: cont.contextMenu.visible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
@@ -162,7 +166,9 @@ export class AccountListView extends AppView {
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
         const isListMode = model.mode === 'list';
+        const isSortMode = model.mode === 'sort';
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
+        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
 
         const res = {
             header: {
@@ -174,9 +180,12 @@ export class AccountListView extends AppView {
             totalCounter: { visible: true, value: itemsCount },
             hiddenCounter: { visible: true, value: model.hiddenTiles.length },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            listMenuContainer: { visible: itemsCount > 0 },
+            listMenuContainer: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible && isListMode },
+            selectModeBtn: { visible: model.listMenuVisible && isListMode && itemsCount > 0 },
+            sortModeBtn: { visible: showSortItems },
+            sortByNameBtn: { visible: showSortItems },
+            sortByDateBtn: { visible: showSortItems },
             selectAllBtn: {
                 visible: showSelectItems && itemsCount > 0 && totalSelected < itemsCount,
             },
@@ -335,7 +344,7 @@ export class AccountListView extends AppView {
     }
 
     async openContextMenu(num) {
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         const item = this.getItemByIndex(num);
 
@@ -360,37 +369,105 @@ export class AccountListView extends AppView {
         return this.checkState(expected);
     }
 
-    async toggleSelectMode() {
-        const isListMode = (this.model.mode === 'list');
-        if (isListMode) {
+    async changeListMode(listMode) {
+        if (this.model.mode === listMode) {
+            return true;
+        }
+
+        assert(
+            this.model.mode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.mode} to ${listMode}.`,
+        );
+
+        if (listMode === 'list') {
             await this.openListMenu();
         }
 
         this.model.listMenuVisible = false;
-        this.model.mode = (isListMode) ? 'select' : 'list';
+        this.model.mode = listMode;
         this.onDeselectAll();
+        if (listMode === 'sort') {
+            this.model.sortMode = SORT_MANUALLY;
+            App.state.updateSettings({
+                sort_accounts: this.model.sortMode,
+            });
+        }
+
         const expected = this.getExpectedState();
 
-        const buttonName = (isListMode) ? 'selectModeBtn' : 'listModeBtn';
-        await this.performAction(() => this.content[buttonName].click());
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+
+        if (listMode === 'sort') {
+            await this.waitForList(() => button.click());
+        } else {
+            await this.performAction(() => button.click());
+        }
 
         return this.checkState(expected);
     }
 
-    async setSelectMode() {
-        if (this.model.mode === 'select') {
-            return true;
-        }
-
-        return this.toggleSelectMode();
+    async setListMode() {
+        return this.changeListMode('list');
     }
 
-    async cancelSelectMode() {
-        if (this.model.mode === 'list') {
-            return true;
-        }
+    async setSelectMode() {
+        return this.changeListMode('select');
+    }
 
-        return this.toggleSelectMode();
+    async setSortMode() {
+        return this.changeListMode('sort');
+    }
+
+    async toggleSortByName() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_NAME_ASC)
+            ? SORT_BY_NAME_DESC
+            : SORT_BY_NAME_ASC;
+
+        App.state.updateSettings({
+            sort_accounts: this.model.sortMode,
+        });
+
+        const expList = AccountListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByNameBtn;
+        assert(button, 'Sort by name button not found');
+
+        await this.waitForList(() => button.click());
+
+        return this.checkState(expected);
+    }
+
+    async toggleSortByDate() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.sortMode = (this.model.sortMode === SORT_BY_CREATEDATE_ASC)
+            ? SORT_BY_CREATEDATE_DESC
+            : SORT_BY_CREATEDATE_ASC;
+
+        App.state.updateSettings({
+            sort_accounts: this.model.sortMode,
+        });
+
+        const expList = AccountListView.render(App.state);
+        const expected = this.getExpectedState();
+        Object.assign(expected, expList);
+
+        const button = this.content.sortByDateBtn;
+        assert(button, 'Sort by date button not found');
+
+        await this.waitForList(() => button.click());
+
+        return this.checkState(expected);
     }
 
     async selectAccounts(data) {
@@ -487,17 +564,17 @@ export class AccountListView extends AppView {
         const exportResp = await httpReq('GET', downloadURL);
         assert(exportResp?.status === 200, 'Invalid response');
 
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         return exportResp.body;
     }
 
     static render(state) {
+        const sortMode = state.profile.settings.sort_accounts;
         const userAccounts = state.accounts.getUserAccounts();
-
         const res = {
-            tiles: TilesList.renderAccounts(userAccounts),
-            hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
+            tiles: TilesList.renderAccounts(userAccounts, sortMode),
+            hiddenTiles: TilesList.renderHiddenAccounts(userAccounts, sortMode),
         };
 
         return res;

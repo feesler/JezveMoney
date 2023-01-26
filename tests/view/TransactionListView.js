@@ -457,6 +457,7 @@ export class TransactionListView extends AppView {
     getExpectedState(model = this.model) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
+        const sortMode = model.listMode === 'sort';
         const isItemsAvailable = (model.filtered.length > 0);
         const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
         const { filtersVisible } = model;
@@ -505,7 +506,7 @@ export class TransactionListView extends AppView {
             transList: { visible: true },
             createBtn: { visible: listMode },
             listModeBtn: { visible: !listMode },
-            listMenuContainer: { visible: isItemsAvailable },
+            listMenuContainer: { visible: isItemsAvailable && !sortMode },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: {
                 visible: model.listMenuVisible && listMode && isItemsAvailable,

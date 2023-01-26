@@ -31,6 +31,7 @@ export class CategoriesStory extends TestStory {
 
         await this.create();
         await this.select();
+        await this.sort();
         await this.details();
         await this.update();
         await this.del();
@@ -171,6 +172,21 @@ export class CategoriesStory extends TestStory {
         setBlock('Select/deselect all categories', 2);
         await CategoryTests.selectAll();
         await CategoryTests.deselectAll();
+    }
+
+    async sort() {
+        setBlock('Sort categories', 1);
+
+        setBlock('Sort by name', 2);
+        await CategoryTests.toggleSortByName();
+        await CategoryTests.toggleSortByName();
+
+        setBlock('Sort by date', 2);
+        await CategoryTests.toggleSortByDate();
+        await CategoryTests.toggleSortByDate();
+
+        setBlock('Sort manually', 2);
+        await CategoryTests.sortManually();
     }
 
     async details() {
