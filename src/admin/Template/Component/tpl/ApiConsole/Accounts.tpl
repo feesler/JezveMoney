@@ -120,3 +120,20 @@
         <input id="delaccbtn" class="btn submit-btn" type="button" value="Submit">
     </div>
 </div>
+
+<div id="setAccPosForm" class="request-data-form">
+    <h3>Set position of account</h3>
+    <form action="<?= BASEURL ?>api/account/setpos" method="post">
+        <div class="std_margin">
+            <label for="acc_pos_id">Id</label>
+            <input id="acc_pos_id" class="stretch-input" name="id" type="text">
+        </div>
+        <div class="std_margin">
+            <label for="acc_pos_pos">Position</label>
+            <input id="acc_pos_pos" class="stretch-input" name="pos" type="text">
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>

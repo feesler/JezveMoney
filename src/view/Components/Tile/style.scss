@@ -93,6 +93,10 @@
   }
 }
 
+.tile_placeholder {
+  opacity: 0;
+}
+
 @media (hover: hover) {
   .tile:hover {
     background-color: #1e82cc;

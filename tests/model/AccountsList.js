@@ -4,14 +4,21 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { normalize } from '../common.js';
+import {
+    normalize,
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+} from '../common.js';
 import { api } from './api.js';
-import { List } from './List.js';
+import { SortableList } from './SortableList.js';
 import { App } from '../Application.js';
 
 export const ACCOUNT_HIDDEN = 1;
 
-export class AccountsList extends List {
+export class AccountsList extends SortableList {
     /** Apply transaction to accounts */
     static applyTransaction(accounts, transaction) {
         assert.isArray(accounts, 'Invalid accounts list specified');
@@ -197,5 +204,39 @@ export class AccountsList extends List {
     /** Return hidden user accounts */
     getUserHidden(returnRaw = false) {
         return this.getUserAccounts().getHidden(returnRaw);
+    }
+
+    sortBy(sortMode) {
+        if (sortMode === SORT_BY_CREATEDATE_ASC) {
+            this.sortByCreateDateAsc();
+        } else if (sortMode === SORT_BY_CREATEDATE_DESC) {
+            this.sortByCreateDateDesc();
+        } else if (sortMode === SORT_BY_NAME_ASC) {
+            this.sortByNameAsc();
+        } else if (sortMode === SORT_BY_NAME_DESC) {
+            this.sortByNameDesc();
+        } else if (sortMode === SORT_MANUALLY) {
+            this.sortByPos();
+        }
+    }
+
+    sortByPos() {
+        this.data.sort((a, b) => a.pos - b.pos);
+    }
+
+    sortByNameAsc() {
+        this.data.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+    }
+
+    sortByNameDesc() {
+        this.data.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+    }
+
+    sortByCreateDateAsc() {
+        this.data.sort((a, b) => a.id - b.id);
+    }
+
+    sortByCreateDateDesc() {
+        this.data.sort((a, b) => b.id - a.id);
     }
 }

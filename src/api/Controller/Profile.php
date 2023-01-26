@@ -10,6 +10,9 @@ use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\UserSettingsModel;
+
+use const JezveMoney\App\Model\AVAILABLE_SETTINGS;
 
 /**
  * Profile API controller
@@ -43,11 +46,15 @@ class Profile extends ApiController
 
         $userObj = $this->uMod->getItem($this->user_id);
 
+        $settingsModel = UserSettingsModel::getInstance();
+        $settings = $settingsModel->getSettings();
+
         $this->ok([
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,
             "login" => $userObj->login,
             "name" => $pObj->name,
+            "settings" => $settings->getUserData(),
         ]);
     }
 
@@ -278,6 +285,38 @@ class Profile extends ApiController
         $this->commit();
 
         $this->setMessage(__("MSG_PROFILE_RESET"));
+        $this->ok();
+    }
+
+    /**
+     * Updates user settings
+     */
+    public function updateSettings()
+    {
+        if (!$this->isPOST()) {
+            throw new \Error(__("ERR_INVALID_REQUEST"));
+        }
+
+        $request = $this->getRequestData();
+        if (!$request) {
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+        }
+
+        $this->begin();
+
+        $updateResult = false;
+        try {
+            $settingsModel = UserSettingsModel::getInstance();
+            $updateResult = $settingsModel->updateSettings($request);
+        } catch (\Error $e) {
+            wlog("Update item error: " . $e->getMessage());
+        }
+        if (!$updateResult) {
+            throw new \Error(__("ERR_SETTINGS_UPDATE"));
+        }
+
+        $this->commit();
+
         $this->ok();
     }
 

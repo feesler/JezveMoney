@@ -137,6 +137,13 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setEvents(delaccbtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delaccounts', 'account/delete') });
+
+        // Set account position form
+        const setPosForm = document.querySelector('#setAccPosForm > form');
+        if (!setPosForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
     }
 
     /** Initialization of forms for Person API controller */
@@ -175,6 +182,13 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setEvents(delpersonbtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delpersons', 'person/delete') });
+
+        // Set person position form
+        const setPosForm = document.querySelector('#setPersonPosForm > form');
+        if (!setPosForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
     }
 
     /** Initialization of forms for Category API controller */
@@ -217,6 +231,13 @@ class AdminApiConsoleView extends AdminView {
         setEvents(delCategoriesBtn, {
             click: (e) => this.onDeleteCategoriesSubmit(e, 'delCategories', 'category/delete'),
         });
+
+        // Set category position form
+        const setPosForm = document.querySelector('#setCategoryPosForm > form');
+        if (!setPosForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
     }
 
     /** Initialization of forms for Transaction API controller */
@@ -588,6 +609,12 @@ class AdminApiConsoleView extends AdminView {
         }
         setEvents(changePwdForm, { submit: (e) => this.onFormSubmit(e) });
 
+        const updateSettingsForm = document.querySelector('#updateSettingsForm > form');
+        if (!updateSettingsForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(updateSettingsForm, { submit: (e) => this.onUpdateSettingsSubmit(e) });
+
         const resetForm = document.querySelector('#resetForm > form');
         if (!resetForm) {
             throw new Error('Fail to init view');
@@ -906,6 +933,27 @@ class AdminApiConsoleView extends AdminView {
             httpMethod: 'POST',
             method,
             data: this.parseIds(itemsInp.value),
+        });
+    }
+
+    /** Update settings form 'submit' event handler */
+    onUpdateSettingsSubmit(e) {
+        e.preventDefault();
+
+        const nameInput = ge('upd_settings_name');
+        const valueInput = ge('upd_settings_value');
+
+        const name = nameInput.value;
+        if (name.length === 0) {
+            return;
+        }
+
+        this.apiRequest({
+            httpMethod: 'POST',
+            method: 'profile/updateSettings',
+            data: {
+                [name]: valueInput.value,
+            },
         });
     }
 

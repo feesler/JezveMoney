@@ -7,7 +7,16 @@ import {
 } from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../js/utils.js';
+import {
+    getSortByDateIcon,
+    getSortByNameIcon,
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+    __,
+} from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -15,13 +24,13 @@ import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
+import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { PersonDetails } from '../../Components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { createStore } from '../../js/store.js';
-import { actions, reducer } from './reducer.js';
+import { actions, createList, reducer } from './reducer.js';
 import './style.scss';
 
 /**
@@ -35,15 +44,20 @@ class PersonListView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.checkPersonModels();
 
+        const { visiblePersons, hiddenPersons } = window.app.model;
+        const { settings } = window.app.model.profile;
+        const sortMode = settings.sort_persons;
+
         const initialState = {
             ...this.props,
             detailsItem: null,
             items: {
-                visible: PersonList.create(window.app.model.visiblePersons),
-                hidden: PersonList.create(window.app.model.hiddenPersons),
+                visible: createList(visiblePersons, sortMode),
+                hidden: createList(hiddenPersons, sortMode),
             },
             loading: false,
             listMode: 'list',
+            sortMode,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -61,14 +75,19 @@ class PersonListView extends View {
                 type: 'button',
                 attrs: { 'data-id': person.id },
                 title: person.name,
-                selected: person.selected,
-                selectMode: listMode === 'select',
+                selected: person.selected ?? false,
+                listMode,
             }),
             className: 'tiles',
             itemSelector: '.tile',
+            itemSortSelector: '.tile.tile_sort',
+            selectModeClass: 'tiles_select',
+            sortModeClass: 'tiles_sort',
+            placeholderClass: 'tile_placeholder',
             listMode: 'list',
             noItemsMessage: __('PERSONS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
+            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         };
 
         this.loadElementsByIds([
@@ -88,17 +107,23 @@ class PersonListView extends View {
             title: __('PERSONS'),
         });
 
-        this.visibleTiles = ListContainer.create(listProps);
+        this.visibleTiles = SortableListContainer.create({
+            ...listProps,
+            sortGroup: 'visiblePersons',
+        });
         this.contentContainer.prepend(this.visibleTiles.elem);
 
-        this.hiddenTiles = ListContainer.create(listProps);
+        this.hiddenTiles = SortableListContainer.create({
+            ...listProps,
+            sortGroup: 'hiddenPersons',
+        });
         this.contentContainer.append(this.hiddenTiles.elem);
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),
-            onClick: () => this.toggleSelectMode(),
+            onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
@@ -127,6 +152,19 @@ class PersonListView extends View {
                 icon: 'select',
                 title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
+            }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: __('SORT'),
+                onClick: () => this.onMenuClick('sortModeBtn'),
+            }, {
+                id: 'sortByNameBtn',
+                title: __('SORT_BY_NAME'),
+                onClick: () => this.onMenuClick('sortByNameBtn'),
+            }, {
+                id: 'sortByDateBtn',
+                title: __('SORT_BY_DATE'),
+                onClick: () => this.onMenuClick('sortByDateBtn'),
             }, {
                 id: 'selectAllBtn',
                 title: __('SELECT_ALL'),
@@ -157,7 +195,10 @@ class PersonListView extends View {
         });
 
         this.menuActions = {
-            selectModeBtn: () => this.toggleSelectMode(),
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            sortByNameBtn: () => this.toggleSortByName(),
+            sortByDateBtn: () => this.toggleSortByDate(),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
             showBtn: () => this.showItems(true),
@@ -252,8 +293,13 @@ class PersonListView extends View {
         this.store.dispatch(actions.deselectAllItems());
     }
 
-    toggleSelectMode() {
-        this.store.dispatch(actions.toggleSelectMode());
+    async setListMode(listMode) {
+        const state = this.store.getState();
+        if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
+            await this.requestSortMode(SORT_MANUALLY);
+        }
+
+        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -334,14 +380,16 @@ class PersonListView extends View {
         }
     }
 
-    async requestList() {
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
         try {
             const { data } = await API.person.list({ visibility: 'all' });
             window.app.model.persons.setData(data);
             window.app.model.visiblePersons = null;
             window.app.checkPersonModels();
 
-            this.store.dispatch(actions.listRequestLoaded());
+            this.store.dispatch(actions.listRequestLoaded(keepState));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -363,6 +411,76 @@ class PersonListView extends View {
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
+    }
+
+    /**
+     * Sent API request to server to change position of person
+     * @param {number} itemId - identifier of item to change position
+     * @param {number} newPos  - new position of item
+     */
+    async sendChangePosRequest(itemId, newPos) {
+        this.startLoading();
+
+        try {
+            await API.person.setPos(itemId, newPos);
+            this.requestList({ keepState: true });
+        } catch (e) {
+            this.cancelPosChange(itemId);
+            this.stopLoading();
+        }
+    }
+
+    /**
+     * Cancel local changes on position update fail
+     */
+    cancelPosChange() {
+        this.render(this.store.getState());
+
+        window.app.createMessage(__('ERR_PERSON_CHANGE_POS'), 'msg_error');
+    }
+
+    getSortMode() {
+        return window.app.model.profile.settings.sort_persons;
+    }
+
+    toggleSortByName() {
+        const current = this.getSortMode();
+        const sortMode = (current === SORT_BY_NAME_ASC)
+            ? SORT_BY_NAME_DESC
+            : SORT_BY_NAME_ASC;
+
+        this.requestSortMode(sortMode);
+    }
+
+    toggleSortByDate() {
+        const current = this.getSortMode();
+        const sortMode = (current === SORT_BY_CREATEDATE_ASC)
+            ? SORT_BY_CREATEDATE_DESC
+            : SORT_BY_CREATEDATE_ASC;
+
+        this.requestSortMode(sortMode);
+    }
+
+    async requestSortMode(sortMode) {
+        const { settings } = window.app.model.profile;
+        if (settings.sort_persons === sortMode) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.profile.updateSettings({
+                sort_persons: sortMode,
+            });
+            settings.sort_persons = sortMode;
+
+            this.store.dispatch(actions.changeSortMode(sortMode));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+
+        this.stopLoading();
     }
 
     /** Show person(s) delete confirmation popup */
@@ -415,16 +533,26 @@ class PersonListView extends View {
         const selCount = selArr.length;
         const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
-        const isSelectMode = (state.listMode === 'select');
+        const isListMode = state.listMode === 'list';
+        const isSelectMode = state.listMode === 'select';
+        const isSortMode = state.listMode === 'sort';
+        const sortMode = this.getSortMode();
 
-        show(this.createBtn, !isSelectMode);
-        this.listModeBtn.show(isSelectMode);
+        show(this.createBtn, isListMode);
+        this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0);
-
+        this.menu.show(itemsCount > 0 && !isSortMode);
         const { items } = this.menu;
 
-        items.selectModeBtn.show(!isSelectMode);
+        items.selectModeBtn.show(isListMode && itemsCount > 0);
+        items.sortModeBtn.show(isListMode && itemsCount > 1);
+
+        items.sortByNameBtn.setIcon(getSortByNameIcon(sortMode));
+        items.sortByNameBtn.show(isListMode && itemsCount > 1);
+
+        items.sortByDateBtn.setIcon(getSortByDateIcon(sortMode));
+        items.sortByDateBtn.show(isListMode && itemsCount > 1);
+
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
         show(items.separator2, isSelectMode);

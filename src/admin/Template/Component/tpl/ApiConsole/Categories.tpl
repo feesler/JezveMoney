@@ -87,3 +87,24 @@
         <input id="delCategoriesBtn" class="btn submit-btn" type="submit" value="Submit">
     </div>
 </div>
+
+<div id="setCategoryPosForm" class="request-data-form">
+    <h3>Set position of category</h3>
+    <form action="<?= BASEURL ?>api/category/setpos" method="post">
+        <div class="std_margin">
+            <label for="category_pos_id">Id</label>
+            <input id="category_pos_id" class="stretch-input" name="id" type="text">
+        </div>
+        <div class="std_margin">
+            <label for="category_pos_pos">Position</label>
+            <input id="category_pos_pos" class="stretch-input" name="pos" type="text">
+        </div>
+        <div class="std_margin">
+            <label for="category_pos_parent">Parent category</label>
+            <input id="category_pos_parent" class="stretch-input" name="parent_id" type="text">
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>

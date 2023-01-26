@@ -1,4 +1,5 @@
 import { __ } from '../utils.js';
+import { CategoryList } from './CategoryList.js';
 import { ListItem } from './ListItem.js';
 import { availTransTypes, Transaction } from './Transaction.js';
 
@@ -10,6 +11,9 @@ const availFields = [
     'createdate',
     'updatedate',
     'transactionsCount',
+    'pos',
+    'children',
+    'selected',
 ];
 
 /**
@@ -37,5 +41,13 @@ export class Category extends ListItem {
      */
     isAvailField(field) {
         return typeof field === 'string' && availFields.includes(field);
+    }
+
+    /**
+     * Sets child categories
+     * @param {CategoryList|Array} data
+     */
+    setChildren(data) {
+        this.children = CategoryList.create(data);
     }
 }

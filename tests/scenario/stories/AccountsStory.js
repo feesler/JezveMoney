@@ -35,6 +35,7 @@ export class AccountsStory extends TestStory {
 
         await this.hide();
         await this.select();
+        await this.sort();
         await this.details();
         await this.show();
         await this.exportCSV();
@@ -210,6 +211,21 @@ export class AccountsStory extends TestStory {
         setBlock('Select/deselect all accounts', 2);
         await AccountTests.selectAll();
         await AccountTests.deselectAll();
+    }
+
+    async sort() {
+        setBlock('Sort accounts', 1);
+
+        setBlock('Sort by name', 2);
+        await AccountTests.toggleSortByName();
+        await AccountTests.toggleSortByName();
+
+        setBlock('Sort by date', 2);
+        await AccountTests.toggleSortByDate();
+        await AccountTests.toggleSortByDate();
+
+        setBlock('Sort manually', 2);
+        await AccountTests.sortManually();
     }
 
     async details() {

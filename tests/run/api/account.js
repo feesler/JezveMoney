@@ -152,3 +152,28 @@ export const del = async (ids) => {
 
     return deleteRes;
 };
+
+/** Set new position for specified account */
+export const setPos = async (params) => {
+    let result;
+
+    await test(`Set position of account (${formatProps(params)})`, async () => {
+        const resExpected = App.state.setAccountPos(params);
+
+        // Send API sequest to server
+        try {
+            result = await api.account.setPos(params);
+            if (resExpected !== result) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+
+    return result;
+};

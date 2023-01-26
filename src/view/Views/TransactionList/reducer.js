@@ -1,4 +1,5 @@
 import { createSlice } from '../../js/store.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
 
 // Utils
 export const isSameSelection = (a, b) => (
@@ -8,11 +9,7 @@ export const isSameSelection = (a, b) => (
 // Reducers
 const reduceDeselectAllItems = (state) => ({
     ...state,
-    items: state.items.map((item) => (
-        (item.selected)
-            ? { ...item, selected: false }
-            : item
-    )),
+    items: state.items.map(reduceDeselectItem),
 });
 
 const slice = createSlice({
@@ -40,20 +37,12 @@ const slice = createSlice({
 
     toggleSelectItem: (state, itemId) => ({
         ...state,
-        items: state.items.map((item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        )),
+        items: state.items.map(reduceToggleItem(itemId)),
     }),
 
     selectAllItems: (state) => ({
         ...state,
-        items: state.items.map((item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        )),
+        items: state.items.map(reduceSelectItem),
     }),
 
     deselectAllItems: (state) => reduceDeselectAllItems(state),

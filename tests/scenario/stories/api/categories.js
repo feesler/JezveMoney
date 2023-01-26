@@ -79,6 +79,10 @@ const createMultiple = async () => {
     }, {
         name: 'Learning',
         parent_id: 0,
+        type: EXPENSE,
+    }, {
+        name: 'Other',
+        parent_id: 0,
         type: 0,
     }];
 
@@ -86,6 +90,7 @@ const createMultiple = async () => {
         App.scenario.CAFE_CATEGORY,
         App.scenario.BIKE_CATEGORY,
         App.scenario.LEARN_CATEGORY,
+        App.scenario.OTHER_CATEGORY,
     ] = await CategoryApiTests.createMultiple(data);
 };
 
@@ -116,23 +121,18 @@ const createMultipleInvalid = async () => {
 const update = async () => {
     setBlock('Update categories', 2);
 
+    const {
+        FOOD_CATEGORY,
+        TAXES_CATEGORY,
+        INVEST_CATEGORY,
+        SHOP_CATEGORY,
+    } = App.scenario;
+
     const data = [
-        {
-            id: App.scenario.FOOD_CATEGORY,
-            name: 'Meal',
-        },
-        {
-            id: App.scenario.TAXES_CATEGORY,
-            parent_id: App.scenario.INVEST_CATEGORY,
-        },
-        {
-            id: App.scenario.INVEST_CATEGORY,
-            type: EXPENSE,
-        },
-        {
-            id: App.scenario.FOOD_CATEGORY,
-            parent_id: App.scenario.SHOP_CATEGORY,
-        },
+        { id: FOOD_CATEGORY, name: 'Meal' },
+        { id: TAXES_CATEGORY, parent_id: INVEST_CATEGORY },
+        { id: INVEST_CATEGORY, type: EXPENSE },
+        { id: FOOD_CATEGORY, parent_id: SHOP_CATEGORY },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
@@ -141,22 +141,64 @@ const update = async () => {
 const updateInvalid = async () => {
     setBlock('Update categories with invalid data', 2);
 
+    const { FOOD_CATEGORY, CAFE_CATEGORY } = App.scenario;
+
     const data = [
         // Try to update name of category to an existing one
-        { id: App.scenario.FOOD_CATEGORY, name: 'Transpost' },
+        { id: FOOD_CATEGORY, name: 'Transpost' },
         // Try to submit category with empty name
-        { id: App.scenario.FOOD_CATEGORY, name: '' },
+        { id: FOOD_CATEGORY, name: '' },
         // Try to submit category with invalid parent
-        { id: App.scenario.FOOD_CATEGORY, parent_id: -1 },
+        { id: FOOD_CATEGORY, parent_id: -1 },
         // Try to submit category with itself as parent
-        { id: App.scenario.FOOD_CATEGORY, parent_id: App.scenario.FOOD_CATEGORY },
+        { id: FOOD_CATEGORY, parent_id: FOOD_CATEGORY },
         // Try to submit category with invalid transaction type
-        { id: App.scenario.FOOD_CATEGORY, type: 100 },
+        { id: FOOD_CATEGORY, type: 100 },
         // Try to submit category with transaction type different than parent
-        { id: App.scenario.CAFE_CATEGORY, type: INCOME },
+        { id: CAFE_CATEGORY, type: INCOME },
     ];
 
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
+};
+
+const setPos = async () => {
+    setBlock('Set position', 2);
+
+    const { SHOP_CATEGORY, LEARN_CATEGORY, INVEST_CATEGORY } = App.scenario;
+
+    const data = [
+        { id: LEARN_CATEGORY, pos: 2, parent_id: 0 },
+        { id: LEARN_CATEGORY, pos: 10, parent_id: SHOP_CATEGORY },
+        { id: SHOP_CATEGORY, pos: 2, parent_id: INVEST_CATEGORY },
+        { id: SHOP_CATEGORY, pos: 4, parent_id: 0 },
+    ];
+
+    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
+};
+
+const setPosInvalid = async () => {
+    setBlock('Set position with invalid data', 2);
+
+    const { SHOP_CATEGORY } = App.scenario;
+
+    const data = [
+        // Invalid 'id'
+        { id: 0, pos: 5, parent_id: 0 },
+        // Invalid 'pos'
+        { id: SHOP_CATEGORY, pos: 0, parent_id: 0 },
+        // Invalid 'parent_id'
+        { id: SHOP_CATEGORY, pos: 0, parent_id: -1 },
+        // No 'id'
+        { pos: 1, parent_id: 0 },
+        // No 'pos'
+        { id: SHOP_CATEGORY, parent_id: 0 },
+        // No 'parent_id'
+        { id: 0, pos: 5 },
+        {},
+        null,
+    ];
+
+    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
 };
 
 const del = async () => {
@@ -197,6 +239,8 @@ export const apiCategoriesTests = {
     async updateAndDeleteTests() {
         await update();
         await updateInvalid();
+        await setPos();
+        await setPosInvalid();
         await del();
         await delInvalid();
     },

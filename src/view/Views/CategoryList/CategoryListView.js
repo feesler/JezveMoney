@@ -11,14 +11,23 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
-import { __ } from '../../js/utils.js';
+import {
+    getSortByDateIcon,
+    getSortByNameIcon,
+    SORT_BY_CREATEDATE_ASC,
+    SORT_BY_CREATEDATE_DESC,
+    SORT_BY_NAME_ASC,
+    SORT_BY_NAME_DESC,
+    SORT_MANUALLY,
+    __,
+} from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { Category } from '../../js/model/Category.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
+import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
@@ -28,6 +37,7 @@ import './style.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
+const CHECK_ITEM_CLASS = 'check-icon-item';
 
 const ANY_TYPE = 0;
 
@@ -40,12 +50,16 @@ class CategoryListView extends View {
 
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
+        const { settings } = window.app.model.profile;
+        const sortMode = settings.sort_categories;
+
         const initialState = {
             ...this.props,
             detailsItem: null,
             items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
+            sortMode,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -70,11 +84,19 @@ class CategoryListView extends View {
                 listMode,
                 showControls: (listMode === 'list'),
             }),
+            getItemById: (id) => this.getItemById(id),
             className: 'categories-list',
             itemSelector: '.category-item',
+            itemSortSelector: '.category-item.category-item_sort',
+            selectModeClass: SELECT_MODE_CLASS,
+            sortModeClass: 'categories-list_sort',
+            placeholderClass: 'category-item_placeholder',
+            treeSort: true,
+            childContainerSelector: '.category-item__children',
             listMode: 'list',
             noItemsMessage: __('CATEGORIES_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
+            onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };
 
         this.loadElementsByIds([
@@ -102,7 +124,10 @@ class CategoryListView extends View {
                         textContent: Category.getTypeTitle(type),
                     },
                 }),
-                list: ListContainer.create(listProps),
+                list: SortableListContainer.create({
+                    ...listProps,
+                    sortGroup: type,
+                }),
             };
 
             section.container = createElement('section', {
@@ -126,7 +151,7 @@ class CategoryListView extends View {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),
-            onClick: () => this.toggleSelectMode(),
+            onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
@@ -156,6 +181,21 @@ class CategoryListView extends View {
                 title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: __('SORT'),
+                onClick: () => this.onMenuClick('sortModeBtn'),
+            }, {
+                id: 'sortByNameBtn',
+                title: __('SORT_BY_NAME'),
+                className: CHECK_ITEM_CLASS,
+                onClick: () => this.onMenuClick('sortByNameBtn'),
+            }, {
+                id: 'sortByDateBtn',
+                title: __('SORT_BY_DATE'),
+                className: CHECK_ITEM_CLASS,
+                onClick: () => this.onMenuClick('sortByDateBtn'),
+            }, {
                 id: 'selectAllBtn',
                 title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
@@ -175,7 +215,10 @@ class CategoryListView extends View {
         });
 
         this.menuActions = {
-            selectModeBtn: () => this.toggleSelectMode(),
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            sortByNameBtn: () => this.toggleSortByName(),
+            sortByDateBtn: () => this.toggleSortByDate(),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
             deleteBtn: () => this.confirmDelete(),
@@ -216,6 +259,10 @@ class CategoryListView extends View {
         }
 
         menuAction();
+    }
+
+    getItemById(itemId) {
+        return window.app.model.categories.getItem(itemId);
     }
 
     onItemClick(itemId, e) {
@@ -261,8 +308,13 @@ class CategoryListView extends View {
         this.store.dispatch(actions.deselectAllItems());
     }
 
-    toggleSelectMode() {
-        this.store.dispatch(actions.toggleSelectMode());
+    async setListMode(listMode) {
+        const state = this.store.getState();
+        if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
+            await this.requestSortMode(SORT_MANUALLY);
+        }
+
+        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -312,12 +364,14 @@ class CategoryListView extends View {
         }
     }
 
-    async requestList() {
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
         try {
             const { data } = await API.category.list();
             window.app.model.categories.setData(data);
 
-            this.store.dispatch(actions.listRequestLoaded());
+            this.store.dispatch(actions.listRequestLoaded(keepState));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -339,6 +393,110 @@ class CategoryListView extends View {
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
+    }
+
+    /**
+     * Returns maximum position of child categories
+     * @param {number} categoryId
+     * @returns
+     */
+    getLastCategoryPos(categoryId) {
+        const { categories } = window.app.model;
+        const category = categories.getItem(categoryId);
+        const children = categories.findByParent(categoryId);
+        return children.reduce((current, item) => Math.max(current, item.pos), category?.pos ?? 0);
+    }
+
+    /**
+     * Sent API request to server to change position of category
+     * @param {number} itemId - identifier of item to change position
+     * @param {number} parentId - identifier of parent category
+     * @param {number} prevId - identifier of previous item
+     * @param {number} nextId - identifier of next item
+     */
+    async sendChangePosRequest(itemId, parentId, prevId, nextId) {
+        const { categories } = window.app.model;
+
+        const item = categories.getItem(itemId);
+        const parent = categories.getItem(parentId);
+        const prevItem = categories.getItem(prevId);
+        const nextItem = categories.getItem(nextId);
+
+        let newPos;
+        if (nextItem) {
+            if (item.pos < nextItem.pos) { // moving down
+                newPos = nextItem.pos - 1;
+            } else { // moving up
+                newPos = nextItem.pos;
+            }
+        } else {
+            newPos = (prevItem)
+                ? this.getLastCategoryPos(prevId) + 1
+                : (parent?.pos ?? 0) + 1;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.category.setPos(itemId, newPos, parentId);
+            this.requestList({ keepState: true });
+        } catch (e) {
+            this.cancelPosChange(itemId);
+            this.stopLoading();
+        }
+    }
+
+    /**
+     * Cancel local changes on position update fail
+     */
+    cancelPosChange() {
+        this.render(this.store.getState());
+
+        window.app.createMessage(__('ERR_CATEGORY_CHANGE_POS'), 'msg_error');
+    }
+
+    getSortMode() {
+        return window.app.model.profile.settings.sort_categories;
+    }
+
+    toggleSortByName() {
+        const current = this.getSortMode();
+        const sortMode = (current === SORT_BY_NAME_ASC)
+            ? SORT_BY_NAME_DESC
+            : SORT_BY_NAME_ASC;
+
+        this.requestSortMode(sortMode);
+    }
+
+    toggleSortByDate() {
+        const current = this.getSortMode();
+        const sortMode = (current === SORT_BY_CREATEDATE_ASC)
+            ? SORT_BY_CREATEDATE_DESC
+            : SORT_BY_CREATEDATE_ASC;
+
+        this.requestSortMode(sortMode);
+    }
+
+    async requestSortMode(sortMode) {
+        const { settings } = window.app.model.profile;
+        if (settings.sort_categories === sortMode) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.profile.updateSettings({
+                sort_categories: sortMode,
+            });
+            settings.sort_categories = sortMode;
+
+            this.store.dispatch(actions.changeSortMode(sortMode));
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+
+        this.stopLoading();
     }
 
     /** Show person(s) delete confirmation popup */
@@ -365,20 +523,6 @@ class CategoryListView extends View {
         });
     }
 
-    getListItemById(id) {
-        for (let i = 0; i < this.transTypes.length; i += 1) {
-            const type = this.transTypes[i];
-            const key = Category.getTypeString(type);
-            const section = this.sections[key];
-            const listItem = section.list.getListItemById(id);
-            if (listItem) {
-                return listItem;
-            }
-        }
-
-        return null;
-    }
-
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu.detach();
@@ -392,8 +536,8 @@ class CategoryListView extends View {
             return;
         }
 
-        const listItem = this.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
+        const selector = `.category-item[data-id="${itemId}"] .popup-menu`;
+        const menuContainer = this.contentContainer.querySelector(selector);
         if (!menuContainer) {
             this.contextMenu.detach();
             return;
@@ -411,16 +555,27 @@ class CategoryListView extends View {
         const itemsCount = state.items.length;
         const selArr = this.getSelectedItems(state);
         const selCount = selArr.length;
-        const isSelectMode = (state.listMode === 'select');
+        const isListMode = state.listMode === 'list';
+        const isSelectMode = state.listMode === 'select';
+        const isSortMode = state.listMode === 'sort';
+        const sortMode = this.getSortMode();
 
-        show(this.createBtn, !isSelectMode);
-        this.listModeBtn.show(isSelectMode);
+        show(this.createBtn, isListMode);
+        this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0);
+        this.menu.show(itemsCount > 0 && !isSortMode);
 
         const { items } = this.menu;
 
-        items.selectModeBtn.show(!isSelectMode);
+        items.selectModeBtn.show(isListMode && itemsCount > 0);
+        items.sortModeBtn.show(isListMode && itemsCount > 1);
+
+        items.sortByNameBtn.setIcon(getSortByNameIcon(sortMode));
+        items.sortByNameBtn.show(isListMode && itemsCount > 1);
+
+        items.sortByDateBtn.setIcon(getSortByDateIcon(sortMode));
+        items.sortByDateBtn.show(isListMode && itemsCount > 1);
+
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
         show(items.separator2, isSelectMode);
@@ -477,7 +632,15 @@ class CategoryListView extends View {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    renderList(state) {
+    renderList(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.listMode === prevState?.listMode
+            && state.sortMode === prevState?.sortMode
+        ) {
+            return;
+        }
+
         // Counters
         const itemsCount = state.items.length;
         this.itemsCount.textContent = itemsCount;
@@ -486,11 +649,20 @@ class CategoryListView extends View {
         const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
         this.selItemsCount.textContent = selected.length;
 
+        const categories = CategoryList.create(state.items);
+        const mainCategories = CategoryList.create(categories.findByParent(0));
+        mainCategories.sortBy(state.sortMode);
+        mainCategories.forEach((item) => {
+            const children = categories.findByParent(item.id);
+            item.setChildren(children);
+            item.children.sortBy(state.sortMode);
+        });
+
         // List of categories
         this.transTypes.forEach((type) => {
             const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
             const section = this.sections[key];
-            const items = state.items.filter((item) => item.type === type);
+            const items = mainCategories.filter((item) => item.type === type);
 
             section.list.setState((listState) => ({
                 ...listState,
@@ -498,7 +670,6 @@ class CategoryListView extends View {
                 listMode: state.listMode,
                 renderTime: Date.now(),
             }));
-            section.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
 
             show(section.container, items.length > 0);
         });
@@ -515,7 +686,7 @@ class CategoryListView extends View {
             this.loadingIndicator.show();
         }
 
-        this.renderList(state);
+        this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);
         this.renderDetails(state, prevState);

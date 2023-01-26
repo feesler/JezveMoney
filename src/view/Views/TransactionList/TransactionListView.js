@@ -436,12 +436,11 @@ class TransactionListView extends View {
 
     /**
      * Cancel local changes on transaction position update fail
-     * @param {number} trans_id - identifier of transaction
      */
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_TR_SET_POS'), 'msg_error');
+        window.app.createMessage(__('ERR_TRANS_CHANGE_POS'), 'msg_error');
     }
 
     /** Returns URL for filter of specified state */
@@ -737,7 +736,7 @@ class TransactionListView extends View {
     renderMenu(state) {
         const itemsCount = state.items.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = (state.listMode === 'select');
+        const isSelectMode = state.listMode === 'select';
         const selectedItems = this.list.getSelectedItems();
         const selCount = selectedItems.length;
 

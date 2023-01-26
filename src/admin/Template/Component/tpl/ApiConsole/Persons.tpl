@@ -78,3 +78,20 @@
         <input id="delpersonbtn" class="btn submit-btn" type="submit" value="Submit">
     </div>
 </div>
+
+<div id="setPersonPosForm" class="request-data-form">
+    <h3>Set position of person</h3>
+    <form action="<?= BASEURL ?>api/person/setpos" method="post">
+        <div class="std_margin">
+            <label for="person_pos_id">Id</label>
+            <input id="person_pos_id" class="stretch-input" name="id" type="text">
+        </div>
+        <div class="std_margin">
+            <label for="person_pos_pos">Position</label>
+            <input id="person_pos_pos" class="stretch-input" name="pos" type="text">
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>

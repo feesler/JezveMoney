@@ -80,6 +80,10 @@ export const API = {
             return apiPost('profile/reset', options);
         },
 
+        async updateSettings(options) {
+            return apiPost('profile/updateSettings', options);
+        },
+
         async del() {
             return apiPost('profile/del');
         },
@@ -119,6 +123,10 @@ export const API = {
         async hide(ids) {
             return apiPost('account/hide', ids);
         },
+
+        async setPos(id, pos) {
+            return apiPost('account/setpos', { id, pos });
+        },
     },
 
     person: {
@@ -149,6 +157,10 @@ export const API = {
         async hide(ids) {
             return apiPost('person/hide', ids);
         },
+
+        async setPos(id, pos) {
+            return apiPost('person/setpos', { id, pos });
+        },
     },
 
     category: {
@@ -170,6 +182,10 @@ export const API = {
 
         async update(data) {
             return apiPost('category/update', data);
+        },
+
+        async setPos(id, pos, parentId) {
+            return apiPost('category/setpos', { id, pos, parent_id: parentId });
         },
 
         async del(ids) {

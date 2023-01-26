@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 15;
+    protected $latestVersion = 16;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -29,7 +29,8 @@ class DBVersion
         "persons",
         "transactions",
         "categories",
-        "users"
+        "user_settings",
+        "users",
     ];
 
     /**
@@ -58,6 +59,7 @@ class DBVersion
             $this->createTransactionsTable();
             $this->createCategoriesTable();
             $this->createUsersTable();
+            $this->createUserSettingsTable();
             $this->createIconTable();
             $this->createImportTemplateTable();
             $this->createImportRuleTable();
@@ -210,6 +212,9 @@ class DBVersion
             }
             if ($current < 15) {
                 $current = $this->version15();
+            }
+            if ($current < 16) {
+                $current = $this->version16();
             }
 
             $this->setVersion($current);
@@ -601,6 +606,55 @@ class DBVersion
     }
 
     /**
+     * Creates database version 16
+     *
+     * @return int
+     */
+    private function version16()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        if (!$this->dbClient->isTableExist("user_settings")) {
+            $this->createUserSettingsTable();
+
+            // Create settings for each user
+            $qResult = $this->dbClient->selectQ("id", "users", null, null, "id ASC");
+            while ($row = $this->dbClient->fetchRow($qResult)) {
+                $data = ["user_id" => intval($row["id"])];
+                $insRes = $this->dbClient->insertQ("user_settings", $data);
+                if (!$insRes) {
+                    throw new \Error("Fail to create user settings");
+                }
+            }
+        }
+
+        // Add 'pos' column to accounts, person and categories tables
+        $tables = ["accounts", "persons", "categories"];
+        foreach ($tables as $tableName) {
+            $columns = $this->dbClient->getColumns($tableName);
+            if (!$columns) {
+                throw new \Error("Fail to obtian columns of '$tableName' table");
+            }
+
+            if (!isset($columns["pos"])) {
+                $res = $this->dbClient->addColumns($tableName, ["pos" => "INT(11) NOT NULL"]);
+                if (!$res) {
+                    throw new \Error("Fail to update '$tableName' table");
+                }
+            }
+
+            $res = $this->dbClient->updateQ($tableName, ["pos=id"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 16;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -655,6 +709,7 @@ class DBVersion
                 "`name` VARCHAR(255) NOT NULL, " .
                 "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .
+                "`pos` INT(11) NOT NULL, " .
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`), " .
@@ -686,6 +741,7 @@ class DBVersion
                 "`name` VARCHAR(255) NOT NULL, " .
                 "`user_id` INT(11) NOT NULL, " .
                 "`flags` INT(11) NOT NULL, " .
+                "`pos` INT(11) NOT NULL, " .
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
@@ -757,6 +813,7 @@ class DBVersion
                 "`parent_id` INT(11) NOT NULL, " .
                 "`type` INT(11) NOT NULL, " .
                 "`name` VARCHAR(255) NOT NULL, " .
+                "`pos` INT(11) NOT NULL, " .
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
@@ -791,6 +848,36 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
+            TABLE_OPTIONS
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates user settings table
+     */
+    private function createUserSettingsTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "user_settings";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+                "`user_id` INT(11) NOT NULL, " .
+                "`sort_accounts` INT(11) NOT NULL DEFAULT 0, " .
+                "`sort_persons` INT(11) NOT NULL DEFAULT 0, " .
+                "`sort_categories` INT(11) NOT NULL DEFAULT 0, " .
+                "PRIMARY KEY (`id`), " .
+                "UNIQUE KEY `user_id` (`user_id`)",
             TABLE_OPTIONS
         );
         if (!$res) {

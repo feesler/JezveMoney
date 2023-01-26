@@ -567,14 +567,21 @@ class UserModel extends CachedTable
         }
         $item_id = intval($item_id);
 
-        $pMod = PersonModel::getInstance();
-        $p_id = $pMod->create(["name" => $this->personName, "user_id" => $item_id, "flags" => 0]);
-
+        // Create owner person
+        $personModel = PersonModel::getInstance();
+        $owner_id = $personModel->create([
+            "name" => $this->personName,
+            "user_id" => $item_id,
+            "flags" => 0,
+        ]);
         $this->personName = null;
+        $this->setOwner($item_id, $owner_id);
 
-        $this->setOwner($item_id, $p_id);
+        // Initialize settings
+        $settingsModel = UserSettingsModel::getInstance();
+        $res = $settingsModel->init($item_id);
 
-        return true;
+        return $res;
     }
 
     /**
@@ -932,17 +939,22 @@ class UserModel extends CachedTable
             }
         }
 
-        $accMod = AccountModel::getInstance();
-        if (!$accMod->reset(["users" => $items])) {
-            return false;
-        }
-
         $setCond = inSetCondition($items);
         if (is_null($setCond)) {
             return false;
         }
 
-        $tables = ["persons", "import_tpl", "import_rule", "import_act"];
+        $tables = [
+            "user_settings",
+            "accounts",
+            "persons",
+            "transactions",
+            "categories",
+            "import_tpl",
+            "import_rule",
+            "import_cond",
+            "import_act",
+        ];
         foreach ($tables as $table) {
             if (!$this->dbObj->deleteQ($table, "user_id" . $setCond)) {
                 return false;

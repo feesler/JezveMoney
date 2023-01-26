@@ -31,6 +31,7 @@
                             <li data-target="createAccForm">Create</li>
                             <li data-target="updateAccForm">Update</li>
                             <li data-target="delAccForm">Delete</li>
+                            <li data-target="setAccPosForm">Set position</li>
                         </ul>
                     </li>
 
@@ -42,6 +43,7 @@
                             <li data-target="createPersonForm">Create</li>
                             <li data-target="updatePersonForm">Update</li>
                             <li data-target="delPersonForm">Delete</li>
+                            <li data-target="setPersonPosForm">Set position</li>
                         </ul>
                     </li>
 
@@ -69,6 +71,7 @@
                             <li data-target="createCategoryForm">Create</li>
                             <li data-target="updateCategoryForm">Update</li>
                             <li data-target="delCategoryForm">Delete</li>
+                            <li data-target="setCategoryPosForm">Set position</li>
                         </ul>
                     </li>
 
@@ -153,6 +156,7 @@
                             <li data-target="readProfileForm">Read profile</li>
                             <li data-target="changeNameForm">Change name</li>
                             <li data-target="changePwdForm">Change password</li>
+                            <li data-target="updateSettingsForm">Update settings</li>
                             <li data-target="resetForm">Reset data</li>
                         </ul>
                     </li>

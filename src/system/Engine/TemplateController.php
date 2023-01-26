@@ -5,6 +5,7 @@ namespace JezveMoney\Core;
 use JezveMoney\Core\Controller;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\UserSettingsModel;
 
 /**
  * Base template controller
@@ -170,6 +171,19 @@ abstract class TemplateController extends Controller
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
+            "settings" => $this->getSettings(),
         ];
+    }
+
+    /**
+     * Returns user settings
+     *
+     * @return array
+     */
+    public function getSettings()
+    {
+        $settingsModel = UserSettingsModel::getInstance();
+        $settings = $settingsModel->getSettings();
+        return $settings->getUserData();
     }
 }

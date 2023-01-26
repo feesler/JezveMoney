@@ -113,6 +113,7 @@ export const isAccount = (obj) => verifyObject(obj, {
     name: isString,
     icon_id: isInt,
     flags: isInt,
+    pos: isInt,
     createdate: isInt,
     updatedate: isInt,
 }, {
@@ -349,6 +350,7 @@ export const isPerson = (obj) => verifyObject(obj, {
     id: isInt,
     name: isString,
     flags: isInt,
+    pos: isInt,
     createdate: isInt,
     updatedate: isInt,
 }, {
@@ -366,6 +368,7 @@ export const isCategory = (obj) => verifyObject(obj, {
     name: isString,
     parent_id: isInt,
     type: isInt,
+    pos: isInt,
     createdate: isInt,
     updatedate: isInt,
 }, {
@@ -376,10 +379,18 @@ export const isCategory = (obj) => verifyObject(obj, {
 /** Verify object is array of categories */
 export const isCategoriesArray = isArrayOf(isCategory);
 
+/** Verify object is user settings */
+export const isSettings = (obj) => verifyObject(obj, {
+    sort_accounts: isInt,
+    sort_persons: isInt,
+    sort_categories: isInt,
+});
+
 /** Verify object is profile */
 export const isProfile = (obj) => verifyObject(obj, {
     login: isString,
     user_id: isInt,
     owner_id: isInt,
     name: isString,
+    settings: isSettings,
 });

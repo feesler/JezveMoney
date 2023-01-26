@@ -628,6 +628,13 @@ label {
   --popupmenu-hover-background: var(--warning-color-alt);
 }
 
+.popup-menu-list .check-icon-item .iconbutton__icon-content {
+  --popupmenu-check-icon-size: 18px;
+
+  width: var(--popupmenu-check-icon-size);
+  height: var(--popupmenu-check-icon-size);
+}
+
 /* Popup menu button */
 .popup-menu .icon.popup-menu-btn__icon {
   --popupmenu-btn-icon-size: 20px;

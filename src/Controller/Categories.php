@@ -33,6 +33,7 @@ class Categories extends ListViewController
             "titleString" => __("APP_NAME") . " | " . __("CATEGORIES"),
         ];
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "categories" => $this->model->getData(),
             "view" => [
                 "detailsId" => $this->getRequestedItem(),

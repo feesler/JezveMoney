@@ -2,13 +2,13 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiListController;
+use JezveMoney\Core\ApiSortableListController;
 use JezveMoney\App\Model\TransactionModel;
 
 /**
  * Transactions API controller
  */
-class Transaction extends ApiListController
+class Transaction extends ApiSortableListController
 {
     protected $requiredFields = [
         "type",
@@ -47,6 +47,7 @@ class Transaction extends ApiListController
         $this->createErrorMsg = __("ERR_TRANS_CREATE");
         $this->updateErrorMsg = __("ERR_TRANS_UPDATE");
         $this->deleteErrorMsg = __("ERR_TRANS_DELETE");
+        $this->changePosErrorMsg = __("ERR_TRANS_CHANGE_POS");
     }
 
     /**
@@ -178,32 +179,6 @@ class Transaction extends ApiListController
 
         if (!$this->model->setCategory($reqData["id"], $reqData["category_id"])) {
             throw new \Error(__("ERR_TRANS_SET_CATEGORY"));
-        }
-
-        $this->commit();
-
-        $this->ok();
-    }
-
-    /**
-     * Sets position of transaction
-     */
-    public function setPos()
-    {
-        if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
-        }
-
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, ["id", "pos"]);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
-
-        $this->begin();
-
-        if (!$this->model->updatePosition($reqData["id"], $reqData["pos"])) {
-            throw new \Error(__("ERR_TRANS_CHANGE_POS"));
         }
 
         $this->commit();

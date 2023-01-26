@@ -16,6 +16,7 @@ const defaultProps = {
     ItemComponent: null,
     itemSelector: null, // mandatory item CSS selector
     getItemProps: null, // optional callback to map items to props
+    getItemById: null, // optional callback to obtain item by id
     isListChanged: null, // optional callback to verify list content was changed
     items: [],
     noItemsMessage: __('LIST_NO_DATA'),
@@ -75,7 +76,7 @@ export class ListContainer extends Component {
 
     /** Returns array of selected items */
     getSelectedItems() {
-        return this.state.items.filter((item) => item.selected);
+        return this.getItems().filter((item) => item.selected);
     }
 
     /**
@@ -83,7 +84,9 @@ export class ListContainer extends Component {
      * @param {number} id - identifier of item
      */
     getItemById(id) {
-        return this.state.items.find((item) => item && item.id === id);
+        return (isFunction(this.state.getItemById))
+            ? this.state.getItemById(id)
+            : this.state.items.find((item) => item && item.id === id);
     }
 
     /**
@@ -256,6 +259,10 @@ export class ListContainer extends Component {
         }
 
         this.renderList(state, prevState);
+        if (state.selectModeClass) {
+            this.elem.classList.toggle(state.selectModeClass, state.listMode === 'select');
+        }
+
         this.elem.dataset.time = state.renderTime;
     }
 }

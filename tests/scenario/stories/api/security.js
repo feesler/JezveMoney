@@ -71,6 +71,7 @@ const accountsTests = async () => {
         flags: 0,
     });
     await AccountApiTests.del(API_USER_ACC_RUB);
+    await AccountApiTests.setPos({ id: API_USER_ACC_RUB, pos: 1 });
 };
 
 const personsTests = async () => {
@@ -84,6 +85,7 @@ const personsTests = async () => {
         flags: 0,
     });
     await PersonApiTests.del(API_USER_PERSON);
+    await PersonApiTests.setPos({ id: API_USER_PERSON, pos: 1 });
 };
 
 const categoriesTests = async () => {
@@ -98,6 +100,7 @@ const categoriesTests = async () => {
         type: EXPENSE,
     });
     await CategoryApiTests.del(API_USER_CATEGORY);
+    await CategoryApiTests.setPos({ id: API_USER_CATEGORY, pos: 1, parent_id: 0 });
 };
 
 const createTransaction = async () => {

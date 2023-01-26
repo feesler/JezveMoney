@@ -22,6 +22,7 @@ class PersonModel extends CachedTable
     private static $owner_id = 0;
     protected $adminForce = false;
     protected $tbl_name = "persons";
+    protected $latestPos = null;
 
     /**
      * Model initialization
@@ -137,9 +138,36 @@ class PersonModel extends CachedTable
     protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
+
+        $pos = 0;
+        $personsCount = $this->getCount();
+        if ($personsCount > 0) {
+            if (is_null($this->latestPos)) {
+                $this->latestPos = $this->getLatestPos();
+            }
+            $this->latestPos++;
+            $pos = $this->latestPos;
+        }
+
+        $res["pos"] = $pos;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
+    }
+
+    /**
+     * Performs final steps after new item was successfully created
+     *
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
+     */
+    protected function postCreate(mixed $items)
+    {
+        $this->cleanCache();
+        $this->latestPos = null;
+
+        return true;
     }
 
     /**
@@ -275,6 +303,111 @@ class PersonModel extends CachedTable
     public function hide(mixed $items)
     {
         return $this->show($items, false);
+    }
+
+    /**
+     * Checks item with specified position is exists
+     *
+     * @param int $position position
+     *
+     * @return bool
+     */
+    public function isPosExist(int $position)
+    {
+        $pos = intval($position);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        foreach ($this->cache as $item) {
+            if ($item->pos == $pos) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns latest position of accounts
+     *
+     * @return int
+     */
+    public function getLatestPos()
+    {
+        if (!$this->checkCache()) {
+            return 0;
+        }
+
+        $res = 0;
+        foreach ($this->cache as $item) {
+            $res = max($item->pos, $res);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Updates position of item
+     *
+     * @param array $request
+     *
+     * @return bool
+     */
+    public function updatePosition(array $request)
+    {
+        $changePosFields = ["id", "pos"];
+        checkFields($request, $changePosFields, true);
+
+        $item_id = intval($request["id"]);
+        $new_pos = intval($request["pos"]);
+        if (!$item_id || !$new_pos) {
+            return false;
+        }
+
+        $item = $this->getItem($item_id);
+        if (!$item || $item->user_id != self::$user_id) {
+            return false;
+        }
+
+        $old_pos = $item->pos;
+        if ($old_pos == $new_pos) {
+            return true;
+        }
+
+        if ($this->isPosExist($new_pos)) {
+            if ($old_pos == 0) {           // insert with specified position
+                $res = $this->dbObj->updateQ(
+                    $this->tbl_name,
+                    ["pos=pos+1"],
+                    ["user_id=" . self::$user_id, "pos >= $new_pos"],
+                );
+            } elseif ($new_pos < $old_pos) {       // moving up
+                $res = $this->dbObj->updateQ(
+                    $this->tbl_name,
+                    ["pos=pos+1"],
+                    ["user_id=" . self::$user_id, "pos >= $new_pos", "pos < $old_pos"],
+                );
+            } elseif ($new_pos > $old_pos) {        // moving down
+                $res = $this->dbObj->updateQ(
+                    $this->tbl_name,
+                    ["pos=pos-1"],
+                    ["user_id=" . self::$user_id, "pos > $old_pos", "pos <= $new_pos"],
+                );
+            }
+            if (!$res) {
+                return false;
+            }
+        }
+
+        if (!$this->dbObj->updateQ($this->tbl_name, ["pos" => $new_pos], "id=" . $item_id)) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
     }
 
     /**

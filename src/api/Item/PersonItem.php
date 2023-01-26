@@ -10,6 +10,7 @@ class PersonItem
     public $user_id = 0;
     public $name = null;
     public $flags = 0;
+    public $pos = 0;
     public $accounts = null;
     public $createdate = 0;
     public $updatedate = 0;
@@ -32,6 +33,7 @@ class PersonItem
         $res->name = $row["name"];
         $res->user_id = intval($row["user_id"]);
         $res->flags = intval($row["flags"]);
+        $res->pos = intval($row["pos"]);
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
 

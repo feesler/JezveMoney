@@ -30,6 +30,7 @@ export class PersonsStory extends TestStory {
         await this.create();
         await this.hide();
         await this.select();
+        await this.sort();
         await this.details();
         await this.show();
         await this.update();
@@ -154,6 +155,21 @@ export class PersonsStory extends TestStory {
         setBlock('Select/deselect all persons', 2);
         await PersonTests.selectAll();
         await PersonTests.deselectAll();
+    }
+
+    async sort() {
+        setBlock('Sort persons', 1);
+
+        setBlock('Sort by name', 2);
+        await PersonTests.toggleSortByName();
+        await PersonTests.toggleSortByName();
+
+        setBlock('Sort by date', 2);
+        await PersonTests.toggleSortByDate();
+        await PersonTests.toggleSortByDate();
+
+        setBlock('Sort manually', 2);
+        await PersonTests.sortManually();
     }
 
     async details() {
