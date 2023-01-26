@@ -205,6 +205,7 @@ export class ListContainer extends Component {
 
         const { ItemComponent } = state;
         const listItems = [];
+        const listElems = [];
 
         const prevItems = prevState?.items ?? [];
         let lastItem = null;
@@ -231,12 +232,14 @@ export class ListContainer extends Component {
 
             lastItem = listItem;
             listItems.push(listItem);
+            listElems.push(listItem.elem);
         });
 
         // Remove items not included in new state
-        this.listItems.forEach((item) => {
-            if (!listItems.includes(item)) {
-                re(item.elem);
+        const childElems = Array.from(this.elem.children);
+        childElems.forEach((elem) => {
+            if (!listElems.includes(elem)) {
+                re(elem);
             }
         });
 
