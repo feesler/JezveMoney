@@ -737,13 +737,14 @@ class TransactionListView extends View {
         const itemsCount = state.items.length;
         const isListMode = state.listMode === 'list';
         const isSelectMode = state.listMode === 'select';
+        const isSortMode = state.listMode === 'sort';
         const selectedItems = this.list.getSelectedItems();
         const selCount = selectedItems.length;
 
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0);
+        this.menu.show(itemsCount > 0 && !isSortMode);
 
         const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);
