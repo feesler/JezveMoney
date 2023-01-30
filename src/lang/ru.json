@@ -173,6 +173,7 @@
     "IMPORT_UPLOAD": "Загрузка",
     "ERR_UPLOAD": "Не удалось обработать файл",
     "IMPORT_CONVERT": "Конвертация",
+    "IMPORT_CONVERT_DONE": "Продолжить",
     "IMPORT_ITEM_CREATE": "Добавить",
     "IMPORT_MAIN_ACCOUNT": "Основной счёт",
     "IMPORT_RULES": "Правила импорта",
