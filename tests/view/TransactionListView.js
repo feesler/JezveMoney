@@ -282,13 +282,14 @@ export class TransactionListView extends AppView {
         const res = this.cloneModel(model);
 
         res.filtered = res.data.applyFilter(res.filter);
-
-        const pageItems = res.filtered.getPage(1);
         if (res.filtered.length > 0) {
+            const pageItems = res.filtered.getPage(1);
+            const { items } = TransactionList.render(pageItems.data, App.state);
+
             res.list = {
                 page: 1,
                 pages: res.filtered.expectedPages(),
-                items: TransactionList.render(pageItems.data, App.state),
+                items,
                 range: 1,
             };
         } else {
@@ -406,7 +407,8 @@ export class TransactionListView extends AppView {
         res.list.page = page;
         res.list.range = 1;
         const pageItems = res.filtered.getPage(page);
-        res.list.items = TransactionList.render(pageItems.data, App.state);
+        const { items } = TransactionList.render(pageItems.data, App.state);
+        res.list.items = items;
 
         return res;
     }
@@ -429,7 +431,8 @@ export class TransactionListView extends AppView {
         res.filtered = res.data.applyFilter(res.filter);
         res.list.range = range;
         const pageItems = res.filtered.getPage(model.list.page, onPage, range);
-        res.list.items = TransactionList.render(pageItems.data, App.state);
+        const { items } = TransactionList.render(pageItems.data, App.state);
+        res.list.items = items;
 
         return res;
     }

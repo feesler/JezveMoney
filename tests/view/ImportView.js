@@ -279,6 +279,7 @@ export class ImportView extends AppView {
         };
         res.itemsList = {
             visible: true,
+            noDataMsg: { visible: !hasItems },
             showMoreBtn: { visible: hasItems && pageNum < model.pagination.pages },
             paginator: { visible: hasItems && model.pagination.pages > 1 },
         };

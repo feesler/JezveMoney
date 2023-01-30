@@ -152,19 +152,26 @@ export class ListContainer extends Component {
     }
 
     renderNoDataMessage(state, prevState) {
-        if (state.noItemsMessage === prevState.noItemsMessage) {
+        if (
+            state.items === prevState.items
+            && state.noItemsMessage === prevState.noItemsMessage
+        ) {
             return;
         }
 
-        if (state.noItemsMessage) {
-            this.noDataMsg = (isFunction(state.noItemsMessage))
-                ? this.state.noItemsMessage()
-                : this.defaultNoDataMessage(state.noItemsMessage);
-            this.elem.append(this.noDataMsg);
-        } else if (this.noDataMsg) {
+        if (this.noDataMsg) {
             re(this.noDataMsg);
             this.noDataMsg = null;
         }
+
+        if (!state.noItemsMessage) {
+            return;
+        }
+
+        this.noDataMsg = (isFunction(state.noItemsMessage))
+            ? this.state.noItemsMessage()
+            : this.defaultNoDataMessage(state.noItemsMessage);
+        this.elem.append(this.noDataMsg);
     }
 
     getListItemById(id) {

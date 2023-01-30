@@ -232,6 +232,7 @@ export class MainView extends AppView {
             tiles: TilesList.renderAccounts(userAccounts),
             hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
         };
+        res.accountsWidget.hiddenTiles.visible = false;
 
         // Transactions widget
         if (userAccounts.length > 0 || state.persons.length > 0) {
@@ -248,6 +249,7 @@ export class MainView extends AppView {
             tiles: TilesList.renderPersons(state.persons, true),
             hiddenTiles: TilesList.renderHiddenPersons(state.persons, true),
         };
+        res.personsWidget.hiddenTiles.visible = false;
 
         return res;
     }
