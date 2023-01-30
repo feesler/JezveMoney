@@ -414,8 +414,8 @@ class MySqlDB
         mixed $fields,
         mixed $tables,
         mixed $condition = null,
-        string $group = null,
-        string $order = null
+        ?string $group = null,
+        ?string $order = null
     ) {
         $fstr = asJoin($fields);
         $tstr = asJoin($tables);
@@ -446,11 +446,11 @@ class MySqlDB
     /**
      * Returns rows count of SELECT query result
      *
-     * @param \mysqli_result $result
+     * @param \mysqli_result|null $result
      *
      * @return int
      */
-    public function rowsCount(\mysqli_result $result)
+    public function rowsCount(?\mysqli_result $result)
     {
         if (is_null($result)) {
             return 0;
@@ -462,11 +462,11 @@ class MySqlDB
     /**
      * Fetches next row from SELECT query result
      *
-     * @param \mysqli_result $result
+     * @param \mysqli_result|null $result
      *
      * @return mixed
      */
-    public function fetchRow(\mysqli_result $result)
+    public function fetchRow(?\mysqli_result $result)
     {
         if (is_null($result)) {
             return null;
