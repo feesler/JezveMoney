@@ -76,8 +76,9 @@ class TransactionListView extends View {
         this.loadElementsByIds([
             'heading',
             'createBtn',
-            // Filters
             'filtersBtn',
+            'contentHeader',
+            // Filters
             'filtersContainer',
             'applyFiltersBtn',
             'clearFiltersBtn',
@@ -110,7 +111,7 @@ class TransactionListView extends View {
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
-        insertAfter(this.filters.elem, this.filtersBtn.elem);
+        this.contentHeader.prepend(this.filters.elem);
 
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
         setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });

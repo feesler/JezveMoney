@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     setEvents,
-    insertAfter,
     show,
     asArray,
 } from 'jezvejs';
@@ -95,8 +94,9 @@ class StatisticsView extends View {
     onStart() {
         this.loadElementsByIds([
             'heading',
-            // Filters
             'filtersBtn',
+            'contentHeader',
+            // Filters
             'filtersContainer',
             'applyFiltersBtn',
             'typeMenu',
@@ -130,7 +130,7 @@ class StatisticsView extends View {
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
-        insertAfter(this.filters.elem, this.filtersBtn.elem);
+        this.contentHeader.prepend(this.filters.elem);
 
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
 
