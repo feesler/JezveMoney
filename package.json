@@ -16,6 +16,7 @@
         "debug": "node --inspect-brk ./tests/index.js",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
+        "rm-cache": "powershell -c \"rm ./node_modules/.cache/ -r -force\"",
         "copy-admin": "powershell -c \"cp ./src/admin/Controller,./src/admin/Template,./src/admin/.htaccess,./src/admin/index.php -Destination ./dist/admin/ -Force -Recurse\"",
         "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/lang,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
         "copy-client": "powershell -c \"cp ./src/view/img -Destination ./dist/view -Force -Recurse\"",
@@ -74,7 +75,7 @@
     "dependencies": {
         "@babel/runtime": "^7.20.13",
         "core-js": "^3.27.2",
-        "jezvejs": "^1.69.1",
+        "jezvejs": "^1.70.0",
         "whatwg-fetch": "^3.6.2"
     }
 }

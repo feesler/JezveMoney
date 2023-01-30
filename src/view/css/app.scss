@@ -71,10 +71,6 @@ a:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
-svg {
-  display: block;
-}
-
 svg * {
   stroke-width: 0;
   stroke-linejoin: round;
