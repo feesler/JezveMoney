@@ -1010,12 +1010,6 @@ export class ImportView extends AppView {
         return true;
     }
 
-    isValidRule() {
-        this.checkRulesFormState();
-
-        return this.rulesDialog.isValidRule();
-    }
-
     async submitRule() {
         this.checkRulesFormState();
 

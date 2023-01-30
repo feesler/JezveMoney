@@ -115,8 +115,10 @@ export class ImportRule extends ListItem {
                     }
                     // Check value regions of 'greater' and 'not equal' conditions is intersected
                     // with value region of current condition
-                    if (greaterConds.hasNotLessCondition(condition)
-                        || notEqConds.hasNotLessCondition(condition)) {
+                    if (
+                        greaterConds.hasNotLessCondition(condition)
+                        || notEqConds.hasNotLessCondition(condition)
+                    ) {
                         throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
@@ -130,8 +132,10 @@ export class ImportRule extends ListItem {
                     }
                     // Check value regions of 'less' and 'not equal' conditions is intersected
                     // with value region of current condition
-                    if (lessConds.hasNotGreaterCondition(condition)
-                        || notEqConds.hasNotGreaterCondition(condition)) {
+                    if (
+                        lessConds.hasNotGreaterCondition(condition)
+                        || notEqConds.hasNotGreaterCondition(condition)
+                    ) {
                         throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
@@ -141,8 +145,10 @@ export class ImportRule extends ListItem {
                 if (condition.operator === IMPORT_COND_OP_NOT_EQUAL) {
                     // Check value regions of 'less' and 'greater' conditions es intersected
                     // with current value
-                    if (lessConds.hasNotGreaterCondition(condition)
-                        || greaterConds.hasNotLessCondition(condition)) {
+                    if (
+                        lessConds.hasNotGreaterCondition(condition)
+                        || greaterConds.hasNotLessCondition(condition)
+                    ) {
                         throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
                     }
 
@@ -174,14 +180,12 @@ export class ImportRule extends ListItem {
 
                 ruleActionTypes.push(action.action_id);
                 // Amount value
-                if (action.isAmountValue()
-                    && !this.isValidActionAmount(action.value)) {
+                if (action.isAmountValue() && !this.isValidActionAmount(action.value)) {
                     throw new ImportActionValidationError(__('ERR_RULE_INVALID_AMOUNT'), ind);
                 }
 
                 // Account value
-                if (action.isAccountValue()
-                    && !this.actions.hasSetTransfer()) {
+                if (action.isAccountValue() && !this.actions.hasSetTransfer()) {
                     throw new ImportActionValidationError(__('ERR_RULE_TRANSFER'), ind);
                 }
 
@@ -195,8 +199,7 @@ export class ImportRule extends ListItem {
                 }
 
                 // Person value
-                if (action.isPersonValue()
-                    && !this.actions.hasSetDebt()) {
+                if (action.isPersonValue() && !this.actions.hasSetDebt()) {
                     throw new ImportActionValidationError(__('ERR_RULE_DEBT'), ind);
                 }
             });

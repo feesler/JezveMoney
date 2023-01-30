@@ -54,6 +54,7 @@ export class ImportActionForm extends TestComponent {
         assert(this.elem, 'Invalid import action form');
 
         const res = {
+            feedbackElem: { elem: await query(this.elem, '.invalid-feedback') },
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
@@ -78,6 +79,7 @@ export class ImportActionForm extends TestComponent {
             && res.categoryField
             && res.amountField
             && res.textField
+            && res.feedbackElem.elem
             && res.deleteBtn.elem,
             'Invalid structure of import action form',
         );
@@ -137,6 +139,7 @@ export class ImportActionForm extends TestComponent {
             category: parseInt(cont.categoryField.value, 10),
             amount: cont.amountField.value,
             text: cont.textField.value,
+            feedbackVisible: cont.feedbackElem.visible,
         };
 
         res.state = ImportActionForm.getStateName(res);
@@ -154,6 +157,7 @@ export class ImportActionForm extends TestComponent {
                     items: model.actionsAvailable.map((id) => ({ id })),
                 },
             },
+            feedbackElem: { visible: model.feedbackVisible },
             deleteBtn: { visible: true },
         };
 

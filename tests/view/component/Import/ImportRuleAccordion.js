@@ -16,6 +16,10 @@ export class ImportRuleAccordion extends Collapsible {
         return res;
     }
 
+    get items() {
+        return this.content.items;
+    }
+
     async create() {
         await click(this.content.createBtn);
     }

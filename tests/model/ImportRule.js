@@ -7,6 +7,10 @@ import {
 } from './ImportCondition.js';
 import { ImportConditionList } from './ImportConditionList.js';
 import { ImportActionList } from './ImportActionList.js';
+import { ImportConditionValidationError } from '../error/ImportConditionValidationError.js';
+import { ImportActionValidationError } from '../error/ImportActionValidationError.js';
+import { __ } from './locale.js';
+import { fixFloat } from '../common.js';
 
 /** Import rule model */
 export class ImportRule {
@@ -44,6 +48,12 @@ export class ImportRule {
         sortedActions.forEach((item) => item.execute(context));
     }
 
+    /** Validate action amount value */
+    isValidActionAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return (!Number.isNaN(amount) && amount > 0);
+    }
+
     /** Check import rule is match search filter */
     isMatchFilter(value) {
         return (this.conditions.isMatchFilter(value) || this.actions.isMatchFilter(value));
@@ -51,117 +61,156 @@ export class ImportRule {
 
     /** Validate import rule */
     validate() {
+        const result = { valid: false };
+
         // Check conditions
         if (!this.conditions.length) {
-            return false;
+            result.message = __('ERR_RULE_NO_CONDITIONS');
+            return result;
         }
 
-        const ruleActionTypes = [];
         const notEqConds = new ImportConditionList();
         const lessConds = new ImportConditionList();
         const greaterConds = new ImportConditionList();
 
-        for (const condition of this.conditions.data) {
-            if (!condition.validate()) {
-                return false;
-            }
-
-            // Check full duplicates of condition
-            if (this.conditions.hasSameCondition(condition)) {
-                return false;
-            }
-
-            // Check 'equal' conditions for each field type present only once
-            // 'Equal' operator is exclusive: conjunction with any other operator gives
-            // the same result, so it is meaningless
-            if (condition.operator === IMPORT_COND_OP_EQUAL) {
-                if (this.conditions.hasSameFieldCondition(condition)) {
-                    return false;
+        try {
+            this.conditions.forEach((condition, ind) => {
+                const validation = condition.validate();
+                if (!validation.amount) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_INVALID_AMOUNT'), ind);
                 }
-            }
-
-            if (condition.operator === IMPORT_COND_OP_LESS) {
-                // Check 'less' condition for each field type present only once
-                if (lessConds.hasSameFieldCondition(condition)) {
-                    return false;
+                if (!validation.date) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_INVALID_DATE'), ind);
                 }
-                // Check value regions of 'greater' and 'not equal' conditions is intersected
-                // with value region of current condition
-                if (greaterConds.hasNotLessCondition(condition)
-                    || notEqConds.hasNotLessCondition(condition)) {
-                    return false;
+                if (!validation.emptyValue) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_EMPTY_VALUE'), ind);
+                }
+                if (!validation.propValue) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_COMPARE_PROPERTY'), ind);
+                }
+                if (!validation.sameProperty) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_COMPARE_SAME'), ind);
                 }
 
-                lessConds.addItem(condition);
-            }
-
-            if (condition.operator === IMPORT_COND_OP_GREATER) {
-                // Check 'greater' condition for each field type present only once
-                if (greaterConds.hasSameFieldCondition(condition)) {
-                    return false;
-                }
-                // Check value regions of 'less' and 'not equal' conditions is intersected
-                // with value region of current condition
-                if (lessConds.hasNotGreaterCondition(condition)
-                    || notEqConds.hasNotGreaterCondition(condition)) {
-                    return false;
+                // Check full duplicates of condition
+                if (this.conditions.hasSameCondition(condition)) {
+                    throw new ImportConditionValidationError(__('ERR_RULE_DUP_CONDITION'), ind);
                 }
 
-                greaterConds.addItem(condition);
-            }
-
-            if (condition.operator === IMPORT_COND_OP_NOT_EQUAL) {
-                // Check value regions of 'less' and 'greater' conditions es intersected
-                // with current value
-                if (lessConds.hasNotGreaterCondition(condition)
-                    || greaterConds.hasNotLessCondition(condition)) {
-                    return false;
+                // Check 'equal' conditions for each field type present only once
+                // 'Equal' operator is exclusive: conjunction with any other operator gives
+                // the same result, so it is meaningless
+                if (condition.operator === IMPORT_COND_OP_EQUAL) {
+                    if (this.conditions.hasSameFieldCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_EQUAL'), ind);
+                    }
                 }
 
-                notEqConds.addItem(condition);
+                if (condition.operator === IMPORT_COND_OP_LESS) {
+                    // Check 'less' condition for each field type present only once
+                    if (lessConds.hasSameFieldCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_DUP_LESS'), ind);
+                    }
+                    // Check value regions of 'greater' and 'not equal' conditions is intersected
+                    // with value region of current condition
+                    if (greaterConds.hasNotLessCondition(condition)
+                        || notEqConds.hasNotLessCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
+                    }
+
+                    lessConds.addItem(condition);
+                }
+
+                if (condition.operator === IMPORT_COND_OP_GREATER) {
+                    // Check 'greater' condition for each field type present only once
+                    if (greaterConds.hasSameFieldCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_DUP_GREATER'), ind);
+                    }
+                    // Check value regions of 'less' and 'not equal' conditions is intersected
+                    // with value region of current condition
+                    if (lessConds.hasNotGreaterCondition(condition)
+                        || notEqConds.hasNotGreaterCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
+                    }
+
+                    greaterConds.addItem(condition);
+                }
+
+                if (condition.operator === IMPORT_COND_OP_NOT_EQUAL) {
+                    // Check value regions of 'less' and 'greater' conditions es intersected
+                    // with current value
+                    if (lessConds.hasNotGreaterCondition(condition)
+                        || greaterConds.hasNotLessCondition(condition)) {
+                        throw new ImportConditionValidationError(__('ERR_RULE_NOT_OVEPLAP'), ind);
+                    }
+
+                    notEqConds.addItem(condition);
+                }
+            });
+        } catch (e) {
+            if (!(e instanceof ImportConditionValidationError)) {
+                throw e;
             }
+
+            result.message = e.message;
+            result.conditionIndex = e.conditionIndex;
+            return result;
         }
 
         // Check actions
+        const ruleActionTypes = [];
         if (!this.actions.length) {
-            return false;
+            result.message = __('ERR_RULE_NO_ACTIONS');
+            return result;
         }
-
-        for (const action of this.actions.data) {
-            if (!action.validate()) {
-                return false;
-            }
-
-            // Check each type of action is used only once
-            if (ruleActionTypes.includes(action.action_id)) {
-                return false;
-            }
-            ruleActionTypes.push(action.action_id);
-
-            // In case action type is 'Set account' check action 'Set transaction type'
-            // with value 'transfer_in' or 'transfer_out' is also exist
-            if (action.isAccountValue()
-                && !this.actions.hasSetTransfer()) {
-                return false;
-            }
-
-            // Check main account guard condition for 'Set account' action
-            if (action.isAccountValue()) {
-                const accountId = parseInt(action.value, 10);
-                const found = this.conditions.hasAccountGuardCondition(accountId);
-                if (!found) {
-                    return false;
+        try {
+            this.actions.forEach((action, ind) => {
+                if (!action.validate()) {
+                    throw new ImportActionValidationError(null, ind);
                 }
+
+                // Check each type of action is used only once
+                if (ruleActionTypes.includes(action.action_id)) {
+                    throw new ImportActionValidationError(__('ERR_RULE_DUP_ACTION'), ind);
+                }
+
+                ruleActionTypes.push(action.action_id);
+                // Amount value
+                if (action.isAmountValue() && !this.isValidActionAmount(action.value)) {
+                    throw new ImportActionValidationError(__('ERR_RULE_INVALID_AMOUNT'), ind);
+                }
+
+                // Account value
+                if (action.isAccountValue() && !this.actions.hasSetTransfer()) {
+                    throw new ImportActionValidationError(__('ERR_RULE_TRANSFER'), ind);
+                }
+
+                // Check main account guard condition for 'Set account' action
+                if (action.isAccountValue()) {
+                    const accountId = parseInt(action.value, 10);
+                    const found = this.conditions.hasAccountGuardCondition(accountId);
+                    if (!found) {
+                        throw new ImportActionValidationError(__('ERR_RULE_ACCOUNT_GUARD'), ind);
+                    }
+                }
+
+                // Person value
+                if (action.isPersonValue() && !this.actions.hasSetDebt()) {
+                    throw new ImportActionValidationError(__('ERR_RULE_DEBT'), ind);
+                }
+            });
+        } catch (e) {
+            if (!(e instanceof ImportActionValidationError)) {
+                throw e;
             }
 
-            // In case action type is 'Set person' check action 'Set transaction type'
-            // with value 'debt_in' or 'debt_out' is also exist
-            if (action.isPersonValue()
-                && !this.actions.hasSetDebt()) {
-                return false;
-            }
+            result.message = e.message;
+            result.actionIndex = e.actionIndex;
+            return result;
         }
 
-        return true;
+        result.valid = true;
+
+        return result;
     }
 }

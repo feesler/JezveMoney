@@ -182,11 +182,11 @@ export class ImportRulesDialog extends TestComponent {
         return this.content.ruleForm.getExpectedRule();
     }
 
-    /** Return validation result for expected import rule */
-    isValidRule() {
+    /** Returns validation result for expected import rule */
+    validateRule() {
         assert(this.isFormState(), 'Invalid state');
 
-        return this.content.ruleForm.isValid();
+        return this.content.ruleForm.validate();
     }
 
     isFirstPage() {
@@ -367,8 +367,27 @@ export class ImportRulesDialog extends TestComponent {
     async submitRule() {
         assert(this.isFormState(), 'Invalid state');
 
-        const valid = this.content.ruleForm.isValid();
-        if (valid) {
+        const validation = this.validateRule();
+        const isInvalid = (
+            validation
+            && !validation.valid
+            && !('conditionIndex' in validation)
+            && !('actionIndex' in validation)
+        );
+        const isInvalidCondition = (
+            validation
+            && !validation.valid
+            && ('conditionIndex' in validation)
+            && validation.conditionIndex !== -1
+        );
+        const isInvalidAction = (
+            validation
+            && !validation.valid
+            && ('actionIndex' in validation)
+            && validation.actionIndex !== -1
+        );
+
+        if (validation?.valid) {
             if (this.model.state === 'create') {
                 const createResult = App.state.createRule(this.model.ruleItem);
                 assert(createResult, 'Failed to update import rule');
@@ -377,6 +396,18 @@ export class ImportRulesDialog extends TestComponent {
                 assert(updateResult, 'Failed to update import rule');
             }
             this.model.state = 'list';
+        } else {
+            this.model.rule.feedbackVisible = isInvalid;
+
+            if (isInvalidCondition) {
+                const invalidCondition = this.model.rule.conditions[validation.conditionIndex];
+                invalidCondition.feedbackVisible = true;
+            }
+
+            if (isInvalidAction) {
+                const invalidAction = this.model.rule.actions[validation.actionIndex];
+                invalidAction.feedbackVisible = true;
+            }
         }
         this.expectedState = this.getExpectedState(this.model);
 
@@ -385,10 +416,15 @@ export class ImportRulesDialog extends TestComponent {
         await this.content.ruleForm.submit();
         await waitForFunction(async () => {
             await this.parse();
-            return !valid || (
-                !this.model.loading
-                && this.model.renderTime !== prevTime
-                && this.isListState()
+            return (
+                isInvalid
+                || isInvalidCondition
+                || isInvalidAction
+                || (
+                    !this.model.loading
+                    && this.model.renderTime !== prevTime
+                    && this.isListState()
+                )
             );
         });
 

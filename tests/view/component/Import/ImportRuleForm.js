@@ -67,6 +67,7 @@ export class ImportRuleForm extends TestComponent {
         const res = {
             conditionsList: { visible: true },
             actionsList: { visible: true },
+            feedbackElem: { visible: model.feedbackVisible },
         };
 
         this.setExpectedRule(localModel);
@@ -210,12 +211,13 @@ export class ImportRuleForm extends TestComponent {
 
     buildModel(cont) {
         const res = {
-            conditions: cont.conditionsList.content.items.map(
+            conditions: cont.conditionsList.items.map(
                 (item) => copyObject(item.model),
             ),
-            actions: cont.actionsList.content.items.map(
+            actions: cont.actionsList.items.map(
                 (item) => copyObject(item.model),
             ),
+            feedbackVisible: cont.feedbackElem.visible,
         };
 
         const ruleId = parseInt(cont.idInput.value, 10);
@@ -240,9 +242,21 @@ export class ImportRuleForm extends TestComponent {
         return ImportRuleForm.setExpectedRule(model);
     }
 
-    /** Return validation result for expected import rule */
-    isValid() {
+    /** Returns validation result for expected import rule */
+    validate() {
         return this.model.rule.validate();
+    }
+
+    resetValidation() {
+        this.model.feedbackVisible = false;
+        this.model.conditions = this.model.conditions.map((action) => ({
+            ...action,
+            feedbackVisible: false,
+        }));
+        this.model.actions = this.model.actions.map((action) => ({
+            ...action,
+            feedbackVisible: false,
+        }));
     }
 
     async openConditions() {
@@ -363,7 +377,7 @@ export class ImportRuleForm extends TestComponent {
         const fieldType = this.getNextAvailProperty(this.model);
         const hasNotIsCond = conditions.hasNotIsCondition(fieldType.id);
         if (hasNotIsCond && fieldType.operators.length < 2) {
-            return;
+            return false;
         }
 
         const operator = (hasNotIsCond)
@@ -381,6 +395,7 @@ export class ImportRuleForm extends TestComponent {
         condition[condition.state] = condition.value;
 
         this.model.conditions.push(condition);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
@@ -388,19 +403,20 @@ export class ImportRuleForm extends TestComponent {
         await this.content.conditionsList.create();
         await this.parse();
 
-        await this.checkState();
+        return this.checkState();
     }
 
     async deleteCondition(index) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         this.model.conditions.splice(ind, 1);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[index];
+        const item = this.content.conditionsList.items[index];
 
         await item.clickDelete();
         await this.parse();
@@ -410,7 +426,7 @@ export class ImportRuleForm extends TestComponent {
 
     async runOnCondition(index, { action, data }) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         if (action === 'changeFieldType') {
             return this.changeConditionFieldType(index, data);
@@ -448,7 +464,7 @@ export class ImportRuleForm extends TestComponent {
 
     async changeConditionFieldType(index, value) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         const conditionModel = this.model.conditions[ind];
 
@@ -460,11 +476,12 @@ export class ImportRuleForm extends TestComponent {
         }
         conditionModel.state = ImportConditionForm.getStateName(conditionModel);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[ind];
+        const item = this.content.conditionsList.items[ind];
         await this.performAction(() => item.changeFieldType(value));
 
         return this.checkState();
@@ -472,7 +489,7 @@ export class ImportRuleForm extends TestComponent {
 
     async changeConditionValue(index, name, value) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         const conditionModel = this.model.conditions[ind];
         assert(conditionModel.state === name, `Invalid state ${conditionModel.state} expected ${name}`);
@@ -483,11 +500,12 @@ export class ImportRuleForm extends TestComponent {
             conditionModel[name] = value;
         }
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[ind];
+        const item = this.content.conditionsList.items[ind];
         await this.performAction(() => item.changeValue(name, value));
 
         return this.checkState();
@@ -495,16 +513,17 @@ export class ImportRuleForm extends TestComponent {
 
     async changeConditionOperator(index, value) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         const conditionModel = this.model.conditions[ind];
         conditionModel.operator = value;
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[ind];
+        const item = this.content.conditionsList.items[ind];
         await this.performAction(() => item.changeOperator(value));
 
         return this.checkState();
@@ -536,7 +555,7 @@ export class ImportRuleForm extends TestComponent {
 
     async toggleConditionPropValue(index) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
 
         const conditionModel = this.model.conditions[ind];
         conditionModel.isFieldValue = !conditionModel.isFieldValue;
@@ -545,11 +564,12 @@ export class ImportRuleForm extends TestComponent {
         }
         conditionModel.state = ImportConditionForm.getStateName(conditionModel);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[ind];
+        const item = this.content.conditionsList.items[ind];
         await this.performAction(() => item.togglePropValue());
 
         return this.checkState();
@@ -569,7 +589,7 @@ export class ImportRuleForm extends TestComponent {
             value: this.getActionDefaultValue(actionType.id),
         };
         this.model.actions.push(action);
-
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openActions();
@@ -582,7 +602,7 @@ export class ImportRuleForm extends TestComponent {
 
     async deleteAction(index) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.actionsList.content.items, ind);
+        assert.arrayIndex(this.content.actionsList.items, ind);
 
         const removedAction = this.model.actions[ind];
         this.model.actions.splice(ind, 1);
@@ -595,16 +615,17 @@ export class ImportRuleForm extends TestComponent {
             ));
         }
 
+        this.resetValidation();
         this.expectedState = this.getExpectedState();
 
         await this.openActions();
 
-        const item = this.content.actionsList.content.items[index];
+        const item = this.content.actionsList.items[index];
 
         await item.clickDelete();
         await this.parse();
 
-        await this.checkState();
+        return this.checkState();
     }
 
     async runOnAction(index, { action, data }) {
@@ -659,7 +680,7 @@ export class ImportRuleForm extends TestComponent {
 
     async changeActionType(index, value) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.actionsList.content.items, ind);
+        assert.arrayIndex(this.content.actionsList.items, ind);
 
         const actionModel = this.model.actions[ind];
         const actionId = parseInt(value, 10);
@@ -667,20 +688,21 @@ export class ImportRuleForm extends TestComponent {
         actionModel.state = ImportActionForm.getStateName(actionModel);
         actionModel.value = ImportActionForm.getStateValue(actionModel);
 
+        this.resetValidation();
         this.onActionUpdate();
         this.expectedState = this.getExpectedState();
 
         await this.openActions();
 
-        const item = this.content.actionsList.content.items[ind];
+        const item = this.content.actionsList.items[ind];
         await this.performAction(() => item.changeAction(value));
 
-        await this.checkState();
+        return this.checkState();
     }
 
     async changeActionValue(index, name, value) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.actionsList.content.items, ind);
+        assert.arrayIndex(this.content.actionsList.items, ind);
 
         const actionModel = this.model.actions[ind];
         if (name === 'amount') {
@@ -690,15 +712,16 @@ export class ImportRuleForm extends TestComponent {
         }
         actionModel.value = ImportActionForm.getStateValue(actionModel);
 
+        this.resetValidation();
         this.onActionUpdate();
         this.expectedState = this.getExpectedState();
 
         await this.openActions();
 
-        const item = this.content.actionsList.content.items[ind];
+        const item = this.content.actionsList.items[ind];
         await this.performAction(() => item.changeValue(name, value));
 
-        await this.checkState();
+        return this.checkState();
     }
 
     async changeActionTransactionType(index, value) {

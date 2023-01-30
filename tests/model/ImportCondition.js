@@ -397,35 +397,40 @@ export class ImportCondition {
 
     /** Check correctness of condition */
     validate() {
+        const res = {
+            amount: true,
+            date: true,
+            emptyValue: true,
+            propValue: true,
+            sameProperty: true,
+        };
+
         // Check amount value
-        if (this.isAmountField() && !this.isValidAmount(this.value)) {
-            return false;
+        if (this.isAmountField()) {
+            res.amount = this.isValidAmount(this.value);
         }
 
         // Check date condition
-        if (this.isDateField() && !convDate(this.value)) {
-            return false;
+        if (this.isDateField()) {
+            res.date = !!convDate(this.value);
         }
 
         // Check empty condition value is used only for string field
         // with 'equal' and 'not equal' operators
-        if (this.value === '' && !(this.isStringField() && this.isItemOperator())) {
-            return false;
+        if (this.value === '') {
+            res.emptyValue = this.isStringField() && this.isItemOperator();
         }
 
         if (this.isPropertyValue()) {
             // Check property value is available
-            if (!this.isPropertyValueAvailable()) {
-                return false;
-            }
-
+            res.propValue = this.isPropertyValueAvailable();
             // Check property is not compared with itself as property value
-            if (this.field_id === parseInt(this.value, 10)) {
-                return false;
-            }
+            res.sameProperty = this.field_id !== parseInt(this.value, 10);
         }
 
-        return true;
+        res.valid = Object.values(res).every((value) => value);
+
+        return res;
     }
 
     /**

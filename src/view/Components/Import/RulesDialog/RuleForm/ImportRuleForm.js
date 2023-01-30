@@ -80,6 +80,8 @@ export class ImportRuleForm extends Component {
             message: null,
             isListChanged: (state, prevState) => (
                 state.items !== prevState.items
+                || state.invalidItemIndex !== prevState.invalidItemIndex
+                || state.message !== prevState.message
             ),
             getItemProps: (condition, state) => this.getConditionProps(condition, state),
         });
@@ -114,6 +116,8 @@ export class ImportRuleForm extends Component {
             message: null,
             isListChanged: (state, prevState) => (
                 state.items !== prevState.items
+                || state.invalidItemIndex !== prevState.invalidItemIndex
+                || state.message !== prevState.message
             ),
             getItemProps: (action, state) => this.getActionProps(action, state),
         });
@@ -525,7 +529,15 @@ export class ImportRuleForm extends Component {
         const index = rule.conditions.findIndex((item) => item.id === id);
         rule.conditions.updateItemByIndex(index, data);
 
-        this.setState({ ...this.state, rule });
+        const newState = {
+            ...this.state,
+            rule,
+        };
+        if (this.state.validation?.conditionIndex === index) {
+            newState.validation = null;
+        }
+
+        this.setState(newState);
     }
 
     /** Condition 'delete' event handler */
@@ -564,17 +576,7 @@ export class ImportRuleForm extends Component {
         const { actions } = this.state.rule;
 
         const index = actions.findIndex((item) => item.id === id);
-        const actionToUpdate = copyObject(actions.getItemByIndex(index));
         actions.updateItemByIndex(index, data);
-
-        // If action type not changed and current type is not `Set transaction type`
-        // then skip action list update
-        if (
-            actionToUpdate.action_id === data.action_id
-            && data.action_id !== IMPORT_ACTION_SET_TR_TYPE
-        ) {
-            return;
-        }
 
         // Check `Set transaction type` action was changed and remove not available
         // `Set account` or `Set person` action
@@ -596,10 +598,15 @@ export class ImportRuleForm extends Component {
         const rule = new ImportRule(this.state.rule);
         rule.actions = ImportActionList.create(newActions);
 
-        this.setState({
+        const newState = {
             ...this.state,
             rule,
-        });
+        };
+        if (this.state.validation?.actionIndex === index) {
+            newState.validation = null;
+        }
+
+        this.setState(newState);
     }
 
     /** Action 'delete' event handler */
@@ -649,12 +656,12 @@ export class ImportRuleForm extends Component {
             && !('actionIndex' in state.validation)
         );
 
-        window.app.setValidation(this.container, !isInvalid);
+        window.app.setValidation(this.feedbackContainer, !isInvalid);
         this.validFeedback.textContent = (isInvalid) ? state.validation.message : '';
 
         // Conditions list
         const isInvalidCondition = (
-            state.validation
+            !!state.validation
             && !state.validation.valid
             && state.validation.conditionIndex !== -1
         );
@@ -667,7 +674,7 @@ export class ImportRuleForm extends Component {
         }));
         // Actions list
         const isInvalidAction = (
-            state.validation
+            !!state.validation
             && !state.validation.valid
             && state.validation.actionIndex !== -1
         );
