@@ -98,7 +98,7 @@ export class ListContainer extends Component {
     }
 
     /**
-     * Return item id from specified item element
+     * Returns item id from specified item element
      * @param {Element} elem - target list item element
      */
     itemIdFromElem(elem) {
@@ -108,6 +108,14 @@ export class ListContainer extends Component {
         }
 
         return parseInt(listItemElem.dataset.id, 10);
+    }
+
+    /**
+     * Returns item fom specified list element
+     * @param {Element} elem - target list item element
+     */
+    itemFromElem(elem) {
+        return this.getItemById(this.itemIdFromElem(elem));
     }
 
     /**
