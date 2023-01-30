@@ -278,18 +278,18 @@
   .import-form {
     --input-disabled-border-color: #202020;
 
-    input[type="text"] {
+    .stretch-input {
       border-color: var(--input-border-color);
     }
 
-    input[disabled] {
+    .stretch-input[disabled] {
       color: var(--input-disabled-text-color);
       -webkit-text-fill-color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
 
-    input[type="text"]:focus {
+    .stretch-input:focus {
       border-color: #d0d0d0;
       background-color: #202020;
     }
