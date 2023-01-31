@@ -1,8 +1,4 @@
-import {
-    createElement,
-    enable,
-    Component,
-} from 'jezvejs';
+import { enable, Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { PopupMenuButton } from 'jezvejs/PopupMenu';
@@ -16,12 +12,12 @@ import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
-const MAIN_CONTENT_CLASS = 'main-content';
 const ITEM_CONTAINER_CLASS = 'item-container';
 const COLUMN_CLASS = 'item-column';
-const ROW_CLASS = 'item-row';
 const AMOUNT_COLUMN_CLASS = 'amount-col';
+const DATE_COLUMN_CLASS = 'date-col';
 const TYPE_COLUMN_CLASS = 'type-col';
+const COMMENT_COLUMN_CLASS = 'comment-col';
 /* Fields */
 const TYPE_FIELD_CLASS = 'type-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
@@ -31,14 +27,6 @@ const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
 const DATE_FIELD_CLASS = 'date-field';
 const CATEGORY_FIELD_CLASS = 'category-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
-/* Field values */
-const TYPE_CLASS = 'import-item__type';
-const ACCOUNT_CLASS = 'import-item__account';
-const PERSON_CLASS = 'import-item__person';
-const AMOUNT_CLASS = 'import-item__amount';
-const DATE_CLASS = 'import-item__date';
-const CATEGORY_CLASS = 'import-item__category';
-const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
 /* Select controls */
@@ -73,80 +61,44 @@ export class ImportTransactionItem extends Component {
     init() {
         const { createContainer } = window.app;
 
-        this.trTypeTitle = createElement('span', { props: { className: TYPE_CLASS } });
-        this.trTypeField = Field.create({
-            title: __('TR_TYPE'),
-            content: this.trTypeTitle,
-            className: TYPE_FIELD_CLASS,
-        });
+        const fields = [
+            [__('TR_TYPE'), TYPE_FIELD_CLASS],
+            [__('TR_ACCOUNT'), ACCOUNT_FIELD_CLASS],
+            [__('TR_PERSON'), PERSON_FIELD_CLASS],
+            [__('TR_AMOUNT'), SRC_AMOUNT_FIELD_CLASS],
+            [__('TR_DEST_AMOUNT'), DEST_AMOUNT_FIELD_CLASS],
+            [__('TR_DATE'), DATE_FIELD_CLASS],
+            [__('TR_CATEGORY'), CATEGORY_FIELD_CLASS],
+            [__('TR_COMMENT'), COMMENT_FIELD_CLASS],
+        ];
 
-        this.accountTitle = createElement('span', { props: { className: ACCOUNT_CLASS } });
-        this.accountField = Field.create({
-            title: __('TR_ACCOUNT'),
-            content: this.accountTitle,
-            className: ACCOUNT_FIELD_CLASS,
-        });
-
-        this.personTitle = createElement('span', { props: { className: PERSON_CLASS } });
-        this.personField = Field.create({
-            title: __('TR_PERSON'),
-            content: this.personTitle,
-            className: PERSON_FIELD_CLASS,
-        });
-
-        this.srcAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
-        this.srcAmountField = Field.create({
-            title: __('TR_AMOUNT'),
-            content: this.srcAmountTitle,
-            className: SRC_AMOUNT_FIELD_CLASS,
-        });
-
-        this.destAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
-        this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
-            content: this.destAmountTitle,
-            className: DEST_AMOUNT_FIELD_CLASS,
-        });
-
-        this.dateTitle = createElement('span', { props: { className: DATE_CLASS } });
-        this.dateField = Field.create({
-            title: __('TR_DATE'),
-            content: this.dateTitle,
-            className: DATE_FIELD_CLASS,
-        });
-
-        this.categoryTitle = createElement('span', { props: { className: CATEGORY_CLASS } });
-        this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
-            content: this.categoryTitle,
-            className: CATEGORY_FIELD_CLASS,
-        });
-
-        this.commentTitle = createElement('span', { props: { className: COMMENT_CLASS } });
-        this.commentField = Field.create({
-            title: __('TR_COMMENT'),
-            content: this.commentTitle,
-            className: COMMENT_FIELD_CLASS,
-        });
-
-        this.topRow = createContainer(ROW_CLASS, [
-            this.dateField.elem,
-            this.categoryField.elem,
-            this.commentField.elem,
-        ]);
+        [
+            this.trTypeField,
+            this.accountField,
+            this.personField,
+            this.srcAmountField,
+            this.destAmountField,
+            this.dateField,
+            this.categoryField,
+            this.commentField,
+        ] = fields.map(([title, className]) => Field.create({ title, className }));
 
         this.itemContainer = createContainer(ITEM_CONTAINER_CLASS, [
-            createContainer(`${COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
+            createContainer([COLUMN_CLASS, TYPE_COLUMN_CLASS].join(' '), [
                 this.trTypeField.elem,
                 this.accountField.elem,
                 this.personField.elem,
             ]),
-            createContainer(`${COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
+            createContainer([COLUMN_CLASS, AMOUNT_COLUMN_CLASS].join(' '), [
                 this.srcAmountField.elem,
                 this.destAmountField.elem,
             ]),
-            createContainer(COLUMN_CLASS, [
-                this.topRow,
+            createContainer([COLUMN_CLASS, DATE_COLUMN_CLASS].join(' '), [
+                this.dateField.elem,
+                this.categoryField.elem,
+            ]),
+            createContainer([COLUMN_CLASS, COMMENT_COLUMN_CLASS].join(' '), [
+                this.commentField.elem,
             ]),
         ]);
 
@@ -158,16 +110,15 @@ export class ImportTransactionItem extends Component {
         ]);
 
         this.createSelectControls();
-        this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
-            this.selectControls,
-            this.itemContainer,
-            this.controls,
-        ]);
 
         this.collapse = Collapsible.create({
             toggleOnClick: false,
             className: CONTAINER_CLASS,
-            header: this.mainContainer,
+            header: [
+                this.selectControls,
+                this.itemContainer,
+                this.controls,
+            ],
         });
         this.elem = this.collapse.elem;
 
@@ -261,7 +212,7 @@ export class ImportTransactionItem extends Component {
         if (!(transaction.type in typeNames)) {
             throw new Error('Invalid transaction type');
         }
-        this.trTypeTitle.textContent = typeNames[transaction.type];
+        this.trTypeField.setContent(typeNames[transaction.type]);
         this.trTypeField.elem.dataset.type = transaction.type;
 
         // Account field
@@ -272,7 +223,7 @@ export class ImportTransactionItem extends Component {
                 ? transaction.destAccountId
                 : transaction.sourceAccountId;
             const account = userAccounts.getItem(accountId);
-            this.accountTitle.textContent = account.name;
+            this.accountField.setContent(account.name);
 
             const accountTitle = (isTransferOut)
                 ? __('TR_DEST_ACCOUNT')
@@ -283,14 +234,14 @@ export class ImportTransactionItem extends Component {
         this.personField.show(isDebt);
         if (isDebt) {
             const person = persons.getItem(transaction.personId);
-            this.personTitle.textContent = person.name;
+            this.personField.setContent(person.name);
         }
 
         // Amount fields
         const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
-        this.srcAmountTitle.textContent = srcAmount;
+        this.srcAmountField.setContent(srcAmount);
 
         this.srcAmountField.elem.dataset.amount = transaction.sourceAmount;
         this.srcAmountField.elem.dataset.curr = transaction.srcCurrId;
@@ -299,17 +250,17 @@ export class ImportTransactionItem extends Component {
         const destAmount = (isDiff)
             ? currency.formatCurrency(transaction.destAmount, transaction.destCurrId)
             : '';
-        this.destAmountTitle.textContent = destAmount;
+        this.destAmountField.setContent(destAmount);
 
         this.destAmountField.elem.dataset.amount = transaction.destAmount;
         this.destAmountField.elem.dataset.curr = transaction.destCurrId;
 
         // Date field
-        this.dateTitle.textContent = transaction.date;
+        this.dateField.setContent(transaction.date);
 
         // Category field
         if (transaction.categoryId === 0) {
-            this.categoryTitle.textContent = '';
+            this.categoryField.setContent('');
         } else {
             const { categories } = window.app.model;
             const category = categories.getItem(transaction.categoryId);
@@ -317,11 +268,11 @@ export class ImportTransactionItem extends Component {
                 throw new Error('invalid category');
             }
 
-            this.categoryTitle.textContent = category.name;
+            this.categoryField.setContent(category.name);
         }
 
         // Comment field
-        this.commentTitle.textContent = transaction.comment;
+        this.commentField.setContent(transaction.comment);
 
         this.menuContainer.show(transaction.listMode === 'list');
 
