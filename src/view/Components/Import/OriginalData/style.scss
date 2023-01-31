@@ -1,13 +1,14 @@
 /* Original import data container */
 .orig-data {
   --odt-header-color: #1083e9;
+  --odt-min-column-width: 135px;
 
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
   overflow: hidden;
 
-  h3 {
+  header {
     font-size: 14px;
     font-weight: 400;
     margin-bottom: 8px;
@@ -21,6 +22,13 @@
   width: 100%;
   column-gap: 16px;
 
+  .column-group {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: normal;
+    column-gap: 16px;
+  }
+
   .column {
     display: flex;
     flex-flow: row nowrap;
@@ -32,12 +40,9 @@
     font-weight: 600;
     padding: 2px 0;
     margin: 0;
-    width: 20%;
-    min-width: 120px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
     flex-shrink: 0;
+    min-width: var(--odt-min-column-width);
+    white-space: nowrap;
     color: var(--odt-header-color);
   }
 
@@ -47,28 +52,22 @@
   }
 }
 
-.comment-column .column__data {
-  text-align: left;
-  word-break: break-word;
-}
-
 /* Desktop */
-@media (min-width: 768px) {
-  .import-item .orig-data-table {
-    flex-flow: row nowrap;
+@media (min-width: 992px) {
+  .orig-data-table {
+    flex-flow: row wrap;
+    row-gap: 8px;
 
-    .column {
-      flex-flow: column nowrap;
+    .column-group {
+      flex-flow: row nowrap;
     }
 
     .column__header {
-      width: auto;
       min-width: auto;
     }
 
-    .column__data {
-      min-width: auto;
-      text-align: right;
+    .column {
+      flex-flow: column nowrap;
     }
   }
 }
