@@ -28,11 +28,7 @@ const AMOUNT_CATEGORY_CLASS = 'trans-item__amount-category';
 const DATE_COMMENT_CLASS = 'trans-item__date-comment';
 /* Details mode */
 const DETAILS_CLASS = 'trans-item_details';
-/* Field groups */
-const ACCOUNTS_GROUP_CLASS = 'trans-item__accounts-group';
-const AMOUNT_GROUP_CLASS = 'trans-item__amount-group';
-const RESULTS_GROUP_CLASS = 'trans-item__results-group';
-const AMOUNT_RESULT_GROUP_CLASS = 'trans-item__amount-result-group';
+const COLUMN_CLASS = 'trans-item__column';
 /* Fields */
 const TITLE_FIELD_CLASS = 'trans-item__account-field';
 const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
@@ -124,7 +120,7 @@ export class TransactionListItem extends Component {
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
-            props: { className: ACCOUNTS_GROUP_CLASS },
+            props: { className: COLUMN_CLASS },
             children: [this.sourceField.elem, this.destField.elem],
         });
         // Amount
@@ -137,7 +133,7 @@ export class TransactionListItem extends Component {
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
-            props: { className: AMOUNT_GROUP_CLASS },
+            props: { className: COLUMN_CLASS },
             children: [this.srcAmountField.elem, this.destAmountField.elem],
         });
         // Result balance
@@ -150,12 +146,12 @@ export class TransactionListItem extends Component {
             className: RESULT_FIELD_CLASS,
         });
         const resultsGroup = createElement('div', {
-            props: { className: RESULTS_GROUP_CLASS },
+            props: { className: COLUMN_CLASS },
             children: [this.srcResultField.elem, this.destResultField.elem],
         });
 
         const amountResultGroup = createElement('div', {
-            props: { className: AMOUNT_RESULT_GROUP_CLASS },
+            props: { className: COLUMN_CLASS },
             children: [amountGroup, resultsGroup],
         });
         // Date
@@ -179,19 +175,19 @@ export class TransactionListItem extends Component {
             className: COMMENT_FIELD_CLASS,
         });
 
-        const dateCommentGroup = createElement('div', {
-            props: { className: DATE_COMMENT_CLASS },
+        const dateCategoryGroup = createElement('div', {
+            props: { className: COLUMN_CLASS },
             children: [
                 this.dateField.elem,
                 this.categoryField.elem,
-                this.commentField.elem,
             ],
         });
 
         this.contentElem.append(
             sourceDestGroup,
             amountResultGroup,
-            dateCommentGroup,
+            dateCategoryGroup,
+            this.commentField.elem,
         );
     }
 
@@ -462,10 +458,11 @@ export class TransactionListItem extends Component {
         this.categoryField.setContent(categoryTitle);
 
         // Comment
-        const commentLabel = (item.comment.length > 0) ? __('TR_COMMENT') : null;
+        const hasComment = item.comment.length > 0;
+        const commentLabel = (hasComment) ? __('TR_COMMENT') : null;
+        this.commentField.show(hasComment);
         this.commentField.setTitle(commentLabel);
-        this.commentElem.textContent = item.comment;
-        this.commentElem.setAttribute('title', item.comment);
+        this.commentField.setContent(item.comment);
     }
 
     renderContent(state, prevState) {
