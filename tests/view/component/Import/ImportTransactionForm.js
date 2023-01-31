@@ -866,12 +866,18 @@ export class ImportTransactionForm extends TestComponent {
                 dropDown: {
                     disabled: !isIncome,
                 },
+                invFeedback: {
+                    visible: false,
+                },
             },
             destAmountField: {
                 disabled: !showDestAmount,
                 visible: showDestAmount,
                 dropDown: {
                     disabled: !isExpense,
+                },
+                invFeedback: {
+                    visible: false,
                 },
             },
             transferAccountField: {
@@ -887,6 +893,9 @@ export class ImportTransactionForm extends TestComponent {
                     (typeof item.date === 'string') ? item.date : secondsToDateString(item.date)
                 ),
                 disabled: false,
+                invFeedback: {
+                    visible: false,
+                },
             },
             commentField: {
                 value: item.comment,

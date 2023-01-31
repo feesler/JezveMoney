@@ -415,8 +415,14 @@ export class ImportTransactionForm extends Component {
     }
 
     reset() {
-        this.state.isUpdate = false;
-        this.state.collapsed = true;
+        this.setState({
+            ...this.state,
+            validation: {
+                ...defaultValidation,
+            },
+            isUpdate: false,
+            collapsed: true,
+        });
     }
 
     /** Show/hide dialog */

@@ -233,6 +233,15 @@ export class ImportListStory extends TestStory {
         setBlock('Verify submit is disabled for empty list', 2);
         await ImportTests.submit();
 
+        setBlock('Verify validation is resetted after close dialog', 2);
+        await ImportTests.createItemAndSave(
+            { action: 'inputDestAmount', data: '' },
+            { action: 'inputDate', data: '' },
+        );
+        await ImportTests.cancelItem();
+        await ImportTests.addItem();
+        await ImportTests.cancelItem();
+
         setBlock('Verify invalid items are not submitted', 2);
         // Empty amount
         await ImportTests.createItemAndSave();
