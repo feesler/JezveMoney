@@ -206,6 +206,7 @@
     "ERR_RULE_DEBT": "Необходим тип транзакции 'Долг'",
     "IMPORT_CHECK_SIMILAR": "Искать похожие транзакции",
     "IMPORT_SIMILAR_FOUND": "Найдена похожая транзакция: ",
+    "IMPORT_SIMILAR_OPEN": "открыть в новой вкладке",
     "IMPORT_SELECT_FILE": "Выбрать файл",
     "IMPORT_SELECT_FILE_DESCR": "или перетащите его на этот диалог",
     "IMPORT_CP1251_ENCODING": "Кодировка CP-1251",

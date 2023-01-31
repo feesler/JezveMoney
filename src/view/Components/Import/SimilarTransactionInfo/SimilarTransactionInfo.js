@@ -21,7 +21,7 @@ export class SimilarTransactionInfo extends Component {
     init() {
         const { baseURL } = window.app;
         const { id } = this.props;
-        const url = `${baseURL}transactions/update/${id}`;
+        const url = `${baseURL}transactions/${id}`;
 
         this.elem = createElement('div', {
             props: { className: SIMILAR_CLASS },
@@ -36,7 +36,8 @@ export class SimilarTransactionInfo extends Component {
                     props: {
                         className: SIMILAR_LINK_CLASS,
                         href: url,
-                        textContent: __('UPDATE'),
+                        target: '_blank',
+                        textContent: __('IMPORT_SIMILAR_OPEN'),
                     },
                 }),
             ],

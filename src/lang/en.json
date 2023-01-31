@@ -206,6 +206,7 @@
     "ERR_RULE_DEBT": "Debt transaction type is required",
     "IMPORT_CHECK_SIMILAR": "Check similar transactions",
     "IMPORT_SIMILAR_FOUND": "Similar transaction found: ",
+    "IMPORT_SIMILAR_OPEN": "open in new tab",
     "IMPORT_SELECT_FILE": "Select file",
     "IMPORT_SELECT_FILE_DESCR": "or simply drop it to this dialog",
     "IMPORT_CP1251_ENCODING": "CP-1251 encoding",
