@@ -16,12 +16,12 @@ import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
 import { fixFloat, __ } from '../../../js/utils.js';
 import { Field } from '../../Field/Field.js';
-import './style.scss';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 import { CategorySelect } from '../../CategorySelect/CategorySelect.js';
 import { transTypeMap, typeNames } from '../../../js/model/ImportTransaction.js';
+import './style.scss';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -29,10 +29,6 @@ const CONTAINER_CLASS = 'import-form';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const FORM_CONTAINER_CLASS = 'form-container';
-const FORM_COLUMN_CLASS = 'form-rows';
-const AMOUNT_COLUMN_CLASS = 'amount-col';
-const TYPE_COLUMN_CLASS = 'type-col';
-const FORM_ROW_CLASS = 'form-row';
 const IG_INPUT_CLASS = 'input-group__input';
 const IG_BUTTON_CLASS = 'input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
@@ -106,25 +102,15 @@ export class ImportTransactionForm extends Component {
         this.createCategoryField();
         this.createCommentField();
 
-        this.topRow = createContainer(FORM_ROW_CLASS, [
+        this.formContainer = createContainer(FORM_CONTAINER_CLASS, [
+            this.trTypeField.elem,
+            this.transferAccountField.elem,
+            this.personField.elem,
+            this.srcAmountField.elem,
+            this.destAmountField.elem,
             this.dateField.elem,
             this.categoryField.elem,
             this.commentField.elem,
-        ]);
-
-        this.formContainer = createContainer(FORM_CONTAINER_CLASS, [
-            createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
-                this.trTypeField.elem,
-                this.transferAccountField.elem,
-                this.personField.elem,
-            ]),
-            createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
-                this.srcAmountField.elem,
-                this.destAmountField.elem,
-            ]),
-            createContainer(FORM_COLUMN_CLASS, [
-                this.topRow,
-            ]),
         ]);
 
         // Save button

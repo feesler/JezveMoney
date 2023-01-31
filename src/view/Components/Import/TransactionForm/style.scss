@@ -19,26 +19,13 @@
     gap: 8px;
   }
 
-  .form-rows {
-    display: flex;
-    flex-flow: column nowrap;
-    flex-grow: 1;
-    align-items: normal;
-    gap: 8px;
-  }
-
-  .form-row {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 8px;
-  }
-
   /* Input field and label group */
   .field {
     --field-title-font-size: 12px;
 
     flex-flow: column nowrap;
     align-items: normal;
+    max-width: 300px;
   }
 
   .field__title {
@@ -47,33 +34,12 @@
     overflow: hidden;
   }
 
-  .amount-field input {
-    min-width: 50px;
-  }
-
-  .date-field input {
-    min-width: 50px;
-    max-width: 100px;
-  }
-
-  .amount-field input,
-  .date-field input,
-  .comment-field input {
-    width: 100%;
-  }
-
-  .form-rows.type-col,
-  .form-rows.amount-col {
-    max-width: 300px;
-  }
-
   .date-field {
-    min-width: 125px;
+    width: 150px;
   }
 
-  .form-row .comment-field,
-  .form-row .comment-field div {
-    flex-grow: 1;
+  .comment-field {
+    max-width: none;
   }
 
   .dd__container {
