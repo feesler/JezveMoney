@@ -193,7 +193,7 @@ export class ImportTransactionForm extends Component {
         });
 
         this.trTypeField = Field.create({
-            title: 'Type',
+            title: __('TR_TYPE'),
             content: this.typeDropDown.elem,
             className: TYPE_FIELD_CLASS,
         });
