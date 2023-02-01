@@ -189,6 +189,8 @@ export class ImportTransactionForm extends Component {
     createAccountField() {
         this.transferAccDropDown = DropDown.create({
             disabled: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTransferAccountChanged(account),
         });
         window.app.initAccountsList(this.transferAccDropDown);
@@ -204,6 +206,8 @@ export class ImportTransactionForm extends Component {
     createPersonField() {
         this.personDropDown = DropDown.create({
             disabled: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (person) => this.onPersonChanged(person),
         });
         window.app.initPersonsList(this.personDropDown);
@@ -364,6 +368,7 @@ export class ImportTransactionForm extends Component {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 

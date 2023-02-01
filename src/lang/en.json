@@ -63,7 +63,6 @@
     "MAIN_TR_NO_DATA": "No items",
     "ACCOUNTS": "Accounts",
     "ACCOUNTS_NO_DATA": "You have no one account. Please create one.",
-    "ACCOUNTS_NOT_FOUND": "Nothing found",
     "ACCOUNTS_HIDDEN": "Hidden accounts",
     "ACCOUNT_CREATE": "Create account",
     "ACCOUNT_UPDATE": "Edit account",

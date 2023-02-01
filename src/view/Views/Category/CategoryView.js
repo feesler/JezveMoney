@@ -92,6 +92,7 @@ class CategoryView extends View {
             parentCategorySelect: true,
             exclude: original.id,
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (o) => this.onParentSelect(o),
         });
     }

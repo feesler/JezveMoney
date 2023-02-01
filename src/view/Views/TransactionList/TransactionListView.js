@@ -132,7 +132,7 @@ class TransactionListView extends View {
                 elem: 'acc_id',
                 placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
-                noResultsMessage: 'Nothing found',
+                noResultsMessage: __('NOT_FOUND'),
                 onItemSelect: (obj) => this.onAccountChange(obj),
                 onChange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',

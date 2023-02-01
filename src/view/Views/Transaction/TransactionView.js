@@ -351,6 +351,7 @@ class TransactionView extends View {
             elem: this.categorySelect,
             className: 'dd_fullwidth',
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 
@@ -396,6 +397,8 @@ class TransactionView extends View {
         this.srcDDList = DropDown.create({
             elem: this.sourceTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onSrcAccountSelect(item),
         });
 
@@ -416,6 +419,8 @@ class TransactionView extends View {
         this.destDDList = DropDown.create({
             elem: this.destTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDestAccountSelect(item),
         });
 
@@ -435,6 +440,8 @@ class TransactionView extends View {
         this.persDDList = DropDown.create({
             elem: this.personTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onPersonSelect(item),
         });
 
@@ -450,6 +457,8 @@ class TransactionView extends View {
         this.accDDList = DropDown.create({
             elem: this.debtAccountTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDebtAccountSelect(item),
         });
 

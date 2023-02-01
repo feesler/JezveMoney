@@ -63,7 +63,6 @@
     "MAIN_TR_NO_DATA": "Нет транзакции",
     "ACCOUNTS": "Счета",
     "ACCOUNTS_NO_DATA": "Нет счетов",
-    "ACCOUNTS_NOT_FOUND": "Не найдено",
     "ACCOUNTS_HIDDEN": "Скрытые счета",
     "ACCOUNT_CREATE": "Новый счёт",
     "ACCOUNT_UPDATE": "Редактирование счёта",

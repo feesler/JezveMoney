@@ -104,6 +104,8 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onMainAccChange(account),
             className: 'dd__main-account dd_ellipsis',
         });

@@ -121,6 +121,8 @@ export class ImportTemplateManager extends Component {
         // Main account
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onAccountChange(account),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -132,6 +134,8 @@ export class ImportTemplateManager extends Component {
         });
 
         this.tplAccountDropDown = DropDown.create({
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTemplateAccountChange(account),
         });
         window.app.initAccountsList(this.tplAccountDropDown);
