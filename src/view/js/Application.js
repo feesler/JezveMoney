@@ -1,6 +1,7 @@
 import {
     ge,
     createElement,
+    getClassName,
     isDate,
     formatDate,
 } from 'jezvejs';
@@ -215,7 +216,11 @@ export class Application {
 
     /** Create simple container element */
     createContainer(elemClass, children, events) {
-        return createElement('div', { props: { className: elemClass }, children, events });
+        return createElement('div', {
+            props: { className: getClassName(elemClass) },
+            children,
+            events,
+        });
     }
 
     checkUserAccountModels() {

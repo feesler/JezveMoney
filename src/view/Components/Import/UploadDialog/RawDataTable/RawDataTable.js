@@ -1,5 +1,6 @@
 import {
     createElement,
+    getClassName,
     isFunction,
     removeChilds,
     Component,
@@ -96,7 +97,7 @@ export class RawDataTable extends Component {
         }
 
         return createElement('div', {
-            props: { className: [COLUMN_CLASS, ROW_NUMBERS_COLUMN_CLASS].join(' ') },
+            props: { className: getClassName(COLUMN_CLASS, ROW_NUMBERS_COLUMN_CLASS) },
             children: cells,
         });
     }

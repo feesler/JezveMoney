@@ -130,7 +130,7 @@ export class ImportConditionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_CLASS}`, [
+        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_CLASS], [
             this.fields,
             this.fieldValueCheck.elem,
             this.validFeedback,

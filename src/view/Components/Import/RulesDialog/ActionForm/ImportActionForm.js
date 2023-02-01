@@ -118,7 +118,7 @@ export class ImportActionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_BLOCK_CLASS}`, [
+        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_BLOCK_CLASS], [
             this.fieldsContainer,
             this.validFeedback,
         ]);

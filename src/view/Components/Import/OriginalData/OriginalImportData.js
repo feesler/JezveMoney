@@ -1,4 +1,4 @@
-import { createElement, Component } from 'jezvejs';
+import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../js/utils.js';
 import './style.scss';
 
@@ -36,28 +36,9 @@ export class OriginalImportData extends Component {
         this.render();
     }
 
-    renderGroup(children, className = null) {
-        const elemClasses = [GROUP_CLASS];
-
-        if (typeof className === 'string' && className.length > 0) {
-            elemClasses.push(className);
-        }
-
-        return createElement('div', {
-            props: { className: elemClasses.join(' ') },
-            children,
-        });
-    }
-
     renderColumn(title, value, className = null) {
-        const elemClasses = [COLUMN_CLASS];
-
-        if (typeof className === 'string' && className.length > 0) {
-            elemClasses.push(className);
-        }
-
         return createElement('div', {
-            props: { className: elemClasses.join(' ') },
+            props: { className: getClassName(COLUMN_CLASS, className) },
             children: [
                 createElement('label', {
                     props: { className: COLUMN_HEADER_CLASS, textContent: title },
@@ -94,11 +75,14 @@ export class OriginalImportData extends Component {
             ],
         ];
 
-        this.elem = window.app.createContainer(CONTAINER_CLASS, [
+        const { createContainer } = window.app;
+
+        this.elem = createContainer(CONTAINER_CLASS, [
             createElement('header', { props: { textContent: __('IMPORT_ORIG_DATA') } }),
-            window.app.createContainer(
+            createContainer(
                 TABLE_CLASS,
-                dataTable.map((group) => this.renderGroup(
+                dataTable.map((group) => createContainer(
+                    GROUP_CLASS,
                     group.map((col) => this.renderColumn(...col)),
                 )),
             ),

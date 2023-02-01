@@ -1,6 +1,6 @@
 import {
     createElement,
-    svg,
+    createSVGElement,
     setAttributes,
     Component,
     removeChilds,
@@ -103,9 +103,9 @@ export class Tile extends Component {
         }
 
         if (this.iconUseElem) {
-            this.icon = this.iconUseElem.href.baseVal;
-            if (this.icon.startsWith('#')) {
-                this.state.icon = this.icon.substring(1);
+            const iconRef = this.iconUseElem.href.baseVal;
+            if (iconRef.startsWith('#')) {
+                this.state.icon = iconRef.substring(1);
             }
         }
     }
@@ -174,8 +174,11 @@ export class Tile extends Component {
         }
 
         if (!this.iconUseElem) {
-            this.iconUseElem = svg('use');
-            this.iconSVGElem = svg('svg', { class: ICON_CONTENT_CLASS }, this.iconUseElem);
+            this.iconUseElem = createSVGElement('use');
+            this.iconSVGElem = createSVGElement('svg', {
+                attrs: { class: ICON_CONTENT_CLASS },
+                children: this.iconUseElem,
+            });
             this.iconElem.append(this.iconSVGElem);
         }
 

@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     createElement,
+    getClassName,
     setEvents,
     show,
     asArray,
@@ -438,7 +439,7 @@ class StatisticsView extends View {
     renderPopupListItem(item) {
         const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
         return createElement('li', {
-            props: { className: [POPUP_LIST_ITEM_CLASS, categoryClass].join(' ') },
+            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, categoryClass) },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,

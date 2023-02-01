@@ -1,5 +1,6 @@
 import {
     createElement,
+    getClassName,
     re,
     isFunction,
     Component,
@@ -77,7 +78,7 @@ export class SearchInput extends Component {
         });
         this.clearBtn = createElement('button', {
             props: {
-                className: [INNER_BTN_CLASS, CLEAR_BTN_CLASS].join(' '),
+                className: getClassName(INNER_BTN_CLASS, CLEAR_BTN_CLASS),
                 type: 'button',
             },
             children: clearIcon.elem,
@@ -90,7 +91,7 @@ export class SearchInput extends Component {
         });
         this.searchBtn = createElement('button', {
             props: {
-                className: [INNER_BTN_CLASS, SEARCH_BTN_CLASS].join(' '),
+                className: getClassName(INNER_BTN_CLASS, SEARCH_BTN_CLASS),
                 type: 'button',
                 tabIndex: -1,
             },

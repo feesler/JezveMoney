@@ -84,20 +84,20 @@ export class ImportTransactionItem extends Component {
         ] = fields.map(([title, className]) => Field.create({ title, className }));
 
         this.itemContainer = createContainer(ITEM_CONTAINER_CLASS, [
-            createContainer([COLUMN_CLASS, TYPE_COLUMN_CLASS].join(' '), [
+            createContainer([COLUMN_CLASS, TYPE_COLUMN_CLASS], [
                 this.trTypeField.elem,
                 this.accountField.elem,
                 this.personField.elem,
             ]),
-            createContainer([COLUMN_CLASS, AMOUNT_COLUMN_CLASS].join(' '), [
+            createContainer([COLUMN_CLASS, AMOUNT_COLUMN_CLASS], [
                 this.srcAmountField.elem,
                 this.destAmountField.elem,
             ]),
-            createContainer([COLUMN_CLASS, DATE_COLUMN_CLASS].join(' '), [
+            createContainer([COLUMN_CLASS, DATE_COLUMN_CLASS], [
                 this.dateField.elem,
                 this.categoryField.elem,
             ]),
-            createContainer([COLUMN_CLASS, COMMENT_COLUMN_CLASS].join(' '), [
+            createContainer([COLUMN_CLASS, COMMENT_COLUMN_CLASS], [
                 this.commentField.elem,
             ]),
         ]);
