@@ -97,6 +97,11 @@
   opacity: 0;
 }
 
+/* Sort mode */
+.tile_sort {
+  cursor: move;
+}
+
 @media (hover: hover) {
   .tile:hover {
     background-color: #1e82cc;
