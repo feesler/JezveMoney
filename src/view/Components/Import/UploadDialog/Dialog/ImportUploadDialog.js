@@ -224,7 +224,7 @@ export class ImportUploadDialog extends Component {
         try {
             this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.state.importedItems = null;
         }
 
@@ -244,7 +244,7 @@ export class ImportUploadDialog extends Component {
     /** Upload error handler */
     onUploadError(message) {
         this.setLoading(false);
-        window.app.createMessage(message, 'msg_error');
+        window.app.createErrorNotification(message);
     }
 
     /**

@@ -669,56 +669,14 @@ label {
   padding: 24px 0 12px 0;
 }
 
-/* Messages */
-.popup.msg {
-  top: 70px;
-  right: 12px;
-  left: auto;
-  bottom: auto;
-  width: auto;
-  height: auto;
-
-  .popup__content {
-    background: none;
-    align-self: baseline;
-  }
-
-  .popup__content-box {
-    padding: 0;
-    max-width: 824px;
-    width: 100%;
-    background: none;
-  }
-
-  .popup__header {
-    position: absolute;
-    right: 8px;
-    top: 17px;
-    width: 18px;
-    height: 18px;
-    z-index: 3;
-  }
-
-  .popup__message {
-    max-width: 400px;
-    min-width: 200px;
-    color: #ffffff;
-    right: 0;
-    padding: 15px 35px 15px 20px;
-  }
-
-  &.msg_success .popup__message {
-    border-color: #20d040;
-    background-color: #40d060;
-  }
-
-  &.msg_error .popup__message {
-    border-color: #f02020;
-    background-color: #f02020;
-  }
+/* Notifications */
+.popup.notification {
+  --notification-success-close-btn: #ffffff;
+  --notification-success-close-btn-hover: #ffffff;
+  --notification-error-close-btn: #ffffff;
+  --notification-error-close-btn-hover: #ffffff;
 
   .close-btn__icon {
-    fill: #ffffff;
     opacity: 0.5;
   }
 }
@@ -900,8 +858,7 @@ a.paginator-arrow:focus-visible {
     border-bottom-style: solid;
   }
 
-  .msg .close-btn:hover .close-btn__icon {
-    fill: #ffffff;
+  .notification .close-btn:hover .close-btn__icon {
     opacity: 1;
   }
 

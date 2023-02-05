@@ -472,7 +472,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: __('ERR_TRANS_UPDATE', App.view.locale) },
+            notification: { success: false, message: __('ERR_TRANS_UPDATE', App.view.locale) },
         };
         App.view.checkState();
         await App.view.closeNotification();
@@ -495,7 +495,7 @@ export const createFromPersonAccount = async ({ type, accountId }) => {
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: __('ERR_TRANS_CREATE', App.view.locale) },
+            notification: { success: false, message: __('ERR_TRANS_CREATE', App.view.locale) },
         };
         App.view.checkState();
         await App.view.closeNotification();

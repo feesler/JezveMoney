@@ -320,7 +320,7 @@ class MainView extends View {
             await API.transaction.setCategory({ id: ids, category_id: categoryId });
             this.requestState();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -344,7 +344,7 @@ class MainView extends View {
             await API.transaction.del({ id: ids });
             this.requestState();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -368,7 +368,7 @@ class MainView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(result.data));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

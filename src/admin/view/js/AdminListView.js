@@ -226,7 +226,7 @@ export class AdminListView extends AdminView {
         }
 
         if (!res) {
-            window.app.createMessage(failMessage, 'msg_error');
+            window.app.createErrorNotification(failMessage);
             return;
         }
 

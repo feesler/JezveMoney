@@ -144,7 +144,7 @@ class PersonView extends View {
             window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -162,7 +162,7 @@ class PersonView extends View {
             window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 

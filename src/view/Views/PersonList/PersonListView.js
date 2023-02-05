@@ -353,7 +353,7 @@ class PersonListView extends View {
             }
             this.requestList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -375,7 +375,7 @@ class PersonListView extends View {
             await API.person.del({ id: ids });
             this.requestList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -391,7 +391,7 @@ class PersonListView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(keepState));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -409,7 +409,7 @@ class PersonListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -436,7 +436,7 @@ class PersonListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_PERSON_CHANGE_POS'), 'msg_error');
+        window.app.createErrorNotification(__('ERR_PERSON_CHANGE_POS'));
     }
 
     getSortMode() {
@@ -477,7 +477,7 @@ class PersonListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

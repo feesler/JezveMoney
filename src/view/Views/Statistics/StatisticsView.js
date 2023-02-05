@@ -413,7 +413,7 @@ class StatisticsView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createMessage(e.message, 'msg_error');
+                window.app.createErrorNotification(e.message);
                 this.store.dispatch(actions.dataRequestError());
             }
         }

@@ -546,7 +546,7 @@ export class ImportTemplateManager extends Component {
 
             await this.requestTemplatesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -558,7 +558,7 @@ export class ImportTemplateManager extends Component {
             await API.importTemplate.del(id);
             await this.requestTemplatesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -607,7 +607,7 @@ export class ImportTemplateManager extends Component {
                 this.props.onUpdate();
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -624,7 +624,7 @@ export class ImportTemplateManager extends Component {
 
             window.app.model.rules.setData(result.data);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 

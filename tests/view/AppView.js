@@ -8,7 +8,7 @@ import {
 } from 'jezve-test';
 import { Header } from './component/Header.js';
 import { Navigation } from './component/Navigation.js';
-import { MessagePopup } from './component/MessagePopup.js';
+import { Notification } from './component/Notification.js';
 
 export class AppView extends TestView {
     isUserLoggedIn() {
@@ -30,16 +30,16 @@ export class AppView extends TestView {
         this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
         this.content.nav = await Navigation.create(this, await query('.offcanvas.navigation'));
 
-        const msgElem = await query('.popup.msg');
-        this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
+        const msgElem = await query('.popup.notification');
+        this.content.notification = (msgElem) ? await Notification.create(this, msgElem) : null;
     }
 
     async closeNotification() {
-        if (!this.content.msgPopup) {
+        if (!this.content.notification) {
             return;
         }
 
-        await this.performAction(() => this.content.msgPopup.close());
+        await this.performAction(() => this.content.notification.close());
     }
 
     async changeLocale(value) {

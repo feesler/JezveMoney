@@ -5,7 +5,7 @@ import {
     isDate,
     formatDate,
 } from 'jezvejs';
-import { Popup } from 'jezvejs/Popup';
+import { Notification } from 'jezvejs/Notification';
 import { parseCookies, setCookie, __ } from './utils.js';
 
 /** CSS classes */
@@ -39,7 +39,7 @@ export class Application {
             this.model.profile = { ...this.props.profile };
         }
 
-        this.messageBox = null;
+        this.notification = null;
     }
 
     createView(ViewClass) {
@@ -187,25 +187,38 @@ export class Application {
     }
 
     /**
-     * Create notification message
+     * Creates notification message
      * @param {string} message - notification text
-     * @param {string} msgClass - CSS class for message box
+     * @param {string} type - type of notification
      */
-    createMessage(message, msgClass) {
-        if (this.messageBox) {
-            this.messageBox.destroy();
+    createNotification(message, type) {
+        if (this.notification) {
+            this.notification.destroy();
         }
 
-        this.messageBox = Popup.create({
+        this.notification = Notification.create({
             id: 'notificationPopup',
+            type,
             content: message,
-            btn: { closeBtn: true },
-            className: ['msg', msgClass],
-            nodim: true,
-            closeOnEmptyClick: true,
         });
 
-        this.messageBox.show();
+        this.notification.show();
+    }
+
+    /**
+     * Creates success notification message
+     * @param {string} message - notification text
+     */
+    createSuccessNotification(message) {
+        this.createNotification(message, 'success');
+    }
+
+    /**
+     * Creates error notification message
+     * @param {string} message - notification text
+     */
+    createErrorNotification(message) {
+        this.createNotification(message, 'error');
     }
 
     /** Set validation state for element */

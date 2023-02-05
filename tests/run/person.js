@@ -261,7 +261,7 @@ export const securityTests = async () => {
         assert(!(App.view instanceof PersonView), 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: __('ERR_PERSON_UPDATE', App.view.locale) },
+            notification: { success: false, message: __('ERR_PERSON_UPDATE', App.view.locale) },
         };
         App.view.checkState();
         await App.view.closeNotification();

@@ -701,7 +701,12 @@ class ImportView extends View {
         }
 
         this.submitProgress.hide();
-        window.app.createMessage(message, (status ? 'msg_success' : 'msg_error'));
+
+        if (status) {
+            window.app.createSuccessNotification(message);
+        } else {
+            window.app.createErrorNotification(message);
+        }
     }
 
     /** Apply rules to imported items */

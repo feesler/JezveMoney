@@ -85,7 +85,7 @@ class ProfileView extends View {
             await API.profile.del();
             window.location = `${window.app.baseURL}login/`;
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.deleteLoading.hide();
         }
     }

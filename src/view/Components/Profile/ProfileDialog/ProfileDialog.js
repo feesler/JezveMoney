@@ -93,10 +93,10 @@ export class ProfileDialog extends Component {
             this.popup.close();
 
             if (result.msg) {
-                window.app.createMessage(result.msg, 'msg_success');
+                window.app.createSuccessNotification(result.msg);
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

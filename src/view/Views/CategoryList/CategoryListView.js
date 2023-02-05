@@ -359,7 +359,7 @@ class CategoryListView extends View {
             await API.category.del({ id: ids, removeChild });
             this.requestList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -373,7 +373,7 @@ class CategoryListView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(keepState));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -391,7 +391,7 @@ class CategoryListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -452,7 +452,7 @@ class CategoryListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_CATEGORY_CHANGE_POS'), 'msg_error');
+        window.app.createErrorNotification(__('ERR_CATEGORY_CHANGE_POS'));
     }
 
     getSortMode() {
@@ -493,7 +493,7 @@ class CategoryListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

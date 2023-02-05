@@ -441,7 +441,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_TRANS_CHANGE_POS'), 'msg_error');
+        window.app.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
     }
 
     /** Returns URL for filter of specified state */
@@ -567,7 +567,7 @@ class TransactionListView extends View {
             await API.transaction.del({ id: ids });
             this.requestTransactions(state.form);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -610,7 +610,7 @@ class TransactionListView extends View {
             await API.transaction.setCategory({ id: ids, category_id: categoryId });
             this.requestTransactions(state.form);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -697,7 +697,7 @@ class TransactionListView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createMessage(e.message, 'msg_error');
+                window.app.createErrorNotification(e.message);
                 this.store.dispatch(actions.listRequestError());
             }
         }

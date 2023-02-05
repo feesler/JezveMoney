@@ -105,7 +105,7 @@ export class ProfileView extends AppView {
 
         if (validInput) {
             if (nameChanged) {
-                await this.performAction(() => wait('.popup.msg', { visible: true }));
+                await this.performAction(() => wait('.popup.notification', { visible: true }));
             }
         } else {
             await this.performAction(() => click(this.content.changeNamePopup.closeBtn));
@@ -131,7 +131,7 @@ export class ProfileView extends AppView {
         await this.performAction(() => click(this.content.changePassPopup.okBtn));
 
         if (validInput) {
-            await this.performAction(() => wait('.popup.msg', { visible: true }));
+            await this.performAction(() => wait('.popup.notification', { visible: true }));
         } else {
             await this.performAction(() => click(this.content.changePassPopup.closeBtn));
         }
@@ -183,7 +183,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(async () => {
             await click(this.content.resetDataPopup.okBtn);
-            await wait('.popup.msg', { visible: true });
+            await wait('.popup.notification', { visible: true });
         });
     }
 

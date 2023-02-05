@@ -1539,12 +1539,8 @@ export class ImportView extends AppView {
         await waitForFunction(async () => {
             await this.parse();
 
-            const notification = this.content.msgPopup?.content?.visible;
-            if (notification && !this.model.submitInProgress) {
-                return true;
-            }
-
-            return false;
+            const notificationVisible = this.content.notification?.content?.visible;
+            return (notificationVisible && !this.model.submitInProgress);
         });
 
         this.items = [];
@@ -1554,13 +1550,14 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
 
-        expected.msgPopup = {
+        expected.notification = {
             success: true,
             message: __('MSG_IMPORT_SUCCESS', this.locale),
         };
+        this.checkState(expected);
 
-        await this.checkState(expected);
         await this.closeNotification();
+
         return true;
     }
 

@@ -317,7 +317,7 @@ export class ImportRulesDialog extends Component {
 
             this.requestRulesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -335,7 +335,7 @@ export class ImportRulesDialog extends Component {
             await API.importRule.del(id);
             this.requestRulesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -365,7 +365,7 @@ export class ImportRulesDialog extends Component {
                 this.props.onUpdate();
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
