@@ -38,6 +38,12 @@
         "import/no-cycle": [
             "warn"
         ],
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                "devDependencies": true
+            }
+        ],
         "no-restricted-syntax": [
             "warn"
         ],
