@@ -1,6 +1,7 @@
 import { setBlock, TestStory } from 'jezve-test';
 import * as ImportTests from '../../../run/import/index.js';
 import { App } from '../../../Application.js';
+import { api } from '../../../model/api.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {
@@ -44,6 +45,7 @@ export class ImportListStory extends TestStory {
         await this.submit();
         await this.stateLoop();
 
+        await this.submitError();
         await this.noAccounts();
     }
 
@@ -475,6 +477,21 @@ export class ImportListStory extends TestStory {
                 { action: 'changePerson', data: App.scenario.MARIA },
             ],
         });
+
+        await ImportTests.submit();
+    }
+
+    async submitError() {
+        setBlock('Handling submit errors', 2);
+
+        const { ACC_3 } = App.scenario;
+
+        await ImportTests.changeMainAccount(ACC_3);
+        await ImportTests.createItemAndSave(
+            { action: 'inputDestAmount', data: '1' },
+        );
+        // Remove selected account
+        await api.account.del(ACC_3);
 
         await ImportTests.submit();
     }

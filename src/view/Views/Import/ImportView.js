@@ -667,46 +667,31 @@ class ImportView extends View {
     }
 
     async submitChunk() {
-        const chunk = this.submitQueue.pop();
-        const result = await API.transaction.createMultiple(chunk);
-        this.onSubmitResult(result);
+        try {
+            const chunk = this.submitQueue.pop();
+            await API.transaction.createMultiple(chunk);
+            this.onSubmitResult();
+        } catch (e) {
+            this.submitProgress.hide();
+            window.app.createErrorNotification(e.message);
+        }
     }
 
     /**
-     * Submit response handler
-     * @param {String} response - response text
+     * Successfull submit response handler
      */
-    onSubmitResult(apiResult) {
-        let status = false;
-        let message = __('MSG_IMPORT_FAIL');
+    onSubmitResult() {
+        this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
+        this.renderSubmitProgress();
 
-        try {
-            status = (apiResult && apiResult.result === 'ok');
-            if (status) {
-                this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
-                this.renderSubmitProgress();
-
-                if (this.submitQueue.length === 0) {
-                    message = __('MSG_IMPORT_SUCCESS');
-                    this.removeAllItems();
-                } else {
-                    this.submitChunk();
-                    return;
-                }
-            } else if (apiResult && apiResult.msg) {
-                message = apiResult.msg;
-            }
-        } catch (e) {
-            message = e.message;
+        if (this.submitQueue.length > 0) {
+            this.submitChunk();
+            return;
         }
 
+        this.removeAllItems();
         this.submitProgress.hide();
-
-        if (status) {
-            window.app.createSuccessNotification(message);
-        } else {
-            window.app.createErrorNotification(message);
-        }
+        window.app.createSuccessNotification(__('MSG_IMPORT_SUCCESS'));
     }
 
     /** Apply rules to imported items */

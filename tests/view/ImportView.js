@@ -851,9 +851,13 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.waitForList(
-            () => this.content.mainAccountSelect.selectItem(val),
-        );
+        const action = () => this.content.mainAccountSelect.selectItem(val);
+
+        if (this.items.length > 0) {
+            await this.waitForList(action);
+        } else {
+            await this.performAction(action);
+        }
 
         return this.checkState();
     }
@@ -1528,11 +1532,18 @@ export class ImportView extends AppView {
             return true;
         }
 
-        enabledItems.forEach((item) => {
+        const expState = App.state.clone();
+        await expState.fetch();
+        const origState = expState.clone();
+
+        const resExpected = enabledItems.every((item) => {
             const expectedTransaction = item.getExpectedTransaction();
-            const createRes = App.state.createTransaction(expectedTransaction);
-            assert(createRes, 'Failed to create transaction');
+            return expState.createTransaction(expectedTransaction);
         });
+
+        if (!resExpected) {
+            expState.setState(origState);
+        }
 
         await this.performAction(() => click(this.content.submitBtn.elem));
 
@@ -1543,22 +1554,29 @@ export class ImportView extends AppView {
             return (notificationVisible && !this.model.submitInProgress);
         });
 
-        this.items = [];
-        this.formIndex = -1;
-        this.originalItemData = null;
+        if (resExpected) {
+            this.items = [];
+            this.formIndex = -1;
+            this.originalItemData = null;
+        }
+
         const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
 
         expected.notification = {
-            success: true,
-            message: __('MSG_IMPORT_SUCCESS', this.locale),
+            success: resExpected,
         };
+        if (resExpected) {
+            expected.notification.message = __('MSG_IMPORT_SUCCESS', this.locale);
+        }
+
         this.checkState(expected);
 
         await this.closeNotification();
 
-        return true;
+        App.state.setState(expState);
+        return App.state.fetchAndTest();
     }
 
     isFirstPage() {
