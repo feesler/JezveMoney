@@ -260,7 +260,7 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async openConditions() {
-        if (this.content.conditionsList.isCollapsed()) {
+        if (this.content.conditionsList.collapsed) {
             await this.content.conditionsList.toggle();
             await this.parse();
         }
@@ -576,7 +576,7 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async openActions() {
-        if (this.content.actionsList.isCollapsed()) {
+        if (this.content.actionsList.collapsed) {
             await this.content.actionsList.toggle();
             await this.parse();
         }
