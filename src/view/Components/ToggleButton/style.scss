@@ -1,25 +1,16 @@
 /* Toggle expand/collapse button */
-.btn.toggle-btn {
-  width: 32px;
-  height: 32px;
+.iconbutton.toggle-btn {
+  --iconbtn-icon-size: 18px;
+  --iconbtn-icon-color: var(--main-text-color);
+
   padding: 7px;
-  background: none;
-  pointer-events: all;
-  cursor: pointer;
   margin-left: auto;
 
-  .icon.toggle-icon {
-    width: 18px;
-    height: 18px;
+  .iconbutton__icon {
+    min-width: auto;
   }
 }
 
-.toggle-btn.rotate .toggle-icon {
+.toggle-btn.rotate .iconbutton__icon {
   transform: rotate(180deg);
-}
-
-@media (hover: hover) {
-  .btn.toggle-btn:hover {
-    background: none;
-  }
 }

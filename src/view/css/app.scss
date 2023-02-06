@@ -118,6 +118,11 @@ label {
   flex-flow: column nowrap;
 }
 
+/* Icon */
+.icon {
+  fill: var(--main-text-color);
+}
+
 /* flat square button with icon */
 .icon-btn {
   width: 34px;
@@ -192,6 +197,14 @@ label {
   .input-group__btn .icon {
     fill: var(--ig-button-color);
   }
+}
+
+/* IconButton */
+.iconbutton {
+  --iconbtn-title-color: var(--main-text-color);
+  --iconbtn-icon-color: var(--main-text-color);
+  --iconbtn-hover-title-color: var(--main-text-color);
+  --iconbtn-hover-icon-color: var(--main-text-color);
 }
 
 /* Action button */

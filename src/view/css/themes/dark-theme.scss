@@ -66,17 +66,6 @@
     color: var(--main-text-color);
   }
 
-  .iconbutton {
-    --iconbtn-title-color: var(--main-text-color);
-    --iconbtn-icon-color: var(--main-text-color);
-    --iconbtn-hover-title-color: var(--main-text-color);
-    --iconbtn-hover-icon-color: var(--main-text-color);
-  }
-
-  .icon {
-    fill: var(--main-text-color);
-  }
-
   /* No data message for lists & etc. */
   .nodata-message {
     color: #b0b0b0;
@@ -194,8 +183,7 @@
     color: var(--main-text-color);
   }
 
-  .filter-icon,
-  .toggle-icon {
+  .filter-icon {
     fill: var(--main-text-color);
   }
 
@@ -293,8 +281,9 @@
       background-color: #202020;
     }
 
-    .icon {
-      fill: var(--list-item-icon-fill);
+    .toggle-btn {
+      --iconbtn-icon-color: var(--list-item-icon-fill);
+      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
     }
   }
 
@@ -330,6 +319,11 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+
+    .toggle-btn {
+      --iconbtn-icon-color: var(--list-item-icon-fill);
+      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
+    }
   }
 
   /* Upload dialog */
@@ -352,9 +346,16 @@
     color: #808080;
   }
 
-  .rule-item .icon,
-  .rule-form .icon {
-    fill: var(--list-item-icon-fill);
+  .rule-item,
+  .rule-form {
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
+
+    .toggle-btn {
+      --iconbtn-icon-color: var(--list-item-icon-fill);
+      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
+    }
   }
 
   .rule-item__info {
