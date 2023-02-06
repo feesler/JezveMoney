@@ -21,9 +21,12 @@ const client = new Client();
 const src = join(currentDir, '..', 'dist');
 const dest = process.env.DEPLOY_PATH;
 
-const skipDirectories = [
+const skipList = [
     'vendor',
 ];
+
+const option = (process.argv.length > 2) ? process.argv[2] : null;
+const isFullDeploy = option?.toLowerCase() === 'full';
 
 let res = 1;
 try {
@@ -36,8 +39,12 @@ try {
 
     await client.uploadDir(src, dest, {
         filter: (source, isDir) => {
+            if (isFullDeploy) {
+                return true;
+            }
+
             const relPath = source.startsWith(src) ? source.substring(src.length + 1) : source;
-            return (!isDir || !skipDirectories.includes(relPath));
+            return (!isDir || !skipList.includes(relPath));
         },
     });
 
