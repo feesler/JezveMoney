@@ -66,7 +66,7 @@ export class AdminListView extends AdminView {
             id: this.elements.dialogPopup,
             content: this.itemForm,
             className: 'item-form',
-            btn: { closeBtn: true },
+            closeButton: true,
         });
         show(this.itemForm, true);
     }

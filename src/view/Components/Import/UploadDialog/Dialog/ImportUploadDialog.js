@@ -85,10 +85,8 @@ export class ImportUploadDialog extends Component {
             id: 'fileupload_popup',
             title: __('IMPORT_UPLOAD'),
             content: this.elem,
+            closeButton: true,
             onClose: () => this.onClose(),
-            btn: {
-                closeBtn: true,
-            },
             className: UPLOAD_POPUP_CLASS,
         });
         show(this.elem, true);

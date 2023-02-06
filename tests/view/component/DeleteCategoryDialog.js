@@ -13,8 +13,8 @@ export class DeleteCategoryDialog extends TestComponent {
             titleElem: await query(this.elem, '.popup__title'),
             messageElem: await query(this.elem, '.popup__message .confirm-message'),
             deleteChildsCheck: await Checkbox.create(this, await query(this.elem, '.checkbox')),
-            okBtn: await query(this.elem, '.popup__controls > .btn.submit-btn'),
-            cancelBtn: await query(this.elem, '.popup__controls > .btn.cancel-btn'),
+            okBtn: await query(this.elem, '.popup__footer .submit-btn'),
+            cancelBtn: await query(this.elem, '.popup__footer .cancel-btn'),
         };
 
         [res.title, res.message] = await evaluate((titleEl, msgEl) => ([

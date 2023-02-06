@@ -47,7 +47,7 @@ export class ProfileView extends AppView {
         };
 
         if (res.changeNamePopup.elem) {
-            res.changeNamePopup.okBtn = await query(res.changeNamePopup.elem, '.popup__controls > input.btn.submit-btn');
+            res.changeNamePopup.okBtn = await query(res.changeNamePopup.elem, '.form-controls > input.btn.submit-btn');
             res.changeNamePopup.closeBtn = await query(res.changeNamePopup.elem, '.close-btn');
         }
 
@@ -61,7 +61,7 @@ export class ProfileView extends AppView {
         if (res.changePassPopup.elem) {
             res.changePassPopup.okBtn = await query(
                 res.changePassPopup.elem,
-                '.popup__controls > input.btn.submit-btn',
+                '.form-controls > input.btn.submit-btn',
             );
             res.changePassPopup.closeBtn = await query(res.changePassPopup.elem, '.close-btn');
         }
@@ -81,7 +81,7 @@ export class ProfileView extends AppView {
         if (res.resetDataPopup.elem) {
             res.resetDataPopup.okBtn = await query(
                 res.resetDataPopup.elem,
-                '.popup__controls > input.btn.submit-btn',
+                '.form-controls .submit-btn',
             );
             res.resetDataPopup.closeBtn = await query(res.resetDataPopup.elem, '.close-btn');
         }

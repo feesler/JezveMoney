@@ -55,7 +55,7 @@
             <div class="invalid-feedback"><?= __("PROFILE_INVALID_NAME") ?></div>
         </div>
 
-        <div class="popup__controls">
+        <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>
     </form>
@@ -75,7 +75,7 @@
             <div class="invalid-feedback"><?= __("PROFILE_INVALID_PASS_NEW") ?></div>
         </div>
 
-        <div class="popup__controls">
+        <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>
     </form>
@@ -133,7 +133,7 @@
             </label>
         </div>
 
-        <div class="popup__controls">
+        <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>
     </form>

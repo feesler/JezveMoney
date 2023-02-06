@@ -650,6 +650,10 @@ label {
 }
 
 /* Popup */
+.popup {
+  --popup-footer-padding: 2rem 1rem 1rem 1rem;
+}
+
 .popup__content {
   background: none;
 }
@@ -666,17 +670,11 @@ label {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
 }
 
-.popup .close-btn,
-.popup__content-box.dragging .close-btn {
-  display: block;
-}
-
-.popup__controls {
+.popup__footer {
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;
   gap: 30px;
-  padding: 24px 0 12px 0;
 }
 
 /* Notifications */

@@ -1,4 +1,4 @@
-import { isFunction, Component } from 'jezvejs';
+import { isFunction, Component, createElement } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { __ } from '../../js/utils.js';
 
@@ -47,10 +47,24 @@ export class ConfirmDialog extends Component {
         const popupProps = {
             title: this.props.title,
             content: this.props.content,
-            btn: {
-                okBtn: { value: __('OK'), onclick: () => this.onResult(true) },
-                cancelBtn: { value: __('CANCEL'), onclick: () => this.onResult(false) },
-            },
+            footer: [
+                createElement('button', {
+                    props: {
+                        className: 'btn submit-btn',
+                        textContent: __('OK'),
+                        type: 'button',
+                    },
+                    events: { click: () => this.onResult(true) },
+                }),
+                createElement('button', {
+                    props: {
+                        className: 'btn cancel-btn',
+                        textContent: __('CANCEL'),
+                        type: 'button',
+                    },
+                    events: { click: () => this.onResult(false) },
+                }),
+            ],
         };
         if ('id' in this.props) {
             popupProps.id = this.props.id;

@@ -149,10 +149,8 @@ export class ImportTransactionForm extends Component {
         this.popup = Popup.create({
             id: 'transactionFormPopup',
             content: this.elem,
+            closeButton: true,
             onClose: () => this.cancel(),
-            btn: {
-                closeBtn: true,
-            },
             className: POPUP_CLASS,
         });
 

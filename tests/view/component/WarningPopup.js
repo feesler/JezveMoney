@@ -11,8 +11,8 @@ export class WarningPopup extends TestComponent {
         const res = {
             titleElem: await query(this.elem, '.popup__title'),
             messageElem: await query(this.elem, '.popup__message > div'),
-            okBtn: await query(this.elem, '.popup__controls > .btn.submit-btn'),
-            cancelBtn: await query(this.elem, '.popup__controls > .btn.cancel-btn'),
+            okBtn: await query(this.elem, '.popup__footer .submit-btn'),
+            cancelBtn: await query(this.elem, '.popup__footer .cancel-btn'),
         };
 
         [res.title, res.message] = await evaluate((titleEl, msgEl) => ([
