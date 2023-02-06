@@ -31,10 +31,6 @@
 
   .sidebar__controls .iconbutton {
     .iconbutton__icon {
-      border-color: #ffffff;
-    }
-
-    .iconbutton__icon-content {
       fill: #ffffff;
     }
   }
@@ -88,7 +84,7 @@
       padding: 0;
     }
 
-    .sidebar__controls .iconbutton:hover .iconbutton__icon-content {
+    .sidebar__controls .iconbutton:hover .iconbutton__icon {
       fill: #44aaff;
     }
   }
@@ -105,11 +101,8 @@
 @media (hover: hover) {
   .sidebar .sidebar__controls .iconbutton:hover {
     .iconbutton__icon {
-      background-color: #ffffff;
-    }
-
-    .iconbutton__icon-content {
       fill: #404040;
+      background-color: #ffffff;
     }
   }
 }

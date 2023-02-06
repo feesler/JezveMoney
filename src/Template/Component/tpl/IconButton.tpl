@@ -3,7 +3,7 @@
     <?php   } else { ?>
         <button <?= $attributes ?>>
         <?php   } ?>
-        <span class="iconbutton__icon"><?= svgIcon($icon, "iconbutton__icon-content") ?></span>
+        <?= svgIcon($icon, "iconbutton__icon") ?>
         <?php if (isset($title) && !is_empty($title)) { ?>
             <span class="iconbutton__content">
                 <?php if (isset($subtitle) && !is_empty($subtitle)) { ?>
