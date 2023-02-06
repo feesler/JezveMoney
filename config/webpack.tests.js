@@ -1,27 +1,28 @@
 import webpack from 'webpack';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+
+const filename = fileURLToPath(import.meta.url);
+const currentDir = dirname(filename);
 
 export default {
     mode: 'production',
     target: 'browserslist',
-    context: resolve(__dirname, '..'),
+    context: resolve(currentDir, '..'),
     entry: './tests/index.js',
     output: {
         filename: 'index.js',
-        path: resolve(__dirname, '../dist/admin/view/js/tests'),
-        clean: true
+        path: resolve(currentDir, '../dist/admin/view/js/tests'),
+        clean: true,
     },
     module: {
         rules: [
             {
                 test: /\.m?js$/,
                 include: [
-                    resolve(__dirname, '../tests'),
-                    resolve(__dirname, '../node_modules/jezvejs'),
-                    resolve(__dirname, '../node_modules/jezve-test'),
+                    resolve(currentDir, '../tests'),
+                    resolve(currentDir, '../node_modules/jezvejs'),
+                    resolve(currentDir, '../node_modules/jezve-test'),
                 ],
                 exclude: /node_modules\/(?!(jezve-test|jezvejs)\/).*/,
                 use: [
@@ -31,11 +32,11 @@ export default {
                             cacheDirectory: true,
                             babelrc: false,
                             rootMode: 'upward',
-                        }
-                    }
+                        },
+                    },
                 ],
             },
-        ]
+        ],
     },
     optimization: {
         minimize: false,
@@ -43,7 +44,7 @@ export default {
     plugins: [
         new webpack.NormalModuleReplacementPlugin(
             /jezve-test\/NodeEnvironment/,
-            'jezve-test\/BrowserEnvironment'
+            'jezve-test/BrowserEnvironment',
         ),
     ],
 };

@@ -11,7 +11,7 @@
         "test": "node ./tests/index.js",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
-        "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/",
+        "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
         "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
         "debug": "node --inspect-brk ./tests/index.js",
         "deploy": "node ./scripts/deploy.js",
