@@ -651,11 +651,15 @@ label {
 
 /* Popup */
 .popup {
+  --popup-text: var(--main-text-color);
+  --popup-bg: var(--main-bg-color);
   --popup-footer-padding: 2rem 1rem 1rem 1rem;
+  --popup-content-padding: 0 1rem 1rem 1rem;
 }
 
 .popup__content {
-  background: none;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
 }
 
 .popup__title {
@@ -663,11 +667,6 @@ label {
   font-size: 1.4rem;
   margin: 0;
   padding: 0;
-}
-
-.popup__content-box {
-  border-radius: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
 }
 
 .popup__footer {

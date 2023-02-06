@@ -95,11 +95,8 @@ textarea {
 
 /* Create/update item popup */
 .item-form {
-  .popup__content-box {
-    width: 100%;
-    max-width: 400px;
-    min-width: 200px;
-  }
+  --popup-max-width: 400px;
+  --popup-min-width: 200px;
 
   label {
     display: block;

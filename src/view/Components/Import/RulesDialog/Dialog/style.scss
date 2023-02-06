@@ -1,16 +1,10 @@
 /* Import rules dialog */
 .rules-popup {
-  background: none;
+  --popup-max-width: 600px;
 
   .popup__wrapper {
     position: relative;
     align-items: flex-start;
-    background: var(--popup-dim-bg);
-  }
-
-  .popup__content-box {
-    max-width: 600px;
-    width: 100%;
   }
 
   .popup__header {

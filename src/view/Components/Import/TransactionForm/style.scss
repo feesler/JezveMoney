@@ -1,8 +1,6 @@
-.import-form-popup .popup__content-box {
+.import-form-popup {
   --import-form-popup-zindex: 500;
-
-  max-width: 600px;
-  width: 100%;
+  --popup-max-width: 600px;
 }
 
 /* Transaction item */

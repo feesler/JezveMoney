@@ -225,17 +225,6 @@
     color: var(--main-text-color);
   }
 
-  /* Popup */
-  .popup__content .popup__content-box {
-    color: var(--main-text-color);
-    background-color: var(--main-bg-color);
-  }
-
-  .popup__title,
-  .popup__message {
-    color: var(--main-text-color);
-  }
-
   /* Swap button */
   .swap-btn:active {
     background-color: #2e2e2e;

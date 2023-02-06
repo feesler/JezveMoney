@@ -1,5 +1,4 @@
 /* Profile dialog */
-.profile-dialog .popup__content-box {
-  max-width: 400px;
-  width: 100%;
+.profile-dialog {
+  --popup-max-width: 400px;
 }

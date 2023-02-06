@@ -1,11 +1,8 @@
 .upload-popup {
-  .popup__content-box {
-    max-width: 600px;
-    width: 100%;
-  }
+  --popup-max-width: 600px;
 
   .popup__header {
-    margin-bottom: 0;
+    padding-bottom: 0;
     column-gap: 12px;
 
     .close-btn {
