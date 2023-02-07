@@ -6,7 +6,7 @@ import {
     click,
     copyObject,
 } from 'jezve-test';
-import { DropDown, IconButton } from 'jezvejs-test';
+import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
@@ -30,7 +30,7 @@ export class AccountView extends AppView {
         res.heading = { elem: await query('.heading > h1') };
         assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
-        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
+        res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
         res.tile = await Tile.create(this, await query('#accountTile'));
 
         res.formElem = await query('form');

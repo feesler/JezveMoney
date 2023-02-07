@@ -13,7 +13,7 @@ import {
     evaluate,
     formatDate,
 } from 'jezve-test';
-import { DropDown, Checkbox, IconButton } from 'jezvejs-test';
+import { DropDown, Checkbox, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
@@ -71,7 +71,7 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
+            uploadBtn: await Button.create(this, await query('#uploadBtn')),
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             enabledCounter: await Counter.create(this, await query('#enabledCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
@@ -94,7 +94,7 @@ export class ImportView extends AppView {
             uploadBtn.disabled,
         ]), res.submitBtn.elem, res.uploadBtn.elem);
 
-        res.listModeBtn = await IconButton.create(this, await query('#listModeBtn'));
+        res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
 
         // List menu
         res.listMenuContainer = {
@@ -161,7 +161,7 @@ export class ImportView extends AppView {
 
         const res = cont;
         await asyncMap(itemIds, async (id) => {
-            res[id] = await IconButton.create(this, await query(`#${id}`));
+            res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
             return res[id];
         });

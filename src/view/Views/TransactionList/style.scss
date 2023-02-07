@@ -55,11 +55,11 @@
 /* Mode selector */
 .dark-theme,
 .white-theme {
-  .iconbutton.mode-selector {
-    --iconbtn-title-color: var(--accent-color);
-    --iconbtn-icon-color: var(--accent-color);
-    --iconbtn-hover-icon-color: var(--accent-color);
-    --iconbtn-hover-title-color: var(--accent-hover-color);
+  .btn.mode-selector {
+    --btn-title-color: var(--accent-color);
+    --btn-icon-color: var(--accent-color);
+    --btn-hover-icon-color: var(--accent-color);
+    --btn-hover-title-color: var(--accent-hover-color);
   }
 }
 
@@ -89,7 +89,7 @@
   }
 
   .mode-selector:hover {
-    .iconbutton__content {
+    .btn__content {
       text-decoration: underline;
     }
   }

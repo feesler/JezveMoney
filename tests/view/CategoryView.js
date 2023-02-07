@@ -5,7 +5,7 @@ import {
     navigation,
     click,
 } from 'jezve-test';
-import { DropDown, IconButton } from 'jezvejs-test';
+import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
@@ -73,7 +73,7 @@ export class CategoryView extends AppView {
             assert(res.id, 'Wrong category id');
         }
 
-        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
+        res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.nameInput = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.nameInput, 'Category name input not found');

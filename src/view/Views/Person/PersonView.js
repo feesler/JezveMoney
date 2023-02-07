@@ -6,7 +6,7 @@ import {
     insertAfter,
     setEvents,
 } from 'jezvejs';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
@@ -67,7 +67,7 @@ class PersonView extends View {
         // Update mode
         const deleteBtn = ge('deleteBtn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement(deleteBtn, {
+            this.deleteBtn = Button.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }

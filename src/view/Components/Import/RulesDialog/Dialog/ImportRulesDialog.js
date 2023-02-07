@@ -7,7 +7,7 @@ import {
     createElement,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
 import { __ } from '../../../../js/utils.js';
@@ -51,7 +51,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        this.createRuleBtn = IconButton.create({
+        this.createRuleBtn = Button.create({
             id: 'createRuleBtn',
             className: 'create-btn',
             icon: 'plus',

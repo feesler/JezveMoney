@@ -4,7 +4,7 @@ import {
     Component,
     setEvents,
 } from 'jezvejs';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import './style.scss';
 
 const TOOLBAR_ACTIVE_CLASS = 'sidebar_active';
@@ -49,31 +49,31 @@ export class Toolbar extends Component {
 
         const editBtn = ge('edit_btn');
         if (editBtn) {
-            this.updateBtn = IconButton.fromElement(editBtn);
+            this.updateBtn = Button.fromElement(editBtn);
         }
 
         const exportBtn = ge('export_btn');
         if (exportBtn) {
-            this.exportBtn = IconButton.fromElement(exportBtn);
+            this.exportBtn = Button.fromElement(exportBtn);
         }
 
         const showBtn = ge('show_btn');
         if (showBtn) {
-            this.showBtn = IconButton.fromElement(showBtn, {
+            this.showBtn = Button.fromElement(showBtn, {
                 onClick: () => this.onShowClick(),
             });
         }
 
         const hideBtn = ge('hide_btn');
         if (hideBtn) {
-            this.hideBtn = IconButton.fromElement(hideBtn, {
+            this.hideBtn = Button.fromElement(hideBtn, {
                 onClick: () => this.onHideClick(),
             });
         }
 
         const deleteBtn = ge('del_btn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
+            this.deleteBtn = Button.fromElement('del_btn', {
                 onClick: () => this.onDeleteClick(),
             });
         }

@@ -19,18 +19,18 @@
     min-width: 15px;
     height: 100%;
 
-    .iconbutton {
+    .btn {
       display: flex;
       margin: 9px 12px;
     }
 
-    .iconbutton span {
+    .btn span {
       color: #ffffff;
     }
   }
 
-  .sidebar__controls .iconbutton {
-    .iconbutton__icon {
+  .sidebar__controls .btn {
+    .btn__icon {
       fill: #ffffff;
     }
   }
@@ -84,12 +84,12 @@
       padding: 0;
     }
 
-    .sidebar__controls .iconbutton:hover .iconbutton__icon {
+    .sidebar__controls .btn:hover .btn__icon {
       fill: #44aaff;
     }
   }
 
-  .siderbar__content .iconbutton {
+  .siderbar__content .btn {
     margin: 9px 0 9px 12px;
   }
 
@@ -99,8 +99,8 @@
 }
 
 @media (hover: hover) {
-  .sidebar .sidebar__controls .iconbutton:hover {
-    .iconbutton__icon {
+  .sidebar .sidebar__controls .btn:hover {
+    .btn__icon {
       fill: #404040;
       background-color: #ffffff;
     }

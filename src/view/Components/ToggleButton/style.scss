@@ -1,16 +1,16 @@
 /* Toggle expand/collapse button */
-.iconbutton.toggle-btn {
-  --iconbtn-icon-size: 18px;
-  --iconbtn-icon-color: var(--main-text-color);
+.btn.toggle-btn {
+  --btn-icon-size: 18px;
+  --btn-icon-color: var(--main-text-color);
 
   padding: 7px;
   margin-left: auto;
 
-  .iconbutton__icon {
+  .btn__icon {
     min-width: auto;
   }
 }
 
-.toggle-btn.rotate .iconbutton__icon {
+.toggle-btn.rotate .btn__icon {
   transform: rotate(180deg);
 }

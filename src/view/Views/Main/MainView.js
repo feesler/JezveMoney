@@ -7,7 +7,7 @@ import {
     removeChilds,
     isFunction,
 } from 'jezvejs';
-import 'jezvejs/style/IconButton';
+import 'jezvejs/style/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { API } from '../../js/api/index.js';

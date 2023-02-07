@@ -13,7 +13,7 @@ import {
     waitForFunction,
     asyncMap,
 } from 'jezve-test';
-import { IconButton, Paginator } from 'jezvejs-test';
+import { Button, Paginator } from 'jezvejs-test';
 import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
@@ -60,9 +60,9 @@ export class ImportRulesDialog extends TestComponent {
             assert(res.contextMenu.itemId, 'Invalid item');
 
             const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
-            res.updateBtn = await IconButton.create(this, updateBtnElem);
+            res.updateBtn = await Button.create(this, updateBtnElem);
             const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');
-            res.deleteBtn = await IconButton.create(this, deleteBtnElem);
+            res.deleteBtn = await Button.create(this, deleteBtnElem);
         }
 
         res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');

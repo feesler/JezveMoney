@@ -30,11 +30,11 @@
 .header .heading-actions {
   margin-right: 9px;
 
-  .iconbutton {
-    --iconbtn-title-color: var(--header-color);
-    --iconbtn-icon-color: var(--header-color);
-    --iconbtn-hover-title-color: var(--header-color);
-    --iconbtn-hover-icon-color: var(--header-color);
+  .btn {
+    --btn-title-color: var(--header-color);
+    --btn-icon-color: var(--header-color);
+    --btn-hover-title-color: var(--header-color);
+    --btn-hover-icon-color: var(--header-color);
   }
 
   .popup-menu-btn__icon {

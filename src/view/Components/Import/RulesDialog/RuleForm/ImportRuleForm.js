@@ -5,7 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
@@ -62,7 +62,7 @@ export class ImportRuleForm extends Component {
         // Hidden id input
         this.idInput = createElement('input', { props: { type: 'hidden' } });
         // Conditions
-        this.createCondBtn = IconButton.create({
+        this.createCondBtn = Button.create({
             id: 'createCondBtn',
             className: 'create-btn right-align',
             icon: 'plus',
@@ -98,7 +98,7 @@ export class ImportRuleForm extends Component {
         });
 
         // Actions
-        this.createActionBtn = IconButton.create({
+        this.createActionBtn = Button.create({
             id: 'createActionBtn',
             className: 'create-btn right-align',
             icon: 'plus',

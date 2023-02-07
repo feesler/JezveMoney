@@ -37,7 +37,7 @@
                             </div>
                             <div class="profile-block__section">
                                 <span><?= __("PROFILE_DELETE_DESCR") ?></span>
-                                <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="<?= __("PROFILE_DELETE") ?>">
+                                <input id="delProfileBtn" class="btn warning-btn" type="button" value="<?= __("PROFILE_DELETE") ?>">
                             </div>
                         </section>
                     </main>

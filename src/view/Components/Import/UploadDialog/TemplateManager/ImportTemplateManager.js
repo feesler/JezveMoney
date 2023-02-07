@@ -11,7 +11,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Switch } from 'jezvejs/Switch';
 import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
@@ -106,7 +106,7 @@ export class ImportTemplateManager extends Component {
         });
         insertAfter(this.templateSelect.elem, this.tplFieldHeader);
 
-        this.createTplBtn = IconButton.create({
+        this.createTplBtn = Button.create({
             id: 'createTplBtn',
             className: 'create-btn',
             icon: 'plus',

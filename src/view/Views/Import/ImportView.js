@@ -8,7 +8,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
@@ -111,11 +111,11 @@ class ImportView extends View {
         });
         window.app.initAccountsList(this.accountDropDown);
 
-        this.uploadBtn = IconButton.fromElement('uploadBtn', {
+        this.uploadBtn = Button.fromElement('uploadBtn', {
             onClick: () => this.showUploadDialog(),
         });
 
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),

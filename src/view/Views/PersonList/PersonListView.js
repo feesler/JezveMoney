@@ -5,7 +5,7 @@ import {
     isFunction,
     show,
 } from 'jezvejs';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import {
     getSortByDateIcon,
@@ -119,7 +119,7 @@ class PersonListView extends View {
         });
         this.contentContainer.append(this.hiddenTiles.elem);
 
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),

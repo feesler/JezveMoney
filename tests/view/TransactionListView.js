@@ -17,7 +17,7 @@ import {
 import {
     DropDown,
     Paginator,
-    IconButton,
+    Button,
 } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
@@ -74,12 +74,12 @@ export class TransactionListView extends AppView {
 
     async parseContent() {
         const res = {
-            createBtn: await IconButton.create(this, await query('#createBtn')),
-            filtersBtn: await IconButton.create(this, await query('#filtersBtn')),
+            createBtn: await Button.create(this, await query('#createBtn')),
+            filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
             clearFiltersBtn: { elem: await query('#clearFiltersBtn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
-            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
+            listModeBtn: await Button.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('.heading-actions .popup-menu'),
                 menuBtn: await query('.heading-actions .popup-menu-btn'),
@@ -131,7 +131,7 @@ export class TransactionListView extends AppView {
         assert(listContainer, 'List container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
-        res.modeSelector = await IconButton.create(this, await query('.mode-selector'));
+        res.modeSelector = await Button.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
 
@@ -162,7 +162,7 @@ export class TransactionListView extends AppView {
 
         const res = cont;
         await asyncMap(itemIds, async (id) => {
-            res[id] = await IconButton.create(this, await query(`#${id}`));
+            res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
             return res[id];
         });

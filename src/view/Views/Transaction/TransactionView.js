@@ -12,7 +12,7 @@ import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
@@ -254,7 +254,7 @@ class TransactionView extends View {
 
         const deleteBtn = ge('deleteBtn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement(deleteBtn, {
+            this.deleteBtn = Button.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }

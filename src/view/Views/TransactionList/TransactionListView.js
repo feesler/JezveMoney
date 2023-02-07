@@ -9,7 +9,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -105,7 +105,7 @@ class TransactionListView extends View {
         });
 
         // Filters
-        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.fromElement(this.filtersBtn, {
             onClick: () => this.filters.toggle(),
         });
         this.filters = FiltersContainer.create({
@@ -198,7 +198,7 @@ class TransactionListView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = IconButton.create({
+        this.modeSelector = Button.create({
             type: 'link',
             className: 'mode-selector',
             onClick: (e) => this.onToggleMode(e),
@@ -235,7 +235,7 @@ class TransactionListView extends View {
         listFooter.append(this.paginator.elem);
 
         // 'Done' button
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),

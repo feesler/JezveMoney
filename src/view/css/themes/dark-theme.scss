@@ -171,8 +171,8 @@
 
   /* Filters */
   .filters-btn {
-    --iconbtn-background: var(--btn-bg);
-    --iconbtn-hover-background: var(--btn-hover-bg);
+    --btn-background: var(--btn-bg);
+    --btn-hover-background: var(--btn-hover-bg);
   }
 
   .filters-offcanvas {
@@ -271,8 +271,8 @@
     }
 
     .toggle-btn {
-      --iconbtn-icon-color: var(--list-item-icon-fill);
-      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
     }
   }
 
@@ -310,8 +310,8 @@
     }
 
     .toggle-btn {
-      --iconbtn-icon-color: var(--list-item-icon-fill);
-      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
     }
   }
 
@@ -342,8 +342,8 @@
     }
 
     .toggle-btn {
-      --iconbtn-icon-color: var(--list-item-icon-fill);
-      --iconbtn-hover-icon-color: var(--list-item-hover-icon-fill);
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
     }
   }
 

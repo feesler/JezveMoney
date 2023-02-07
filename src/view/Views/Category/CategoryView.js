@@ -7,7 +7,7 @@ import {
     setEvents,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -74,7 +74,7 @@ class CategoryView extends View {
         // Update mode
         const deleteBtn = ge('deleteBtn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement('deleteBtn', {
+            this.deleteBtn = Button.fromElement('deleteBtn', {
                 onClick: () => this.confirmDelete(),
             });
         }

@@ -9,7 +9,7 @@ import {
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -125,7 +125,7 @@ class StatisticsView extends View {
         });
 
         // Filters
-        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.fromElement(this.filtersBtn, {
             onClick: () => this.filters.toggle(),
         });
         this.filters = FiltersContainer.create({
