@@ -282,13 +282,13 @@ class Transactions extends ListViewController
             "hidden" => (!$trAvailable || $tr["type"] != DEBT),
             "inputId" => "personIdInp",
             "inputValue" => $data["person_id"],
-            "title" => "Person",
+            "title" => __("TR_PERSON"),
             "tile" => $data["personTile"],
             "infoItems" => [],
         ];
 
         if ($noAccount) {
-            $debtAccountLabel = "No account";
+            $debtAccountLabel = __("TR_NO_ACCOUNT");
         } else {
             $debtAccountLabel = ($debtType) ? __("TR_DEST_ACCOUNT") : __("TR_SRC_ACCOUNT");
         }
