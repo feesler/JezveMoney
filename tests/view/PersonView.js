@@ -5,7 +5,7 @@ import {
     navigation,
     click,
 } from 'jezve-test';
-import { IconButton } from 'jezvejs-test';
+import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
@@ -30,7 +30,7 @@ export class PersonView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
-        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
+        res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.name = await InputRow.create(this, await query(res.formElem, 'div.view-row'));
         assert(res.name, 'Person name input not found');

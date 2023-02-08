@@ -8,6 +8,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
+import { __ } from '../../../../js/utils.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -117,7 +118,7 @@ export class ImportActionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_BLOCK_CLASS}`, [
+        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_BLOCK_CLASS], [
             this.fieldsContainer,
             this.validFeedback,
         ]);
@@ -192,6 +193,7 @@ export class ImportActionForm extends Component {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -202,6 +204,7 @@ export class ImportActionForm extends Component {
         this.personDropDown = DropDown.create({
             className: PERSON_FIELD_CLASS,
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
         window.app.initPersonsList(this.personDropDown);
@@ -212,6 +215,7 @@ export class ImportActionForm extends Component {
         this.categorySelect = CategorySelect.create({
             className: CATEGORY_FIELD_CLASS,
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
     }

@@ -3,7 +3,6 @@ import {
     assert,
     query,
     queryAll,
-    isVisible,
     copyObject,
     asyncMap,
     evaluate,
@@ -13,6 +12,16 @@ import { App } from '../../../Application.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 
 export class ImportList extends TestComponent {
+    static render(transactions, state) {
+        assert.isArray(transactions, 'Invalid data');
+
+        return {
+            items: transactions.map((item) => (
+                ImportTransactionItem.render(item, state)
+            )),
+        };
+    }
+
     static async getListMode(elem) {
         if (!elem) {
             return null;
@@ -45,21 +54,14 @@ export class ImportList extends TestComponent {
             items: [],
         };
 
-        const listItems = await queryAll(this.elem, '.import-item');
-        if (listItems) {
-            res.items = await asyncMap(
-                listItems,
-                (item) => ImportTransactionItem.create(this.parent, item, this.mainAccount),
-            );
+        res.items = await asyncMap(
+            await queryAll(this.elem, '.import-item'),
+            (item) => ImportTransactionItem.create(this.parent, item, this.mainAccount),
+        );
 
-            res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
-            res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
-        } else {
-            const noDataMsg = await query(this.elem, '.nodata-message');
-            const visible = await isVisible(noDataMsg);
-            assert(visible, 'No data message is not visible');
-        }
-
+        res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
+        res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
+        res.noDataMsg = { elem: await query(this.elem, '.nodata-message') };
         res.loadingIndicator = { elem: await query(this.elem, '.loading-indicator') };
 
         return res;
@@ -75,6 +77,10 @@ export class ImportList extends TestComponent {
 
     get showMoreBtn() {
         return this.content.showMoreBtn;
+    }
+
+    get noDataMsg() {
+        return this.content.noDataMsg;
     }
 
     get paginator() {
@@ -144,25 +150,5 @@ export class ImportList extends TestComponent {
 
     getEnabledItems() {
         return this.content.items.filter((item) => item.model.enabled);
-    }
-
-    getExpectedState() {
-        const res = {
-            items: this.content.items.map((item) => (
-                ImportTransactionItem.getExpectedState(item.model)
-            )),
-        };
-
-        return res;
-    }
-
-    static render(transactions, state) {
-        assert.isArray(transactions, 'Invalid data');
-
-        return {
-            items: transactions.map((item) => (
-                ImportTransactionItem.render(item, state)
-            )),
-        };
     }
 }

@@ -93,7 +93,7 @@
         </div>
         <div id="convertFeedback" class="feedback" hidden></div>
         <div id="uploadControls" class="form-controls" hidden>
-            <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="<?= __("SUBMIT") ?>">
+            <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="<?= __("IMPORT_CONVERT_DONE") ?>">
         </div>
     </section>
 </div>

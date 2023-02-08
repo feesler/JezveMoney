@@ -47,7 +47,7 @@ export class ProfileView extends AppView {
         };
 
         if (res.changeNamePopup.elem) {
-            res.changeNamePopup.okBtn = await query(res.changeNamePopup.elem, '.popup__controls > input.btn.submit-btn');
+            res.changeNamePopup.okBtn = await query(res.changeNamePopup.elem, '.form-controls > input.btn.submit-btn');
             res.changeNamePopup.closeBtn = await query(res.changeNamePopup.elem, '.close-btn');
         }
 
@@ -61,7 +61,7 @@ export class ProfileView extends AppView {
         if (res.changePassPopup.elem) {
             res.changePassPopup.okBtn = await query(
                 res.changePassPopup.elem,
-                '.popup__controls > input.btn.submit-btn',
+                '.form-controls > input.btn.submit-btn',
             );
             res.changePassPopup.closeBtn = await query(res.changePassPopup.elem, '.close-btn');
         }
@@ -81,7 +81,7 @@ export class ProfileView extends AppView {
         if (res.resetDataPopup.elem) {
             res.resetDataPopup.okBtn = await query(
                 res.resetDataPopup.elem,
-                '.popup__controls > input.btn.submit-btn',
+                '.form-controls .submit-btn',
             );
             res.resetDataPopup.closeBtn = await query(res.resetDataPopup.elem, '.close-btn');
         }
@@ -105,7 +105,7 @@ export class ProfileView extends AppView {
 
         if (validInput) {
             if (nameChanged) {
-                await this.performAction(() => wait('.popup.msg', { visible: true }));
+                await this.performAction(() => wait('.popup.notification', { visible: true }));
             }
         } else {
             await this.performAction(() => click(this.content.changeNamePopup.closeBtn));
@@ -131,7 +131,7 @@ export class ProfileView extends AppView {
         await this.performAction(() => click(this.content.changePassPopup.okBtn));
 
         if (validInput) {
-            await this.performAction(() => wait('.popup.msg', { visible: true }));
+            await this.performAction(() => wait('.popup.notification', { visible: true }));
         } else {
             await this.performAction(() => click(this.content.changePassPopup.closeBtn));
         }
@@ -183,7 +183,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(async () => {
             await click(this.content.resetDataPopup.okBtn);
-            await wait('.popup.msg', { visible: true });
+            await wait('.popup.notification', { visible: true });
         });
     }
 

@@ -36,6 +36,7 @@ export class SetCategoryDialog extends Component {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (category) => this.onChangeCategory(category),
         });
         this.categoryField = Field.create({

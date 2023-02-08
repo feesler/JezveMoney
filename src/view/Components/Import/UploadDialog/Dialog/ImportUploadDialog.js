@@ -85,10 +85,8 @@ export class ImportUploadDialog extends Component {
             id: 'fileupload_popup',
             title: __('IMPORT_UPLOAD'),
             content: this.elem,
+            closeButton: true,
             onClose: () => this.onClose(),
-            btn: {
-                closeBtn: true,
-            },
             className: UPLOAD_POPUP_CLASS,
         });
         show(this.elem, true);
@@ -224,7 +222,7 @@ export class ImportUploadDialog extends Component {
         try {
             this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.state.importedItems = null;
         }
 
@@ -244,7 +242,7 @@ export class ImportUploadDialog extends Component {
     /** Upload error handler */
     onUploadError(message) {
         this.setLoading(false);
-        window.app.createMessage(message, 'msg_error');
+        window.app.createErrorNotification(message);
     }
 
     /**

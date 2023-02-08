@@ -47,10 +47,6 @@
     cursor: pointer;
   }
 
-  .toggle-icon {
-    height: 18px;
-  }
-
   .collapsible-content {
     display: flex;
     flex-flow: column nowrap;
@@ -113,7 +109,7 @@
   flex-flow: row nowrap;
 }
 
-.rule-item.collapsible__expanded .toggle-icon {
+.rule-item.collapsible__expanded .toggle-btn .btn__icon {
   transform: rotate(180deg);
 }
 

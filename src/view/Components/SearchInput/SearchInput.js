@@ -1,5 +1,6 @@
 import {
     createElement,
+    getClassName,
     re,
     isFunction,
     Component,
@@ -15,7 +16,7 @@ const INNER_BTN_CLASS = 'input-group__inner-btn';
 const INNER_BTN_ICON_CLASS = 'input-group__inner-btn__icon';
 const CLEAR_BTN_CLASS = 'clear-btn';
 const SEARCH_BTN_CLASS = 'search-btn';
-const SEARCH_ICON_CLASS = 'icon search-icon';
+const SEARCH_ICON_CLASS = 'search-icon';
 
 const defaultProps = {
     id: undefined,
@@ -77,7 +78,7 @@ export class SearchInput extends Component {
         });
         this.clearBtn = createElement('button', {
             props: {
-                className: [INNER_BTN_CLASS, CLEAR_BTN_CLASS].join(' '),
+                className: getClassName(INNER_BTN_CLASS, CLEAR_BTN_CLASS),
                 type: 'button',
             },
             children: clearIcon.elem,
@@ -86,11 +87,11 @@ export class SearchInput extends Component {
 
         const searchIcon = Icon.create({
             icon: 'search',
-            className: SEARCH_ICON_CLASS,
+            className: getClassName(INNER_BTN_ICON_CLASS, SEARCH_ICON_CLASS),
         });
         this.searchBtn = createElement('button', {
             props: {
-                className: [INNER_BTN_CLASS, SEARCH_BTN_CLASS].join(' '),
+                className: getClassName(INNER_BTN_CLASS, SEARCH_BTN_CLASS),
                 type: 'button',
                 tabIndex: -1,
             },

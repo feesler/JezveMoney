@@ -18,7 +18,7 @@ import {
 import {
     Checkbox,
     DropDown,
-    IconButton,
+    Button,
     Switch,
 } from 'jezvejs-test';
 import { App } from '../../../Application.js';
@@ -100,11 +100,11 @@ export class ImportUploadDialog extends TestComponent {
         // Template select context menu
         res.tplContextMenu = { elem: await query(this.elem, '.popup-menu-list') };
         if (res.tplContextMenu.elem) {
-            res.updateTplBtn = await IconButton.create(
+            res.updateTplBtn = await Button.create(
                 this,
                 await query(res.tplContextMenu.elem, '.update-btn'),
             );
-            res.deleteTplBtn = await IconButton.create(
+            res.deleteTplBtn = await Button.create(
                 this,
                 await query(res.tplContextMenu.elem, '.delete-btn'),
             );

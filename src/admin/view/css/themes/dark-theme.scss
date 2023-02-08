@@ -62,14 +62,9 @@
   }
 
   /* Popup */
-  .popup__content .popup__content-box {
-    color: #dddddd;
-    background-color: #303030;
-  }
-
-  .popup__title,
-  .popup__message {
-    color: #dddddd;
+  .popup {
+    --popup-text: var(--main-text-color);
+    --popup-bg: #303030;
   }
 
   /* API tests */

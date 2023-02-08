@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    query,
     queryAll,
     assert,
     asyncMap,
@@ -32,6 +33,7 @@ export class TilesList extends TestComponent {
 
         const listItems = await queryAll(this.elem, '.tile');
         res.items = await asyncMap(listItems, (item) => Tile.create(this.parent, item));
+        res.noDataMsg = { elem: await query(this.elem, '.nodata-message') };
 
         return res;
     }
@@ -78,7 +80,9 @@ export class TilesList extends TestComponent {
         const visibleAccounts = accountsList.getVisible();
         visibleAccounts.sortBy(sortMode);
         return {
+            visible: true,
             items: visibleAccounts.map(Tile.renderAccount),
+            noDataMsg: { visible: visibleAccounts.length === 0 },
         };
     }
 
@@ -88,6 +92,7 @@ export class TilesList extends TestComponent {
         const hiddenAccounts = accountsList.getHidden();
         hiddenAccounts.sortBy(sortMode);
         return {
+            visible: hiddenAccounts.length > 0,
             items: hiddenAccounts.map(Tile.renderAccount),
         };
     }
@@ -98,7 +103,9 @@ export class TilesList extends TestComponent {
         const visiblePersons = personsList.getVisible();
         visiblePersons.sortBy(sortMode);
         return {
+            visible: true,
             items: visiblePersons.map((p) => Tile.renderPerson(p, withDebts)),
+            noDataMsg: { visible: visiblePersons.length === 0 },
         };
     }
 
@@ -108,6 +115,7 @@ export class TilesList extends TestComponent {
         const hiddenPersons = personsList.getHidden();
         hiddenPersons.sortBy(sortMode);
         return {
+            visible: hiddenPersons.length > 0,
             items: hiddenPersons.map((p) => Tile.renderPerson(p, withDebts)),
         };
     }

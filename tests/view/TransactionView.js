@@ -10,7 +10,7 @@ import {
     copyObject,
     formatDate,
 } from 'jezve-test';
-import { DropDown, IconButton } from 'jezvejs-test';
+import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -30,7 +30,6 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerRow } from './component/DatePickerRow.js';
 import { TileInfoItem } from './component/Tiles/TileInfoItem.js';
 import { TileBlock } from './component/Tiles/TileBlock.js';
-import { Button } from './component/Button.js';
 import {
     EXPENSE,
     INCOME,
@@ -78,7 +77,7 @@ export class TransactionView extends AppView {
             res.heading.title = await prop(res.heading.elem, 'textContent');
         }
 
-        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
+        res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
@@ -101,8 +100,8 @@ export class TransactionView extends AppView {
         const debtAccountInp = await query('#debtAccountInp');
         res.debtAccountContainer.content.id = parseInt(await prop(debtAccountInp, 'value'), 10);
 
-        res.selaccount = await Button.create(this, await query(accountBlock, '.account-toggler'));
-        assert(res.selaccount, 'Select account button not found');
+        res.selaccount = { elem: await query(accountBlock, '.account-toggler .btn') };
+        assert(res.selaccount.elem, 'Select account button not found');
 
         res.swapBtn = { elem: await query('#swapBtn') };
         assert(res.swapBtn.elem, 'Swap button not found');
@@ -336,7 +335,7 @@ export class TransactionView extends AppView {
             const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
             res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
 
-            const isSelectAccountVisible = cont.selaccount?.content?.visible;
+            const isSelectAccountVisible = cont.selaccount.visible;
             res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
             res.account = appState.accounts.getItem(cont.debtAccountContainer.content.id);
@@ -2384,7 +2383,7 @@ export class TransactionView extends AppView {
 
         const action = (this.model.noAccount)
             ? () => click(this.content.noacc_btn.elem)
-            : () => this.content.selaccount.click();
+            : () => click(this.content.selaccount.elem);
 
         await this.performAction(action);
 

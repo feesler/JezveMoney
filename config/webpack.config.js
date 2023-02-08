@@ -1,12 +1,13 @@
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+
+const filename = fileURLToPath(import.meta.url);
+const currentDir = dirname(filename);
 
 export default {
     target: 'browserslist',
-    context: resolve(__dirname, '..'),
+    context: resolve(currentDir, '..'),
     entry: {
         polyfills: {
             import: './src/view/js/polyfill/index.js',
@@ -127,16 +128,18 @@ export default {
     },
     output: {
         filename: '[name].js',
-        path: resolve(__dirname, '../dist'),
+        path: resolve(currentDir, '../dist'),
         clean: {
             keep: 'vendor',
         },
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: ({ chunk }) => chunk.filenameTemplate
-                .replace("/js/", "/css/")
-                .replace(".js", ".css")
+            filename: ({ chunk }) => (
+                chunk.filenameTemplate
+                    .replace('/js/', '/css/')
+                    .replace('.js', '.css')
+            ),
         }),
     ],
     module: {
@@ -144,8 +147,8 @@ export default {
             {
                 test: /\.m?js$/,
                 include: [
-                    resolve(__dirname, '../src'),
-                    resolve(__dirname, '../node_modules/jezvejs'),
+                    resolve(currentDir, '../src'),
+                    resolve(currentDir, '../node_modules/jezvejs'),
                 ],
                 exclude: /node_modules\/(?!(jezvejs)\/).*/,
                 use: [
@@ -155,9 +158,9 @@ export default {
                             cacheDirectory: true,
                             babelrc: false,
                             rootMode: 'upward',
-                        }
+                        },
                     },
-                    'astroturf/loader'
+                    'astroturf/loader',
                 ],
             },
             {
@@ -174,7 +177,7 @@ export default {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
             },
-        ]
+        ],
     },
     cache: {
         type: 'filesystem',

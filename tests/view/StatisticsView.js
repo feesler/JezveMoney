@@ -9,7 +9,7 @@ import {
     waitForFunction,
     isObject,
 } from 'jezve-test';
-import { DropDown, LinkMenu, IconButton } from 'jezvejs-test';
+import { DropDown, LinkMenu, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
@@ -29,7 +29,7 @@ export class StatisticsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
-            filtersBtn: await IconButton.create(this, await query('#filtersBtn')),
+            filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             typeMenu: await TransactionTypeMenu.create(this, await query('.trtype-menu')),

@@ -10,8 +10,8 @@ export class SetCategoryDialog extends TestComponent {
     async parseContent() {
         const res = {
             titleElem: await query(this.elem, '.popup__title'),
-            submitBtn: { elem: await query(this.elem, '.popup__controls .btn.submit-btn') },
-            cancelBtn: { elem: await query(this.elem, '.popup__controls .btn.cancel-btn') },
+            submitBtn: { elem: await query(this.elem, '.popup__footer .submit-btn') },
+            cancelBtn: { elem: await query(this.elem, '.popup__footer .cancel-btn') },
             categorySelect: await DropDown.create(this, await query(this.elem, '.dd__container')),
         };
 

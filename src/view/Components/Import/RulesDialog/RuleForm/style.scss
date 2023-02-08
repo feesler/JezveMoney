@@ -53,10 +53,6 @@
     }
   }
 
-  .toggle-icon {
-    height: 18px;
-  }
-
   /* Conditions/Actions list container */
   .collapsible-content {
     display: block;
@@ -75,7 +71,7 @@
   }
 
   &.collapsible__expanded {
-    .toggle-icon {
+    .toggle-btn .btn__icon {
       transform: rotate(180deg);
     }
 

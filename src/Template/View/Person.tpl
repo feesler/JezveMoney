@@ -1,6 +1,6 @@
 <?php
 
-use JezveMoney\App\Template\Component\IconButton;
+use JezveMoney\App\Template\Component\Button;
 
 include(TPL_PATH . "Header.tpl");    ?>
 
@@ -14,9 +14,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <h1><?= e($headString) ?></h1>
                         <?php if ($this->action == "update") {        ?>
                             <div class="heading-actions">
-                                <?= IconButton::render([
+                                <?= Button::render([
                                     "id" => "deleteBtn",
-                                    "classNames" => "warning-iconbutton",
+                                    "classNames" => "warning-btn",
                                     "title" => __("DELETE"),
                                     "icon" => "del",
                                 ]) ?>

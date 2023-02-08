@@ -9,7 +9,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -76,8 +76,9 @@ class TransactionListView extends View {
         this.loadElementsByIds([
             'heading',
             'createBtn',
-            // Filters
             'filtersBtn',
+            'contentHeader',
+            // Filters
             'filtersContainer',
             'applyFiltersBtn',
             'clearFiltersBtn',
@@ -104,13 +105,13 @@ class TransactionListView extends View {
         });
 
         // Filters
-        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.fromElement(this.filtersBtn, {
             onClick: () => this.filters.toggle(),
         });
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
-        insertAfter(this.filters.elem, this.filtersBtn.elem);
+        this.contentHeader.prepend(this.filters.elem);
 
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
         setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });
@@ -131,7 +132,7 @@ class TransactionListView extends View {
                 elem: 'acc_id',
                 placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
-                noResultsMessage: 'Nothing found',
+                noResultsMessage: __('NOT_FOUND'),
                 onItemSelect: (obj) => this.onAccountChange(obj),
                 onChange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
@@ -197,7 +198,7 @@ class TransactionListView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = IconButton.create({
+        this.modeSelector = Button.create({
             type: 'link',
             className: 'mode-selector',
             onClick: (e) => this.onToggleMode(e),
@@ -234,7 +235,7 @@ class TransactionListView extends View {
         listFooter.append(this.paginator.elem);
 
         // 'Done' button
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),
@@ -440,7 +441,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_TRANS_CHANGE_POS'), 'msg_error');
+        window.app.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
     }
 
     /** Returns URL for filter of specified state */
@@ -566,7 +567,7 @@ class TransactionListView extends View {
             await API.transaction.del({ id: ids });
             this.requestTransactions(state.form);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -609,7 +610,7 @@ class TransactionListView extends View {
             await API.transaction.setCategory({ id: ids, category_id: categoryId });
             this.requestTransactions(state.form);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -696,7 +697,7 @@ class TransactionListView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createMessage(e.message, 'msg_error');
+                window.app.createErrorNotification(e.message);
                 this.store.dispatch(actions.listRequestError());
             }
         }

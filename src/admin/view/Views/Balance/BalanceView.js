@@ -27,6 +27,7 @@ class AdminBalanceView extends View {
         this.accountSelect = DropDown.create({
             elem: 'acc_id',
             placeholder: 'Select account',
+            enableFilter: true,
             onChange: (o) => this.onAccountChange(o),
             className: 'dd_fullwidth',
         });

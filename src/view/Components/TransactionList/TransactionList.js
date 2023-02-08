@@ -21,6 +21,7 @@ const defaultProps = {
     noItemsMessage: __('TRANSACTIONS_NO_DATA'),
     mode: 'classic',
     showControls: true,
+    ascending: false,
     onSort: null,
 };
 

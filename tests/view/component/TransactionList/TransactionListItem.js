@@ -18,39 +18,38 @@ import { App } from '../../../Application.js';
 
 export class TransactionListItem extends TestComponent {
     async parseContent() {
-        const commentElem = await query(this.elem, '.trans-item__comment');
-
-        const res = await evaluate((elem, commentEl) => ({
+        const res = await evaluate((elem) => ({
             id: parseInt(elem.dataset.id, 10),
             type: parseInt(elem.dataset.type, 10),
             selected: elem.classList.contains('trans-item_selected'),
             detailsMode: elem.classList.contains('trans-item_details'),
-            comment: (commentEl) ? commentEl.textContent : '',
-        }), this.elem, commentElem);
+        }), this.elem);
 
         if (res.detailsMode) {
             const [
-                srcAccountElem,
-                destAccountElem,
+                srcAccElem,
+                destAccElem,
             ] = await queryAll(this.elem, '.trans-item__account-field .field__content');
             const [
                 srcAmountElem,
                 destAmountElem,
             ] = await queryAll(this.elem, '.trans-item__amount-field .field__content');
             const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
+            const commentElem = await query(this.elem, '.trans-item__comment-field .field__content');
 
-            const sourceVisible = await isVisible(srcAccountElem, true);
-            const destVisible = await isVisible(destAccountElem, true);
+            const sourceVisible = await isVisible(srcAccElem, true);
+            const destVisible = await isVisible(destAccElem, true);
             const srcAmountVisible = await isVisible(srcAmountElem, true);
             const destAmountVisible = await isVisible(destAmountElem, true);
 
-            const props = await evaluate((sAccount, dAccount, sAmount, dAmount, dateEl) => ({
-                sourceContent: sAccount.textContent,
-                destContent: dAccount.textContent,
+            const props = await evaluate((sAcc, dAcc, sAmount, dAmount, dateEl, commentEl) => ({
+                sourceContent: sAcc.textContent,
+                destContent: dAcc.textContent,
                 srcAmount: sAmount.textContent,
                 destAmount: dAmount.textContent,
                 dateFmt: dateEl.textContent,
-            }), srcAccountElem, destAccountElem, srcAmountElem, destAmountElem, dateElem);
+                comment: (commentEl) ? commentEl.textContent : '',
+            }), srcAccElem, destAccElem, srcAmountElem, destAmountElem, dateElem, commentElem);
 
             if (sourceVisible && destVisible) {
                 res.accountTitle = `${props.sourceContent} → ${props.destContent}`;
@@ -58,15 +57,11 @@ export class TransactionListItem extends TestComponent {
                 res.accountTitle = (sourceVisible) ? props.sourceContent : props.destContent;
             }
 
-            let sign;
+            let sign = '';
             if (res.type === EXPENSE) {
                 sign = '- ';
-            }
-            if (res.type === INCOME) {
+            } else if (res.type === INCOME) {
                 sign = '+ ';
-            }
-            if (res.type === TRANSFER || res.type === DEBT) {
-                sign = '';
             }
 
             if (srcAmountVisible && destAmountVisible) {
@@ -76,18 +71,21 @@ export class TransactionListItem extends TestComponent {
             }
 
             res.dateFmt = props.dateFmt;
+            res.comment = props.comment;
         } else {
             const titleElem = await query(this.elem, '.trans-item__title');
             assert(titleElem, 'Account title not found');
             const amountElem = await query(this.elem, '.trans-item__amount');
             assert(amountElem, 'Amount text not found');
             const dateElem = await query(this.elem, '.trans-item__date');
+            const commentElem = await query(this.elem, '.trans-item__comment');
 
-            const props = await evaluate((titleEl, amountEl, dateEl) => ({
+            const props = await evaluate((titleEl, amountEl, dateEl, commentEl) => ({
                 accountTitle: titleEl.textContent,
                 amountText: amountEl.textContent,
                 dateFmt: dateEl.textContent,
-            }), titleElem, amountElem, dateElem);
+                comment: (commentEl) ? commentEl.textContent : '',
+            }), titleElem, amountElem, dateElem, commentElem);
             Object.assign(res, props);
         }
 

@@ -12,7 +12,7 @@ import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
@@ -254,7 +254,7 @@ class TransactionView extends View {
 
         const deleteBtn = ge('deleteBtn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement(deleteBtn, {
+            this.deleteBtn = Button.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }
@@ -351,6 +351,7 @@ class TransactionView extends View {
             elem: this.categorySelect,
             className: 'dd_fullwidth',
             enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 
@@ -396,6 +397,8 @@ class TransactionView extends View {
         this.srcDDList = DropDown.create({
             elem: this.sourceTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onSrcAccountSelect(item),
         });
 
@@ -416,6 +419,8 @@ class TransactionView extends View {
         this.destDDList = DropDown.create({
             elem: this.destTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDestAccountSelect(item),
         });
 
@@ -435,6 +440,8 @@ class TransactionView extends View {
         this.persDDList = DropDown.create({
             elem: this.personTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onPersonSelect(item),
         });
 
@@ -450,6 +457,8 @@ class TransactionView extends View {
         this.accDDList = DropDown.create({
             elem: this.debtAccountTile.elem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDebtAccountSelect(item),
         });
 
@@ -855,7 +864,7 @@ class TransactionView extends View {
             window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -873,7 +882,7 @@ class TransactionView extends View {
             window.app.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 

@@ -1,10 +1,11 @@
-import { createElement, Component } from 'jezvejs';
+import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'orig-data';
 const TABLE_CLASS = 'orig-data-table';
+const GROUP_CLASS = 'column-group';
 const COLUMN_CLASS = 'column';
 const COLUMN_HEADER_CLASS = 'column__header';
 const COLUMN_DATA_CLASS = 'column__data';
@@ -36,14 +37,8 @@ export class OriginalImportData extends Component {
     }
 
     renderColumn(title, value, className = null) {
-        const elemClasses = [COLUMN_CLASS];
-
-        if (typeof className === 'string' && className.length > 0) {
-            elemClasses.push(className);
-        }
-
         return createElement('div', {
-            props: { className: elemClasses.join(' ') },
+            props: { className: getClassName(COLUMN_CLASS, className) },
             children: [
                 createElement('label', {
                     props: { className: COLUMN_HEADER_CLASS, textContent: title },
@@ -60,21 +55,36 @@ export class OriginalImportData extends Component {
         const templateName = (template) ? template.name : '';
 
         const dataTable = [
-            [__('IMPORT_MAIN_ACCOUNT'), this.props.origAccount.name],
-            [__('TEMPLATE'), templateName],
-            [__('COLUMN_DATE'), window.app.formatDate(new Date(this.props.date))],
-            [__('COLUMN_TR_AMOUNT'), this.props.transactionAmount],
-            [__('COLUMN_TR_CURRENCY'), this.props.transactionCurrency],
-            [__('COLUMN_ACCOUNT_AMOUNT'), this.props.accountAmount],
-            [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
-            [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],
+            [
+                [__('IMPORT_MAIN_ACCOUNT'), this.props.origAccount.name],
+                [__('TEMPLATE'), templateName],
+            ],
+            [
+                [__('COLUMN_TR_AMOUNT'), this.props.transactionAmount],
+                [__('COLUMN_TR_CURRENCY'), this.props.transactionCurrency],
+            ],
+            [
+                [__('COLUMN_ACCOUNT_AMOUNT'), this.props.accountAmount],
+                [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
+            ],
+            [
+                [__('COLUMN_DATE'), window.app.formatDate(new Date(this.props.date))],
+            ],
+            [
+                [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],
+            ],
         ];
 
-        this.elem = window.app.createContainer(CONTAINER_CLASS, [
-            createElement('h3', { props: { textContent: __('IMPORT_ORIG_DATA') } }),
-            window.app.createContainer(
+        const { createContainer } = window.app;
+
+        this.elem = createContainer(CONTAINER_CLASS, [
+            createElement('header', { props: { textContent: __('IMPORT_ORIG_DATA') } }),
+            createContainer(
                 TABLE_CLASS,
-                dataTable.map((col) => this.renderColumn(...col)),
+                dataTable.map((group) => createContainer(
+                    GROUP_CLASS,
+                    group.map((col) => this.renderColumn(...col)),
+                )),
             ),
         ]);
     }

@@ -13,7 +13,7 @@ import {
     evaluate,
     formatDate,
 } from 'jezve-test';
-import { DropDown, Checkbox, IconButton } from 'jezvejs-test';
+import { DropDown, Checkbox, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
@@ -71,7 +71,7 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
+            uploadBtn: await Button.create(this, await query('#uploadBtn')),
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             enabledCounter: await Counter.create(this, await query('#enabledCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
@@ -94,7 +94,7 @@ export class ImportView extends AppView {
             uploadBtn.disabled,
         ]), res.submitBtn.elem, res.uploadBtn.elem);
 
-        res.listModeBtn = await IconButton.create(this, await query('#listModeBtn'));
+        res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
 
         // List menu
         res.listMenuContainer = {
@@ -161,7 +161,7 @@ export class ImportView extends AppView {
 
         const res = cont;
         await asyncMap(itemIds, async (id) => {
-            res[id] = await IconButton.create(this, await query(`#${id}`));
+            res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
             return res[id];
         });
@@ -279,6 +279,7 @@ export class ImportView extends AppView {
         };
         res.itemsList = {
             visible: true,
+            noDataMsg: { visible: !hasItems },
             showMoreBtn: { visible: hasItems && pageNum < model.pagination.pages },
             paginator: { visible: hasItems && model.pagination.pages > 1 },
         };
@@ -850,9 +851,13 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.waitForList(
-            () => this.content.mainAccountSelect.selectItem(val),
-        );
+        const action = () => this.content.mainAccountSelect.selectItem(val);
+
+        if (this.items.length > 0) {
+            await this.waitForList(action);
+        } else {
+            await this.performAction(action);
+        }
 
         return this.checkState();
     }
@@ -1007,12 +1012,6 @@ export class ImportView extends AppView {
         await this.performAction(() => ruleForm.runOnAction(index, action));
 
         return true;
-    }
-
-    isValidRule() {
-        this.checkRulesFormState();
-
-        return this.rulesDialog.isValidRule();
     }
 
     async submitRule() {
@@ -1533,40 +1532,51 @@ export class ImportView extends AppView {
             return true;
         }
 
-        enabledItems.forEach((item) => {
+        const expState = App.state.clone();
+        await expState.fetch();
+        const origState = expState.clone();
+
+        const resExpected = enabledItems.every((item) => {
             const expectedTransaction = item.getExpectedTransaction();
-            const createRes = App.state.createTransaction(expectedTransaction);
-            assert(createRes, 'Failed to create transaction');
+            return expState.createTransaction(expectedTransaction);
         });
+
+        if (!resExpected) {
+            expState.setState(origState);
+        }
 
         await this.performAction(() => click(this.content.submitBtn.elem));
 
         await waitForFunction(async () => {
             await this.parse();
 
-            const notification = this.content.msgPopup?.content?.visible;
-            if (notification && !this.model.submitInProgress) {
-                return true;
-            }
-
-            return false;
+            const notificationVisible = this.content.notification?.content?.visible;
+            return (notificationVisible && !this.model.submitInProgress);
         });
 
-        this.items = [];
-        this.formIndex = -1;
-        this.originalItemData = null;
+        if (resExpected) {
+            this.items = [];
+            this.formIndex = -1;
+            this.originalItemData = null;
+        }
+
         const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
 
-        expected.msgPopup = {
-            success: true,
-            message: __('MSG_IMPORT_SUCCESS', this.locale),
+        expected.notification = {
+            success: resExpected,
         };
+        if (resExpected) {
+            expected.notification.message = __('MSG_IMPORT_SUCCESS', this.locale);
+        }
 
-        await this.checkState(expected);
+        this.checkState(expected);
+
         await this.closeNotification();
-        return true;
+
+        App.state.setState(expState);
+        return App.state.fetchAndTest();
     }
 
     isFirstPage() {

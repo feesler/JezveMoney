@@ -130,7 +130,7 @@ export class ImportConditionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_CLASS}`, [
+        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_CLASS], [
             this.fields,
             this.fieldValueCheck.elem,
             this.validFeedback,
@@ -203,6 +203,8 @@ export class ImportConditionForm extends Component {
     createAccountField() {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -216,6 +218,8 @@ export class ImportConditionForm extends Component {
 
         this.templateDropDown = DropDown.create({
             className: TEMPLATE_FIELD_CLASS,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
         this.templateDropDown.append(templateItems);

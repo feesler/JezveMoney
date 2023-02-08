@@ -333,7 +333,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, AccountListView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: __('ERR_ACCOUNT_UPDATE', App.view.locale) },
+            notification: { success: false, message: __('ERR_ACCOUNT_UPDATE', App.view.locale) },
         };
         App.view.checkState();
         await App.view.closeNotification();

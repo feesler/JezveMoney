@@ -63,30 +63,21 @@ class Message
     {
         sessionStart();
 
-        if (!isset($_SESSION["msg"]) || is_null($_SESSION["msg"])) {
-            return null;
-        }
-
-        $msgType = intval($_SESSION["msgType"]);
-        if ($msgType == MSG_TYPE_NONE) {
-            $_SESSION["msg"] = null;
-            return null;
-        }
-
-        $msgMessage = $_SESSION["msg"];
-
-        $msgClass = "";
-        if ($msgType == MSG_TYPE_SUCCESS) {
-            $msgClass = "msg_success";
-        } elseif ($msgType == MSG_TYPE_ERROR) {
-            $msgClass = "msg_error";
-        }
+        $msgType = isset($_SESSION["msgType"]) ? intval($_SESSION["msgType"]) : MSG_TYPE_NONE;
+        $message = $_SESSION["msg"] ?? null;
 
         $_SESSION["msg"] = null;
 
+        if (
+            ($msgType !== MSG_TYPE_SUCCESS && $msgType !== MSG_TYPE_ERROR)
+            || is_empty($message)
+        ) {
+            return null;
+        }
+
         $res = [
-            "title" => $msgMessage,
-            "type" => $msgClass,
+            "title" => $message,
+            "type" => ($msgType === MSG_TYPE_SUCCESS) ? "success" : "error",
         ];
 
         return $res;

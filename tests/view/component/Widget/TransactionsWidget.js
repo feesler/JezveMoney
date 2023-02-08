@@ -7,7 +7,7 @@ import {
     asyncMap,
     navigation,
 } from 'jezve-test';
-import { IconButton } from 'jezvejs-test';
+import { Button } from 'jezvejs-test';
 import { Widget } from './Widget.js';
 import { TransactionList } from '../TransactionList/TransactionList.js';
 
@@ -48,7 +48,7 @@ export class TransactionsWidget extends Widget {
 
         const res = cont;
         await asyncMap(itemIds, async (id) => {
-            res[id] = await IconButton.create(this, await query(`#${id}`));
+            res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
             return res[id];
         });

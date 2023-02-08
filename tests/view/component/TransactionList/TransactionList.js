@@ -14,7 +14,7 @@ export class TransactionList extends TestComponent {
     async parseContent() {
         const res = {
             items: [],
-            noDataMessage: await query(this.elem, '.nodata-message'),
+            noDataMessage: { elem: await query(this.elem, '.nodata-message') },
         };
 
         const props = await evaluate((elem) => ({
@@ -86,11 +86,12 @@ export class TransactionList extends TestComponent {
     }
 
     static render(transactions, state) {
-        if (!Array.isArray(transactions)) {
-            return [];
-        }
+        assert.isArray(transactions);
 
-        return transactions.map((item) => TransactionListItem.render(item, state));
+        return {
+            items: transactions.map((item) => TransactionListItem.render(item, state)),
+            noDataMessage: { visible: transactions.length === 0 },
+        };
     }
 
     static renderWidget(transactions, state) {
@@ -98,9 +99,7 @@ export class TransactionList extends TestComponent {
 
         const res = {
             title: __('TRANSACTIONS', App.view.locale),
-            transList: {
-                items: this.render(transactions, state),
-            },
+            transList: this.render(transactions, state),
         };
 
         return res;

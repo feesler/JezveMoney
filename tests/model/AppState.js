@@ -1461,7 +1461,8 @@ export class AppState {
 
         try {
             const rule = new ImportRule(params);
-            return rule.validate();
+            const validation = rule.validate();
+            return !!validation?.valid;
         } catch (e) {
             return false;
         }

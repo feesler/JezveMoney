@@ -454,9 +454,7 @@ export const deleteAllItems = async () => {
 export const submit = async () => {
     await test('Submit items', async () => {
         await checkNavigation();
-        await App.state.fetch();
-        await App.view.submit();
-        return App.state.fetchAndTest();
+        return App.view.submit();
     });
 };
 

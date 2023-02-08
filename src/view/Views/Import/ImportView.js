@@ -8,7 +8,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
@@ -104,16 +104,18 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onMainAccChange(account),
             className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
 
-        this.uploadBtn = IconButton.fromElement('uploadBtn', {
+        this.uploadBtn = Button.fromElement('uploadBtn', {
             onClick: () => this.showUploadDialog(),
         });
 
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),
@@ -665,41 +667,31 @@ class ImportView extends View {
     }
 
     async submitChunk() {
-        const chunk = this.submitQueue.pop();
-        const result = await API.transaction.createMultiple(chunk);
-        this.onSubmitResult(result);
+        try {
+            const chunk = this.submitQueue.pop();
+            await API.transaction.createMultiple(chunk);
+            this.onSubmitResult();
+        } catch (e) {
+            this.submitProgress.hide();
+            window.app.createErrorNotification(e.message);
+        }
     }
 
     /**
-     * Submit response handler
-     * @param {String} response - response text
+     * Successfull submit response handler
      */
-    onSubmitResult(apiResult) {
-        let status = false;
-        let message = __('MSG_IMPORT_FAIL');
+    onSubmitResult() {
+        this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
+        this.renderSubmitProgress();
 
-        try {
-            status = (apiResult && apiResult.result === 'ok');
-            if (status) {
-                this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
-                this.renderSubmitProgress();
-
-                if (this.submitQueue.length === 0) {
-                    message = __('MSG_IMPORT_SUCCESS');
-                    this.removeAllItems();
-                } else {
-                    this.submitChunk();
-                    return;
-                }
-            } else if (apiResult && apiResult.msg) {
-                message = apiResult.msg;
-            }
-        } catch (e) {
-            message = e.message;
+        if (this.submitQueue.length > 0) {
+            this.submitChunk();
+            return;
         }
 
+        this.removeAllItems();
         this.submitProgress.hide();
-        window.app.createMessage(message, (status ? 'msg_success' : 'msg_error'));
+        window.app.createSuccessNotification(__('MSG_IMPORT_SUCCESS'));
     }
 
     /** Apply rules to imported items */

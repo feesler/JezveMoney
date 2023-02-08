@@ -6,7 +6,7 @@ import {
     show,
     urlJoin,
 } from 'jezvejs';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -122,7 +122,7 @@ class AccountListView extends View {
         });
         this.contentContainer.append(this.hiddenTiles.elem);
 
-        this.listModeBtn = IconButton.create({
+        this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
             title: __('DONE'),
@@ -367,7 +367,7 @@ class AccountListView extends View {
             }
             this.requestList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -389,7 +389,7 @@ class AccountListView extends View {
             await API.account.del({ id: ids });
             this.requestList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -405,7 +405,7 @@ class AccountListView extends View {
 
             this.store.dispatch(actions.listRequestLoaded(keepState));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -423,7 +423,7 @@ class AccountListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -450,7 +450,7 @@ class AccountListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createMessage(__('ERR_ACCOUNT_CHANGE_POS'), 'msg_error');
+        window.app.createErrorNotification(__('ERR_ACCOUNT_CHANGE_POS'));
     }
 
     getSortMode() {
@@ -491,7 +491,7 @@ class AccountListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

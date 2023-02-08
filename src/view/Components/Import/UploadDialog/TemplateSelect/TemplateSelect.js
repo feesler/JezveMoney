@@ -72,6 +72,8 @@ export class TemplateSelect extends Component {
         this.templateDropDown = DropDown.create({
             elem: this.contentElem,
             listAttach: true,
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (tpl) => this.onChange(tpl),
         });
     }

@@ -1,6 +1,6 @@
 <?php
 
-use JezveMoney\App\Template\Component\IconButton;
+use JezveMoney\App\Template\Component\Button;
 
 include(TPL_PATH . "Header.tpl");    ?>
 
@@ -13,7 +13,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <header id="heading" class="heading">
                         <h1><?= __("IMPORT") ?></h1>
                         <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
-                            <?= IconButton::render($uploadBtn) ?>
+                            <?= Button::render($uploadBtn) ?>
                         </div>
                     </header>
 

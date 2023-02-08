@@ -4,8 +4,8 @@ import {
     isFunction,
     asArray,
 } from 'jezvejs';
+import { CloseButton } from 'jezvejs/CloseButton';
 import { timeToDate, __ } from '../../js/utils.js';
-import { CloseButton } from '../CloseButton/CloseButton.js';
 import { Field } from '../Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
 import './style.scss';

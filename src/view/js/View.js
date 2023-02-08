@@ -30,7 +30,7 @@ export class View {
 
         const { message } = window.app;
         if (message) {
-            window.app.createMessage(message.title, message.type);
+            window.app.createNotification(message.title, message.type);
         }
     }
 

@@ -35,7 +35,7 @@
 
   /* List item icons */
   --list-item-icon-fill: #a7a7a7;
-  --list-item-hover-icon-fill: #ffffff;
+  --list-item-hover-icon-fill: #808080;
 
   /* Popup menu */
   --popup-menu-bg: #ffffffbb;
@@ -63,17 +63,6 @@
 
   .heading {
     color: var(--main-text-color);
-  }
-
-  .iconbutton {
-    --iconbtn-title-color: var(--main-text-color);
-    --iconbtn-icon-color: var(--main-text-color);
-    --iconbtn-hover-title-color: var(--main-text-color);
-    --iconbtn-hover-icon-color: var(--main-text-color);
-  }
-
-  .icon {
-    fill: var(--main-text-color);
   }
 
   /* No data message for lists & etc. */
@@ -181,8 +170,8 @@
 
   /* Filters */
   .filters-btn {
-    --iconbtn-background: var(--btn-bg);
-    --iconbtn-hover-background: var(--btn-hover-bg);
+    --btn-background: var(--btn-bg);
+    --btn-hover-background: var(--btn-hover-bg);
   }
 
   .filters-offcanvas {
@@ -193,8 +182,7 @@
     color: var(--main-text-color);
   }
 
-  .filter-icon,
-  .toggle-icon {
+  .filter-icon {
     fill: var(--main-text-color);
   }
 
@@ -208,7 +196,6 @@
     background-color: var(--list-item-bg-color);
   }
 
-  .trans-item__balance,
   .trans-item__title {
     color: var(--main-text-color);
   }
@@ -234,17 +221,6 @@
 
   /* Profile view */
   .profile-block {
-    color: var(--main-text-color);
-  }
-
-  /* Popup */
-  .popup__content .popup__content-box {
-    color: var(--main-text-color);
-    background-color: var(--main-bg-color);
-  }
-
-  .popup__title,
-  .popup__message {
     color: var(--main-text-color);
   }
 
@@ -277,24 +253,25 @@
   .import-form {
     --input-disabled-border-color: #eeeeee;
 
-    input[type="text"] {
+    .stretch-input {
       border-color: var(--input-border-color);
     }
 
-    input[disabled] {
+    .stretch-input[disabled] {
       color: var(--input-disabled-text-color);
       -webkit-text-fill-color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
 
-    input[type="text"]:focus {
+    .stretch-input:focus {
       border-color: #888888;
       background-color: #f2f2f2;
     }
 
-    .icon {
-      fill: var(--list-item-icon-fill);
+    .toggle-btn {
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
     }
   }
 
@@ -330,6 +307,11 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+
+    .toggle-btn {
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    }
   }
 
   /* Upload dialog */
@@ -352,9 +334,16 @@
     color: #808080;
   }
 
-  .rule-item .icon,
-  .rule-form .icon {
-    fill: var(--list-item-icon-fill);
+  .rule-item,
+  .rule-form {
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
+
+    .toggle-btn {
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    }
   }
 
   .rule-item__info {
@@ -448,13 +437,6 @@
 
     .swap-btn:hover .swap-icon {
       fill: var(--main-text-color);
-    }
-
-    .import-form,
-    .import-item {
-      .toggle-btn:hover {
-        background-color: #808080;
-      }
     }
 
     .rule-item .collapsible-header:hover,

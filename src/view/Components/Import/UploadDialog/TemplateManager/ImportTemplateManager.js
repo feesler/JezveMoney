@@ -11,7 +11,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { Switch } from 'jezvejs/Switch';
 import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
@@ -106,7 +106,7 @@ export class ImportTemplateManager extends Component {
         });
         insertAfter(this.templateSelect.elem, this.tplFieldHeader);
 
-        this.createTplBtn = IconButton.create({
+        this.createTplBtn = Button.create({
             id: 'createTplBtn',
             className: 'create-btn',
             icon: 'plus',
@@ -121,6 +121,8 @@ export class ImportTemplateManager extends Component {
         // Main account
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onAccountChange(account),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -132,6 +134,8 @@ export class ImportTemplateManager extends Component {
         });
 
         this.tplAccountDropDown = DropDown.create({
+            enableFilter: true,
+            noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTemplateAccountChange(account),
         });
         window.app.initAccountsList(this.tplAccountDropDown);
@@ -542,7 +546,7 @@ export class ImportTemplateManager extends Component {
 
             await this.requestTemplatesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -554,7 +558,7 @@ export class ImportTemplateManager extends Component {
             await API.importTemplate.del(id);
             await this.requestTemplatesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -603,7 +607,7 @@ export class ImportTemplateManager extends Component {
                 this.props.onUpdate();
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 
@@ -620,7 +624,7 @@ export class ImportTemplateManager extends Component {
 
             window.app.model.rules.setData(result.data);
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
     }
 

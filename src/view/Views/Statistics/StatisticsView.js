@@ -1,15 +1,15 @@
 import 'jezvejs/style';
 import {
     createElement,
+    getClassName,
     setEvents,
-    insertAfter,
     show,
     asArray,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -95,8 +95,9 @@ class StatisticsView extends View {
     onStart() {
         this.loadElementsByIds([
             'heading',
-            // Filters
             'filtersBtn',
+            'contentHeader',
+            // Filters
             'filtersContainer',
             'applyFiltersBtn',
             'typeMenu',
@@ -124,13 +125,13 @@ class StatisticsView extends View {
         });
 
         // Filters
-        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.fromElement(this.filtersBtn, {
             onClick: () => this.filters.toggle(),
         });
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
-        insertAfter(this.filters.elem, this.filtersBtn.elem);
+        this.contentHeader.prepend(this.filters.elem);
 
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
 
@@ -162,7 +163,7 @@ class StatisticsView extends View {
             multiple: true,
             placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
-            noResultsMessage: __('ACCOUNTS_NOT_FOUND'),
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (obj) => this.onAccountSel(obj),
             onChange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
@@ -175,7 +176,7 @@ class StatisticsView extends View {
             multiple: true,
             placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
-            noResultsMessage: 'Nothing found',
+            noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (obj) => this.onCategorySel(obj),
             onChange: (obj) => this.onCategorySel(obj),
             className: 'dd_fullwidth',
@@ -412,7 +413,7 @@ class StatisticsView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createMessage(e.message, 'msg_error');
+                window.app.createErrorNotification(e.message);
                 this.store.dispatch(actions.dataRequestError());
             }
         }
@@ -438,7 +439,7 @@ class StatisticsView extends View {
     renderPopupListItem(item) {
         const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
         return createElement('li', {
-            props: { className: [POPUP_LIST_ITEM_CLASS, categoryClass].join(' ') },
+            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, categoryClass) },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,

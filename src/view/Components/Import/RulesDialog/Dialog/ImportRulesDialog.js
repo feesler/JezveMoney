@@ -7,7 +7,7 @@ import {
     createElement,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
-import { IconButton } from 'jezvejs/IconButton';
+import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
 import { __ } from '../../../../js/utils.js';
@@ -51,7 +51,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        this.createRuleBtn = IconButton.create({
+        this.createRuleBtn = Button.create({
             id: 'createRuleBtn',
             className: 'create-btn',
             icon: 'plus',
@@ -95,11 +95,8 @@ export class ImportRulesDialog extends Component {
             id: 'rules_popup',
             content: this.elem,
             title: this.headerElem,
-            scrollMessage: true,
+            closeButton: true,
             onClose: () => this.onClose(),
-            btn: {
-                closeBtn: true,
-            },
             className: IMPORT_RULES_POPUP_CLASS,
         });
         show(this.elem, true);
@@ -318,7 +315,7 @@ export class ImportRulesDialog extends Component {
 
             this.requestRulesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -336,7 +333,7 @@ export class ImportRulesDialog extends Component {
             await API.importRule.del(id);
             this.requestRulesList();
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }
@@ -366,7 +363,7 @@ export class ImportRulesDialog extends Component {
                 this.props.onUpdate();
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
             this.stopLoading();
         }
     }

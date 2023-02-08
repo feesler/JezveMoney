@@ -24,7 +24,7 @@ export class ProfileDialog extends Component {
             title,
             className: [DIALOG_CLASS, className],
             content: this.elem,
-            btn: { closeBtn: true },
+            closeButton: true,
             onClose: () => this.onClose(),
         });
         show(this.elem, true);
@@ -93,10 +93,10 @@ export class ProfileDialog extends Component {
             this.popup.close();
 
             if (result.msg) {
-                window.app.createMessage(result.msg, 'msg_success');
+                window.app.createSuccessNotification(result.msg);
             }
         } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
+            window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();

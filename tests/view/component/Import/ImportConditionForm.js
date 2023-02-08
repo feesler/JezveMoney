@@ -57,6 +57,7 @@ export class ImportConditionForm extends TestComponent {
     async parseContent() {
         const res = {
             fieldValueCheck: await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox')),
+            feedbackElem: { elem: await query(this.elem, '.invalid-feedback') },
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
@@ -84,6 +85,7 @@ export class ImportConditionForm extends TestComponent {
             && res.propertyField
             && res.textField
             && res.fieldValueCheck.elem
+            && res.feedbackElem.elem
             && res.deleteBtn.elem,
             'Invalid structure of import condition form',
         );
@@ -149,6 +151,7 @@ export class ImportConditionForm extends TestComponent {
             amount: cont.amountField.value,
             currency: cont.currencyField.value,
             text: cont.textField.value,
+            feedbackVisible: cont.feedbackElem.visible,
         };
 
         res.state = ImportConditionForm.getStateName(res);
@@ -171,6 +174,7 @@ export class ImportConditionForm extends TestComponent {
                 checked: model.isFieldValue,
                 visible: ImportCondition.isPropertyValueAvailable(model.fieldType),
             },
+            feedbackElem: { visible: model.feedbackVisible },
             deleteBtn: { visible: true },
         };
 

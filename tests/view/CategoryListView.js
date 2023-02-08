@@ -14,7 +14,7 @@ import {
     goTo,
     baseUrl,
 } from 'jezve-test';
-import { IconButton } from 'jezvejs-test';
+import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
@@ -91,8 +91,8 @@ export class CategoryListView extends AppView {
 
     async parseContent() {
         const res = {
-            createBtn: await IconButton.create(this, await query('#createBtn')),
-            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
+            createBtn: await Button.create(this, await query('#createBtn')),
+            listModeBtn: await Button.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('.heading-actions .popup-menu'),
                 menuBtn: await query('.heading-actions .popup-menu-btn'),
@@ -182,7 +182,7 @@ export class CategoryListView extends AppView {
 
         const res = cont;
         await asyncMap(itemIds, async (id) => {
-            res[id] = await IconButton.create(this, await query(`#${id}`));
+            res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
             return res[id];
         });

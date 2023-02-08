@@ -3,6 +3,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from '../ListContainer/ListContainer.js';
 
 const defaultProps = {
+    ascending: true,
     itemSortSelector: null,
     placeholderClass: null,
     sortModeClass: null,
@@ -59,18 +60,29 @@ export class SortableListContainer extends ListContainer {
             return;
         }
 
-        const itemId = this.itemIdFromElem(elem);
-        const refId = this.itemIdFromElem(refElem);
-        if (!itemId || !refId) {
+        const item = this.itemFromElem(elem);
+        if (!item) {
             return;
         }
 
-        const replacedItem = this.getItemById(refId);
-        if (!replacedItem) {
+        const prev = (this.props.ascending) ? newPos.prev : newPos.next;
+        const next = (this.props.ascending) ? newPos.next : newPos.prev;
+        const prevItem = this.itemFromElem(prev);
+        const nextItem = this.itemFromElem(next);
+        if (!prevItem && !nextItem) {
             return;
         }
 
-        this.props.onSort(itemId, replacedItem.pos);
+        let itemPos;
+        if (nextItem) {
+            itemPos = (item.pos < nextItem.pos)
+                ? (nextItem.pos - 1) // moving down
+                : nextItem.pos; // moving up
+        } else {
+            itemPos = prevItem.pos;
+        }
+
+        this.props.onSort(item.id, itemPos);
     }
 
     /**

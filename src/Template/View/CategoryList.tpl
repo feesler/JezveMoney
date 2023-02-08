@@ -1,6 +1,6 @@
 <?php
 
-use JezveMoney\App\Template\Component\IconButton;
+use JezveMoney\App\Template\Component\Button;
 
 include(TPL_PATH . "Header.tpl");    ?>
 
@@ -14,7 +14,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <header id="heading" class="heading">
                             <h1><?= __("CATEGORIES") ?></h1>
                             <div class="heading-actions">
-                                <?= IconButton::render([
+                                <?= Button::render([
                                     "id" => "createBtn",
                                     "type" => "link",
                                     "link" => BASEURL . "categories/create/",

@@ -75,12 +75,12 @@ export class ImportRuleItem extends Component {
         this.conditionsHeader = createElement('label', {
             props: { className: 'rule-item__header', textContent: __('IMPORT_CONDITIONS') },
         });
-        this.conditionsContainer = window.app.createContainer('rule-item__conditions', []);
+        this.conditionsContainer = window.app.createContainer('rule-item__conditions');
 
         this.actionsHeader = createElement('label', {
             props: { className: 'rule-item__header', textContent: __('IMPORT_ACTIONS') },
         });
-        this.actionsContainer = window.app.createContainer('rule-item__actions', []);
+        this.actionsContainer = window.app.createContainer('rule-item__actions');
 
         this.collapse = Collapsible.create({
             toggleOnClick: false,
