@@ -12,8 +12,6 @@ use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
-use const JezveMoney\App\Model\AVAILABLE_SETTINGS;
-
 /**
  * Profile API controller
  */

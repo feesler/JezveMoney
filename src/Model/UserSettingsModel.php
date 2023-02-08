@@ -23,6 +23,8 @@ const AVAIL_SORT_TYPES = [
 
 const AVAIL_SORT_SETTINGS = ["sort_accounts", "sort_persons", "sort_categories"];
 
+const AVAILABLE_SETTINGS = [...AVAIL_SORT_SETTINGS];
+
 const DEFAULT_SETTINGS = [
     "sort_accounts" => SORT_BY_CREATEDATE_ASC,
     "sort_persons" => SORT_BY_CREATEDATE_ASC,
@@ -47,6 +49,7 @@ class UserSettingsModel extends CachedTable
      */
     public static function getAvailableSettings()
     {
+        return AVAILABLE_SETTINGS;
     }
 
     /**
@@ -113,7 +116,7 @@ class UserSettingsModel extends CachedTable
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = AVAIL_SORT_SETTINGS;
+        $avFields = AVAILABLE_SETTINGS;
         $res = [];
 
         // In CREATE mode all fields is required
@@ -220,7 +223,7 @@ class UserSettingsModel extends CachedTable
             }
         } else {
             if (!$this->checkCache()) {
-                return null;
+                return [];
             }
 
             $items = $this->cache;
@@ -247,7 +250,8 @@ class UserSettingsModel extends CachedTable
             "user_id" => $user_id,
         ], DEFAULT_SETTINGS);
 
-        return $this->create($params);
+        $createRes = $this->create($params);
+        return $createRes !== 0;
     }
 
     /**
