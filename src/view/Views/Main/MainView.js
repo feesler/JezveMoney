@@ -573,12 +573,12 @@ class MainView extends View {
     }
 
     /** Renders statistics widget */
-    renderStatisticsWidget(state) {
-        if (!this.histogram) {
+    renderStatisticsWidget(state, prevState) {
+        if (state.chartData === prevState?.chartData) {
             return;
         }
 
-        this.histogram.setData(state.chartData);
+        this.histogram?.setData(state.chartData);
     }
 
     /** Renders 'Set transaction category' dialog */
