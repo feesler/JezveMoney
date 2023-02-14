@@ -7,7 +7,9 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -24,7 +26,6 @@ import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { PersonDetails } from '../../Components/PersonDetails/PersonDetails.js';
@@ -72,8 +73,8 @@ class PersonListView extends View {
         const listProps = {
             ItemComponent: Tile,
             getItemProps: (person, { listMode }) => ({
+                id: person.id,
                 type: 'button',
-                attrs: { 'data-id': person.id },
                 title: person.name,
                 selected: person.selected ?? false,
                 listMode,
@@ -254,15 +255,20 @@ class PersonListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            this.showContextMenu(itemId);
+            this.showContextMenu(id);
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -624,7 +630,7 @@ class PersonListView extends View {
         // Visible persons
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: state.items.visible,
+            items: listData(state.items.visible),
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
@@ -632,7 +638,7 @@ class PersonListView extends View {
         // Hidden persons
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: state.items.hidden,
+            items: listData(state.items.hidden),
             listMode: state.listMode,
         }));
 

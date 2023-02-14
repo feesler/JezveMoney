@@ -4,8 +4,10 @@ import {
     copyObject,
     Component,
 } from 'jezvejs';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { Button } from 'jezvejs/Button';
+import { Collapsible } from 'jezvejs/Collapsible';
+import { ListContainer } from 'jezvejs/ListContainer';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
@@ -13,14 +15,13 @@ import {
     ImportAction,
 } from '../../../../js/model/ImportAction.js';
 import { ImportCondition } from '../../../../js/model/ImportCondition.js';
+import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
-import { __ } from '../../../../js/utils.js';
+import { listData, __ } from '../../../../js/utils.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
-import { ListContainer } from '../../../ListContainer/ListContainer.js';
-import './style.scss';
-import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
+import './style.scss';
 
 const defaultProps = {
     onSubmit: null,
@@ -192,7 +193,7 @@ export class ImportRuleForm extends Component {
         let propFilter = this.fieldTypes.map(({ id }) => id);
         // Remove properties which already have `is` operator
         propFilter = propFilter.filter((property) => {
-            const found = state.items.findIsCondition(property);
+            const found = ImportConditionList.findIsCondition(state.items, property);
             const foundInd = state.items.indexOf(found);
             return (!found || foundInd === index);
         });
@@ -226,14 +227,17 @@ export class ImportRuleForm extends Component {
         let actionsFilter = this.actionTypes.map(({ id }) => id);
         // Remove already added actions
         actionsFilter = actionsFilter.filter((type) => {
-            const found = state.items.findAction(type);
+            const found = ImportActionList.findAction(state.items, type);
             return (!found || found === action);
         });
         // Show `Set account` action if has `Set transaction type` action with
         // transfer type selected
-        const setAccountAction = state.items.findAction(IMPORT_ACTION_SET_ACCOUNT);
+        const setAccountAction = ImportActionList.findAction(
+            state.items,
+            IMPORT_ACTION_SET_ACCOUNT,
+        );
         const showSetAccount = (
-            state.items.hasSetTransfer()
+            ImportActionList.hasSetTransfer(state.items)
             && (!setAccountAction || setAccountAction === action)
         );
         if (!showSetAccount) {
@@ -241,10 +245,10 @@ export class ImportRuleForm extends Component {
         }
         // Show `Set person` action if person available and has `Set transaction type` action
         // with debt type selected
-        const setPersonAction = state.items.findAction(IMPORT_ACTION_SET_PERSON);
+        const setPersonAction = ImportActionList.findAction(state.items, IMPORT_ACTION_SET_PERSON);
         const showSetPerson = (
             window.app.model.persons.length > 0
-            && state.items.hasSetDebt()
+            && ImportActionList.hasSetDebt(state.items)
             && (!setPersonAction || setPersonAction === action)
         );
         if (!showSetPerson) {
@@ -667,7 +671,7 @@ export class ImportRuleForm extends Component {
         );
         this.conditionsList.setState((conditionsState) => ({
             ...conditionsState,
-            items: state.rule.conditions,
+            items: listData(state.rule.conditions),
             invalidItemIndex: (isInvalidCondition) ? state.validation.conditionIndex : -1,
             message: (isInvalidCondition) ? state.validation.message : null,
             renderTime: Date.now(),
@@ -680,7 +684,7 @@ export class ImportRuleForm extends Component {
         );
         this.actionsList.setState((actionsState) => ({
             ...actionsState,
-            items: state.rule.actions,
+            items: listData(state.rule.actions),
             invalidItemIndex: (isInvalidAction) ? state.validation.actionIndex : -1,
             message: (isInvalidAction) ? state.validation.message : null,
             renderTime: Date.now(),

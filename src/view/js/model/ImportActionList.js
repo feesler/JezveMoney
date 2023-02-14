@@ -14,6 +14,50 @@ export class ImportActionList extends List {
         return new ImportActionList(props);
     }
 
+    /** Check list has specified action type */
+    static findAction(actions, action) {
+        const actionType = parseInt(action, 10);
+        if (!actionType) {
+            throw new Error('Invalid action type');
+        }
+
+        return actions.find((item) => (item.action_id === actionType));
+    }
+
+    /** Check list has specified action type */
+    static hasAction(actions, action) {
+        return !!this.findAction(actions, action);
+    }
+
+    /** Check list has `Set transaction type` action with 'transfer_out' or 'transfer_in' value */
+    static hasSetTransfer(actions) {
+        return !!actions.find((item) => (
+            item.action_id === IMPORT_ACTION_SET_TR_TYPE
+            && (
+                item.value === 'transfer_out'
+                || item.value === 'transfer_in'
+            )
+        ));
+    }
+
+    /** Check list has `Set transaction type` action with 'debt_out' or 'debt_in' value */
+    static hasSetDebt(actions) {
+        return !!actions.find((item) => (
+            item.action_id === IMPORT_ACTION_SET_TR_TYPE
+            && (
+                item.value === 'debt_out'
+                || item.value === 'debt_in'
+            )
+        ));
+    }
+
+    /** Returns sorted array of actions */
+    static sort(actions) {
+        const data = copyObject(actions);
+        data.sort((a, b) => a.action_id - b.action_id);
+        return data;
+    }
+
     /**
      * Create list item from specified object
      * @param {Object} obj
@@ -42,44 +86,26 @@ export class ImportActionList extends List {
 
     /** Check list has specified action type */
     findAction(action) {
-        const actionType = parseInt(action, 10);
-        if (!actionType) {
-            throw new Error('Invalid action type');
-        }
-
-        return this.find((item) => (item.action_id === actionType));
+        return ImportActionList.findAction(this, action);
     }
 
     /** Check list has specified action type */
     hasAction(action) {
-        return !!this.findAction(action);
+        return ImportActionList.hasAction(this, action);
     }
 
     /** Check list has `Set transaction type` action with 'transfer_out' or 'transfer_in' value */
     hasSetTransfer() {
-        return !!this.find((item) => (
-            item.action_id === IMPORT_ACTION_SET_TR_TYPE
-            && (
-                item.value === 'transfer_out'
-                || item.value === 'transfer_in'
-            )
-        ));
+        return ImportActionList.hasSetTransfer(this);
     }
 
     /** Check list has `Set transaction type` action with 'debt_out' or 'debt_in' value */
     hasSetDebt() {
-        return !!this.find((item) => (
-            item.action_id === IMPORT_ACTION_SET_TR_TYPE
-            && (
-                item.value === 'debt_out'
-                || item.value === 'debt_in'
-            )
-        ));
+        return ImportActionList.hasSetDebt(this);
     }
 
     sort() {
-        const data = copyObject(this.data);
-        data.sort((a, b) => a.action_id - b.action_id);
-        return ImportActionList.create(data);
+        const sorted = ImportActionList.sort(this.data);
+        return ImportActionList.create(sorted);
     }
 }

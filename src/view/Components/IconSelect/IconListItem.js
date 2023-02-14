@@ -23,6 +23,10 @@ const defaultProps = {
 };
 
 export class IconListItem extends Component {
+    static get selector() {
+        return 'li';
+    }
+
     constructor(props = {}) {
         super(props);
 
@@ -35,10 +39,7 @@ export class IconListItem extends Component {
             throw new Error('Invalid id');
         }
 
-        this.state = {
-            ...this.props,
-            id: this.props.id.toString(),
-        };
+        this.state = { ...this.props };
 
         this.init();
         this.render(this.state);
@@ -50,6 +51,7 @@ export class IconListItem extends Component {
 
     init() {
         this.icon = Icon.create({
+            icon: this.props.file,
             className: ICON_CLASS,
         });
         this.iconElem = createElement('span', {
@@ -86,5 +88,6 @@ export class IconListItem extends Component {
         this.contentElem.classList.toggle(LIST_ITEM_ACTIVE_CLASS, state.active);
 
         this.enable(!state.disabled);
+        this.show(!state.hidden);
     }
 }

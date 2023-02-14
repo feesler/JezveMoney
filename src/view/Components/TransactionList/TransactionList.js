@@ -1,5 +1,5 @@
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { __ } from '../../js/utils.js';
-import { SortableListContainer } from '../SortableListContainer/SortableListContainer.js';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
 import './style.scss';
 

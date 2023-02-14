@@ -293,3 +293,5 @@ export const getSortByDateIcon = (sortMode) => {
     }
     return (sortMode === SORT_BY_CREATEDATE_DESC) ? 'sort-desc' : null;
 };
+
+export const listData = (list) => (Array.isArray(list) ? list : list?.data);

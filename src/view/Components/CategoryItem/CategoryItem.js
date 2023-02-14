@@ -6,7 +6,8 @@ import {
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { PopupMenuButton } from 'jezvejs/PopupMenu';
-import { ListContainer } from '../ListContainer/ListContainer.js';
+import { ListContainer } from 'jezvejs/ListContainer';
+import { listData } from '../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
@@ -185,7 +186,7 @@ export class CategoryItem extends Component {
 
         this.childContainer.setState((listState) => ({
             ...listState,
-            items: item.children,
+            items: listData(item.children),
             listMode,
             renderTime: Date.now(),
         }));

@@ -660,18 +660,23 @@ class TransactionListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const state = this.store.getState();
         if (state.listMode === 'list') {
             const menuBtn = e?.target?.closest('.popup-menu-btn');
             if (menuBtn) {
-                this.showContextMenu(itemId);
+                this.showContextMenu(id);
             }
         } else if (state.listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 

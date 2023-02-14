@@ -8,10 +8,12 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -27,7 +29,6 @@ import { CategoryList } from '../../js/model/CategoryList.js';
 import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
@@ -266,18 +267,23 @@ class CategoryListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
             const menuBtn = e?.target?.closest('.popup-menu-btn');
             if (menuBtn) {
-                this.showContextMenu(itemId);
+                this.showContextMenu(id);
             }
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -662,16 +668,16 @@ class CategoryListView extends View {
         this.transTypes.forEach((type) => {
             const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
             const section = this.sections[key];
-            const items = mainCategories.filter((item) => item.type === type);
+            const typeCategories = mainCategories.filter((item) => item.type === type);
 
             section.list.setState((listState) => ({
                 ...listState,
-                items,
+                items: listData(typeCategories),
                 listMode: state.listMode,
                 renderTime: Date.now(),
             }));
 
-            show(section.container, items.length > 0);
+            show(section.container, typeCategories.length > 0);
         });
     }
 

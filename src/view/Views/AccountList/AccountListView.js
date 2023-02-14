@@ -8,10 +8,12 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -29,7 +31,6 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountDetails } from '../../Components/AccountDetails/AccountDetails.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
@@ -77,7 +78,6 @@ class AccountListView extends View {
             getItemProps: (account, { listMode }) => ({
                 type: 'button',
                 account,
-                attrs: { 'data-id': account.id },
                 selected: account.selected ?? false,
                 listMode,
             }),
@@ -268,15 +268,20 @@ class AccountListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            this.showContextMenu(itemId);
+            this.showContextMenu(id);
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -657,7 +662,7 @@ class AccountListView extends View {
         // Visible accounts
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: state.items.visible,
+            items: listData(state.items.visible),
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
@@ -665,7 +670,7 @@ class AccountListView extends View {
         // Hidden accounts
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: state.items.hidden,
+            items: listData(state.items.hidden),
             listMode: state.listMode,
         }));
 

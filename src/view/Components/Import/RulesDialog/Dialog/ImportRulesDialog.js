@@ -6,17 +6,17 @@ import {
     Component,
     createElement,
 } from 'jezvejs';
-import { Popup } from 'jezvejs/Popup';
 import { Button } from 'jezvejs/Button';
-import { PopupMenu } from 'jezvejs/PopupMenu';
+import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
+import { Popup } from 'jezvejs/Popup';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
-import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 import { SearchInput } from '../../../SearchInput/SearchInput.js';
 import './style.scss';
