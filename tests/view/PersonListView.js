@@ -10,6 +10,7 @@ import {
     click,
     baseUrl,
     goTo,
+    wait,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -354,7 +355,10 @@ export class PersonListView extends AppView {
         const expected = this.getExpectedState();
 
         const tile = this.getTileByIndex(num);
-        await this.performAction(() => tile.click());
+        await this.performAction(async () => {
+            await tile.click();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }

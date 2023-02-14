@@ -11,6 +11,7 @@ import {
     asyncMap,
     goTo,
     baseUrl,
+    wait,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -353,7 +354,10 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
 
         const tile = this.getTileByIndex(num);
-        await this.performAction(() => tile.click());
+        await this.performAction(async () => {
+            await tile.click();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }

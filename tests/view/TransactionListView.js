@@ -594,8 +594,10 @@ export class TransactionListView extends AppView {
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => item.clickMenu());
-        assert(this.content.contextMenu.visible, 'Context menu not visible');
+        await this.performAction(async () => {
+            await item.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }

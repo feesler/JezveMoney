@@ -6,6 +6,7 @@ import {
     asArray,
     asyncMap,
     navigation,
+    wait,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { Widget } from './Widget.js';
@@ -15,6 +16,8 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
 
+const contextMenuSelector = '#contextMenu';
+
 export class TransactionsWidget extends Widget {
     async parseContent() {
         const res = await super.parseContent();
@@ -23,7 +26,7 @@ export class TransactionsWidget extends Widget {
         assert(res.transList, 'Invalid transactions widget');
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
+        res.contextMenu = { elem: await query(contextMenuSelector) };
         const contextParent = await closest(res.contextMenu.elem, '.trans-item');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
@@ -64,8 +67,10 @@ export class TransactionsWidget extends Widget {
         this.checkValidIndex(index);
 
         const item = this.content.transList.items[index];
-        await this.performAction(() => item.clickMenu());
-        assert(this.content.contextMenu.visible, 'Context menu not visible');
+        await this.performAction(async () => {
+            await item.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return true;
     }

@@ -13,6 +13,7 @@ import {
     isVisible,
     goTo,
     baseUrl,
+    wait,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -437,7 +438,10 @@ export class CategoryListView extends AppView {
         const categoryItem = this.getItemByIndex(index);
         assert(categoryItem, `Failed to obtain item [${index}]`);
 
-        await this.performAction(() => categoryItem.clickMenu());
+        await this.performAction(async () => {
+            await categoryItem.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }

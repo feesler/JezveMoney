@@ -432,8 +432,10 @@ export class ImportView extends AppView {
         const expected = this.getExpectedState();
 
         const item = this.itemsList.getItem(pos.rangeIndex);
-        await this.performAction(() => item.clickMenu());
-        assert(this.content.contextMenu.visible, 'Context menu not visible');
+        await this.performAction(async () => {
+            await item.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }
