@@ -42,6 +42,10 @@ const defaultProps = {
  * ImportConditionForm component
  */
 export class ImportConditionForm extends Component {
+    static get selector() {
+        return `.${FORM_CLASS}`;
+    }
+
     constructor(props) {
         super(props);
 

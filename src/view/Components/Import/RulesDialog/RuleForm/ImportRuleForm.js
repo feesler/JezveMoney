@@ -23,6 +23,20 @@ import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 import './style.scss';
 
+/* CSS classes */
+const FORM_CLASS = 'rule-form';
+const COLLAPSE_CLASS = 'rule-form-collapse';
+const CREATE_BUTTON_CLASS = 'create-btn right-align';
+const CONDITIONS_LIST_CLASS = 'conditions-list';
+const ACTIONS_LIST_CLASS = 'actions-list';
+/* Validation */
+const FEEDBACK_CONTAINER_CLASS = 'rule-form__feedback validation-block';
+const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
+/* Controls */
+const CONTROLS_CLASS = 'form-controls';
+const SUBMIT_BTN_CLASS = 'btn submit-btn';
+const CANCEL_BTN_CLASS = 'btn cancel-btn';
+
 const defaultProps = {
     onSubmit: null,
     onCancel: null,
@@ -65,7 +79,7 @@ export class ImportRuleForm extends Component {
         // Conditions
         this.createCondBtn = Button.create({
             id: 'createCondBtn',
-            className: 'create-btn right-align',
+            className: CREATE_BUTTON_CLASS,
             icon: 'plus',
             onClick: (e) => this.onCreateConditionClick(e),
         });
@@ -74,8 +88,8 @@ export class ImportRuleForm extends Component {
 
         this.conditionsList = ListContainer.create({
             ItemComponent: ImportConditionForm,
-            className: 'conditions-list',
-            itemSelector: '.cond-form',
+            className: CONDITIONS_LIST_CLASS,
+            itemSelector: ImportConditionForm.selector,
             noItemsMessage: __('IMPORT_CONDITIONS_NO_DATA'),
             invalidItemIndex: -1,
             message: null,
@@ -88,7 +102,7 @@ export class ImportRuleForm extends Component {
         });
 
         this.conditionsCollapse = Collapsible.create({
-            className: 'rule-form-collapse',
+            className: COLLAPSE_CLASS,
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_CONDITIONS') } }),
                 this.createCondBtn.elem,
@@ -101,7 +115,7 @@ export class ImportRuleForm extends Component {
         // Actions
         this.createActionBtn = Button.create({
             id: 'createActionBtn',
-            className: 'create-btn right-align',
+            className: CREATE_BUTTON_CLASS,
             icon: 'plus',
             onClick: (e) => this.onCreateActionClick(e),
         });
@@ -110,8 +124,8 @@ export class ImportRuleForm extends Component {
 
         this.actionsList = ListContainer.create({
             ItemComponent: ImportActionForm,
-            className: 'actions-list',
-            itemSelector: '.action-form',
+            className: ACTIONS_LIST_CLASS,
+            itemSelector: ImportActionForm.selector,
             noItemsMessage: __('IMPORT_ACTIONS_NO_DATA'),
             invalidItemIndex: -1,
             message: null,
@@ -124,7 +138,7 @@ export class ImportRuleForm extends Component {
         });
 
         this.actionsCollapse = new Collapsible({
-            className: 'rule-form-collapse',
+            className: COLLAPSE_CLASS,
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
                 this.createActionBtn.elem,
@@ -136,27 +150,27 @@ export class ImportRuleForm extends Component {
 
         // Controls
         this.saveBtn = createElement('button', {
-            props: { className: 'btn submit-btn', type: 'button', textContent: __('SUBMIT') },
+            props: { className: SUBMIT_BTN_CLASS, type: 'button', textContent: __('SUBMIT') },
             events: { click: () => this.onSubmit() },
         });
         this.cancelBtn = createElement('button', {
-            props: { className: 'btn cancel-btn', type: 'button', textContent: __('CANCEL') },
+            props: { className: CANCEL_BTN_CLASS, type: 'button', textContent: __('CANCEL') },
             events: { click: () => this.onCancel() },
         });
 
         // Invalid feedback message
-        this.validFeedback = createElement('div', { props: { className: 'feedback invalid-feedback' } });
+        this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         this.feedbackContainer = window.app.createContainer(
-            'rule-form__feedback validation-block',
+            FEEDBACK_CONTAINER_CLASS,
             this.validFeedback,
         );
 
-        this.controls = window.app.createContainer('form-controls', [
+        this.controls = window.app.createContainer(CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
         ]);
 
-        this.elem = window.app.createContainer('rule-form', [
+        this.elem = window.app.createContainer(FORM_CLASS, [
             this.idInput,
             this.conditionsCollapse.elem,
             this.actionsCollapse.elem,

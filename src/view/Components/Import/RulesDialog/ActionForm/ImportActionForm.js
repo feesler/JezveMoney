@@ -47,6 +47,10 @@ const defaultProps = {
  * ImportActionForm component
  */
 export class ImportActionForm extends Component {
+    static get selector() {
+        return `.${FORM_CLASS}`;
+    }
+
     constructor(props) {
         super(props);
 
