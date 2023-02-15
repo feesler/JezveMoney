@@ -18,6 +18,11 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --header-size: 50px;
   --std-field-margin: 8px 0 12px;
 
+  /* Validation feedback */
+  --invalid-input-border-color: #ff0000;
+  --valid-feedback-color: #00b500;
+  --invalid-feedback-color: #ff3131;
+
   /* Tiles */
   --tile-gap: 10px;
   --tile-size: 100px;
@@ -481,10 +486,18 @@ label {
 }
 
 /* Validation */
-.validation-block .invalid-feedback {
-  color: #ff0000;
+.validation-block .feedback {
   display: none;
   font-size: 14px;
+}
+
+/* Validation feedback */
+.feedback.valid-feedback {
+  color: var(--valid-feedback-color);
+}
+
+.feedback.invalid-feedback {
+  color: var(--invalid-feedback-color);
 }
 
 .validation-block.invalid-block .invalid-feedback {
@@ -492,7 +505,7 @@ label {
 }
 
 .validation-block.invalid-block .stretch-input {
-  border-color: #ff0000;
+  border-color: var(--invalid-input-border-color);
 }
 
 /* No data message for lists & etc. */

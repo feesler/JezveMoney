@@ -14,12 +14,12 @@
                 <div id="login-inp-block" class="validation-block std_margin">
                     <label for="loginInp"><?= __("LOG_IN_USERNAME") ?></label>
                     <input id="loginInp" class="stretch-input" name="login" type="text" autocomplete="off">
-                    <div class="invalid-feedback"><?= __("LOG_IN_INVALID_USERNAME") ?></div>
+                    <div class="feedback invalid-feedback"><?= __("LOG_IN_INVALID_USERNAME") ?></div>
                 </div>
                 <div id="pwd-inp-block" class="validation-block std_margin">
                     <label for="passwordInp"><?= __("LOG_IN_PASSWORD") ?></label>
                     <input id="passwordInp" class="stretch-input" name="password" type="password" autocomplete="off">
-                    <div class="invalid-feedback"><?= __("LOG_IN_INVALID_PASSWORD") ?></div>
+                    <div class="feedback invalid-feedback"><?= __("LOG_IN_INVALID_PASSWORD") ?></div>
                 </div>
                 <div class="std_margin">
                     <label id="rememberCheck" class="checkbox">

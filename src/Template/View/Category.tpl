@@ -41,7 +41,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
                                 <label for="nameInp"><?= __("CATEGORY_NAME") ?></label>
                                 <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
-                                <div id="nameFeedback" class="invalid-feedback"></div>
+                                <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
 
                             <div id="type-block" class="view-row std_margin">

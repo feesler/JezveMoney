@@ -30,7 +30,7 @@ const VALUE_PROP_FIELD_CLASS = 'value-prop-field';
 const COND_FIELDS_CLASS = 'cond-form__fields';
 const CONTROLS_CLASS = 'cond-form__controls';
 const VALIDATION_CLASS = 'validation-block';
-const INV_FEEDBACK_CLASS = 'invalid-feedback';
+const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
 
 const defaultProps = {
     properties: null,

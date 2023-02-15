@@ -33,7 +33,7 @@ const CATEGORY_FIELD_CLASS = 'category-field';
 const VALUE_FIELD_CLASS = 'action-value-field';
 /* Validation */
 const VALIDATION_BLOCK_CLASS = 'validation-block';
-const INV_FEEDBACK_CLASS = 'invalid-feedback';
+const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
 /* Controls */
 const CONTROLS_CLASS = 'action-form__controls';
 

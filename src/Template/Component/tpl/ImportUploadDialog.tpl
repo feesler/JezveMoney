@@ -46,8 +46,8 @@
         <section id="templateForm" hidden>
             <div id="nameField" class="tpl-form-field validation-block">
                 <label for="tplNameInp"><?= __("TEMPLATE_NAME") ?></label>
-                <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
-                <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
+                <input id="tplNameInp" class="stretch-input" type="text" autocomplete="off">
+                <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
             </div>
             <div id="firstRowField" class="tpl-form-field first-row-field validation-block">
                 <label for="firstRowInp"><?= __("TEMPLATE_FIRST_ROW") ?></label>
@@ -56,7 +56,7 @@
                     <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
                     <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
                 </div>
-                <div class="invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
+                <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
             </div>
             <div id="tplAccountSwitchField" class="tpl-form-field tpl-form-switch-field">
                 <span class="tpl-form-field__label"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
@@ -75,7 +75,7 @@
                         <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
                     <?php   }   ?>
                 </select>
-                <div id="columnFeedback" class="invalid-feedback"></div>
+                <div id="columnFeedback" class="feedback invalid-feedback"></div>
             </div>
 
             <div id="rawDataTable" class="tpl-form-field raw-data-field">

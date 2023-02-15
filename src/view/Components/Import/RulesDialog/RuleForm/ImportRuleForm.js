@@ -145,7 +145,7 @@ export class ImportRuleForm extends Component {
         });
 
         // Invalid feedback message
-        this.validFeedback = createElement('div', { props: { className: 'invalid-feedback' } });
+        this.validFeedback = createElement('div', { props: { className: 'feedback invalid-feedback' } });
         this.feedbackContainer = window.app.createContainer(
             'rule-form__feedback validation-block',
             this.validFeedback,

@@ -105,16 +105,3 @@
   justify-content: center;
   min-height: var(--input-height);
 }
-
-/* Validation feedback */
-.validation-block.invalid-block .tpl-name-inp {
-  border-color: #ff0000;
-}
-
-.feedback.valid-feedback {
-  color: #00b500;
-}
-
-.feedback.invalid-feedback {
-  color: #ff3131;
-}

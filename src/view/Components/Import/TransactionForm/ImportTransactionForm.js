@@ -27,7 +27,7 @@ import './style.scss';
 const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
 const VALIDATION_CLASS = 'validation-block';
-const INV_FEEDBACK_CLASS = 'invalid-feedback';
+const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
 const FORM_CONTAINER_CLASS = 'form-container';
 const IG_INPUT_CLASS = 'input-group__input';
 const IG_BUTTON_CLASS = 'input-group__btn';

@@ -74,7 +74,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="srcCurrInp" name="src_curr" type="hidden" value="<?= e($tr["src_curr"]) ?>">
                             </div>
 
@@ -92,7 +92,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="destCurrInp" name="dest_curr" type="hidden" value="<?= e($tr["dest_curr"]) ?>">
                             </div>
 
@@ -131,7 +131,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     </div>
                                     <div id="datePickerWrapper" class="calendar"></div>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_DATE") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_DATE") ?></div>
                             </div>
 
                             <div id="categoryRow" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>

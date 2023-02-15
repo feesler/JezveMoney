@@ -39,7 +39,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
                                 <label for="nameInp"><?= __("ACCOUNT_NAME") ?></label>
                                 <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
-                                <div id="nameFeedback" class="invalid-feedback"></div>
+                                <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
                             <div id="currency-block" class="view-row std_margin">
                                 <label for="currency"><?= __("ACCOUNT_CURRENCY") ?></label>
@@ -53,7 +53,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     <input id="balanceInp" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
                                     <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
                                 </div>
-                                <div class="invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>
                             </div>
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">

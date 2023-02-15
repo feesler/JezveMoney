@@ -13,17 +13,17 @@
                                 <div id="login-inp-block" class="validation-block std_margin">
                                     <label for="loginInp"><?= __("REG_ACCOUNT_NAME") ?></label>
                                     <input id="loginInp" class="stretch-input" name="login" type="text" autocomplete="off">
-                                    <div class="invalid-feedback"><?= __("REG_INVALID_ACCOUNT_NAME") ?></div>
+                                    <div class="feedback invalid-feedback"><?= __("REG_INVALID_ACCOUNT_NAME") ?></div>
                                 </div>
                                 <div id="name-inp-block" class="validation-block std_margin">
                                     <label for="nameInp"><?= __("REG_USER_NAME") ?></label>
                                     <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off">
-                                    <div class="invalid-feedback"><?= __("REG_INVALID_USER_NAME") ?></div>
+                                    <div class="feedback invalid-feedback"><?= __("REG_INVALID_USER_NAME") ?></div>
                                 </div>
                                 <div id="pwd-inp-block" class="validation-block std_margin">
                                     <label for="passwordInp"><?= __("REG_PASSWORD") ?></label>
                                     <input id="passwordInp" class="stretch-input" name="password" type="password" autocomplete="off">
-                                    <div class="invalid-feedback"><?= __("REG_INVALID_PASSWORD") ?></div>
+                                    <div class="feedback invalid-feedback"><?= __("REG_INVALID_PASSWORD") ?></div>
                                 </div>
                                 <div class="form-controls std_margin">
                                     <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">

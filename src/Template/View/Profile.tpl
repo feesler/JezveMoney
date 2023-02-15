@@ -52,7 +52,7 @@
         <div id="name-inp-block" class="validation-block view-row std_margin">
             <label for="newname"><?= __("PROFILE_NAME_NEW") ?></label>
             <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($profileInfo["name"]) ?>">
-            <div class="invalid-feedback"><?= __("PROFILE_INVALID_NAME") ?></div>
+            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_NAME") ?></div>
         </div>
 
         <div class="form-controls">
@@ -66,13 +66,13 @@
         <div id="old-pwd-inp-block" class="validation-block view-row std_margin">
             <label for="oldpwd"><?= __("PROFILE_PASSWORD_CURRENT") ?></label>
             <input id="oldpwd" class="stretch-input" name="current" type="password" autocomplete="off">
-            <div class="invalid-feedback"><?= __("PROFILE_INVALID_PASS_CURRENT") ?></div>
+            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_CURRENT") ?></div>
         </div>
 
         <div id="new-pwd-inp-block" class="validation-block view-row std_margin">
             <label for="newpwd"><?= __("PROFILE_PASSWORD_NEW") ?></label>
             <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
-            <div class="invalid-feedback"><?= __("PROFILE_INVALID_PASS_NEW") ?></div>
+            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_NEW") ?></div>
         </div>
 
         <div class="form-controls">
