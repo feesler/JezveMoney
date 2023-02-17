@@ -34,8 +34,15 @@
   }
 }
 
-.trans-list_select .trans-item__select {
-  width: 32px;
+/* Select mode */
+.trans-list_select {
+  .trans-item__select {
+    width: 32px;
+  }
+
+  .trans-item__content {
+    padding: 8px;
+  }
 }
 
 .trans-item__content {
