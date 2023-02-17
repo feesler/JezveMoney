@@ -115,6 +115,8 @@ export class TemplateSelect extends Component {
     /** Menu button 'click' event handler */
     onToggleMenu(e) {
         e.stopPropagation();
+        this.templateDropDown.showList(false);
+
         if (this.state.disabled) {
             return;
         }
