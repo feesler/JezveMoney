@@ -1,5 +1,3 @@
-/* Import view */
-
 /* Header */
 .data-header {
   display: flex;
@@ -8,47 +6,12 @@
   column-gap: 12px;
 }
 
-.header-field {
-  display: flex;
-  flex-flow: column nowrap;
-}
-
-.header-field__content {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
 /* Main account header field */
-.account-field label {
-  margin-bottom: 2px;
-}
-
-.dd__main-account {
+.account-field {
   max-width: 200px;
-}
-
-.account-field > div {
-  justify-content: left;
 }
 
 .data-header .submit-btn {
   align-self: flex-end;
   margin-left: auto;
-}
-
-/* Transactions list */
-
-/* Transaction items container */
-.data-container {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: stretch;
-  position: relative;
-  row-gap: 2px;
-
-  .collapsible-content {
-    margin-left: 0;
-    transition: margin-left 0.2s ease;
-  }
 }

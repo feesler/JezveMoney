@@ -130,7 +130,7 @@ export class ImportActionForm extends Component {
         // Delete button
         const delIcon = Icon.create({
             icon: 'del',
-            className: 'icon delete-icon',
+            className: 'btn__icon delete-icon',
         });
         this.delBtn = createElement('button', {
             props: { className: 'btn icon-btn delete-btn right-align', type: 'button' },

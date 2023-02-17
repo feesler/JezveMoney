@@ -41,10 +41,10 @@
   .field {
     --field-content-font-size: var(--ii-font-size);
     --field-title-font-size: 12px;
+    --field-title-margin: 0 0 1px 0;
   }
 
   .field__title {
-    margin: 0 0 1px 0;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

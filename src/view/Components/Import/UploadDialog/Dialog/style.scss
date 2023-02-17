@@ -70,15 +70,14 @@
 }
 
 .browse-btn {
+  --btn-background: var(--accent-color);
+  --btn-border-radius: var(--action-btn-border-radius);
+  --btn-disabled-background: var(--accent-disabled-color);
+
+  height: var(--input-height);
   padding: 6px 24px;
   margin: 0;
   white-space: nowrap;
-  border-radius: var(--action-btn-border-radius);
-  background-color: var(--accent-color);
-}
-
-.browse-btn:disabled {
-  background-color: #5082aa;
 }
 
 .upload-form__descr {

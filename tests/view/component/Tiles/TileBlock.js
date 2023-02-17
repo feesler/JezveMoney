@@ -17,11 +17,9 @@ export class TileBlock extends TestComponent {
     }
 
     async parseContent() {
-        assert(this.elem, 'Invalid tile block');
-
         const res = {};
 
-        const lbl = await query(this.elem, '.tile_header label');
+        const lbl = await query(this.elem, '.field__title span');
         assert(lbl, 'Tile block label not found');
         res.label = await prop(lbl, 'textContent');
 

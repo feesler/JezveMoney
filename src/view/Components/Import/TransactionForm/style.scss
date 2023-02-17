@@ -14,15 +14,11 @@
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
-    gap: 8px;
+    gap: 12px;
   }
 
   /* Input field and label group */
   .field {
-    --field-title-font-size: 12px;
-
-    flex-flow: column nowrap;
-    align-items: normal;
     max-width: 300px;
   }
 
@@ -30,10 +26,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-  }
-
-  .date-field {
-    width: 150px;
   }
 
   .comment-field {
@@ -48,12 +40,6 @@
 
   .dp__wrapper {
     z-index: var(--import-form-popup-zindex);
-  }
-
-  input[type="button"] {
-    width: 30px;
-    border: 0 none;
-    pointer-events: all;
   }
 
   .input-group {
@@ -77,10 +63,5 @@
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
-  }
-
-  .field.invalid-block input,
-  .field.invalid-block .dd__combo {
-    --input-border-color: #ff0000;
   }
 }

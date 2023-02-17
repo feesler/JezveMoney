@@ -107,7 +107,7 @@ class ImportView extends View {
             enableFilter: true,
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onMainAccChange(account),
-            className: 'dd__main-account dd_ellipsis',
+            className: 'dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
 

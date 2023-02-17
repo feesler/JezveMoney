@@ -30,35 +30,40 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?php if ($this->action == "update") {        ?>
                                 <input id="accid" name="id" type="hidden" value="<?= e($accInfo->id) ?>">
                             <?php    }    ?>
-                            <div class="view-row std_margin">
+
+                            <div class="form-row">
                                 <?= Tile::render($tile) ?>
                             </div>
-                            <div id="iconField" class="view-row std_margin">
-                                <label><?= __("ACCOUNT_ICON") ?></label>
+
+                            <div id="iconField" class="field form-row">
+                                <label class="field__title"><?= __("ACCOUNT_ICON") ?></label>
                             </div>
-                            <div id="name-inp-block" class="validation-block view-row std_margin">
-                                <label for="nameInp"><?= __("ACCOUNT_NAME") ?></label>
+
+                            <div id="name-inp-block" class="field validation-block form-row">
+                                <label for="nameInp" class="field__title"><?= __("ACCOUNT_NAME") ?></label>
                                 <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
                                 <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
-                            <div id="currency-block" class="view-row std_margin">
-                                <label for="currency"><?= __("ACCOUNT_CURRENCY") ?></label>
-                                <div>
-                                    <select id="currency" name="curr_id"></select>
-                                </div>
+
+                            <div id="currency-block" class="field form-row">
+                                <label for="currency" class="field__title"><?= __("ACCOUNT_CURRENCY") ?></label>
+                                <select id="currency" name="curr_id"></select>
                             </div>
-                            <div id="initbal-inp-block" class="validation-block view-row std_margin">
-                                <label for="balanceInp"><?= __("ACCOUNT_INITIAL_BALANCE") ?></label>
+
+                            <div id="initbal-inp-block" class="field validation-block form-row">
+                                <label for="balanceInp" class="field__title"><?= __("ACCOUNT_INITIAL_BALANCE") ?></label>
                                 <div class="input-group">
                                     <input id="balanceInp" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
                                     <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
                                 </div>
                                 <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>
                             </div>
+
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
+
                             <input id="flags" name="flags" type="hidden" value="<?= e($accInfo->flags) ?>">
                         </form>
                     </main>

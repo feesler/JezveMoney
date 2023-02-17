@@ -7,7 +7,7 @@
             <?= svgIcon("close", "input-group__inner-btn__icon") ?>
         </button>
         <button class="btn icon-btn input-group__btn dp-btn" type="button">
-            <?= useIcon("calendar-icon", "icon calendar-icon") ?>
+            <?= useIcon("calendar-icon", "btn__icon calendar-icon") ?>
         </button>
     </div>
     <input type="submit" hidden>

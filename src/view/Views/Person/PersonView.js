@@ -15,10 +15,11 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../Components/Heading/style.scss';
-import './style.scss';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
+import '../../Components/Heading/style.scss';
+import '../../Components/Field/style.scss';
+import './style.scss';
 
 /**
  * Create/update person view

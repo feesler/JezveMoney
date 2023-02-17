@@ -126,7 +126,7 @@ export class ImportTemplateManager extends Component {
             onChange: (account) => this.onAccountChange(account),
         });
         window.app.initAccountsList(this.accountDropDown);
-        this.accountDropDown.setSelection(this.state.mainAccount.id.toString());
+        this.accountDropDown.setSelection(this.state.mainAccount.id);
 
         // Template default account
         this.tplAccountSwitch = Switch.fromElement(this.tplAccountSwitch, {
@@ -134,6 +134,7 @@ export class ImportTemplateManager extends Component {
         });
 
         this.tplAccountDropDown = DropDown.create({
+            className: 'dd_fullwidth',
             enableFilter: true,
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTemplateAccountChange(account),

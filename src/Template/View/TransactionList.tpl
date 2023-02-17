@@ -34,8 +34,8 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <aside id="filtersContainer" class="filters-container">
                                 <header class="filters-heading">
                                     <span class="filters-heading__title"><?= __("FILTERS") ?></span>
-                                    <button id="closeFiltersBtn" class="btn icon-btn close-btn right-align" type="button">
-                                        <svg class="icon close-icon">
+                                    <button id="closeFiltersBtn" class="btn close-btn right-align" type="button">
+                                        <svg class="btn__icon">
                                             <use href="#close"></use>
                                         </svg>
                                     </button>

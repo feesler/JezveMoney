@@ -1,0 +1,13 @@
+/* Import transactions list */
+.import-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  position: relative;
+  row-gap: 2px;
+
+  .collapsible-content {
+    margin-left: 0;
+    transition: margin-left 0.2s ease;
+  }
+}

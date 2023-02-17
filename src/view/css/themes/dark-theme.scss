@@ -170,11 +170,6 @@
   }
 
   /* Filters */
-  .filters-btn {
-    --btn-background: var(--btn-bg);
-    --btn-hover-background: var(--btn-hover-bg);
-  }
-
   .filters-offcanvas {
     --offcanvas-bg: var(--semitrans-bg-color);
   }
@@ -212,12 +207,6 @@
 
   .trans-item_details .field__title {
     color: var(--dimmed-text-color);
-  }
-
-  /* 'Show more' button */
-  .show-more-btn {
-    color: var(--main-text-color);
-    background-color: var(--btn-bg);
   }
 
   /* Profile view */
@@ -297,8 +286,8 @@
       background-color: #202020;
     }
 
-    .field__title {
-      color: var(--dimmed-text-color);
+    .field {
+      --field-title-color: var(--dimmed-text-color);
     }
 
     .btn {
@@ -404,19 +393,14 @@
     color: var(--main-text-color);
   }
 
-  /* Tile info block */
-  .tile-info-item {
-    color: var(--main-text-color);
-  }
-
   /* Link menu item */
   b.link-menu-item_selected .link-menu-item__title {
     color: var(--main-text-color);
   }
 
   /* Input group disabled button with icon */
-  .input-group .icon-btn[disabled] .icon {
-    fill: var(--input-disabled-text-color);
+  .input-group .btn.icon-btn {
+    --btn-disabled-icon-color: var(--input-disabled-text-color);
   }
 }
 
@@ -428,11 +412,6 @@
 
     .nav-item__icon-btn:hover {
       background: var(--icon-btn-hover-bg);
-    }
-
-    /* 'Show more' button */
-    .show-more-btn:hover {
-      background-color: var(--btn-hover-bg);
     }
 
     .swap-btn:hover .swap-icon {
@@ -463,10 +442,6 @@
 
     .back-btn:hover {
       background: var(--icon-btn-hover-bg);
-    }
-
-    .tile_header .close-btn:hover .close-icon {
-      fill: #ffffff;
     }
   }
 }

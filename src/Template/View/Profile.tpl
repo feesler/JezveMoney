@@ -49,8 +49,8 @@
 
 <div id="changename" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changename/">
-        <div id="name-inp-block" class="validation-block view-row std_margin">
-            <label for="newname"><?= __("PROFILE_NAME_NEW") ?></label>
+        <div id="name-inp-block" class="field form-row validation-block">
+            <label for="newname" class="field__title"><?= __("PROFILE_NAME_NEW") ?></label>
             <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($profileInfo["name"]) ?>">
             <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_NAME") ?></div>
         </div>
@@ -63,14 +63,14 @@
 
 <div id="changepass" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changepass/">
-        <div id="old-pwd-inp-block" class="validation-block view-row std_margin">
-            <label for="oldpwd"><?= __("PROFILE_PASSWORD_CURRENT") ?></label>
+        <div id="old-pwd-inp-block" class="field form-row validation-block">
+            <label for="oldpwd" class="field__title"><?= __("PROFILE_PASSWORD_CURRENT") ?></label>
             <input id="oldpwd" class="stretch-input" name="current" type="password" autocomplete="off">
             <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_CURRENT") ?></div>
         </div>
 
-        <div id="new-pwd-inp-block" class="validation-block view-row std_margin">
-            <label for="newpwd"><?= __("PROFILE_PASSWORD_NEW") ?></label>
+        <div id="new-pwd-inp-block" class="field form-row validation-block">
+            <label for="newpwd" class="field__title"><?= __("PROFILE_PASSWORD_NEW") ?></label>
             <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
             <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_NEW") ?></div>
         </div>
@@ -83,7 +83,7 @@
 
 <div id="reset" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/reset/">
-        <div class="view-row column-container">
+        <div class="column-container">
             <label id="resetAllCheck" class="checkbox">
                 <input type="checkbox">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>

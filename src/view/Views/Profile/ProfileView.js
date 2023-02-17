@@ -12,6 +12,8 @@ import { ChangeNameDialog } from '../../Components/Profile/ChangeNameDialog/Chan
 import { ChangePasswordDialog } from '../../Components/Profile/ChangePasswordDialog/ChangePasswordDialog.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
+import '../../Components/Heading/style.scss';
+import '../../Components/Field/style.scss';
 import './style.scss';
 
 const titleMap = {

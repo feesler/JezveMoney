@@ -1,8 +1,8 @@
-<?php	include(ADMIN_TPL_PATH . "Header.tpl");	?>
+<?php include(ADMIN_TPL_PATH . "Header.tpl");    ?>
 
 <div class="page">
     <div class="page_wrapper">
-<?php	include(ADMIN_TPL_PATH . "Component/tpl/Header.tpl");	?>
+        <?php include(ADMIN_TPL_PATH . "Component/tpl/Header.tpl");    ?>
 
         <div class="container">
             <div class="content">
@@ -11,24 +11,29 @@
 
                     <table class="admin-tbl">
                         <thead>
-                            <tr><th>id</th><th>name</th><th>file</th><th>type</th></tr>
+                            <tr>
+                                <th>id</th>
+                                <th>name</th>
+                                <th>file</th>
+                                <th>type</th>
+                            </tr>
                         </thead>
                         <tbody id="items-list">
-<?php	foreach($itemsData as $item) {		?>
-                            <tr data-id=<?=e($item->id)?>>
-                                <td><?=e($item->id)?></td>
-                                <td><?=e($item->name)?></td>
-                                <td><?=e($item->file)?></td>
-                                <td><?=e($item->type)?></td>
-                            </tr>
-<?php	}	?>
+                            <?php foreach ($itemsData as $item) {        ?>
+                                <tr data-id=<?= e($item->id) ?>>
+                                    <td><?= e($item->id) ?></td>
+                                    <td><?= e($item->name) ?></td>
+                                    <td><?= e($item->file) ?></td>
+                                    <td><?= e($item->type) ?></td>
+                                </tr>
+                            <?php    }    ?>
                         </tbody>
                     </table>
 
                     <div class="form-controls">
-                        <input id="createbtn" class="adm_act_btn" type="button" value="create">
-                        <input id="updbtn" class="adm_act_btn" type="button" value="update" hidden>
-                        <input id="del_btn" class="adm_act_btn" type="button" value="delete" hidden>
+                        <input id="createbtn" class="btn submit-btn" type="button" value="create">
+                        <input id="updbtn" class="btn submit-btn" type="button" value="update" hidden>
+                        <input id="del_btn" class="btn submit-btn" type="button" value="delete" hidden>
                     </div>
                 </div>
             </div>
@@ -36,28 +41,32 @@
     </div>
 </div>
 
-<form id="item-frm" method="post" action="<?=BASEURL?>api/icon/create" hidden>
+<form id="item-frm" method="post" action="<?= BASEURL ?>api/icon/create" hidden>
     <input id="icon_id" name="id" type="hidden">
-    <div class="view-row">
-        <label for="icon_name">Name</label>
+
+    <div class="field form-row">
+        <label for="icon_name" class="field__title">Name</label>
         <input id="icon_name" class="stretch-input" name="name" type="text">
     </div>
-    <div class="view-row">
-        <label for="icon_file">File name</label>
+
+    <div class="field form-row">
+        <label for="icon_file" class="field__title">File name</label>
         <input id="icon_file" class="stretch-input" name="file" type="text">
     </div>
-    <div id="admin_block" class="view-row">
-        <label for="icon_type">Type</label>
+
+    <div id="admin_block" class="field form-row">
+        <label for="icon_type" class="field__title">Type</label>
         <select id="icon_type" class="stretch-input admin-select" name="type">
             <option value="0">Select type</option>
-    <?php	foreach($typesData as $type_id => $typeName) {		?>
-            <option value="<?=e($type_id)?>"><?=e($typeName)?></option>
-    <?php	}		?>
+            <?php foreach ($typesData as $type_id => $typeName) {        ?>
+                <option value="<?= e($type_id) ?>"><?= e($typeName) ?></option>
+            <?php    }        ?>
         </select>
     </div>
-    <div class="popup__form-controls">
+
+    <div class="form-controls">
         <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 
-<?php	include(ADMIN_TPL_PATH . "Footer.tpl");	?>
+<?php include(ADMIN_TPL_PATH . "Footer.tpl");    ?>

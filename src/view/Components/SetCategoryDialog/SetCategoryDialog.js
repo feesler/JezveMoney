@@ -42,13 +42,14 @@ export class SetCategoryDialog extends Component {
         this.categoryField = Field.create({
             title: __('TR_CATEGORY'),
             content: this.categorySelect.elem,
-            className: 'view-row',
+            className: 'form-row',
         });
 
         this.dialog = ConfirmDialog.create({
             id: 'selectCategoryDialog',
             title: __('TR_SET_CATEGORY'),
             content: this.categoryField.elem,
+            confirmButtonTitle: __('SAVE'),
             className: 'category-dialog',
             destroyOnResult: false,
             onConfirm: () => this.onSubmit(),

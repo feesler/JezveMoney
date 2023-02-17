@@ -87,7 +87,6 @@ export class Header extends Component {
         // Locale select
         this.localeSelect = DropDown.create({
             elem: 'localeSelect',
-            className: 'dd_fullwidth',
             onChange: (locale) => this.onLocaleChange(locale),
             data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
         });

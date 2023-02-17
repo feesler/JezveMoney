@@ -207,7 +207,7 @@
 
                         <div class="right-column">
                             <div class="request-log">
-                                <h2>Request log</h2><input id="clearResultsBtn" class="adm_act_btn" type="button" value="clear" disabled>
+                                <h2>Request log</h2><input id="clearResultsBtn" class="btn submit-btn" type="button" value="clear" disabled>
                             </div>
                             <div id="results"></div>
                         </div>

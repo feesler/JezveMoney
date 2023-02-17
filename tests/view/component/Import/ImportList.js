@@ -26,7 +26,7 @@ export class ImportList extends TestComponent {
         if (!elem) {
             return null;
         }
-        const dataContainer = await query(elem, '.data-container');
+        const dataContainer = await query(elem, '.import-list');
         if (!dataContainer) {
             return null;
         }

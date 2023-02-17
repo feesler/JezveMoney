@@ -5,7 +5,7 @@ import { __ } from '../../../js/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
 
 /* CSS classes */
-const LIST_CLASS = 'data-container';
+const LIST_CLASS = 'import-list';
 const SELECT_MODE_CLASS = 'import-list_select';
 const SORT_MODE_CLASS = 'import-list_sort';
 

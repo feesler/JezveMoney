@@ -34,8 +34,9 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -43,8 +44,7 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
-import '../../Components/Heading/style.scss';
-import './style.scss';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { createStore } from '../../js/store.js';
 import {
     actions,
@@ -54,8 +54,9 @@ import {
     updateStateExchange,
 } from './reducer.js';
 import * as STATE from './stateId.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import '../../Components/Heading/style.scss';
+import '../../Components/Field/style.scss';
+import './style.scss';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
@@ -359,14 +360,14 @@ class TransactionView extends View {
 
         this.debtAccountTile = AccountTile.fromElement(this.debtAccountTile);
 
-        this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
+        this.noAccountBtn = this.debtAccountContainer.querySelector('.field__title .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
 
         this.selectAccountBtn = this.debtAccountContainer.querySelector('.account-toggler');
         this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
         setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
 
-        this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
+        this.debtAccountLabel = this.debtAccountContainer.querySelector('.field__title span');
 
         this.personTile = Tile.fromElement(this.personTile, { parent: this });
 

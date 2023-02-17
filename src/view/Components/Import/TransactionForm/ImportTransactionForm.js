@@ -28,21 +28,20 @@ const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
-const FORM_CONTAINER_CLASS = 'form-container';
 const IG_INPUT_CLASS = 'input-group__input';
 const IG_BUTTON_CLASS = 'input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'stretch-input';
 const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
-const TYPE_FIELD_CLASS = 'type-field';
-const ACCOUNT_FIELD_CLASS = 'account-field';
-const SRC_AMOUNT_FIELD_CLASS = 'amount-field src-amount-field';
-const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
-const PERSON_FIELD_CLASS = 'person-field';
-const DATE_FIELD_CLASS = 'date-field';
-const CATEGORY_FIELD_CLASS = 'category-field';
-const COMMENT_FIELD_CLASS = 'comment-field';
+const TYPE_FIELD_CLASS = 'form-row type-field';
+const ACCOUNT_FIELD_CLASS = 'form-row account-field';
+const SRC_AMOUNT_FIELD_CLASS = 'form-row amount-field src-amount-field';
+const DEST_AMOUNT_FIELD_CLASS = 'form-row amount-field dest-amount-field';
+const PERSON_FIELD_CLASS = 'form-row person-field';
+const DATE_FIELD_CLASS = 'form-row date-field';
+const CATEGORY_FIELD_CLASS = 'form-row category-field';
+const COMMENT_FIELD_CLASS = 'form-row comment-field';
 /* Controls */
 const CALENDAR_ICON_CLASS = 'icon calendar-icon';
 /* Form controls */
@@ -102,17 +101,6 @@ export class ImportTransactionForm extends Component {
         this.createCategoryField();
         this.createCommentField();
 
-        this.formContainer = createContainer(FORM_CONTAINER_CLASS, [
-            this.trTypeField.elem,
-            this.transferAccountField.elem,
-            this.personField.elem,
-            this.srcAmountField.elem,
-            this.destAmountField.elem,
-            this.dateField.elem,
-            this.categoryField.elem,
-            this.commentField.elem,
-        ]);
-
         // Save button
         this.saveBtn = createElement('button', {
             props: {
@@ -142,7 +130,14 @@ export class ImportTransactionForm extends Component {
         ]);
 
         this.initContainer(CONTAINER_CLASS, [
-            this.formContainer,
+            this.trTypeField.elem,
+            this.transferAccountField.elem,
+            this.personField.elem,
+            this.srcAmountField.elem,
+            this.destAmountField.elem,
+            this.dateField.elem,
+            this.categoryField.elem,
+            this.commentField.elem,
             this.formControls,
         ]);
 

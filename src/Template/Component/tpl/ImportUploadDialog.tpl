@@ -34,8 +34,9 @@
 
     <section id="templateBlock" class="tpl-form" hidden>
         <div id="tplFilename" class="tpl-form__file"></div>
+
         <section id="tplSelectGroup" class="tpl-form__select-group">
-            <div id="tplField" class="tpl-form-field template-field">
+            <div id="tplField" class="field template-field">
                 <header id="tplFieldHeader" class="template-field__header">
                     <label><?= __("TEMPLATE") ?></label>
                 </header>
@@ -44,13 +45,14 @@
         </section>
 
         <section id="templateForm" hidden>
-            <div id="nameField" class="tpl-form-field validation-block">
-                <label for="tplNameInp"><?= __("TEMPLATE_NAME") ?></label>
+            <div id="nameField" class="field form-row validation-block">
+                <label for="tplNameInp" class="field__title"><?= __("TEMPLATE_NAME") ?></label>
                 <input id="tplNameInp" class="stretch-input" type="text" autocomplete="off">
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
             </div>
-            <div id="firstRowField" class="tpl-form-field first-row-field validation-block">
-                <label for="firstRowInp"><?= __("TEMPLATE_FIRST_ROW") ?></label>
+
+            <div id="firstRowField" class="field form-row first-row-field validation-block">
+                <label for="firstRowInp" class="field__title"><?= __("TEMPLATE_FIRST_ROW") ?></label>
                 <div class="input-group">
                     <button id="decFirstRowBtn" class="input-group__btn" type="button">-</button>
                     <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
@@ -58,18 +60,21 @@
                 </div>
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
             </div>
-            <div id="tplAccountSwitchField" class="tpl-form-field tpl-form-switch-field">
+
+            <div id="tplAccountSwitchField" class="field form-row tpl-form-switch-field">
                 <span class="tpl-form-field__label"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
                 <label id="tplAccountSwitch" class="switch">
                     <input type="checkbox">
                     <div class="switch-slider"></div>
                 </label>
             </div>
-            <div id="tplAccountField" class="tpl-form-field tpl-account-field" hidden>
-                <label><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></label>
+
+            <div id="tplAccountField" class="field form-row tpl-account-field" hidden>
+                <label class="field__title"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></label>
             </div>
-            <div id="columnField" class="tpl-form-field validation-block">
-                <label for="columnSel"><?= __("TEMPLATE_COLUMN") ?></label>
+
+            <div id="columnField" class="field form-row validation-block">
+                <label for="columnSel" class="field__title"><?= __("TEMPLATE_COLUMN") ?></label>
                 <select id="columnSel">
                     <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
                         <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
@@ -78,17 +83,18 @@
                 <div id="columnFeedback" class="feedback invalid-feedback"></div>
             </div>
 
-            <div id="rawDataTable" class="tpl-form-field raw-data-field">
-                <label><?= __("TEMPLATE_COLUMN_MAP") ?></label>
+            <div id="rawDataTable" class="field form-row raw-data-field">
+                <label class="field__title"><?= __("TEMPLATE_COLUMN_MAP") ?></label>
             </div>
             <div id="tplFormFeedback" class="feedback"></div>
+
             <div id="tplControls" class="form-controls">
                 <input id="submitTplBtn" class="btn submit-btn" type="button" value="<?= __("SAVE") ?>">
                 <input id="cancelTplBtn" class="btn cancel-btn" type="button" value="<?= __("CANCEL") ?>">
             </div>
         </section>
-        <div id="initialAccField" class="tpl-form-field" hidden>
-            <label><?= __("IMPORT_MAIN_ACCOUNT") ?></label>
+        <div id="initialAccField" class="field" hidden>
+            <label class="field__title"><?= __("IMPORT_MAIN_ACCOUNT") ?></label>
             <select id="initialAccount"></select>
         </div>
         <div id="convertFeedback" class="feedback" hidden></div>

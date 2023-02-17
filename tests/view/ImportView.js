@@ -119,7 +119,7 @@ export class ImportView extends AppView {
         const mainAccountId = res.mainAccountSelect.value;
 
         // Import list
-        const rowsContainer = await query('.data-container');
+        const rowsContainer = await query('.import-list');
         res.renderTime = await prop(rowsContainer, 'dataset.time');
 
         const listContainer = await query('.data-form');

@@ -3,36 +3,27 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-}
 
-/* Uploaded file name */
-.tpl-form__file {
-  font-size: 14px;
-  color: #7b7b7b;
-}
-
-/* Template form field */
-.tpl-form-field {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: baseline;
-  margin: 9px 0;
-  max-width: 300px;
-
-  input {
-    flex: 0 0 auto;
+  /* Uploaded file name */
+  .tpl-form__file {
+    font-size: 0.9rem;
+    color: #7b7b7b;
+    margin: var(--form-field-margin);
   }
 
-  .input-group {
-    --ig-height: var(--input-height);
+  /* Template form field */
+  .field {
+    .input-group {
+      --ig-height: var(--input-height);
+    }
   }
-}
 
-/* Import template field */
-.template-field {
-  overflow: hidden;
-  max-width: none;
-  width: 100%;
+  /* Import template field */
+  .template-field {
+    overflow: hidden;
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 /* Template field header */
@@ -99,6 +90,7 @@
   flex-flow: row nowrap;
   align-items: baseline;
   overflow: hidden;
+  margin: var(--form-field-margin);
 }
 
 .tpl-account-field {
