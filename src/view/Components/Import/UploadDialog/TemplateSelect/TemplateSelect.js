@@ -5,7 +5,8 @@ import {
     Component,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { PopupMenu, PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../js/utils.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 import './style.scss';
@@ -50,7 +51,7 @@ export class TemplateSelect extends Component {
     init() {
         this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
 
-        this.menuContainer = PopupMenuButton.create({
+        this.menuButton = MenuButton.create({
             onClick: (e) => this.onToggleMenu(e),
         });
         this.toggleExtBtn = ToggleButton.create();
@@ -58,7 +59,7 @@ export class TemplateSelect extends Component {
         this.createContextMenu();
 
         this.controls = window.app.createContainer(CONTROLS_CLASS, [
-            this.menuContainer.elem,
+            this.menuButton.elem,
             this.toggleExtBtn.elem,
         ]);
         this.contentElem = window.app.createContainer(CONTENT_CLASS, [
@@ -80,7 +81,7 @@ export class TemplateSelect extends Component {
 
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
-            attached: true,
+            fixed: false,
             onClose: () => this.showMenu(false),
             items: [{
                 icon: 'update',
@@ -161,11 +162,11 @@ export class TemplateSelect extends Component {
             this.contextMenu.detach();
             return;
         }
-        if (!this.menuContainer.elem) {
+        if (!this.menuButton.elem) {
             return;
         }
 
-        this.contextMenu.attachAndShow(this.menuContainer.elem);
+        this.contextMenu.attachAndShow(this.menuButton.elem);
     }
 
     renderSelect(state, prevState) {
@@ -204,7 +205,7 @@ export class TemplateSelect extends Component {
 
         this.templateDropDown.enable(!state.disabled);
         enable(this.elem, !state.disabled);
-        enable(this.menuContainer.button, !state.disabled);
+        enable(this.menuButton.button, !state.disabled);
         enable(this.toggleExtBtn.elem, !state.disabled);
     }
 }

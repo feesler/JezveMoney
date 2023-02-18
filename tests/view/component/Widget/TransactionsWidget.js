@@ -1,8 +1,7 @@
 import {
     query,
     assert,
-    closest,
-    prop,
+    evaluate,
     asArray,
     asyncMap,
     navigation,
@@ -16,8 +15,6 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
 
-const contextMenuSelector = '#contextMenu';
-
 export class TransactionsWidget extends Widget {
     async parseContent() {
         const res = await super.parseContent();
@@ -26,13 +23,15 @@ export class TransactionsWidget extends Widget {
         assert(res.transList, 'Invalid transactions widget');
 
         // Context menu
-        res.contextMenu = { elem: await query(contextMenuSelector) };
-        const contextParent = await closest(res.contextMenu.elem, '.trans-item');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.itemId = parseInt(itemId, 10);
-            assert(res.contextMenu.itemId, 'Invalid item');
+        res.contextMenu = { elem: await query('#contextMenu') };
+        res.contextMenu.itemId = await evaluate((menuEl) => {
+            const contextParent = menuEl?.closest('.trans-item');
+            return (contextParent)
+                ? parseInt(contextParent.dataset.id, 10)
+                : null;
+        }, res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
 

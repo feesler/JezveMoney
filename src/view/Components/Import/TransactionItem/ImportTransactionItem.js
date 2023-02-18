@@ -1,7 +1,7 @@
 import { enable, Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { __ } from '../../../js/utils.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
@@ -102,10 +102,10 @@ export class ImportTransactionItem extends Component {
             ]),
         ]);
 
-        this.menuContainer = PopupMenuButton.create();
+        this.menuButton = MenuButton.create();
         this.toggleExtBtn = ToggleButton.create();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menuContainer.elem,
+            this.menuButton.elem,
             this.toggleExtBtn.elem,
         ]);
 
@@ -274,7 +274,7 @@ export class ImportTransactionItem extends Component {
         // Comment field
         this.commentField.setContent(transaction.comment);
 
-        this.menuContainer.show(transaction.listMode === 'list');
+        this.menuButton.show(transaction.listMode === 'list');
 
         if (this.collapse) {
             if (transaction.collapsed) {

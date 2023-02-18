@@ -319,8 +319,13 @@ svg * {
   --btn-icon-color: var(--warning-color-alt);
   --btn-hover-title-color: var(--warning-color);
   --btn-hover-icon-color: var(--warning-color);
+  --btn-focus-shadow: 0 0 0 0.25rem #f31b1b40;
 
   text-decoration: underline;
+}
+
+.heading-actions .btn.warning-btn {
+  --btn-size: 32px;
 }
 
 .alter-link,
@@ -330,6 +335,13 @@ svg * {
   padding: 6px 24px;
   overflow: visible;
   cursor: pointer;
+}
+
+/* Circle button with icon */
+.btn.circle-btn {
+  --btn-border-radius: 100vh;
+  --btn-hover-background: var(--icon-btn-hover-bg);
+  --btn-active-background: var(--icon-btn-hover-bg);
 }
 
 /* flat square button with icon */
@@ -361,10 +373,6 @@ svg * {
 
   vertical-align: baseline;
   text-decoration: underline;
-}
-
-.btn.warning-btn:focus-visible {
-  box-shadow: 0 0 0 0.25rem #f31b1b40;
 }
 
 /* Underlined text button */
@@ -606,12 +614,12 @@ svg * {
 }
 
 /* Popup menu button */
-.popup-menu .popup-menu-btn__icon {
-  --popupmenu-btn-icon-size: 20px;
-
-  width: var(--popupmenu-btn-icon-size);
-  height: var(--popupmenu-btn-icon-size);
-  fill: var(--popupmenu-icon-color);
+.btn.menu-btn {
+  --btn-size: 32px;
+  --btn-icon-size: 24px;
+  --btn-padding: 0;
+  --btn-background: none;
+  --btn-icon-color: var(--main-text-color);
 }
 
 /* Popup */

@@ -16,6 +16,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div class="heading-actions">
                                 <?= Button::render([
                                     "id" => "createBtn",
+                                    "classNames" => "circle-btn",
                                     "type" => "link",
                                     "link" => BASEURL . "persons/create/",
                                     "icon" => "plus",

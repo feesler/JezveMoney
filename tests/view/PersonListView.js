@@ -4,13 +4,13 @@ import {
     asyncMap,
     query,
     prop,
-    closest,
     navigation,
     waitForFunction,
     click,
     baseUrl,
     goTo,
     wait,
+    evaluate,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -58,10 +58,7 @@ export class PersonListView extends AppView {
         const res = {
             addBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
-            listMenuContainer: {
-                elem: await query('.heading-actions .popup-menu'),
-                menuBtn: await query('.heading-actions .popup-menu-btn'),
-            },
+            menuBtn: { elem: await query('.heading-actions .menu-btn') },
             listMenu: { elem: await query('#listMenu') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
@@ -76,12 +73,13 @@ export class PersonListView extends AppView {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.tile');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.tileId = parseInt(itemId, 10);
-            assert(res.contextMenu.tileId, 'Invalid person');
+        res.contextMenu.itemId = await evaluate((menuEl) => (
+            menuEl?.previousElementSibling?.classList.contains('tile')
+                ? parseInt(menuEl.previousElementSibling.dataset.id, 10)
+                : null
+        ), res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
@@ -121,7 +119,7 @@ export class PersonListView extends AppView {
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
-            contextItem: cont.contextMenu.tileId,
+            contextItem: cont.contextMenu.itemId,
             mode: cont.tiles.listMode,
             sortMode: App.state.getPersonsSortMode(),
             listMenuVisible: cont.listMenu.visible,
@@ -184,7 +182,7 @@ export class PersonListView extends AppView {
             totalCounter: { visible: true, value: itemsCount },
             hiddenCounter: { visible: true, value: model.hiddenTiles.length },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            listMenuContainer: { visible: itemsCount > 0 && !isSortMode },
+            menuBtn: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible && isListMode && itemsCount > 0 },
             sortModeBtn: { visible: showSortItems },
@@ -213,7 +211,7 @@ export class PersonListView extends AppView {
             const isHidden = App.state.persons.isHidden(ctxPerson);
             res.contextMenu = {
                 visible: true,
-                tileId: model.contextItem,
+                itemId: model.contextItem,
             };
 
             res.ctxDetailsBtn = { visible: true };
@@ -369,7 +367,7 @@ export class PersonListView extends AppView {
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+        await this.performAction(() => click(this.content.menuBtn.elem));
 
         return this.checkState(expected);
     }

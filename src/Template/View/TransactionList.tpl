@@ -18,11 +18,13 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <div class="heading-actions">
                                 <?= Button::render([
                                     "id" => "filtersBtn",
+                                    "classNames" => "circle-btn",
                                     "type" => "button",
                                     "icon" => "filter",
                                 ]) ?>
                                 <?= Button::render([
                                     "id" => "createBtn",
+                                    "classNames" => "circle-btn",
                                     "type" => "link",
                                     "link" => BASEURL . "transactions/create/",
                                     "icon" => "plus",

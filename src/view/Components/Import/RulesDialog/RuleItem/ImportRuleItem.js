@@ -7,7 +7,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
@@ -66,9 +66,9 @@ export class ImportRuleItem extends Component {
             this.bottomRow,
         ]);
 
-        this.menuContainer = PopupMenuButton.create();
+        this.menuButton = MenuButton.create();
         this.controls = window.app.createContainer('rule-item__main-controls', [
-            this.menuContainer.elem,
+            this.menuButton.elem,
             this.toggleExtBtn.elem,
         ]);
 

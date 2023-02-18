@@ -3,8 +3,6 @@ import {
     assert,
     asyncMap,
     query,
-    prop,
-    closest,
     navigation,
     waitForFunction,
     click,
@@ -94,10 +92,7 @@ export class CategoryListView extends AppView {
         const res = {
             createBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
-            listMenuContainer: {
-                elem: await query('.heading-actions .popup-menu'),
-                menuBtn: await query('.heading-actions .popup-menu-btn'),
-            },
+            menuBtn: { elem: await query('.heading-actions .menu-btn') },
             listMenu: { elem: await query('#listMenu') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
@@ -111,12 +106,14 @@ export class CategoryListView extends AppView {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.category-item');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.itemId = parseInt(itemId, 10);
-            assert(res.contextMenu.itemId, 'Invalid category');
+        res.contextMenu.itemId = await evaluate((menuEl) => {
+            const contextParent = menuEl?.closest('.category-item');
+            return (contextParent)
+                ? parseInt(contextParent.dataset.id, 10)
+                : null;
+        }, res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
@@ -270,7 +267,7 @@ export class CategoryListView extends AppView {
             loadingIndicator: { visible: model.loading },
             totalCounter: { visible: true, value: itemsCount },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            listMenuContainer: { visible: itemsCount > 0 && !isSortMode },
+            menuBtn: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible && isListMode },
             sortModeBtn: { visible: showSortItems },
@@ -452,7 +449,7 @@ export class CategoryListView extends AppView {
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+        await this.performAction(() => click(this.content.menuBtn.elem));
 
         return this.checkState(expected);
     }

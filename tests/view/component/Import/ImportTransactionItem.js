@@ -73,7 +73,7 @@ export class ImportTransactionItem extends TestComponent {
 
         res.typeField.type = await prop(res.typeField.elem, 'dataset.type');
 
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.origDataTable = await query(this.elem, '.orig-data-table');

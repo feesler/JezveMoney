@@ -21,10 +21,6 @@
   flex: 1 1 auto;
   column-gap: 18px;
   z-index: 1001;
-
-  .popup-menu-btn {
-    background: none;
-  }
 }
 
 .header .heading-actions {
@@ -37,7 +33,7 @@
     --btn-hover-icon-color: var(--header-color);
   }
 
-  .popup-menu-btn__icon {
+  .btn__icon {
     fill: var(--header-color);
   }
 }

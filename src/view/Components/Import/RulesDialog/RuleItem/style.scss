@@ -13,22 +13,17 @@
   }
 
   /* Menu */
-  .popup-menu-btn {
-    width: 26px;
-    height: 26px;
-    padding: 4px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-
-  .popup-menu-btn__icon {
-    width: 18px;
-    height: 18px;
-  }
-
   .popup-menu {
     position: static;
+  }
+
+  .btn.menu-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 0;
+    --btn-background: none;
+    --btn-icon-color: var(--list-item-icon-fill);
+
     margin: 0 4px;
   }
 

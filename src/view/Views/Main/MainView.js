@@ -223,7 +223,8 @@ class MainView extends View {
     createTransactionContextMenu() {
         this.transactionContextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: this.showContextMenu(null),
             items: [{
                 id: 'ctxUpdateBtn',
                 type: 'link',
@@ -285,7 +286,7 @@ class MainView extends View {
 
     /** Transaction list 'click' event handler */
     onTransactionClick(itemId, e) {
-        if (e?.target?.closest('.popup-menu-btn')) {
+        if (e?.target?.closest('.menu-btn')) {
             this.showContextMenu(itemId);
         }
     }
@@ -544,8 +545,8 @@ class MainView extends View {
             return;
         }
         const listItem = this.latestList.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
             this.transactionContextMenu.detach();
             return;
         }
@@ -554,7 +555,7 @@ class MainView extends View {
         const { items } = this.transactionContextMenu;
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
-        this.transactionContextMenu.attachAndShow(menuContainer);
+        this.transactionContextMenu.attachAndShow(menuButton);
     }
 
     /** Renders transactions widget */

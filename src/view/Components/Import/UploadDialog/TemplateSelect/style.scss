@@ -24,23 +24,19 @@
   width: 100%;
 
   /* Menu */
-  .popup-menu-btn {
+  .menu-btn {
     width: 26px;
     height: 26px;
     padding: 4px;
+    margin: 0 4px;
     background: none;
     pointer-events: all;
     cursor: pointer;
   }
 
-  .popup-menu-btn__icon {
+  .btn__icon {
     width: 18px;
     height: 18px;
-  }
-
-  .popup-menu {
-    position: static;
-    margin: 0 4px;
   }
 
   .popup-menu-list {

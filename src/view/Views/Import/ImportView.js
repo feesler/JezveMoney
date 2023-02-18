@@ -7,8 +7,9 @@ import {
     insertAfter,
     isFunction,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
+import { DropDown } from 'jezvejs/DropDown';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
@@ -123,8 +124,9 @@ class ImportView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
 
+        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
         this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         // List
         this.list = ImportTransactionList.create({
@@ -175,6 +177,8 @@ class ImportView extends View {
     createMenu() {
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            fixed: false,
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',
@@ -266,7 +270,7 @@ class ImportView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
             onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxRestoreBtn',
@@ -528,7 +532,7 @@ class ImportView extends View {
 
         const { listMode } = state;
         if (listMode === 'list') {
-            if (!e.target.closest('.popup-menu-btn')) {
+            if (!e.target.closest('.menu-btn')) {
                 return;
             }
             this.showContextMenu(index);
@@ -826,8 +830,8 @@ class ImportView extends View {
 
         const item = state.items[index];
         const listItem = this.list.getListItemById(item.id);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
             this.contextMenu.detach();
             return;
         }
@@ -841,7 +845,7 @@ class ImportView extends View {
         const title = (item.enabled) ? __('DISABLE') : __('ENABLE');
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {

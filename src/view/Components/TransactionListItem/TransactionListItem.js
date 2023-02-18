@@ -5,7 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { timeToDate, __ } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -232,10 +232,10 @@ export class TransactionListItem extends Component {
             return;
         }
 
-        this.menuContainer = PopupMenuButton.create();
+        this.menuButton = MenuButton.create();
         this.controlsElem = createElement('div', {
             props: { className: CONTROLS_CLASS },
-            children: this.menuContainer.elem,
+            children: this.menuButton.elem,
         });
 
         this.elem.append(this.controlsElem);

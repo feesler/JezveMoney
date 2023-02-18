@@ -8,8 +8,9 @@ import {
     debounce,
     isFunction,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
+import { DropDown } from 'jezvejs/DropDown';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -243,8 +244,9 @@ class TransactionListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
+        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
         this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -254,6 +256,8 @@ class TransactionListView extends View {
     createMenu() {
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            fixed: false,
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -303,7 +307,8 @@ class TransactionListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -667,7 +672,7 @@ class TransactionListView extends View {
 
         const state = this.store.getState();
         if (state.listMode === 'list') {
-            const menuBtn = e?.target?.closest('.popup-menu-btn');
+            const menuBtn = e?.target?.closest('.menu-btn');
             if (menuBtn) {
                 this.showContextMenu(id);
             }
@@ -725,8 +730,8 @@ class TransactionListView extends View {
             return;
         }
         const listItem = this.list.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
             this.contextMenu.detach();
             return;
         }
@@ -736,7 +741,7 @@ class TransactionListView extends View {
         items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {
@@ -750,7 +755,7 @@ class TransactionListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
 
         const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);

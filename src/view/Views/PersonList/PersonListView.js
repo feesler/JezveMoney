@@ -6,6 +6,7 @@ import {
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import {
@@ -128,8 +129,9 @@ class PersonListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
+        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
         this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -148,6 +150,8 @@ class PersonListView extends View {
     createMenu() {
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            fixed: false,
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -211,7 +215,8 @@ class PersonListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -300,12 +305,12 @@ class PersonListView extends View {
     }
 
     async setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
         }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -547,7 +552,7 @@ class PersonListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
         const { items } = this.menu;
 
         items.selectModeBtn.show(isListMode && itemsCount > 0);

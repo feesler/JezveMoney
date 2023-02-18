@@ -97,10 +97,7 @@ export class ImportView extends AppView {
         res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
 
         // List menu
-        res.listMenuContainer = {
-            elem: await query('.heading-actions .popup-menu'),
-            menuBtn: await query('.heading-actions .popup-menu-btn'),
-        };
+        res.menuBtn = { elem: await query('.heading-actions .menu-btn') };
         res.listMenu = { elem: await query('#listMenu') };
         if (res.listMenu.elem) {
             await this.parseMenuItems(res, menuItems);
@@ -224,7 +221,7 @@ export class ImportView extends AppView {
                 localeSelect: { value: model.locale },
             },
             notAvailMsg: { visible: !model.enabled },
-            listMenuContainer: { visible: model.enabled },
+            menuBtn: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
             uploadBtn: {
                 visible: model.enabled && listMode,
@@ -449,7 +446,7 @@ export class ImportView extends AppView {
 
         this.model.menuOpen = true;
         this.expectedState = this.getExpectedState();
-        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+        await this.performAction(() => click(this.content.menuBtn.elem));
 
         return this.checkState();
     }

@@ -60,7 +60,7 @@ export class ImportUploadDialog extends TestComponent {
             templateSelect: {
                 elem: await query(this.elem, '.template-select'),
                 titleElem: await query(this.elem, '.template-select .template-select__title'),
-                menuBtn: await query(this.elem, '.template-select .popup-menu-btn'),
+                menuBtn: await query(this.elem, '.template-select .menu-btn'),
             },
             templateDropDown: await DropDown.create(
                 this,

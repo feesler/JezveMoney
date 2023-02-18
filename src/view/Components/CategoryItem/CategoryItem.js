@@ -5,7 +5,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { listData } from '../../js/utils.js';
 import './style.scss';
@@ -93,10 +93,10 @@ export class CategoryItem extends Component {
             return;
         }
 
-        this.menuContainer = PopupMenuButton.create();
+        this.menuButton = MenuButton.create();
         this.controlsElem = createElement('div', {
             props: { className: CONTROLS_CLASS },
-            children: this.menuContainer.elem,
+            children: this.menuButton.elem,
         });
 
         this.mainContainer.append(this.controlsElem);

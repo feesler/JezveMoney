@@ -7,6 +7,7 @@ import {
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { Application } from '../../js/Application.js';
@@ -156,8 +157,9 @@ class CategoryListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
+        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
         this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -176,6 +178,8 @@ class CategoryListView extends View {
     createMenu() {
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            fixed: false,
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -229,7 +233,8 @@ class CategoryListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -274,7 +279,7 @@ class CategoryListView extends View {
 
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            const menuBtn = e?.target?.closest('.popup-menu-btn');
+            const menuBtn = e?.target?.closest('.menu-btn');
             if (menuBtn) {
                 this.showContextMenu(id);
             }
@@ -315,12 +320,12 @@ class CategoryListView extends View {
     }
 
     async setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
         }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -542,9 +547,9 @@ class CategoryListView extends View {
             return;
         }
 
-        const selector = `.category-item[data-id="${itemId}"] .popup-menu`;
-        const menuContainer = this.contentContainer.querySelector(selector);
-        if (!menuContainer) {
+        const selector = `.category-item[data-id="${itemId}"] .menu-btn`;
+        const menuButton = this.contentContainer.querySelector(selector);
+        if (!menuButton) {
             this.contextMenu.detach();
             return;
         }
@@ -554,7 +559,7 @@ class CategoryListView extends View {
         items.ctxDetailsBtn.setURL(`${baseURL}categories/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${itemId}`);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {
@@ -569,7 +574,7 @@ class CategoryListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
 
         const { items } = this.menu;
 

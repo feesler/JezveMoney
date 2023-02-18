@@ -89,7 +89,7 @@ export class TransactionListItem extends TestComponent {
             Object.assign(res, props);
         }
 
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
 
         return res;
     }

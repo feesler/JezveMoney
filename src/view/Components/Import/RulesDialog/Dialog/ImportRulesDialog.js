@@ -111,7 +111,8 @@ export class ImportRulesDialog extends Component {
 
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 icon: 'update',
                 title: __('UPDATE'),
@@ -249,7 +250,7 @@ export class ImportRulesDialog extends Component {
     onItemClick(itemId, e) {
         if (
             this.state.id !== this.LIST_STATE
-            || !e.target.closest('.popup-menu-btn')
+            || !e.target.closest('.menu-btn')
         ) {
             return;
         }
@@ -379,12 +380,12 @@ export class ImportRulesDialog extends Component {
             return;
         }
         const listItem = this.rulesList.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
             return;
         }
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     /** Render list state of component */
