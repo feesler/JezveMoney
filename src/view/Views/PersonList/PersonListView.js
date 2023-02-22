@@ -29,7 +29,7 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { PersonDetails } from '../../Components/PersonDetails/PersonDetails.js';
+import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';

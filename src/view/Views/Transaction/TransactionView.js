@@ -43,7 +43,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
+import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { createStore } from '../../js/store.js';
 import {
