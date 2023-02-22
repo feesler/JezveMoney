@@ -96,6 +96,10 @@
 /* Sort mode */
 .trans-item_sort {
   cursor: move;
+
+  .trans-item__content {
+    padding: 8px;
+  }
 }
 
 .trans-item__amount,
