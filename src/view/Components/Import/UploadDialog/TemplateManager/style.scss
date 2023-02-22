@@ -20,8 +20,6 @@
 
   /* Import template field */
   .template-field {
-    overflow: hidden;
-    max-width: 100%;
     width: 100%;
   }
 }
@@ -89,7 +87,6 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;
-  overflow: hidden;
   margin: var(--form-field-margin);
 }
 

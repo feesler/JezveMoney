@@ -23,26 +23,6 @@
   flex: 1 1 auto;
   width: 100%;
 
-  /* Menu */
-  .menu-btn {
-    width: 26px;
-    height: 26px;
-    padding: 4px;
-    margin: 0 4px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-
-  .btn__icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .popup-menu-list {
-    right: auto;
-  }
-
   /* Menu and toggle expand/collapse button */
   .icon-btn {
     display: flex;
