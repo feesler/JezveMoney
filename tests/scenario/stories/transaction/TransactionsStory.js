@@ -411,7 +411,7 @@ export class TransactionsStory extends TestStory {
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
-        // Try to submit debt with invalid amount
+        // Try to submit debt with invalid destination amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '' },
@@ -420,6 +420,15 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Try to submit debt with invalid source amount
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '-200' },
         ]);
 
         // Try to submit debt with invalid date

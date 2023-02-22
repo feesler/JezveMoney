@@ -799,7 +799,12 @@ class TransactionView extends View {
             return;
         }
 
-        if (state.transaction.type === EXPENSE) {
+        const startFromDestAmount = (
+            state.transaction.type === EXPENSE
+            || (state.transaction.type === DEBT && !state.transaction.debtType)
+        );
+
+        if (startFromDestAmount) {
             this.validateDestAmount(state);
             if (state.isDiff) {
                 this.validateSourceAmount(state);

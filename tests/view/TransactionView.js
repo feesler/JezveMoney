@@ -215,9 +215,11 @@ export class TransactionView extends AppView {
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
         res.srcAmount = cont.srcAmountRow.value;
+        res.srcAmountInvalidated = cont.srcAmountRow.isInvalid;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
         res.destAmount = cont.destAmountRow.value;
+        res.destAmountInvalidated = cont.destAmountRow.isInvalid;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
         res.srcResBal = cont.srcResBalanceRow.value;
@@ -426,6 +428,8 @@ export class TransactionView extends AppView {
         }
 
         res.date = cont.datePicker.value;
+        res.dateInvalidated = cont.datePicker.isInvalid;
+
         res.categoryId = parseInt(cont.categorySelect.value, 10);
         res.comment = cont.commentRow.value;
 
@@ -549,10 +553,12 @@ export class TransactionView extends AppView {
             res.srcAmountRow.value = this.model.srcAmount.toString();
             res.srcAmountRow.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
             res.srcAmountRow.isCurrActive = (isIncome || (isDebt && this.model.debtType));
+            res.srcAmountRow.isInvalid = this.model.srcAmountInvalidated;
 
             res.destAmountRow.value = this.model.destAmount.toString();
             res.destAmountRow.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
             res.destAmountRow.isCurrActive = (isExpense || (isDebt && !this.model.debtType));
+            res.destAmountRow.isInvalid = this.model.destAmountInvalidated;
 
             if (this.model.destCurr && this.model.srcCurr) {
                 const exchRateValue = (this.model.useBackExchange)
@@ -570,6 +576,7 @@ export class TransactionView extends AppView {
             res.datePicker = {
                 visible: true,
                 value: this.model.date,
+                isInvalid: this.model.dateInvalidated,
             };
 
             const visibleCategories = this.appState()
@@ -1458,12 +1465,39 @@ export class TransactionView extends AppView {
     }
 
     async submit() {
+        if (this.content.srcAmountRow?.content?.visible) {
+            if (this.model.fSrcAmount <= 0) {
+                this.model.srcAmountInvalidated = true;
+            }
+        }
+
+        if (this.content.destAmountRow?.content?.visible) {
+            if (this.model.fDestAmount <= 0) {
+                this.model.destAmountInvalidated = true;
+            }
+        }
+
+        const timestamp = convDate(this.model.date);
+        if (!timestamp || timestamp < 0) {
+            this.model.dateInvalidated = true;
+        }
+
+        const isValid = (
+            !this.model.srcAmountInvalidated
+            && !this.model.destAmountInvalidated
+            && !this.model.dateInvalidated
+        );
+
         const action = () => click(this.content.submitBtn);
 
-        if (this.isValid()) {
+        if (isValid) {
             await navigation(action);
         } else {
+            const expected = this.getExpectedState();
+
             await this.performAction(action);
+
+            this.checkState(expected);
         }
     }
 
@@ -1681,6 +1715,7 @@ export class TransactionView extends AppView {
                 this.setDestAmount(this.model.fSrcAmount);
             }
         }
+        this.model.srcAmountInvalidated = false;
 
         this.expectedState = this.getExpectedState();
 
@@ -1759,6 +1794,7 @@ export class TransactionView extends AppView {
                 this.setSrcAmount(this.model.fDestAmount);
             }
         }
+        this.model.destAmountInvalidated = false;
 
         this.expectedState = this.getExpectedState();
 
