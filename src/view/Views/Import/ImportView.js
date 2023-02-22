@@ -171,8 +171,6 @@ class ImportView extends View {
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         listContainer.append(this.loadingInd.elem);
 
-        this.createContextMenu();
-
         this.subscribeToStore(this.store);
         this.setRenderTime();
     }
@@ -275,6 +273,10 @@ class ImportView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
@@ -823,7 +825,7 @@ class ImportView extends View {
             return;
         }
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         if (state.contextItemIndex === prevState.contextItemIndex) {
@@ -832,7 +834,7 @@ class ImportView extends View {
 
         const index = state.contextItemIndex;
         if (index === -1) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
@@ -847,8 +849,12 @@ class ImportView extends View {
         const listItem = this.list.getListItemById(item.id);
         const menuButton = listItem?.elem?.querySelector('.menu-btn');
         if (!menuButton) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const itemRestoreAvail = (

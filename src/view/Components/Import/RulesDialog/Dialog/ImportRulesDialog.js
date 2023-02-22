@@ -101,8 +101,6 @@ export class ImportRulesDialog extends Component {
         });
         show(this.elem, true);
 
-        this.createContextMenu();
-
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.loadingIndicator.elem);
 
@@ -110,6 +108,10 @@ export class ImportRulesDialog extends Component {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             fixed: false,
             onClose: () => this.showContextMenu(null),
@@ -371,18 +373,23 @@ export class ImportRulesDialog extends Component {
 
     renderContextMenu(state) {
         if (state.id !== this.LIST_STATE) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const itemId = state.contextItem;
         if (!itemId) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const listItem = this.rulesList.getListItemById(itemId);
         const menuButton = listItem?.elem?.querySelector('.menu-btn');
         if (!menuButton) {
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         this.contextMenu.attachAndShow(menuButton);

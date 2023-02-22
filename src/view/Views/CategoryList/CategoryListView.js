@@ -164,8 +164,6 @@ class CategoryListView extends View {
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
-        this.createContextMenu();
-
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
@@ -238,6 +236,10 @@ class CategoryListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
@@ -551,22 +553,26 @@ class CategoryListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
         const itemId = state.contextItem;
         const category = window.app.model.categories.getItem(itemId);
         if (!category) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
         const selector = `.category-item[data-id="${itemId}"] .menu-btn`;
         const menuButton = this.contentContainer.querySelector(selector);
         if (!menuButton) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;

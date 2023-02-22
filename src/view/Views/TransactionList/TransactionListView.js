@@ -251,8 +251,6 @@ class TransactionListView extends View {
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
-        this.createContextMenu();
-
         this.subscribeToStore(this.store);
     }
 
@@ -312,6 +310,10 @@ class TransactionListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
@@ -736,19 +738,23 @@ class TransactionListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const itemId = state.contextItem;
         if (!itemId) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const listItem = this.list.getListItemById(itemId);
         const menuButton = listItem?.elem?.querySelector('.menu-btn');
         if (!menuButton) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;

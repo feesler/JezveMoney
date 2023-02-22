@@ -56,8 +56,6 @@ export class TemplateSelect extends Component {
         });
         this.toggleExtBtn = ToggleButton.create();
 
-        this.createContextMenu();
-
         this.controls = window.app.createContainer(CONTROLS_CLASS, [
             this.menuButton.elem,
             this.toggleExtBtn.elem,
@@ -80,6 +78,10 @@ export class TemplateSelect extends Component {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             fixed: false,
             onClose: () => this.showMenu(false),
@@ -159,11 +161,16 @@ export class TemplateSelect extends Component {
 
     renderContextMenu(state) {
         if (!state.showMenu) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         if (!this.menuButton.elem) {
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         this.contextMenu.attachAndShow(this.menuButton.elem);

@@ -136,8 +136,6 @@ class PersonListView extends View {
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
-        this.createContextMenu();
-
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
@@ -220,6 +218,10 @@ class PersonListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
@@ -528,18 +530,22 @@ class PersonListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const person = window.app.model.persons.getItem(state.contextItem);
         if (!person) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${person.id}"]`);
         if (!tile) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;

@@ -138,8 +138,6 @@ class AccountListView extends View {
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
-        this.createContextMenu();
-
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
@@ -228,6 +226,10 @@ class AccountListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
@@ -543,18 +545,22 @@ class AccountListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const account = window.app.model.userAccounts.getItem(state.contextItem);
         if (!account) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
         if (!tile) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;
