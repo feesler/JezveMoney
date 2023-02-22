@@ -36,6 +36,7 @@ const modeButtons = {
     sort: 'sortModeBtn',
 };
 
+const listMenuSelector = '#listMenu';
 const listMenuItems = [
     'selectModeBtn',
     'sortModeBtn',
@@ -93,7 +94,6 @@ export class CategoryListView extends AppView {
             createBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            listMenu: { elem: await query('#listMenu') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
@@ -102,7 +102,11 @@ export class CategoryListView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
-        await this.parseMenuItems(res, listMenuItems);
+        // Main menu
+        res.listMenu = { elem: await query(listMenuSelector) };
+        if (res.listMenu.elem) {
+            await this.parseMenuItems(res, listMenuItems);
+        }
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
@@ -269,17 +273,6 @@ export class CategoryListView extends AppView {
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
             menuBtn: { visible: itemsCount > 0 && !isSortMode },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible && isListMode },
-            sortModeBtn: { visible: showSortItems },
-            sortByNameBtn: { visible: showSortItems },
-            sortByDateBtn: { visible: showSortItems },
-            selectAllBtn: {
-                visible: showSelectItems && totalSelected < itemsCount,
-            },
-            deselectAllBtn: {
-                visible: showSelectItems && totalSelected > 0,
-            },
-            deleteBtn: { visible: showSelectItems && totalSelected > 0 },
         };
 
         const categories = model.items.map((item) => {
@@ -309,6 +302,20 @@ export class CategoryListView extends AppView {
         if (model.detailsItem) {
             res.itemInfo = CategoryDetails.render(model.detailsItem, App.state);
             res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.selectModeBtn = { visible: model.listMenuVisible && isListMode };
+            res.sortModeBtn = { visible: showSortItems };
+            res.sortByNameBtn = { visible: showSortItems };
+            res.sortByDateBtn = { visible: showSortItems };
+            res.selectAllBtn = {
+                visible: showSelectItems && totalSelected < itemsCount,
+            };
+            res.deselectAllBtn = {
+                visible: showSelectItems && totalSelected > 0,
+            };
+            res.deleteBtn = { visible: showSelectItems && totalSelected > 0 };
         }
 
         if (model.contextMenuVisible) {
@@ -449,7 +456,10 @@ export class CategoryListView extends AppView {
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.menuBtn.elem));
+        await this.performAction(async () => {
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: true });
+        });
 
         return this.checkState(expected);
     }
@@ -464,7 +474,7 @@ export class CategoryListView extends AppView {
             `Can't change list mode from ${this.model.mode} to ${listMode}.`,
         );
 
-        if (listMode === 'list') {
+        if (listMode !== 'list') {
             await this.openListMenu();
         }
 

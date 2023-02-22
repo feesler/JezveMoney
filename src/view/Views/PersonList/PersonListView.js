@@ -59,6 +59,7 @@ class PersonListView extends View {
             },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -129,9 +130,11 @@ class PersonListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
-        this.createMenu();
 
         this.createContextMenu();
 
@@ -148,9 +151,14 @@ class PersonListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -245,6 +253,14 @@ class PersonListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -552,6 +568,15 @@ class PersonListView extends View {
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);
+
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
         const { items } = this.menu;
 
         items.selectModeBtn.show(isListMode && itemsCount > 0);
@@ -570,6 +595,10 @@ class PersonListView extends View {
         items.showBtn.show(hiddenSelCount > 0);
         items.hideBtn.show(selCount > 0);
         items.deleteBtn.show(totalSelCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderDetails(state, prevState) {

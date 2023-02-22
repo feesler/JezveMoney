@@ -62,6 +62,7 @@ class AccountListView extends View {
             },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -131,9 +132,11 @@ class AccountListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
-        this.createMenu();
 
         this.createContextMenu();
 
@@ -150,9 +153,14 @@ class AccountListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -258,6 +266,14 @@ class AccountListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -568,8 +584,16 @@ class AccountListView extends View {
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);
-        const { items } = this.menu;
 
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
+        const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);
 
         const showSortItems = isListMode && itemsCount > 1;
@@ -601,6 +625,10 @@ class AccountListView extends View {
                 exportURL += `?${urlJoin({ id: selectedIds })}`;
             }
             items.exportBtn.setURL(exportURL);
+        }
+
+        if (showFirstTime) {
+            this.menu.showMenu();
         }
     }
 

@@ -74,6 +74,7 @@ class ImportView extends View {
             checkSimilarEnabled: true,
             contextItemIndex: -1,
             listMode: 'list',
+            showMenu: false,
         };
 
         this.store = createStore(reducer, { initialState });
@@ -124,9 +125,11 @@ class ImportView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
 
-        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
-        this.createMenu();
 
         // List
         this.list = ImportTransactionList.create({
@@ -175,9 +178,14 @@ class ImportView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',
@@ -295,6 +303,14 @@ class ImportView extends View {
                 onClick: () => this.onRemoveItem(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -858,6 +874,14 @@ class ImportView extends View {
         this.uploadBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
         const { items } = this.menu;
 
         items.createItemBtn.show(isListMode);
@@ -880,6 +904,10 @@ class ImportView extends View {
         items.rulesBtn.show(isListMode);
         items.rulesBtn.enable(state.rulesEnabled);
         items.similarCheck.show(isListMode);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderList(state, prevState) {

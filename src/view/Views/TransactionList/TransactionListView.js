@@ -52,6 +52,7 @@ class TransactionListView extends View {
             form: { ...this.props.filter },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             contextItem: null,
             selDateRange: null,
             showCategoryDialog: false,
@@ -244,9 +245,11 @@ class TransactionListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
-        this.createMenu();
 
         this.createContextMenu();
 
@@ -254,9 +257,14 @@ class TransactionListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -333,6 +341,14 @@ class TransactionListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -756,6 +772,14 @@ class TransactionListView extends View {
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);
 
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
         const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);
         items.sortModeBtn.show(isListMode && itemsCount > 1);
@@ -768,6 +792,10 @@ class TransactionListView extends View {
 
         items.setCategoryBtn.show(isSelectMode && selCount > 0);
         items.deleteBtn.show(isSelectMode && selCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     /** Render accounts and persons selection */

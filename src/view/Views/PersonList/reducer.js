@@ -41,6 +41,14 @@ const slice = createSlice({
             }
     ),
 
+    showMenu: (state) => (
+        (state.showMenu) ? state : { ...state, showMenu: true }
+    ),
+
+    hideMenu: (state) => (
+        (!state.showMenu) ? state : { ...state, showMenu: false }
+    ),
+
     showContextMenu: (state, itemId) => (
         (state.contextItem === itemId)
             ? state

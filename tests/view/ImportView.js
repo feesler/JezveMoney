@@ -37,6 +37,7 @@ const modeButtons = {
     sort: 'sortModeBtn',
 };
 
+const listMenuSelector = '#listMenu';
 const menuItems = [
     'createItemBtn',
     'selectModeBtn',
@@ -98,13 +99,14 @@ export class ImportView extends AppView {
 
         // List menu
         res.menuBtn = { elem: await query('.heading-actions .menu-btn') };
-        res.listMenu = { elem: await query('#listMenu') };
+        res.listMenu = { elem: await query(listMenuSelector) };
         if (res.listMenu.elem) {
             await this.parseMenuItems(res, menuItems);
             res.deleteAllBtn.content.disabled = await hasAttr(res.deleteAllBtn.elem, 'disabled');
+
+            res.rulesCheck = await Checkbox.create(this, await query('#rulesCheck'));
+            res.similarCheck = await Checkbox.create(this, await query('#similarCheck'));
         }
-        res.rulesCheck = await Checkbox.create(this, await query('#rulesCheck'));
-        res.similarCheck = await Checkbox.create(this, await query('#similarCheck'));
 
         if (!importEnabled) {
             return res;
@@ -192,8 +194,15 @@ export class ImportView extends AppView {
         }
 
         res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
-        res.rulesEnabled = (res.enabled) ? cont.rulesCheck.checked : false;
-        res.checkSimilarEnabled = (res.enabled) ? cont.similarCheck.checked : false;
+
+        if (res.enabled) {
+            res.rulesEnabled = cont.rulesCheck?.checked ?? true;
+            res.checkSimilarEnabled = cont.similarCheck?.checked ?? true;
+        } else {
+            res.rulesEnabled = false;
+            res.checkSimilarEnabled = false;
+        }
+
         res.renderTime = cont.renderTime;
         res.listMode = (cont.itemsList) ? cont.itemsList.listMode : 'list';
         res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
@@ -251,24 +260,6 @@ export class ImportView extends AppView {
         res.enabledCounter.value = enabledItems.length;
         res.selectedCounter.value = selectedItems.length;
 
-        // Main menu
-        res.createItemBtn = { visible: showListItems };
-        res.selectModeBtn = { visible: showListItems && hasItems };
-        res.sortModeBtn = { visible: showListItems && this.items.length > 1 };
-
-        res.selectAllBtn = {
-            visible: showSelectItems && selectedItems.length < this.items.length,
-        };
-        res.deselectAllBtn = { visible: showSelectItems && selectedItems.length > 0 };
-        res.enableSelectedBtn = { visible: showMenuItems && hasDisabled };
-        res.disableSelectedBtn = { visible: showMenuItems && hasEnabled };
-        res.deleteSelectedBtn = { visible: showMenuItems && selectedItems.length > 0 };
-        res.deleteAllBtn = { visible: showMenuItems, disabled: !hasItems };
-
-        res.rulesCheck = { checked: model.rulesEnabled, visible: showListItems };
-        res.similarCheck = { checked: model.checkSimilarEnabled, visible: showListItems };
-        res.rulesBtn = { visible: showListItems };
-
         res.mainAccountSelect = {
             value: model.mainAccount.toString(),
             visible: model.enabled,
@@ -281,6 +272,26 @@ export class ImportView extends AppView {
             paginator: { visible: hasItems && model.pagination.pages > 1 },
         };
         res.submitBtn.disabled = !(listMode && hasItems && enabledItems.length > 0);
+
+        // Main menu
+        if (model.menuOpen) {
+            res.createItemBtn = { visible: showListItems };
+            res.selectModeBtn = { visible: showListItems && hasItems };
+            res.sortModeBtn = { visible: showListItems && this.items.length > 1 };
+
+            res.selectAllBtn = {
+                visible: showSelectItems && selectedItems.length < this.items.length,
+            };
+            res.deselectAllBtn = { visible: showSelectItems && selectedItems.length > 0 };
+            res.enableSelectedBtn = { visible: showMenuItems && hasDisabled };
+            res.disableSelectedBtn = { visible: showMenuItems && hasEnabled };
+            res.deleteSelectedBtn = { visible: showMenuItems && selectedItems.length > 0 };
+            res.deleteAllBtn = { visible: showMenuItems, disabled: !hasItems };
+
+            res.rulesCheck = { checked: model.rulesEnabled, visible: showListItems };
+            res.similarCheck = { checked: model.checkSimilarEnabled, visible: showListItems };
+            res.rulesBtn = { visible: showListItems };
+        }
 
         if (model.contextMenuVisible) {
             const itemsOnPage = App.config.importTransactionsOnPage;
@@ -445,10 +456,14 @@ export class ImportView extends AppView {
         }
 
         this.model.menuOpen = true;
-        this.expectedState = this.getExpectedState();
-        await this.performAction(() => click(this.content.menuBtn.elem));
+        const expected = this.getExpectedState();
 
-        return this.checkState();
+        await this.performAction(async () => {
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: true });
+        });
+
+        return this.checkState(expected);
     }
 
     async enableRules(value) {

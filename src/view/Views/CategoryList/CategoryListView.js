@@ -61,6 +61,7 @@ class CategoryListView extends View {
             items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -157,9 +158,11 @@ class CategoryListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.menuButton = MenuButton.create({ className: 'circle-btn' });
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
-        this.createMenu();
 
         this.createContextMenu();
 
@@ -176,9 +179,14 @@ class CategoryListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -253,6 +261,14 @@ class CategoryListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -575,6 +591,14 @@ class CategoryListView extends View {
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);
 
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
         const { items } = this.menu;
 
         items.selectModeBtn.show(isListMode && itemsCount > 0);
@@ -591,6 +615,10 @@ class CategoryListView extends View {
         show(items.separator2, isSelectMode);
 
         items.deleteBtn.show(selCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderDetails(state, prevState) {
