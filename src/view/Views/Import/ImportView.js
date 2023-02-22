@@ -178,7 +178,6 @@ class ImportView extends View {
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
-            fixed: false,
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',

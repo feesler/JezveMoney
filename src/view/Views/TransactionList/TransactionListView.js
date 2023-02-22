@@ -257,7 +257,6 @@ class TransactionListView extends View {
         this.menu = PopupMenu.create({
             id: 'listMenu',
             attachTo: this.menuButton.elem,
-            fixed: false,
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
