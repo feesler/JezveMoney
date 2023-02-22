@@ -28,6 +28,7 @@ export class TileInfoItem extends TestComponent {
     }
 
     async click() {
+        assert(this.content.visible, 'Component is not visible');
         return click(this.content.buttonElem);
     }
 }

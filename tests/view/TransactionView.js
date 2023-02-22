@@ -1707,9 +1707,6 @@ export class TransactionView extends AppView {
             this.stateTransition(this.model, {
                 1: 0, // Transition 2
                 2: 0, // Transition 4
-                4: 3, // Transition 30
-                5: 3, // Transition 12
-                8: 7, // Transition 31
                 9: 6, // Transition 35
                 11: 10, // Transition 56
                 13: 12, // Transition 72
@@ -1874,6 +1871,8 @@ export class TransactionView extends AppView {
             });
         } else if (this.model.type === DEBT) {
             this.stateTransition(this.model, {
+                4: 3, // Transition 10
+                5: 3, // Transition 12
                 8: 7, // Transition 31
                 12: 10, // Transition 58
                 13: 11, // Transition 66
