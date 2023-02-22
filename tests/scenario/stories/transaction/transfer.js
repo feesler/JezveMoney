@@ -27,20 +27,7 @@ export const stateLoop = async () => {
     });
 
     // Input source amount
-    const saInputData = [
-        '1',
-        '1.',
-        '1.0',
-        '1.01',
-        '1.010',
-        '1.0101',
-        '',
-        '.',
-        '.0',
-        '.09',
-        '',
-    ];
-    await TransactionTests.runGroup('inputSrcAmount', saInputData);
+    await TransactionTests.runGroup('inputSrcAmount', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 7: Change destination account to another one with same currency
@@ -54,19 +41,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input source result balance
-    const srbInputData = [
-        '400',
-        '400.',
-        '400.9',
-        '400.99',
-        '400.990',
-        '400.9901',
-        '',
-        '.',
-        '.0',
-        '.01',
-    ];
-    await TransactionTests.runGroup('inputResBalance', srbInputData);
+    await TransactionTests.runGroup('inputResBalance', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 11: Change source account to another one with same currency as destination
@@ -80,19 +55,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input destination result balance
-    const drbInputData = [
-        '600',
-        '600.',
-        '600.9',
-        '600.90',
-        '600.901',
-        '600.9010',
-        '600.90101',
-        '',
-        '.',
-        '.0',
-    ];
-    await TransactionTests.runGroup('inputDestResBalance', drbInputData);
+    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 15: Change source account to another one with same currency and stay
@@ -181,24 +144,12 @@ export const stateLoop = async () => {
     ]);
 
     // Input exchange rate
-    const exInputData = [
-        '1.09',
-        '3.09',
-        '.',
-        '.0',
-        '.09',
-        '.090101',
-    ];
-    await TransactionTests.runGroup('inputExchRate', exInputData);
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
 
     // Toggle direction of exchange rate and stay on State 8
     await TransactionTests.runAction({ action: 'toggleExchange' });
-    // Input backexchange rate
-    const backExchInputData = [
-        '66.5',
-        '166.56',
-    ];
-    await TransactionTests.runGroup('inputExchRate', backExchInputData);
+    // Input back exchange rate
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
     // Toggle direction of exchange rate and stay on State 8
     await TransactionTests.runAction({ action: 'toggleExchange' });
 

@@ -1008,13 +1008,7 @@ const slice = createSlice({
     },
 
     exchangeChange: (state, value) => {
-        const { transaction } = state;
         const { useBackExchange } = state.form;
-
-        if (transaction.type === DEBT) {
-            return state;
-        }
-
         const newState = {
             ...state,
             form: { ...state.form },

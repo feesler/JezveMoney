@@ -140,16 +140,22 @@ export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d
 
 /** Fix string to correct float number format */
 export const fixFloat = (str) => {
-    if (typeof str === 'number') {
+    if (typeof str === 'number' && !Number.isNaN(str) && Number.isFinite(str)) {
         return str.toString();
     }
-
     if (typeof str !== 'string') {
         return null;
     }
 
     let res = str.replace(/,/g, '.');
-    if (res.startsWith('.') || !res.length) {
+    if (res.indexOf('-') === 0
+        && (
+            res.length === 1
+            || res.indexOf('.') === 1
+        )) {
+        res = `-0${res.substring(1)}`;
+    }
+    if (res.indexOf('.') === 0 || !res.length) {
         res = `0${res}`;
     }
     return res;
@@ -170,7 +176,7 @@ export const normalize = (val, prec = CENTS_DIGITS) => (
 );
 
 /** Normalize exchange rate value from string */
-export const normalizeExch = (val) => normalize(val, EXCHANGE_DIGITS);
+export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_DIGITS));
 
 /** Check value is valid */
 export const isValidValue = (val) => (
@@ -181,18 +187,22 @@ export const isValidValue = (val) => (
 export const digitsAfterPoint = (val) => {
     const fixed = fixFloat(val);
     const float = parseFloat(fixed);
-    const intPart = Math.trunc(float).toString();
+    const integer = Math.trunc(float);
+    const intPart = (fixed < 0 && integer === 0) ? '-0' : integer.toString();
     return fixed.length - intPart.length - 1;
 };
 
-/** Trim string value of decimal to specified number of digits after decimal point */
-export const trimToDigitsLimit = (val, limit) => {
-    const digits = digitsAfterPoint(val);
-    if (digits <= limit) {
-        return val;
-    }
+/** Cuts minus sign if 'allowNegative' is disabled and returns result */
+const handleNegative = (val, allowNegative) => {
+    const strVal = val.toString();
+    return (!allowNegative && strVal.startsWith('-')) ? strVal.substring(1) : strVal;
+};
 
-    return val.substring(0, val.length - (digits - limit));
+/** Trims string value of decimal to specified number of digits after decimal point */
+export const trimToDigitsLimit = (val, limit, allowNegative = true) => {
+    const digits = digitsAfterPoint(val);
+    const trimmed = (digits > limit) ? val.substring(0, val.length - (digits - limit)) : val;
+    return handleNegative(trimmed, allowNegative);
 };
 
 /*

@@ -1704,7 +1704,7 @@ export class TransactionView extends AppView {
 
         const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         this.model.srcAmount = cutVal;
-        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        const fNewValue = normalize(cutVal);
         if (this.model.fSrcAmount !== fNewValue) {
             this.setSrcAmount(cutVal);
 
@@ -1782,7 +1782,7 @@ export class TransactionView extends AppView {
         }
 
         const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
-        const fNewValue = (isValidValue(cutVal)) ? normalize(cutVal) : cutVal;
+        const fNewValue = normalize(cutVal);
         this.model.destAmount = cutVal;
         if (this.model.fDestAmount !== fNewValue) {
             this.setDestAmount(cutVal);
@@ -2177,29 +2177,21 @@ export class TransactionView extends AppView {
     }
 
     isExchangeInputVisible() {
-        const transferStates = [7, 8];
-        const debtStates = [12, 13, 18, 19];
-
-        return (
-            ((this.model.type === EXPENSE || this.model.type === INCOME) && this.model.state === 3)
-            || (this.model.type === TRANSFER && transferStates.includes(this.model.state))
-            || (this.model.type === DEBT && debtStates.includes(this.model.state))
-        );
+        return !!this.content.exchangeRow?.content?.visible;
     }
 
     async inputExchRate(val) {
-        const { useBackExchange } = this.model;
-
         assert(this.isExchangeInputVisible(), `Unexpected state ${this.model.state} to input exchange rate`);
 
-        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS);
+        const { useBackExchange } = this.model;
+        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS, false);
         if (useBackExchange) {
             this.model.backExchRate = cutVal;
         } else {
             this.model.exchRate = cutVal;
         }
 
-        const fNewValue = isValidValue(cutVal) ? normalizeExch(cutVal) : cutVal;
+        const fNewValue = normalizeExch(cutVal);
         const valueChanged = (
             (useBackExchange && this.model.fBackExchRate !== fNewValue)
             || (!useBackExchange && this.model.fExchRate !== fNewValue)

@@ -22,6 +22,35 @@ import { App } from '../Application.js';
 import { generateId } from '../common.js';
 import { __ } from '../model/locale.js';
 
+export const decimalInputTestStrings = [
+    '.',
+    '-',
+    '-.',
+    '-.0',
+    '-.01',
+    '-.015',
+    '-0',
+    '-0.',
+    '-0.0',
+    '-0.01',
+    '-0.015',
+    '.0',
+    '.01',
+    '.015',
+    '0',
+    '0.',
+    '0.0',
+    '0.01',
+    '0.015',
+    '',
+    '1',
+    '1.',
+    '1.0',
+    '1.01',
+    '1.010',
+    '1.0101',
+];
+
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
 
