@@ -11,12 +11,18 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;
+  justify-content: space-between;
   width: 100%;
+  margin-bottom: 4px;
 
   .filters-heading__title {
     margin: 0 30px 0 0;
     font-size: 26px;
     font-weight: 300;
+  }
+
+  .btn.close-btn {
+    margin: calc((var(--btn-icon-size) - var(--btn-size)) / 2);
   }
 }
 

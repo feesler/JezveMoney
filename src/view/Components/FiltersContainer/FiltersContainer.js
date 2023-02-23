@@ -1,9 +1,9 @@
 import {
-    setEvents,
     isVisible,
     debounce,
     Component,
 } from 'jezvejs';
+import { CloseButton } from 'jezvejs/CloseButton';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import './style.scss';
@@ -34,8 +34,14 @@ export class FiltersContainer extends Component {
             className: 'filters-collapsible',
         });
 
-        this.closeBtn = this.content.querySelector('.close-btn');
-        setEvents(this.closeBtn, { click: () => this.closeOffcanvas() });
+        this.heading = this.content.querySelector('.filters-heading');
+
+        this.closeBtn = CloseButton.create({
+            id: 'closeFiltersBtn',
+            className: 'circle-btn',
+            onClick: () => this.closeOffcanvas(),
+        });
+        this.heading.append(this.closeBtn.elem);
 
         this.elem = this.collapsible.elem;
 

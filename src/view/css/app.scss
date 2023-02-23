@@ -342,6 +342,8 @@ svg * {
   --btn-border-radius: 100vh;
   --btn-hover-background: var(--icon-btn-hover-bg);
   --btn-active-background: var(--icon-btn-hover-bg);
+
+  width: var(--btn-size);
 }
 
 /* flat square button with icon */
