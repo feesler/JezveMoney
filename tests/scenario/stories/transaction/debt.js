@@ -33,19 +33,7 @@ export const stateLoop = async () => {
     });
 
     // Input source amount
-    const saInputData = [
-        '1',
-        '1.',
-        '1.0',
-        '1.01',
-        '1.010',
-        '1.0101',
-        '',
-        '.',
-        '.0',
-        '.09',
-    ];
-    await TransactionTests.runGroup('inputSrcAmount', saInputData);
+    await TransactionTests.runGroup('inputSrcAmount', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 1: Click by source result balance and move from State 0 to State 1
@@ -55,19 +43,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input source result balance
-    const srbInputData = [
-        '400',
-        '400.',
-        '400.9',
-        '400.99',
-        '400.990',
-        '400.9901',
-        '',
-        '.',
-        '.0',
-        '.01',
-    ];
-    await TransactionTests.runGroup('inputResBalance', srbInputData);
+    await TransactionTests.runGroup('inputResBalance', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 2: Click by source amount and move from State 1 to State 0
@@ -79,19 +55,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input destination result balance
-    const drbInputData = [
-        '600',
-        '600.',
-        '600.9',
-        '600.90',
-        '600.901',
-        '600.9010',
-        '600.90101',
-        '',
-        '.',
-        '.0',
-    ];
-    await TransactionTests.runGroup('inputDestResBalance', drbInputData);
+    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 4: Click by source result balance and move from State 2 to State 1
@@ -111,15 +75,15 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' },
         // Transition 51: Change to another one and stay on State 4
         { action: 'changeAccount', data: CARD_RUB },
-        // Transition 10: Click by source amount and move from State 4 to State 3
-        { action: 'clickSrcAmount' },
+        // Transition 10: Click by destination amount and move from State 4 to State 3
+        { action: 'clickDestAmount' },
         // Transition 11: Click by source result balance and move from State 4 to State 5
         { action: 'clickDestResultBalance' }, // move from State 3 to State 4
         { action: 'clickSrcResultBalance' },
         // Transition 48: Change to another one and stay on State 5
         { action: 'changeAccount', data: ACC_3 },
-        // Transition 12: Click by source amount and move from State 5 to State 3
-        { action: 'clickSrcAmount' },
+        // Transition 12: Click by destination amount and move from State 5 to State 3
+        { action: 'clickDestAmount' },
         // Transition 13: Click by source result balance and move from State 3 to State 5
         { action: 'clickSrcResultBalance' },
         // Transition 14: Click by destination result balance and move from State 5 to State 4
@@ -134,7 +98,7 @@ export const stateLoop = async () => {
         // Transition 18: Change debt type to "take" and move from State 2 to State 5
         { action: 'swapSourceAndDest' },
         // Transition 19: Change person to another one and stay on State 0
-        { action: 'clickSrcAmount' }, // move from State 5 to State 3
+        { action: 'clickDestAmount' }, // move from State 5 to State 3
         { action: 'swapSourceAndDest' }, // move from State 3 to State 0
         { action: 'changePerson', data: IVAN },
         // Transition 20: Change person to another one and stay on State 1
@@ -150,7 +114,7 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' }, // move from State 5 to State 4
         { action: 'changePerson', data: IVAN },
         // Transition 24: Change person to another one and stay on State 3
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changePerson', data: MARIA },
         // Transition 25: Disable account and move from State 0 to State 6
         { action: 'swapSourceAndDest' }, // move from State 3 to State 0
@@ -176,8 +140,8 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' },
         // Transition 45: Change person to another one and stay on State 8
         { action: 'changePerson', data: IVAN },
-        // Transition 31: Click by source amount and move from State 8 to State 7
-        { action: 'clickSrcAmount' },
+        // Transition 31: Click by destination amount and move from State 8 to State 7
+        { action: 'clickDestAmount' },
         // Transition 32: Enable account and move from State 8 to State 4
         { action: 'clickDestResultBalance' }, // move from State 7 to State 8
         { action: 'toggleAccount' },
@@ -253,31 +217,31 @@ export const stateLoop = async () => {
         { action: 'clickExchRate' },
     ]);
 
-    // Transition 58: Click by dest amount and move from State 12 to State 10
+    // Input exchange rate
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    // Toggle direction of exchange rate and stay on State 12
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+    // Input back exchange rate
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    // Toggle direction of exchange rate and stay on State 12
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+
+    // Transition 58: Click by destination amount and move from State 12 to State 10
     setBlock('Transition 58', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
     ]);
 
     // Input destination amount
-    const daInputData = [
-        '',
-        '.',
-        '0.',
-        '.0',
-        '.01',
-        '1.01',
-        '1.010',
-    ];
-    await TransactionTests.runGroup('inputDestAmount', daInputData);
+    await TransactionTests.runGroup('inputDestAmount', TransactionTests.decimalInputTestStrings);
 
-    // Transition 59: Click by dest result and move from State 10 to State 15
+    // Transition 59: Click by destination result and move from State 10 to State 15
     setBlock('Transition 59', 2);
     await TransactionTests.runActions([
         { action: 'clickDestResultBalance' },
     ]);
 
-    // Transition 60: Click by dest amount and move from State 15 to State 10
+    // Transition 60: Click by destination amount and move from State 15 to State 10
     setBlock('Transition 60', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
@@ -298,7 +262,7 @@ export const stateLoop = async () => {
         { action: 'changeAccount', data: ACC_RUB },
     ]);
 
-    // Transition 63: Click by dest result and move from State 11 to State 14
+    // Transition 63: Click by destination result and move from State 11 to State 14
     setBlock('Transition 63', 2);
     await TransactionTests.runActions([
         { action: 'changeSourceCurrency', data: EUR }, // move from State 0 to State 10
@@ -306,7 +270,7 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' },
     ]);
 
-    // Transition 64: Click by dest amount and move from State 14 to State 11
+    // Transition 64: Click by destination amount and move from State 14 to State 11
     setBlock('Transition 64', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
@@ -318,7 +282,7 @@ export const stateLoop = async () => {
         { action: 'clickExchRate' },
     ]);
 
-    // Transition 66: Click by dest amount and move from State 13 to State 11
+    // Transition 66: Click by destination amount and move from State 13 to State 11
     setBlock('Transition 66', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
@@ -356,7 +320,7 @@ export const stateLoop = async () => {
         { action: 'clickSrcAmount' },
     ]);
 
-    // Transition 73: Click by dest result and move from State 12 to State 15
+    // Transition 73: Click by destination result and move from State 12 to State 15
     setBlock('Transition 73', 2);
     await TransactionTests.runActions([
         { action: 'clickDestResultBalance' },
@@ -392,7 +356,7 @@ export const stateLoop = async () => {
         { action: 'toggleAccount' },
     ]);
 
-    // Transition 78: Click by dest result and move from State 13 to State 14
+    // Transition 78: Click by destination result and move from State 13 to State 14
     setBlock('Transition 78', 2);
     await TransactionTests.runActions([
         { action: 'toggleAccount' }, // move from State 6 to State 0
@@ -508,13 +472,13 @@ export const stateLoop = async () => {
         { action: 'clickSrcAmount' },
     ]);
 
-    // Transition 91: Click by dest result and move from State 16 to State 17
+    // Transition 91: Click by destination result and move from State 16 to State 17
     setBlock('Transition 91', 2);
     await TransactionTests.runActions([
         { action: 'clickDestResultBalance' },
     ]);
 
-    // Transition 92: Click by dest amount and move from State 17 to State 16
+    // Transition 92: Click by destination amount and move from State 17 to State 16
     setBlock('Transition 92', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
@@ -591,23 +555,23 @@ export const stateLoop = async () => {
     // Transition 105: Disable account and move from State 17 to State 8
     setBlock('Transition 105', 2);
     await TransactionTests.runActions([
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: RUB }, // move from State 3 to State 16
         { action: 'clickDestResultBalance' }, // move from State 16 to State 17
         { action: 'toggleAccount' },
     ]);
 
-    // Transition 107: Click by dest result and move from State 18 to State 19
+    // Transition 107: Click by destination result and move from State 18 to State 19
     setBlock('Transition 107', 2);
     await TransactionTests.runActions([
         { action: 'toggleAccount' }, // move from State 8 to State 4
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: USD }, // move from State 3 to State 16
         { action: 'clickExchRate' }, // move from State 16 to State 18
         { action: 'clickDestResultBalance' },
     ]);
 
-    // Transition 108: Click by dest amount and move from State 19 to State 18
+    // Transition 108: Click by destination amount and move from State 19 to State 18
     setBlock('Transition 108', 2);
     await TransactionTests.runActions([
         { action: 'clickDestAmount' },
@@ -675,25 +639,25 @@ export const stateLoop = async () => {
     // Transition 117: Disable account and move from State 19 to State 8
     setBlock('Transition 117', 2);
     await TransactionTests.runActions([
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: RUB }, // move from State 3 to State 16
         { action: 'clickDestResultBalance' }, // move from State 16 to State 17
         { action: 'clickExchRate' }, // move from State 17 to State 19
         { action: 'toggleAccount' },
     ]);
 
-    // Transition 118: Click by dest amount and move from State 20 to State 21
+    // Transition 118: Click by destination amount and move from State 20 to State 21
     setBlock('Transition 118', 2);
     await TransactionTests.runActions([
         { action: 'toggleAccount' }, // move from State 8 to State 4
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: USD }, // move from State 3 to State 16
         { action: 'clickDestResultBalance' }, // move from State 16 to State 17
         { action: 'clickSrcResultBalance' }, // move from State 17 to State 20
         { action: 'clickDestAmount' },
     ]);
 
-    // Transition 119: Click by dest result and move from State 21 to State 20
+    // Transition 119: Click by destination result and move from State 21 to State 20
     setBlock('Transition 119', 2);
     await TransactionTests.runActions([
         { action: 'clickDestResultBalance' },
@@ -709,7 +673,7 @@ export const stateLoop = async () => {
     // Transition 121: Disable account and move from State 20 to State 8
     setBlock('Transition 121', 2);
     await TransactionTests.runActions([
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: RUB }, // move from State 3 to State 16
         { action: 'clickDestResultBalance' }, // move from State 16 to State 17
         { action: 'clickSrcResultBalance' }, // move from State 17 to State 20
@@ -721,7 +685,7 @@ export const stateLoop = async () => {
     setBlock('Transition 122', 2);
     await TransactionTests.runActions([
         { action: 'toggleAccount' }, // move from State 8 to State 4
-        { action: 'clickSrcAmount' }, // move from State 4 to State 3
+        { action: 'clickDestAmount' }, // move from State 4 to State 3
         { action: 'changeDestCurrency', data: EUR }, // move from State 3 to State 16
         { action: 'clickSrcResultBalance' }, // move from State 16 to State 21
         { action: 'changeDestCurrency', data: USD },

@@ -110,14 +110,21 @@ export const cutTime = (value) => {
  * @param {string} str - decimal value string
  */
 export const fixFloat = (str) => {
-    if (typeof str === 'number') {
-        return str;
+    if (typeof str === 'number' && !Number.isNaN(str) && Number.isFinite(str)) {
+        return str.toString();
     }
     if (typeof str !== 'string') {
         return null;
     }
 
     let res = str.replace(/,/g, '.');
+    if (res.indexOf('-') === 0
+        && (
+            res.length === 1
+            || res.indexOf('.') === 1
+        )) {
+        res = `-0${res.substring(1)}`;
+    }
     if (res.indexOf('.') === 0 || !res.length) {
         res = `0${res}`;
     }
@@ -126,7 +133,7 @@ export const fixFloat = (str) => {
 
 /** Convert string to amount value */
 export const amountFix = (value, thSep = ' ') => {
-    if (typeof value === 'number') {
+    if (typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value)) {
         return value;
     }
     if (typeof value !== 'string') {
@@ -173,7 +180,7 @@ export const normalize = (val, prec = CENTS_DIGITS) => correct(fixFloat(val), pr
  * Normalize exchange rate value from string
  * @param {string|Number} val - exchange rate value
  */
-export const normalizeExch = (val) => normalize(val, EXCHANGE_DIGITS);
+export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_DIGITS));
 
 /**
  * Check value is valid
@@ -293,3 +300,5 @@ export const getSortByDateIcon = (sortMode) => {
     }
     return (sortMode === SORT_BY_CREATEDATE_DESC) ? 'sort-desc' : null;
 };
+
+export const listData = (list) => (Array.isArray(list) ? list : list?.data);

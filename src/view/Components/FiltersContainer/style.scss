@@ -11,7 +11,9 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;
+  justify-content: space-between;
   width: 100%;
+  margin-bottom: 4px;
 
   .filters-heading__title {
     margin: 0 30px 0 0;
@@ -19,18 +21,8 @@
     font-weight: 300;
   }
 
-  /* Close button */
-  .close-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    background: none;
-    cursor: pointer;
-  }
-
-  .close-icon {
-    height: 18px;
+  .btn.close-btn {
+    margin: calc((var(--btn-icon-size) - var(--btn-size)) / 2);
   }
 }
 

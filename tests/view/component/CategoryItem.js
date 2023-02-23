@@ -31,7 +31,7 @@ export class CategoryItem extends TestComponent {
             isChild: !!elem.closest('.category-item__children'),
         }), this.elem, titleElem);
 
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
 
         return res;
     }

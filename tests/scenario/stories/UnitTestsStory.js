@@ -8,6 +8,28 @@ import {
     normalizePrecTest,
     isValidValueTest,
 } from '../../run/unit.js';
+import { App } from '../../Application.js';
+
+const zeroStrings = [
+    '',
+    '.',
+    '.0',
+    '.00',
+    '0',
+    '0.',
+    '0.0',
+    '0.00',
+];
+
+const negativeZeroStrings = [
+    '-',
+    '-.',
+    '-.0',
+    '-0',
+    '-0.',
+    '-0.0',
+    '-0.00',
+];
 
 export class UnitTestsStory extends TestStory {
     async run() {
@@ -23,12 +45,48 @@ export class UnitTestsStory extends TestStory {
     }
 
     async fixFloatTests() {
-        setBlock('fixFloat', 2);
+        setBlock('fixFloat', 1);
 
-        await fixFloatTest('Integer number', 100, 100);
-        await fixFloatTest('Float number', 100.5, 100.5);
+        setBlock('Number values', 2);
+        await fixFloatTest('Integer number', 100, '100');
+        await fixFloatTest('Float number', 100.5, '100.5');
+
+        setBlock('Invalid values', 2);
         await fixFloatTest('null value', null, null);
         await fixFloatTest('undefined value', undefined, null);
+        await fixFloatTest('NaN value', NaN, null);
+
+        setBlock('Zero strings', 2);
+        // [value, expected result]
+        const zeroPairs = [
+            ['.', '0.'],
+            ['.0', '0.0'],
+            ['.00', '0.00'],
+            ['0', '0'],
+            ['0.', '0.'],
+            ['0.0', '0.0'],
+            ['0.00', '0.00'],
+        ];
+        const negZeroPairs = [
+            ['-', '-0'],
+            ['-.', '-0.'],
+            ['-.0', '-0.0'],
+            ['-0', '-0'],
+            ['-0.', '-0.'],
+            ['-0.0', '-0.0'],
+            ['-0.00', '-0.00'],
+        ];
+
+        await App.scenario.runner.runGroup(([value, expected]) => (
+            fixFloatTest(`Zero string '${value}'`, value, expected)
+        ), zeroPairs);
+
+        setBlock('Negative zero strings', 2);
+        await App.scenario.runner.runGroup(([value, expected]) => (
+            fixFloatTest(`Negative zero string '${value}'`, value, expected)
+        ), negZeroPairs);
+
+        setBlock('Strings', 2);
         await fixFloatTest('Empty string', '', '0');
         await fixFloatTest('Integer number string', '123', '123');
         await fixFloatTest('Float number string with point', '123.5', '123.5');
@@ -38,13 +96,28 @@ export class UnitTestsStory extends TestStory {
     }
 
     async amountFixTests() {
-        setBlock('amountFix', 2);
+        setBlock('amountFix', 1);
 
+        setBlock('Number values', 2);
         await amountFixTest('Integer number', 100, 100);
         await amountFixTest('Float number', 100.5, 100.5);
+
+        setBlock('Invalid values', 2);
         await amountFixTest('null value', null, null);
         await amountFixTest('undefined value', undefined, null);
-        await amountFixTest('Empty string', '', 0);
+        await amountFixTest('NaN value', NaN, null);
+
+        setBlock('Zero strings', 2);
+        await App.scenario.runner.runGroup((value) => (
+            amountFixTest(`Zero string '${value}'`, value, 0)
+        ), zeroStrings);
+
+        setBlock('Negative zero strings', 2);
+        await App.scenario.runner.runGroup((value) => (
+            amountFixTest(`Negative zero string '${value}'`, value, 0)
+        ), negativeZeroStrings);
+
+        setBlock('Strings', 2);
         await amountFixTest('Integer number string', '123', 123);
         await amountFixTest('Float number string with point', '123.5', 123.5);
         await amountFixTest('Float number string with comma', '123,5', 123.5);
@@ -55,12 +128,18 @@ export class UnitTestsStory extends TestStory {
     }
 
     async correctTests() {
-        setBlock('correct', 2);
+        setBlock('correct', 1);
 
+        setBlock('Number values', 2);
         await correctTest('Integer number', 100, 100);
         await correctTest('Float number', 100.5, 100.5);
+
+        setBlock('Invalid values', 2);
         await correctTest('null value', null, NaN);
         await correctTest('undefined value', undefined, NaN);
+        await correctTest('NaN value', NaN, NaN);
+
+        setBlock('Strings', 2);
         await correctTest('Empty string', '', NaN);
         await correctTest('Integer number string', '123', 123);
         await correctTest('Float number string with point', '123.567', 123.57);
@@ -73,12 +152,18 @@ export class UnitTestsStory extends TestStory {
     }
 
     async correctPrecTests() {
-        setBlock('correct with precision parameter', 2);
+        setBlock('correct with precision parameter', 1);
 
+        setBlock('Number values', 2);
         await correctPrecTest('Integer number', 100, 5, 100);
         await correctPrecTest('Float number', 100.5, 5, 100.5);
+
+        setBlock('Invalid values', 2);
         await correctPrecTest('null value', null, 5, NaN);
         await correctPrecTest('undefined value', undefined, 5, NaN);
+        await correctPrecTest('NaN value', NaN, 5, NaN);
+
+        setBlock('Strings', 2);
         await correctPrecTest('Empty string', '', 5, NaN);
         await correctPrecTest('Integer number string', '123', 5, 123);
         await correctPrecTest('Float number string with point', '123.567', 5, 123.567);
@@ -91,12 +176,18 @@ export class UnitTestsStory extends TestStory {
     }
 
     async normalizeTests() {
-        setBlock('normalize', 2);
+        setBlock('normalize', 1);
 
+        setBlock('Number values', 2);
         await normalizeTest('Integer number', 100, 100);
         await normalizeTest('Float number', 100.5, 100.5);
+
+        setBlock('Invalid values', 2);
         await normalizeTest('null value', null, NaN);
         await normalizeTest('undefined value', undefined, NaN);
+        await normalizeTest('NaN value', NaN, NaN);
+
+        setBlock('Strings', 2);
         await normalizeTest('Empty string', '', 0);
         await normalizeTest('Integer number string', '123', 123);
         await normalizeTest('Float number string with point', '123.567', 123.57);
@@ -109,12 +200,18 @@ export class UnitTestsStory extends TestStory {
     }
 
     async normalizePrecTests() {
-        setBlock('normalize with precision parameter', 2);
+        setBlock('normalize with precision parameter', 1);
 
+        setBlock('Number values', 2);
         await normalizePrecTest('Integer number', 100, 5, 100);
         await normalizePrecTest('Float number', 100.5, 5, 100.5);
+
+        setBlock('Invalid values', 2);
         await normalizePrecTest('null value', null, 5, NaN);
         await normalizePrecTest('undefined value', undefined, 5, NaN);
+        await normalizePrecTest('NaN value', NaN, 5, NaN);
+
+        setBlock('Strings', 2);
         await normalizePrecTest('Empty string', '', 5, 0);
         await normalizePrecTest('Integer number string', '123', 5, 123);
         await normalizePrecTest('Float number string with point', '123.567', 5, 123.567);
@@ -127,12 +224,18 @@ export class UnitTestsStory extends TestStory {
     }
 
     async isValidValueTests() {
-        setBlock('isValidValue', 2);
+        setBlock('isValidValue', 1);
 
+        setBlock('Number values', 2);
         await isValidValueTest('Integer number', 100, true);
         await isValidValueTest('Float number', 100.5, true);
+
+        setBlock('Invalid values', 2);
         await isValidValueTest('null value', null, false);
         await isValidValueTest('undefined value', undefined, false);
+        await isValidValueTest('NaN value', NaN, false);
+
+        setBlock('Strings', 2);
         await isValidValueTest('Empty string', '', true);
         await isValidValueTest('Integer number string', '123', true);
         await isValidValueTest('Float number string with point', '123.567', true);

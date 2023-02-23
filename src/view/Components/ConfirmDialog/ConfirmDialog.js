@@ -1,10 +1,13 @@
-import { isFunction, Component, createElement } from 'jezvejs';
+import { isFunction, Component } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { Popup } from 'jezvejs/Popup';
 import { __ } from '../../js/utils.js';
 
 const defaultProps = {
     destroyOnResult: true,
     title: null,
+    confirmButtonTitle: __('OK'),
+    cancelButtonTitle: __('CANCEL'),
     content: null,
 };
 
@@ -17,19 +20,6 @@ const defaultProps = {
  * @param {Function} props.onReject - reject callback function
  */
 export class ConfirmDialog extends Component {
-    static create(props) {
-        let res;
-
-        try {
-            res = new ConfirmDialog(props);
-            res.show();
-        } catch (e) {
-            res = null;
-        }
-
-        return res;
-    }
-
     constructor(props = {}) {
         super({
             ...defaultProps,
@@ -44,26 +34,23 @@ export class ConfirmDialog extends Component {
             throw new Error('Invalid onReject callback');
         }
 
+        const confirmButton = Button.create({
+            title: this.props.confirmButtonTitle,
+            className: 'submit-btn',
+            onClick: () => this.onResult(true),
+        });
+        const cancelButton = Button.create({
+            title: this.props.cancelButtonTitle,
+            className: 'cancel-btn',
+            onClick: () => this.onResult(false),
+        });
+
         const popupProps = {
             title: this.props.title,
             content: this.props.content,
             footer: [
-                createElement('button', {
-                    props: {
-                        className: 'btn submit-btn',
-                        textContent: __('OK'),
-                        type: 'button',
-                    },
-                    events: { click: () => this.onResult(true) },
-                }),
-                createElement('button', {
-                    props: {
-                        className: 'btn cancel-btn',
-                        textContent: __('CANCEL'),
-                        type: 'button',
-                    },
-                    events: { click: () => this.onResult(false) },
-                }),
+                confirmButton.elem,
+                cancelButton.elem,
             ],
         };
         if ('id' in this.props) {
@@ -77,6 +64,8 @@ export class ConfirmDialog extends Component {
         if (!this.popup) {
             throw new Error('Failed to create popup');
         }
+
+        this.show();
     }
 
     /**

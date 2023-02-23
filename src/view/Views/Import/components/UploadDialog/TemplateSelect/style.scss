@@ -1,0 +1,52 @@
+/* Import template select */
+.template-select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  flex: 1 1 auto;
+  width: 100%;
+  font-size: 16px;
+  color: var(--main-text-color);
+  background-color: var(--list-item-bg-color);
+  cursor: pointer;
+
+  .dd__container_attached {
+    width: 100%;
+  }
+}
+
+.template-select__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px 4px 8px 8px;
+  flex: 1 1 auto;
+  width: 100%;
+
+  /* Menu and toggle expand/collapse button */
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    flex-flow: row nowrap;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+  }
+}
+
+.template-select__title {
+  display: inline-block;
+  flex-grow: 1;
+  font-weight: 200;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+/* Controls */
+.template-select__controls {
+  display: flex;
+  flex-flow: row nowrap;
+}

@@ -30,15 +30,7 @@ export const stateLoop = async () => {
     });
 
     // Input source amount
-    const saInputData = [
-        '1',
-        '1.',
-        '1.0',
-        '1.01',
-        '1.010',
-        '1.0101',
-    ];
-    await TransactionTests.runGroup('inputSrcAmount', saInputData);
+    await TransactionTests.runGroup('inputSrcAmount', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 2: Click on destination result balance block and move from State 0 to State 1
@@ -49,12 +41,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input result balance
-    const drbInputData = [
-        '502.08',
-        '502.080',
-        '502.0801',
-    ];
-    await TransactionTests.runGroup('inputDestResBalance', drbInputData);
+    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 4: Click on source amount block and move from State 1 to State 0
@@ -69,16 +56,7 @@ export const stateLoop = async () => {
     ]);
 
     // Input destination amount
-    const daInputData = [
-        '',
-        '.',
-        '0.',
-        '.0',
-        '.01',
-        '1.01',
-        '1.010',
-    ];
-    await TransactionTests.runGroup('inputDestAmount', daInputData);
+    await TransactionTests.runGroup('inputDestAmount', TransactionTests.decimalInputTestStrings);
 
     await TransactionTests.runActions([
         // Transition 7: Click on result balance block and move from State 2 to State 4
@@ -102,22 +80,12 @@ export const stateLoop = async () => {
     ]);
 
     // Input exchange rate
-    const exInputData = [
-        '1.09',
-        '3.09',
-        '.09',
-        '.090101',
-    ];
-    await TransactionTests.runGroup('inputExchRate', exInputData);
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
 
     // Toggle direction of exchange rate and stay on State 3
     await TransactionTests.runAction({ action: 'toggleExchange' });
-    // Input backexchange rate
-    const backExchInputData = [
-        '66.5',
-        '166.56',
-    ];
-    await TransactionTests.runGroup('inputExchRate', backExchInputData);
+    // Input back exchange rate
+    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
     // Toggle direction of exchange rate and stay on State 3
     await TransactionTests.runAction({ action: 'toggleExchange' });
 

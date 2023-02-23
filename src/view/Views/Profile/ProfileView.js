@@ -2,16 +2,18 @@ import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
-import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ChangeNameDialog } from '../../Components/Profile/ChangeNameDialog/ChangeNameDialog.js';
-import { ChangePasswordDialog } from '../../Components/Profile/ChangePasswordDialog/ChangePasswordDialog.js';
+import { ChangeNameDialog } from './components/ChangeNameDialog/ChangeNameDialog.js';
+import { ChangePasswordDialog } from './components/ChangePasswordDialog/ChangePasswordDialog.js';
+import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
+import '../../Components/Heading/style.scss';
+import '../../Components/Field/style.scss';
 import './style.scss';
 
 const titleMap = {

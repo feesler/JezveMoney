@@ -5,7 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { timeToDate, __ } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -171,6 +171,7 @@ export class TransactionListItem extends Component {
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
+            title: __('TR_COMMENT'),
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
@@ -232,10 +233,10 @@ export class TransactionListItem extends Component {
             return;
         }
 
-        this.menuContainer = PopupMenuButton.create();
+        this.menuButton = MenuButton.create();
         this.controlsElem = createElement('div', {
             props: { className: CONTROLS_CLASS },
-            children: this.menuContainer.elem,
+            children: this.menuButton.elem,
         });
 
         this.elem.append(this.controlsElem);
@@ -455,13 +456,12 @@ export class TransactionListItem extends Component {
 
         // Category field
         const categoryTitle = this.getCategoryTitle(state);
+        this.categoryField.show(!!categoryTitle);
         this.categoryField.setContent(categoryTitle);
 
         // Comment
         const hasComment = item.comment.length > 0;
-        const commentLabel = (hasComment) ? __('TR_COMMENT') : null;
         this.commentField.show(hasComment);
-        this.commentField.setTitle(commentLabel);
         this.commentField.setContent(item.comment);
     }
 

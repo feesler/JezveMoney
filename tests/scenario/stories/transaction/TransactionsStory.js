@@ -126,7 +126,7 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '0.01' },
         ]);
 
-        // Try to submit expense with invalid amount
+        // Try to submit expense with invalid destination amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '' },
         ]);
@@ -135,6 +135,13 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '-100' },
         ]);
 
+        // Check invalidated destination amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '' },
+            { action: 'clickSrcResultBalance' },
+        ]);
+
+        // Try to submit expense with invalid source amount
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'changeDestCurrency', data: KRW },
             { action: 'inputDestAmount', data: '1' },
@@ -145,6 +152,14 @@ export class TransactionsStory extends TestStory {
             { action: 'changeDestCurrency', data: KRW },
             { action: 'inputDestAmount', data: '1' },
             { action: 'inputSrcAmount', data: '-100' },
+        ]);
+
+        // Check invalidated source amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeDestCurrency', data: KRW },
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputSrcAmount', data: '' },
+            { action: 'clickExchRate' },
         ]);
 
         // Try to submit expense with invalid date
@@ -201,7 +216,7 @@ export class TransactionsStory extends TestStory {
             { action: 'inputSrcAmount', data: '0.01' },
         ]);
 
-        // Try to submit income with invalid amount
+        // Try to submit income with invalid source amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '' },
@@ -212,6 +227,14 @@ export class TransactionsStory extends TestStory {
             { action: 'inputSrcAmount', data: '-100' },
         ]);
 
+        // Check invalidated source amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '' },
+            { action: 'clickDestResultBalance' },
+        ]);
+
+        // Try to submit income with invalid destination amount
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeSourceCurrency', data: KRW },
@@ -224,6 +247,15 @@ export class TransactionsStory extends TestStory {
             { action: 'changeSourceCurrency', data: KRW },
             { action: 'inputSrcAmount', data: '1' },
             { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Check invalidated destination amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeSourceCurrency', data: KRW },
+            { action: 'inputSrcAmount', data: '1' },
+            { action: 'inputDestAmount', data: '' },
+            { action: 'clickExchRate' },
         ]);
 
         // Try to submit income with invalid date
@@ -288,7 +320,7 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '75' },
         ]);
 
-        // Try to submit transfer with invalid amount
+        // Try to submit transfer with invalid source amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '' },
@@ -299,6 +331,14 @@ export class TransactionsStory extends TestStory {
             { action: 'inputSrcAmount', data: '-100' },
         ]);
 
+        // Check invalidated source amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'inputSrcAmount', data: '' },
+            { action: 'clickDestResultBalance' },
+        ]);
+
+        // Try to submit transfer with invalid destination amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
@@ -311,6 +351,15 @@ export class TransactionsStory extends TestStory {
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Check invalidated destination amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccount', data: ACC_USD },
+            { action: 'inputSrcAmount', data: '11.4' },
+            { action: 'inputDestAmount', data: '' },
+            { action: 'clickExchRate' },
         ]);
 
         // Try to submit transfer with invalid date
@@ -411,7 +460,7 @@ export class TransactionsStory extends TestStory {
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
-        // Try to submit debt with invalid amount
+        // Try to submit debt with invalid destination amount
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '' },
@@ -420,6 +469,28 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Check invalidated destination amount field is shown on submit
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'inputDestAmount', data: '' },
+            { action: 'clickDestResultBalance' },
+        ]);
+
+        // Try to submit debt with invalid source amount
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '-200' },
+        ]);
+
+        // Check invalidated source amount field is shown on submit
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '' },
+            { action: 'clickSrcResultBalance' },
         ]);
 
         // Try to submit debt with invalid date

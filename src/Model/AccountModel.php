@@ -425,26 +425,27 @@ class AccountModel extends CachedTable
         }
 
         if ($this->isPosExist($new_pos)) {
+            $updRes = false;
             if ($old_pos == 0) {           // insert with specified position
-                $res = $this->dbObj->updateQ(
+                $updRes = $this->dbObj->updateQ(
                     $this->tbl_name,
                     ["pos=pos+1"],
                     ["user_id=" . self::$user_id, "pos >= $new_pos"],
                 );
             } elseif ($new_pos < $old_pos) {       // moving up
-                $res = $this->dbObj->updateQ(
+                $updRes = $this->dbObj->updateQ(
                     $this->tbl_name,
                     ["pos=pos+1"],
                     ["user_id=" . self::$user_id, "pos >= $new_pos", "pos < $old_pos"],
                 );
             } elseif ($new_pos > $old_pos) {        // moving down
-                $res = $this->dbObj->updateQ(
+                $updRes = $this->dbObj->updateQ(
                     $this->tbl_name,
                     ["pos=pos-1"],
                     ["user_id=" . self::$user_id, "pos > $old_pos", "pos <= $new_pos"],
                 );
             }
-            if (!$res) {
+            if (!$updRes) {
                 return false;
             }
         }

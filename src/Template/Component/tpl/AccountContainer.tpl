@@ -3,20 +3,18 @@
 use JezveMoney\App\Template\Component\Tile;
 use JezveMoney\App\Template\Component\TileInfoItem;
 ?>
-<div id="<?= ($id) ?>" class="account-container" <?= hidden($hidden) ?>>
+<div id="<?= ($id) ?>" class="field account-container" <?= hidden($hidden) ?>>
     <input id="<?= ($inputId) ?>" name="<?= ($inputId) ?>" type="hidden" value="<?= ($inputValue) ?>">
-    <header class="tile_header">
-        <label><?= ($title) ?></label>
+    <label class="field__title">
+        <span><?= ($title) ?></span>
         <?php if (!is_null($closeButton)) {     ?>
-            <button class="close-btn" type="button" <?= hidden($closeButton) ?>>
-                <?= svgIcon("close", "close-icon") ?>
+            <button class="btn close-btn" type="button" <?= hidden($closeButton) ?>>
+                <?= svgIcon("close", "btn__icon") ?>
             </button>
         <?php   }   ?>
-    </header>
+    </label>
     <div class="tile-base" <?= hidden($baseHidden) ?>>
-        <div class="tile_container">
-            <?= Tile::render($tile) ?>
-        </div>
+        <?= Tile::render($tile) ?>
 
         <div class="tile-info-block">
             <?php foreach ($infoItems as $item) {    ?>

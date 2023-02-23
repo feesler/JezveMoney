@@ -215,9 +215,11 @@ export class TransactionView extends AppView {
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
         res.srcAmount = cont.srcAmountRow.value;
+        res.srcAmountInvalidated = cont.srcAmountRow.isInvalid;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
         res.destAmount = cont.destAmountRow.value;
+        res.destAmountInvalidated = cont.destAmountRow.isInvalid;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
         res.srcResBal = cont.srcResBalanceRow.value;
@@ -426,27 +428,41 @@ export class TransactionView extends AppView {
         }
 
         res.date = cont.datePicker.value;
+        res.dateInvalidated = cont.datePicker.isInvalid;
+
         res.categoryId = parseInt(cont.categorySelect.value, 10);
         res.comment = cont.commentRow.value;
 
         return res;
     }
 
+    isValidAmount(value) {
+        return value > 0;
+    }
+
+    isValidDate(value) {
+        const timestamp = convDate(value);
+        return timestamp > 0;
+    }
+
     isValid() {
-        if (this.content.srcAmountRow?.content?.visible) {
-            if (this.model.fSrcAmount <= 0) {
+        const startFromDestAmount = (
+            (this.model.type === EXPENSE)
+            || (this.model.type === DEBT && !this.model.debtType)
+        );
+
+        const srcAmountValid = this.isValidAmount(this.model.fSrcAmount);
+        const destAmountValid = this.isValidAmount(this.model.fDestAmount);
+
+        if (startFromDestAmount) {
+            if (!destAmountValid || (this.model.isDiffCurr && !srcAmountValid)) {
                 return false;
             }
+        } else if (!srcAmountValid || (this.model.isDiffCurr && !destAmountValid)) {
+            return false;
         }
 
-        if (this.content.destAmountRow?.content?.visible) {
-            if (this.model.fDestAmount <= 0) {
-                return false;
-            }
-        }
-
-        const timestamp = convDate(this.model.date);
-        if (!timestamp || timestamp < 0) {
+        if (!this.isValidDate(this.model.date)) {
             return false;
         }
 
@@ -549,10 +565,12 @@ export class TransactionView extends AppView {
             res.srcAmountRow.value = this.model.srcAmount.toString();
             res.srcAmountRow.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
             res.srcAmountRow.isCurrActive = (isIncome || (isDebt && this.model.debtType));
+            res.srcAmountRow.isInvalid = this.model.srcAmountInvalidated;
 
             res.destAmountRow.value = this.model.destAmount.toString();
             res.destAmountRow.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
             res.destAmountRow.isCurrActive = (isExpense || (isDebt && !this.model.debtType));
+            res.destAmountRow.isInvalid = this.model.destAmountInvalidated;
 
             if (this.model.destCurr && this.model.srcCurr) {
                 const exchRateValue = (this.model.useBackExchange)
@@ -570,6 +588,7 @@ export class TransactionView extends AppView {
             res.datePicker = {
                 visible: true,
                 value: this.model.date,
+                isInvalid: this.model.dateInvalidated,
             };
 
             const visibleCategories = this.appState()
@@ -974,11 +993,15 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    stateTransition(model, stateMap) {
+    stateTransition(model, stateMap, throwOnNotFound = true) {
         const res = model;
         const newState = stateMap[res.state];
-        assert.isDefined(newState, `Invalid state ${res.state}`);
-        res.state = newState;
+        if (throwOnNotFound) {
+            assert.isDefined(newState, `Invalid state ${res.state}`);
+        }
+        if (typeof newState !== 'undefined') {
+            res.state = newState;
+        }
 
         return res;
     }
@@ -1457,13 +1480,116 @@ export class TransactionView extends AppView {
         await navigation(() => this.content.delete_warning.clickOk());
     }
 
+    validateSourceAmount() {
+        this.model.srcAmountInvalidated = !this.isValidAmount(this.model.fSrcAmount);
+        if (!this.model.srcAmountInvalidated) {
+            return;
+        }
+
+        if (this.model.type === INCOME) {
+            this.stateTransition(this.model, {
+                1: 0,
+            }, false);
+        } else if (this.model.type === TRANSFER) {
+            this.stateTransition(this.model, {
+                1: 0,
+                2: 0,
+                4: 3,
+                6: 5,
+                8: 7,
+            }, false);
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                1: 0,
+                2: 0,
+                4: 3,
+                9: 6,
+                11: 10,
+                13: 12,
+                14: 15,
+                18: 16,
+                19: 17,
+                20: 17,
+            }, false);
+        }
+    }
+
+    validateDestAmount() {
+        this.model.destAmountInvalidated = !this.isValidAmount(this.model.fDestAmount);
+        if (!this.model.destAmountInvalidated) {
+            return;
+        }
+
+        if (this.model.type === EXPENSE) {
+            this.stateTransition(this.model, {
+                1: 0,
+                3: 2,
+                4: 2,
+            }, false);
+        } else if (this.model.type === INCOME) {
+            this.stateTransition(this.model, {
+                3: 2,
+                4: 2,
+            }, false);
+        } else if (this.model.type === TRANSFER) {
+            this.stateTransition(this.model, {
+                5: 3,
+                6: 4,
+                7: 3,
+                8: 4,
+            }, false);
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                4: 3,
+                5: 3,
+                8: 7,
+                12: 10,
+                13: 11,
+                14: 11,
+                15: 10,
+                17: 16,
+                19: 18,
+                20: 21,
+            }, false);
+        }
+    }
+
     async submit() {
+        const startFromDestAmount = (
+            (this.model.type === EXPENSE)
+            || (this.model.type === DEBT && !this.model.debtType)
+        );
+
+        if (startFromDestAmount) {
+            this.validateDestAmount();
+            if (this.model.isDiffCurr) {
+                this.validateSourceAmount();
+            }
+        } else {
+            this.validateSourceAmount();
+            if (this.model.isDiffCurr) {
+                this.validateDestAmount();
+            }
+        }
+
+        this.model.dateInvalidated = !this.isValidDate(this.model.date);
+
+        const isValid = (
+            !this.model.srcAmountInvalidated
+            && !this.model.destAmountInvalidated
+            && !this.model.dateInvalidated
+        );
+
         const action = () => click(this.content.submitBtn);
 
-        if (this.isValid()) {
+        if (isValid) {
             await navigation(action);
         } else {
+            const expected = this.getExpectedState();
+
             await this.performAction(action);
+
+            this.checkState(expected);
         }
     }
 
@@ -1670,7 +1796,7 @@ export class TransactionView extends AppView {
 
         const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         this.model.srcAmount = cutVal;
-        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        const fNewValue = normalize(cutVal);
         if (this.model.fSrcAmount !== fNewValue) {
             this.setSrcAmount(cutVal);
 
@@ -1681,6 +1807,7 @@ export class TransactionView extends AppView {
                 this.setDestAmount(this.model.fSrcAmount);
             }
         }
+        this.model.srcAmountInvalidated = false;
 
         this.expectedState = this.getExpectedState();
 
@@ -1707,9 +1834,6 @@ export class TransactionView extends AppView {
             this.stateTransition(this.model, {
                 1: 0, // Transition 2
                 2: 0, // Transition 4
-                4: 3, // Transition 30
-                5: 3, // Transition 12
-                8: 7, // Transition 31
                 9: 6, // Transition 35
                 11: 10, // Transition 56
                 13: 12, // Transition 72
@@ -1750,7 +1874,7 @@ export class TransactionView extends AppView {
         }
 
         const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
-        const fNewValue = (isValidValue(cutVal)) ? normalize(cutVal) : cutVal;
+        const fNewValue = normalize(cutVal);
         this.model.destAmount = cutVal;
         if (this.model.fDestAmount !== fNewValue) {
             this.setDestAmount(cutVal);
@@ -1762,6 +1886,7 @@ export class TransactionView extends AppView {
                 this.setSrcAmount(this.model.fDestAmount);
             }
         }
+        this.model.destAmountInvalidated = false;
 
         this.expectedState = this.getExpectedState();
 
@@ -1874,6 +1999,8 @@ export class TransactionView extends AppView {
             });
         } else if (this.model.type === DEBT) {
             this.stateTransition(this.model, {
+                4: 3, // Transition 10
+                5: 3, // Transition 12
                 8: 7, // Transition 31
                 12: 10, // Transition 58
                 13: 11, // Transition 66
@@ -2142,29 +2269,21 @@ export class TransactionView extends AppView {
     }
 
     isExchangeInputVisible() {
-        const transferStates = [7, 8];
-        const debtStates = [12, 13, 18, 19];
-
-        return (
-            ((this.model.type === EXPENSE || this.model.type === INCOME) && this.model.state === 3)
-            || (this.model.type === TRANSFER && transferStates.includes(this.model.state))
-            || (this.model.type === DEBT && debtStates.includes(this.model.state))
-        );
+        return !!this.content.exchangeRow?.content?.visible;
     }
 
     async inputExchRate(val) {
-        const { useBackExchange } = this.model;
-
         assert(this.isExchangeInputVisible(), `Unexpected state ${this.model.state} to input exchange rate`);
 
-        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS);
+        const { useBackExchange } = this.model;
+        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS, false);
         if (useBackExchange) {
             this.model.backExchRate = cutVal;
         } else {
             this.model.exchRate = cutVal;
         }
 
-        const fNewValue = isValidValue(cutVal) ? normalizeExch(cutVal) : cutVal;
+        const fNewValue = normalizeExch(cutVal);
         const valueChanged = (
             (useBackExchange && this.model.fBackExchRate !== fNewValue)
             || (!useBackExchange && this.model.fExchRate !== fNewValue)
@@ -2231,6 +2350,7 @@ export class TransactionView extends AppView {
 
     async inputDate(val) {
         this.model.date = val.toString();
+        this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.datePicker.input(val));
@@ -2242,6 +2362,7 @@ export class TransactionView extends AppView {
         assert.isDate(val, 'Invalid date');
 
         this.model.date = formatDate(val);
+        this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.datePicker.selectDate(val));

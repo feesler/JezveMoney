@@ -7,14 +7,14 @@ import {
     insertAfter,
     isFunction,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
+import { DropDown } from 'jezvejs/DropDown';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
-import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -24,10 +24,11 @@ import { CategoryList } from '../../js/model/CategoryList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
-import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ImportTransactionList } from '../../Components/Import/List/ImportTransactionList.js';
+import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
+import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
+import { ImportTransactionList } from './components/List/ImportTransactionList.js';
+import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 import './style.scss';
@@ -73,6 +74,7 @@ class ImportView extends View {
             checkSimilarEnabled: true,
             contextItemIndex: -1,
             listMode: 'list',
+            showMenu: false,
         };
 
         this.store = createStore(reducer, { initialState });
@@ -107,7 +109,7 @@ class ImportView extends View {
             enableFilter: true,
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onMainAccChange(account),
-            className: 'dd__main-account dd_ellipsis',
+            className: 'dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
 
@@ -123,8 +125,11 @@ class ImportView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
 
-        this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
         // List
         this.list = ImportTransactionList.create({
@@ -166,15 +171,19 @@ class ImportView extends View {
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         listContainer.append(this.loadingInd.elem);
 
-        this.createContextMenu();
-
         this.subscribeToStore(this.store);
         this.setRenderTime();
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',
@@ -264,9 +273,13 @@ class ImportView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
             onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxRestoreBtn',
@@ -292,6 +305,14 @@ class ImportView extends View {
                 onClick: () => this.onRemoveItem(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -528,7 +549,7 @@ class ImportView extends View {
 
         const { listMode } = state;
         if (listMode === 'list') {
-            if (!e.target.closest('.popup-menu-btn')) {
+            if (!e.target.closest('.menu-btn')) {
                 return;
             }
             this.showContextMenu(index);
@@ -804,7 +825,7 @@ class ImportView extends View {
             return;
         }
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         if (state.contextItemIndex === prevState.contextItemIndex) {
@@ -813,7 +834,7 @@ class ImportView extends View {
 
         const index = state.contextItemIndex;
         if (index === -1) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
@@ -826,10 +847,14 @@ class ImportView extends View {
 
         const item = state.items[index];
         const listItem = this.list.getListItemById(item.id);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
-            this.contextMenu.detach();
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const itemRestoreAvail = (
@@ -841,7 +866,7 @@ class ImportView extends View {
         const title = (item.enabled) ? __('DISABLE') : __('ENABLE');
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {
@@ -854,6 +879,14 @@ class ImportView extends View {
 
         this.uploadBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
+
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
 
         const { items } = this.menu;
 
@@ -877,6 +910,10 @@ class ImportView extends View {
         items.rulesBtn.show(isListMode);
         items.rulesBtn.enable(state.rulesEnabled);
         items.similarCheck.show(isListMode);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderList(state, prevState) {

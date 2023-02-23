@@ -12,7 +12,7 @@
                     <form method="post" action="<?=BASEURL?>admin/log/clean/">
                     <input name="clean" type="hidden" value="1">
                     <div class="form-controls">
-                        <input class="adm_act_btn" type="submit" value="Clean log">
+                        <input class="btn submit-btn" type="submit" value="Clean log">
                     </div>
                     </form>
                     <textarea rows="30" cols="150"><?=$contents?></textarea>

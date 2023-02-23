@@ -7,11 +7,14 @@ import {
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -27,10 +30,9 @@ import { CategoryList } from '../../js/model/CategoryList.js';
 import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
-import { CategoryDetails } from '../../Components/CategoryDetails/CategoryDetails.js';
+import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
+import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './style.scss';
@@ -59,6 +61,7 @@ class CategoryListView extends View {
             items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -155,10 +158,11 @@ class CategoryListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
-
-        this.createContextMenu();
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
@@ -173,8 +177,14 @@ class CategoryListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -226,9 +236,14 @@ class CategoryListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -250,6 +265,14 @@ class CategoryListView extends View {
         });
     }
 
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
+    }
+
     onMenuClick(item) {
         this.menu.hideMenu();
 
@@ -266,18 +289,23 @@ class CategoryListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            const menuBtn = e?.target?.closest('.popup-menu-btn');
+            const menuBtn = e?.target?.closest('.menu-btn');
             if (menuBtn) {
-                this.showContextMenu(itemId);
+                this.showContextMenu(id);
             }
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -309,12 +337,12 @@ class CategoryListView extends View {
     }
 
     async setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
         }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -525,22 +553,26 @@ class CategoryListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
         const itemId = state.contextItem;
         const category = window.app.model.categories.getItem(itemId);
         if (!category) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
 
-        const selector = `.category-item[data-id="${itemId}"] .popup-menu`;
-        const menuContainer = this.contentContainer.querySelector(selector);
-        if (!menuContainer) {
-            this.contextMenu.detach();
+        const selector = `.category-item[data-id="${itemId}"] .menu-btn`;
+        const menuButton = this.contentContainer.querySelector(selector);
+        if (!menuButton) {
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;
@@ -548,7 +580,7 @@ class CategoryListView extends View {
         items.ctxDetailsBtn.setURL(`${baseURL}categories/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${itemId}`);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {
@@ -563,7 +595,15 @@ class CategoryListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
+
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
 
         const { items } = this.menu;
 
@@ -581,6 +621,10 @@ class CategoryListView extends View {
         show(items.separator2, isSelectMode);
 
         items.deleteBtn.show(selCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderDetails(state, prevState) {
@@ -662,16 +706,16 @@ class CategoryListView extends View {
         this.transTypes.forEach((type) => {
             const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
             const section = this.sections[key];
-            const items = mainCategories.filter((item) => item.type === type);
+            const typeCategories = mainCategories.filter((item) => item.type === type);
 
             section.list.setState((listState) => ({
                 ...listState,
-                items,
+                items: listData(typeCategories),
                 listMode: state.listMode,
                 renderTime: Date.now(),
             }));
 
-            show(section.container, items.length > 0);
+            show(section.container, typeCategories.length > 0);
         });
     }
 

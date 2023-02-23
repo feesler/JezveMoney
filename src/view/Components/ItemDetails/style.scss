@@ -4,7 +4,7 @@
   flex-flow: column nowrap;
 
   .field {
-    margin: var(--std-field-margin);
+    margin: var(--form-field-margin);
   }
 
   .field__title {
@@ -23,7 +23,7 @@
 
   .subcategories-list,
   .transactions-link {
-    margin: var(--std-field-margin);
+    margin: var(--form-field-margin);
     margin-top: 0;
   }
 

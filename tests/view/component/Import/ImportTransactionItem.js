@@ -73,7 +73,7 @@ export class ImportTransactionItem extends TestComponent {
 
         res.typeField.type = await prop(res.typeField.elem, 'dataset.type');
 
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.origDataTable = await query(this.elem, '.orig-data-table');
@@ -251,11 +251,11 @@ export class ImportTransactionItem extends TestComponent {
             },
             categoryField: {
                 value: categoryName,
-                visible: true,
+                visible: (model.categoryId !== 0),
             },
             commentField: {
-                value: model.comment.toString(),
-                visible: true,
+                value: model.comment,
+                visible: model.comment.length > 0,
             },
         };
 
@@ -498,6 +498,9 @@ export class ImportTransactionItem extends TestComponent {
         const srcCurrency = App.currency.getItem(item.src_curr);
         const destCurrency = App.currency.getItem(item.dest_curr);
 
+        const category = state.categories.getItem(item.category_id);
+        const categoryName = (item.category_id === 0) ? '' : category.name;
+
         const res = {
             enabled: item.enabled,
             typeField: {
@@ -521,9 +524,13 @@ export class ImportTransactionItem extends TestComponent {
                 value: secondsToDateString(item.date),
                 visible: true,
             },
+            categoryField: {
+                value: categoryName,
+                visible: (item.category_id !== 0),
+            },
             commentField: {
                 value: item.comment,
-                visible: true,
+                visible: item.comment.length > 0,
             },
         };
 

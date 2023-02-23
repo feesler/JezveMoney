@@ -5,8 +5,8 @@ import {
     hasFlag,
     query,
     queryAll,
-    closest,
     prop,
+    evaluate,
     click,
     isVisible,
     wait,
@@ -53,12 +53,14 @@ export class ImportRulesDialog extends TestComponent {
             'Failed to initialize import rules dialog',
         );
 
-        const contextParent = await closest(res.contextMenu.elem, '.rule-item');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.itemId = parseInt(itemId, 10);
-            assert(res.contextMenu.itemId, 'Invalid item');
+        res.contextMenu.itemId = await evaluate((menuEl) => {
+            const contextParent = menuEl?.closest('.rule-item');
+            return (contextParent)
+                ? parseInt(contextParent.dataset.id, 10)
+                : null;
+        }, res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
             res.updateBtn = await Button.create(this, updateBtnElem);
             const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');

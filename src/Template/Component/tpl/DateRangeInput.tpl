@@ -7,10 +7,10 @@
             <?= svgIcon("close", "input-group__inner-btn__icon") ?>
         </button>
         <button class="btn icon-btn input-group__btn dp-btn" type="button">
-            <?= useIcon("calendar-icon", "icon calendar-icon") ?>
+            <?= useIcon("calendar-icon", "btn__icon calendar-icon") ?>
         </button>
     </div>
     <input type="submit" hidden>
     <div class="calendar"></div>
-    <div class="invalid-feedback"><?= __("FILTER_INVALID_DATE_RANGE") ?></div>
+    <div class="feedback invalid-feedback"><?= __("FILTER_INVALID_DATE_RANGE") ?></div>
 </form>

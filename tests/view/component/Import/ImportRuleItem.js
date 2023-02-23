@@ -31,7 +31,7 @@ export class ImportRuleItem extends TestComponent {
             operatorElem: { elem: await query(this.elem, '.rule-item__operator') },
             valueElem: { elem: await query(this.elem, '.rule-item__value') },
             infoElem: { elem: await query(this.elem, '.rule-item__info') },
-            menuBtn: { elem: await query(this.elem, '.popup-menu-btn') },
+            menuBtn: { elem: await query(this.elem, '.menu-btn') },
             toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
         };
 

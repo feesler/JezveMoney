@@ -9,10 +9,10 @@
         <div class="header__content">
             <button id="userbtn" class="btn user-btn right-align" type="button" tabindex="2">
                 <?php if ($this->user_id != 0) {        ?>
-                    <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+                    <span class="btn__icon user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
                     <span class="user-btn__title"><?= e($this->user_name) ?></span>
                 <?php    } else {        ?>
-                    <span class="user-btn__icon"><?= svgIcon("ellipsis", "user-icon") ?></span>
+                    <span class="btn__icon user-btn__icon"><?= svgIcon("ellipsis", "user-icon") ?></span>
                 <?php    }        ?>
             </button>
         </div>
@@ -74,7 +74,7 @@
     <div class="user-navigation-controls">
         <?php if ($this->user_id != 0) {        ?>
             <div class="btn user-btn">
-                <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+                <span class="btn__icon user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
                 <span class="user-btn__title"><?= e($this->user_name) ?></span>
             </div>
         <?php    }    ?>

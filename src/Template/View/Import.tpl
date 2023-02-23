@@ -23,11 +23,9 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                     <header class="content-header" <?= hidden(!$importAvailable) ?>>
                         <div id="dataHeaderControls" class="data-header">
-                            <div class="header-field account-field">
-                                <label><?= __("IMPORT_MAIN_ACCOUNT") ?></label>
-                                <div class="header-field__content">
-                                    <select id="acc_id"></select>
-                                </div>
+                            <div class="field account-field">
+                                <label class="field__title"><?= __("IMPORT_MAIN_ACCOUNT") ?></label>
+                                <select id="acc_id"></select>
                             </div>
                             <button id="submitBtn" class="btn submit-btn" type="button" disabled><?= __("SUBMIT") ?></button>
                         </div>

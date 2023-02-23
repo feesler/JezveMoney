@@ -13,6 +13,66 @@
   }
 }
 
+/* Account container */
+.accounts-section {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: normal;
+  position: relative;
+  max-width: var(--section-width);
+}
+
+.account-container {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  width: var(--form-field-width);
+  margin: var(--form-field-margin);
+
+  .field__title {
+    display: flex;
+    flex-flow: row nowrap;
+    column-gap: 12px;
+
+    .btn.close-btn {
+      --btn-size: 14px;
+      --btn-icon-size: 14px;
+      --btn-icon-color: var(--dimmed-text-color);
+      --btn-hover-icon-color: var(--main-text-color);
+
+      align-self: center;
+    }
+  }
+}
+
+.tile-base {
+  display: flex;
+  flex-flow: row nowrap;
+  column-gap: 6px;
+
+  .dd__container_attached {
+    display: flex;
+  }
+}
+
+.tile-info-block {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 10px;
+  min-width: 100px;
+}
+
+.tile-info-item {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  font-size: 0.8rem;
+  color: var(--dimmed-text-color);
+}
+
+.account-toggler {
+  display: flex;
+}
+
 /* Swap button */
 .swap-btn {
   display: inline-flex;
@@ -30,84 +90,6 @@
 .swap-icon {
   height: 24px;
   width: 24px;
-}
-
-/* Tile block header */
-.tile_header {
-  flex-basis: 100%;
-  flex-grow: 2;
-  flex-shrink: 0;
-  height: 20px;
-  line-height: 20px;
-  overflow: hidden;
-
-  label {
-    display: inline-flex;
-    font-size: 16px;
-    margin: 0 5px 0 0;
-  }
-
-  .close-btn {
-    display: inline-flex;
-    padding: 1px;
-    margin: 0;
-    background: none;
-    cursor: pointer;
-    line-height: 20px;
-    height: 20px;
-  }
-
-  .close-icon {
-    height: 14px;
-    width: 14px;
-    fill: #888888;
-  }
-}
-
-.tile-base {
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-.tile_container {
-  margin: 8px 5px 8px 0;
-
-  .dd__container_attached {
-    display: inline-flex;
-  }
-}
-
-.tile-info-block {
-  display: flex;
-  flex-flow: column nowrap;
-  row-gap: 10px;
-  min-width: 100px;
-  margin: 8px 20px 10px 0;
-}
-
-.tile-info-item {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: flex-start;
-}
-
-.account-toggler {
-  padding: 8px 5px 8px 0;
-}
-
-.accounts-section {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: baseline;
-  position: relative;
-  max-width: var(--section-width);
-}
-
-.account-container {
-  min-width: 100px;
-  max-width: 400px;
-  display: inline-flex;
-  flex-flow: column nowrap;
 }
 
 /* Desktop */

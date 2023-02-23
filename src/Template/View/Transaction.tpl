@@ -32,6 +32,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
                             <?php    }    ?>
                             <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
+                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
+
                             <?= LinkMenu::render([
                                 "id" => "typeMenu",
                                 "classNames" => "trtype-menu",
@@ -58,10 +60,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <?= AccountContainer::render($destContainer) ?>
                             </div>
 
-                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
-
-                            <div id="srcAmountRow" class="validation-block view-row std_margin" <?= hidden(!$trAvailable || !$showSrcAmount) ?>>
-                                <label for="srcAmountInput"><?= e($srcAmountLbl) ?></label>
+                            <div id="srcAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showSrcAmount) ?>>
+                                <label for="srcAmountInput" class="field__title"><?= e($srcAmountLbl) ?></label>
                                 <div class="input-group">
                                     <input id="srcAmountInput" name="src_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
                                     <?php if ($tr["type"] == INCOME || ($tr["type"] == DEBT && $debtType)) { ?>
@@ -74,12 +74,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="srcCurrInp" name="src_curr" type="hidden" value="<?= e($tr["src_curr"]) ?>">
                             </div>
 
-                            <div id="destAmountRow" class="validation-block view-row std_margin" <?= hidden(!$trAvailable || !$showDestAmount) ?>>
-                                <label for="destAmountInput"><?= e($destAmountLbl) ?></label>
+                            <div id="destAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showDestAmount) ?>>
+                                <label for="destAmountInput" class="field__title"><?= e($destAmountLbl) ?></label>
                                 <div class="input-group">
                                     <input id="destAmountInput" name="dest_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
                                     <?php if ($tr["type"] == EXPENSE || ($tr["type"] == DEBT && !$debtType)) { ?>
@@ -92,55 +92,55 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         </button>
                                     <?php   } ?>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_AMOUNT") ?></div>
                                 <input id="destCurrInp" name="dest_curr" type="hidden" value="<?= e($tr["dest_curr"]) ?>">
                             </div>
 
-                            <div id="exchangeRow" class="view-row std_margin" hidden>
-                                <label for="exchangeInput"><?= __("TR_EXCHANGE_RATE") ?></label>
+                            <div id="exchangeRow" class="field form-row" hidden>
+                                <label for="exchangeInput" class="field__title"><?= __("TR_EXCHANGE_RATE") ?></label>
                                 <div class="input-group">
                                     <input id="exchangeInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
                                     <button id="exchangeSign" class="input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
                                 </div>
                             </div>
 
-                            <div id="srcResBalanceRow" class="view-row std_margin" hidden>
-                                <label for="srcResBalanceInput"><?= e($srcBalTitle) ?></label>
+                            <div id="srcResBalanceRow" class="field form-row" hidden>
+                                <label for="srcResBalanceInput" class="field__title"><?= e($srcBalTitle) ?></label>
                                 <div class="input-group">
                                     <input id="srcResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["srcResult"]) ?>">
                                     <div id="srcResBalanceSign" class="input-group__text"><?= e($form["srcCurrSign"]) ?></div>
                                 </div>
                             </div>
 
-                            <div id="destResBalanceRow" class="view-row std_margin" hidden>
-                                <label for="destResBalanceInput"><?= e($destBalTitle) ?></label>
+                            <div id="destResBalanceRow" class="field form-row" hidden>
+                                <label for="destResBalanceInput" class="field__title"><?= e($destBalTitle) ?></label>
                                 <div class="input-group">
                                     <input id="destResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["destResult"]) ?>">
                                     <div id="destResBalanceSign" class="input-group__text"><?= e($form["destCurrSign"]) ?></div>
                                 </div>
                             </div>
 
-                            <div id="dateRow" class="validation-block view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="dateInput"><?= __("TR_DATE") ?></label>
+                            <div id="dateRow" class="field form-row validation-block" <?= hidden(!$trAvailable) ?>>
+                                <label for="dateInput" class="field__title"><?= __("TR_DATE") ?></label>
                                 <div class="column-container">
                                     <div class="input-group">
                                         <input id="dateInput" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
                                         <button id="dateInputBtn" class="btn icon-btn input-group__btn" type="button">
-                                            <?= useIcon("calendar-icon", "icon calendar-icon") ?>
+                                            <?= useIcon("calendar-icon", "btn__icon calendar-icon") ?>
                                         </button>
                                     </div>
                                     <div id="datePickerWrapper" class="calendar"></div>
                                 </div>
-                                <div class="invalid-feedback"><?= __("TR_INVALID_DATE") ?></div>
+                                <div class="feedback invalid-feedback"><?= __("TR_INVALID_DATE") ?></div>
                             </div>
 
-                            <div id="categoryRow" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="categorySelect"><?= __("TR_CATEGORY") ?></label>
+                            <div id="categoryRow" class="field form-row" <?= hidden(!$trAvailable) ?>>
+                                <label for="categorySelect" class="field__title"><?= __("TR_CATEGORY") ?></label>
                                 <select id="categorySelect" name="category_id"></select>
                             </div>
 
-                            <div id="commentRow" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
-                                <label for="commentInput"><?= __("TR_COMMENT") ?></label>
+                            <div id="commentRow" class="field form-row" <?= hidden(!$trAvailable) ?>>
+                                <label for="commentInput" class="field__title"><?= __("TR_COMMENT") ?></label>
                                 <input id="commentInput" class="stretch-input" name="comment" type="text" value="<?= e($tr["comment"]) ?>">
                             </div>
 

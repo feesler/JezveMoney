@@ -3,7 +3,7 @@ import {
     asArray,
     asyncMap,
     query,
-    prop,
+    evaluate,
     navigation,
     click,
     waitForFunction,
@@ -11,7 +11,6 @@ import {
     baseUrl,
     copyObject,
     isVisible,
-    closest,
     wait,
 } from 'jezve-test';
 import {
@@ -44,6 +43,7 @@ const modeButtons = {
     sort: 'sortModeBtn',
 };
 
+const listMenuSelector = '#listMenu';
 const listMenuItems = [
     'selectModeBtn',
     'sortModeBtn',
@@ -80,11 +80,7 @@ export class TransactionListView extends AppView {
             clearFiltersBtn: { elem: await query('#clearFiltersBtn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
-            listMenuContainer: {
-                elem: await query('.heading-actions .popup-menu'),
-                menuBtn: await query('.heading-actions .popup-menu-btn'),
-            },
-            listMenu: { elem: await query('#listMenu') },
+            menuBtn: { elem: await query('.heading-actions .menu-btn') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
@@ -93,16 +89,22 @@ export class TransactionListView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
-        await this.parseMenuItems(res, listMenuItems);
+        // Main menu
+        res.listMenu = { elem: await query(listMenuSelector) };
+        if (res.listMenu.elem) {
+            await this.parseMenuItems(res, listMenuItems);
+        }
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.trans-item');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.itemId = parseInt(itemId, 10);
-            assert(res.contextMenu.itemId, 'Invalid item');
+        res.contextMenu.itemId = await evaluate((menuEl) => {
+            const contextParent = menuEl?.closest('.trans-item');
+            return (contextParent)
+                ? parseInt(contextParent.dataset.id, 10)
+                : null;
+        }, res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
@@ -509,27 +511,30 @@ export class TransactionListView extends AppView {
             transList: { visible: true },
             createBtn: { visible: listMode },
             listModeBtn: { visible: !listMode },
-            listMenuContainer: { visible: isItemsAvailable && !sortMode },
+            menuBtn: { visible: isItemsAvailable && !sortMode },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: {
-                visible: model.listMenuVisible && listMode && isItemsAvailable,
-            },
-            sortModeBtn: {
-                visible: model.listMenuVisible && listMode && model.list.items.length > 1,
-            },
-            selectAllBtn: {
-                visible: showSelectItems && selected.length < model.list.items.length,
-            },
-            deselectAllBtn: {
-                visible: showSelectItems && selected.length > 0,
-            },
-            setCategoryBtn: { visible: showSelectItems && selected.length > 0 },
-            deleteBtn: { visible: showSelectItems && selected.length > 0 },
         };
 
         if (model.detailsItem) {
             res.itemInfo = TransactionDetails.render(model.detailsItem, App.state);
             res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.selectModeBtn = {
+                visible: model.listMenuVisible && listMode && isItemsAvailable,
+            };
+            res.sortModeBtn = {
+                visible: model.listMenuVisible && listMode && model.list.items.length > 1,
+            };
+            res.selectAllBtn = {
+                visible: showSelectItems && selected.length < model.list.items.length,
+            };
+            res.deselectAllBtn = {
+                visible: showSelectItems && selected.length > 0,
+            };
+            res.setCategoryBtn = { visible: showSelectItems && selected.length > 0 };
+            res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
         }
 
         if (model.contextMenuVisible) {
@@ -594,8 +599,10 @@ export class TransactionListView extends AppView {
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => item.clickMenu());
-        assert(this.content.contextMenu.visible, 'Context menu not visible');
+        await this.performAction(async () => {
+            await item.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return this.checkState(expected);
     }
@@ -608,7 +615,10 @@ export class TransactionListView extends AppView {
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+        await this.performAction(async () => {
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: true });
+        });
 
         return this.checkState(expected);
     }
@@ -623,7 +633,7 @@ export class TransactionListView extends AppView {
             `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
         );
 
-        if (listMode === 'list') {
+        if (listMode !== 'list') {
             await this.openListMenu();
         }
 

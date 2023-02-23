@@ -6,8 +6,11 @@ import {
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -24,10 +27,9 @@ import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { PersonDetails } from '../../Components/PersonDetails/PersonDetails.js';
+import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
@@ -57,6 +59,7 @@ class PersonListView extends View {
             },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -72,8 +75,8 @@ class PersonListView extends View {
         const listProps = {
             ItemComponent: Tile,
             getItemProps: (person, { listMode }) => ({
+                id: person.id,
                 type: 'button',
-                attrs: { 'data-id': person.id },
                 title: person.name,
                 selected: person.selected ?? false,
                 listMode,
@@ -127,10 +130,11 @@ class PersonListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
-
-        this.createContextMenu();
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
@@ -145,8 +149,14 @@ class PersonListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -208,9 +218,14 @@ class PersonListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -242,6 +257,14 @@ class PersonListView extends View {
         });
     }
 
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
+    }
+
     onMenuClick(item) {
         this.menu.hideMenu();
 
@@ -254,15 +277,20 @@ class PersonListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            this.showContextMenu(itemId);
+            this.showContextMenu(id);
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -294,12 +322,12 @@ class PersonListView extends View {
     }
 
     async setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
         }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -502,18 +530,22 @@ class PersonListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const person = window.app.model.persons.getItem(state.contextItem);
         if (!person) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${person.id}"]`);
         if (!tile) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;
@@ -541,7 +573,16 @@ class PersonListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
+
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
         const { items } = this.menu;
 
         items.selectModeBtn.show(isListMode && itemsCount > 0);
@@ -560,6 +601,10 @@ class PersonListView extends View {
         items.showBtn.show(hiddenSelCount > 0);
         items.hideBtn.show(selCount > 0);
         items.deleteBtn.show(totalSelCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     renderDetails(state, prevState) {
@@ -624,7 +669,7 @@ class PersonListView extends View {
         // Visible persons
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: state.items.visible,
+            items: listData(state.items.visible),
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
@@ -632,7 +677,7 @@ class PersonListView extends View {
         // Hidden persons
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: state.items.hidden,
+            items: listData(state.items.hidden),
             listMode: state.listMode,
         }));
 

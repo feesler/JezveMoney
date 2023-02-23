@@ -1,5 +1,11 @@
 .field {
-  --field-title-font-size: 1rem;
+  /* Title */
+  --field-title-font-size: 0.8rem;
+  --field-title-font-weight: 400;
+  --field-title-margin: 0 0 5px 1px;
+  --field-title-color: var(--dimmed-text-color);
+
+  /* Content */
   --field-content-font-size: 1rem;
 
   display: flex;
@@ -8,11 +14,10 @@
 }
 
 .field__title {
-  width: auto;
-  min-width: auto;
-  margin: 0 0 1px 1px;
+  margin: var(--field-title-margin);
   font-size: var(--field-title-font-size);
-  text-align: left;
+  font-weight: var(--field-title-font-weight);
+  color: var(--field-title-color);
 }
 
 .field__content {

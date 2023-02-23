@@ -54,7 +54,8 @@ const slice = createSlice({
 
         let categoryId = 0;
         if (ids.length === 1) {
-            const [id] = ids;
+            const [itemId] = ids;
+            const id = parseInt(itemId, 10);
             const transaction = state.transactions.find((item) => item.id === id);
             if (transaction) {
                 categoryId = transaction.category_id;
@@ -62,7 +63,8 @@ const slice = createSlice({
         }
 
         // Check all transactions have same type, otherwise show only categories with type 'Any'
-        const type = ids.reduce((currentType, id) => {
+        const type = ids.reduce((currentType, itemId) => {
+            const id = parseInt(itemId, 10);
             const transaction = state.transactions.find((item) => item.id === id);
             if (!transaction) {
                 throw new Error(`Transaction '${id}' not found`);

@@ -1,11 +1,11 @@
 import {
     query,
     assert,
-    closest,
-    prop,
+    evaluate,
     asArray,
     asyncMap,
     navigation,
+    wait,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { Widget } from './Widget.js';
@@ -24,12 +24,14 @@ export class TransactionsWidget extends Widget {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.trans-item');
-        if (contextParent) {
-            const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.itemId = parseInt(itemId, 10);
-            assert(res.contextMenu.itemId, 'Invalid item');
+        res.contextMenu.itemId = await evaluate((menuEl) => {
+            const contextParent = menuEl?.closest('.trans-item');
+            return (contextParent)
+                ? parseInt(contextParent.dataset.id, 10)
+                : null;
+        }, res.contextMenu.elem);
 
+        if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
@@ -64,8 +66,10 @@ export class TransactionsWidget extends Widget {
         this.checkValidIndex(index);
 
         const item = this.content.transList.items[index];
-        await this.performAction(() => item.clickMenu());
-        assert(this.content.contextMenu.visible, 'Context menu not visible');
+        await this.performAction(async () => {
+            await item.clickMenu();
+            return wait('#ctxDeleteBtn', { visible: true });
+        });
 
         return true;
     }

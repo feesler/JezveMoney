@@ -16,6 +16,22 @@ export class ImportConditionList extends List {
     }
 
     /**
+     * Search for condition for specified property with `is` (equal) operator
+     * @param {Number} field
+     */
+    static findIsCondition(conditions, fieldId) {
+        const field = parseInt(fieldId, 10);
+        if (!field) {
+            throw new Error('Invalid field id');
+        }
+
+        return conditions.find((item) => (
+            item.field_id === field
+            && item.operator === IMPORT_COND_OP_EQUAL
+        ));
+    }
+
+    /**
      * Create list item from specified object
      * @param {Object} obj
      */
@@ -46,15 +62,7 @@ export class ImportConditionList extends List {
      * @param {Number} field
      */
     findIsCondition(fieldId) {
-        const field = parseInt(fieldId, 10);
-        if (!field) {
-            throw new Error('Invalid field id');
-        }
-
-        return this.find((item) => (
-            item.field_id === field
-            && item.operator === IMPORT_COND_OP_EQUAL
-        ));
+        return ImportConditionList.findIsCondition(this, fieldId);
     }
 
     /**

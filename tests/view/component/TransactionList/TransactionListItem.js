@@ -35,6 +35,7 @@ export class TransactionListItem extends TestComponent {
                 destAmountElem,
             ] = await queryAll(this.elem, '.trans-item__amount-field .field__content');
             const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
+            const categoryElem = await query(this.elem, '.trans-item__category-field .field__content');
             const commentElem = await query(this.elem, '.trans-item__comment-field .field__content');
 
             const sourceVisible = await isVisible(srcAccElem, true);
@@ -42,14 +43,24 @@ export class TransactionListItem extends TestComponent {
             const srcAmountVisible = await isVisible(srcAmountElem, true);
             const destAmountVisible = await isVisible(destAmountElem, true);
 
-            const props = await evaluate((sAcc, dAcc, sAmount, dAmount, dateEl, commentEl) => ({
-                sourceContent: sAcc.textContent,
-                destContent: dAcc.textContent,
-                srcAmount: sAmount.textContent,
-                destAmount: dAmount.textContent,
-                dateFmt: dateEl.textContent,
-                comment: (commentEl) ? commentEl.textContent : '',
-            }), srcAccElem, destAccElem, srcAmountElem, destAmountElem, dateElem, commentElem);
+            const props = await evaluate(
+                (sAcc, dAcc, sAmount, dAmount, dateEl, catEl, commentEl) => ({
+                    sourceContent: sAcc.textContent,
+                    destContent: dAcc.textContent,
+                    srcAmount: sAmount.textContent,
+                    destAmount: dAmount.textContent,
+                    dateFmt: dateEl.textContent,
+                    category: catEl.textContent,
+                    comment: (commentEl) ? commentEl.textContent : '',
+                }),
+                srcAccElem,
+                destAccElem,
+                srcAmountElem,
+                destAmountElem,
+                dateElem,
+                categoryElem,
+                commentElem,
+            );
 
             if (sourceVisible && destVisible) {
                 res.accountTitle = `${props.sourceContent} → ${props.destContent}`;
@@ -78,18 +89,20 @@ export class TransactionListItem extends TestComponent {
             const amountElem = await query(this.elem, '.trans-item__amount');
             assert(amountElem, 'Amount text not found');
             const dateElem = await query(this.elem, '.trans-item__date');
+            const categoryElem = await query(this.elem, '.trans-item__category');
             const commentElem = await query(this.elem, '.trans-item__comment');
 
-            const props = await evaluate((titleEl, amountEl, dateEl, commentEl) => ({
+            const props = await evaluate((titleEl, amountEl, dateEl, catEl, commentEl) => ({
                 accountTitle: titleEl.textContent,
                 amountText: amountEl.textContent,
                 dateFmt: dateEl.textContent,
+                category: catEl.textContent,
                 comment: (commentEl) ? commentEl.textContent : '',
-            }), titleElem, amountElem, dateElem, commentElem);
+            }), titleElem, amountElem, dateElem, categoryElem, commentElem);
             Object.assign(res, props);
         }
 
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
 
         return res;
     }
@@ -171,6 +184,10 @@ export class TransactionListItem extends TestComponent {
         }
 
         res.dateFmt = Transaction.formatDate(transaction.date);
+
+        const category = state.categories.getItem(transaction.category_id);
+        res.category = (transaction.category_id === 0) ? '' : category.name;
+
         res.comment = transaction.comment;
 
         return res;

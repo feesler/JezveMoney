@@ -1,0 +1,67 @@
+.import-form-popup {
+  --import-form-popup-zindex: 500;
+  --popup-max-width: 600px;
+}
+
+/* Transaction item */
+.import-form {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
+  .form-container {
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    align-items: normal;
+    gap: 12px;
+  }
+
+  /* Input field and label group */
+  .field {
+    max-width: 300px;
+  }
+
+  .field__title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .comment-field {
+    max-width: none;
+  }
+
+  .dd__container {
+    --dd-list-z-index: var(--import-form-popup-zindex);
+
+    display: flex;
+  }
+
+  .dp__wrapper {
+    z-index: var(--import-form-popup-zindex);
+  }
+
+  .input-group {
+    --ig-height: var(--input-height);
+  }
+
+  /* Toggle expand/collapse button */
+  .toggle-btn {
+    margin-left: auto;
+  }
+
+  /* Delete item button */
+  .calendar-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .collapsible-content {
+    flex-flow: column nowrap;
+    row-gap: 1rem;
+    border-top: 1px solid;
+    padding: 8px;
+    overflow: hidden;
+  }
+}

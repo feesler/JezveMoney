@@ -7,11 +7,14 @@ import {
     urlJoin,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import {
+    listData,
     getSortByDateIcon,
     getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
@@ -27,10 +30,9 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { AccountDetails } from '../../Components/AccountDetails/AccountDetails.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { SortableListContainer } from '../../Components/SortableListContainer/SortableListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { AccountDetails } from './components/AccountDetails/AccountDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
 import './style.scss';
@@ -60,6 +62,7 @@ class AccountListView extends View {
             },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             sortMode,
             contextItem: null,
             renderTime: Date.now(),
@@ -77,7 +80,6 @@ class AccountListView extends View {
             getItemProps: (account, { listMode }) => ({
                 type: 'button',
                 account,
-                attrs: { 'data-id': account.id },
                 selected: account.selected ?? false,
                 listMode,
             }),
@@ -130,10 +132,11 @@ class AccountListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
-
-        this.createContextMenu();
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
@@ -148,8 +151,14 @@ class AccountListView extends View {
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -217,9 +226,14 @@ class AccountListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -256,6 +270,14 @@ class AccountListView extends View {
         });
     }
 
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
+    }
+
     onMenuClick(item) {
         this.menu.hideMenu();
 
@@ -268,15 +290,20 @@ class AccountListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            this.showContextMenu(itemId);
+            this.showContextMenu(id);
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -308,12 +335,12 @@ class AccountListView extends View {
     }
 
     async setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
         }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     startLoading() {
@@ -518,18 +545,22 @@ class AccountListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const account = window.app.model.userAccounts.getItem(state.contextItem);
         if (!account) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
         if (!tile) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;
@@ -558,9 +589,17 @@ class AccountListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
-        const { items } = this.menu;
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
 
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
+
+        const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);
 
         const showSortItems = isListMode && itemsCount > 1;
@@ -592,6 +631,10 @@ class AccountListView extends View {
                 exportURL += `?${urlJoin({ id: selectedIds })}`;
             }
             items.exportBtn.setURL(exportURL);
+        }
+
+        if (showFirstTime) {
+            this.menu.showMenu();
         }
     }
 
@@ -657,7 +700,7 @@ class AccountListView extends View {
         // Visible accounts
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: state.items.visible,
+            items: listData(state.items.visible),
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
@@ -665,7 +708,7 @@ class AccountListView extends View {
         // Hidden accounts
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: state.items.hidden,
+            items: listData(state.items.hidden),
             listMode: state.listMode,
         }));
 

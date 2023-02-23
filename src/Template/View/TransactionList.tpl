@@ -18,11 +18,13 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <div class="heading-actions">
                                 <?= Button::render([
                                     "id" => "filtersBtn",
+                                    "classNames" => "circle-btn",
                                     "type" => "button",
                                     "icon" => "filter",
                                 ]) ?>
                                 <?= Button::render([
                                     "id" => "createBtn",
+                                    "classNames" => "circle-btn",
                                     "type" => "link",
                                     "link" => BASEURL . "transactions/create/",
                                     "icon" => "plus",
@@ -34,11 +36,6 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <aside id="filtersContainer" class="filters-container">
                                 <header class="filters-heading">
                                     <span class="filters-heading__title"><?= __("FILTERS") ?></span>
-                                    <button id="closeFiltersBtn" class="btn icon-btn close-btn right-align" type="button">
-                                        <svg class="icon close-icon">
-                                            <use href="#close"></use>
-                                        </svg>
-                                    </button>
                                 </header>
 
                                 <hr class="filters-separator">

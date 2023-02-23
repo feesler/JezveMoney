@@ -21,11 +21,12 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../Components/Heading/style.scss';
-import './style.scss';
+import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
+import '../../Components/Heading/style.scss';
+import '../../Components/Field/style.scss';
+import './style.scss';
 
 /**
  * Create/update account view

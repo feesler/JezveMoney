@@ -29,10 +29,10 @@
                     </table>
 
                     <div class="form-controls">
-                        <input id="createbtn" class="adm_act_btn" type="button" value="create">
-                        <input id="updbtn" class="adm_act_btn" type="button" value="update" hidden>
-                        <input id="passbtn" class="adm_act_btn" type="button" value="set password" hidden>
-                        <input id="del_btn" class="adm_act_btn" type="button" value="delete" hidden>
+                        <input id="createbtn" class="btn submit-btn" type="button" value="create">
+                        <input id="updbtn" class="btn submit-btn" type="button" value="update" hidden>
+                        <input id="passbtn" class="btn submit-btn" type="button" value="set password" hidden>
+                        <input id="del_btn" class="btn submit-btn" type="button" value="delete" hidden>
                     </div>
                 </div>
             </div>
@@ -42,19 +42,19 @@
 
 <form id="item-frm" method="post" hidden>
     <input id="user_id" name="id" type="hidden">
-    <div id="login_block" class="view-row">
-        <label for="user_login">Login</label>
+    <div id="login_block" class="field form-row">
+        <label for="user_login" class="field__title">Login</label>
         <input id="user_login" class="stretch-input" name="login" type="text">
     </div>
-    <div id="name_block" class="view-row">
-        <label for="user_name">Name</label>
+    <div id="name_block" class="field form-row">
+        <label for="user_name" class="field__title">Name</label>
         <input id="user_name" class="stretch-input" name="name" type="text">
     </div>
-    <div id="pwd_block" class="view-row">
-        <label for="user_pass">Password</label>
+    <div id="pwd_block" class="field form-row">
+        <label for="user_pass" class="field__title">Password</label>
         <input id="user_pass" class="stretch-input" name="password" type="password">
     </div>
-    <div id="admin_block" class="view-row">
+    <div id="admin_block" class="form-row">
         <div class="checkbox-wrap">
             <label for="isadmin"><input id="isadmin" name="access" type="radio" value="1">Admin access level</label>
         </div>

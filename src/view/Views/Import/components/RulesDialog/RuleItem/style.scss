@@ -1,0 +1,144 @@
+/* Import rule item */
+.rule-item {
+  flex: 0 0 auto;
+
+  /* Main static view */
+  .collapsible-header {
+    flex-flow: row nowrap;
+    align-items: center;
+    font-size: 16px;
+    padding: 8px 4px 8px 8px;
+    border: 0;
+    cursor: pointer;
+  }
+
+  /* Menu */
+  .popup-menu {
+    position: static;
+  }
+
+  .btn.menu-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 0;
+    --btn-background: none;
+    --btn-icon-color: var(--list-item-icon-fill);
+
+    margin: 0 4px;
+  }
+
+  .popup-menu-list {
+    right: auto;
+  }
+
+  /* Delete and toggle expand/collapse button */
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    flex-flow: row nowrap;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+  }
+
+  .collapsible-content {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 0 none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+.rule-item__main-info {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+/* Top row: property, operator, value */
+.rule-item__main-top {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.rule-item__property,
+.rule-item__value-property {
+  font-weight: 200;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.rule-item__operator {
+  font-size: 16px;
+  font-weight: 200;
+  font-style: italic;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.rule-item__value {
+  flex-grow: 1;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rule-item__value::before,
+.rule-item__value::after {
+  content: "`";
+}
+
+/* Actions and child rules count info element */
+.rule-item__info {
+  font-size: 12px;
+}
+
+/* Controls */
+.rule-item__main-controls {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.rule-item.collapsible__expanded .toggle-btn .btn__icon {
+  transform: rotate(180deg);
+}
+
+/* Rule item content */
+.rule-item.collapsible__expanded > .collapsible-content {
+  height: auto;
+  padding: 8px;
+  margin: 0 1px;
+}
+
+.rule-item__header {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rule-item__conditions,
+.rule-item__actions {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 1px;
+}
+
+.rule-item__conditions {
+  margin-bottom: 8px;
+}
+
+.rule-item__conditions .cond-item:first-child,
+.rule-item__actions .action-item:first-child {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.rule-item__conditions .cond-item:last-child,
+.rule-item__actions .action-item:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}

@@ -9,11 +9,13 @@ import {
 } from 'jezvejs';
 import 'jezvejs/style/Button';
 import { Histogram } from 'jezvejs/Histogram';
+import { ListContainer } from 'jezvejs/ListContainer';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { API } from '../../js/api/index.js';
 import {
     formatPersonDebts,
     formatValueShort,
+    listData,
     normalize,
     __,
 } from '../../js/utils.js';
@@ -27,7 +29,6 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
@@ -101,7 +102,6 @@ class MainView extends View {
                 type: 'link',
                 link: `${baseURL}transactions/create/?acc_id=${account.id}`,
                 account,
-                attrs: { 'data-id': account.id },
                 selected: account.selected ?? false,
                 selectMode: listMode === 'select',
             }),
@@ -114,13 +114,13 @@ class MainView extends View {
         // Accounts widget
         this.visibleAccounts = ListContainer.create({
             ...accountsProps,
-            items: state.accounts.visible,
+            items: listData(state.accounts.visible),
         });
         this.accountsWidget.append(this.visibleAccounts.elem);
 
         this.hiddenAccounts = ListContainer.create({
             ...accountsProps,
-            items: state.accounts.hidden,
+            items: listData(state.accounts.hidden),
         });
         this.accountsWidget.append(this.hiddenAccounts.elem);
 
@@ -142,9 +142,9 @@ class MainView extends View {
         const personProps = {
             ItemComponent: Tile,
             getItemProps: (person, { listMode }) => ({
+                id: person.id,
                 type: 'link',
                 link: `${baseURL}transactions/create/?type=debt&person_id=${person.id}`,
-                attrs: { 'data-id': person.id },
                 title: person.name,
                 subtitle: formatPersonDebts(person),
                 selected: person.selected,
@@ -158,13 +158,13 @@ class MainView extends View {
 
         this.visiblePersons = ListContainer.create({
             ...personProps,
-            items: state.persons.visible,
+            items: listData(state.persons.visible),
         });
         this.personsWidget.append(this.visiblePersons.elem);
 
         this.hiddenPersons = ListContainer.create({
             ...personProps,
-            items: state.persons.hidden,
+            items: listData(state.persons.hidden),
         });
         this.personsWidget.append(this.hiddenPersons.elem);
 
@@ -223,7 +223,8 @@ class MainView extends View {
     createTransactionContextMenu() {
         this.transactionContextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: this.showContextMenu(null),
             items: [{
                 id: 'ctxUpdateBtn',
                 type: 'link',
@@ -232,7 +233,7 @@ class MainView extends View {
             }, {
                 id: 'ctxSetCategoryBtn',
                 title: __('SET_CATEGORY'),
-                onClick: () => this.showCategoryDialog(true),
+                onClick: () => this.showCategoryDialog(),
             }, {
                 type: 'separator',
             }, {
@@ -285,7 +286,7 @@ class MainView extends View {
 
     /** Transaction list 'click' event handler */
     onTransactionClick(itemId, e) {
-        if (e?.target?.closest('.popup-menu-btn')) {
+        if (e?.target?.closest('.menu-btn')) {
             this.showContextMenu(itemId);
         }
     }
@@ -442,7 +443,7 @@ class MainView extends View {
 
         this.visibleAccounts.setState((listState) => ({
             ...listState,
-            items: state.accounts.visible,
+            items: listData(state.accounts.visible),
             renderTime: state.renderTime,
         }));
 
@@ -455,7 +456,7 @@ class MainView extends View {
 
         this.hiddenAccounts.setState((listState) => ({
             ...listState,
-            items: state.accounts.hidden,
+            items: listData(state.accounts.hidden),
             renderTime: state.renderTime,
         }));
         this.hiddenAccounts.show(hiddenAvailable && state.accounts.showHidden);
@@ -513,7 +514,7 @@ class MainView extends View {
 
         this.visiblePersons.setState((listState) => ({
             ...listState,
-            items: state.persons.visible,
+            items: listData(state.persons.visible),
             renderTime: state.renderTime,
         }));
 
@@ -526,7 +527,7 @@ class MainView extends View {
 
         this.hiddenPersons.setState((listState) => ({
             ...listState,
-            items: state.persons.hidden,
+            items: listData(state.persons.hidden),
             renderTime: state.renderTime,
         }));
         this.hiddenPersons.show(hiddenAvailable && state.persons.showHidden);
@@ -544,8 +545,8 @@ class MainView extends View {
             return;
         }
         const listItem = this.latestList.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
             this.transactionContextMenu.detach();
             return;
         }
@@ -554,7 +555,7 @@ class MainView extends View {
         const { items } = this.transactionContextMenu;
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
-        this.transactionContextMenu.attachAndShow(menuContainer);
+        this.transactionContextMenu.attachAndShow(menuButton);
     }
 
     /** Renders transactions widget */
@@ -573,12 +574,12 @@ class MainView extends View {
     }
 
     /** Renders statistics widget */
-    renderStatisticsWidget(state) {
-        if (!this.histogram) {
+    renderStatisticsWidget(state, prevState) {
+        if (state.chartData === prevState?.chartData) {
             return;
         }
 
-        this.histogram.setData(state.chartData);
+        this.histogram?.setData(state.chartData);
     }
 
     /** Renders 'Set transaction category' dialog */

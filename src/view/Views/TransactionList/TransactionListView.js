@@ -8,8 +8,9 @@ import {
     debounce,
     isFunction,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
+import { DropDown } from 'jezvejs/DropDown';
+import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -31,7 +32,7 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { TransactionDetails } from '../../Components/TransactionDetails/TransactionDetails.js';
+import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
@@ -51,6 +52,7 @@ class TransactionListView extends View {
             form: { ...this.props.filter },
             loading: false,
             listMode: 'list',
+            showMenu: false,
             contextItem: null,
             selDateRange: null,
             showCategoryDialog: false,
@@ -243,17 +245,24 @@ class TransactionListView extends View {
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
 
-        this.createMenu();
-        insertAfter(this.menu.elem, this.listModeBtn.elem);
-
-        this.createContextMenu();
+        this.menuButton = MenuButton.create({
+            className: 'circle-btn',
+            onClick: (e) => this.showMenu(e),
+        });
+        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
         this.subscribeToStore(this.store);
     }
 
     createMenu() {
+        if (this.menu) {
+            return;
+        }
+
         this.menu = PopupMenu.create({
             id: 'listMenu',
+            attachTo: this.menuButton.elem,
+            onClose: () => this.hideMenu(),
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -301,9 +310,14 @@ class TransactionListView extends View {
     }
 
     createContextMenu() {
+        if (this.contextMenu) {
+            return;
+        }
+
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attached: true,
+            fixed: false,
+            onClose: () => this.showContextMenu(null),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -329,6 +343,14 @@ class TransactionListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    showMenu() {
+        this.store.dispatch(actions.showMenu());
+    }
+
+    hideMenu() {
+        this.store.dispatch(actions.hideMenu());
     }
 
     onMenuClick(item) {
@@ -660,18 +682,23 @@ class TransactionListView extends View {
     }
 
     onItemClick(itemId, e) {
+        const id = parseInt(itemId, 10);
+        if (!id) {
+            return;
+        }
+
         const state = this.store.getState();
         if (state.listMode === 'list') {
-            const menuBtn = e?.target?.closest('.popup-menu-btn');
+            const menuBtn = e?.target?.closest('.menu-btn');
             if (menuBtn) {
-                this.showContextMenu(itemId);
+                this.showContextMenu(id);
             }
         } else if (state.listMode === 'select') {
             if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
-            this.toggleSelectItem(itemId);
+            this.toggleSelectItem(id);
         }
     }
 
@@ -711,19 +738,23 @@ class TransactionListView extends View {
 
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const itemId = state.contextItem;
         if (!itemId) {
-            this.contextMenu.detach();
+            this.contextMenu?.detach();
             return;
         }
         const listItem = this.list.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
-        if (!menuContainer) {
-            this.contextMenu.detach();
+        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+        if (!menuButton) {
+            this.contextMenu?.detach();
             return;
+        }
+
+        if (!this.contextMenu) {
+            this.createContextMenu();
         }
 
         const { baseURL } = window.app;
@@ -731,7 +762,7 @@ class TransactionListView extends View {
         items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
-        this.contextMenu.attachAndShow(menuContainer);
+        this.contextMenu.attachAndShow(menuButton);
     }
 
     renderMenu(state) {
@@ -745,7 +776,15 @@ class TransactionListView extends View {
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
 
-        this.menu.show(itemsCount > 0 && !isSortMode);
+        this.menuButton.show(itemsCount > 0 && !isSortMode);
+
+        if (!state.showMenu) {
+            this.menu?.hideMenu();
+            return;
+        }
+
+        const showFirstTime = !this.menu;
+        this.createMenu();
 
         const { items } = this.menu;
         items.selectModeBtn.show(isListMode && itemsCount > 0);
@@ -759,6 +798,10 @@ class TransactionListView extends View {
 
         items.setCategoryBtn.show(isSelectMode && selCount > 0);
         items.deleteBtn.show(isSelectMode && selCount > 0);
+
+        if (showFirstTime) {
+            this.menu.showMenu();
+        }
     }
 
     /** Render accounts and persons selection */
@@ -874,8 +917,8 @@ class TransactionListView extends View {
 
         // Render date
         const dateFilter = {
-            stdate: (state.filter.stdate ?? null),
-            enddate: (state.filter.enddate ?? null),
+            stdate: (state.form.stdate ?? null),
+            enddate: (state.form.enddate ?? null),
         };
         this.dateRangeFilter.setData(dateFilter);
 
