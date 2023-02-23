@@ -270,8 +270,11 @@ export class ImportTransactionItem extends Component {
 
             this.categoryField.setContent(category.name);
         }
+        this.categoryField.show(transaction.categoryId !== 0);
 
         // Comment field
+        const hasComment = transaction.comment.length > 0;
+        this.commentField.show(hasComment);
         this.commentField.setContent(transaction.comment);
 
         this.menuButton.show(transaction.listMode === 'list');
