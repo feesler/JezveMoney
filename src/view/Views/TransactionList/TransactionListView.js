@@ -917,8 +917,8 @@ class TransactionListView extends View {
 
         // Render date
         const dateFilter = {
-            stdate: (state.filter.stdate ?? null),
-            enddate: (state.filter.enddate ?? null),
+            stdate: (state.form.stdate ?? null),
+            enddate: (state.form.enddate ?? null),
         };
         this.dateRangeFilter.setData(dateFilter);
 
