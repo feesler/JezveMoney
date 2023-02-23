@@ -212,7 +212,7 @@ const getPersonAccount = (personId, currencyId) => {
     };
 };
 
-const stateTransition = (state, stateMap) => {
+const stateTransition = (state, stateMap, throwOnNotFound = true) => {
     if (!state || !stateMap) {
         throw new Error('Invalid parameters');
     }
@@ -222,23 +222,31 @@ const stateTransition = (state, stateMap) => {
     }
     const res = stateMap[state.id];
     if (typeof res === 'undefined') {
-        throw new Error('Invalid state');
+        if (throwOnNotFound) {
+            throw new Error('Invalid state');
+        } else {
+            return state.id;
+        }
     }
 
     return res;
 };
 
-const stateTransitionByType = (state, stateMap) => {
+const stateTransitionByType = (state, stateMap, throwOnNotFound = true) => {
     if (!state || !stateMap) {
         throw new Error('Invalid parameters');
     }
 
     const typeMap = stateMap[state.transaction.type];
     if (typeof typeMap === 'undefined') {
-        throw new Error('Invalid transaction type');
+        if (throwOnNotFound) {
+            throw new Error('Invalid transaction type');
+        } else {
+            return state.id;
+        }
     }
 
-    return stateTransition(state, typeMap);
+    return stateTransition(state, typeMap, throwOnNotFound);
 };
 
 // Reducers
@@ -1101,6 +1109,25 @@ const slice = createSlice({
 
     invalidateSourceAmount: (state) => ({
         ...state,
+        id: stateTransition(state, {
+            [STATE.I_D_RESULT]: STATE.I_S_AMOUNT,
+            [STATE.T_S_RESULT]: STATE.T_S_AMOUNT,
+            [STATE.T_D_RESULT]: STATE.T_S_AMOUNT,
+            [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_RESULT_D_RESULT]: STATE.T_S_AMOUNT_D_RESULT,
+            [STATE.T_EXCH_S_RESULT]: STATE.T_S_AMOUNT_EXCH,
+            [STATE.DG_S_RESULT]: STATE.DG_S_AMOUNT,
+            [STATE.DG_D_RESULT]: STATE.DG_S_AMOUNT,
+            [STATE.DT_D_RESULT]: STATE.DT_D_AMOUNT,
+            [STATE.DG_NOACC_S_RESULT]: STATE.DG_NOACC_S_AMOUNT,
+            [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_S_AMOUNT_EXCH,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_S_AMOUNT_D_RESULT,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_S_AMOUNT_D_RESULT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_S_AMOUNT_D_RESULT,
+            [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_S_AMOUNT_D_RESULT,
+        }, false),
         validation: {
             ...state.validation,
             sourceAmount: false,
@@ -1109,6 +1136,27 @@ const slice = createSlice({
 
     invalidateDestAmount: (state) => ({
         ...state,
+        id: stateTransition(state, {
+            [STATE.E_S_RESULT]: STATE.E_D_AMOUNT,
+            [STATE.E_S_AMOUNT_EXCH]: STATE.E_S_AMOUNT_D_AMOUNT,
+            [STATE.E_S_AMOUNT_S_RESULT]: STATE.E_S_AMOUNT_D_AMOUNT,
+            [STATE.I_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT_D_AMOUNT,
+            [STATE.I_S_AMOUNT_D_RESULT]: STATE.I_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_RESULT_D_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+            [STATE.T_S_AMOUNT_EXCH]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_EXCH_S_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+            [STATE.DT_D_RESULT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_S_RESULT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_NOACC_D_RESULT]: STATE.DT_NOACC_D_AMOUNT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_D_AMOUNT_S_RESULT,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_D_AMOUNT_S_RESULT,
+            [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_D_AMOUNT_EXCH,
+            [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_D_AMOUNT_S_RESULT,
+        }, false),
         validation: {
             ...state.validation,
             destAmount: false,

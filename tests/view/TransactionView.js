@@ -436,21 +436,33 @@ export class TransactionView extends AppView {
         return res;
     }
 
+    isValidAmount(value) {
+        return value > 0;
+    }
+
+    isValidDate(value) {
+        const timestamp = convDate(value);
+        return timestamp > 0;
+    }
+
     isValid() {
-        if (this.content.srcAmountRow?.content?.visible) {
-            if (this.model.fSrcAmount <= 0) {
+        const startFromDestAmount = (
+            (this.model.type === EXPENSE)
+            || (this.model.type === DEBT && !this.model.debtType)
+        );
+
+        const srcAmountValid = this.isValidAmount(this.model.fSrcAmount);
+        const destAmountValid = this.isValidAmount(this.model.fDestAmount);
+
+        if (startFromDestAmount) {
+            if (!destAmountValid || (this.model.isDiffCurr && !srcAmountValid)) {
                 return false;
             }
+        } else if (!srcAmountValid || (this.model.isDiffCurr && !destAmountValid)) {
+            return false;
         }
 
-        if (this.content.destAmountRow?.content?.visible) {
-            if (this.model.fDestAmount <= 0) {
-                return false;
-            }
-        }
-
-        const timestamp = convDate(this.model.date);
-        if (!timestamp || timestamp < 0) {
+        if (!this.isValidDate(this.model.date)) {
             return false;
         }
 
@@ -981,11 +993,15 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    stateTransition(model, stateMap) {
+    stateTransition(model, stateMap, throwOnNotFound = true) {
         const res = model;
         const newState = stateMap[res.state];
-        assert.isDefined(newState, `Invalid state ${res.state}`);
-        res.state = newState;
+        if (throwOnNotFound) {
+            assert.isDefined(newState, `Invalid state ${res.state}`);
+        }
+        if (typeof newState !== 'undefined') {
+            res.state = newState;
+        }
 
         return res;
     }
@@ -1464,23 +1480,99 @@ export class TransactionView extends AppView {
         await navigation(() => this.content.delete_warning.clickOk());
     }
 
+    validateSourceAmount() {
+        this.model.srcAmountInvalidated = !this.isValidAmount(this.model.fSrcAmount);
+        if (!this.model.srcAmountInvalidated) {
+            return;
+        }
+
+        if (this.model.type === INCOME) {
+            this.stateTransition(this.model, {
+                1: 0,
+            }, false);
+        } else if (this.model.type === TRANSFER) {
+            this.stateTransition(this.model, {
+                1: 0,
+                2: 0,
+                4: 3,
+                6: 5,
+                8: 7,
+            }, false);
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                1: 0,
+                2: 0,
+                4: 3,
+                9: 6,
+                11: 10,
+                13: 12,
+                14: 15,
+                18: 16,
+                19: 17,
+                20: 17,
+            }, false);
+        }
+    }
+
+    validateDestAmount() {
+        this.model.destAmountInvalidated = !this.isValidAmount(this.model.fDestAmount);
+        if (!this.model.destAmountInvalidated) {
+            return;
+        }
+
+        if (this.model.type === EXPENSE) {
+            this.stateTransition(this.model, {
+                1: 0,
+                3: 2,
+                4: 2,
+            }, false);
+        } else if (this.model.type === INCOME) {
+            this.stateTransition(this.model, {
+                3: 2,
+                4: 2,
+            }, false);
+        } else if (this.model.type === TRANSFER) {
+            this.stateTransition(this.model, {
+                5: 3,
+                6: 4,
+                7: 3,
+                8: 4,
+            }, false);
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                4: 3,
+                5: 3,
+                8: 7,
+                12: 10,
+                13: 11,
+                14: 11,
+                15: 10,
+                17: 16,
+                19: 18,
+                20: 21,
+            }, false);
+        }
+    }
+
     async submit() {
-        if (this.content.srcAmountRow?.content?.visible) {
-            if (this.model.fSrcAmount <= 0) {
-                this.model.srcAmountInvalidated = true;
+        const startFromDestAmount = (
+            (this.model.type === EXPENSE)
+            || (this.model.type === DEBT && !this.model.debtType)
+        );
+
+        if (startFromDestAmount) {
+            this.validateDestAmount();
+            if (this.model.isDiffCurr) {
+                this.validateSourceAmount();
+            }
+        } else {
+            this.validateSourceAmount();
+            if (this.model.isDiffCurr) {
+                this.validateDestAmount();
             }
         }
 
-        if (this.content.destAmountRow?.content?.visible) {
-            if (this.model.fDestAmount <= 0) {
-                this.model.destAmountInvalidated = true;
-            }
-        }
-
-        const timestamp = convDate(this.model.date);
-        if (!timestamp || timestamp < 0) {
-            this.model.dateInvalidated = true;
-        }
+        this.model.dateInvalidated = !this.isValidDate(this.model.date);
 
         const isValid = (
             !this.model.srcAmountInvalidated
@@ -2258,6 +2350,7 @@ export class TransactionView extends AppView {
 
     async inputDate(val) {
         this.model.date = val.toString();
+        this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.datePicker.input(val));
@@ -2269,6 +2362,7 @@ export class TransactionView extends AppView {
         assert.isDate(val, 'Invalid date');
 
         this.model.date = formatDate(val);
+        this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.datePicker.selectDate(val));

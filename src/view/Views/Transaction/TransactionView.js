@@ -800,7 +800,7 @@ class TransactionView extends View {
         }
 
         const startFromDestAmount = (
-            state.transaction.type === EXPENSE
+            (state.transaction.type === EXPENSE)
             || (state.transaction.type === DEBT && !state.transaction.debtType)
         );
 
