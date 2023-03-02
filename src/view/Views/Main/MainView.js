@@ -11,6 +11,7 @@ import 'jezvejs/style/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { TabList } from 'jezvejs/TabList';
 import { API } from '../../js/api/index.js';
 import {
     formatPersonDebts,
@@ -87,8 +88,7 @@ class MainView extends View {
 
         this.loadElementsByIds([
             'contentContainer',
-            'accountsWidget',
-            'personsWidget',
+            'summaryWidget',
         ]);
 
         // Loading indicator
@@ -96,6 +96,9 @@ class MainView extends View {
         this.contentContainer.append(this.loadingIndicator.elem);
         this.loadingIndicator.show(state.loading);
 
+        // Summary widget
+
+        // Accounts tab
         const accountsProps = {
             ItemComponent: AccountTile,
             getItemProps: (account, { listMode }) => ({
@@ -111,34 +114,21 @@ class MainView extends View {
             noItemsMessage: () => this.renderAccountsNoData(),
         };
 
-        // Accounts widget
         this.visibleAccounts = ListContainer.create({
             ...accountsProps,
             items: listData(state.accounts.visible),
         });
-        this.accountsWidget.append(this.visibleAccounts.elem);
 
         this.hiddenAccounts = ListContainer.create({
             ...accountsProps,
             items: listData(state.accounts.hidden),
         });
-        this.accountsWidget.append(this.hiddenAccounts.elem);
 
         this.toggleAccountsBtn = this.createToggleShowAllButton({
             onClick: () => this.toggleHiddenAccounts(),
         });
-        this.accountsWidget.append(this.toggleAccountsBtn);
 
-        // Totals widget
-        this.totalWidget = ge('totalWidget');
-        if (this.totalWidget) {
-            this.totalList = createElement('div', {
-                props: { className: 'total-list' },
-            });
-            this.totalWidget.append(this.totalList);
-        }
-
-        // Persons widget
+        // Persons tab
         const personProps = {
             ItemComponent: Tile,
             getItemProps: (person, { listMode }) => ({
@@ -160,18 +150,48 @@ class MainView extends View {
             ...personProps,
             items: listData(state.persons.visible),
         });
-        this.personsWidget.append(this.visiblePersons.elem);
 
         this.hiddenPersons = ListContainer.create({
             ...personProps,
             items: listData(state.persons.hidden),
         });
-        this.personsWidget.append(this.hiddenPersons.elem);
 
         this.togglePersonsBtn = this.createToggleShowAllButton({
             onClick: () => this.toggleHiddenPersons(),
         });
-        this.personsWidget.append(this.togglePersonsBtn);
+
+        this.summaryTabs = TabList.create({
+            items: [{
+                id: 'accounts',
+                value: 'accounts',
+                title: __('ACCOUNTS'),
+                content: [
+                    this.visibleAccounts.elem,
+                    this.hiddenAccounts.elem,
+                    this.toggleAccountsBtn,
+                ],
+            }, {
+                id: 'persons',
+                value: 'persons',
+                title: __('PERSONS'),
+                content: [
+                    this.visiblePersons.elem,
+                    this.hiddenPersons.elem,
+                    this.togglePersonsBtn,
+                ],
+            }],
+        });
+
+        this.summaryWidget.append(this.summaryTabs.elem);
+
+        // Totals widget
+        this.totalWidget = ge('totalWidget');
+        if (this.totalWidget) {
+            this.totalList = createElement('div', {
+                props: { className: 'total-list' },
+            });
+            this.totalWidget.append(this.totalList);
+        }
 
         // Latest transactions widget
         this.transactionsWidget = ge('transactionsWidget');

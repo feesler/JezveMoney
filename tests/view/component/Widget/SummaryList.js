@@ -3,11 +3,11 @@ import {
     query,
     navigation,
     click,
+    TestComponent,
 } from 'jezve-test';
-import { Widget } from './Widget.js';
 import { TilesList } from '../Tiles/TilesList.js';
 
-export class TilesWidget extends Widget {
+export class SummaryList extends TestComponent {
     async parseContent() {
         const res = await super.parseContent();
 

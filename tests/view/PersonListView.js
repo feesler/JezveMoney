@@ -567,11 +567,19 @@ export class PersonListView extends AppView {
     }
 
     static render(state) {
+        const visiblePersons = state.persons.getVisible(true);
+        const hiddenPersons = state.persons.getHidden(true);
+
         const sortMode = state.profile.settings.sort_persons;
         const res = {
             tiles: TilesList.renderPersons(state.persons, false, sortMode),
             hiddenTiles: TilesList.renderHiddenPersons(state.persons, false, sortMode),
         };
+        res.tiles.visible = true;
+        res.tiles.noDataMsg = {
+            visible: visiblePersons.length === 0,
+        };
+        res.hiddenTiles.visible = hiddenPersons.length > 0;
 
         return res;
     }

@@ -585,10 +585,18 @@ export class AccountListView extends AppView {
     static render(state) {
         const sortMode = state.profile.settings.sort_accounts;
         const userAccounts = state.accounts.getUserAccounts();
+        const visibleAccounts = userAccounts.getVisible(true);
+        const hiddenAccounts = userAccounts.getHidden(true);
+
         const res = {
             tiles: TilesList.renderAccounts(userAccounts, sortMode),
             hiddenTiles: TilesList.renderHiddenAccounts(userAccounts, sortMode),
         };
+        res.tiles.visible = true;
+        res.tiles.noDataMsg = {
+            visible: visibleAccounts.length === 0,
+        };
+        res.hiddenTiles.visible = hiddenAccounts.length > 0;
 
         return res;
     }
