@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.48.0",
+    "version": "1.49.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -15,6 +15,7 @@
         "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
         "debug": "node --inspect-brk ./tests/index.js",
         "deploy": "node ./scripts/deploy.js",
+        "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
         "rm-cache": "powershell -c \"rm ./node_modules/.cache/ -r -force\"",
@@ -24,12 +25,14 @@
         "build-themes": "sass --style=compressed --no-source-map src/view/css/themes:dist/view/css/themes src/admin/view/css/themes:dist/admin/view/css/themes",
         "build-themes-dev": "sass src/view/css/themes:dist/view/css/themes src/admin/view/css/themes:dist/admin/view/css/themes",
         "copy-dist": "npm-run-all copy-admin copy-server copy-client",
+        "update": "npm update --save",
         "update-composer": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.*\"",
         "dump-autoload": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer dump-autoload -a --no-dev; rm composer.*\"",
         "postbuild": "npm-run-all copy-dist build-themes",
         "postbuild-dev": "npm-run-all copy-dist build-themes-dev",
         "build-tests": "npx webpack --progress -c ./config/webpack.tests.js",
-        "build-all": "npm-run-all build build-tests"
+        "build-all": "npm-run-all build build-tests",
+        "release": "npm-run-all update build update-composer deploy-full"
     },
     "keywords": [
         "money",
