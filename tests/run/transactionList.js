@@ -360,3 +360,17 @@ export const clearSearchForm = async (directNavigate = false) => {
         return App.view.iteratePages();
     });
 };
+
+export const exportTest = async () => {
+    await test('Export transactions', async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+        const transactions = App.state.transactions.applyFilter(App.view.model.filter);
+        const expectedContent = transactions.exportToCSV();
+
+        const content = await App.view.exportTransactions();
+
+        return assert.deepMeet(content.trim(), expectedContent.trim());
+    });
+};

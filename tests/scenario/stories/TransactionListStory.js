@@ -114,7 +114,13 @@ export class TransactionListStory extends TestStory {
         }, {
             action: TransactionListTests.filterByPersons,
             data: { persons: App.scenario.MARIA, directNavigate },
-        }, {
+        }]);
+
+        if (!directNavigate) {
+            await TransactionListTests.exportTest();
+        }
+
+        await App.scenario.runner.runTasks([{
             action: TransactionListTests.filterByType,
             data: { type: 0, directNavigate },
         }, {

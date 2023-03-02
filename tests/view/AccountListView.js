@@ -374,8 +374,24 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
 
         await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: true });
+        });
+
+        return this.checkState(expected);
+    }
+
+    async closeListMenu() {
+        assert(this.content.listMenu.visible, 'List menu not opened');
+
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: false });
         });
 
         return this.checkState(expected);

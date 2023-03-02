@@ -5,6 +5,7 @@ import {
     asArray,
 } from 'jezve-test';
 import {
+    createCSV,
     cutDate,
     getWeek,
     MS_IN_SECOND,
@@ -17,6 +18,7 @@ import {
     TRANSFER,
     DEBT,
     availTransTypes,
+    Transaction,
 } from './Transaction.js';
 import { AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
@@ -487,6 +489,32 @@ export class TransactionsList extends SortableList {
         const res = this.onDeleteCategories(this.data, ids);
 
         return TransactionsList.create(res);
+    }
+
+    exportToCSV() {
+        const header = [
+            'ID',
+            'Type',
+            'Source amount',
+            'Destination amount',
+            'Source result',
+            'Destination result',
+            'Date',
+            'Comment',
+        ];
+
+        const data = this.map((transaction) => [
+            transaction.id,
+            Transaction.typeToString(transaction.type),
+            App.currency.format(transaction.src_curr, transaction.src_amount),
+            App.currency.format(transaction.dest_curr, transaction.dest_amount),
+            App.currency.format(transaction.src_curr, transaction.src_result),
+            App.currency.format(transaction.dest_curr, transaction.dest_result),
+            Transaction.formatDate(transaction.date),
+            transaction.comment,
+        ]);
+
+        return createCSV({ header, data });
     }
 
     getFixedWeekYear(date) {

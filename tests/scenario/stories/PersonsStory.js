@@ -33,6 +33,7 @@ export class PersonsStory extends TestStory {
         await this.sort();
         await this.details();
         await this.show();
+        await this.exportCSV();
         await this.update();
         await this.del();
 
@@ -139,6 +140,17 @@ export class PersonsStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(PersonTests.show, data);
+    }
+
+    async exportCSV() {
+        setBlock('Export persons', 1);
+
+        const data = [
+            [0],
+            [0, 1],
+        ];
+
+        await App.scenario.runner.runGroup(PersonTests.exportTest, data);
     }
 
     async select() {
