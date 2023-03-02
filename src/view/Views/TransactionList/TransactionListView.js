@@ -288,6 +288,12 @@ class TransactionListView extends View {
                 id: 'separator2',
                 type: 'separator',
             }, {
+                id: 'exportBtn',
+                type: 'link',
+                icon: 'export',
+                title: __('TR_EXPORT_CSV'),
+                onClick: () => this.onMenuClick('exportBtn'),
+            }, {
                 id: 'setCategoryBtn',
                 title: __('SET_CATEGORY'),
                 onClick: () => this.onMenuClick('setCategoryBtn'),
@@ -466,11 +472,8 @@ class TransactionListView extends View {
         window.app.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
     }
 
-    /** Returns URL for filter of specified state */
-    getFilterURL(state, keepPage = true) {
-        const { baseURL } = window.app;
-        const { filter } = state;
-        const res = new URL(`${baseURL}transactions/`);
+    getBaseFilterURL(path, filter) {
+        const res = new URL(`${window.app.baseURL}${path}`);
 
         Object.keys(filter).forEach((prop) => {
             const value = filter[prop];
@@ -482,6 +485,13 @@ class TransactionListView extends View {
             }
         });
 
+        return res;
+    }
+
+    /** Returns URL for filter of specified state */
+    getFilterURL(state, keepPage = true) {
+        const res = this.getBaseFilterURL('transactions/', state.filter);
+
         if (keepPage) {
             res.searchParams.set('page', state.pagination.page);
         }
@@ -491,6 +501,11 @@ class TransactionListView extends View {
         }
 
         return res;
+    }
+
+    /** Returns URL to export transaction */
+    getExportURL(state) {
+        return this.getBaseFilterURL('transactions/export/', state.filter);
     }
 
     /**
@@ -795,6 +810,12 @@ class TransactionListView extends View {
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
         show(items.separator2, isSelectMode);
+
+        items.exportBtn.show(itemsCount > 0);
+        if (itemsCount > 0) {
+            const exportURL = this.getExportURL(state);
+            items.exportBtn.setURL(exportURL.toString());
+        }
 
         items.setCategoryBtn.show(isSelectMode && selCount > 0);
         items.deleteBtn.show(isSelectMode && selCount > 0);

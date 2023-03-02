@@ -12,6 +12,7 @@ import {
     copyObject,
     isVisible,
     wait,
+    httpReq,
 } from 'jezve-test';
 import {
     DropDown,
@@ -49,6 +50,7 @@ const listMenuItems = [
     'sortModeBtn',
     'selectAllBtn',
     'deselectAllBtn',
+    'exportBtn',
     'setCategoryBtn',
     'deleteBtn',
 ];
@@ -533,6 +535,7 @@ export class TransactionListView extends AppView {
             res.deselectAllBtn = {
                 visible: showSelectItems && selected.length > 0,
             };
+            res.exportBtn = { visible: isItemsAvailable };
             res.setCategoryBtn = { visible: showSelectItems && selected.length > 0 };
             res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
         }
@@ -616,8 +619,24 @@ export class TransactionListView extends AppView {
         const expected = this.getExpectedState();
 
         await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: true });
+        });
+
+        return this.checkState(expected);
+    }
+
+    async closeListMenu() {
+        assert(this.content.listMenu.visible, 'List menu not opened');
+
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: false });
         });
 
         return this.checkState(expected);
@@ -1262,6 +1281,21 @@ export class TransactionListView extends AppView {
         await this.openContextMenu(num);
 
         return navigation(() => this.content.ctxUpdateBtn.click());
+    }
+
+    /** Export transactions of specified accounts */
+    async exportTransactions() {
+        await this.openListMenu();
+
+        const downloadURL = this.content.exportBtn.link;
+        assert(downloadURL, 'Invalid export URL');
+
+        const exportResp = await httpReq('GET', downloadURL);
+        assert(exportResp?.status === 200, 'Invalid response');
+
+        await this.closeListMenu();
+
+        return exportResp.body;
     }
 
     // Check all transactions have same type, otherwise show only categories with type 'Any'

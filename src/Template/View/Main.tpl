@@ -1,8 +1,4 @@
-<?php
-
-use JezveMoney\App\Template\Component\Tile;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
@@ -11,13 +7,7 @@ include(TPL_PATH . "Header.tpl");    ?>
             <div class="content">
                 <div class="content_wrap main-view">
                     <main id="contentContainer" class="content-container">
-                        <section id="accountsWidget" class="widget accounts-widget">
-                            <header class="widget_title">
-                                <a class="widget_title-link" href="<?= BASEURL ?>accounts/">
-                                    <span><?= __("ACCOUNTS") ?></span>
-                                    <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
-                                </a>
-                            </header>
+                        <section id="summaryWidget" class="widget summary-widget">
                         </section>
 
                         <?php if ($accountsCount > 0) {    ?>
@@ -38,15 +28,6 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 </header>
                             </section>
                         <?php    }    ?>
-
-                        <section id="personsWidget" class="widget persons-widget">
-                            <header class="widget_title">
-                                <a class="widget_title-link" href="<?= BASEURL ?>persons/">
-                                    <span><?= __("PERSONS") ?></span>
-                                    <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
-                                </a>
-                            </header>
-                        </section>
 
                         <?php if ($accountsCount > 0 || $personsCount > 0) {    ?>
                             <section class="widget statistics-widget">

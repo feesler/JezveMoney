@@ -9,8 +9,7 @@ import {
 } from 'jezve-test';
 import { MainView } from '../view/MainView.js';
 import { AccountListView } from '../view/AccountListView.js';
-import { Transaction } from '../model/Transaction.js';
-import { createCSV, generateId } from '../common.js';
+import { generateId } from '../common.js';
 import { App } from '../Application.js';
 import { AccountView } from '../view/AccountView.js';
 import { __ } from '../model/locale.js';
@@ -210,31 +209,9 @@ export const exportTest = async (accounts) => {
 
         await App.state.fetch();
         const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
-        const trList = App.state.transactions.filterByAccounts(ids);
-        const transactions = trList.sortAsc();
+        const transactions = App.state.transactions.applyFilter({ accounts: ids });
+        const expectedContent = transactions.exportToCSV();
 
-        const header = [
-            'ID',
-            'Type',
-            'Source amount',
-            'Destination amount',
-            'Source result',
-            'Destination result',
-            'Date',
-            'Comment',
-        ];
-        const data = transactions.map((transaction) => [
-            transaction.id,
-            Transaction.typeToString(transaction.type),
-            App.currency.format(transaction.src_curr, transaction.src_amount),
-            App.currency.format(transaction.dest_curr, transaction.dest_amount),
-            App.currency.format(transaction.src_curr, transaction.src_result),
-            App.currency.format(transaction.dest_curr, transaction.dest_result),
-            Transaction.formatDate(transaction.date),
-            transaction.comment,
-        ]);
-
-        const expectedContent = createCSV({ header, data });
         const content = await App.view.exportAccounts(itemIds);
 
         return assert.deepMeet(content.trim(), expectedContent.trim());

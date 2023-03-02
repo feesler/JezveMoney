@@ -483,7 +483,6 @@ svg * {
   flex-flow: row wrap;
   gap: var(--tile-gap);
   max-width: var(--section-width);
-  padding: 0.25rem 0;
 }
 
 /* Total list */
@@ -666,10 +665,7 @@ svg * {
 /* Link menu */
 .link-menu {
   --link-menu-icon-color: var(--accent-color);
-}
-
-.link-menu-item {
-  padding: 0;
+  --link-menu-item-padding: 0;
 }
 
 /* Counters */

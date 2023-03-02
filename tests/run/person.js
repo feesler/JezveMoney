@@ -169,6 +169,23 @@ export const show = async (persons, val = true) => {
 
 export const hide = async (persons) => show(persons, false);
 
+export const exportTest = async (persons) => {
+    const itemIds = asArray(persons);
+
+    await test(`Export persons [${itemIds.join()}]`, async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+        const ids = App.state.getSortedPersonsByIndexes(itemIds, true);
+        const transactions = App.state.transactions.applyFilter({ persons: ids });
+        const expectedContent = transactions.exportToCSV();
+
+        const content = await App.view.exportPersons(itemIds);
+
+        return assert.deepMeet(content.trim(), expectedContent.trim());
+    });
+};
+
 export const toggleSelect = async (persons) => {
     const itemIds = asArray(persons);
 

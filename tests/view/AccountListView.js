@@ -374,8 +374,24 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
 
         await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: true });
+        });
+
+        return this.checkState(expected);
+    }
+
+    async closeListMenu() {
+        assert(this.content.listMenu.visible, 'List menu not opened');
+
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: false });
         });
 
         return this.checkState(expected);
@@ -585,10 +601,18 @@ export class AccountListView extends AppView {
     static render(state) {
         const sortMode = state.profile.settings.sort_accounts;
         const userAccounts = state.accounts.getUserAccounts();
+        const visibleAccounts = userAccounts.getVisible(true);
+        const hiddenAccounts = userAccounts.getHidden(true);
+
         const res = {
             tiles: TilesList.renderAccounts(userAccounts, sortMode),
             hiddenTiles: TilesList.renderHiddenAccounts(userAccounts, sortMode),
         };
+        res.tiles.visible = true;
+        res.tiles.noDataMsg = {
+            visible: visibleAccounts.length === 0,
+        };
+        res.hiddenTiles.visible = hiddenAccounts.length > 0;
 
         return res;
     }

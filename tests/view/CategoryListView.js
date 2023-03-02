@@ -537,7 +537,7 @@ export class CategoryListView extends AppView {
         const button = this.content.sortByNameBtn;
         assert(button, 'Sort by name button not found');
 
-        await this.performAction(() => button.click());
+        await this.waitForList(() => button.click());
 
         return this.checkState(expected);
     }
@@ -562,7 +562,7 @@ export class CategoryListView extends AppView {
         const button = this.content.sortByDateBtn;
         assert(button, 'Sort by date button not found');
 
-        await this.performAction(() => button.click());
+        await this.waitForList(() => button.click());
 
         return this.checkState(expected);
     }

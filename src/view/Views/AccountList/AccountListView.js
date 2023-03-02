@@ -4,7 +4,6 @@ import {
     insertAfter,
     isFunction,
     show,
-    urlJoin,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -192,7 +191,7 @@ class AccountListView extends View {
                 id: 'exportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('ACCOUNT_EXPORT_CSV'),
+                title: __('TR_EXPORT_CSV'),
                 onClick: () => this.onMenuClick('exportBtn'),
             }, {
                 id: 'showBtn',
@@ -250,7 +249,7 @@ class AccountListView extends View {
                 id: 'ctxExportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('ACCOUNT_EXPORT_CSV'),
+                title: __('TR_EXPORT_CSV'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
@@ -543,6 +542,16 @@ class AccountListView extends View {
         });
     }
 
+    /** Returns URL to export transaction of selected accounts */
+    getExportURL(selectedIds) {
+        const ids = asArray(selectedIds);
+        const res = new URL(`${window.app.baseURL}transactions/export/`);
+        ids.forEach((id) => {
+            res.searchParams.append('acc_id[]', id);
+        });
+        return res;
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu?.detach();
@@ -567,7 +576,9 @@ class AccountListView extends View {
         const { items } = this.contextMenu;
         items.ctxDetailsBtn.setURL(`${baseURL}accounts/${account.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
-        items.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
+
+        const exportURL = this.getExportURL(account.id);
+        items.ctxExportBtn.setURL(exportURL.toString());
         items.ctxShowBtn.show(!account.isVisible());
         items.ctxHideBtn.show(account.isVisible());
 
@@ -620,17 +631,10 @@ class AccountListView extends View {
         items.hideBtn.show(isSelectMode && selCount > 0);
         items.deleteBtn.show(isSelectMode && totalSelCount > 0);
 
-        const { baseURL } = window.app;
-        const selectedIds = this.getSelectedIds(state);
-
         if (totalSelCount > 0) {
-            let exportURL = `${baseURL}accounts/export/`;
-            if (totalSelCount === 1) {
-                exportURL += selectedIds[0];
-            } else {
-                exportURL += `?${urlJoin({ id: selectedIds })}`;
-            }
-            items.exportBtn.setURL(exportURL);
+            const selectedIds = this.getSelectedIds(state);
+            const exportURL = this.getExportURL(selectedIds);
+            items.exportBtn.setURL(exportURL.toString());
         }
 
         if (showFirstTime) {

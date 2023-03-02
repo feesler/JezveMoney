@@ -7,11 +7,10 @@ import {
 } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { __ } from '../model/locale.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { TilesList } from './component/Tiles/TilesList.js';
 import { Widget } from './component/Widget/Widget.js';
-import { TilesWidget } from './component/Widget/TilesWidget.js';
+import { SummaryWidget } from './component/Widget/SummaryWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { SetCategoryDialog } from './component/SetCategoryDialog.js';
@@ -20,9 +19,9 @@ import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 export class MainView extends AppView {
     async parseContent() {
         const res = {
-            accountsWidget: await TilesWidget.create(
+            summaryWidget: await SummaryWidget.create(
                 this,
-                await query('.accounts-widget'),
+                await query('.summary-widget'),
             ),
             totalsWidget: await Widget.create(
                 this,
@@ -31,10 +30,6 @@ export class MainView extends AppView {
             transactionsWidget: await TransactionsWidget.create(
                 this,
                 await query('.transactions-widget'),
-            ),
-            personsWidget: await TilesWidget.create(
-                this,
-                await query('.persons-widget'),
             ),
             statisticsWidget: await Widget.create(
                 this,
@@ -48,7 +43,7 @@ export class MainView extends AppView {
             ),
         };
 
-        res.renderTime = await prop(res.accountsWidget?.tiles?.elem, 'dataset.time');
+        res.renderTime = await prop(res.summaryWidget.accountsTab.tiles?.elem, 'dataset.time');
 
         return res;
     }
@@ -58,8 +53,9 @@ export class MainView extends AppView {
             locale: cont.locale,
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
-            showHiddenAccounts: !!cont.accountsWidget.hiddenTiles?.content?.visible,
-            showHiddenPersons: !!cont.personsWidget.hiddenTiles?.content?.visible,
+            summaryTab: cont.summaryWidget.tabs.selectedId,
+            showHiddenAccounts: !!cont.summaryWidget.accountsTab.hiddenTiles?.content?.visible,
+            showHiddenPersons: !!cont.summaryWidget.personsTab.hiddenTiles?.content?.visible,
         };
 
         return res;
@@ -67,30 +63,54 @@ export class MainView extends AppView {
 
     getExpectedState(model = this.model) {
         const userAccounts = App.state.getUserAccounts();
-        const hiddenUserAccounts = userAccounts.getHidden(true);
+        const visibleAccounts = userAccounts.getVisible(true);
+        const hiddenAccounts = userAccounts.getHidden(true);
+        const hasHiddenAccounts = hiddenAccounts.length > 0;
+        const showAccountsTab = model.summaryTab === 'accounts';
+
+        const visiblePersons = App.state.persons.getVisible(true);
         const hiddenPersons = App.state.persons.getHidden(true);
-        const hasHiddenAccounts = hiddenUserAccounts.length > 0;
         const hasHiddenPersons = hiddenPersons.length > 0;
+        const showPersonsTab = model.summaryTab === 'persons';
+
+        const accountsTab = {
+            visible: showAccountsTab,
+            tiles: TilesList.renderAccounts(userAccounts),
+            hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
+            toggleHiddenBtn: { visible: showAccountsTab && hasHiddenAccounts },
+        };
+        accountsTab.tiles.visible = showAccountsTab;
+        accountsTab.tiles.noDataMsg = {
+            visible: (showAccountsTab && visibleAccounts.length === 0),
+        };
+        accountsTab.hiddenTiles.visible = (
+            showAccountsTab
+            && hasHiddenAccounts
+            && model.showHiddenAccounts
+        );
+
+        const personsTab = {
+            visible: showPersonsTab,
+            tiles: TilesList.renderPersons(App.state.persons, true),
+            hiddenTiles: TilesList.renderHiddenPersons(App.state.persons, true),
+            toggleHiddenBtn: { visible: showPersonsTab && hasHiddenPersons },
+        };
+        personsTab.tiles.visible = showPersonsTab;
+        personsTab.tiles.noDataMsg = {
+            visible: (showPersonsTab && visiblePersons.length === 0),
+        };
+        personsTab.hiddenTiles.visible = (
+            showPersonsTab
+            && hasHiddenPersons
+            && model.showHiddenPersons
+        );
 
         const res = {
-            accountsWidget: {
-                visible: true,
-                title: __('ACCOUNTS', App.view.locale),
-                tiles: TilesList.renderAccounts(userAccounts),
-                hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
-                toggleHiddenBtn: { visible: hasHiddenAccounts },
-            },
-            personsWidget: {
-                visible: true,
-                title: __('PERSONS', App.view.locale),
-                tiles: TilesList.renderPersons(App.state.persons, true),
-                hiddenTiles: TilesList.renderHiddenPersons(App.state.persons, true),
-                toggleHiddenBtn: { visible: hasHiddenPersons },
+            summaryWidget: {
+                accountsTab,
+                personsTab,
             },
         };
-
-        res.accountsWidget.hiddenTiles.visible = hasHiddenAccounts && model.showHiddenAccounts;
-        res.personsWidget.hiddenTiles.visible = hasHiddenPersons && model.showHiddenPersons;
 
         // Transactions widget
         if (userAccounts.length > 0 || App.state.persons.length > 0) {
@@ -132,30 +152,53 @@ export class MainView extends AppView {
         await this.parse();
     }
 
-    async goToAccounts() {
-        assert(this.content.accountsWidget, 'Accounts widget not found');
+    async showAccountsTab() {
+        if (this.model.summaryTab === 'accounts') {
+            return true;
+        }
 
-        await navigation(() => this.content.accountsWidget.clickByTitle());
+        this.model.summaryTab = 'accounts';
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.summaryWidget.showAccounts());
+
+        return this.checkState(expected);
+    }
+
+    async showPersonsTab() {
+        if (this.model.summaryTab === 'persons') {
+            return true;
+        }
+
+        this.model.summaryTab = 'persons';
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.summaryWidget.showPersons());
+
+        return this.checkState(expected);
     }
 
     async toggleHiddenAccounts() {
-        assert(this.content.accountsWidget, 'Accounts widget not found');
+        assert(this.content.summaryWidget, 'Summary widget not found');
 
-        const hiddenUserAccounts = App.state.getUserAccounts().getHidden(true);
-        assert(hiddenUserAccounts.length > 0, 'No hidden accounts');
+        await this.showAccountsTab();
+
+        const hiddenAccounts = App.state.getUserAccounts().getHidden(true);
+        assert(hiddenAccounts.length > 0, 'No hidden accounts');
 
         this.model.showHiddenAccounts = !this.model.showHiddenAccounts;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.accountsWidget.toggleHidden());
+        await this.performAction(() => this.content.summaryWidget.accountsTab.toggleHidden());
 
         return this.checkState(expected);
     }
 
     async goToNewTransactionByAccount(index) {
-        assert(this.content.accountsWidget, 'Accounts widget not found');
+        assert(this.content.summaryWidget, 'Summary widget not found');
 
-        await this.content.accountsWidget.clickTileByIndex(index);
+        await this.showAccountsTab();
+        await this.content.summaryWidget.accountsTab.clickTileByIndex(index);
     }
 
     async goToTransactions() {
@@ -164,14 +207,10 @@ export class MainView extends AppView {
         await navigation(() => this.content.transactionsWidget.clickByTitle());
     }
 
-    async goToPersons() {
-        assert(this.content.personsWidget, 'Persons widget not found');
-
-        await navigation(() => this.content.personsWidget.clickByTitle());
-    }
-
     async toggleHiddenPersons() {
-        assert(this.content.personsWidget, 'Persons widget not found');
+        assert(this.content.summaryWidget, 'Summary widget not found');
+
+        await this.showPersonsTab();
 
         const hiddenPersons = App.state.persons.getHidden(true);
         assert(hiddenPersons.length > 0, 'No hidden persons');
@@ -179,15 +218,16 @@ export class MainView extends AppView {
         this.model.showHiddenPersons = !this.model.showHiddenPersons;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.personsWidget.toggleHidden());
+        await this.performAction(() => this.content.summaryWidget.personsTab.toggleHidden());
 
         return this.checkState(expected);
     }
 
     async goToNewTransactionByPerson(index) {
-        assert(this.content.personsWidget, 'Persons widget not found');
+        assert(this.content.summaryWidget, 'Persons widget not found');
 
-        await this.content.personsWidget.clickTileByIndex(index);
+        await this.showPersonsTab();
+        await this.content.summaryWidget.personsTab.clickTileByIndex(index);
     }
 
     async goToStatistics() {
@@ -225,14 +265,29 @@ export class MainView extends AppView {
         const res = {};
 
         const userAccounts = state.accounts.getUserAccounts();
+        const visibleAccounts = userAccounts.getVisible(true);
 
         // Accounts widget
-        res.accountsWidget = {
-            title: __('ACCOUNTS', App.view.locale),
+        const accountsTab = {
             tiles: TilesList.renderAccounts(userAccounts),
             hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
         };
-        res.accountsWidget.hiddenTiles.visible = false;
+        accountsTab.tiles.visible = true;
+        accountsTab.tiles.noDataMsg = { visible: visibleAccounts.length === 0 };
+        accountsTab.hiddenTiles.visible = false;
+
+        const personsTab = {
+            tiles: TilesList.renderPersons(state.persons, true),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons, true),
+        };
+        personsTab.tiles.visible = false;
+        personsTab.tiles.noDataMsg = { visible: false };
+        personsTab.hiddenTiles.visible = false;
+
+        res.summaryWidget = {
+            accountsTab,
+            personsTab,
+        };
 
         // Transactions widget
         if (userAccounts.length > 0 || state.persons.length > 0) {
@@ -242,14 +297,6 @@ export class MainView extends AppView {
             );
             res.transactionsWidget = TransactionList.renderWidget(latest, state);
         }
-
-        // Persons widget
-        res.personsWidget = {
-            title: __('PERSONS', App.view.locale),
-            tiles: TilesList.renderPersons(state.persons, true),
-            hiddenTiles: TilesList.renderHiddenPersons(state.persons, true),
-        };
-        res.personsWidget.hiddenTiles.visible = false;
 
         return res;
     }

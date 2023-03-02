@@ -187,6 +187,12 @@ class PersonListView extends View {
                 id: 'separator2',
                 type: 'separator',
             }, {
+                id: 'exportBtn',
+                type: 'link',
+                icon: 'export',
+                title: __('TR_EXPORT_CSV'),
+                onClick: () => this.onMenuClick('exportBtn'),
+            }, {
                 id: 'showBtn',
                 icon: 'show',
                 title: __('SHOW'),
@@ -238,6 +244,11 @@ class PersonListView extends View {
                 type: 'link',
                 icon: 'update',
                 title: __('UPDATE'),
+            }, {
+                id: 'ctxExportBtn',
+                type: 'link',
+                icon: 'export',
+                title: __('TR_EXPORT_CSV'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
@@ -528,6 +539,16 @@ class PersonListView extends View {
         });
     }
 
+    /** Returns URL to export transaction of selected persons */
+    getExportURL(selectedIds) {
+        const ids = asArray(selectedIds);
+        const res = new URL(`${window.app.baseURL}transactions/export/`);
+        ids.forEach((id) => {
+            res.searchParams.append('person_id[]', id);
+        });
+        return res;
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu?.detach();
@@ -552,6 +573,9 @@ class PersonListView extends View {
         const { items } = this.contextMenu;
         items.ctxDetailsBtn.setURL(`${baseURL}persons/${person.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
+
+        const exportURL = this.getExportURL(person.id);
+        items.ctxExportBtn.setURL(exportURL.toString());
         items.ctxShowBtn.show(!person.isVisible());
         items.ctxHideBtn.show(person.isVisible());
 
@@ -598,9 +622,17 @@ class PersonListView extends View {
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
         show(items.separator2, isSelectMode);
 
+        items.exportBtn.show(isSelectMode && totalSelCount > 0);
+
         items.showBtn.show(hiddenSelCount > 0);
         items.hideBtn.show(selCount > 0);
         items.deleteBtn.show(totalSelCount > 0);
+
+        if (totalSelCount > 0) {
+            const selectedIds = this.getSelectedIds(state);
+            const exportURL = this.getExportURL(selectedIds);
+            items.exportBtn.setURL(exportURL.toString());
+        }
 
         if (showFirstTime) {
             this.menu.showMenu();

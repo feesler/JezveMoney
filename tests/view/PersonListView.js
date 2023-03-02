@@ -11,6 +11,7 @@ import {
     goTo,
     wait,
     evaluate,
+    httpReq,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -40,6 +41,7 @@ const listMenuItems = [
     'sortByDateBtn',
     'selectAllBtn',
     'deselectAllBtn',
+    'exportBtn',
     'showBtn',
     'hideBtn',
     'deleteBtn',
@@ -48,6 +50,7 @@ const listMenuItems = [
 const contextMenuItems = [
     'ctxDetailsBtn',
     'ctxUpdateBtn',
+    'ctxExportBtn',
     'ctxShowBtn',
     'ctxHideBtn',
     'ctxDeleteBtn',
@@ -206,6 +209,7 @@ export class PersonListView extends AppView {
             res.deselectAllBtn = {
                 visible: showSelectItems && totalSelected > 0,
             };
+            res.exportBtn = { visible: showSelectItems && (totalSelected > 0) };
             res.showBtn = { visible: showSelectItems && hiddenSelected.length > 0 };
             res.hideBtn = { visible: showSelectItems && visibleSelected.length > 0 };
             res.deleteBtn = { visible: showSelectItems && totalSelected > 0 };
@@ -223,6 +227,7 @@ export class PersonListView extends AppView {
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
+            res.ctxExportBtn = { visible: true };
             res.ctxShowBtn = { visible: isHidden };
             res.ctxHideBtn = { visible: !isHidden };
             res.ctxDeleteBtn = { visible: true };
@@ -375,8 +380,24 @@ export class PersonListView extends AppView {
         const expected = this.getExpectedState();
 
         await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: true });
+        });
+
+        return this.checkState(expected);
+    }
+
+    async closeListMenu() {
+        assert(this.content.listMenu.visible, 'List menu not opened');
+
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(async () => {
+            assert(this.content.menuBtn.visible, 'Menu button not visible');
+            await click(this.content.menuBtn.elem);
+            return wait(listMenuSelector, { visible: false });
         });
 
         return this.checkState(expected);
@@ -453,7 +474,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByNameBtn;
         assert(button, 'Sort by name button not found');
 
-        await this.performAction(() => button.click());
+        await this.waitForList(() => button.click());
 
         return this.checkState(expected);
     }
@@ -478,7 +499,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByDateBtn;
         assert(button, 'Sort by date button not found');
 
-        await this.performAction(() => button.click());
+        await this.waitForList(() => button.click());
 
         return this.checkState(expected);
     }
@@ -566,12 +587,36 @@ export class PersonListView extends AppView {
         await this.showPersons(persons, false);
     }
 
+    /** Export transactions of specified persons */
+    async exportPersons(persons) {
+        await this.selectPersons(persons);
+        await this.openListMenu();
+
+        const downloadURL = this.content.exportBtn.link;
+        assert(downloadURL, 'Invalid export URL');
+
+        const exportResp = await httpReq('GET', downloadURL);
+        assert(exportResp?.status === 200, 'Invalid response');
+
+        await this.closeListMenu();
+
+        return exportResp.body;
+    }
+
     static render(state) {
+        const visiblePersons = state.persons.getVisible(true);
+        const hiddenPersons = state.persons.getHidden(true);
+
         const sortMode = state.profile.settings.sort_persons;
         const res = {
             tiles: TilesList.renderPersons(state.persons, false, sortMode),
             hiddenTiles: TilesList.renderHiddenPersons(state.persons, false, sortMode),
         };
+        res.tiles.visible = true;
+        res.tiles.noDataMsg = {
+            visible: visiblePersons.length === 0,
+        };
+        res.hiddenTiles.visible = hiddenPersons.length > 0;
 
         return res;
     }
