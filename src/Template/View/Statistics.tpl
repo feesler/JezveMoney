@@ -1,6 +1,5 @@
 <?php
 
-use JezveMoney\App\Template\Component\DateRangeInput;
 use JezveMoney\App\Template\Component\LinkMenu;
 
 include(TPL_PATH . "Header.tpl");    ?>
@@ -81,7 +80,6 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                                     <section id="dateFilter" class="filter-item date-range-filter">
                                         <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
-                                        <?= DateRangeInput::render($dateRange) ?>
                                     </section>
                                 </div>
                             </div>

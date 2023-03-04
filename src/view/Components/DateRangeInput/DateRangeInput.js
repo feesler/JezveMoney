@@ -1,14 +1,24 @@
 import {
     isDate,
     isFunction,
-    setEvents,
-    show,
     Component,
+    createElement,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
+import { CloseButton } from 'jezvejs/CloseButton';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { dateStringToTime, fixDate, timeToDate } from '../../js/utils.js';
+import {
+    dateStringToTime,
+    fixDate,
+    timeToDate,
+    __,
+} from '../../js/utils.js';
+import './style.scss';
+
+const DATEPICKER_CONTAINER_CLASS = 'calendar';
+const FEEDBACK_CLASS = 'feedback invalid-feedback';
 
 const defaultValidation = {
     stdate: true,
@@ -29,6 +39,10 @@ const defaultProps = {
  * Date range component
  */
 export class DateRangeInput extends Component {
+    static userProps = {
+        elem: ['id'],
+    };
+
     constructor(props) {
         super(props);
 
@@ -39,7 +53,93 @@ export class DateRangeInput extends Component {
 
         this.state = {};
 
-        this.parse();
+        this.init();
+    }
+
+    init() {
+        this.startDateInput = DateInput.create({
+            elem: this.createInput('stdate'),
+            locales: window.app.dateFormatLocale,
+            placeholder: this.props.startPlaceholder,
+            onInput: (e) => this.onStartDateInput(e),
+        });
+
+        const textElem = createElement('div', {
+            props: {
+                className: 'input-group__text',
+                textContent: '-',
+            },
+        });
+
+        this.endDateInput = DateInput.create({
+            elem: this.createInput('enddate'),
+            locales: window.app.dateFormatLocale,
+            placeholder: this.props.endPlaceholder,
+            onInput: (e) => this.onEndDateInput(e),
+        });
+
+        this.clearBtn = CloseButton.create({
+            className: 'input-group__inner-btn clear-btn',
+            onClick: () => this.onDateClear(),
+        });
+
+        this.dateInputBtn = Button.create({
+            icon: 'calendar-icon',
+            className: 'icon-btn input-group__btn dp-btn',
+            onClick: () => this.showCalendar(),
+        });
+
+        this.inputGroup = InputGroup.create({
+            children: [
+                this.startDateInput.elem,
+                textElem,
+                this.endDateInput.elem,
+                this.clearBtn.elem,
+                this.dateInputBtn.elem,
+            ],
+        });
+
+        const hiddenInp = createElement('input', {
+            props: { type: 'submit' },
+            attrs: { hidden: '' },
+        });
+
+        this.datePickerWrapper = createElement('div', {
+            props: { className: DATEPICKER_CONTAINER_CLASS },
+        });
+
+        this.feedbackElem = createElement('div', {
+            props: {
+                className: FEEDBACK_CLASS,
+                textContent: __('FILTER_INVALID_DATE_RANGE'),
+            },
+        });
+
+        this.elem = createElement('form', {
+            props: { className: 'validation-block' },
+            events: { submit: (e) => this.onSubmit(e) },
+            children: [
+                this.inputGroup.elem,
+                hiddenInp,
+                this.datePickerWrapper,
+                this.feedbackElem,
+            ],
+        });
+
+        this.setClassNames();
+        this.setUserProps();
+        this.setData(this.props);
+    }
+
+    createInput(name) {
+        return createElement('input', {
+            props: {
+                className: 'input-group__input stretch-input',
+                name,
+                type: 'text',
+                autocomplete: 'off',
+            },
+        });
     }
 
     setData(data) {
@@ -51,46 +151,6 @@ export class DateRangeInput extends Component {
             filter: { stdate, enddate },
             validation: { ...defaultValidation },
         });
-    }
-
-    parse() {
-        if (!this.elem) {
-            throw new Error('Invalid element');
-        }
-        setEvents(this.elem, { submit: (e) => this.onSubmit(e) });
-
-        this.inputGroup = InputGroup.fromElement(this.elem.querySelector('.input-group'));
-
-        this.startDateInput = DateInput.create({
-            elem: this.elem.querySelector('input[name="stdate"]'),
-            locales: window.app.dateFormatLocale,
-            placeholder: this.props.startPlaceholder,
-            onInput: (e) => this.onStartDateInput(e),
-        });
-
-        this.endDateInput = DateInput.create({
-            elem: this.elem.querySelector('input[name="enddate"]'),
-            locales: window.app.dateFormatLocale,
-            placeholder: this.props.endPlaceholder,
-            onInput: (e) => this.onEndDateInput(e),
-        });
-
-        this.clearBtn = this.elem.querySelector('.clear-btn');
-        if (!this.clearBtn) {
-            throw new Error('Clear button not found');
-        }
-        setEvents(this.clearBtn, { click: () => this.onDateClear() });
-
-        this.dateInputBtn = this.elem.querySelector('.dp-btn');
-        if (!this.dateInputBtn) {
-            throw new Error('DatePicker button not found');
-        }
-        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
-
-        this.datePickerWrapper = this.elem.querySelector('.calendar');
-
-        this.setClassNames();
-        this.setData(this.props);
     }
 
     notifyChanged(data) {
@@ -258,7 +318,7 @@ export class DateRangeInput extends Component {
         this.startDateInput.value = state.form.stdate ?? '';
         this.endDateInput.value = state.form.enddate ?? '';
         const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
-        show(this.clearBtn, isDateFilter);
+        this.clearBtn.show(isDateFilter);
 
         window.app.setValidation(this.elem, state.validation.valid);
 

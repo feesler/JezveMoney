@@ -39,12 +39,6 @@ class Statistics extends TemplateController
             ["title" => __("STAT_REPORT_CURRENCIES"), "value" => "currency"]
         ];
 
-        $data["dateRange"] = [
-            "id" => "dateFrm",
-            "start" => ($filterObj->stdate ?? null),
-            "end" => ($filterObj->enddate ?? null)
-        ];
-
         $groupTypes = TransactionModel::getHistogramGroupNames();
         $data["groupTypes"] = $groupTypes;
 

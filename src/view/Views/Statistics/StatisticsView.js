@@ -104,7 +104,7 @@ class StatisticsView extends View {
             'accountsFilter',
             'categoriesFilter',
             'currencyFilter',
-            'dateFrm',
+            'dateFilter',
             // Histogram
             'chart',
             // Pie chart
@@ -194,11 +194,13 @@ class StatisticsView extends View {
         });
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
+        this.dateRangeFilter = DateRangeInput.create({
+            id: 'dateFrm',
             startPlaceholder: __('DATE_RANGE_FROM'),
             endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
+        this.dateFilter.append(this.dateRangeFilter.elem);
 
         // Chart
         this.noDataMessage = this.chart.querySelector('.nodata-message');

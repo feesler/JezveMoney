@@ -85,7 +85,7 @@ class TransactionListView extends View {
             'typeMenu',
             'accountsFilter',
             'categoriesFilter',
-            'dateFrm',
+            'dateFilter',
             'searchFilter',
             // Counters
             'itemsCount',
@@ -188,11 +188,13 @@ class TransactionListView extends View {
         }
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
+        this.dateRangeFilter = DateRangeInput.create({
+            id: 'dateFrm',
             startPlaceholder: __('DATE_RANGE_FROM'),
             endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
+        this.dateFilter.append(this.dateRangeFilter.elem);
 
         // Search input
         this.searchInput = SearchInput.create({

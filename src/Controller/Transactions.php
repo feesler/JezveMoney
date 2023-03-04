@@ -66,11 +66,6 @@ class Transactions extends ListViewController
         $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
         $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
         $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
-        $data["dateRange"] = [
-            "id" => "dateFrm",
-            "start" => ($filterObj["stdate"] ?? null),
-            "end" => ($filterObj["enddate"] ?? null)
-        ];
 
         // Obtain requested view mode
         $showDetails = false;
