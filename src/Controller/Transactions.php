@@ -193,7 +193,7 @@ class Transactions extends ListViewController
     }
 
     /**
-     * Retunrs properties for transaction type menu
+     * Returns properties for transaction type menu
      *
      * @param string $baseUrl
      * @param int $selectedType
@@ -251,7 +251,6 @@ class Transactions extends ListViewController
             "inputId" => "personIdInp",
             "inputValue" => $data["person_id"],
             "title" => __("TR_PERSON"),
-            "infoItems" => [],
         ];
 
         if ($noAccount) {
@@ -270,67 +269,29 @@ class Transactions extends ListViewController
             "accountToggler" => (!$noAccount || !$acc_count),
             "noAccountsMsg" => __("TR_DEBT_NO_ACCOUNTS"),
             "noAccountsMsgHidden" => ($acc_count > 0),
-            "infoItems" => [],
         ];
 
         $debtSrcContainer = ($debtType) ? $personContainer : $debtAccountContainer;
         $debtDestContainer = ($debtType) ? $debtAccountContainer : $personContainer;
 
-        if ($tr["type"] == DEBT) {
-            $debtSrcContainer["infoItems"][] = $data["srcAmountInfo"];
-            $debtSrcContainer["infoItems"][] = $data["exchangeInfo"];
-            $debtSrcContainer["infoItems"][] = $data["srcResultInfo"];
-
-            $debtDestContainer["infoItems"][] = $data["destAmountInfo"];
-            $debtDestContainer["infoItems"][] = $data["destResultInfo"];
-        }
-
         $data["debtSrcContainer"] = $debtSrcContainer;
         $data["debtDestContainer"] = $debtDestContainer;
 
-        $sourceContainer = [
+        $data["sourceContainer"] = [
             "id" => "sourceContainer",
             "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
             "inputId" => "srcIdInp",
             "inputValue" => $tr["src_id"],
             "title" => __("TR_SRC_ACCOUNT"),
-            "infoItems" => [],
         ];
-        if ($tr["type"] == TRANSFER) {
-            $sourceContainer["infoItems"][] = $data["srcAmountInfo"];
-        }
-        if ($tr["type"] == EXPENSE) {
-            $sourceContainer["infoItems"][] = $data["destAmountInfo"];
-        }
-        if ($tr["type"] != DEBT) {
-            $sourceContainer["infoItems"][] = $data["srcResultInfo"];
-        }
-        if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {
-            $sourceContainer["infoItems"][] = $data["exchangeInfo"];
-        }
-        $data["sourceContainer"] = $sourceContainer;
 
-        $destContainer = [
+        $data["destContainer"] = [
             "id" => "destContainer",
             "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
             "inputId" => "destIdInp",
             "inputValue" => $tr["dest_id"],
             "title" => __("TR_DEST_ACCOUNT"),
-            "infoItems" => [],
         ];
-        if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
-            $destContainer["infoItems"][] = $data["srcAmountInfo"];
-        }
-        if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
-            $destContainer["infoItems"][] = $data["destAmountInfo"];
-        }
-        if ($tr["type"] != DEBT) {
-            $destContainer["infoItems"][] = $data["destResultInfo"];
-        }
-        if ($tr["type"] == INCOME) {
-            $destContainer["infoItems"][] = $data["exchangeInfo"];
-        }
-        $data["destContainer"] = $destContainer;
 
         return $data;
     }
@@ -508,12 +469,6 @@ class Transactions extends ListViewController
         }
         $data["srcBalTitle"] = $srcBalTitle;
 
-        $balDiff = $tr["src_amount"];
-        if ($tr["type"] != DEBT && !is_null($src)) {
-            $src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
-            $src->icon = $this->accModel->getIconFile($src->id);
-        }
-
         $destBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
             $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
@@ -521,12 +476,6 @@ class Transactions extends ListViewController
             $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
         }
         $data["destBalTitle"] = $destBalTitle;
-
-        $balDiff = $tr["dest_amount"];
-        if ($tr["type"] != DEBT && !is_null($dest)) {
-            $dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
-            $dest->icon = $this->accModel->getIconFile($dest->id);
-        }
 
         /**
          * Show destination amount input for expense and source amount input for income by default,
@@ -567,58 +516,20 @@ class Transactions extends ListViewController
 
         $form["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
         $form["exchange"] = 1;
-        $rtExchange = $form["exchange"] . " " . $form["exchSign"];
 
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : 0;
             $destResBalance = ($dest) ? $dest->balance : 0;
-
-            $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
-            $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
             $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
 
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
-
-            $rtSrcResBal = $this->currModel->format($srcResBalance, $tr["src_curr"]);
-            $rtDestResBal = $this->currModel->format($destResBalance, $tr["dest_curr"]);
         }
         $form["srcResult"] = $srcResBalance;
         $form["destResult"] = $destResBalance;
 
         $data["form"] = $form;
-
-        $data["srcAmountInfo"] = [
-            "id" => "srcAmountInfo",
-            "title" => $data["srcAmountLbl"],
-            "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
-            "hidden" => true
-        ];
-        $data["destAmountInfo"] = [
-            "id" => "destAmountInfo",
-            "title" => $data["destAmountLbl"],
-            "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
-            "hidden" => true
-        ];
-        $data["srcResultInfo"] = [
-            "id" => "srcResBalanceInfo",
-            "title" => __("TR_RESULT"),
-            "value" => $rtSrcResBal,
-            "hidden" => false
-        ];
-        $data["destResultInfo"] = [
-            "id" => "destResBalanceInfo",
-            "title" => __("TR_RESULT"),
-            "value" => $rtDestResBal,
-            "hidden" => false
-        ];
-        $data["exchangeInfo"] = [
-            "id" => "exchangeInfo",
-            "title" => __("TR_EXCHANGE_RATE"),
-            "value" => $rtExchange,
-            "hidden" => !$isDiffCurr
-        ];
 
         $data = $this->getContainersData($data);
 
@@ -739,7 +650,6 @@ class Transactions extends ListViewController
             $person_acc = $this->accModel->getItem($person_acc_id);
             $person_curr = $person_acc->curr_id;
             $person_res_balance = $person_acc->balance;
-            $person_balance = $person_res_balance + (($debtType) ? $tr["src_amount"] : -$tr["dest_amount"]);
 
             $debtAcc = $debtType ? $dest : $src;
             $noAccount = is_null($debtAcc);
@@ -771,7 +681,6 @@ class Transactions extends ListViewController
             $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
             $person_acc_id = ($person_acc) ? $person_acc->id : 0;
             $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
-            $person_balance = $person_res_balance;
         }
 
         $srcBalTitle = __("TR_RESULT");
@@ -816,14 +725,10 @@ class Transactions extends ListViewController
 
         $form["exchSign"] = $form["destCurrSign"] . "/" . $form["srcCurrSign"];
         $form["exchange"] = normalize($tr["dest_amount"] / $tr["src_amount"], 4);
-        $rtExchange = $form["exchange"] . " " . $form["exchSign"];
 
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : 0;
             $destResBalance = ($dest) ? $dest->balance : 0;
-
-            $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $tr["src_curr"]) : null;
-            $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $tr["dest_curr"]) : null;
         } else {
             $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
             if ($noAccount) {
@@ -831,44 +736,11 @@ class Transactions extends ListViewController
             }
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
-            $rtSrcResBal = $this->currModel->format($srcResBalance, $tr["src_curr"]);
-            $rtDestResBal = $this->currModel->format($destResBalance, $tr["dest_curr"]);
         }
         $form["srcResult"] = $srcResBalance;
         $form["destResult"] = $destResBalance;
 
         $data["form"] = $form;
-
-        $data["srcAmountInfo"] = [
-            "id" => "srcAmountInfo",
-            "title" => $data["srcAmountLbl"],
-            "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
-            "hidden" => true
-        ];
-        $data["destAmountInfo"] = [
-            "id" => "destAmountInfo",
-            "title" => $data["destAmountLbl"],
-            "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
-            "hidden" => true
-        ];
-        $data["srcResultInfo"] = [
-            "id" => "srcResBalanceInfo",
-            "title" => __("TR_RESULT"),
-            "value" => $rtSrcResBal,
-            "hidden" => false
-        ];
-        $data["destResultInfo"] = [
-            "id" => "destResBalanceInfo",
-            "title" => __("TR_RESULT"),
-            "value" => $rtDestResBal,
-            "hidden" => false
-        ];
-        $data["exchangeInfo"] = [
-            "id" => "exchangeInfo",
-            "title" => __("TR_EXCHANGE_RATE"),
-            "value" => $rtExchange,
-            "hidden" => !$isDiffCurr
-        ];
 
         $data = $this->getContainersData($data);
 

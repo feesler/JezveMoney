@@ -294,21 +294,38 @@ class TransactionView extends View {
         this.destTile = AccountTile.create({ id: 'destTile' });
         this.destTileBase.prepend(this.destTile.elem);
 
-        this.srcAmountInfo = TileInfoItem.fromElement('srcAmountInfo', {
+        this.srcAmountInfo = TileInfoItem.create({
+            id: 'srcAmountInfo',
             onClick: () => this.store.dispatch(actions.sourceAmountClick()),
         });
-        this.destAmountInfo = TileInfoItem.fromElement('destAmountInfo', {
+        this.srcTileInfoBlock.append(this.srcAmountInfo.elem);
+
+        this.destAmountInfo = TileInfoItem.create({
+            id: 'destAmountInfo',
             onClick: () => this.store.dispatch(actions.destAmountClick()),
         });
-        this.exchangeInfo = TileInfoItem.fromElement('exchangeInfo', {
-            onClick: () => this.store.dispatch(actions.exchangeClick()),
-        });
-        this.srcResBalanceInfo = TileInfoItem.fromElement('srcResBalanceInfo', {
+        this.destTileInfoBlock.append(this.destAmountInfo.elem);
+
+        this.srcResBalanceInfo = TileInfoItem.create({
+            id: 'srcResBalanceInfo',
+            label: __('TR_RESULT'),
             onClick: () => this.store.dispatch(actions.sourceResultClick()),
         });
-        this.destResBalanceInfo = TileInfoItem.fromElement('destResBalanceInfo', {
+        this.srcTileInfoBlock.append(this.srcResBalanceInfo.elem);
+
+        this.destResBalanceInfo = TileInfoItem.create({
+            id: 'destResBalanceInfo',
+            label: __('TR_RESULT'),
             onClick: () => this.store.dispatch(actions.destResultClick()),
         });
+        this.destTileInfoBlock.append(this.destResBalanceInfo.elem);
+
+        this.exchangeInfo = TileInfoItem.create({
+            id: 'exchangeInfo',
+            label: __('TR_EXCHANGE_RATE'),
+            onClick: () => this.store.dispatch(actions.exchangeClick()),
+        });
+        this.srcTileInfoBlock.append(this.exchangeInfo.elem);
 
         this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
         if (this.srcAmountInput) {
@@ -1005,6 +1022,7 @@ class TransactionView extends View {
         }
 
         addChilds(this.srcTileInfoBlock, [
+            this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
             this.srcResBalanceInfo.elem,
             this.exchangeInfo.elem,
@@ -1051,6 +1069,7 @@ class TransactionView extends View {
         }
 
         addChilds(this.destTileInfoBlock, [
+            this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
             this.destResBalanceInfo.elem,
             this.exchangeInfo.elem,
