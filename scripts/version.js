@@ -3,8 +3,7 @@ import { isFunction } from 'jezvejs';
 
 /* eslint-disable no-console */
 
-const getPackageVersion = () => {
-    const fileName = './package.json';
+const getPackageVersion = (fileName) => {
     const content = readFileSync(fileName);
     const json = JSON.parse(content);
     return json.version;
@@ -46,7 +45,7 @@ try {
         throw new Error('Invalid argument. Available values: \'major\', \'minor\' and \'patch\'');
     }
 
-    const ver = getPackageVersion();
+    const ver = getPackageVersion('./package.json');
     const versionParts = ver.split('.').map((part) => parseInt(part, 10));
     const updateFunc = optionsMap[option];
     const updatedParts = updateFunc(versionParts);
