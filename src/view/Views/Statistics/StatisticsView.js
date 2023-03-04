@@ -99,8 +99,8 @@ class StatisticsView extends View {
             // Filters
             'filtersContainer',
             'applyFiltersBtn',
-            'typeMenu',
-            'reportMenu',
+            'typeFilter',
+            'reportTypeFilter',
             'accountsFilter',
             'categoriesFilter',
             'currencyFilter',
@@ -140,18 +140,27 @@ class StatisticsView extends View {
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
 
         // Transaction type filter
-        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
+        this.typeMenu = TransactionTypeMenu.create({
+            id: 'typeMenu',
             multiple: true,
             allowActiveLink: true,
-            itemParam: 'type',
+            showAll: false,
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
+        this.typeFilter.append(this.typeMenu.elem);
 
         // Report type filter
-        this.reportMenu = LinkMenu.fromElement(this.reportMenu, {
+        this.reportMenu = LinkMenu.create({
+            id: 'reportMenu',
             itemParam: 'report',
+            items: [
+                { value: 'category', title: __('STAT_REPORT_CATEGORIES') },
+                { value: 'account', title: __('STAT_REPORT_ACCOUNTS') },
+                { value: 'currency', title: __('STAT_REPORT_CURRENCIES') },
+            ],
             onChange: (value) => this.onSelectReportType(value),
         });
+        this.reportTypeFilter.append(this.reportMenu.elem);
 
         // Currency filter
         this.currencyDropDown = DropDown.create({

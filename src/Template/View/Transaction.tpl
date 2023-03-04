@@ -1,7 +1,6 @@
 <?php
 
 use JezveMoney\App\Template\Component\AccountContainer;
-use JezveMoney\App\Template\Component\LinkMenu;
 
 include(TPL_PATH . "Header.tpl");    ?>
 
@@ -18,18 +17,6 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                     <main>
                         <form id="form" method="post" action="<?= e($form["action"]) ?>">
-                            <?php if ($action == "update") {    ?>
-                                <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
-                            <?php    }    ?>
-                            <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
-                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
-
-                            <?= LinkMenu::render([
-                                "id" => "typeMenu",
-                                "classNames" => "trtype-menu",
-                                "items" => $typeMenu,
-                            ]) ?>
-
                             <span id="notAvailMsg" class="nodata-message" <?= hidden($trAvailable) ?>><?= e($notAvailMessage) ?></span>
 
                             <div class="accounts-section">
@@ -138,6 +125,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
+
+                            <?php if ($action == "update") {    ?>
+                                <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
+                            <?php    }    ?>
+                            <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
+                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
                         </form>
                     </main>
                 </div>

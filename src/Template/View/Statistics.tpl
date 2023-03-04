@@ -1,8 +1,4 @@
-<?php
-
-use JezveMoney\App\Template\Component\LinkMenu;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
@@ -25,21 +21,14 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                             <div class="filters-list">
                                 <div class="filters-row">
-                                    <section class="filter-item trans-type-filter">
+                                    <section id="typeFilter" class="filter-item trans-type-filter">
                                         <header class="filter-item__title"><?= __("FILTER_TYPE") ?></header>
-                                        <?= LinkMenu::render([
-                                            "id" => "typeMenu",
-                                            "classNames" => "trtype-menu",
-                                            "multiple" => true,
-                                            "items" => $typeMenu,
-                                        ]) ?>
                                     </section>
 
                                     <hr class="filters-separator">
 
-                                    <section class="filter-item report-type-filter">
+                                    <section id="reportTypeFilter" class="filter-item report-type-filter">
                                         <header class="filter-item__title"><?= __("STAT_FILTER_REPORT") ?></header>
-                                        <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
                                     </section>
 
                                     <hr class="filters-separator">

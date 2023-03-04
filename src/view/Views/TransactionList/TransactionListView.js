@@ -82,7 +82,7 @@ class TransactionListView extends View {
             'filtersContainer',
             'applyFiltersBtn',
             'clearFiltersBtn',
-            'typeMenu',
+            'typeFilter',
             'accountsFilter',
             'categoriesFilter',
             'dateFilter',
@@ -129,12 +129,13 @@ class TransactionListView extends View {
         setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });
 
         // Transaction type filter
-        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
+        this.typeMenu = TransactionTypeMenu.create({
+            id: 'typeMenu',
             multiple: true,
             allowActiveLink: true,
-            itemParam: 'type',
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
+        this.typeFilter.append(this.typeMenu.elem);
 
         // Accounts and persons filter
         if (!this.isAvailable()) {

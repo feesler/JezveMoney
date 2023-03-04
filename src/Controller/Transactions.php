@@ -79,44 +79,6 @@ class Transactions extends ListViewController
         $transCount = $this->model->getTransCount($trParams);
         $pagination["total"] = $transCount;
 
-        // Prepare transaction types menu
-        $trTypes = [0 => __("SHOW_ALL")];
-        $availTypes = TransactionModel::getTypeNames();
-        array_push($trTypes, ...$availTypes);
-
-        $typeMenu = [];
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $urlParams = $filterObj;
-            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
-
-            if ($type_id != 0) {
-                $urlParams["type"] = strtolower($trTypeName);
-            } else {
-                unset($urlParams["type"]);
-            }
-
-            // Clear page number because list of transactions guaranteed to change on change type filter
-            unset($urlParams["page"]);
-
-            if ($type_id == 0) {
-                $selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
-            } else {
-                $selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
-            }
-
-            $item = [
-                "title" => $trTypeName,
-                "selected" => $selected,
-                "url" => urlJoin($baseUrl, $urlParams)
-            ];
-
-            if ($type_id != 0) {
-                $item["value"] = $type_id;
-            }
-            $typeMenu[] = $item;
-        }
-        $data["typeMenu"] = $typeMenu;
-
         // Build data for paginator
         if ($trParams["onPage"] > 0) {
             $pageCount = ceil($transCount / $trParams["onPage"]);
@@ -182,41 +144,6 @@ class Transactions extends ListViewController
         }
         if (!$res) {
             $this->fail(__("ERR_TRANSACTION_TYPE"));
-        }
-
-        return $res;
-    }
-
-    /**
-     * Returns properties for transaction type menu
-     *
-     * @param string $baseUrl
-     * @param int $selectedType
-     * @param array $params
-     *
-     * @return array
-     */
-    protected function getTypeMenu(string $baseUrl, int $selectedType, array $params = [])
-    {
-        $trTypes = TransactionModel::getTypeNames();
-        $acc_id = (is_array($params) && isset($params["acc_id"])) ? intval($params["acc_id"]) : 0;
-
-        $res = [];
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $urlParams = $params;
-            $urlParams["type"] = strtolower($trTypeName);
-            if ($type_id != DEBT && $acc_id == 0) {
-                unset($urlParams["acc_id"]);
-            }
-
-            $item = [
-                "value" => $type_id,
-                "title" => $trTypeName,
-                "selected" => ($type_id == $selectedType),
-                "url" => urlJoin($baseUrl, $urlParams)
-            ];
-
-            $res[] = $item;
         }
 
         return $res;
@@ -449,11 +376,6 @@ class Transactions extends ListViewController
         $data["src"] = $src;
         $data["dest"] = $dest;
 
-        // Prepare transaction types menu
-        $menuParams = ["acc_id" => $acc_id];
-        $baseUrl = BASEURL . "transactions/create/";
-        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
-
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
         $srcBalTitle = __("TR_RESULT");
@@ -603,13 +525,8 @@ class Transactions extends ListViewController
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
         $dest = $this->accModel->getItem($tr["dest_id"]);
-
         $data["src"] = $src;
         $data["dest"] = $dest;
-
-        // Prepare transaction types menu
-        $baseUrl = $baseUrl = BASEURL . "transactions/update/" . $trans_id;
-        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 

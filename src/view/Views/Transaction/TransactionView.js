@@ -202,7 +202,6 @@ class TransactionView extends View {
         this.loadElementsByIds([
             'heading',
             'form',
-            'typeMenu',
             'notAvailMsg',
             'sourceContainer',
             'destContainer',
@@ -269,10 +268,14 @@ class TransactionView extends View {
         // Init form submit event handler
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
-        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
+        this.typeMenu = TransactionTypeMenu.create({
+            id: 'typeMenu',
+            multiple: false,
+            showAll: false,
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
+        this.form.prepend(this.typeMenu.elem);
 
         setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
 
