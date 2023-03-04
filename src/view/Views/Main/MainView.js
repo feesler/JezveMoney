@@ -109,7 +109,7 @@ class MainView extends View {
                 selectMode: listMode === 'select',
             }),
             className: 'tiles',
-            itemSelector: '.tile',
+            itemSelector: AccountTile.selector,
             listMode: 'list',
             noItemsMessage: () => this.renderAccountsNoData(),
         };
@@ -141,7 +141,7 @@ class MainView extends View {
                 selectMode: listMode === 'select',
             }),
             className: 'tiles',
-            itemSelector: '.tile',
+            itemSelector: Tile.selector,
             listMode: 'list',
             noItemsMessage: () => this.renderPersonsNoData(),
         };

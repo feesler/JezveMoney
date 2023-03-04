@@ -1,7 +1,6 @@
 import {
     createElement,
     createSVGElement,
-    setAttributes,
     Component,
     removeChilds,
 } from 'jezvejs';
@@ -9,7 +8,7 @@ import { Checkbox } from 'jezvejs/Checkbox';
 import './style.scss';
 
 /** CSS classes */
-export const TILE_CLASS = 'tile';
+const TILE_CLASS = 'tile';
 const WIDE_CLASS = 'tile_wide';
 const SELECTED_CLASS = 'tile_selected';
 const SORT_CLASS = 'tile_sort';
@@ -22,7 +21,6 @@ const CHECKBOX_CLASS = 'tile__checkbox';
 const SUBTITLE_LIMIT = 13;
 
 const defaultProps = {
-    attrs: {},
     type: 'static', // 'static', 'button' or 'link'
     link: null,
     title: '',
@@ -40,6 +38,14 @@ export class Tile extends Component {
         elem: ['id'],
     };
 
+    static get selector() {
+        return `.${TILE_CLASS}`;
+    }
+
+    static get sortSelector() {
+        return `.${TILE_CLASS}.${SORT_CLASS}`;
+    }
+
     constructor(props = {}) {
         super({
             ...defaultProps,
@@ -50,82 +56,42 @@ export class Tile extends Component {
             ...this.props,
         };
 
-        if (this.elem) {
-            this.parse();
-        } else {
-            this.init();
-        }
-
-        this.setClassNames();
-        this.setUserProps();
-        this.render(this.state);
+        this.init();
     }
 
     get id() {
         return this.state.id;
     }
 
+    getTagName(type) {
+        const tagsMap = {
+            link: 'a',
+            button: 'button',
+            static: 'div',
+        };
+
+        if (typeof tagsMap[type] !== 'string') {
+            throw new Error('Invalid type');
+        }
+
+        return tagsMap[type];
+    }
+
     init() {
-        if (this.props.type === 'static') {
-            this.elem = createElement('div', { props: { className: TILE_CLASS } });
-        }
-        if (this.props.type === 'link') {
-            this.elem = createElement('a', { props: { className: TILE_CLASS } });
-            if (this.props.link) {
-                this.elem.href = this.props.link;
-            }
-        }
-        if (this.props.type === 'button') {
-            this.elem = createElement('button', {
-                props: { className: TILE_CLASS, type: 'button' },
-            });
-        }
-    }
+        const { type } = this.props;
+        const tagName = this.getTagName(type);
+        const props = { className: TILE_CLASS };
 
-    /**
-     * Parse DOM to obtain child elements and build state of component
-     */
-    parse() {
-        if (!this.elem?.classList?.contains(TILE_CLASS)) {
-            throw new Error('Invalid element specified');
+        if (type === 'button') {
+            props.type = type;
+        } else if (type === 'link' && this.props.link) {
+            props.href = this.props.link;
         }
+        this.elem = createElement(tagName, { props });
 
-        this.titleElem = this.elem.querySelector(`.${TITLE_CLASS}`);
-        if (this.titleElem) {
-            this.state.title = this.titleElem.textContent;
-        }
-
-        this.subTitleElem = this.elem.querySelector(`.${SUBTITLE_CLASS}`);
-        if (this.subTitleElem) {
-            this.state.subtitle = this.subTitleElem.textContent;
-        }
-
-        this.iconElem = this.elem.querySelector(`.${ICON_CLASS}`);
-        if (this.iconElem) {
-            this.iconUseElem = this.iconElem.querySelector('use');
-        }
-
-        if (this.iconUseElem) {
-            const iconRef = this.iconUseElem.href.baseVal;
-            if (iconRef.startsWith('#')) {
-                this.state.icon = iconRef.substring(1);
-            }
-        }
-    }
-
-    renderAttributes(state, prevState) {
-        if (state.attrs === prevState.attrs) {
-            return;
-        }
-
-        const prevAttrs = prevState.attrs ?? {};
-        const attrs = state.attrs ?? {};
-        for (const name in prevAttrs) {
-            if (!(name in attrs)) {
-                this.elem.removeAttribute(name);
-            }
-        }
-        setAttributes(this.elem, attrs);
+        this.setClassNames();
+        this.setUserProps();
+        this.render(this.state);
     }
 
     renderTitle(state, prevState) {
@@ -222,7 +188,6 @@ export class Tile extends Component {
             throw new Error('Invalid state specified');
         }
 
-        this.renderAttributes(state, prevState);
         this.renderTitle(state, prevState);
         this.renderSubTitle(state, prevState);
         this.renderIcon(state, prevState);
