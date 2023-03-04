@@ -39,6 +39,7 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -54,7 +55,6 @@ import {
     updateStateExchange,
 } from './reducer.js';
 import * as STATE from './stateId.js';
-import '../../Components/Heading/style.scss';
 import '../../Components/Field/style.scss';
 import './style.scss';
 
@@ -197,18 +197,17 @@ class TransactionView extends View {
      * View initialization
      */
     onStart() {
+        const isUpdate = this.props.transaction.id;
+
         this.loadElementsByIds([
+            'heading',
             'form',
             'typeMenu',
             'notAvailMsg',
             'sourceContainer',
-            'sourceTile',
             'destContainer',
-            'destTile',
             'personContainer',
-            'personTile',
             'debtAccountContainer',
-            'debtAccountTile',
             'swapBtn',
             'srcAmountRow',
             'srcAmountInput',
@@ -250,15 +249,25 @@ class TransactionView extends View {
             'cancelBtn',
         ]);
 
-        // Init form submit event handler
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        this.heading = Heading.fromElement(this.heading, {
+            title: (isUpdate) ? __('PERSON_UPDATE') : __('PERSON_CREATE'),
+            showInHeaderOnScroll: false,
+        });
 
-        const deleteBtn = ge('deleteBtn');
-        if (deleteBtn) {
-            this.deleteBtn = Button.fromElement(deleteBtn, {
+        // Update mode
+        if (isUpdate) {
+            this.deleteBtn = Button.create({
+                id: 'deleteBtn',
+                className: 'warning-btn',
+                title: __('DELETE'),
+                icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
+            this.heading.actionsContainer.append(this.deleteBtn.elem);
         }
+
+        // Init form submit event handler
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
         this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
             itemParam: 'type',
@@ -267,15 +276,23 @@ class TransactionView extends View {
 
         setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
 
+        this.srcTileBase = this.sourceContainer.querySelector('.tile-base');
         this.srcTileInfoBlock = this.sourceContainer.querySelector('.tile-info-block');
+
+        this.destTileBase = this.destContainer.querySelector('.tile-base');
         this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
+
+        this.personTileBase = this.personContainer.querySelector('.tile-base');
         this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
 
         this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
-        this.sourceTile = (this.sourceTile) ? AccountTile.fromElement(this.sourceTile) : null;
-        this.destTile = (this.destTile) ? AccountTile.fromElement(this.destTile) : null;
+        this.sourceTile = AccountTile.create({ id: 'sourceTile' });
+        this.srcTileBase.prepend(this.sourceTile.elem);
+
+        this.destTile = AccountTile.create({ id: 'destTile' });
+        this.destTileBase.prepend(this.destTile.elem);
 
         this.srcAmountInfo = TileInfoItem.fromElement('srcAmountInfo', {
             onClick: () => this.store.dispatch(actions.sourceAmountClick()),
@@ -358,7 +375,8 @@ class TransactionView extends View {
 
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
-        this.debtAccountTile = AccountTile.fromElement(this.debtAccountTile);
+        this.debtAccountTile = AccountTile.create({ id: 'debtAccountTile' });
+        this.debtAccountTileBase.prepend(this.debtAccountTile.elem);
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.field__title .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -369,7 +387,8 @@ class TransactionView extends View {
 
         this.debtAccountLabel = this.debtAccountContainer.querySelector('.field__title span');
 
-        this.personTile = Tile.fromElement(this.personTile, { parent: this });
+        this.personTile = Tile.create({ id: 'personTile' });
+        this.personTileBase.prepend(this.personTile.elem);
 
         this.spinner = Spinner.create();
         this.spinner.hide();

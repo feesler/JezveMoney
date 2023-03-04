@@ -1,6 +1,5 @@
 <?php
 
-use JezveMoney\App\Template\Component\Tile;
 use JezveMoney\App\Template\Component\TileInfoItem;
 ?>
 <div id="<?= ($id) ?>" class="field account-container" <?= hidden($hidden) ?>>
@@ -14,8 +13,6 @@ use JezveMoney\App\Template\Component\TileInfoItem;
         <?php   }   ?>
     </label>
     <div class="tile-base" <?= hidden($baseHidden) ?>>
-        <?= Tile::render($tile) ?>
-
         <div class="tile-info-block">
             <?php foreach ($infoItems as $item) {    ?>
                 <?= TileInfoItem::render($item) ?>

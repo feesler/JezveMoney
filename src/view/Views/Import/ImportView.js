@@ -102,6 +102,14 @@ class ImportView extends View {
             title: __('IMPORT'),
         });
 
+        this.uploadBtn = Button.create({
+            id: 'uploadBtn',
+            className: 'circle-btn',
+            icon: 'import',
+            onClick: () => this.showUploadDialog(),
+        });
+        this.heading.actionsContainer.append(this.uploadBtn.elem);
+
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
 
         this.accountDropDown = DropDown.create({
@@ -112,10 +120,6 @@ class ImportView extends View {
             className: 'dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
-
-        this.uploadBtn = Button.fromElement('uploadBtn', {
-            onClick: () => this.showUploadDialog(),
-        });
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',

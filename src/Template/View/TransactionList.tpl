@@ -1,6 +1,5 @@
 <?php
 
-use JezveMoney\App\Template\Component\Button;
 use JezveMoney\App\Template\Component\DateRangeInput;
 use JezveMoney\App\Template\Component\LinkMenu;
 
@@ -15,21 +14,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                     <main>
                         <header id="heading" class="heading">
                             <h1><?= __("TRANSACTIONS") ?></h1>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "filtersBtn",
-                                    "classNames" => "circle-btn",
-                                    "type" => "button",
-                                    "icon" => "filter",
-                                ]) ?>
-                                <?= Button::render([
-                                    "id" => "createBtn",
-                                    "classNames" => "circle-btn",
-                                    "type" => "link",
-                                    "link" => BASEURL . "transactions/create/",
-                                    "icon" => "plus",
-                                ]) ?>
-                            </div>
+                            <div class="heading-actions"></div>
                         </header>
 
                         <header id="contentHeader" class="content-header">

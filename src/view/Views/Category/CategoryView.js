@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     show,
     enable,
     insertAfter,
@@ -16,11 +15,11 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { Category } from '../../js/model/Category.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
-import '../../Components/Heading/style.scss';
 import '../../Components/Field/style.scss';
 import './style.scss';
 
@@ -53,7 +52,10 @@ class CategoryView extends View {
      * View initialization
      */
     onStart() {
+        const isUpdate = this.props.category.id;
+
         this.loadElementsByIds([
+            'heading',
             'categoryForm',
             'nameInp',
             'nameFeedback',
@@ -61,6 +63,11 @@ class CategoryView extends View {
             'submitBtn',
             'cancelBtn',
         ]);
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: (isUpdate) ? __('CATEGORY_UPDATE') : __('CATEGORY_CREATE'),
+            showInHeaderOnScroll: false,
+        });
 
         setEvents(this.categoryForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
@@ -73,11 +80,15 @@ class CategoryView extends View {
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        const deleteBtn = ge('deleteBtn');
-        if (deleteBtn) {
-            this.deleteBtn = Button.fromElement('deleteBtn', {
+        if (isUpdate) {
+            this.deleteBtn = Button.create({
+                id: 'deleteBtn',
+                className: 'warning-btn',
+                title: __('DELETE'),
+                icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
+            this.heading.actionsContainer.append(this.deleteBtn.elem);
         }
 
         this.subscribeToStore(this.store);

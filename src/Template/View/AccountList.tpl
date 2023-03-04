@@ -1,8 +1,4 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
@@ -13,15 +9,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <main>
                         <header id="heading" class="heading">
                             <h1><?= __("ACCOUNTS") ?></h1>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "createBtn",
-                                    "classNames" => "circle-btn",
-                                    "type" => "link",
-                                    "link" => BASEURL . "accounts/create/",
-                                    "icon" => "plus",
-                                ]) ?>
-                            </div>
+                            <div class="heading-actions"></div>
                         </header>
                         <header id="contentHeader" class="content-header">
                             <div class="counters">

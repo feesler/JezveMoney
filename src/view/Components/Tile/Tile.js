@@ -36,13 +36,15 @@ const defaultProps = {
  * Tile component
  */
 export class Tile extends Component {
-    constructor(props) {
-        super(props);
+    static userProps = {
+        elem: ['id'],
+    };
 
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
 
         this.state = {
             ...this.props,
@@ -55,6 +57,7 @@ export class Tile extends Component {
         }
 
         this.setClassNames();
+        this.setUserProps();
         this.render(this.state);
     }
 

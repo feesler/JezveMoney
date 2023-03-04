@@ -95,7 +95,6 @@ class StatisticsView extends View {
     onStart() {
         this.loadElementsByIds([
             'heading',
-            'filtersBtn',
             'contentHeader',
             // Filters
             'filtersContainer',
@@ -125,9 +124,14 @@ class StatisticsView extends View {
         });
 
         // Filters
-        this.filtersBtn = Button.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.create({
+            id: 'filtersBtn',
+            className: 'circle-btn',
+            icon: 'filter',
             onClick: () => this.filters.toggle(),
         });
+        this.heading.actionsContainer.prepend(this.filtersBtn.elem);
+
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });

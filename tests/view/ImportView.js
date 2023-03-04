@@ -72,7 +72,6 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            uploadBtn: await Button.create(this, await query('#uploadBtn')),
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             enabledCounter: await Counter.create(this, await query('#enabledCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
@@ -89,11 +88,9 @@ export class ImportView extends AppView {
         // Heading
         [
             res.submitBtn.disabled,
-            res.uploadBtn.content.disabled,
-        ] = await evaluate((submitBtn, uploadBtn) => ([
+        ] = await evaluate((submitBtn) => ([
             submitBtn.disabled,
-            uploadBtn.disabled,
-        ]), res.submitBtn.elem, res.uploadBtn.elem);
+        ]), res.submitBtn.elem);
 
         res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
 
@@ -111,6 +108,8 @@ export class ImportView extends AppView {
         if (!importEnabled) {
             return res;
         }
+
+        res.uploadBtn = await Button.create(this, await query('#uploadBtn'));
 
         // Main account select
         res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
@@ -232,10 +231,6 @@ export class ImportView extends AppView {
             notAvailMsg: { visible: !model.enabled },
             menuBtn: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
-            uploadBtn: {
-                visible: model.enabled && listMode,
-                disabled: !model.enabled,
-            },
             totalCounter: { visible: model.enabled },
             enabledCounter: { visible: model.enabled },
             selectedCounter: { visible: model.enabled && selectMode },
@@ -253,6 +248,7 @@ export class ImportView extends AppView {
 
         const pageNum = this.currentPage(model);
 
+        res.uploadBtn = { visible: listMode };
         res.listModeBtn = { visible: !listMode };
 
         // Counters

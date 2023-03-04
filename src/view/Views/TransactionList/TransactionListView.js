@@ -77,8 +77,6 @@ class TransactionListView extends View {
     onStart() {
         this.loadElementsByIds([
             'heading',
-            'createBtn',
-            'filtersBtn',
             'contentHeader',
             // Filters
             'filtersContainer',
@@ -107,9 +105,21 @@ class TransactionListView extends View {
         });
 
         // Filters
-        this.filtersBtn = Button.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.create({
+            id: 'filtersBtn',
+            className: 'circle-btn',
+            icon: 'filter',
             onClick: () => this.filters.toggle(),
         });
+        this.createBtn = Button.create({
+            id: 'createBtn',
+            type: 'link',
+            className: 'circle-btn',
+            icon: 'plus',
+            url: `${window.app.baseURL}transactions/create/`,
+        });
+        this.heading.actionsContainer.append(this.filtersBtn.elem, this.createBtn.elem);
+
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
@@ -243,7 +253,7 @@ class TransactionListView extends View {
             title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn);
+        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
@@ -788,7 +798,7 @@ class TransactionListView extends View {
         const selectedItems = this.list.getSelectedItems();
         const selCount = selectedItems.length;
 
-        show(this.createBtn, isListMode);
+        this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);

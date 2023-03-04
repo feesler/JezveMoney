@@ -169,42 +169,6 @@ class Transactions extends ListViewController
     }
 
     /**
-     * Returns properties for hidden Tile
-     *
-     * @param string $tileId tile id
-     *
-     * @return array
-     */
-    protected function getHiddenAccountTileData(string $tileId)
-    {
-        return [
-            "id" => $tileId,
-            "title" => "",
-            "subtitle" => "",
-            "icon" => "",
-        ];
-    }
-
-    /**
-     * Returns properties for account Tile
-     *
-     * @param object $account
-     * @param string $tileId tile id
-     * @param float $balanceDiff difference to add to account balance
-     *
-     * @return array
-     */
-    protected function getAccountTileData(object $account, string $tileId, float $balanceDiff = 0)
-    {
-        return [
-            "id" => $tileId,
-            "title" => $account->name,
-            "subtitle" => $this->currModel->format($account->balance + $balanceDiff, $account->curr_id),
-            "icon" => $this->accModel->getIconFile($account->id),
-        ];
-    }
-
-    /**
      * Returns transaction type from request
      *
      * @param array $request request data
@@ -287,7 +251,6 @@ class Transactions extends ListViewController
             "inputId" => "personIdInp",
             "inputValue" => $data["person_id"],
             "title" => __("TR_PERSON"),
-            "tile" => $data["personTile"],
             "infoItems" => [],
         ];
 
@@ -307,7 +270,6 @@ class Transactions extends ListViewController
             "accountToggler" => (!$noAccount || !$acc_count),
             "noAccountsMsg" => __("TR_DEBT_NO_ACCOUNTS"),
             "noAccountsMsgHidden" => ($acc_count > 0),
-            "tile" => $data["debtAccountTile"],
             "infoItems" => [],
         ];
 
@@ -332,7 +294,6 @@ class Transactions extends ListViewController
             "inputId" => "srcIdInp",
             "inputValue" => $tr["src_id"],
             "title" => __("TR_SRC_ACCOUNT"),
-            "tile" => $data["srcAccountTile"],
             "infoItems" => [],
         ];
         if ($tr["type"] == TRANSFER) {
@@ -355,7 +316,6 @@ class Transactions extends ListViewController
             "inputId" => "destIdInp",
             "inputValue" => $tr["dest_id"],
             "title" => __("TR_DEST_ACCOUNT"),
-            "tile" => $data["destAccountTile"],
             "infoItems" => [],
         ];
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
@@ -465,25 +425,12 @@ class Transactions extends ListViewController
         $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
         $person_acc_id = ($person_acc) ? $person_acc->id : 0;
         $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
-        $person_balance = $person_res_balance;
 
         $data["person_id"] = $person_id;
         $data["debtType"] = $debtType;
         $data["noAccount"] = $noAccount;
 
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
-
-        $data["personTile"] = [
-            "id" => "personTile",
-            "title" => ($pObj) ? $pObj->name : null,
-            "subtitle" => $this->currModel->format($person_balance, $person_curr)
-        ];
-
-        if ($tr["type"] == DEBT && $debtAcc) {
-            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "debtAccountTile");
-        } else {
-            $data["debtAccountTile"] = $this->getHiddenAccountTileData("debtAccountTile");
-        }
 
         if ($tr["type"] == DEBT) {
             $tr["src_id"] = $person_acc_id;
@@ -542,19 +489,7 @@ class Transactions extends ListViewController
 
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
-        if ($src) {
-            $data["srcAccountTile"] = $this->getAccountTileData($src, "sourceTile");
-        } else {
-            $data["srcAccountTile"] = $this->getHiddenAccountTileData("sourceTile");
-        }
-
         $dest = $this->accModel->getItem($tr["dest_id"]);
-        if ($dest) {
-            $data["destAccountTile"] = $this->getAccountTileData($dest, "destTile");
-        } else {
-            $data["destAccountTile"] = $this->getHiddenAccountTileData("destTile");
-        }
-
         $data["src"] = $src;
         $data["dest"] = $dest;
 
@@ -761,18 +696,7 @@ class Transactions extends ListViewController
 
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
-        if ($src) {
-            $data["srcAccountTile"] = $this->getAccountTileData($src, "sourceTile", $tr["src_amount"]);
-        } else {
-            $data["srcAccountTile"] = $this->getHiddenAccountTileData("sourceTile");
-        }
-
         $dest = $this->accModel->getItem($tr["dest_id"]);
-        if ($dest) {
-            $data["destAccountTile"] = $this->getAccountTileData($dest, "destTile", -$tr["dest_amount"]);
-        } else {
-            $data["destAccountTile"] = $this->getHiddenAccountTileData("destTile");
-        }
 
         $data["src"] = $src;
         $data["dest"] = $dest;
@@ -876,28 +800,11 @@ class Transactions extends ListViewController
         $data["debtType"] = $debtType;
         $data["noAccount"] = $noAccount;
 
-        $data["personTile"] = [
-            "id" => "personTile",
-            "title" => ($pObj) ? $pObj->name : null,
-            "subtitle" => $this->currModel->format($person_balance, $person_curr),
-        ];
-
         $data["tr"] = $tr;
 
         $showBothAmounts = $showSrcAmount && $showDestAmount;
         $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
         $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
-
-        if ($tr["type"] == DEBT && $debtAcc) {
-            $balanceDiff = 0;
-            if (!$noAccount) {
-                $balanceDiff = ($debtType) ? -$tr["dest_amount"] : $tr["src_amount"];
-            }
-
-            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "debtAccountTile", $balanceDiff);
-        } else {
-            $data["debtAccountTile"] = $this->getHiddenAccountTileData("debtAccountTile");
-        }
 
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
 

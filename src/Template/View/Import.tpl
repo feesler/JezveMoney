@@ -1,8 +1,4 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page import-view">
     <div class="page_wrapper">
@@ -12,9 +8,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                 <div class="content_wrap">
                     <header id="heading" class="heading">
                         <h1><?= __("IMPORT") ?></h1>
-                        <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
-                            <?= Button::render($uploadBtn) ?>
-                        </div>
+                        <div class="heading-actions" <?= hidden(!$importAvailable) ?>></div>
                     </header>
 
                     <?php if (!$importAvailable) { ?>

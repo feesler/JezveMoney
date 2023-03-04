@@ -108,7 +108,6 @@ class CategoryListView extends View {
             'selectedCounter',
             'selItemsCount',
             'heading',
-            'createBtn',
             'contentContainer',
             'itemInfo',
         ]);
@@ -116,6 +115,15 @@ class CategoryListView extends View {
         this.heading = Heading.fromElement(this.heading, {
             title: __('CATEGORIES'),
         });
+
+        this.createBtn = Button.create({
+            id: 'createBtn',
+            type: 'link',
+            className: 'circle-btn',
+            icon: 'plus',
+            url: `${window.app.baseURL}categories/create/`,
+        });
+        this.heading.actionsContainer.prepend(this.createBtn.elem);
 
         this.sections = {};
 
@@ -156,7 +164,7 @@ class CategoryListView extends View {
             title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn);
+        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
@@ -592,7 +600,7 @@ class CategoryListView extends View {
         const isSortMode = state.listMode === 'sort';
         const sortMode = this.getSortMode();
 
-        show(this.createBtn, isListMode);
+        this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);
