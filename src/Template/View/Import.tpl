@@ -2,7 +2,7 @@
 
 <div class="page import-view">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");        ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");        ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
@@ -49,8 +49,8 @@
     </div>
 </div>
 
-<?php include(TPL_PATH . "Component/tpl/ImportUploadDialog.tpl");    ?>
-<?php include(TPL_PATH . "Component/tpl/ImportRulesDialog.tpl");    ?>
+<?php include(TPL_PATH . "Component/ImportUploadDialog.tpl");    ?>
+<?php include(TPL_PATH . "Component/ImportRulesDialog.tpl");    ?>
 
 <?php include(ICONS_PATH . "Common.tpl");    ?>
 <?php include(TPL_PATH . "Footer.tpl");    ?>
