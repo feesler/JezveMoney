@@ -295,7 +295,7 @@ export class Application {
         } = options;
 
         const itemsGroup = (typeof group === 'string' && group.length > 0)
-            ? ddlist.addGroup(group)
+            ? ddlist.addGroup({ title: group })
             : null;
         items.forEach(
             (item) => ddlist.addItem({

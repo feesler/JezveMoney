@@ -321,9 +321,7 @@ export class ImportTransactionForm extends Component {
 
     /** Create date field */
     createDateField() {
-        const elem = createElement('input', { props: { type: 'text', autocomplete: 'off' } });
         this.dateInp = DateInput.create({
-            elem,
             className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
             name: 'date[]',
             placeholder: __('TR_DATE'),

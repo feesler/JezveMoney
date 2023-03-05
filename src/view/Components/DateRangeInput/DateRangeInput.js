@@ -58,7 +58,8 @@ export class DateRangeInput extends Component {
 
     init() {
         this.startDateInput = DateInput.create({
-            elem: this.createInput('stdate'),
+            className: 'input-group__input stretch-input',
+            name: 'stdate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
             onInput: (e) => this.onStartDateInput(e),
@@ -72,7 +73,8 @@ export class DateRangeInput extends Component {
         });
 
         this.endDateInput = DateInput.create({
-            elem: this.createInput('enddate'),
+            className: 'input-group__input stretch-input',
+            name: 'enddate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
             onInput: (e) => this.onEndDateInput(e),
@@ -129,17 +131,6 @@ export class DateRangeInput extends Component {
         this.setClassNames();
         this.setUserProps();
         this.setData(this.props);
-    }
-
-    createInput(name) {
-        return createElement('input', {
-            props: {
-                className: 'input-group__input stretch-input',
-                name,
-                type: 'text',
-                autocomplete: 'off',
-            },
-        });
     }
 
     setData(data) {
