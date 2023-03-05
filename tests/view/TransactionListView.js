@@ -1333,10 +1333,11 @@ export class TransactionListView extends AppView {
 
         this.checkState(expected);
 
-        const { selectCategoryDialog } = this.content;
-        assert(selectCategoryDialog, 'Select category dialog not found');
+        assert(this.content.selectCategoryDialog, 'Select category dialog not found');
 
-        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
+        await this.waitForList(() => (
+            this.content.selectCategoryDialog.selectCategoryAndSubmit(category)
+        ));
     }
 
     /** Set category for selected transactions */
@@ -1366,10 +1367,11 @@ export class TransactionListView extends AppView {
 
         this.checkState(expected);
 
-        const { selectCategoryDialog } = this.content;
-        assert(selectCategoryDialog, 'Select category dialog not found');
+        assert(this.content.selectCategoryDialog, 'Select category dialog not found');
 
-        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
+        await this.waitForList(() => (
+            this.content.selectCategoryDialog.selectCategoryAndSubmit(category)
+        ));
     }
 
     /** Delete specified transactions */

@@ -497,9 +497,9 @@ export class CategoryListView extends AppView {
         assert(button, `Button ${buttonName} not found`);
 
         if (listMode === 'sort') {
-            await this.waitForList(() => button.click());
+            await this.waitForList(() => this.content[buttonName].click());
         } else {
-            await this.performAction(() => button.click());
+            await this.performAction(() => this.content[buttonName].click());
         }
 
         return this.checkState(expected);
@@ -537,7 +537,7 @@ export class CategoryListView extends AppView {
         const button = this.content.sortByNameBtn;
         assert(button, 'Sort by name button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByNameBtn.click());
 
         return this.checkState(expected);
     }
@@ -562,7 +562,7 @@ export class CategoryListView extends AppView {
         const button = this.content.sortByDateBtn;
         assert(button, 'Sort by date button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByDateBtn.click());
 
         return this.checkState(expected);
     }
@@ -586,7 +586,7 @@ export class CategoryListView extends AppView {
 
             const expected = this.getExpectedState();
 
-            await this.waitForList(() => categoryItem.click());
+            await this.waitForList(() => this.getItemByIndex(index).click());
 
             this.checkState(expected);
         }

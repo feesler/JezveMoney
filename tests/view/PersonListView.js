@@ -434,9 +434,9 @@ export class PersonListView extends AppView {
         assert(button, `Button ${buttonName} not found`);
 
         if (listMode === 'sort') {
-            await this.waitForList(() => button.click());
+            await this.waitForList(() => this.content[buttonName].click());
         } else {
-            await this.performAction(() => button.click());
+            await this.performAction(() => this.content[buttonName].click());
         }
 
         return this.checkState(expected);
@@ -474,7 +474,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByNameBtn;
         assert(button, 'Sort by name button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByNameBtn.click());
 
         return this.checkState(expected);
     }
@@ -499,7 +499,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByDateBtn;
         assert(button, 'Sort by date button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByDateBtn.click());
 
         return this.checkState(expected);
     }
@@ -516,8 +516,7 @@ export class PersonListView extends AppView {
 
             const expected = this.getExpectedState();
 
-            const tile = this.getTileByIndex(num);
-            await this.waitForList(() => tile.click());
+            await this.waitForList(() => this.getTileByIndex(num).click());
 
             this.checkState(expected);
         }
