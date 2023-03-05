@@ -22,45 +22,6 @@
   max-width: var(--section-width);
 }
 
-.account-container {
-  display: inline-flex;
-  flex-flow: column nowrap;
-  width: var(--form-field-width);
-  margin: var(--form-field-margin);
-
-  .field__title {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 12px;
-
-    .btn.close-btn {
-      --btn-size: 14px;
-      --btn-icon-size: 14px;
-      --btn-icon-color: var(--dimmed-text-color);
-      --btn-hover-icon-color: var(--main-text-color);
-
-      align-self: center;
-    }
-  }
-}
-
-.tile-base {
-  display: flex;
-  flex-flow: row nowrap;
-  column-gap: 6px;
-
-  .dd__container_attached {
-    display: flex;
-  }
-}
-
-.tile-info-block {
-  display: flex;
-  flex-flow: column nowrap;
-  row-gap: 10px;
-  min-width: 100px;
-}
-
 .tile-info-item {
   display: flex;
   flex-flow: column nowrap;
@@ -75,6 +36,8 @@
 
 /* Swap button */
 .swap-btn {
+  --btn-icon-size: 24px;
+
   display: inline-flex;
   position: absolute;
   top: 50%;
@@ -85,11 +48,6 @@
   border: 0 none;
   border-radius: 50%;
   cursor: pointer;
-}
-
-.swap-icon {
-  height: 24px;
-  width: 24px;
 }
 
 /* Desktop */

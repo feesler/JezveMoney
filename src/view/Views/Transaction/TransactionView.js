@@ -57,6 +57,7 @@ import {
 import * as STATE from './stateId.js';
 import '../../Components/Field/style.scss';
 import './style.scss';
+import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
@@ -203,11 +204,7 @@ class TransactionView extends View {
             'heading',
             'form',
             'notAvailMsg',
-            'sourceContainer',
-            'destContainer',
-            'personContainer',
-            'debtAccountContainer',
-            'swapBtn',
+            'accountsSection',
             'srcAmountRow',
             'srcAmountInput',
             'srcCurrBtn',
@@ -277,58 +274,90 @@ class TransactionView extends View {
         });
         this.form.prepend(this.typeMenu.elem);
 
-        setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
+        this.swapBtn = Button.create({
+            id: 'swapBtn',
+            icon: 'swap',
+            className: 'swap-btn circle-btn',
+            onClick: () => this.store.dispatch(actions.swapSourceAndDest()),
+        });
 
-        this.srcTileBase = this.sourceContainer.querySelector('.tile-base');
-        this.srcTileInfoBlock = this.sourceContainer.querySelector('.tile-info-block');
-
-        this.destTileBase = this.destContainer.querySelector('.tile-base');
-        this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
-
-        this.personTileBase = this.personContainer.querySelector('.tile-base');
-        this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
-
-        this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
-        this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
-
+        this.sourceContainer = AccountContainer.create({
+            id: 'sourceContainer',
+            title: __('TR_SRC_ACCOUNT'),
+        });
         this.sourceTile = AccountTile.create({ id: 'sourceTile' });
-        this.srcTileBase.prepend(this.sourceTile.elem);
+        this.sourceContainer.tileBase.prepend(this.sourceTile.elem);
 
+        this.destContainer = AccountContainer.create({
+            id: 'destContainer',
+            title: __('TR_DEST_ACCOUNT'),
+        });
         this.destTile = AccountTile.create({ id: 'destTile' });
-        this.destTileBase.prepend(this.destTile.elem);
+        this.destContainer.tileBase.prepend(this.destTile.elem);
+
+        this.personContainer = AccountContainer.create({
+            id: 'personContainer',
+            title: __('TR_PERSON'),
+        });
+        this.personTile = Tile.create({ id: 'personTile' });
+        this.personContainer.tileBase.prepend(this.personTile.elem);
+
+        const debtAccProps = {
+            id: 'debtAccountContainer',
+            title: __('TR_PERSON'),
+            accountToggler: true,
+            onToggleAccount: () => this.toggleEnableAccount(),
+            closeButton: true,
+            onClose: () => this.toggleEnableAccount(),
+        };
+        if (window.app.model.userAccounts.length === 0) {
+            debtAccProps.noDataMessage = __('TR_DEBT_NO_ACCOUNTS');
+        }
+
+        this.debtAccountContainer = AccountContainer.create(debtAccProps);
+        this.debtAccountTile = AccountTile.create({ id: 'debtAccountTile' });
+        this.debtAccountContainer.tileBase.prepend(this.debtAccountTile.elem);
+
+        this.accountsSection.append(
+            this.sourceContainer.elem,
+            this.swapBtn.elem,
+            this.destContainer.elem,
+            this.personContainer.elem,
+            this.debtAccountContainer.elem,
+        );
 
         this.srcAmountInfo = TileInfoItem.create({
             id: 'srcAmountInfo',
             onClick: () => this.store.dispatch(actions.sourceAmountClick()),
         });
-        this.srcTileInfoBlock.append(this.srcAmountInfo.elem);
+        this.sourceContainer.infoBlock.append(this.srcAmountInfo.elem);
 
         this.destAmountInfo = TileInfoItem.create({
             id: 'destAmountInfo',
             onClick: () => this.store.dispatch(actions.destAmountClick()),
         });
-        this.destTileInfoBlock.append(this.destAmountInfo.elem);
+        this.destContainer.infoBlock.append(this.destAmountInfo.elem);
 
         this.srcResBalanceInfo = TileInfoItem.create({
             id: 'srcResBalanceInfo',
             label: __('TR_RESULT'),
             onClick: () => this.store.dispatch(actions.sourceResultClick()),
         });
-        this.srcTileInfoBlock.append(this.srcResBalanceInfo.elem);
+        this.sourceContainer.infoBlock.append(this.srcResBalanceInfo.elem);
 
         this.destResBalanceInfo = TileInfoItem.create({
             id: 'destResBalanceInfo',
             label: __('TR_RESULT'),
             onClick: () => this.store.dispatch(actions.destResultClick()),
         });
-        this.destTileInfoBlock.append(this.destResBalanceInfo.elem);
+        this.destContainer.infoBlock.append(this.destResBalanceInfo.elem);
 
         this.exchangeInfo = TileInfoItem.create({
             id: 'exchangeInfo',
             label: __('TR_EXCHANGE_RATE'),
             onClick: () => this.store.dispatch(actions.exchangeClick()),
         });
-        this.srcTileInfoBlock.append(this.exchangeInfo.elem);
+        this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
 
         this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
         if (this.srcAmountInput) {
@@ -394,21 +423,6 @@ class TransactionView extends View {
         });
 
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
-
-        this.debtAccountTile = AccountTile.create({ id: 'debtAccountTile' });
-        this.debtAccountTileBase.prepend(this.debtAccountTile.elem);
-
-        this.noAccountBtn = this.debtAccountContainer.querySelector('.field__title .close-btn');
-        setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
-
-        this.selectAccountBtn = this.debtAccountContainer.querySelector('.account-toggler');
-        this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
-        setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
-
-        this.debtAccountLabel = this.debtAccountContainer.querySelector('.field__title span');
-
-        this.personTile = Tile.create({ id: 'personTile' });
-        this.personTileBase.prepend(this.personTile.elem);
 
         this.spinner = Spinner.create();
         this.spinner.hide();
@@ -1024,7 +1038,7 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INFO);
         }
 
-        addChilds(this.srcTileInfoBlock, [
+        addChilds(this.sourceContainer.infoBlock, [
             this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
             this.srcResBalanceInfo.elem,
@@ -1071,7 +1085,7 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INFO);
         }
 
-        addChilds(this.destTileInfoBlock, [
+        addChilds(this.destContainer.infoBlock, [
             this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
             this.destResBalanceInfo.elem,
@@ -1142,14 +1156,14 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
-        insertAfter(this.swapBtn, this.sourceContainer);
+        insertAfter(this.swapBtn.elem, this.sourceContainer.elem);
 
-        addChilds(this.srcTileInfoBlock, [
+        addChilds(this.sourceContainer.infoBlock, [
             this.srcAmountInfo.elem,
             this.srcResBalanceInfo.elem,
             this.exchangeInfo.elem,
         ]);
-        addChilds(this.destTileInfoBlock, [
+        addChilds(this.destContainer.infoBlock, [
             this.destAmountInfo.elem,
             this.destResBalanceInfo.elem,
         ]);
@@ -1288,40 +1302,42 @@ class TransactionView extends View {
 
         this.debtOperationInp.value = (debtType) ? 1 : 2;
         if (debtType) {
-            insertAfter(this.swapBtn, this.personContainer);
-            insertAfter(this.debtAccountContainer, this.swapBtn);
+            insertAfter(this.swapBtn.elem, this.personContainer.elem);
+            insertAfter(this.debtAccountContainer.elem, this.swapBtn.elem);
         } else {
-            insertAfter(this.swapBtn, this.debtAccountContainer);
-            insertAfter(this.personContainer, this.swapBtn);
+            insertAfter(this.swapBtn.elem, this.debtAccountContainer.elem);
+            insertAfter(this.personContainer.elem, this.swapBtn.elem);
         }
 
-        addChilds(this.personTileInfoBlock, [
+        addChilds(this.personContainer.infoBlock, [
             this.srcAmountInfo.elem,
             (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
             (debtType) ? this.exchangeInfo.elem : this.destAmountInfo.elem,
         ]);
 
-        addChilds(this.debtAccTileInfoBlock, [
+        addChilds(this.debtAccountContainer.infoBlock, [
             (debtType) ? this.destResBalanceInfo.elem : this.srcResBalanceInfo.elem,
             (debtType) ? this.destAmountInfo.elem : this.exchangeInfo.elem,
         ]);
 
         if (noAccount) {
-            this.debtAccountLabel.textContent = __('TR_NO_ACCOUNT');
+            this.debtAccountContainer.setTitle(__('TR_NO_ACCOUNT'));
         } else {
-            this.debtAccountLabel.textContent = (debtType)
-                ? __('TR_DEST_ACCOUNT')
-                : __('TR_SRC_ACCOUNT');
+            const title = (debtType) ? __('TR_DEST_ACCOUNT') : __('TR_SRC_ACCOUNT');
+            this.debtAccountContainer.setTitle(title);
         }
 
-        show(this.noAccountBtn, !noAccount);
-        enable(this.noAccountBtn, !state.submitStarted);
+        this.debtAccountContainer.closeButton.show(!noAccount);
+        this.debtAccountContainer.closeButton.enable(!state.submitStarted);
 
-        show(this.debtAccountTileBase, !noAccount);
+        show(this.debtAccountContainer.tileBase, !noAccount);
 
         const { userAccounts } = window.app.model;
-        show(this.selectAccountBtn, noAccount && userAccounts.length > 0);
-        enable(this.accountToggleBtn, !state.submitStarted);
+        show(
+            this.debtAccountContainer.accountToggler,
+            noAccount && userAccounts.length > 0,
+        );
+        this.debtAccountContainer.togglerButton.enable(!state.submitStarted);
 
         const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
         const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
@@ -1382,21 +1398,18 @@ class TransactionView extends View {
         }
         show(this.notAvailMsg, !state.isAvailable);
 
-        show(
-            this.sourceContainer,
+        this.sourceContainer.show(
             state.isAvailable && (transaction.type === EXPENSE || transaction.type === TRANSFER),
         );
-        show(
-            this.destContainer,
+        this.destContainer.show(
             state.isAvailable && (transaction.type === INCOME || transaction.type === TRANSFER),
         );
-        show(this.personContainer, state.isAvailable && transaction.type === DEBT);
-        show(this.debtAccountContainer, state.isAvailable && transaction.type === DEBT);
-        show(
-            this.swapBtn,
+        this.personContainer.show(state.isAvailable && transaction.type === DEBT);
+        this.debtAccountContainer.show(state.isAvailable && transaction.type === DEBT);
+        this.swapBtn.show(
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
         );
-        enable(this.swapBtn, !state.submitStarted);
+        this.swapBtn.enable(!state.submitStarted);
 
         // Type menu
         this.typeMenu.setActive(transaction.type);

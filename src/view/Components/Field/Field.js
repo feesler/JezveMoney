@@ -15,6 +15,10 @@ const CONTENT_CLASS = 'field__content';
  * Field component
  */
 export class Field extends Component {
+    static userProps = {
+        elem: ['id'],
+    };
+
     constructor(...args) {
         super(...args);
 
@@ -30,6 +34,7 @@ export class Field extends Component {
         });
 
         this.setClassNames();
+        this.setUserProps();
         this.render();
     }
 

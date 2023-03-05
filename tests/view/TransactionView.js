@@ -109,7 +109,6 @@ export class TransactionView extends AppView {
         res.noacc_btn = { elem: await query(accountBlock, '.close-btn') };
         assert(res.noacc_btn.elem, 'Disable account button not found');
         res.noAccountsMsg = { elem: await query(accountBlock, '.nodata-message') };
-        assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
         res.sourceContainer = await TileBlock.create(this, await query('#sourceContainer'));
         if (res.sourceContainer) {

@@ -1,8 +1,4 @@
-<?php
-
-use JezveMoney\App\Template\Component\AccountContainer;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
@@ -19,23 +15,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <form id="form" method="post" action="<?= e($form["action"]) ?>">
                             <span id="notAvailMsg" class="nodata-message" <?= hidden($trAvailable) ?>><?= e($notAvailMessage) ?></span>
 
-                            <div class="accounts-section">
-                                <?= AccountContainer::render($debtSrcContainer) ?>
-                                <?php if ($tr["type"] == DEBT) {        ?>
-                                    <button id="swapBtn" class="swap-btn" type="button" <?= hidden(!$trAvailable) ?>>
-                                        <?= svgIcon("swap", "swap-icon") ?>
-                                    </button>
-                                <?php    }    ?>
-                                <?= AccountContainer::render($debtDestContainer) ?>
-
-                                <?= AccountContainer::render($sourceContainer) ?>
-                                <?php if ($tr["type"] != DEBT) {        ?>
-                                    <button id="swapBtn" class="swap-btn" type="button" <?= hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME) ?>>
-                                        <?= svgIcon("swap", "swap-icon") ?>
-                                    </button>
-                                <?php    }    ?>
-                                <?= AccountContainer::render($destContainer) ?>
-                            </div>
+                            <div id="accountsSection" class="accounts-section"></div>
 
                             <div id="srcAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showSrcAmount) ?>>
                                 <label for="srcAmountInput" class="field__title"><?= e($srcAmountLbl) ?></label>
@@ -129,8 +109,12 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?php if ($action == "update") {    ?>
                                 <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
                             <?php    }    ?>
-                            <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
-                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
+                            <input id="typeInp" type="hidden" value="<?= e($tr["type"]) ?>">
+                            <input id="srcIdInp" type="hidden" value="<?= e($tr["src_id"]) ?>">
+                            <input id="destIdInp" type="hidden" value="<?= e($tr["dest_id"]) ?>">
+                            <input id="personIdInp" type="hidden" value="<?= e($person_id) ?>">
+                            <input id="debtAccountInp" type="hidden" value="<?= e($acc_id) ?>">
+                            <input id="debtOperationInp" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
                         </form>
                     </main>
                 </div>

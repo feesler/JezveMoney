@@ -150,75 +150,6 @@ class Transactions extends ListViewController
     }
 
     /**
-     * Returns properties for accounts and person containers
-     *
-     * @param array $data
-     *
-     * @return array
-     */
-    protected function getContainersData(array $data)
-    {
-        $trAvailable = $data["trAvailable"];
-        $tr = $data["tr"];
-        $debtType = $data["debtType"];
-        $noAccount = $data["noAccount"];
-        $acc_count = $data["acc_count"];
-        if (!is_array($tr) || !isset($tr["type"])) {
-            throw new \Error("Invalid parameters");
-        }
-
-        $personContainer = [
-            "id" => "personContainer",
-            "hidden" => (!$trAvailable || $tr["type"] != DEBT),
-            "inputId" => "personIdInp",
-            "inputValue" => $data["person_id"],
-            "title" => __("TR_PERSON"),
-        ];
-
-        if ($noAccount) {
-            $debtAccountLabel = __("TR_NO_ACCOUNT");
-        } else {
-            $debtAccountLabel = ($debtType) ? __("TR_DEST_ACCOUNT") : __("TR_SRC_ACCOUNT");
-        }
-        $debtAccountContainer = [
-            "id" => "debtAccountContainer",
-            "hidden" => (!$trAvailable || $tr["type"] != DEBT),
-            "inputId" => "debtAccountInp",
-            "inputValue" => $data["acc_id"],
-            "title" => $debtAccountLabel,
-            "baseHidden" => $noAccount,
-            "closeButton" => $noAccount,
-            "accountToggler" => (!$noAccount || !$acc_count),
-            "noAccountsMsg" => __("TR_DEBT_NO_ACCOUNTS"),
-            "noAccountsMsgHidden" => ($acc_count > 0),
-        ];
-
-        $debtSrcContainer = ($debtType) ? $personContainer : $debtAccountContainer;
-        $debtDestContainer = ($debtType) ? $debtAccountContainer : $personContainer;
-
-        $data["debtSrcContainer"] = $debtSrcContainer;
-        $data["debtDestContainer"] = $debtDestContainer;
-
-        $data["sourceContainer"] = [
-            "id" => "sourceContainer",
-            "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
-            "inputId" => "srcIdInp",
-            "inputValue" => $tr["src_id"],
-            "title" => __("TR_SRC_ACCOUNT"),
-        ];
-
-        $data["destContainer"] = [
-            "id" => "destContainer",
-            "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
-            "inputId" => "destIdInp",
-            "inputValue" => $tr["dest_id"],
-            "title" => __("TR_DEST_ACCOUNT"),
-        ];
-
-        return $data;
-    }
-
-    /**
      * /transactions/create/ route handler
      * Renders create transaction view
      */
@@ -448,8 +379,6 @@ class Transactions extends ListViewController
 
         $data["form"] = $form;
 
-        $data = $this->getContainersData($data);
-
         $data["dateFmt"] = date("d.m.Y");
 
         $data["headString"] = __("TR_CREATE");
@@ -653,8 +582,6 @@ class Transactions extends ListViewController
         $form["destResult"] = $destResBalance;
 
         $data["form"] = $form;
-
-        $data = $this->getContainersData($data);
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
 
