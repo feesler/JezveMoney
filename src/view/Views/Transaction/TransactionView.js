@@ -452,6 +452,8 @@ class TransactionView extends View {
             elem: this.sourceTile.elem,
             listAttach: true,
             enableFilter: true,
+            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+            useSingleSelectionAsPlaceholder: false,
             noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onSrcAccountSelect(item),
         });
@@ -474,6 +476,8 @@ class TransactionView extends View {
             elem: this.destTile.elem,
             listAttach: true,
             enableFilter: true,
+            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+            useSingleSelectionAsPlaceholder: false,
             noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDestAccountSelect(item),
         });
@@ -495,6 +499,8 @@ class TransactionView extends View {
             elem: this.personTile.elem,
             listAttach: true,
             enableFilter: true,
+            placeholder: __('PERSON_TYPE_TO_FILTER'),
+            useSingleSelectionAsPlaceholder: false,
             noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onPersonSelect(item),
         });
@@ -512,6 +518,8 @@ class TransactionView extends View {
             elem: this.debtAccountTile.elem,
             listAttach: true,
             enableFilter: true,
+            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+            useSingleSelectionAsPlaceholder: false,
             noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDebtAccountSelect(item),
         });
