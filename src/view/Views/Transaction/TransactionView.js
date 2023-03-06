@@ -246,7 +246,7 @@ class TransactionView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('PERSON_UPDATE') : __('PERSON_CREATE'),
+            title: (isUpdate) ? __('TR_UPDATE') : __('TR_CREATE'),
             showInHeaderOnScroll: false,
         });
 
