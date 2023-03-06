@@ -7,6 +7,8 @@
   margin: 5px 0;
   border: 1px solid;
   border-radius: 2px;
+  border-color: var(--border-color-3);
+  background-color: var(--border-color-3);
 
   .title {
     display: flex;
@@ -52,6 +54,8 @@
   .response-container.response-container_pending {
     background: none;
     border: 1px dashed;
+    border-color: var(--border-color-3);
+    color: var(--border-color-3);
   }
 
   .response-container.ok-result .title {

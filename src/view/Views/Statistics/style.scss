@@ -45,6 +45,10 @@
   position: relative;
   width: 100%;
 
+  span {
+    color: var(--main-text-color);
+  }
+
   .loading-indicator {
     z-index: auto;
   }
@@ -59,6 +63,8 @@
   backdrop-filter: var(--popup-menu-backdrop-filter);
   padding: 8px;
   white-space: nowrap;
+  background-color: var(--popup-menu-bg);
+  color: var(--main-text-color);
 }
 
 .chart-popup__content {
@@ -87,6 +93,7 @@
 .chart-legend__item-title {
   position: relative;
   left: -5px;
+  color: var(--main-text-color);
 }
 
 /* Pie chart */

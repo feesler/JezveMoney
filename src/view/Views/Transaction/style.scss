@@ -37,6 +37,9 @@
 /* Swap button */
 .swap-btn {
   --btn-icon-size: 24px;
+  --btn-hover-icon-color: var(--main-text-color);
+  --btn-active-background: var(--bg-color-4);
+  --btn-icon-color: var(--neutral-color);
 
   display: inline-flex;
   position: absolute;

@@ -83,7 +83,7 @@
                                     <div class="input-group">
                                         <input id="dateInput" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
                                         <button id="dateInputBtn" class="btn icon-btn input-group__btn" type="button">
-                                            <?= useIcon("calendar-icon", "btn__icon calendar-icon") ?>
+                                            <?= useIcon("calendar-icon", "btn__icon") ?>
                                         </button>
                                     </div>
                                     <div id="datePickerWrapper" class="calendar"></div>

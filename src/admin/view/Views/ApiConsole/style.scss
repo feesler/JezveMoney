@@ -70,6 +70,7 @@ h3 {
   white-space: nowrap;
   background: none;
   cursor: pointer;
+  color: var(--main-text-color);
 }
 
 .menu-list > li.active > button {
@@ -161,5 +162,6 @@ h3 {
 
   .menu-list .sub-menu-list > li:hover {
     text-decoration: underline;
+    color: var(--text-color-3);
   }
 }

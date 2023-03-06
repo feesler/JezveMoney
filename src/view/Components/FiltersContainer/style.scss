@@ -15,6 +15,10 @@
   width: 100%;
   margin-bottom: 4px;
 
+  label {
+    color: var(--main-text-color);
+  }
+
   .filters-heading__title {
     margin: 0 30px 0 0;
     font-size: 26px;
@@ -45,6 +49,7 @@
   margin-bottom: 5px;
   margin-left: 1px;
   white-space: nowrap;
+  color: var(--dimmed-text-color);
 }
 
 /* Horizontal filters separator */
@@ -90,6 +95,8 @@
 
 /* Filters inside Offcanvas */
 .filters-offcanvas {
+  --offcanvas-bg: var(--semitrans-bg-color);
+
   width: 100%;
 
   .filters-container {

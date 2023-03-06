@@ -11,4 +11,9 @@
   flex-flow: row nowrap;
   justify-content: center;
   top: 50px;
+  background-color: var(--main-bg-color);
+
+  h1 {
+    color: var(--main-text-color);
+  }
 }

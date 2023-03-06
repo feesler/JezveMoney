@@ -6,12 +6,12 @@ import {
     checkDate,
     Component,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { Icon } from 'jezvejs/Icon';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
 import { fixFloat, __ } from '../../../../js/utils.js';
@@ -42,8 +42,6 @@ const PERSON_FIELD_CLASS = 'form-row person-field';
 const DATE_FIELD_CLASS = 'form-row date-field';
 const CATEGORY_FIELD_CLASS = 'form-row category-field';
 const COMMENT_FIELD_CLASS = 'form-row comment-field';
-/* Controls */
-const CALENDAR_ICON_CLASS = 'icon calendar-icon';
 /* Form controls */
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
@@ -322,28 +320,21 @@ export class ImportTransactionForm extends Component {
     /** Create date field */
     createDateField() {
         this.dateInp = DateInput.create({
-            className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
+            className: [DEFAULT_INPUT_CLASS, IG_INPUT_CLASS],
             name: 'date[]',
             placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
             onInput: () => this.onDateInput(),
         });
 
-        const dateIcon = Icon.create({
+        this.dateBtn = Button.create({
             icon: 'calendar-icon',
-            className: CALENDAR_ICON_CLASS,
-        });
-        this.dateBtn = createElement('button', {
-            props: {
-                type: 'button',
-                className: IG_BUTTON_CLASS,
-            },
-            children: dateIcon.elem,
-            events: { click: () => this.showDatePicker() },
+            className: IG_BUTTON_CLASS,
+            onClick: () => this.showDatePicker(),
         });
 
         this.dateGroup = InputGroup.create({
-            children: [this.dateInp.elem, this.dateBtn],
+            children: [this.dateInp.elem, this.dateBtn.elem],
         });
         const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_DATE'));
 
@@ -779,7 +770,7 @@ export class ImportTransactionForm extends Component {
         this.personField.show(isDebt);
 
         // Date field
-        enable(this.dateBtn, transaction.enabled);
+        this.dateBtn.enable(transaction.enabled);
         this.dateInp.enable(transaction.enabled);
         this.dateInp.value = transaction.date;
         window.app.setValidation(this.dateField.elem, state.validation.date);

@@ -56,11 +56,11 @@ input[type="submit"] {
 /* Admin table */
 .test-tbl {
   border-collapse: collapse;
-  border: 1px solid;
+  border: 1px solid var(--main-text-color);
 
   th,
   td {
-    border: 1px solid;
+    border: 1px solid var(--main-text-color);
     padding: 5px;
   }
 
@@ -89,6 +89,7 @@ input[type="submit"] {
 .test-results-container {
   display: none;
   overflow-y: auto;
+  border-color: var(--main-text-color);
 
   table {
     border-collapse: collapse;
@@ -160,5 +161,11 @@ input[type="submit"] {
     flex-grow: 1;
     flex-basis: 65%;
     overflow: hidden;
+  }
+}
+
+@media (hover: hover) {
+  .test-tbl tr:hover td {
+    background-color: var(--bg-color-4);
   }
 }

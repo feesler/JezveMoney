@@ -16,7 +16,6 @@
 <?php	foreach($this->cssArr as $cssFile) {	?>
 <link rel="stylesheet" type="text/css" href="<?=e(BASEURL.auto_version("view/css/".$cssFile))?>">
 <?php	}	?>
-<link id="theme-style" rel="stylesheet" type="text/css" href="<?=e(BASEURL."view/css/themes/".$this->themeStylesheet)?>">
 <script>
     window.appProps = <?=(isset($appProps) ? $appProps : "{}")?>;
     window.addEventListener('error', function(e) {

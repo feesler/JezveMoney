@@ -53,14 +53,11 @@
 }
 
 /* Mode selector */
-.dark-theme,
-.white-theme {
-  .btn.mode-selector {
-    --btn-title-color: var(--accent-color);
-    --btn-icon-color: var(--accent-color);
-    --btn-hover-icon-color: var(--accent-color);
-    --btn-hover-title-color: var(--accent-hover-color);
-  }
+.btn.mode-selector {
+  --btn-title-color: var(--accent-color);
+  --btn-icon-color: var(--accent-color);
+  --btn-hover-icon-color: var(--accent-color);
+  --btn-hover-title-color: var(--accent-hover-color);
 }
 
 .transaction-view-view {

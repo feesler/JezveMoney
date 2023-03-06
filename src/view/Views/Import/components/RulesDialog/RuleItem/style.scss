@@ -10,6 +10,8 @@
     padding: 8px 4px 8px 8px;
     border: 0;
     cursor: pointer;
+    color: var(--main-text-color);
+    background-color: var(--list-item-bg-color);
   }
 
   /* Menu */
@@ -42,6 +44,11 @@
     cursor: pointer;
   }
 
+  .toggle-btn {
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+  }
+
   .collapsible-content {
     display: flex;
     flex-flow: column nowrap;
@@ -51,6 +58,8 @@
     border: 0 none;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+    color: var(--text-color-3);
+    background-color: var(--bg-color-5);
   }
 }
 
@@ -78,6 +87,7 @@
   font-style: italic;
   white-space: nowrap;
   margin-right: 12px;
+  color: var(--dimmed-text-color);
 }
 
 .rule-item__value {
@@ -96,6 +106,7 @@
 /* Actions and child rules count info element */
 .rule-item__info {
   font-size: 12px;
+  color: var(--list-item-text-color);
 }
 
 /* Controls */
@@ -141,4 +152,10 @@
 .rule-item__actions .action-item:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+@media (hover: hover) {
+  .rule-item .collapsible-header:hover {
+    background-color: var(--bg-color-4);
+  }
 }

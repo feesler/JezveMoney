@@ -5,6 +5,8 @@
 
 /* Transaction item */
 .import-form {
+  --input-disabled-border-color: var(--disabled-color-1);
+
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
@@ -15,6 +17,22 @@
     flex-grow: 1;
     align-items: normal;
     gap: 12px;
+  }
+
+  .stretch-input {
+    border-color: var(--input-border-color);
+  }
+
+  .stretch-input[disabled] {
+    color: var(--input-disabled-text-color);
+    -webkit-text-fill-color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
+  }
+
+  .stretch-input:focus {
+    border-color: var(--border-color-1);
+    background-color: var(--input-bg-color);
   }
 
   /* Input field and label group */
@@ -48,13 +66,10 @@
 
   /* Toggle expand/collapse button */
   .toggle-btn {
-    margin-left: auto;
-  }
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
 
-  /* Delete item button */
-  .calendar-icon {
-    width: 24px;
-    height: 24px;
+    margin-left: auto;
   }
 
   .collapsible-content {
@@ -63,5 +78,8 @@
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
+    color: var(--text-color-3);
+    border-color: var(--border-color-2);
+    background-color: var(--bg-color-3);
   }
 }

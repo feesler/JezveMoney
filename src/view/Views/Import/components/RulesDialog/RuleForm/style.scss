@@ -6,10 +6,14 @@
   flex: 1 1 auto;
   min-height: 0;
 
-  /* Delete and toggle expand/collapse button */
+  /* Delete button */
   .icon-btn,
-  .icon-btn:visited,
-  .icon-btn:active {
+  .icon-btn:visited {
+    --btn-icon-width: 34px;
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    --btn-hover-background: var(--bg-color-4);
+
     display: flex;
     align-items: center;
     padding: 0;
@@ -41,7 +45,8 @@
     padding: 2px 8px 2px 8px;
     border: 0;
     cursor: pointer;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    color: var(--main-text-color);
+    background-color: var(--list-item-bg-color);
 
     label {
       font-size: 18px;
@@ -49,6 +54,9 @@
     }
 
     .toggle-btn {
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+
       margin-left: 0;
     }
   }
@@ -64,6 +72,8 @@
     border: 0 none;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+    color: var(--text-color-3);
+    background-color: var(--bg-color-5);
   }
 
   .link-btn {
@@ -105,4 +115,10 @@
 /* Validation feedback container */
 .rule-form__feedback {
   margin-bottom: 9px;
+}
+
+@media (hover: hover) {
+  .rule-form-collapse .collapsible-header:hover {
+    background-color: var(--bg-color-4);
+  }
 }

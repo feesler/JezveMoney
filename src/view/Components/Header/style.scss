@@ -309,6 +309,7 @@ a.nav-item__link:visited {
   font-weight: 300;
   text-decoration: none;
   white-space: nowrap;
+  color: var(--text-color-2);
 }
 
 .nav-item__icon-btn {
@@ -403,5 +404,10 @@ a.nav-item__link:visited {
 
   a.nav-item__link:hover {
     text-decoration: underline;
+    color: var(--hl-text-color);
+  }
+
+  .nav-item__icon-btn:hover {
+    background: var(--icon-btn-hover-bg);
   }
 }

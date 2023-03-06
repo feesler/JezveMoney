@@ -31,6 +31,14 @@
   display: block;
   height: 32px;
   margin: 10px 0;
+  color: var(--main-text-color);
+
+  .widget_title-link,
+  .widget_title-link:visited {
+    height: 32px;
+    text-decoration: none;
+    color: var(--main-text-color);
+  }
 
   span {
     font-weight: 300;
@@ -46,17 +54,12 @@
     margin: 0 0 0 4px;
     vertical-align: text-bottom;
   }
-}
 
-.widget_title-link,
-.widget_title-link:hover {
-  height: 32px;
-  text-decoration: none;
-}
-
-.glyph-icon {
-  width: 24px;
-  height: 24px;
+  .glyph-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--main-text-color);
+  }
 }
 
 /* Summary widget */
@@ -98,4 +101,11 @@
 /* Latest transactions widget */
 .transactions-widget {
   flex-basis: 350px;
+}
+
+@media (hover: hover) {
+  .widget_title-link:hover {
+    color: var(--main-text-color);
+    text-decoration: none;
+  }
 }

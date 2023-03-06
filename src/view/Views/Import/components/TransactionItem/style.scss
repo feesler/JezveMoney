@@ -20,6 +20,7 @@
     padding: 4px 0 4px 8px;
     overflow: hidden;
     position: relative;
+    background-color: var(--list-item-bg-color);
   }
 
   .item-column {
@@ -42,6 +43,7 @@
     --field-content-font-size: var(--ii-font-size);
     --field-title-font-size: 12px;
     --field-title-margin: 0 0 1px 0;
+    --field-title-color: var(--dimmed-text-color);
   }
 
   .field__title {
@@ -80,6 +82,12 @@
     justify-content: flex-end;
     width: 66px;
     flex: 0 0 66px;
+    background-color: var(--list-item-bg-color);
+  }
+
+  .toggle-btn {
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
   }
 
   /* Menu */
@@ -89,6 +97,7 @@
     --btn-padding: 0;
     --btn-background: none;
     --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
 
     margin: 0 4px;
   }
@@ -99,6 +108,9 @@
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
+    color: var(--text-color-3);
+    border-color: var(--border-color-2);
+    background-color: var(--bg-color-3);
   }
 
   &.collapsible__expanded .toggle-btn .btn__icon {
@@ -130,6 +142,21 @@
   }
 }
 
+/* Import item */
+.import-item[disabled] {
+  .item-container,
+  .controls {
+    background-color: var(--list-item-disabled-bg-color);
+    color: var(--neutral-color);
+  }
+
+  .collapsible-content {
+    color: var(--text-color-6);
+    border-color: var(--bg-color-5);
+    background-color: var(--bg-color-3);
+  }
+}
+
 /* Select mode */
 .import-list_select .import-item {
   cursor: pointer;
@@ -145,7 +172,8 @@
 
 /* Placeholder */
 .import-item__placeholder {
-  border: 1px dashed;
+  border: 1px dashed var(--neutral-color);
+  background-color: var(--main-bg-color);
 
   * {
     opacity: 0;

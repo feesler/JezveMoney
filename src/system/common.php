@@ -285,39 +285,20 @@ function auto_version(string $file)
 /**
  * Returns array of available themes
  *
- * @param string $base
- *
  * @return array
  */
-function getThemes(string $base)
+function getThemes()
 {
-    $themes = [
+    return [
         WHITE_THEME => [
-            "name" => "white-theme",
+            "className" => "white-theme",
             "color" => "#fefefe",
         ],
         DARK_THEME => [
-            "name" => "dark-theme",
+            "className" => "dark-theme",
             "color" => "#202020",
         ],
     ];
-
-    $res = [];
-    foreach ($themes as $theme_id => $theme) {
-        $fileName = $theme["name"] . ".css";
-        $mtime = getModifiedTime($base . $fileName);
-        if ($mtime === false) {
-            continue;
-        }
-
-        $res[$theme_id] = [
-            "file" => $fileName . "?" . $mtime,
-            "color" => $theme["color"],
-            "className" => $theme["name"],
-        ];
-    }
-
-    return $res;
 }
 
 /**

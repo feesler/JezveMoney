@@ -42,12 +42,14 @@
   overflow: hidden;
   flex: 1 1 auto;
   padding: 8px 0 8px 8px;
+  background-color: var(--list-item-bg-color);
 }
 
 .trans-item__controls {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+  background-color: var(--list-item-bg-color);
 
   .btn.menu-btn {
     --btn-size: 32px;
@@ -102,6 +104,15 @@
   }
 }
 
+.trans-item__date,
+.trans-item__category,
+.trans-item__comment,
+.trans-item__date-field .field__content,
+.trans-item__category-field .field__content,
+.trans-item__comment-field .field__content {
+  color: var(--list-item-text-color);
+}
+
 .trans-item__amount,
 .trans-item__comment,
 .trans-item__category,
@@ -121,6 +132,7 @@
 
 .trans-item__title {
   font-size: 14px;
+  color: var(--main-text-color);
 }
 
 .trans-item__amount {
@@ -186,6 +198,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--dimmed-text-color);
   }
 
   .field__content {

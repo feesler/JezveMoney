@@ -19,11 +19,11 @@
 /* Admin table */
 .admin-tbl {
   border-collapse: collapse;
-  border: 1px solid;
+  border: 1px solid var(--main-text-color);
 
   th,
   td {
-    border: 1px solid;
+    border: 1px solid var(--main-text-color);
     padding: 5px;
   }
 
@@ -41,6 +41,9 @@
 textarea {
   border: 1px solid;
   padding: 5px;
+  color: var(--main-text-color);
+  border-color: var(--main-text-color);
+  background-color: var(--main-bg-color);
 }
 
 .popup__form-controls {
@@ -137,5 +140,11 @@ textarea {
 
   .admin_cont_wrap {
     padding: 100px 12px 50px 12px;
+  }
+}
+
+@media (hover: hover) {
+  .admin-tbl tr:hover td {
+    background-color: var(--bg-color-4);
   }
 }

@@ -87,7 +87,7 @@ export class DateRangeInput extends Component {
 
         this.dateInputBtn = Button.create({
             icon: 'calendar-icon',
-            className: 'icon-btn input-group__btn dp-btn',
+            className: 'input-group__btn',
             onClick: () => this.showCalendar(),
         });
 

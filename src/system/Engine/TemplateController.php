@@ -24,7 +24,6 @@ abstract class TemplateController extends Controller
     protected $user_name = null;
     protected $user_id = 0;
     protected $owner_id = 0;
-    protected $themesPath = "view/css/themes/";
     protected $locale = null;
     protected $locales = [];
 
@@ -62,9 +61,8 @@ abstract class TemplateController extends Controller
     {
         $userTheme = $this->uMod->getUserTheme();
         $this->template->userTheme = $userTheme;
-        $themes = getThemes($this->themesPath);
+        $themes = getThemes();
         $this->template->themes = $themes;
-        $this->template->themeStylesheet = $themes[$userTheme]["file"];
         $this->template->themeColor = $themes[$userTheme]["color"];
         $this->template->themeClass = $themes[$userTheme]["className"];
     }
@@ -103,7 +101,6 @@ abstract class TemplateController extends Controller
             $data["appProps"] = [];
         }
         $data["appProps"]["baseURL"] = BASEURL;
-        $data["appProps"]["themesPath"] = $this->themesPath;
         $data["appProps"]["themes"] = (object)$this->template->themes;
         $data["appProps"]["locales"] = $this->locales;
         $data["appProps"]["locale"] = $this->locale;
