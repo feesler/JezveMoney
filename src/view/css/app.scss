@@ -524,23 +524,35 @@ svg * {
 .dd__container_attached {
   --dd-border-width: 1px;
   --dd-list-border-radius: 5px;
-  --dd-selection-item-border-radius: 3px;
-  --dd-disabled-list-item-bg: none;
+
+  /* Combo box */
   --dd-combo-border-radius: 5px;
   --dd-combo-height: var(--input-height);
+
+  /* List items */
   --dd-active-list-item-text: #ffffff;
   --dd-active-list-item-bg: #3078e2;
+
+  /* Disabled list item */
+  --dd-disabled-list-item-bg: none;
+
+  /* Input element */
   --dd-input-font-size: 0.9rem;
   --dd-input-padding: var(--input-padding);
+
+  /* Selection */
   --dd-selection-font-size: 15px;
+  --dd-selection-item-border-radius: 3px;
+
+  /* Active component */
+  --dd-active-input-text: var(--main-text-color);
+  --dd-active-selection-text: var(--main-text-color);
   --dd-active-selection-bg: var(--dd-active-bg);
 }
 
 .dd__list-group {
-  padding-left: 12px;
-
   .dd__list-group__label {
-    padding: 0;
+    padding: 5px 10px;
   }
 }
 
