@@ -10,13 +10,13 @@ import {
     removeChilds,
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
+import * as apiTypes from '../../../../view/js/api/types.js';
 import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
-import { AdminView } from '../../js/AdminView.js';
 import '../../css/admin.scss';
+import { AdminView } from '../../js/AdminView.js';
+import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
 import './style.scss';
-import * as apiTypes from '../../../../view/js/api/types.js';
-import { ApiRequest } from '../../Components/ApiRequest/ApiRequest.js';
 
 /**
  * Admin currecny list view
