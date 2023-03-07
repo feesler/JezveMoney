@@ -252,6 +252,7 @@ export class ImportRuleForm extends Component {
         );
         const showSetAccount = (
             ImportActionList.hasSetTransfer(state.items)
+            && (action.action_id !== IMPORT_ACTION_SET_TR_TYPE)
             && (!setAccountAction || setAccountAction === action)
         );
         if (!showSetAccount) {
@@ -263,6 +264,7 @@ export class ImportRuleForm extends Component {
         const showSetPerson = (
             window.app.model.persons.length > 0
             && ImportActionList.hasSetDebt(state.items)
+            && (action.action_id !== IMPORT_ACTION_SET_TR_TYPE)
             && (!setPersonAction || setPersonAction === action)
         );
         if (!showSetPerson) {
