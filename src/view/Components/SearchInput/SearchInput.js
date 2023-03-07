@@ -11,7 +11,7 @@ import './style.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'search-field';
-const INPUT_CLASS = 'input-group__input stretch-input';
+const INPUT_CLASS = 'input-group__input';
 const INNER_BTN_CLASS = 'input-group__inner-btn';
 const INNER_BTN_ICON_CLASS = 'input-group__inner-btn__icon';
 const CLEAR_BTN_CLASS = 'clear-btn';

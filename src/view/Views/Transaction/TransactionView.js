@@ -31,7 +31,6 @@ import {
     Transaction,
 } from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { AccountList } from '../../js/model/AccountList.js';
@@ -43,6 +42,7 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
@@ -56,8 +56,8 @@ import {
 } from './reducer.js';
 import * as STATE from './stateId.js';
 import '../../Components/Field/style.scss';
+import '../../css/app.scss';
 import './style.scss';
-import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;

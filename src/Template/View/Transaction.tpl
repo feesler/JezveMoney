@@ -20,9 +20,9 @@
                             <div id="srcAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showSrcAmount) ?>>
                                 <label for="srcAmountInput" class="field__title"><?= e($srcAmountLbl) ?></label>
                                 <div class="input-group">
-                                    <input id="srcAmountInput" name="src_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
+                                    <input id="srcAmountInput" name="src_amount" class="input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
                                     <?php if ($tr["type"] == INCOME || ($tr["type"] == DEBT && $debtType)) { ?>
-                                        <button id="srcCurrBtn" class="input-group__btn" type="button" tabindex="-1">
+                                        <button id="srcCurrBtn" class="btn input-group__btn" type="button" tabindex="-1">
                                             <div id="srcAmountSign" class="input-group__btn-title"><?= e($form["srcCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
@@ -38,9 +38,9 @@
                             <div id="destAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showDestAmount) ?>>
                                 <label for="destAmountInput" class="field__title"><?= e($destAmountLbl) ?></label>
                                 <div class="input-group">
-                                    <input id="destAmountInput" name="dest_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
+                                    <input id="destAmountInput" name="dest_amount" class="input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
                                     <?php if ($tr["type"] == EXPENSE || ($tr["type"] == DEBT && !$debtType)) { ?>
-                                        <button id="destCurrBtn" class="input-group__btn" type="button" tabindex="-1">
+                                        <button id="destCurrBtn" class="btn input-group__btn" type="button" tabindex="-1">
                                             <div id="destAmountSign" class="input-group__btn-title"><?= e($form["destCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
@@ -56,15 +56,15 @@
                             <div id="exchangeRow" class="field form-row" hidden>
                                 <label for="exchangeInput" class="field__title"><?= __("TR_EXCHANGE_RATE") ?></label>
                                 <div class="input-group">
-                                    <input id="exchangeInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
-                                    <button id="exchangeSign" class="input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
+                                    <input id="exchangeInput" class="input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
+                                    <button id="exchangeSign" class="btn input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
                                 </div>
                             </div>
 
                             <div id="srcResBalanceRow" class="field form-row" hidden>
                                 <label for="srcResBalanceInput" class="field__title"><?= e($srcBalTitle) ?></label>
                                 <div class="input-group">
-                                    <input id="srcResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["srcResult"]) ?>">
+                                    <input id="srcResBalanceInput" class="input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["srcResult"]) ?>">
                                     <div id="srcResBalanceSign" class="input-group__text"><?= e($form["srcCurrSign"]) ?></div>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                             <div id="destResBalanceRow" class="field form-row" hidden>
                                 <label for="destResBalanceInput" class="field__title"><?= e($destBalTitle) ?></label>
                                 <div class="input-group">
-                                    <input id="destResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["destResult"]) ?>">
+                                    <input id="destResBalanceInput" class="input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["destResult"]) ?>">
                                     <div id="destResBalanceSign" class="input-group__text"><?= e($form["destCurrSign"]) ?></div>
                                 </div>
                             </div>
@@ -81,8 +81,8 @@
                                 <label for="dateInput" class="field__title"><?= __("TR_DATE") ?></label>
                                 <div class="column-container">
                                     <div class="input-group">
-                                        <input id="dateInput" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
-                                        <button id="dateInputBtn" class="btn icon-btn input-group__btn" type="button">
+                                        <input id="dateInput" class="input-group__input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
+                                        <button id="dateInputBtn" class="btn input-group__btn" type="button">
                                             <?= useIcon("calendar-icon", "btn__icon") ?>
                                         </button>
                                     </div>

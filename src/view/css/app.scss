@@ -10,6 +10,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
   --accent-hover-color: #1e82cc;
+  --accent-active-color: #104b79;
   --accent-disabled-color: #5082aa;
   --warning-color: #c60000;
   --warning-color-alt: #e63030;
@@ -303,6 +304,10 @@ svg * {
   --ig-text-border: var(--input-border-color);
   --ig-text-color: var(--main-text-color);
 
+  .input-group__input {
+    flex-grow: 1;
+  }
+
   .input-group__btn,
   .input-group__text {
     font-size: 1rem;
@@ -330,8 +335,14 @@ svg * {
   }
 
   .btn.input-group__btn {
-    --btn-icon-color: var(--ig-button-color);
-    --btn-hover-icon-color: var(--ig-button-color);
+    --btn-icon-color: #ffffff;
+    --btn-hover-icon-color: #ffffff;
+    --btn-title-color: #ffffff;
+    --btn-background: var(--accent-color);
+    --btn-hover-title-color: #ffffff;
+    --btn-hover-background: var(--accent-hover-color);
+    --btn-active-background: var(--accent-active-color);
+    --btn-disabled-background: var(--accent-disabled-color);
   }
 }
 
@@ -504,6 +515,7 @@ svg * {
   --btn-padding: 5px;
   --btn-background: var(--accent-color);
   --btn-hover-background: var(--accent-hover-color);
+  --btn-active-background: var(--accent-active-color);
   --btn-disabled-icon-color: var(--input-disabled-text-color);
 }
 
@@ -513,6 +525,7 @@ svg * {
   --btn-background: var(--accent-color);
   --btn-hover-title-color: #ffffff;
   --btn-hover-background: var(--accent-hover-color);
+  --btn-active-background: var(--accent-active-color);
   --btn-disabled-background: var(--accent-disabled-color);
   --btn-size: var(--input-height);
   --btn-padding: 0 24px;

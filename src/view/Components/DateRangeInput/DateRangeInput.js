@@ -58,7 +58,7 @@ export class DateRangeInput extends Component {
 
     init() {
         this.startDateInput = DateInput.create({
-            className: 'input-group__input stretch-input',
+            className: 'input-group__input',
             name: 'stdate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
@@ -73,7 +73,7 @@ export class DateRangeInput extends Component {
         });
 
         this.endDateInput = DateInput.create({
-            className: 'input-group__input stretch-input',
+            className: 'input-group__input',
             name: 'enddate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
@@ -87,7 +87,7 @@ export class DateRangeInput extends Component {
 
         this.dateInputBtn = Button.create({
             icon: 'calendar-icon',
-            className: 'input-group__btn',
+            className: 'btn input-group__btn',
             onClick: () => this.showCalendar(),
         });
 
