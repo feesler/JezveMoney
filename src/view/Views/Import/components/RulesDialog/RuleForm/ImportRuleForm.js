@@ -137,7 +137,7 @@ export class ImportRuleForm extends Component {
             getItemProps: (action, state) => this.getActionProps(action, state),
         });
 
-        this.actionsCollapse = new Collapsible({
+        this.actionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
