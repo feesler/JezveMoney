@@ -14,9 +14,6 @@
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
         "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
         "debug": "node --inspect-brk ./tests/index.js",
-        "ver-major": "node ./scripts/version.js major",
-        "ver-minor": "node ./scripts/version.js minor",
-        "ver-patch": "node ./scripts/version.js patch",
         "deploy": "node ./scripts/deploy.js",
         "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
@@ -34,9 +31,12 @@
         "build-tests": "npx webpack --progress -c ./config/webpack.tests.js",
         "build-all": "npm-run-all build build-tests",
         "release": "npm-run-all update build update-composer deploy-full",
-        "release-major": "npm-run-all ver-major release",
-        "release-minor": "npm-run-all ver-minor release",
-        "release-patch": "npm-run-all ver-patch release"
+        "ver-major": "node ./scripts/version.js major",
+        "ver-minor": "node ./scripts/version.js minor",
+        "ver-patch": "node ./scripts/version.js patch",
+        "release-major": "npm-run-all all ver-major release",
+        "release-minor": "npm-run-all all ver-minor release",
+        "release-patch": "npm-run-all all ver-patch release"
     },
     "keywords": [
         "money",
