@@ -617,7 +617,8 @@ svg * {
   display: block;
 }
 
-.validation-block.invalid-block .stretch-input {
+.validation-block.invalid-block .stretch-input,
+.validation-block.invalid-block .input-group__input {
   border-color: var(--invalid-input-border-color);
 }
 
