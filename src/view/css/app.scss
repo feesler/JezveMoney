@@ -448,9 +448,10 @@ svg * {
   padding: 24px 0 12px 0;
 }
 
-.form-controls .spinner {
-  --spinner-size: 20px;
-  --spinner-color: #dddddd;
+/* Request loading spinner indicator */
+.spinner.request-spinner {
+  --spinner-size: 1.5rem;
+  --spinner-color: var(--border-color-1);
 }
 
 .right-align-text {

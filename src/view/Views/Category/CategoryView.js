@@ -75,7 +75,7 @@ class CategoryView extends View {
         this.createParentCategorySelect();
         this.createTransactionTypeSelect();
 
-        this.spinner = Spinner.create();
+        this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 

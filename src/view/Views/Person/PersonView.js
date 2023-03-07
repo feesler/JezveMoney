@@ -68,7 +68,7 @@ class PersonView extends View {
         setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
-        this.spinner = Spinner.create();
+        this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 

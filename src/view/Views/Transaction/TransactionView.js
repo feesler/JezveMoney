@@ -424,7 +424,7 @@ class TransactionView extends View {
 
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
-        this.spinner = Spinner.create();
+        this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 
