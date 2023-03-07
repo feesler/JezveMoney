@@ -138,6 +138,7 @@ export class TransactionListView extends AppView {
         res.modeSelector = await Button.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
+        res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
 
         const transList = await query('.trans-list');
         assert(transList, 'List of transactions not found');
@@ -256,7 +257,8 @@ export class TransactionListView extends AppView {
             items: cont.selectCategoryDialog?.items.map((item) => item.id),
         };
 
-        res.loading = cont.loadingIndicator.visible;
+        res.isLoadingMore = cont.showMoreSpinner.visible;
+        res.loading = (cont.loadingIndicator.visible || res.isLoadingMore);
 
         return res;
     }
@@ -508,7 +510,10 @@ export class TransactionListView extends AppView {
             totalCounter: { visible: true, value: model.filtered.length },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: { visible: isItemsAvailable && pageNum < model.list.pages },
+            showMoreBtn: {
+                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
+            },
+            showMoreSpinner: { visible: model.isLoadingMore },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
             createBtn: { visible: listMode },

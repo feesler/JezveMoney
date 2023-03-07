@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    createElement,
     show,
     insertAfter,
     asArray,
@@ -14,6 +13,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
+import { Spinner } from 'jezvejs/Spinner';
 import { __ } from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -51,6 +51,7 @@ class TransactionListView extends View {
             ...this.props,
             form: { ...this.props.filter },
             loading: false,
+            isLoadingMore: false,
             listMode: 'list',
             showMenu: false,
             contextItem: null,
@@ -231,15 +232,14 @@ class TransactionListView extends View {
 
         const listFooter = document.querySelector('.list-footer');
         // 'Show more' button
-        this.showMoreBtn = createElement('button', {
-            props: {
-                className: 'btn show-more-btn',
-                type: 'button',
-                textContent: __('SHOW_MORE'),
-            },
-            events: { click: (e) => this.showMore(e) },
+        this.spinner = Spinner.create({ className: 'request-spinner' });
+        this.spinner.hide();
+        this.showMoreBtn = Button.create({
+            className: 'show-more-btn',
+            title: __('SHOW_MORE'),
+            onClick: (e) => this.showMore(e),
         });
-        listFooter.append(this.showMoreBtn);
+        listFooter.append(this.showMoreBtn.elem, this.spinner.elem);
 
         // Paginator
         this.paginator = Paginator.create({
@@ -433,8 +433,8 @@ class TransactionListView extends View {
     }
 
     /** Set loading state and render view */
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
+    startLoading(isLoadingMore = false) {
+        this.store.dispatch(actions.startLoading(isLoadingMore));
     }
 
     /** Remove loading state and render view */
@@ -691,6 +691,7 @@ class TransactionListView extends View {
             range,
             page,
             keepState: true,
+            isLoadingMore: true,
         });
     }
 
@@ -737,9 +738,13 @@ class TransactionListView extends View {
         this.abortController = new AbortController();
         const { signal } = this.abortController;
         let aborted = false;
-        const { keepState = false, ...request } = options;
+        const {
+            keepState = false,
+            isLoadingMore = false,
+            ...request
+        } = options;
 
-        this.startLoading();
+        this.startLoading(isLoadingMore);
 
         try {
             const result = await API.transaction.list(request, { signal });
@@ -937,7 +942,9 @@ class TransactionListView extends View {
     render(state, prevState = {}) {
         this.renderHistory(state, prevState);
 
-        if (state.loading) {
+        const loadingMore = state.loading && state.isLoadingMore;
+
+        if (state.loading && !state.isLoadingMore) {
             this.loadingIndicator.show();
         }
 
@@ -989,11 +996,12 @@ class TransactionListView extends View {
             }));
         }
 
-        show(
-            this.showMoreBtn,
+        this.showMoreBtn.show(
             state.items.length > 0
-            && pageNum < state.pagination.pagesCount,
+            && pageNum < state.pagination.pagesCount
+            && !loadingMore,
         );
+        this.spinner.show(loadingMore);
 
         const isDetails = (state.mode === 'details');
 

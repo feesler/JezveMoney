@@ -69,12 +69,12 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAllItems(newState) : newState;
     },
 
-    startLoading: (state) => (
-        (state.loading) ? state : { ...state, loading: true }
+    startLoading: (state, isLoadingMore = false) => (
+        (state.loading) ? state : { ...state, isLoadingMore, loading: true }
     ),
 
     stopLoading: (state) => (
-        (state.loading) ? { ...state, loading: false } : state
+        (state.loading) ? { ...state, loading: false, isLoadingMore: false } : state
     ),
 
     setRenderTime: (state) => ({

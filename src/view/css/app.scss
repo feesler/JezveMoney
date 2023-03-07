@@ -592,6 +592,13 @@ svg * {
   margin: 16px 0;
 }
 
+.show-more-btn + .spinner {
+  --spinner-size: 2rem;
+  --spinner-width: 5px;
+
+  margin: 16px 0;
+}
+
 /* List footer */
 .list-footer {
   display: flex;
