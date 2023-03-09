@@ -109,7 +109,7 @@ textarea {
 
 /* Desktop */
 @media (min-width: 768px) {
-  .main-navigation-offcanvas {
+  .navigation.main-navigation-offcanvas {
     --offcanvas-bg: var(--header-bg-color);
 
     top: 50px;
@@ -126,15 +126,10 @@ textarea {
     .nav-list {
       flex-flow: row nowrap;
     }
-  }
 
-  .white-theme,
-  .dark-theme {
-    .main-navigation-offcanvas {
-      a.nav-item__link,
-      a.nav-item__link:visited {
-        color: var(--header-color);
-      }
+    a.nav-item__link,
+    a.nav-item__link:visited {
+      color: var(--header-color);
     }
   }
 
