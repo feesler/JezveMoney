@@ -87,7 +87,7 @@ class ImportConditionModel extends CachedTable
      */
     protected function dataQuery()
     {
-        return $this->dbObj->selectQ("*", $this->tbl_name);
+        return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
     /**
