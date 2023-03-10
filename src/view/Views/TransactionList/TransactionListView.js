@@ -457,19 +457,54 @@ class TransactionListView extends View {
         return selected.map((item) => item.id);
     }
 
+    getListRequest(state) {
+        return {
+            ...state.form,
+            order: 'desc',
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
+    }
+
+    prepareRequest(data, state) {
+        return {
+            ...data,
+            returnState: {
+                transactions: this.getListRequest(state),
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.transactions;
+    }
+
+    setListData(data, keepState = false) {
+        const payload = {
+            ...data,
+            keepState,
+        };
+
+        this.store.dispatch(actions.listRequestLoaded(payload));
+    }
+
     /**
      * Sent AJAX request to server to change position of transaction
-     * @param {number} transactionId - identifier of transaction to change position
-     * @param {number} newPos  - new position of transaction
+     * @param {number} id - identifier of transaction to change position
+     * @param {number} pos  - new position of transaction
      */
-    async sendChangePosRequest(transactionId, newPos) {
+    async sendChangePosRequest(id, pos) {
+        const state = this.store.getState();
+
         this.startLoading();
 
         try {
-            await API.transaction.setPos(transactionId, newPos);
-            this.list.setPosition(transactionId, newPos);
+            const request = this.prepareRequest({ id, pos }, state);
+            const response = await API.transaction.setPos(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data, true);
         } catch (e) {
-            this.cancelPosChange(transactionId);
+            this.cancelPosChange();
         }
 
         this.stopLoading();
@@ -614,13 +649,16 @@ class TransactionListView extends View {
         this.startLoading();
 
         try {
-            await API.transaction.del({ id: ids });
-            this.requestTransactions(state.form);
+            const request = this.prepareRequest({ id: ids }, state);
+            const response = await API.transaction.del(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
-            this.setRenderTime();
         }
+
+        this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -657,13 +695,16 @@ class TransactionListView extends View {
         this.startLoading();
 
         try {
-            await API.transaction.setCategory({ id: ids, category_id: categoryId });
-            this.requestTransactions(state.form);
+            const request = this.prepareRequest({ id: ids, category_id: categoryId }, state);
+            const response = await API.transaction.setCategory(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
-            this.setRenderTime();
         }
+
+        this.stopLoading();
+        this.setRenderTime();
     }
 
     onChangeCategorySelect(category) {
@@ -747,13 +788,8 @@ class TransactionListView extends View {
         this.startLoading(isLoadingMore);
 
         try {
-            const result = await API.transaction.list(request, { signal });
-            const payload = {
-                ...result.data,
-                keepState,
-            };
-
-            this.store.dispatch(actions.listRequestLoaded(payload));
+            const { data } = await API.transaction.list(request, { signal });
+            this.setListData(data, keepState);
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {

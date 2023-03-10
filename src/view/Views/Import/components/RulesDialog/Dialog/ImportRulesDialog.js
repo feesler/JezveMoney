@@ -301,6 +301,34 @@ export class ImportRulesDialog extends Component {
         });
     }
 
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                importrules: {},
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.importrules?.data;
+    }
+
+    setListData(data) {
+        const { rules } = window.app.model;
+
+        rules.setData(data);
+        this.state.id = this.LIST_STATE;
+        this.state.contextItem = null;
+        this.updateList();
+
+        delete this.state.rule;
+
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate();
+        }
+    }
+
     /** Send create/update import rule request to API */
     async submitRule(data) {
         if (!data) {
@@ -310,17 +338,18 @@ export class ImportRulesDialog extends Component {
         this.startLoading();
 
         try {
-            if (data.id) {
-                await API.importRule.update(data);
-            } else {
-                await API.importRule.create(data);
-            }
+            const request = this.prepareRequest(data);
+            const response = (data.id)
+                ? await API.importRule.update(request)
+                : await API.importRule.create(request);
 
-            this.requestRulesList();
+            const rules = this.getListDataFromResponse(response);
+            this.setListData(rules);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
         }
+
+        this.stopLoading();
     }
 
     /** Send delete import rule request to API */
@@ -333,42 +362,29 @@ export class ImportRulesDialog extends Component {
         this.startLoading();
 
         try {
-            await API.importRule.del(id);
-            this.requestRulesList();
+            const request = this.prepareRequest({ id });
+            const response = await API.importRule.del(request);
+            const rules = this.getListDataFromResponse(response);
+            this.setListData(rules);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
         }
+
+        this.stopLoading();
     }
 
     /** Send API request to obain list of import rules */
     async requestRulesList() {
-        const { rules } = window.app.model;
+        this.startLoading();
 
         try {
             const result = await API.importRule.list({ extended: true });
-            if (!Array.isArray(result.data)) {
-                const errorMessage = (result && 'msg' in result)
-                    ? result.msg
-                    : __('ERR_RULE_LIST_READ');
-                throw new Error(errorMessage);
-            }
-
-            rules.setData(result.data);
-            this.state.id = this.LIST_STATE;
-            this.state.contextItem = null;
-            this.updateList();
-
-            delete this.state.rule;
-            this.stopLoading();
-
-            if (isFunction(this.props.onUpdate)) {
-                this.props.onUpdate();
-            }
+            this.setListData(result.data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
         }
+
+        this.stopLoading();
     }
 
     renderContextMenu(state) {

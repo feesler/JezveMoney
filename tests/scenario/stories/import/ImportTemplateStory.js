@@ -232,7 +232,7 @@ export class ImportTemplateStory extends TestStory {
             comment_col: 4,
         });
         // Remove first account
-        await api.account.del(account1);
+        await api.account.del({ id: account1 });
         await App.state.fetch();
         // Reload page
         await App.view.navigateToImport();

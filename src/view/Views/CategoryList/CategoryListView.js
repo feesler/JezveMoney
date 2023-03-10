@@ -392,27 +392,53 @@ class CategoryListView extends View {
         this.startLoading();
 
         try {
-            await API.category.del({ id: ids, removeChild });
-            this.requestList();
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-            this.stopLoading();
-        }
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        try {
-            const { data } = await API.category.list();
-            window.app.model.categories.setData(data);
-
-            this.store.dispatch(actions.listRequestLoaded(keepState));
+            const request = this.prepareRequest({ id: ids, removeChild });
+            const response = await API.category.del(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+    }
+
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
+        this.startLoading();
+
+        try {
+            const request = this.getListRequest();
+            const { data } = await API.category.list(request);
+            this.setListData(data, keepState);
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+    }
+
+    getListRequest() {
+        return {};
+    }
+
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                categories: this.getListRequest(),
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.categories?.data;
+    }
+
+    setListData(data, keepState = false) {
+        window.app.model.categories.setData(data);
+        this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
     async requestItem() {
@@ -474,12 +500,20 @@ class CategoryListView extends View {
         this.startLoading();
 
         try {
-            await API.category.setPos(itemId, newPos, parentId);
-            this.requestList({ keepState: true });
+            const request = this.prepareRequest({
+                id: itemId,
+                pos: newPos,
+                parent_id: parentId,
+            });
+
+            const response = await API.category.setPos(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data, true);
         } catch (e) {
-            this.cancelPosChange(itemId);
-            this.stopLoading();
+            this.cancelPosChange();
         }
+
+        this.stopLoading();
     }
 
     /**

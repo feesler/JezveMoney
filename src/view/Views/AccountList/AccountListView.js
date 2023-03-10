@@ -394,16 +394,18 @@ class AccountListView extends View {
         this.startLoading();
 
         try {
-            if (value) {
-                await API.account.show({ id: ids });
-            } else {
-                await API.account.hide({ id: ids });
-            }
-            this.requestList();
+            const request = this.prepareRequest({ id: ids });
+            const response = (value)
+                ? await API.account.show(request)
+                : await API.account.hide(request);
+
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
         }
+
+        this.stopLoading();
     }
 
     async deleteItems() {
@@ -420,29 +422,56 @@ class AccountListView extends View {
         this.startLoading();
 
         try {
-            await API.account.del({ id: ids });
-            this.requestList();
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-            this.stopLoading();
-        }
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        try {
-            const { data } = await API.account.list({ visibility: 'all' });
-            window.app.model.accounts.setData(data);
-            window.app.model.userAccounts = null;
-            window.app.checkUserAccountModels();
-
-            this.store.dispatch(actions.listRequestLoaded(keepState));
+            const request = this.prepareRequest({ id: ids });
+            const response = await API.account.del(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+    }
+
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
+        this.startLoading();
+
+        try {
+            const request = this.getListRequest();
+            const { data } = await API.account.list(request);
+            this.setListData(data, keepState);
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+    }
+
+    getListRequest() {
+        return { visibility: 'all' };
+    }
+
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                accounts: this.getListRequest(),
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.accounts?.data;
+    }
+
+    setListData(data, keepState = false) {
+        window.app.model.accounts.setData(data);
+        window.app.model.userAccounts = null;
+        window.app.checkUserAccountModels();
+
+        this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
     async requestItem() {
@@ -463,19 +492,22 @@ class AccountListView extends View {
 
     /**
      * Sent API request to server to change position of account
-     * @param {number} itemId - identifier of item to change position
-     * @param {number} newPos  - new position of item
+     * @param {number} id - identifier of item to change position
+     * @param {number} pos - new position of item
      */
-    async sendChangePosRequest(itemId, newPos) {
+    async sendChangePosRequest(id, pos) {
         this.startLoading();
 
         try {
-            await API.account.setPos(itemId, newPos);
-            this.requestList({ keepState: true });
+            const request = this.prepareRequest({ id, pos });
+            const response = await API.account.setPos(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data, true);
         } catch (e) {
-            this.cancelPosChange(itemId);
-            this.stopLoading();
+            this.cancelPosChange();
         }
+
+        this.stopLoading();
     }
 
     /**

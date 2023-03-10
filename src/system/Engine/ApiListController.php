@@ -2,6 +2,8 @@
 
 namespace JezveMoney\Core;
 
+use JezveMoney\App\API\Controller\State;
+
 /**
  * Base API list controller
  */
@@ -115,13 +117,78 @@ class ApiListController extends ApiController
     }
 
     /**
+     * Obtains state request from specified API request data and returns result
+     *
+     * @param array $request API request data
+     *
+     * @return array|null
+     */
+    protected function getStateRequest(array $request)
+    {
+        $stateRequest = $request["returnState"] ?? null;
+        if (is_null($stateRequest)) {
+            return null;
+        }
+
+        return (is_string($stateRequest))
+            ? JSON::decode($stateRequest, true)
+            : $stateRequest;
+    }
+
+    /**
+     * Returns state for specified request
+     *
+     * @param array $request API request data
+     *
+     * @return array|null
+     */
+    protected function getState(array $request)
+    {
+        $stateRequest = $this->getStateRequest($request);
+        if (is_null($stateRequest)) {
+            return null;
+        }
+
+        $stateController = new State();
+        return $stateController->getData($stateRequest);
+    }
+
+    /**
+     * Performs state result for specified request
+     *
+     * @param array $request request data
+     *
+     * @return array|null
+     */
+    protected function getStateResult(array $request)
+    {
+        $state = $this->getState($request);
+        return (is_null($state)) ? null : ["state" => $state];
+    }
+
+    /**
      * Performs controller-specific actions after new item successfully created
      *
      * @param int|int[]|null $item_id id or array of created item ids
      * @param array $request create request data
+     *
+     * @return mixed
      */
     protected function postCreate(mixed $item_id, array $request)
     {
+        $result = [];
+        if (is_array($item_id)) {
+            $result["ids"] = $item_id;
+        } else {
+            $result["id"] = $item_id;
+        }
+
+        $state = $this->getState($request);
+        if (!is_null($state)) {
+            $result["state"] = $state;
+        }
+
+        return $result;
     }
 
     /**
@@ -158,11 +225,11 @@ class ApiListController extends ApiController
             throw new \Error($this->createErrorMsg);
         }
 
-        $this->postCreate($item_id, $request);
+        $result = $this->postCreate($item_id, $request);
 
         $this->commit();
 
-        $this->ok(["id" => $item_id]);
+        $this->ok($result);
     }
 
     /**
@@ -207,11 +274,11 @@ class ApiListController extends ApiController
             throw new \Error($this->createErrorMsg);
         }
 
-        $this->postCreate($ids, $request);
+        $result = $this->postCreate($ids, $request);
 
         $this->commit();
 
-        $this->ok(["ids" => $ids]);
+        $this->ok($result);
     }
 
     /**
@@ -233,6 +300,8 @@ class ApiListController extends ApiController
      */
     protected function postUpdate(array $request)
     {
+        $state = $this->getState($request);
+        return (is_null($state)) ? null : ["state" => $state];
     }
 
     /**
@@ -269,11 +338,22 @@ class ApiListController extends ApiController
             throw new \Error($this->updateErrorMsg);
         }
 
-        $this->postUpdate($request);
+        $result = $this->postUpdate($request);
 
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
+    }
+
+    /**
+     * Performs controller-specific actions after items successfully removed
+     *
+     * @param array $request request data
+     */
+    protected function postDelete(array $request)
+    {
+        $state = $this->getState($request);
+        return (is_null($state)) ? null : ["state" => $state];
     }
 
     /**
@@ -302,8 +382,11 @@ class ApiListController extends ApiController
             throw new \Error($this->deleteErrorMsg);
         }
 
+        $request = $this->getRequestData();
+        $result = $this->postDelete($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 }

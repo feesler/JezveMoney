@@ -28,6 +28,9 @@ const MONTHS_IN_YEAR = 12;
 const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
 
+const availFilters = ['type', 'accounts', 'persons', 'categories', 'startDate', 'endDate', 'search'];
+const arrayFilters = ['type', 'accounts', 'persons', 'categories'];
+
 const availGroupTypes = ['day', 'week', 'month', 'year'];
 
 const defaultReportType = 'category';
@@ -335,6 +338,22 @@ export class TransactionsList extends SortableList {
         const isDesc = params.order?.toLowerCase() === 'desc';
         if (!isDesc) {
             res.data = res.sortAsc();
+        }
+
+        return res;
+    }
+
+    getFilter(params) {
+        const res = {};
+
+        for (const filter in params) {
+            if (availFilters.includes(filter)) {
+                const filterValue = params[filter];
+
+                res[filter] = (arrayFilters.includes(filter))
+                    ? asArray(filterValue)
+                    : filterValue;
+            }
         }
 
         return res;

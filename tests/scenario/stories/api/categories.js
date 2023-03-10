@@ -37,6 +37,32 @@ const create = async () => {
     ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
 };
 
+const createWithChainedRequest = async () => {
+    setBlock('Create categories with chained request', 2);
+
+    const data = [{
+        name: 'Services chained',
+        parent_id: 0,
+        type: EXPENSE,
+        returnState: {
+            categories: {},
+        },
+    }, {
+        name: 'Beauty chained',
+        parent_id: 0,
+        type: EXPENSE,
+        returnState: {
+            accounts: { visibility: 'visible' },
+            categories: {},
+        },
+    }];
+
+    [
+        App.scenario.SCV_CHAINED_CATEGORY,
+        App.scenario.BEAUTY_CHAINED_CATEGORY,
+    ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
+};
+
 const createInvalid = async () => {
     setBlock('Create categories with invalid data', 2);
 
@@ -138,6 +164,31 @@ const update = async () => {
     return App.scenario.runner.runGroup(CategoryApiTests.update, data);
 };
 
+const updateWithChainedRequest = async () => {
+    setBlock('Update categories with chained request', 2);
+
+    const {
+        SCV_CHAINED_CATEGORY,
+        BEAUTY_CHAINED_CATEGORY,
+    } = App.scenario;
+
+    const data = [{
+        id: SCV_CHAINED_CATEGORY,
+        name: 'Services',
+        returnState: {
+            categories: { parent_id: App.scenario.FOOD_CATEGORY },
+        },
+    }, {
+        id: BEAUTY_CHAINED_CATEGORY,
+        name: 'Beauty',
+        returnState: {
+            categories: { parent_id: 0 },
+        },
+    }];
+
+    return App.scenario.runner.runGroup(CategoryApiTests.update, data);
+};
+
 const updateInvalid = async () => {
     setBlock('Update categories with invalid data', 2);
 
@@ -172,6 +223,23 @@ const setPos = async () => {
         { id: SHOP_CATEGORY, pos: 2, parent_id: INVEST_CATEGORY },
         { id: SHOP_CATEGORY, pos: 4, parent_id: 0 },
     ];
+
+    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
+};
+
+const setPosWithChainedRequest = async () => {
+    setBlock('Set position with chained request', 2);
+
+    const { SCV_CHAINED_CATEGORY } = App.scenario;
+
+    const data = [{
+        id: SCV_CHAINED_CATEGORY,
+        pos: 5,
+        parent_id: 0,
+        returnState: {
+            categories: { parent_id: 0 },
+        },
+    }];
 
     await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
 };
@@ -216,6 +284,22 @@ const del = async () => {
     await CategoryApiTests.del([BIKE_CATEGORY, LEARN_CATEGORY]);
 };
 
+const delWithChainedRequest = async () => {
+    setBlock('Delete categories with chained request', 2);
+
+    const {
+        SCV_CHAINED_CATEGORY,
+        BEAUTY_CHAINED_CATEGORY,
+    } = App.scenario;
+
+    await CategoryApiTests.del({
+        id: [SCV_CHAINED_CATEGORY, BEAUTY_CHAINED_CATEGORY],
+        returnState: {
+            categories: {},
+        },
+    });
+};
+
 const delInvalid = async () => {
     setBlock('Delete categories with invalid data', 2);
 
@@ -231,6 +315,7 @@ const delInvalid = async () => {
 export const apiCategoriesTests = {
     async createTests() {
         await create();
+        await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
@@ -238,10 +323,13 @@ export const apiCategoriesTests = {
 
     async updateAndDeleteTests() {
         await update();
+        await updateWithChainedRequest();
         await updateInvalid();
         await setPos();
+        await setPosWithChainedRequest();
         await setPosInvalid();
         await del();
+        await delWithChainedRequest();
         await delInvalid();
     },
 };

@@ -9,6 +9,7 @@
             </label>
             <input class="stretch-input" name="owner" type="text" disabled>
         </div>
+
         <div class="std_margin">
             <label class="checkbox">
                 <input type="checkbox" data-target="visibility">
@@ -21,6 +22,7 @@
                 <option value="hidden">Hidden</option>
             </select>
         </div>
+
         <div class="std_margin">
             <label class="checkbox">
                 <input type="checkbox" data-target="sort">
@@ -31,6 +33,7 @@
                 <option value="visibility">Visibility</option>
             </select>
         </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -55,22 +58,36 @@
             <label for="create_account_name">Name</label>
             <input id="create_account_name" class="stretch-input" name="name" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_account_initbalance">Initial balance</label>
             <input id="create_account_initbalance" class="stretch-input" name="initbalance" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_account_curr">Currency (1-5, 10-22)</label>
             <input id="create_account_curr" class="stretch-input" name="curr_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_account_icon">Icon (1-6; 0 - no icon)</label>
             <input id="create_account_icon" class="stretch-input" name="icon_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
             <input id="create_account_flags" class="stretch-input" name="flags" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -84,18 +101,22 @@
             <label for="update_account_id">Id</label>
             <input id="update_account_id" class="stretch-input" name="id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_account_name">Name</label>
             <input id="update_account_name" class="stretch-input" name="name" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_account_initbalance">Initial balance</label>
             <input id="update_account_initbalance" class="stretch-input" name="initbalance" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_account_curr">Currency (1-5, 10-22)</label>
             <input id="update_account_curr" class="stretch-input" name="curr_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_account_icon">Icon (1-6; 0 - no icon)</label>
             <input id="update_account_icon" class="stretch-input" name="icon_id" type="text">
@@ -104,6 +125,16 @@
             <label for="update_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
             <input id="update_account_flags" class="stretch-input" name="flags" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -112,13 +143,25 @@
 
 <div id="delAccForm" class="request-data-form">
     <h3>Delete accounts</h3>
-    <div class="std_margin">
-        <label for="delaccounts">Accounts (comma separated ids)</label>
-        <input id="delaccounts" class="stretch-input" type="text">
-    </div>
-    <div class="form-controls">
-        <input id="delaccbtn" class="btn submit-btn" type="button" value="Submit">
-    </div>
+    <form action="<?= BASEURL ?>api/account/delete" method="post">
+        <div class="std_margin">
+            <label for="delaccounts">Accounts (comma separated ids)</label>
+            <input id="delaccounts" class="stretch-input" name="id" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
+        <div class="form-controls">
+            <input id="delaccbtn" class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
 </div>
 
 <div id="setAccPosForm" class="request-data-form">
@@ -131,6 +174,14 @@
         <div class="std_margin">
             <label for="acc_pos_pos">Position</label>
             <input id="acc_pos_pos" class="stretch-input" name="pos" type="text">
+        </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">

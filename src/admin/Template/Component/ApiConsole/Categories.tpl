@@ -7,7 +7,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Parent category</span>
             </label>
-            <inpu class="stretch-input" name="parent_id" type="text" value="" disabled>
+            <input class="stretch-input" name="parent_id" type="text" value="" disabled>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -41,6 +41,14 @@
             <label for="create_category_type">Transaction type (0 for any)</label>
             <input id="create_category_type" class="stretch-input" name="type" type="text">
         </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -66,6 +74,14 @@
             <label for="update_category_type">Transaction type (0 for any)</label>
             <input id="update_category_type" class="stretch-input" name="type" type="text">
         </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -74,18 +90,28 @@
 
 <div id="delCategoryForm" class="request-data-form">
     <h3>Delete categories</h3>
-    <div class="std_margin">
-        <label for="delCategories">Categories (comma separated ids)</label>
-        <input id="delCategories" class="stretch-input" type="text">
-    </div>
-    <label id="delSubCategoriesCheck" class="checkbox std_margin">
-        <input type="checkbox" checked>
-        <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-        <span class="checkbox__label">Delete child categories</span>
-    </label>
-    <div class="form-controls">
-        <input id="delCategoriesBtn" class="btn submit-btn" type="submit" value="Submit">
-    </div>
+    <form action="<?= BASEURL ?>api/category/delete" method="post">
+        <div class="std_margin">
+            <label for="delCategories">Categories (comma separated ids)</label>
+            <input id="delCategories" class="stretch-input" name="id" type="text">
+        </div>
+        <label class="checkbox std_margin">
+            <input type="checkbox" name="removeChild" checked>
+            <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+            <span class="checkbox__label">Delete child categories</span>
+        </label>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
 </div>
 
 <div id="setCategoryPosForm" class="request-data-form">
@@ -102,6 +128,14 @@
         <div class="std_margin">
             <label for="category_pos_parent">Parent category</label>
             <input id="category_pos_parent" class="stretch-input" name="parent_id" type="text">
+        </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">

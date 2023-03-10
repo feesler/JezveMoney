@@ -40,6 +40,7 @@ const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TY
 
 /** Transactions */
 const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
+const trAvailFields = [...trReqFields, 'id', 'person_id', 'acc_id', 'op'];
 
 /** Import templates */
 const tplReqFields = [
@@ -130,7 +131,8 @@ export class AppState {
         if (!this.transactions) {
             this.transactions = TransactionsList.create();
         }
-        this.transactions.setData(state.transactions.data);
+        const transactions = state.transactions?.items ?? state.transactions.data;
+        this.transactions.setData(transactions);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.categories) {
@@ -142,14 +144,16 @@ export class AppState {
         if (!this.templates) {
             this.templates = ImportTemplateList.create();
         }
-        this.templates.setData(state.templates.data);
-        this.templates.autoincrement = state.templates.autoincrement;
+        const templates = state.importtemplates ?? state.templates;
+        this.templates.setData(templates.data);
+        this.templates.autoincrement = templates.autoincrement;
 
         if (!this.rules) {
             this.rules = ImportRuleList.create();
         }
-        this.rules.setData(state.rules.data);
-        this.rules.autoincrement = state.rules.autoincrement;
+        const rules = state.importrules ?? state.rules;
+        this.rules.setData(rules.data);
+        this.rules.autoincrement = rules.autoincrement;
 
         this.profile = copyObject(state.profile);
     }
@@ -180,18 +184,22 @@ export class AppState {
         return res;
     }
 
-    /* eslint-disable no-console */
-    compareLists(local, expected) {
-        assert(local.data.length === expected.data.length);
-
-        const noDatesData = expected.data.map((item) => {
-            const res = item;
+    getNoDatesList(data) {
+        return data.map((item) => {
+            const res = { ...item };
             delete res.createdate;
             delete res.updatedate;
             return res;
         });
+    }
+
+    /* eslint-disable no-console */
+    compareLists(local, expected) {
+        const noDatesData = this.getNoDatesList(expected.data);
 
         try {
+            assert(local.data.length === expected.data.length);
+
             assert.deepMeet(local.data, noDatesData);
         } catch (e) {
             console.log('Local: ', local.data);
@@ -241,18 +249,18 @@ export class AppState {
                 ? this.accounts
                 : this.accounts.getUserAccounts();
 
-            const ids = accountsToDelete.getIds();
-            this.deleteAccounts(ids);
+            const id = accountsToDelete.getIds();
+            this.deleteAccounts({ id });
         }
 
         if (resetPersons) {
-            const ids = this.persons?.getIds();
-            this.deletePersons(ids);
+            const id = this.persons?.getIds();
+            this.deletePersons({ id });
         }
 
         if ('categories' in options) {
-            const ids = this.categories?.getIds();
-            this.deleteCategories(ids);
+            const id = this.categories?.getIds();
+            this.deleteCategories({ id });
         }
 
         if ('transactions' in options) {
@@ -293,6 +301,217 @@ export class AppState {
     deleteProfile() {
         this.resetAll();
         delete this.profile;
+    }
+
+    getCurrencies() {
+        const res = {
+            data: this.getNoDatesList(App.currency.data),
+        };
+
+        return res;
+    }
+
+    getIcons() {
+        const res = {
+            data: this.getNoDatesList(App.icons.data),
+        };
+
+        return res;
+    }
+
+    getAccounts(options = {}) {
+        let {
+            visibility = 'visible',
+        } = options;
+
+        visibility = visibility?.toLowerCase();
+
+        const res = {};
+
+        if (visibility === 'visible') {
+            res.data = this.accounts.getUserVisible(true);
+        } else if (visibility === 'hidden') {
+            res.data = this.accounts.getUserHidden(true);
+        } else if (visibility === 'all') {
+            res.data = this.accounts.getUserAccounts(true);
+        } else {
+            throw new Error(`Invalid visibility value: ${options.visibility}`);
+        }
+
+        res.data = this.getNoDatesList(res.data);
+
+        return res;
+    }
+
+    getPersons(options = {}) {
+        let {
+            visibility = 'visible',
+        } = options;
+
+        visibility = visibility?.toLowerCase();
+
+        const res = {};
+
+        if (visibility === 'visible') {
+            res.data = this.persons.getVisible(true);
+        } else if (visibility === 'hidden') {
+            res.data = this.persons.getHidden(true);
+        } else if (visibility === 'all') {
+            res.data = this.persons.data;
+        } else {
+            throw new Error(`Invalid visibility value: ${options.visibility}`);
+        }
+
+        res.data = this.getNoDatesList(res.data);
+
+        return res;
+    }
+
+    getCategories(options = {}) {
+        const res = {};
+
+        if ('parent_id' in options) {
+            res.data = this.categories.findByParent(options.parent_id);
+        } else {
+            res.data = this.categories.data;
+        }
+
+        res.data = this.getNoDatesList(res.data);
+        res.data.sort((a, b) => a.id - b.id);
+
+        return res;
+    }
+
+    getImportTemplates() {
+        const res = {
+            data: copyObject(this.templates.data),
+        };
+
+        return res;
+    }
+
+    getImportRules() {
+        const res = {
+            data: this.rules.map((item) => item.toPlain()),
+        };
+
+        return res;
+    }
+
+    getProfile() {
+        return copyObject(this.profile);
+    }
+
+    getTransactions(options = {}) {
+        const defaultOptions = {
+            onPage: 10,
+        };
+
+        const request = {
+            ...defaultOptions,
+            ...options,
+        };
+
+        const filtered = this.transactions.applyFilter(request);
+        let items = filtered.clone();
+        const { onPage } = request;
+
+        if ('page' in request || 'range' in request || 'onPage' in request) {
+            const targetPage = request.page ?? 1;
+            const targetRange = request.range ?? 1;
+            items = items.getPage(targetPage, request.onPage, targetRange);
+        }
+
+        const isDesc = request.order?.toLowerCase() === 'desc';
+        if (!isDesc) {
+            items.data = items.sortAsc();
+        }
+
+        const res = {
+            items: this.getNoDatesList(items.data),
+            filter: this.transactions.getFilter(request),
+            order: request.order ?? 'asc',
+            pagination: {
+                total: filtered.length,
+                onPage,
+                pagesCount: Math.ceil(filtered.length / onPage),
+                page: request.page ?? 1,
+            },
+        };
+
+        if (request.range) {
+            res.pagination.range = request.range;
+        }
+
+        return res;
+    }
+
+    getStatistics(options = {}) {
+        const defaultOptions = {
+            type: EXPENSE,
+            report: 'currency',
+            group: 'week',
+            limit: 5,
+        };
+
+        const request = {
+            ...defaultOptions,
+            ...options,
+        };
+
+        const res = this.transactions.getStatistics(request);
+        return res;
+    }
+
+    getState(request) {
+        const res = {};
+
+        if (request.currency) {
+            res.currency = this.getCurrency(App.currency);
+        }
+        if (request.icons) {
+            res.icons = this.getIcons(App.icons);
+        }
+        if (request.accounts) {
+            res.accounts = this.getAccounts(request.accounts);
+        }
+        if (request.persons) {
+            res.persons = this.getPersons(request.persons);
+        }
+        if (request.transactions) {
+            res.transactions = this.getTransactions(request.transactions);
+        }
+        if (request.statistics) {
+            res.statistics = this.getStatistics(request.statistics);
+        }
+        if (request.categories) {
+            res.categories = this.getCategories(request.categories);
+        }
+        if (request.importtemplates) {
+            res.categories = this.getImportTemplates(request.importtemplates);
+        }
+        if (request.importrules) {
+            res.importrules = this.getImportRules(request.importrules);
+        }
+        if (request.profile) {
+            res.profile = this.getProfile();
+        }
+
+        return res;
+    }
+
+    prepareChainedRequestData(request) {
+        if (!request?.returnState?.transactions) {
+            return request;
+        }
+
+        return {
+            ...request,
+            returnState: {
+                ...request.returnState,
+                transactions: this.getTransactionsListRequest(request.returnState.transactions),
+            },
+        };
     }
 
     isValidSettings(settings) {
@@ -366,7 +585,12 @@ export class AppState {
         const item = this.accounts.getItemByIndex(ind);
         this.updatePersonAccounts();
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     updateAccount(params) {
@@ -400,11 +624,16 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deleteAccounts(accountIds) {
-        const ids = asArray(accountIds).map((id) => parseInt(id, 10));
+    deleteAccounts(params) {
+        const ids = asArray(params?.id).map((id) => parseInt(id, 10));
         if (!ids.length) {
             return false;
         }
@@ -422,12 +651,17 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     /* eslint-disable no-bitwise */
-    showAccounts(ids, show = true) {
-        const itemIds = asArray(ids);
+    showAccounts(params, show = true) {
+        const itemIds = asArray(params?.id);
 
         for (const accountId of itemIds) {
             const account = this.accounts.getItem(accountId);
@@ -444,7 +678,12 @@ export class AppState {
             this.accounts.update(account);
         }
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
     /* eslint-enable no-bitwise */
 
@@ -458,7 +697,16 @@ export class AppState {
             return false;
         }
 
-        return this.accounts.setPos(id, pos);
+        if (!this.accounts.setPos(id, pos)) {
+            return false;
+        }
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     cacheUserAccounts() {
@@ -584,7 +832,12 @@ export class AppState {
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     updatePerson(params) {
@@ -604,11 +857,16 @@ export class AppState {
 
         this.persons.update(expPerson);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deletePersons(personIds) {
-        const ids = asArray(personIds);
+    deletePersons(params) {
+        const ids = asArray(params?.id);
         if (!ids.length) {
             return false;
         }
@@ -627,12 +885,17 @@ export class AppState {
         this.accounts.deleteItems(accountsToDelete);
         this.transactions.updateResults(this.accounts);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     /* eslint-disable no-bitwise */
-    showPersons(ids, show = true) {
-        const itemIds = asArray(ids);
+    showPersons(params, show = true) {
+        const itemIds = asArray(params?.id);
         for (const personId of itemIds) {
             const person = this.persons.getItem(personId);
             if (!person) {
@@ -648,7 +911,12 @@ export class AppState {
             this.persons.update(person);
         }
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
     /* eslint-enable no-bitwise */
 
@@ -662,7 +930,16 @@ export class AppState {
             return false;
         }
 
-        return this.persons.setPos(id, pos);
+        if (!this.persons.setPos(id, pos)) {
+            return false;
+        }
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     getPersonAccounts(personId) {
@@ -831,7 +1108,12 @@ export class AppState {
         const item = this.categories.getItemByIndex(ind);
         this.categories.sortByParent();
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     updateCategory(params) {
@@ -869,11 +1151,16 @@ export class AppState {
 
         this.categories.sortByParent();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deleteCategories(categoryIds, removeChildren = true) {
-        const ids = asArray(categoryIds);
+    deleteCategories(params) {
+        const ids = asArray(params?.id);
         if (!ids.length) {
             return false;
         }
@@ -887,6 +1174,7 @@ export class AppState {
             this.categories.findByParent(id).map((item) => item.id)
         ));
 
+        const removeChildren = params.removeChildren ?? true;
         if (removeChildren) {
             categoriesToDelete.push(...childrenCategories);
         } else {
@@ -908,7 +1196,12 @@ export class AppState {
 
         this.categories.sortByParent();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     setCategoryPos(params) {
@@ -921,7 +1214,16 @@ export class AppState {
             return false;
         }
 
-        return this.categories.setPos(id, pos, params.parent_id);
+        if (!this.categories.setPos(id, pos, params.parent_id)) {
+            return false;
+        }
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     getSortedCategories() {
@@ -1129,8 +1431,47 @@ export class AppState {
         return res;
     }
 
+    /** Prepares transaction list request parameters */
+    getTransactionsListRequest(params) {
+        const res = {};
+
+        if ('order' in params) {
+            res.order = params.order;
+        }
+        if ('type' in params) {
+            res.type = params.type;
+        }
+        if ('accounts' in params) {
+            res.acc_id = params.accounts;
+        }
+        if ('persons' in params) {
+            res.person_id = params.persons;
+        }
+        if ('categories' in params) {
+            res.category_id = params.categories;
+        }
+        if ('startDate' in params && 'endDate' in params) {
+            res.stdate = params.startDate;
+            res.enddate = params.endDate;
+        }
+        if ('search' in params) {
+            res.search = params.search;
+        }
+        if ('onPage' in params) {
+            res.count = params.onPage;
+        }
+        if ('page' in params) {
+            res.page = params.page;
+        }
+        if ('range' in params) {
+            res.range = params.range;
+        }
+
+        return res;
+    }
+
     getExpectedTransaction(params) {
-        const res = copyObject(params);
+        const res = copyFields(params, trAvailFields);
         if (!res.date) {
             res.date = App.datesSec.now;
         }
@@ -1200,7 +1541,12 @@ export class AppState {
 
         const item = this.transactions.getItemByIndex(ind);
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     updateTransaction(params) {
@@ -1233,11 +1579,16 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deleteTransactions(transactionIds) {
-        const ids = asArray(transactionIds);
+    deleteTransactions(params) {
+        const ids = asArray(params?.id);
         if (!ids.length) {
             return false;
         }
@@ -1253,11 +1604,16 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    setTransactionCategory({ id, category }) {
-        const ids = asArray(id);
+    setTransactionCategory(params) {
+        const ids = asArray(params?.id);
         if (ids.length === 0) {
             return false;
         }
@@ -1266,26 +1622,40 @@ export class AppState {
             return false;
         }
 
-        const categoryId = parseInt(category, 10);
-        if (categoryId !== 0 && !this.categories.getItem(category)) {
+        const categoryId = parseInt(params.category, 10);
+        if (categoryId !== 0 && !this.categories.getItem(params.category)) {
             return false;
         }
 
-        return this.transactions.setCategory(id, category);
+        if (!this.transactions.setCategory(params.id, params.category)) {
+            return false;
+        }
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    setTransactionPos({ id, pos }) {
-        if (!parseInt(id, 10) || !parseInt(pos, 10)) {
+    setTransactionPos(params) {
+        if (!parseInt(params?.id, 10) || !parseInt(params?.pos, 10)) {
             return false;
         }
 
-        if (!this.transactions.setPos(id, pos)) {
+        if (!this.transactions.setPos(params.id, params.pos)) {
             return false;
         }
 
         this.transactions.updateResults(this.accounts);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     isAvailableTransactionType(type) {
@@ -1381,7 +1751,12 @@ export class AppState {
         const ind = this.templates.create(data);
         const item = this.templates.getItemByIndex(ind);
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     getUpdateTemplateRequest(params) {
@@ -1431,13 +1806,20 @@ export class AppState {
             return false;
         }
 
-        this.templates.update(expTemplate);
+        if (!this.templates.update(expTemplate)) {
+            return false;
+        }
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deleteTemplates(templateIds) {
-        const ids = asArray(templateIds);
+    deleteTemplates(params) {
+        const ids = asArray(params?.id);
         if (!ids.length) {
             return false;
         }
@@ -1448,7 +1830,12 @@ export class AppState {
         this.rules.deleteTemplate(ids);
         this.templates.deleteItems(ids);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     /**
@@ -1499,7 +1886,12 @@ export class AppState {
         const ind = this.rules.create(data);
         const item = this.rules.getItemByIndex(ind);
 
-        return item.id;
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     updateRule(params) {
@@ -1522,11 +1914,16 @@ export class AppState {
 
         this.rules.update(expRule);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
-    deleteRules(ruleIds) {
-        const ids = asArray(ruleIds);
+    deleteRules(params) {
+        const ids = asArray(params?.id);
         if (!ids.length) {
             return false;
         }
@@ -1536,6 +1933,11 @@ export class AppState {
 
         this.rules.deleteItems(ids);
 
-        return true;
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 }

@@ -19,6 +19,30 @@ const create = async () => {
     ] = await App.scenario.runner.runGroup(PersonApiTests.create, data);
 };
 
+const createWithChainedRequest = async () => {
+    setBlock('Create persons with chained request', 2);
+
+    const data = [{
+        name: 'Person Z',
+        flags: 0,
+        returnState: {
+            persons: { visibility: 'visible' },
+        },
+    }, {
+        name: 'AA',
+        flags: 0,
+        returnState: {
+            persons: { visibility: 'all' },
+            accounts: { visibility: 'all' },
+        },
+    }];
+
+    [
+        App.scenario.PERSON_CHAINED_Z,
+        App.scenario.PERSON_CHAINED_AA,
+    ] = await App.scenario.runner.runGroup(PersonApiTests.create, data);
+};
+
 const createInvalid = async () => {
     setBlock('Create persons with invalid data', 2);
 
@@ -93,6 +117,22 @@ const update = async () => {
     return App.scenario.runner.runGroup(PersonApiTests.update, data);
 };
 
+const updateWithChainedRequest = async () => {
+    setBlock('Update persons with chained request', 2);
+
+    const data = [
+        {
+            id: App.scenario.PERSON_CHAINED_Z,
+            name: 'Zzz',
+            returnState: {
+                persons: { visibility: 'hidden' },
+            },
+        },
+    ];
+
+    return App.scenario.runner.runGroup(PersonApiTests.update, data);
+};
+
 const updateInvalid = async () => {
     setBlock('Update persons with invalid data', 2);
 
@@ -119,6 +159,24 @@ const setPos = async () => {
     await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
 };
 
+const setPosWithChainedRequest = async () => {
+    setBlock('Set position with chained request', 2);
+
+    const { PERSON_CHAINED_AA } = App.scenario;
+
+    const data = [
+        {
+            id: PERSON_CHAINED_AA,
+            pos: 15,
+            returnState: {
+                persons: { visibility: 'all' },
+            },
+        },
+    ];
+
+    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+};
+
 const setPosInvalid = async () => {
     setBlock('Set position with invalid data', 2);
 
@@ -140,7 +198,25 @@ const del = async () => {
     setBlock('Delete persons', 2);
 
     const data = [
-        [App.scenario.PERSON_Y],
+        { id: App.scenario.PERSON_Y },
+    ];
+
+    return App.scenario.runner.runGroup(PersonApiTests.del, data);
+};
+
+const delWithChainedRequest = async () => {
+    setBlock('Delete persons with chained request', 2);
+
+    const { PERSON_CHAINED_Z, PERSON_CHAINED_AA } = App.scenario;
+
+    const data = [
+        {
+            id: [PERSON_CHAINED_Z, PERSON_CHAINED_AA],
+            returnState: {
+                persons: { visibility: 'all' },
+                accounts: { visibility: 'all' },
+            },
+        },
     ];
 
     return App.scenario.runner.runGroup(PersonApiTests.del, data);
@@ -161,6 +237,7 @@ const delInvalid = async () => {
 export const apiPersonsTests = {
     async createTests() {
         await create();
+        await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
@@ -168,10 +245,13 @@ export const apiPersonsTests = {
 
     async updateAndDeleteTests() {
         await update();
+        await updateWithChainedRequest();
         await updateInvalid();
         await setPos();
+        await setPosWithChainedRequest();
         await setPosInvalid();
         await del();
+        await delWithChainedRequest();
         await delInvalid();
     },
 };

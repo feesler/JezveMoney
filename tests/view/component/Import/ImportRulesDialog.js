@@ -8,7 +8,6 @@ import {
     prop,
     evaluate,
     click,
-    isVisible,
     wait,
     waitForFunction,
     asyncMap,
@@ -77,9 +76,6 @@ export class ImportRulesDialog extends TestComponent {
         );
 
         res.paginator = await Paginator.create(res.rulesList.elem, await query('.paginator'));
-
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
-        res.rulesList.visible = await isVisible(res.rulesList.elem, true);
 
         const ruleFormElem = await query(this.elem, '.rule-form');
         if (ruleFormElem) {
@@ -338,7 +334,7 @@ export class ImportRulesDialog extends TestComponent {
         assert.arrayIndex(this.content.items, ind);
 
         const id = App.state.rules.indexToId(ind);
-        App.state.deleteRules(id);
+        App.state.deleteRules({ id });
 
         this.expectedState = this.getExpectedState(this.model);
 
@@ -411,7 +407,7 @@ export class ImportRulesDialog extends TestComponent {
                 invalidAction.feedbackVisible = true;
             }
         }
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState(this.model);
 
         const prevTime = this.model.renderTime;
 
@@ -431,7 +427,7 @@ export class ImportRulesDialog extends TestComponent {
         });
 
         await App.state.fetchAndTest();
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async cancelRule() {

@@ -237,7 +237,6 @@
     "MSG_TPL_DATE": "Select column for date",
     "MSG_TPL_COMMENT": "Select column for comment",
     "MSG_TPL_NOT_MATCH": "Template does not match data",
-    "ERR_TPL_LIST_READ": "Fail to read list of import templates",
     "ERR_CONVERT_ACCOUNT_CURRENCY": "Failed to convert data. Account currency must match the main account currency.",
     "ERR_CONVERT_ACCOUNT_AMOUNT": "Failed to convert data. Invalid account amount value.",
     "ERR_CONVERT_TR_AMOUNT": "Failed to convert data. Invalid transaction amount value.",

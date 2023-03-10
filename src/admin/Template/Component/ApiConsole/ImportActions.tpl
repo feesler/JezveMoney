@@ -40,14 +40,26 @@
             <label for="create_act_rule">Parent rule id</label>
             <input id="create_act_rule" class="stretch-input" name="rule_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_act_type">Action type (1-6)</label>
             <input id="create_act_type" class="stretch-input" name="action_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="create_act_value">Value</label>
             <input id="create_act_value" class="stretch-input" name="value" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -61,18 +73,31 @@
             <label for="update_act_id">Id</label>
             <input id="update_act_id" class="stretch-input" name="id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_act_rule">Parent rule id</label>
             <input id="update_act_rule" class="stretch-input" name="rule_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_act_type">Action type (1-6)</label>
             <input id="update_act_type" class="stretch-input" name="action_id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="update_act_value">Value</label>
             <input id="update_act_value" class="stretch-input" name="value" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -81,11 +106,23 @@
 
 <div id="delActForm" class="request-data-form">
     <h3>Delete import actions</h3>
-    <div class="std_margin">
-        <label for="delactions">Rules (comma separated ids)</label>
-        <input id="delactions" class="stretch-input" type="text">
-    </div>
-    <div class="form-controls">
-        <input id="delactbtn" class="btn submit-btn" type="button" value="Submit">
-    </div>
+    <form action="<?= BASEURL ?>api/importaction/delete" method="post">
+        <div class="std_margin">
+            <label for="delactions">Actions (comma separated ids)</label>
+            <input id="delactions" class="stretch-input" name="id" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
+        <div class="form-controls">
+            <input id="delactbtn" class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
 </div>

@@ -13,6 +13,7 @@ class AdminIconListView extends AdminListView {
         super(...args);
 
         this.apiController = 'icon';
+        this.statePath = 'icons';
         this.deleteConfirmMessage = 'Are you sure want to delete selected icon?';
     }
 

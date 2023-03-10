@@ -164,6 +164,15 @@
             <input id="create_trans_comment" class="stretch-input" name="comment" type="text">
         </div>
 
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -218,6 +227,15 @@
         <div class="std_margin">
             <label for="create_debt_comment">Comment</label>
             <input id="create_debt_comment" class="stretch-input" name="comment" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
         </div>
 
         <div class="form-controls">
@@ -278,6 +296,15 @@
         <div class="std_margin">
             <label for="update_trans_comment">Comment</label>
             <input id="update_trans_comment" class="stretch-input" name="comment" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
         </div>
 
         <div class="form-controls">
@@ -342,6 +369,15 @@
             <input id="update_debt_comment" class="stretch-input" name="comment" type="text">
         </div>
 
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -350,14 +386,25 @@
 
 <div id="delTrForm" class="request-data-form">
     <h3>Delete transactions</h3>
-    <div class="std_margin">
-        <label for="deltransactions">Transactions (comma separated ids)</label>
-        <input id="deltransactions" class="stretch-input" type="text">
-    </div>
+    <form action="<?= BASEURL ?>api/transaction/delete" method="post">
+        <div class="std_margin">
+            <label for="deltransactions">Transactions (comma separated ids)</label>
+            <input id="deltransactions" class="stretch-input" name="id" type="text">
+        </div>
 
-    <div class="form-controls">
-        <input id="deltransbtn" class="btn submit-btn" type="button" value="Submit">
-    </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
 </div>
 
 <div id="setTrCategoryForm" class="request-data-form">
@@ -367,10 +414,21 @@
             <label for="trans_setCategory_id">Id</label>
             <input id="trans_setCategory_id" class="stretch-input" name="id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="trans_setCategory_category_id">Category id</label>
             <input id="trans_setCategory_category_id" class="stretch-input" name="category_id" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -384,10 +442,21 @@
             <label for="trans_pos_id">Id</label>
             <input id="trans_pos_id" class="stretch-input" name="id" type="text">
         </div>
+
         <div class="std_margin">
             <label for="trans_pos_pos">Position</label>
             <input id="trans_pos_pos" class="stretch-input" name="pos" type="text">
         </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>

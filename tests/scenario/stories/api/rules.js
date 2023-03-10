@@ -172,6 +172,27 @@ const create = async () => {
     ] = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
 };
 
+const createWithChainedRequest = async () => {
+    setBlock('Create import rule with chained request', 2);
+
+    const data = [{
+        flags: 0,
+        conditions: [
+            conditions.comment.includes.value('Chained'),
+        ],
+        actions: [
+            actions.setComment('Chained rule'),
+        ],
+        returnState: {
+            importrules: {},
+        },
+    }];
+
+    [
+        App.scenario.RULE_CHAINED,
+    ] = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
+};
+
 const update = async () => {
     setBlock('Update import rule', 2);
 
@@ -223,12 +244,47 @@ const update = async () => {
     await App.scenario.runner.runGroup(ImportRuleApiTests.update, data);
 };
 
+const updateWithChainedRequest = async () => {
+    setBlock('Update import rule with chained request', 2);
+
+    const data = [{
+        id: App.scenario.RULE_CHAINED,
+        conditions: [
+            conditions.comment.includes.value('Chained'),
+        ],
+        actions: [
+            actions.setComment('Concatenated'),
+        ],
+        returnState: {
+            importrules: {},
+            accounts: { visibility: 'visible' },
+        },
+    }];
+
+    await App.scenario.runner.runGroup(ImportRuleApiTests.update, data);
+};
+
 const del = async () => {
     setBlock('Delete import rule', 2);
 
     const data = [
-        [App.scenario.RULE_3],
-        [App.scenario.RULE_1, App.scenario.RULE_2],
+        { id: App.scenario.RULE_3 },
+        { id: [App.scenario.RULE_1, App.scenario.RULE_2] },
+    ];
+
+    await App.scenario.runner.runGroup(ImportRuleApiTests.del, data);
+};
+
+const delWithChainedRequest = async () => {
+    setBlock('Delete import rule with chained request', 2);
+
+    const data = [
+        {
+            id: App.scenario.RULE_CHAINED,
+            returnState: {
+                importrules: {},
+            },
+        },
     ];
 
     await App.scenario.runner.runGroup(ImportRuleApiTests.del, data);
@@ -239,7 +295,10 @@ export const apiImportRulesTests = {
         setBlock('Import rule', 1);
 
         await create();
+        await createWithChainedRequest();
         await update();
+        await updateWithChainedRequest();
         await del();
+        await delWithChainedRequest();
     },
 };

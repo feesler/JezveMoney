@@ -28,6 +28,8 @@ class AdminApiConsoleView extends AdminView {
         this.activeController = null;
         this.activeFormLink = null;
         this.activeForm = null;
+
+        this.defaultSubmitHandler = (e) => this.onFormSubmit(e);
     }
 
     /**
@@ -86,29 +88,31 @@ class AdminApiConsoleView extends AdminView {
         checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
     }
 
+    /** Initialization of create/update form */
+    initForm(selector, handler = null) {
+        const form = document.querySelector(selector);
+        if (!form) {
+            throw new Error('Failed to initialize form');
+        }
+
+        setEvents(form, { submit: handler ?? this.defaultSubmitHandler });
+        this.initCheckboxes(form);
+    }
+
+    /** Initialization of delete form */
+    initDeleteForm(selector) {
+        this.initForm(selector, (e) => this.onDeleteItemsSubmit(e));
+    }
+
     /** Initialization of forms for State API controller */
     initCommonForms() {
-        const readStateForm = document.querySelector('#readStateForm > form');
-        if (!readStateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readStateForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const mainStateForm = document.querySelector('#mainStateForm > form');
-        if (!mainStateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(mainStateForm, { submit: (e) => this.onFormSubmit(e) });
+        this.initForm('#readStateForm > form');
+        this.initForm('#mainStateForm > form');
     }
 
     /** Initialization of forms for Account API controller */
     initAccountForms() {
-        const listAccForm = document.querySelector('#listAccForm > form');
-        if (!listAccForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listAccForm, { submit: this.getVerifyHandler(apiTypes.isAccountsArray) });
-        this.initCheckboxes(listAccForm);
+        this.initForm('#listAccForm > form', this.getVerifyHandler(apiTypes.isAccountsArray));
 
         const readaccbtn = ge('readaccbtn');
         if (!readaccbtn) {
@@ -120,40 +124,15 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createAccForm = document.querySelector('#createAccForm > form');
-        if (!createAccForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createAccForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateAccForm = document.querySelector('#updateAccForm > form');
-        if (!updateAccForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateAccForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delaccbtn = ge('delaccbtn');
-        if (!delaccbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delaccbtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delaccounts', 'account/delete') });
-
-        // Set account position form
-        const setPosForm = document.querySelector('#setAccPosForm > form');
-        if (!setPosForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
+        this.initForm('#createAccForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateAccForm > form');
+        this.initDeleteForm('#delAccForm > form');
+        this.initForm('#setAccPosForm > form');
     }
 
     /** Initialization of forms for Person API controller */
     initPersonForms() {
-        const listPersonsForm = document.querySelector('#listPersonsForm > form');
-        if (!listPersonsForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listPersonsForm, { submit: this.getVerifyHandler(apiTypes.isPersonsArray) });
-        this.initCheckboxes(listPersonsForm);
+        this.initForm('#listPersonsForm > form', this.getVerifyHandler(apiTypes.isPersonsArray));
 
         const readpersonbtn = ge('readpersonbtn');
         if (!readpersonbtn) {
@@ -165,42 +144,18 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createPersonForm = document.querySelector('#createPersonForm > form');
-        if (!createPersonForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createPersonForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updatePersonForm = document.querySelector('#updatePersonForm > form');
-        if (!updatePersonForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updatePersonForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delpersonbtn = ge('delpersonbtn');
-        if (!delpersonbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delpersonbtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delpersons', 'person/delete') });
-
-        // Set person position form
-        const setPosForm = document.querySelector('#setPersonPosForm > form');
-        if (!setPosForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
+        this.initForm('#createPersonForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updatePersonForm > form');
+        this.initDeleteForm('#delPersonForm > form');
+        this.initForm('#setPersonPosForm > form');
     }
 
     /** Initialization of forms for Category API controller */
     initCategoryForms() {
-        const listCategoriesForm = document.querySelector('#listCategoriesForm > form');
-        if (!listCategoriesForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listCategoriesForm, {
-            submit: this.getVerifyHandler(apiTypes.isCategoriesArray),
-        });
-        this.initCheckboxes(listCategoriesForm);
+        this.initForm(
+            '#listCategoriesForm > form',
+            this.getVerifyHandler(apiTypes.isCategoriesArray),
+        );
 
         const readCategoryBtn = ge('readCategoryBtn');
         if (!readCategoryBtn) {
@@ -212,43 +167,15 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createCategoryForm = document.querySelector('#createCategoryForm > form');
-        if (!createCategoryForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createCategoryForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateCategoryForm = document.querySelector('#updateCategoryForm > form');
-        if (!updateCategoryForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateCategoryForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delCategoriesBtn = ge('delCategoriesBtn');
-        if (!delCategoriesBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delCategoriesBtn, {
-            click: (e) => this.onDeleteCategoriesSubmit(e, 'delCategories', 'category/delete'),
-        });
-
-        // Set category position form
-        const setPosForm = document.querySelector('#setCategoryPosForm > form');
-        if (!setPosForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(setPosForm, { submit: (e) => this.onFormSubmit(e) });
+        this.initForm('#createCategoryForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateCategoryForm > form');
+        this.initForm('#delCategoryForm > form', (e) => this.onDeleteCategoriesSubmit(e));
+        this.initForm('#setCategoryPosForm > form');
     }
 
     /** Initialization of forms for Transaction API controller */
     initTransactionForms() {
-        // Transactions list form
-        const listTrForm = document.querySelector('#listTrForm > form');
-        if (!listTrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listTrForm, { submit: (e) => this.onListTransactionSubmit(e) });
-        this.initCheckboxes(listTrForm);
+        this.initForm('#listTrForm > form', (e) => this.onListTransactionSubmit(e));
 
         // Read transactions by ids form
         const readtransbtn = ge('readtransbtn');
@@ -261,64 +188,15 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        // Create transaction form
-        const createTrForm = document.querySelector('#createTrForm > form');
-        if (!createTrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createTrForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
+        this.initForm('#createTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#createDebtForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateTrForm > form');
+        this.initForm('#updateDebtForm > form');
+        this.initDeleteForm('#delTrForm > form');
+        this.initForm('#setTrCategoryForm > form', (e) => this.onSetCategorySubmit(e));
+        this.initForm('#setTrPosForm > form');
+        this.initForm('#statisticsForm > form', (e) => this.onStatisticsSubmit(e));
 
-        // Create debt transaction form
-        const createDebtForm = document.querySelector('#createDebtForm > form');
-        if (!createDebtForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createDebtForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        // Update transaction form
-        const updateTrForm = document.querySelector('#updateTrForm > form');
-        if (!updateTrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateTrForm, { submit: (e) => this.onFormSubmit(e) });
-
-        // Update debt transaction form
-        const updateDebtForm = document.querySelector('#updateDebtForm > form');
-        if (!updateDebtForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateDebtForm, { submit: (e) => this.onFormSubmit(e) });
-
-        // Delete transactions form
-        const deltransbtn = ge('deltransbtn');
-        if (!deltransbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(deltransbtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'deltransactions', 'transaction/delete'),
-        });
-
-        // Set transactions category form
-        const setTrCategoryForm = document.querySelector('#setTrCategoryForm > form');
-        if (!setTrCategoryForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(setTrCategoryForm, { submit: (e) => this.onSetCategorySubmit(e) });
-
-        // Set transaction position form
-        const setTrPosForm = document.querySelector('#setTrPosForm > form');
-        if (!setTrPosForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(setTrPosForm, { submit: (e) => this.onFormSubmit(e) });
-
-        // Statistics form
-        const statisticsForm = document.querySelector('#statisticsForm > form');
-        if (!statisticsForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(statisticsForm, { submit: (e) => this.onStatisticsSubmit(e) });
-        this.initCheckboxes(statisticsForm);
         const statisticsFilter = ge('statistics-filter');
         setEvents(statisticsFilter, {
             change: () => {
@@ -332,11 +210,7 @@ class AdminApiConsoleView extends AdminView {
 
     /** Initialization of forms for Import template API controller */
     initTemplateForms() {
-        const listForm = document.querySelector('#listTplForm > form');
-        if (!listForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listForm, { submit: this.getVerifyHandler(apiTypes.isTemplatesArray) });
+        this.initForm('#listTplForm > form', this.getVerifyHandler(apiTypes.isTemplatesArray));
 
         const readBtn = ge('readtplbtn');
         if (!readBtn) {
@@ -348,36 +222,14 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = document.querySelector('#createTplForm > form');
-        if (!createForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateForm = document.querySelector('#updateTplForm > form');
-        if (!updateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delBtn = ge('deltplbtn');
-        if (!delBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delBtn, {
-            click: (e) => (
-                this.onDeleteItemsSubmit(e, 'deltemplates', 'importtpl/delete')
-            ),
-        });
+        this.initForm('#createTplForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateTplForm > form');
+        this.initDeleteForm('#delTplForm > form');
     }
 
     /** Initialization of forms for Import rules API controller */
     initRuleForms() {
-        const listForm = document.querySelector('#listRuleForm > form');
-        if (!listForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listForm, { submit: this.getVerifyHandler(apiTypes.isImportRulesArray) });
+        this.initForm('#listRuleForm > form', this.getVerifyHandler(apiTypes.isImportRulesArray));
 
         const readBtn = ge('readrulebtn');
         if (!readBtn) {
@@ -389,35 +241,14 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = document.querySelector('#createRuleForm > form');
-        if (!createForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateForm = document.querySelector('#updateRuleForm > form');
-        if (!updateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delBtn = ge('delrulebtn');
-        if (!delBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delBtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'delrules', 'importrule/delete'),
-        });
+        this.initForm('#createRuleForm > form', (e) => this.onRuleFormSubmit(e, apiTypes.isCreateResult));
+        this.initForm('#updateRuleForm > form', (e) => this.onRuleFormSubmit(e));
+        this.initDeleteForm('#delRuleForm > form');
     }
 
     /** Initialization of forms for Import conditions API controller */
     initConditionForms() {
-        const listForm = document.querySelector('#listCondForm > form');
-        if (!listForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listForm, { submit: this.getVerifyHandler(apiTypes.isConditionsArray) });
-        this.initCheckboxes(listForm);
+        this.initForm('#listCondForm > form', this.getVerifyHandler(apiTypes.isConditionsArray));
 
         const readBtn = ge('readcondbtn');
         if (!readBtn) {
@@ -429,35 +260,14 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = document.querySelector('#createCondForm > form');
-        if (!createForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateForm = document.querySelector('#updateCondForm > form');
-        if (!updateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delBtn = ge('delcondbtn');
-        if (!delBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delBtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'delconds', 'importcond/delete'),
-        });
+        this.initForm('#createCondForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateCondForm > form');
+        this.initDeleteForm('#delCondForm > form');
     }
 
     /** Initialization of forms for Import actions API controller */
     initActionForms() {
-        const listForm = document.querySelector('#listActForm > form');
-        if (!listForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listForm, { submit: this.getVerifyHandler(apiTypes.isActionsArray) });
-        this.initCheckboxes(listForm);
+        this.initForm('#listActForm > form', this.getVerifyHandler(apiTypes.isActionsArray));
 
         const readBtn = ge('readactbtn');
         if (!readBtn) {
@@ -469,34 +279,14 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = document.querySelector('#createActForm > form');
-        if (!createForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateForm = document.querySelector('#updateActForm > form');
-        if (!updateForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delBtn = ge('delactbtn');
-        if (!delBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delBtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'delactions', 'importaction/delete'),
-        });
+        this.initForm('#createActForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateActForm > form');
+        this.initDeleteForm('#delActForm > form');
     }
 
     /** Initialization of forms for Currency API controller */
     initCurrencyForms() {
-        const getCurrForm = document.querySelector('#listCurrForm > form');
-        if (!getCurrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(getCurrForm, { submit: this.getVerifyHandler(apiTypes.isCurrenciesArray) });
+        this.initForm('#listCurrForm > form', this.getVerifyHandler(apiTypes.isCurrenciesArray));
 
         const readCurrBtn = ge('readcurrbtn');
         if (!readCurrBtn) {
@@ -508,34 +298,14 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createCurrForm = document.querySelector('#createCurrForm > form');
-        if (!createCurrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createCurrForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateCurrForm = document.querySelector('#updateCurrForm > form');
-        if (!updateCurrForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateCurrForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delCurrBtn = ge('delcurrbtn');
-        if (!delCurrBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delCurrBtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'delcurrencies', 'currency/delete'),
-        });
+        this.initForm('#createCurrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateCurrForm > form');
+        this.initDeleteForm('#delCurrForm > form');
     }
 
     /** Initialization of forms for Icon API controller */
     initIconForms() {
-        const listIconForm = document.querySelector('#listIconForm > form');
-        if (!listIconForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(listIconForm, { submit: this.getVerifyHandler(apiTypes.isIconsArray) });
+        this.initForm('#listIconForm > form', this.getVerifyHandler(apiTypes.isIconsArray));
 
         const readIconBtn = ge('read_icon_btn');
         if (!readIconBtn) {
@@ -547,25 +317,9 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createIconForm = document.querySelector('#createIconForm > form');
-        if (!createIconForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(createIconForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
-
-        const updateIconForm = document.querySelector('#updateIconForm > form');
-        if (!updateIconForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateIconForm, { submit: (e) => this.onFormSubmit(e) });
-
-        const delIconBtn = ge('deliconbtn');
-        if (!delIconBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(delIconBtn, {
-            click: (e) => this.onDeleteItemsSubmit(e, 'del_icons', 'icon/delete'),
-        });
+        this.initForm('#createIconForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateIconForm > form');
+        this.initDeleteForm('#delIconForm > form');
     }
 
     /** Initialization of forms for User API controller */
@@ -729,6 +483,10 @@ class AdminApiConsoleView extends AdminView {
         const frmData = this.getFormData(formEl);
         if (!frmData) {
             return;
+        }
+
+        if (typeof frmData.returnState === 'string') {
+            frmData.returnState = JSON.parse(frmData.returnState);
         }
 
         const request = {
@@ -918,22 +676,29 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Send delete items request */
-    onDeleteItemsSubmit(e, inputId, method) {
-        if (typeof method !== 'string') {
-            throw new Error('Invalid parameters');
-        }
-
+    onDeleteItemsSubmit(e, verifyCallback) {
         e.preventDefault();
-        const itemsInp = ge(inputId);
-        if (!itemsInp) {
+
+        const formEl = e.target;
+        const frmData = this.getFormData(formEl);
+        if (!frmData) {
             return;
         }
 
-        this.apiRequest({
-            httpMethod: 'POST',
-            method,
-            data: this.parseIds(itemsInp.value),
-        });
+        frmData.id = this.parseIds(frmData.id).id;
+
+        if (typeof frmData.returnState === 'string') {
+            frmData.returnState = JSON.parse(frmData.returnState);
+        }
+
+        const request = {
+            httpMethod: formEl.method,
+            method: formEl.action,
+            data: frmData,
+            verify: verifyCallback,
+        };
+
+        this.apiRequest(request);
     }
 
     /** Update settings form 'submit' event handler */
@@ -1023,6 +788,10 @@ class AdminApiConsoleView extends AdminView {
 
         frmData.id = this.parseIds(frmData.id).id;
 
+        if (typeof frmData.returnState === 'string') {
+            frmData.returnState = JSON.parse(frmData.returnState);
+        }
+
         this.apiRequest({
             httpMethod: 'post',
             method: 'transaction/setCategory',
@@ -1031,27 +800,64 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Send delete categories request */
-    onDeleteCategoriesSubmit(e, inputId, method) {
-        if (typeof method !== 'string') {
-            throw new Error('Invalid parameters');
-        }
-
+    onDeleteCategoriesSubmit(e, verifyCallback) {
         e.preventDefault();
-        const itemsInp = ge(inputId);
-        if (!itemsInp) {
+
+        const formEl = e.target;
+        const frmData = this.getFormData(formEl);
+        if (!frmData) {
             return;
         }
 
-        const data = this.parseIds(itemsInp.value);
+        frmData.id = this.parseIds(frmData.id).id;
+        frmData.removeChild = !!frmData.removeChild;
 
-        const checkbox = document.querySelector('#delSubCategoriesCheck > input');
-        data.removeChild = checkbox.checked;
+        if (typeof frmData.returnState === 'string') {
+            frmData.returnState = JSON.parse(frmData.returnState);
+        }
 
-        this.apiRequest({
-            httpMethod: 'POST',
-            method,
-            data,
-        });
+        const request = {
+            httpMethod: formEl.method,
+            method: formEl.action,
+            data: frmData,
+            verify: verifyCallback,
+        };
+
+        this.apiRequest(request);
+    }
+
+    /**
+     * Import rule form submit event handler
+     * @param {Event} e - submit event object
+     * @param {Function} verifyCallback - response verification callback
+     */
+    onRuleFormSubmit(e, verifyCallback) {
+        e.preventDefault();
+
+        const formEl = e.target;
+        const frmData = this.getFormData(formEl);
+        if (!frmData) {
+            return;
+        }
+
+        if (typeof frmData.conditions === 'string') {
+            frmData.conditions = JSON.parse(frmData.conditions);
+        }
+        if (typeof frmData.actions === 'string') {
+            frmData.actions = JSON.parse(frmData.actions);
+        }
+        if (typeof frmData.returnState === 'string') {
+            frmData.returnState = JSON.parse(frmData.returnState);
+        }
+
+        const request = {
+            httpMethod: formEl.method,
+            method: formEl.action,
+            data: frmData,
+            verify: verifyCallback,
+        };
+
+        this.apiRequest(request);
     }
 }
 

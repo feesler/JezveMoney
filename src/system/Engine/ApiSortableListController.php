@@ -11,6 +11,17 @@ class ApiSortableListController extends ApiListController
     protected $changePosFields = ["id", "pos"];
 
     /**
+     * Performs controller-specific actions after position successfully updated
+     *
+     * @param array $request request data
+     */
+    protected function postSetPos(array $request)
+    {
+        $state = $this->getState($request);
+        return (is_null($state)) ? null : ["state" => $state];
+    }
+
+    /**
      * Updates position of item
      */
     public function setPos()
@@ -31,8 +42,10 @@ class ApiSortableListController extends ApiListController
             throw new \Error($this->changePosErrorMsg);
         }
 
+        $result = $this->postSetPos($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 }

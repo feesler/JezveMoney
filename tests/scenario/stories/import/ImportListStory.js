@@ -491,7 +491,7 @@ export class ImportListStory extends TestStory {
             { action: 'inputDestAmount', data: '1' },
         );
         // Remove selected account
-        await api.account.del(ACC_3);
+        await api.account.del({ id: ACC_3 });
 
         await ImportTests.submit();
     }

@@ -218,28 +218,28 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('account/update', options);
-            return true;
+            const response = await apiPost('account/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('account/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('account/delete', options);
+            return response.data ?? {};
         },
 
-        async show(ids) {
-            await apiPost('account/show', { id: asArray(ids) });
-            return true;
+        async show(options) {
+            const response = await apiPost('account/show', options);
+            return response.data ?? {};
         },
 
-        async hide(ids) {
-            await apiPost('account/hide', { id: asArray(ids) });
-            return true;
+        async hide(options) {
+            const response = await apiPost('account/hide', options);
+            return response.data ?? {};
         },
 
         async setPos(options) {
-            await apiPost('account/setpos', options);
-            return true;
+            const response = await apiPost('account/setpos', options);
+            return response.data ?? {};
         },
 
         async list(full) {
@@ -271,28 +271,28 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('person/update', options);
-            return true;
+            const response = await apiPost('person/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('person/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('person/delete', options);
+            return response.data ?? {};
         },
 
-        async show(ids) {
-            await apiPost('person/show', { id: asArray(ids) });
-            return true;
+        async show(options) {
+            const response = await apiPost('person/show', options);
+            return response.data ?? {};
         },
 
-        async hide(ids) {
-            await apiPost('person/hide', { id: asArray(ids) });
-            return true;
+        async hide(options) {
+            const response = await apiPost('person/hide', options);
+            return response.data ?? {};
         },
 
         async setPos(options) {
-            await apiPost('person/setpos', options);
-            return true;
+            const response = await apiPost('person/setpos', options);
+            return response.data ?? {};
         },
 
         async list() {
@@ -319,18 +319,18 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('category/update', options);
-            return true;
+            const response = await apiPost('category/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids, removeChild = true) {
-            await apiPost('category/delete', { id: asArray(ids), removeChild });
-            return true;
+        async del(options) {
+            const response = await apiPost('category/delete', options);
+            return response.data ?? {};
         },
 
         async setPos(options) {
-            await apiPost('category/setpos', options);
-            return true;
+            const response = await apiPost('category/setpos', options);
+            return response.data ?? {};
         },
 
         async list(options = {}) {
@@ -358,13 +358,13 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('transaction/update', options);
-            return true;
+            const response = await apiPost('transaction/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('transaction/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('transaction/delete', options);
+            return response.data ?? {};
         },
 
         async list(params = {}) {
@@ -379,13 +379,13 @@ export const api = {
         },
 
         async setCategory(options) {
-            await apiPost('transaction/setCategory', options);
-            return true;
+            const response = await apiPost('transaction/setCategory', options);
+            return response.data ?? {};
         },
 
         async setPos(options) {
-            await apiPost('transaction/setpos', options);
-            return true;
+            const response = await apiPost('transaction/setpos', options);
+            return response.data ?? {};
         },
 
         async statistics(options = {}) {
@@ -408,13 +408,13 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('importrule/update', options);
-            return true;
+            const response = await apiPost('importrule/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('importrule/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('importrule/delete', options);
+            return response.data ?? {};
         },
 
         async list(params = {}) {
@@ -442,13 +442,13 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('importcond/update', options);
-            return true;
+            const response = await apiPost('importcond/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('importcond/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('importcond/delete', options);
+            return response.data ?? {};
         },
 
         async list() {
@@ -476,13 +476,13 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('importaction/update', options);
-            return true;
+            const response = await apiPost('importaction/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('importaction/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('importaction/delete', options);
+            return response.data ?? {};
         },
 
         async list() {
@@ -510,13 +510,13 @@ export const api = {
         },
 
         async update(options) {
-            await apiPost('importtpl/update', options);
-            return true;
+            const response = await apiPost('importtpl/update', options);
+            return response.data ?? {};
         },
 
-        async del(ids) {
-            await apiPost('importtpl/delete', { id: asArray(ids) });
-            return true;
+        async del(options) {
+            const response = await apiPost('importtpl/delete', options);
+            return response.data ?? {};
         },
 
         async list() {

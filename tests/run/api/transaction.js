@@ -25,19 +25,18 @@ import { App } from '../../Application.js';
 export const create = async (params) => {
     let transactionId = 0;
 
+    const typeStr = Transaction.typeToString(params.type);
     const titleParams = copyObject(params);
     delete titleParams.type;
 
-    await test(`Create ${Transaction.typeToString(params.type)} transaction (${formatProps(titleParams)})`, async () => {
+    await test(`Create ${typeStr} transaction (${formatProps(titleParams)})`, async () => {
         const resExpected = App.state.createTransaction(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         let createRes;
         try {
-            createRes = await api.transaction.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.transaction.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -61,7 +60,7 @@ export const createMultiple = async (params) => {
     await test('Create multiple transactions', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
-            expectedResult = [];
+            expectedResult = { ids: [] };
             const origState = App.state.clone();
 
             for (const item of params) {
@@ -72,17 +71,14 @@ export const createMultiple = async (params) => {
                     break;
                 }
 
-                expectedResult.push(resExpected);
+                expectedResult.ids.push(resExpected.id);
             }
         }
 
-        // Send API sequest to server
         let createRes;
         try {
             createRes = await api.transaction.createMultiple(params);
-            if (expectedResult && (!createRes || !createRes.ids)) {
-                return false;
-            }
+            assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
                 throw e;
@@ -136,23 +132,17 @@ export const update = async (params) => {
     await test(`Update transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.updateTransaction(params);
 
-        // Obtain data for API request
-        let updParams = { date: App.datesSec.now, comment: '' };
         const expTrans = App.state.transactions.getItem(params.id);
+        const updParams = (expTrans)
+            ? App.state.transactionToRequest(expTrans)
+            : { date: App.datesSec.now, comment: '' };
+        Object.assign(updParams, params);
 
-        if (expTrans) {
-            updParams = App.state.transactionToRequest(expTrans);
-        }
-        if (!resExpected) {
-            Object.assign(updParams, params);
-        }
+        const reqParams = App.state.prepareChainedRequestData(updParams);
 
-        // Send API sequest to server
         try {
-            updateRes = await api.transaction.update(updParams);
-            if (resExpected !== updateRes) {
-                return false;
-            }
+            updateRes = await api.transaction.update(reqParams);
+            assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -169,18 +159,16 @@ export const update = async (params) => {
  * Delete specified transaction(s) and check expected state of app
  * @param {number[]} ids - array of transaction identificators
  */
-export const del = async (ids) => {
+export const del = async (params) => {
     let deleteRes;
 
-    await test(`Delete transaction (${ids})`, async () => {
-        const resExpected = App.state.deleteTransactions(ids);
+    await test(`Delete transaction (${params})`, async () => {
+        const resExpected = App.state.deleteTransactions(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            deleteRes = await api.transaction.del(ids);
-            if (resExpected !== deleteRes) {
-                return false;
-            }
+            deleteRes = await api.transaction.del(reqParams);
+            assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -200,16 +188,15 @@ export const setCategory = async (params) => {
     await test(`Set category of transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.setTransactionCategory(params);
 
-        // Send API sequest to server
-        const request = {
-            id: params.id,
-            category_id: params.category,
-        };
+        let reqParams = copyObject(params);
+        reqParams.category_id = reqParams.category;
+        delete reqParams.category;
+
+        reqParams = App.state.prepareChainedRequestData(reqParams);
+
         try {
-            result = await api.transaction.setCategory(request);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.transaction.setCategory(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -228,13 +215,11 @@ export const setPos = async (params) => {
 
     await test(`Set position of transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.setTransactionPos(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.transaction.setPos(params);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.transaction.setPos(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -252,9 +237,10 @@ export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
-        if ('page' in params || 'onPage' in params) {
-            const targetPage = ('page' in params) ? params.page : 1;
-            expTransList = expTransList.getPage(targetPage, params.onPage);
+        if ('page' in params || 'range' in params || 'onPage' in params) {
+            const targetPage = params.page ?? 1;
+            const targetRange = params.range ?? 1;
+            expTransList = expTransList.getPage(targetPage, params.onPage, targetRange);
         }
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at TransactionsList.setData()
@@ -264,36 +250,7 @@ export const filter = async (params) => {
         }
 
         // Prepare request parameters
-        const reqParams = {};
-
-        if ('order' in params) {
-            reqParams.order = params.order;
-        }
-        if ('type' in params) {
-            reqParams.type = params.type;
-        }
-        if ('accounts' in params) {
-            reqParams.acc_id = params.accounts;
-        }
-        if ('persons' in params) {
-            reqParams.person_id = params.persons;
-        }
-        if ('categories' in params) {
-            reqParams.category_id = params.categories;
-        }
-        if ('startDate' in params && 'endDate' in params) {
-            reqParams.stdate = params.startDate;
-            reqParams.enddate = params.endDate;
-        }
-        if ('search' in params) {
-            reqParams.search = params.search;
-        }
-        if ('onPage' in params) {
-            reqParams.count = params.onPage;
-        }
-        if ('page' in params) {
-            reqParams.page = params.page;
-        }
+        const reqParams = App.state.getTransactionsListRequest(params);
 
         // Send API sequest to server
         const trList = await api.transaction.list(reqParams);

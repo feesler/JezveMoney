@@ -71,9 +71,12 @@ class Person extends ApiSortableListController
             throw new \Error(__("ERR_PERSON_SHOW"));
         }
 
+        $request = $this->getRequestData();
+        $result = $this->getStateResult($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 
     /**
@@ -96,8 +99,11 @@ class Person extends ApiSortableListController
             throw new \Error(__("ERR_PERSON_HIDE"));
         }
 
+        $request = $this->getRequestData();
+        $result = $this->getStateResult($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 }

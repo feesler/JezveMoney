@@ -157,6 +157,39 @@ const create = async () => {
     ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
 };
 
+const createWithChainedRequest = async () => {
+    setBlock('Create transactions with chained request', 2);
+
+    const { EUR, ACC_RUB } = App.scenario;
+
+    const data = [{
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 10,
+        comment: 'Chained',
+        returnState: {
+            transactions: {},
+        },
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 4588,
+        dest_amount: 50,
+        dest_curr: EUR,
+        comment: 'Chained 2',
+        returnState: {
+            transactions: {
+                type: EXPENSE,
+            },
+        },
+    }];
+
+    [
+        App.scenario.TR_EXPENSE_CHAINED_1,
+        App.scenario.TR_EXPENSE_CHAINED_2,
+    ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+};
+
 const createInvalid = async () => {
     setBlock('Create transactions with invalid data', 2);
 
@@ -472,6 +505,34 @@ const update = async () => {
     await App.scenario.runner.runGroup(TransactionApiTests.update, data);
 };
 
+const updateWithChainedRequest = async () => {
+    setBlock('Update transactions with chained request', 3);
+
+    const {
+        USD,
+        CASH_RUB,
+        TR_EXPENSE_CHAINED_1,
+        TR_EXPENSE_CHAINED_2,
+    } = App.scenario;
+
+    const data = [{
+        id: TR_EXPENSE_CHAINED_1,
+        src_id: CASH_RUB,
+        returnState: {
+            transactions: { onPage: 20 },
+        },
+    }, {
+        id: TR_EXPENSE_CHAINED_2,
+        dest_amount: 58,
+        dest_curr: USD,
+        returnState: {
+            transactions: { range: 2 },
+        },
+    }];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+};
+
 const updateInvalid = async () => {
     setBlock('Update transactions with invalid data', 2);
 
@@ -562,8 +623,25 @@ const del = async () => {
     setBlock('Delete transactions', 2);
 
     const data = [
-        [App.scenario.TR_EXPENSE_2],
-        [App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3],
+        { id: App.scenario.TR_EXPENSE_2 },
+        { id: [App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3] },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+};
+
+const delWithChainedRequest = async () => {
+    setBlock('Delete transactions with chained request', 2);
+
+    const data = [
+        {
+            id: [App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3],
+            returnState: {
+                transactions: {},
+                accounts: { visibility: 'all' },
+                persons: { visibility: 'all' },
+            },
+        },
     ];
 
     await App.scenario.runner.runGroup(TransactionApiTests.del, data);
@@ -602,6 +680,28 @@ const setCategory = async () => {
     await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
 };
 
+const setCategoryWithChainedRequest = async () => {
+    setBlock('Set category of transactions with chained request', 2);
+
+    const {
+        TR_EXPENSE_CHAINED_1,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = [
+        {
+            id: TR_EXPENSE_CHAINED_1,
+            category_id: FOOD_CATEGORY,
+            returnState: {
+                transactions: { categories: FOOD_CATEGORY },
+                accounts: { visibility: 'all' },
+            },
+        },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
+};
+
 const setCategoryInvalid = async () => {
     setBlock('Set category of transactions with invalid data', 2);
 
@@ -628,6 +728,22 @@ const setPos = async () => {
         { id: App.scenario.TR_EXPENSE_2, pos: 5 },
         { id: App.scenario.TR_INCOME_2, pos: 10 },
         { id: App.scenario.TR_TRANSFER_1, pos: 100 },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+};
+
+const setPosWithChainedRequest = async () => {
+    setBlock('Set position with chained request', 2);
+
+    const data = [
+        {
+            id: App.scenario.TR_EXPENSE_CHAINED_1,
+            pos: 15,
+            returnState: {
+                transactions: {},
+            },
+        },
     ];
 
     await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
@@ -763,6 +879,7 @@ const statistics = async () => {
 export const apiTransactionsTests = {
     async createTests() {
         await create();
+        await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
@@ -770,10 +887,13 @@ export const apiTransactionsTests = {
 
     async updateTests() {
         await update();
+        await updateWithChainedRequest();
         await updateInvalid();
         await setCategory();
+        await setCategoryWithChainedRequest();
         await setCategoryInvalid();
         await setPos();
+        await setPosWithChainedRequest();
     },
 
     async filterTests() {
@@ -783,6 +903,7 @@ export const apiTransactionsTests = {
 
     async deleteTests() {
         await del();
+        await delWithChainedRequest();
         await delInvalid();
     },
 };

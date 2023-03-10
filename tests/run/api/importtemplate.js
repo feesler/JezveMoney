@@ -1,4 +1,4 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
@@ -21,13 +21,12 @@ export const create = async (params) => {
     await test('Create import template', async () => {
         const expTemplate = App.state.templateFromRequest(params);
         const resExpected = App.state.createTemplate(expTemplate);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.importtemplate.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.importtemplate.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -51,27 +50,24 @@ export const createMultiple = async (params) => {
     await test('Create multiple import templates', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
-            expectedResult = [];
+            expectedResult = { ids: [] };
             for (const item of params) {
                 const expTemplate = App.state.templateFromRequest(item);
                 const resExpected = App.state.createTemplate(expTemplate);
                 if (!resExpected) {
-                    App.state.deleteTemplates(expectedResult);
+                    App.state.deleteTemplates({ id: expectedResult.ids });
                     expectedResult = false;
                     break;
                 }
 
-                expectedResult.push(resExpected);
+                expectedResult.ids.push(resExpected.id);
             }
         }
 
-        // Send API sequest to server
         let createRes;
         try {
             createRes = await api.importtemplate.createMultiple(params);
-            if (expectedResult && (!createRes || !createRes.ids)) {
-                return false;
-            }
+            assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
                 throw e;
@@ -106,13 +102,11 @@ export const update = async (params) => {
         const expTemplate = App.state.templateFromRequest(props);
         const resExpected = App.state.updateTemplate(expTemplate);
         const updParams = App.state.getUpdateTemplateRequest(props);
+        const reqParams = App.state.prepareChainedRequestData(updParams);
 
-        // Send API sequest to server
         try {
-            result = await api.importtemplate.update(updParams);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.importtemplate.update(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -129,18 +123,16 @@ export const update = async (params) => {
  * Delete specified import template(s) and check expected state of app
  * @param {number[]} ids - array of template identifiers
  */
-export const del = async (ids) => {
+export const del = async (params) => {
     let result = false;
 
-    await test(`Delete import template(s) (${ids})`, async () => {
-        const resExpected = App.state.deleteTemplates(ids);
+    await test(`Delete import template(s) (${params})`, async () => {
+        const resExpected = App.state.deleteTemplates(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.importtemplate.del(ids);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.importtemplate.del(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;

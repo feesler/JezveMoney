@@ -1,4 +1,4 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
@@ -15,13 +15,12 @@ export const create = async (params) => {
 
     await test('Create import rule', async () => {
         const resExpected = App.state.createRule(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.importrule.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.importrule.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -46,25 +45,21 @@ export const update = async (params) => {
 
     await test('Update import rule', async () => {
         const resExpected = App.state.updateRule(props);
-        let updParams = {};
-
         const item = App.state.rules.getItem(props.id);
-        if (item) {
-            updParams = item.toPlain();
-        }
+        const updParams = (item) ? item.toPlain() : {};
 
         if (!resExpected) {
             updParams.conditions = [];
             updParams.actions = [];
-            Object.assign(updParams, props);
         }
 
-        // Send API sequest to server
+        Object.assign(updParams, props);
+
+        const reqParams = App.state.prepareChainedRequestData(updParams);
+
         try {
-            result = await api.importrule.update(updParams);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.importrule.update(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -81,18 +76,16 @@ export const update = async (params) => {
  * Delete specified import rule(s) and check expected state of app
  * @param {number[]} ids - array of template identifiers
  */
-export const del = async (ids) => {
+export const del = async (params) => {
     let result = false;
 
-    await test(`Delete import rule(s) (${ids})`, async () => {
-        const resExpected = App.state.deleteRules(ids);
+    await test(`Delete import rule(s) (${params})`, async () => {
+        const resExpected = App.state.deleteRules(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.importrule.del(ids);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.importrule.del(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
