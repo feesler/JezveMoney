@@ -15,7 +15,6 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
@@ -31,6 +30,7 @@ import { ImportTransactionList } from './components/List/ImportTransactionList.j
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
+import '../../css/app.scss';
 import './style.scss';
 
 const SUBMIT_LIMIT = 100;

@@ -51,12 +51,12 @@
 }
 
 /* Template first row field */
-.first-row-field {
+.field.first-row-field {
   max-width: 150px;
 }
 
 /* Default account switch */
-.tpl-form-switch-field {
+.field.tpl-form-switch-field {
   align-items: center;
   display: flex;
   flex-flow: row nowrap;
@@ -77,7 +77,7 @@
 }
 
 /* Raw data table field */
-.raw-data-field {
+.field.raw-data-field {
   align-items: normal;
   max-width: none;
 }
