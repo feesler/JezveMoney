@@ -226,7 +226,7 @@ class TransactionListView extends View {
         this.list = TransactionList.create({
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
-            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
+            onSort: (info) => this.onSort(info),
         });
         listContainer.append(this.list.elem);
 
@@ -486,6 +486,34 @@ class TransactionListView extends View {
         };
 
         this.store.dispatch(actions.listRequestLoaded(payload));
+    }
+
+    getItem(id) {
+        const { items } = this.store.getState();
+        const strId = id?.toString() ?? null;
+        if (strId === null) {
+            return null;
+        }
+
+        return items.find((item) => item.id.toString() === strId);
+    }
+
+    onSort(info) {
+        const item = this.getItem(info.itemId);
+        const prevItem = this.getItem(info.prevId);
+        const nextItem = this.getItem(info.nextId);
+        if (!prevItem && !nextItem) {
+            return;
+        }
+
+        let pos = null;
+        if (prevItem) {
+            pos = (item.pos < prevItem.pos) ? prevItem.pos : (prevItem.pos + 1);
+        } else {
+            pos = nextItem.pos;
+        }
+
+        this.sendChangePosRequest(item.id, pos);
     }
 
     /**

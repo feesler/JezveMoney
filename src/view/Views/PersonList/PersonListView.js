@@ -90,7 +90,7 @@ class PersonListView extends View {
             listMode: 'list',
             noItemsMessage: __('PERSONS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
-            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
+            onSort: (info) => this.onSort(info),
         };
 
         this.loadElementsByIds([
@@ -487,6 +487,25 @@ class PersonListView extends View {
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
+    }
+
+    onSort(info) {
+        const { persons } = window.app.model;
+        const item = persons.getItem(info.itemId);
+        const prevItem = persons.getItem(info.prevId);
+        const nextItem = persons.getItem(info.nextId);
+        if (!prevItem && !nextItem) {
+            return;
+        }
+
+        let pos = null;
+        if (prevItem) {
+            pos = (item.pos < prevItem.pos) ? prevItem.pos : (prevItem.pos + 1);
+        } else {
+            pos = nextItem.pos;
+        }
+
+        this.sendChangePosRequest(item.id, pos);
     }
 
     /**

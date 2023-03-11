@@ -91,7 +91,7 @@ class AccountListView extends View {
             listMode: 'list',
             noItemsMessage: __('ACCOUNTS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
-            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
+            onSort: (info) => this.onSort(info),
         };
 
         this.loadElementsByIds([
@@ -488,6 +488,25 @@ class AccountListView extends View {
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
+    }
+
+    onSort(info) {
+        const { userAccounts } = window.app.model;
+        const item = userAccounts.getItem(info.itemId);
+        const prevItem = userAccounts.getItem(info.prevId);
+        const nextItem = userAccounts.getItem(info.nextId);
+        if (!prevItem && !nextItem) {
+            return;
+        }
+
+        let pos = null;
+        if (prevItem) {
+            pos = (item.pos < prevItem.pos) ? prevItem.pos : (prevItem.pos + 1);
+        } else {
+            pos = nextItem.pos;
+        }
+
+        this.sendChangePosRequest(item.id, pos);
     }
 
     /**
