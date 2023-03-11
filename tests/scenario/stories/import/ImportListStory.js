@@ -104,18 +104,13 @@ export class ImportListStory extends TestStory {
     async pagination() {
         setBlock('Pagination', 1);
 
-        const { cardFile } = App.scenario;
+        const { largeFile } = App.scenario;
         const itemsOnPage = App.config.importTransactionsOnPage;
 
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
-            ...cardFile,
-            account: App.scenario.ACC_RUB,
-        });
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded(cardFile);
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded(cardFile);
+        await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
+
+        await ImportTests.uploadFile(largeFile);
+        await ImportTests.submitUploaded(largeFile);
         await ImportTests.createItemAndSave(
             { action: 'inputDestAmount', data: '1' },
         );

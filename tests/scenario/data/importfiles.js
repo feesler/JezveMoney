@@ -1,22 +1,34 @@
 import { generateCardCSV, generateAccountCSV } from '../../model/import.js';
 
+const getCardData = (date) => ([
+    [date, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
+    [date, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
+    [date, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
+    [date, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
+    [date, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
+    [date, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+    [date, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+    [date, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
+    [date, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
+    [date, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50 750.35'],
+    [date, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100 000.00'],
+    [date, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
+    [date, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5 000.00'],
+    [date, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10 000.00'],
+]);
+
 export const getCardCSV = () => {
     const now = new Date();
+    return generateCardCSV(getCardData(now));
+};
+
+export const getLargeCSV = () => {
+    const now = new Date();
+    const cardData = getCardData(now);
     return generateCardCSV([
-        [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
-        [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
-        [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
-        [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
-        [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
-        [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-        [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-        [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
-        [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
-        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50 750.35'],
-        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100 000.00'],
-        [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
-        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5 000.00'],
-        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10 000.00'],
+        ...cardData,
+        ...cardData,
+        ...cardData,
     ]);
 };
 

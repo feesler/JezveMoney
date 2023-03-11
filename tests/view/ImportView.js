@@ -537,10 +537,7 @@ export class ImportView extends AppView {
         this.checkMainState();
 
         this.expectedState = this.getExpectedState();
-        this.expectedState.uploadDialog = {
-            visible: true,
-            initialAccount: { value: this.model.mainAccount.toString() },
-        };
+        this.expectedState.uploadDialog = { visible: true };
 
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
@@ -614,6 +611,9 @@ export class ImportView extends AppView {
     /** Select file to upload */
     async upload() {
         this.checkUploadState();
+
+        const { mainAccount } = this.model;
+        this.uploadDialog.model.initialAccount = App.state.accounts.getItem(mainAccount);
 
         await this.performAction(() => this.uploadDialog.upload());
     }
