@@ -89,6 +89,8 @@ class Query extends AdminController
             return;
         }
 
+        $this->begin();
+
         $escapedQuery = $this->db->escape($query);
 
         $this->db->insertQ($this->tableName, [
@@ -97,6 +99,8 @@ class Query extends AdminController
             "query" => $escapedQuery,
             "flags" => 0
         ]);
+
+        $this->commit();
     }
 
     /**
