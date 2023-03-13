@@ -100,7 +100,7 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Initialization of delete form */
-    initDeleteForm(selector) {
+    initIdsForm(selector) {
         this.initForm(selector, (e) => this.onDeleteItemsSubmit(e));
     }
 
@@ -126,7 +126,9 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createAccForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateAccForm > form');
-        this.initDeleteForm('#delAccForm > form');
+        this.initIdsForm('#showAccForm > form');
+        this.initIdsForm('#hideAccForm > form');
+        this.initIdsForm('#delAccForm > form');
         this.initForm('#setAccPosForm > form');
     }
 
@@ -146,7 +148,9 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createPersonForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updatePersonForm > form');
-        this.initDeleteForm('#delPersonForm > form');
+        this.initIdsForm('#showPersonForm > form');
+        this.initIdsForm('#hidePersonForm > form');
+        this.initIdsForm('#delPersonForm > form');
         this.initForm('#setPersonPosForm > form');
     }
 
@@ -192,7 +196,7 @@ class AdminApiConsoleView extends AdminView {
         this.initForm('#createDebtForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateTrForm > form');
         this.initForm('#updateDebtForm > form');
-        this.initDeleteForm('#delTrForm > form');
+        this.initIdsForm('#delTrForm > form');
         this.initForm('#setTrCategoryForm > form', (e) => this.onSetCategorySubmit(e));
         this.initForm('#setTrPosForm > form');
         this.initForm('#statisticsForm > form', (e) => this.onStatisticsSubmit(e));
@@ -224,7 +228,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createTplForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateTplForm > form');
-        this.initDeleteForm('#delTplForm > form');
+        this.initIdsForm('#delTplForm > form');
     }
 
     /** Initialization of forms for Import rules API controller */
@@ -243,7 +247,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createRuleForm > form', (e) => this.onRuleFormSubmit(e, apiTypes.isCreateResult));
         this.initForm('#updateRuleForm > form', (e) => this.onRuleFormSubmit(e));
-        this.initDeleteForm('#delRuleForm > form');
+        this.initIdsForm('#delRuleForm > form');
     }
 
     /** Initialization of forms for Import conditions API controller */
@@ -262,7 +266,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createCondForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateCondForm > form');
-        this.initDeleteForm('#delCondForm > form');
+        this.initIdsForm('#delCondForm > form');
     }
 
     /** Initialization of forms for Import actions API controller */
@@ -281,7 +285,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createActForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateActForm > form');
-        this.initDeleteForm('#delActForm > form');
+        this.initIdsForm('#delActForm > form');
     }
 
     /** Initialization of forms for Currency API controller */
@@ -300,7 +304,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createCurrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateCurrForm > form');
-        this.initDeleteForm('#delCurrForm > form');
+        this.initIdsForm('#delCurrForm > form');
     }
 
     /** Initialization of forms for Icon API controller */
@@ -319,7 +323,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.initForm('#createIconForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateIconForm > form');
-        this.initDeleteForm('#delIconForm > form');
+        this.initIdsForm('#delIconForm > form');
     }
 
     /** Initialization of forms for User API controller */

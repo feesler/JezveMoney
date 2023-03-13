@@ -141,6 +141,52 @@
     </form>
 </div>
 
+<div id="showAccForm" class="request-data-form">
+    <h3>Show accounts</h3>
+    <form action="<?= BASEURL ?>api/account/show" method="post">
+        <div class="std_margin">
+            <label for="showAccounts">Accounts (comma separated ids)</label>
+            <input id="showAccounts" class="stretch-input" name="id" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<div id="hideAccForm" class="request-data-form">
+    <h3>Hide accounts</h3>
+    <form action="<?= BASEURL ?>api/account/hide" method="post">
+        <div class="std_margin">
+            <label for="hideAccounts">Accounts (comma separated ids)</label>
+            <input id="hideAccounts" class="stretch-input" name="id" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
 <div id="delAccForm" class="request-data-form">
     <h3>Delete accounts</h3>
     <form action="<?= BASEURL ?>api/account/delete" method="post">
@@ -159,7 +205,7 @@
         </div>
 
         <div class="form-controls">
-            <input id="delaccbtn" class="btn submit-btn" type="submit" value="Submit">
+            <input class="btn submit-btn" type="submit" value="Submit">
         </div>
     </form>
 </div>

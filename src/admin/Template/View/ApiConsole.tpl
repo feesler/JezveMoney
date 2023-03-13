@@ -30,6 +30,8 @@
                             <li data-target="readAccForm">Read</li>
                             <li data-target="createAccForm">Create</li>
                             <li data-target="updateAccForm">Update</li>
+                            <li data-target="showAccForm">Show</li>
+                            <li data-target="hideAccForm">Hide</li>
                             <li data-target="delAccForm">Delete</li>
                             <li data-target="setAccPosForm">Set position</li>
                         </ul>
@@ -42,6 +44,8 @@
                             <li data-target="readPersonForm">Read</li>
                             <li data-target="createPersonForm">Create</li>
                             <li data-target="updatePersonForm">Update</li>
+                            <li data-target="showPersonForm">Show</li>
+                            <li data-target="hidePersonForm">Hide</li>
                             <li data-target="delPersonForm">Delete</li>
                             <li data-target="setPersonPosForm">Set position</li>
                         </ul>

@@ -84,6 +84,48 @@
     </form>
 </div>
 
+<div id="showPersonForm" class="request-data-form">
+    <h3>Show persons</h3>
+    <form action="<?= BASEURL ?>api/person/show" method="post">
+        <div class="std_margin">
+            <label for="delpersons">Persons (comma separated ids)</label>
+            <input id="delpersons" class="stretch-input" name="id" type="text">
+        </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<div id="hidePersonForm" class="request-data-form">
+    <h3>Hide persons</h3>
+    <form action="<?= BASEURL ?>api/person/hide" method="post">
+        <div class="std_margin">
+            <label for="delpersons">Persons (comma separated ids)</label>
+            <input id="delpersons" class="stretch-input" name="id" type="text">
+        </div>
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="returnState">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Return state</span>
+            </label>
+            <input class="stretch-input" name="returnState" type="text" disabled>
+        </div>
+        <div class="form-controls">
+            <input class="btn submit-btn" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
 <div id="delPersonForm" class="request-data-form">
     <h3>Delete persons</h3>
     <form action="<?= BASEURL ?>api/person/delete" method="post">
@@ -100,7 +142,7 @@
             <input class="stretch-input" name="returnState" type="text" disabled>
         </div>
         <div class="form-controls">
-            <input id="delpersonbtn" class="btn submit-btn" type="submit" value="Submit">
+            <input class="btn submit-btn" type="submit" value="Submit">
         </div>
     </form>
 </div>
