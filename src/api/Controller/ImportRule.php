@@ -160,9 +160,10 @@ class ImportRule extends ApiListController
     protected function postCreate(mixed $item_id, array $request)
     {
         if (!$this->setRuleData($item_id, $request)) {
-            $this->model->del($item_id);
             throw new \Error($this->createErrorMsg);
         }
+
+        return parent::postCreate($item_id, $request);
     }
 
     /**
@@ -187,5 +188,7 @@ class ImportRule extends ApiListController
         if (!$this->setRuleData($request["id"], $request)) {
             throw new \Error($this->updateErrorMsg);
         }
+
+        return parent::postUpdate($request);
     }
 }

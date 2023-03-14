@@ -1,26 +1,15 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
                             <h1><?= __("CATEGORIES") ?></h1>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "createBtn",
-                                    "type" => "link",
-                                    "link" => BASEURL . "categories/create/",
-                                    "icon" => "plus",
-                                ]) ?>
-                            </div>
+                            <div class="heading-actions"></div>
                         </header>
                         <header id="contentHeader" class="content-header">
                             <div class="counters">

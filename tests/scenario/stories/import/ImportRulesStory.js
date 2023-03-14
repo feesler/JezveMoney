@@ -1,4 +1,9 @@
-import { setBlock, assert, TestStory } from 'jezve-test';
+import {
+    setBlock,
+    assert,
+    TestStory,
+    copyObject,
+} from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
@@ -456,11 +461,7 @@ export class ImportRulesStory extends TestStory {
         };
 
         for (let i = 1; i <= RULES_TO_CREATE; i += 1) {
-            const rule = {
-                ...ruleBase,
-                conditions: [...ruleBase.conditions],
-                actions: [...ruleBase.actions],
-            };
+            const rule = copyObject(ruleBase);
             rule.conditions[0].value = `Cond ${i}`;
             rule.actions[0].value = `Act ${i}`;
             data.push(rule);
@@ -473,7 +474,7 @@ export class ImportRulesStory extends TestStory {
         // Iterate rules list pages
         await ImportTests.iterateRulesList();
         // Remove previously created rules via API
-        await ImportRuleApiTests.del(ruleIds);
+        await ImportRuleApiTests.del({ id: ruleIds });
         // Refresh page
         await App.view.navigateToImport();
     }

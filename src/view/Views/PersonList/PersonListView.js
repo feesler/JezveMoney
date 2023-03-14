@@ -33,7 +33,7 @@ import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
-import './style.scss';
+import './PersonListView.scss';
 
 /**
  * List of persons view
@@ -61,6 +61,7 @@ class PersonListView extends View {
             listMode: 'list',
             showMenu: false,
             sortMode,
+            showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -82,15 +83,15 @@ class PersonListView extends View {
                 listMode,
             }),
             className: 'tiles',
-            itemSelector: '.tile',
-            itemSortSelector: '.tile.tile_sort',
+            itemSelector: Tile.selector,
+            itemSortSelector: Tile.sortSelector,
             selectModeClass: 'tiles_select',
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
             noItemsMessage: __('PERSONS_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
-            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
+            onSort: (info) => this.onSort(info),
         };
 
         this.loadElementsByIds([
@@ -102,13 +103,21 @@ class PersonListView extends View {
             'heading',
             'contentContainer',
             'hiddenTilesHeading',
-            'createBtn',
             'itemInfo',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: __('PERSONS'),
         });
+
+        this.createBtn = Button.create({
+            id: 'createBtn',
+            type: 'link',
+            className: 'circle-btn',
+            icon: 'plus',
+            url: `${window.app.baseURL}persons/create/`,
+        });
+        this.heading.actionsContainer.prepend(this.createBtn.elem);
 
         this.visibleTiles = SortableListContainer.create({
             ...listProps,
@@ -128,7 +137,7 @@ class PersonListView extends View {
             title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn);
+        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
@@ -231,7 +240,8 @@ class PersonListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -320,6 +330,10 @@ class PersonListView extends View {
         this.store.dispatch(actions.showContextMenu(itemId));
     }
 
+    hideContextMenu() {
+        this.store.dispatch(actions.hideContextMenu());
+    }
+
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
     }
@@ -385,16 +399,18 @@ class PersonListView extends View {
         this.startLoading();
 
         try {
-            if (value) {
-                await API.person.show({ id: ids });
-            } else {
-                await API.person.hide({ id: ids });
-            }
-            this.requestList();
+            const request = this.prepareRequest({ id: ids });
+            const response = (value)
+                ? await API.person.show(request)
+                : await API.person.hide(request);
+
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
-            this.stopLoading();
         }
+
+        this.stopLoading();
     }
 
     async deleteItems() {
@@ -411,29 +427,56 @@ class PersonListView extends View {
         this.startLoading();
 
         try {
-            await API.person.del({ id: ids });
-            this.requestList();
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-            this.stopLoading();
-        }
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        try {
-            const { data } = await API.person.list({ visibility: 'all' });
-            window.app.model.persons.setData(data);
-            window.app.model.visiblePersons = null;
-            window.app.checkPersonModels();
-
-            this.store.dispatch(actions.listRequestLoaded(keepState));
+            const request = this.prepareRequest({ id: ids });
+            const response = await API.person.del(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+    }
+
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
+        this.startLoading();
+
+        try {
+            const request = this.getListRequest();
+            const { data } = await API.person.list(request);
+            this.setListData(data, keepState);
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+    }
+
+    getListRequest() {
+        return { visibility: 'all' };
+    }
+
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                persons: this.getListRequest(),
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.persons?.data;
+    }
+
+    setListData(data, keepState = false) {
+        window.app.model.persons.setData(data);
+        window.app.model.visiblePersons = null;
+        window.app.checkPersonModels();
+
+        this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
     async requestItem() {
@@ -452,21 +495,43 @@ class PersonListView extends View {
         }
     }
 
+    onSort(info) {
+        const { persons } = window.app.model;
+        const item = persons.getItem(info.itemId);
+        const prevItem = persons.getItem(info.prevId);
+        const nextItem = persons.getItem(info.nextId);
+        if (!prevItem && !nextItem) {
+            return;
+        }
+
+        let pos = null;
+        if (prevItem) {
+            pos = (item.pos < prevItem.pos) ? prevItem.pos : (prevItem.pos + 1);
+        } else {
+            pos = nextItem.pos;
+        }
+
+        this.sendChangePosRequest(item.id, pos);
+    }
+
     /**
      * Sent API request to server to change position of person
-     * @param {number} itemId - identifier of item to change position
-     * @param {number} newPos  - new position of item
+     * @param {number} id - identifier of item to change position
+     * @param {number} pos  - new position of item
      */
-    async sendChangePosRequest(itemId, newPos) {
+    async sendChangePosRequest(id, pos) {
         this.startLoading();
 
         try {
-            await API.person.setPos(itemId, newPos);
-            this.requestList({ keepState: true });
+            const request = this.prepareRequest({ id, pos });
+            const response = await API.person.setPos(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data, true);
         } catch (e) {
-            this.cancelPosChange(itemId);
-            this.stopLoading();
+            this.cancelPosChange();
         }
+
+        this.stopLoading();
     }
 
     /**
@@ -550,7 +615,7 @@ class PersonListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }
@@ -594,7 +659,7 @@ class PersonListView extends View {
         const isSortMode = state.listMode === 'sort';
         const sortMode = this.getSortMode();
 
-        show(this.createBtn, isListMode);
+        this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);

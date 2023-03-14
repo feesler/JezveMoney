@@ -131,6 +131,7 @@ export class ImportRuleForm extends TestComponent {
             const setAccountInd = rule.actions.indexOf(setAccountAction);
             const showSetAccount = (
                 rule.actions.hasSetTransfer()
+                && (action.actionType !== IMPORT_ACTION_SET_TR_TYPE)
                 && (!setAccountAction || setAccountInd === ind)
             );
             if (!showSetAccount) {
@@ -144,6 +145,7 @@ export class ImportRuleForm extends TestComponent {
             const showSetPerson = (
                 App.state.persons.length > 0
                 && rule.actions.hasSetDebt()
+                && (action.actionType !== IMPORT_ACTION_SET_TR_TYPE)
                 && (!setPersonAction || setPersonInd === ind)
             );
             if (!showSetPerson) {

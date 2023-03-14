@@ -107,12 +107,30 @@ export const submit = async () => {
     });
 };
 
+export const deleteFromContextMenu = async (index) => {
+    await test(`Delete person from context menu [${index}]`, async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+
+        await App.view.deleteFromContextMenu(index);
+
+        const id = App.state.getSortedPersonsByIndexes(index, true);
+        App.state.deletePersons({ id });
+
+        App.view.expectedState = PersonListView.render(App.state);
+        App.view.checkState();
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const del = async (persons) => {
     await test(`Delete persons [${persons.join()}]`, async () => {
         await checkNavigation();
 
-        const ids = App.state.getSortedPersonsByIndexes(persons, true);
-        App.state.deletePersons(ids);
+        const id = App.state.getSortedPersonsByIndexes(persons, true);
+        App.state.deletePersons({ id });
 
         await App.view.deletePersons(persons);
 
@@ -133,8 +151,8 @@ export const delFromUpdate = async (pos) => {
         await App.view.goToUpdatePerson(ind);
         await App.view.deleteSelfItem();
 
-        const ids = App.state.getSortedPersonsByIndexes(ind, true);
-        App.state.deletePersons(ids);
+        const id = App.state.getSortedPersonsByIndexes(ind, true);
+        App.state.deletePersons({ id });
 
         App.view.expectedState = PersonListView.render(App.state);
         App.view.checkState();
@@ -155,8 +173,8 @@ export const show = async (persons, val = true) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getSortedPersonsByIndexes(itemIds, true);
-        App.state.showPersons(ids, val);
+        const id = App.state.getSortedPersonsByIndexes(itemIds, true);
+        App.state.showPersons({ id }, val);
 
         await App.view.showPersons(itemIds, val);
 

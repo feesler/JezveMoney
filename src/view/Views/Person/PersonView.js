@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     show,
     enable,
     insertAfter,
@@ -14,12 +13,12 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
-import '../../Components/Heading/style.scss';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './PersonView.scss';
 
 /**
  * Create/update person view
@@ -50,7 +49,10 @@ class PersonView extends View {
      * View initialization
      */
     onStart() {
+        const isUpdate = this.props.person.id;
+
         this.loadElementsByIds([
+            'heading',
             'personForm',
             'nameInp',
             'nameFeedback',
@@ -58,19 +60,28 @@ class PersonView extends View {
             'cancelBtn',
         ]);
 
+        this.heading = Heading.fromElement(this.heading, {
+            title: (isUpdate) ? __('PERSON_UPDATE') : __('PERSON_CREATE'),
+            showInHeaderOnScroll: false,
+        });
+
         setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
-        this.spinner = Spinner.create();
+        this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        const deleteBtn = ge('deleteBtn');
-        if (deleteBtn) {
-            this.deleteBtn = Button.fromElement(deleteBtn, {
+        if (isUpdate) {
+            this.deleteBtn = Button.create({
+                id: 'deleteBtn',
+                className: 'warning-btn',
+                title: __('DELETE'),
+                icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
+            this.heading.actionsContainer.append(this.deleteBtn.elem);
         }
 
         this.subscribeToStore(this.store);

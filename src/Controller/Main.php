@@ -9,6 +9,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\IconModel;
+use JezveMoney\Core\Application;
 
 /**
  * Main controller
@@ -107,8 +108,10 @@ class Main extends TemplateController
             "titleString" => __("APP_NAME")
         ];
 
+        $app = Application::getInstance();
+
         $data["year"] = date("Y");
-        $data["version"] = APP_VERSION;
+        $data["version"] = $app->getVersion();
 
         $this->cssArr[] = "AboutView.css";
         $this->jsArr[] = "AboutView.js";

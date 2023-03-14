@@ -15,7 +15,6 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
@@ -31,7 +30,8 @@ import { ImportTransactionList } from './components/List/ImportTransactionList.j
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
-import './style.scss';
+import '../../css/app.scss';
+import './ImportView.scss';
 
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
@@ -102,6 +102,14 @@ class ImportView extends View {
             title: __('IMPORT'),
         });
 
+        this.uploadBtn = Button.create({
+            id: 'uploadBtn',
+            className: 'circle-btn',
+            icon: 'import',
+            onClick: () => this.showUploadDialog(),
+        });
+        this.heading.actionsContainer.append(this.uploadBtn.elem);
+
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
 
         this.accountDropDown = DropDown.create({
@@ -112,10 +120,6 @@ class ImportView extends View {
             className: 'dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
-
-        this.uploadBtn = Button.fromElement('uploadBtn', {
-            onClick: () => this.showUploadDialog(),
-        });
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',

@@ -138,6 +138,7 @@ export class TransactionListView extends AppView {
         res.modeSelector = await Button.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
+        res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
 
         const transList = await query('.trans-list');
         assert(transList, 'List of transactions not found');
@@ -256,7 +257,8 @@ export class TransactionListView extends AppView {
             items: cont.selectCategoryDialog?.items.map((item) => item.id),
         };
 
-        res.loading = cont.loadingIndicator.visible;
+        res.isLoadingMore = cont.showMoreSpinner.visible;
+        res.loading = (cont.loadingIndicator.visible || res.isLoadingMore);
 
         return res;
     }
@@ -508,7 +510,10 @@ export class TransactionListView extends AppView {
             totalCounter: { visible: true, value: model.filtered.length },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: { visible: isItemsAvailable && pageNum < model.list.pages },
+            showMoreBtn: {
+                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
+            },
+            showMoreSpinner: { visible: model.isLoadingMore },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
             createBtn: { visible: listMode },
@@ -540,14 +545,15 @@ export class TransactionListView extends AppView {
             res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
         }
 
+        res.contextMenu = {
+            visible: model.contextMenuVisible,
+        };
+
         if (model.contextMenuVisible) {
             const ctxTransaction = model.filtered.getItem(model.contextItem);
             assert(ctxTransaction, 'Invalid state');
 
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-            };
+            res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
@@ -1333,10 +1339,11 @@ export class TransactionListView extends AppView {
 
         this.checkState(expected);
 
-        const { selectCategoryDialog } = this.content;
-        assert(selectCategoryDialog, 'Select category dialog not found');
+        assert(this.content.selectCategoryDialog, 'Select category dialog not found');
 
-        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
+        await this.waitForList(() => (
+            this.content.selectCategoryDialog.selectCategoryAndSubmit(category)
+        ));
     }
 
     /** Set category for selected transactions */
@@ -1366,10 +1373,28 @@ export class TransactionListView extends AppView {
 
         this.checkState(expected);
 
-        const { selectCategoryDialog } = this.content;
-        assert(selectCategoryDialog, 'Select category dialog not found');
+        assert(this.content.selectCategoryDialog, 'Select category dialog not found');
 
-        await this.waitForList(() => selectCategoryDialog.selectCategoryAndSubmit(category));
+        await this.waitForList(() => (
+            this.content.selectCategoryDialog.selectCategoryAndSubmit(category)
+        ));
+    }
+
+    /** Delete secified transaction from context menu */
+    async deleteFromContextMenu(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxDeleteBtn.click());
+
+        this.checkState(expected);
+
+        assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Delete specified transactions */

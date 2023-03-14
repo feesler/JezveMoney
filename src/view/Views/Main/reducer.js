@@ -29,9 +29,13 @@ const slice = createSlice({
     ),
 
     showTransactionContextMenu: (state, itemId) => (
-        (state.transactionContextItem === itemId)
+        (state.transactionContextItem === itemId && state.showContextMenu)
             ? state
-            : { ...state, transactionContextItem: itemId }
+            : { ...state, transactionContextItem: itemId, showContextMenu: true }
+    ),
+
+    hideTransactionContextMenu: (state) => (
+        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
     startLoading: (state) => (
@@ -107,7 +111,7 @@ const slice = createSlice({
 
     listRequestLoaded: (state, data) => ({
         ...state,
-        transactions: data.transactions.data,
+        transactions: data.transactions.items,
         accounts: {
             ...state.accounts,
             visible: AccountList.create(window.app.model.visibleUserAccounts),

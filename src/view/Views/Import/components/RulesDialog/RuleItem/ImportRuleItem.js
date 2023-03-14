@@ -15,7 +15,7 @@ import { __ } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
-import './style.scss';
+import './ImportRuleItem.scss';
 
 /**
  * ImportRuleItem component

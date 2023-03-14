@@ -35,7 +35,7 @@ import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
-import './style.scss';
+import './CategoryListView.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
@@ -63,6 +63,7 @@ class CategoryListView extends View {
             listMode: 'list',
             showMenu: false,
             sortMode,
+            showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -108,7 +109,6 @@ class CategoryListView extends View {
             'selectedCounter',
             'selItemsCount',
             'heading',
-            'createBtn',
             'contentContainer',
             'itemInfo',
         ]);
@@ -116,6 +116,15 @@ class CategoryListView extends View {
         this.heading = Heading.fromElement(this.heading, {
             title: __('CATEGORIES'),
         });
+
+        this.createBtn = Button.create({
+            id: 'createBtn',
+            type: 'link',
+            className: 'circle-btn',
+            icon: 'plus',
+            url: `${window.app.baseURL}categories/create/`,
+        });
+        this.heading.actionsContainer.prepend(this.createBtn.elem);
 
         this.sections = {};
 
@@ -156,7 +165,7 @@ class CategoryListView extends View {
             title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn);
+        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
@@ -243,7 +252,8 @@ class CategoryListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -324,6 +334,10 @@ class CategoryListView extends View {
         this.store.dispatch(actions.showContextMenu(itemId));
     }
 
+    hideContextMenu() {
+        this.store.dispatch(actions.hideContextMenu());
+    }
+
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
     }
@@ -384,27 +398,53 @@ class CategoryListView extends View {
         this.startLoading();
 
         try {
-            await API.category.del({ id: ids, removeChild });
-            this.requestList();
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-            this.stopLoading();
-        }
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        try {
-            const { data } = await API.category.list();
-            window.app.model.categories.setData(data);
-
-            this.store.dispatch(actions.listRequestLoaded(keepState));
+            const request = this.prepareRequest({ id: ids, removeChild });
+            const response = await API.category.del(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+    }
+
+    async requestList(options = {}) {
+        const { keepState = false } = options;
+
+        this.startLoading();
+
+        try {
+            const request = this.getListRequest();
+            const { data } = await API.category.list(request);
+            this.setListData(data, keepState);
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+    }
+
+    getListRequest() {
+        return {};
+    }
+
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                categories: this.getListRequest(),
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.categories?.data;
+    }
+
+    setListData(data, keepState = false) {
+        window.app.model.categories.setData(data);
+        this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
     async requestItem() {
@@ -466,12 +506,20 @@ class CategoryListView extends View {
         this.startLoading();
 
         try {
-            await API.category.setPos(itemId, newPos, parentId);
-            this.requestList({ keepState: true });
+            const request = this.prepareRequest({
+                id: itemId,
+                pos: newPos,
+                parent_id: parentId,
+            });
+
+            const response = await API.category.setPos(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data, true);
         } catch (e) {
-            this.cancelPosChange(itemId);
-            this.stopLoading();
+            this.cancelPosChange();
         }
+
+        this.stopLoading();
     }
 
     /**
@@ -552,7 +600,7 @@ class CategoryListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }
@@ -592,7 +640,7 @@ class CategoryListView extends View {
         const isSortMode = state.listMode === 'sort';
         const sortMode = this.getSortMode();
 
-        show(this.createBtn, isListMode);
+        this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
         this.menuButton.show(itemsCount > 0 && !isSortMode);

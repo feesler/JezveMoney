@@ -1,6 +1,6 @@
 import { createElement, Component } from 'jezvejs';
 import { __ } from '../../../../js/utils.js';
-import './style.scss';
+import './SimilarTransactionInfo.scss';
 
 /* CSS classes */
 const SIMILAR_CLASS = 'similar';

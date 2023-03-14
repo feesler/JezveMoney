@@ -1,6 +1,6 @@
 import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../../js/utils.js';
-import './style.scss';
+import './OriginalImportData.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'orig-data';

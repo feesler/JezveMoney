@@ -1,6 +1,6 @@
 import { getClassNames } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
-import './style.scss';
+import './ToggleButton.scss';
 
 /* CSS classes */
 const TOGGLE_BUTTON_CLASS = 'toggle-btn';

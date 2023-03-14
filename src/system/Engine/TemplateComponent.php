@@ -34,7 +34,7 @@ abstract class TemplateComponent
     protected static function renderTemplate(array $data)
     {
         if (!static::$template) {
-            static::$template = new Template(TPL_PATH . "Component/tpl/" . static::$filename);
+            static::$template = new Template(TPL_PATH . "Component/" . static::$filename);
         }
 
         return static::$template->render($data);

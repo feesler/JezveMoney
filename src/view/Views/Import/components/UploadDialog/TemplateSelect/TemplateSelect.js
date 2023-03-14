@@ -9,7 +9,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
-import './style.scss';
+import './TemplateSelect.scss';
 
 /** CSS classes */
 const SELECT_CLASS = 'template-select';
@@ -72,6 +72,7 @@ export class TemplateSelect extends Component {
             elem: this.contentElem,
             listAttach: true,
             enableFilter: true,
+            isValidToggleTarget: (elem) => this.isValidToggleTarget(elem),
             noResultsMessage: __('NOT_FOUND'),
             onChange: (tpl) => this.onChange(tpl),
         });
@@ -97,6 +98,17 @@ export class TemplateSelect extends Component {
                 onClick: (e) => this.onDelete(e),
             }],
         });
+    }
+
+    /** Returns true if element is allowed to toggle menu list */
+    isValidToggleTarget(elem) {
+        return (
+            !this.menuButton.elem.contains(elem)
+            && (
+                !this.contextMenu
+                || !this.contextMenu.elem.contains(elem)
+            )
+        );
     }
 
     /**

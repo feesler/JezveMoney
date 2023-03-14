@@ -17,7 +17,7 @@ import {
     TPL_UPDATE_STATE,
 } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
-import './style.scss';
+import './ImportUploadDialog.scss';
 
 /** CSS classes */
 const UPLOAD_POPUP_CLASS = 'upload-popup';

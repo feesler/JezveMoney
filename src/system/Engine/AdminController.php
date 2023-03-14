@@ -10,7 +10,6 @@ abstract class AdminController extends TemplateController
     protected $cssAdmin = [];
     protected $jsAdmin = [];
     protected $jsAdminModule = [];
-    protected $themesPath = "admin/view/css/themes/";
 
     /**
      * Initialize application resources

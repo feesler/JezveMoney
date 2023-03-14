@@ -215,15 +215,16 @@ export class PersonListView extends AppView {
             res.deleteBtn = { visible: showSelectItems && totalSelected > 0 };
         }
 
+        res.contextMenu = {
+            visible: model.contextMenuVisible,
+        };
+
         if (model.contextMenuVisible) {
             const ctxPerson = App.state.persons.getItem(model.contextItem);
             assert(ctxPerson, 'Invalid state');
 
             const isHidden = App.state.persons.isHidden(ctxPerson);
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-            };
+            res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
@@ -434,9 +435,9 @@ export class PersonListView extends AppView {
         assert(button, `Button ${buttonName} not found`);
 
         if (listMode === 'sort') {
-            await this.waitForList(() => button.click());
+            await this.waitForList(() => this.content[buttonName].click());
         } else {
-            await this.performAction(() => button.click());
+            await this.performAction(() => this.content[buttonName].click());
         }
 
         return this.checkState(expected);
@@ -474,7 +475,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByNameBtn;
         assert(button, 'Sort by name button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByNameBtn.click());
 
         return this.checkState(expected);
     }
@@ -499,7 +500,7 @@ export class PersonListView extends AppView {
         const button = this.content.sortByDateBtn;
         assert(button, 'Sort by date button not found');
 
-        await this.waitForList(() => button.click());
+        await this.waitForList(() => this.content.sortByDateBtn.click());
 
         return this.checkState(expected);
     }
@@ -516,8 +517,7 @@ export class PersonListView extends AppView {
 
             const expected = this.getExpectedState();
 
-            const tile = this.getTileByIndex(num);
-            await this.waitForList(() => tile.click());
+            await this.waitForList(() => this.getTileByIndex(num).click());
 
             this.checkState(expected);
         }
@@ -551,6 +551,23 @@ export class PersonListView extends AppView {
         await this.performAction(() => this.content.deselectAllBtn.click());
 
         return this.checkState(expected);
+    }
+
+    /** Delete secified person from context menu */
+    async deleteFromContextMenu(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxDeleteBtn.click());
+
+        this.checkState(expected);
+
+        assert(this.content.delete_warning?.content?.visible, 'Delete person warning popup not appear');
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     async deletePersons(persons) {

@@ -1,35 +1,15 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-use JezveMoney\App\Template\Component\DateRangeInput;
-use JezveMoney\App\Template\Component\LinkMenu;
-
-include(TPL_PATH . "Header.tpl"); ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page transaction-view-view">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
                             <h1><?= __("TRANSACTIONS") ?></h1>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "filtersBtn",
-                                    "classNames" => "circle-btn",
-                                    "type" => "button",
-                                    "icon" => "filter",
-                                ]) ?>
-                                <?= Button::render([
-                                    "id" => "createBtn",
-                                    "classNames" => "circle-btn",
-                                    "type" => "link",
-                                    "link" => BASEURL . "transactions/create/",
-                                    "icon" => "plus",
-                                ]) ?>
-                            </div>
+                            <div class="heading-actions"></div>
                         </header>
 
                         <header id="contentHeader" class="content-header">
@@ -42,14 +22,8 @@ include(TPL_PATH . "Header.tpl"); ?>
 
                                 <div class="filters-list">
                                     <div class="filters-row">
-                                        <section class="filter-item trans-type-filter">
+                                        <section id="typeFilter" class="filter-item trans-type-filter">
                                             <header class="filter-item__title"><?= __("FILTER_TYPE") ?></header>
-                                            <?= LinkMenu::render([
-                                                "id" => "typeMenu",
-                                                "classNames" => "trtype-menu",
-                                                "multiple" => true,
-                                                "items" => $typeMenu,
-                                            ]) ?>
                                         </section>
 
                                         <hr class="filters-separator">
@@ -72,7 +46,6 @@ include(TPL_PATH . "Header.tpl"); ?>
                                     <div class="filters-row">
                                         <section id="dateFilter" class="filter-item date-range-filter validation-block">
                                             <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
-                                            <?= DateRangeInput::render($dateRange) ?>
                                         </section>
 
                                         <hr class="filters-separator">

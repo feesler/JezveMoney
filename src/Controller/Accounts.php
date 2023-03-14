@@ -89,12 +89,6 @@ class Accounts extends ListViewController
 
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
-        $data["tile"] = [
-            "id" => "accountTile",
-            "title" => __("ACCOUNT_NAME_NEW"),
-            "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
-            "icon" => $accInfo->icon,
-        ];
 
         $iconModel = IconModel::getInstance();
 
@@ -161,13 +155,6 @@ class Accounts extends ListViewController
         $accInfo->sign = ($currObj) ? $currObj->sign : null;
         $accInfo->icon = $this->model->getIconFile($acc_id);
         $data["accInfo"] = $accInfo;
-
-        $data["tile"] = [
-            "id" => "accountTile",
-            "title" => $accInfo->name,
-            "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
-            "icon" => $accInfo->icon
-        ];
 
         $iconModel = IconModel::getInstance();
 

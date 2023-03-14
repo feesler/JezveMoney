@@ -13,8 +13,7 @@ export class List {
             .map((id) => parseInt(id, 10))
             .filter((id) => !!id);
 
-        const res = copyObject(list)
-            .filter((item) => !itemIds.includes(item.id));
+        const res = list.filter((item) => !itemIds.includes(item.id));
 
         return res;
     }

@@ -1,0 +1,13 @@
+.search-field {
+  .btn.search-btn {
+    --btn-size: 37px;
+    --btn-icon-size: 24px;
+    --btn-icon-color: #888888;
+
+    pointer-events: none;
+  }
+
+  .clear-btn {
+    width: 37px;
+  }
+}

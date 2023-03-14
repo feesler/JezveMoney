@@ -7,8 +7,8 @@ import { View } from '../../js/View.js';
 import { parseCookies, setCookie } from '../../js/utils.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './LoginView.scss';
 
 /**
  * User log in view

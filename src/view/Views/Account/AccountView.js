@@ -1,7 +1,7 @@
 import 'jezvejs/style';
+import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
 import {
-    ge,
     setEvents,
     insertAfter,
     enable,
@@ -19,14 +19,14 @@ import { API } from '../../js/api/index.js';
 import { IconList } from '../../js/model/IconList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Heading/style.scss';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './AccountView.scss';
 
 /**
  * Create/update account view
@@ -62,8 +62,12 @@ class AccountView extends View {
      * View initialization
      */
     onStart() {
+        const isUpdate = this.props.account.id;
+
         this.loadElementsByIds([
+            'heading',
             'accountForm',
+            'tileField',
             'iconField',
             'currencySign',
             'balanceInp',
@@ -73,7 +77,16 @@ class AccountView extends View {
             'cancelBtn',
         ]);
 
-        this.tile = AccountTile.fromElement('accountTile');
+        this.heading = Heading.fromElement(this.heading, {
+            title: (isUpdate) ? __('ACCOUNT_UPDATE') : __('ACCOUNT_CREATE'),
+            showInHeaderOnScroll: false,
+        });
+
+        this.tile = AccountTile.create({
+            id: 'accountTile',
+            account: this.props.account,
+        });
+        this.tileField.append(this.tile.elem);
 
         this.iconSelect = IconSelect.create({
             className: 'dd_fullwidth',
@@ -97,16 +110,20 @@ class AccountView extends View {
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
-        this.spinner = Spinner.create();
+        this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        const deleteBtn = ge('deleteBtn');
-        if (deleteBtn) {
-            this.deleteBtn = Button.fromElement(deleteBtn, {
+        if (isUpdate) {
+            this.deleteBtn = Button.create({
+                id: 'deleteBtn',
+                className: 'warning-btn',
+                title: __('DELETE'),
+                icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
+            this.heading.actionsContainer.append(this.deleteBtn.elem);
         }
 
         this.subscribeToStore(this.store);

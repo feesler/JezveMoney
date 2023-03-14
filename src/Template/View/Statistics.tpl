@@ -1,27 +1,14 @@
-<?php
-
-use JezveMoney\App\Template\Component\DateRangeInput;
-use JezveMoney\App\Template\Component\Button;
-use JezveMoney\App\Template\Component\LinkMenu;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
                         <h1><?= __("STATISTICS") ?></h1>
-                        <div class="heading-actions">
-                            <?= Button::render([
-                                "id" => "filtersBtn",
-                                "classNames" => "circle-btn",
-                                "type" => "button",
-                                "icon" => "filter",
-                            ]) ?>
-                        </div>
+                        <div class="heading-actions"></div>
                     </header>
 
                     <header id="contentHeader" class="content-header">
@@ -34,21 +21,14 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                             <div class="filters-list">
                                 <div class="filters-row">
-                                    <section class="filter-item trans-type-filter">
+                                    <section id="typeFilter" class="filter-item trans-type-filter">
                                         <header class="filter-item__title"><?= __("FILTER_TYPE") ?></header>
-                                        <?= LinkMenu::render([
-                                            "id" => "typeMenu",
-                                            "classNames" => "trtype-menu",
-                                            "multiple" => true,
-                                            "items" => $typeMenu,
-                                        ]) ?>
                                     </section>
 
                                     <hr class="filters-separator">
 
-                                    <section class="filter-item report-type-filter">
+                                    <section id="reportTypeFilter" class="filter-item report-type-filter">
                                         <header class="filter-item__title"><?= __("STAT_FILTER_REPORT") ?></header>
-                                        <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
                                     </section>
 
                                     <hr class="filters-separator">
@@ -89,7 +69,6 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                                     <section id="dateFilter" class="filter-item date-range-filter">
                                         <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
-                                        <?= DateRangeInput::render($dateRange) ?>
                                     </section>
                                 </div>
                             </div>

@@ -15,7 +15,6 @@ UPLOAD_PATH - path to the uploads directory
 LOGS_PATH - path to the logs directory
 */
 
-define("APP_VERSION", "1.49.0");
 define("APP_PROTOCOL", "https://");
 
 define("PROD_HOST", "jezvemoney.ru");

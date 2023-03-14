@@ -16,13 +16,12 @@ export const create = async (params) => {
 
     await test(`Create category (${formatProps(params)})`, async () => {
         const resExpected = App.state.createCategory(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.category.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.category.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -46,16 +45,16 @@ export const createMultiple = async (params) => {
     await test('Create multiple categories', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
-            expectedResult = [];
+            expectedResult = { ids: [] };
             for (const item of params) {
                 const resExpected = App.state.createCategory(item);
                 if (!resExpected) {
-                    App.state.deleteCategories(expectedResult);
+                    App.state.deleteCategories({ id: expectedResult.ids });
                     expectedResult = false;
                     break;
                 }
 
-                expectedResult.push(resExpected);
+                expectedResult.ids.push(resExpected.id);
             }
         }
 
@@ -63,9 +62,7 @@ export const createMultiple = async (params) => {
         let createRes;
         try {
             createRes = await api.category.createMultiple(params);
-            if (expectedResult && (!createRes || !createRes.ids)) {
-                return false;
-            }
+            assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
                 throw e;
@@ -94,23 +91,16 @@ export const update = async (params) => {
 
     await test(`Update category (${formatProps(props)})`, async () => {
         const resExpected = App.state.updateCategory(props);
-        let updParams = {};
 
         const item = App.state.categories.getItem(props.id);
-        if (item) {
-            updParams = copyObject(item);
-        }
+        const updParams = (item) ? copyObject(item) : {};
+        Object.assign(updParams, props);
 
-        if (!resExpected) {
-            Object.assign(updParams, props);
-        }
+        const reqParams = App.state.prepareChainedRequestData(updParams);
 
-        // Send API sequest to server
         try {
-            updateRes = await api.category.update(updParams);
-            if (resExpected !== updateRes) {
-                return false;
-            }
+            updateRes = await api.category.update(reqParams);
+            assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -125,20 +115,18 @@ export const update = async (params) => {
 
 /**
  * Delete specified categories and check expected state of app
- * @param {number[]} ids - array of category identificators
+ * @param {object} params - delete categories request object
  */
-export const del = async (ids, removeChildren = true) => {
+export const del = async (params) => {
     let deleteRes = false;
 
-    await test(`Delete categories (${ids})`, async () => {
-        const resExpected = App.state.deleteCategories(ids, removeChildren);
+    await test(`Delete categories (${params})`, async () => {
+        const resExpected = App.state.deleteCategories(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            deleteRes = await api.category.del(ids, removeChildren);
-            if (resExpected !== deleteRes) {
-                return false;
-            }
+            deleteRes = await api.category.del(reqParams);
+            assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -157,11 +145,11 @@ export const setPos = async (params) => {
 
     await test(`Set position of category (${formatProps(params)})`, async () => {
         const resExpected = App.state.setCategoryPos(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.category.setPos(params);
-            assert.equal(result, resExpected);
+            result = await api.category.setPos(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;

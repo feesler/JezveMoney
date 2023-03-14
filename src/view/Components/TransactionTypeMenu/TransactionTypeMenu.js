@@ -12,35 +12,41 @@ const CONTAINER_CLASS = 'link-menu trtype-menu';
 
 const defaultProps = {
     itemParam: 'type',
+    showAll: true,
 };
 
 /**
  * Transaction type menu component
  */
 export class TransactionTypeMenu extends LinkMenu {
-    constructor(props) {
-        super(props);
-
-        this.state = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.state,
-        };
+            ...props,
+        });
     }
 
     init() {
         this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
         this.setHandlers();
+        this.setUserProps();
         this.setClassNames();
+
+        const items = [];
+
+        if (this.props.showAll) {
+            items.push({ title: __('SHOW_ALL') });
+        }
+        items.push(
+            { value: EXPENSE, title: __('TR_EXPENSE') },
+            { value: INCOME, title: __('TR_INCOME') },
+            { value: TRANSFER, title: __('TR_TRANSFER') },
+            { value: DEBT, title: __('TR_DEBT') },
+        );
 
         this.setState({
             ...this.state,
-            items: [
-                { title: __('SHOW_ALL') },
-                { value: EXPENSE, title: __('TR_EXPENSE') },
-                { value: INCOME, title: __('TR_INCOME') },
-                { value: TRANSFER, title: __('TR_TRANSFER') },
-                { value: DEBT, title: __('TR_DEBT') },
-            ],
+            items,
         });
     }
 

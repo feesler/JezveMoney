@@ -131,6 +131,24 @@ export const submit = async () => {
     });
 };
 
+export const deleteFromContextMenu = async (index) => {
+    await test(`Delete account from context menu [${index}]`, async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+
+        await App.view.deleteFromContextMenu(index);
+
+        const id = App.state.getSortedAccountsByIndexes(index, true);
+        App.state.deleteAccounts({ id });
+
+        App.view.expectedState = AccountListView.render(App.state);
+        App.view.checkState();
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const del = async (accounts) => {
     const indexes = asArray(accounts);
 
@@ -138,8 +156,8 @@ export const del = async (accounts) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getSortedAccountsByIndexes(indexes, true);
-        App.state.deleteAccounts(ids);
+        const id = App.state.getSortedAccountsByIndexes(indexes, true);
+        App.state.deleteAccounts({ id });
 
         await App.view.deleteAccounts(indexes);
 
@@ -161,8 +179,8 @@ export const delFromUpdate = async (pos) => {
 
         await App.view.deleteSelfItem();
 
-        const ids = App.state.getSortedAccountsByIndexes(ind, true);
-        App.state.deleteAccounts(ids);
+        const id = App.state.getSortedAccountsByIndexes(ind, true);
+        App.state.deleteAccounts({ id });
 
         App.view.expectedState = AccountListView.render(App.state);
         App.view.checkState();
@@ -183,8 +201,8 @@ export const show = async (accounts, val = true) => {
         await checkNavigation();
 
         await App.state.fetch();
-        const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
-        App.state.showAccounts(ids, val);
+        const id = App.state.getSortedAccountsByIndexes(itemIds, true);
+        App.state.showAccounts({ id }, val);
 
         if (val) {
             await App.view.showAccounts(itemIds);

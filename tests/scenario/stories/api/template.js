@@ -47,6 +47,30 @@ const create = async () => {
     ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
 };
 
+const createWithChainedRequest = async () => {
+    setBlock('Create import template with chained request', 2);
+
+    const data = [{
+        name: 'Template chained',
+        type_id: 0,
+        first_row: 2,
+        account_id: App.scenario.CASH_RUB,
+        account_amount_col: 10,
+        account_curr_col: 20,
+        trans_amount_col: 30,
+        trans_curr_col: 40,
+        date_col: 50,
+        comment_col: 60,
+        returnState: {
+            importtemplates: {},
+        },
+    }];
+
+    [
+        App.scenario.TEMPLATE_CHAINED,
+    ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
+};
+
 const createInvalid = async () => {
     setBlock('Create import template with invalid data', 2);
 
@@ -169,6 +193,22 @@ const update = async () => {
     await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
 };
 
+const updateWithChainedRequest = async () => {
+    setBlock('Update import template with chained request', 2);
+
+    const data = [{
+        id: App.scenario.TEMPLATE_CHAINED,
+        name: 'Chained',
+        account_amount_col: 5,
+        returnState: {
+            importtemplates: {},
+            accounts: { visibility: 'all' },
+        },
+    }];
+
+    await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
+};
+
 const updateInvalid = async () => {
     setBlock('Update import template with invalid data', 2);
 
@@ -194,8 +234,24 @@ const del = async () => {
     setBlock('Delete import template', 2);
 
     const data = [
-        [App.scenario.TEMPLATE_3],
-        [App.scenario.TEMPLATE_1, App.scenario.TEMPLATE_2],
+        { id: App.scenario.TEMPLATE_3 },
+        { id: [App.scenario.TEMPLATE_1, App.scenario.TEMPLATE_2] },
+    ];
+
+    await App.scenario.runner.runGroup(ImportTemplateApiTests.del, data);
+};
+
+const delWithChainedRequest = async () => {
+    setBlock('Delete import template with chained request', 2);
+
+    const data = [
+        {
+            id: App.scenario.TEMPLATE_3,
+            returnState: {
+                importtemplates: {},
+                importrules: {},
+            },
+        },
     ];
 
     await App.scenario.runner.runGroup(ImportTemplateApiTests.del, data);
@@ -206,11 +262,14 @@ export const apiImportTemplateTests = {
         setBlock('Import template', 1);
 
         await create();
+        await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
         await update();
+        await updateWithChainedRequest();
         await updateInvalid();
         await del();
+        await delWithChainedRequest();
     },
 };

@@ -2,31 +2,62 @@ import {
     isFunction,
     enable,
     Component,
-    setEvents,
+    createElement,
 } from 'jezvejs';
+
+const ITEM_CLASS = 'tile-info-item';
+const BUTTON_CLASS = 'btn dashed-btn';
+
+const defaultProps = {
+    label: null,
+    title: null,
+    onClick: null,
+};
 
 /**
  * TileInfoItem component
  */
 export class TileInfoItem extends Component {
-    constructor(props) {
-        super(props);
+    static userProps = {
+        elem: ['id'],
+    };
 
-        this.parse();
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
+
+        this.state = {
+            ...this.props,
+        };
+
+        this.init();
     }
 
-    /** Parse DOM to obtain child elements and build state of component */
-    parse() {
-        if (!(this.elem)) {
-            throw new Error('Invalid element specified');
+    init() {
+        this.labelElem = createElement('span');
+
+        const buttonProps = {
+            props: {
+                className: BUTTON_CLASS,
+                type: 'button',
+            },
+        };
+        if (isFunction(this.props.onClick)) {
+            buttonProps.events = { click: this.props.onClick };
         }
 
-        this.labelElem = this.elem.firstElementChild;
+        this.buttonElem = createElement('button', buttonProps);
 
-        this.buttonElem = this.elem.querySelector('button');
-        if (this.buttonElem && isFunction(this.props.onClick)) {
-            setEvents(this.buttonElem, { click: this.props.onClick });
-        }
+        this.elem = createElement('div', {
+            props: { className: ITEM_CLASS },
+            children: [this.labelElem, this.buttonElem],
+        });
+
+        this.setClassNames();
+        this.setUserProps();
+        this.render(this.state);
     }
 
     enable(value = true) {
@@ -41,13 +72,11 @@ export class TileInfoItem extends Component {
         if (typeof label !== 'string') {
             throw new Error('Invalid label specified');
         }
-
-        if (this.label === label) {
+        if (this.state.label === label) {
             return;
         }
 
-        this.label = label;
-        this.labelElem.textContent = this.label;
+        this.setState({ ...this.state, label });
     }
 
     /**
@@ -58,12 +87,19 @@ export class TileInfoItem extends Component {
         if (typeof title !== 'string') {
             throw new Error('Invalid title specified');
         }
-
-        if (this.title === title) {
+        if (this.state.title === title) {
             return;
         }
 
-        this.title = title;
-        this.buttonElem.textContent = this.title;
+        this.setState({ ...this.state, title });
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.labelElem.textContent = state.label;
+        this.buttonElem.textContent = state.title;
     }
 }

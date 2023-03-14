@@ -6,9 +6,11 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   #3c9dd1, #ffcb40, #ff6b40, #ee3b80, #37da7e, #e6fc3f;
 
 :root {
+  --neutral-color: #888888;
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
   --accent-hover-color: #1e82cc;
+  --accent-active-color: #104b79;
   --accent-disabled-color: #5082aa;
   --warning-color: #c60000;
   --warning-color-alt: #e63030;
@@ -49,10 +51,148 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   }
 }
 
+.dark-theme {
+  /* Text colors */
+  --main-text-color: #dddddd;
+  --dimmed-text-color: #858585;
+  --hl-text-color: #ffffff;
+  --text-color-2: #dddddd;
+  --text-color-3: #bbbbbb;
+  --text-color-4: #b0b0b0;
+  --text-color-5: #505050;
+  --text-color-6: #707070;
+
+  /* Background colors */
+  --main-bg-color: #202020;
+  --semitrans-bg-color: #20202066;
+  --alt-bg-color: #2a2a2a;
+  --bg-color-2: #202020;
+  --bg-color-3: #202020;
+  --bg-color-4: #2e2e2e;
+  --bg-color-5: #303030;
+
+  /* Disabled colors */
+  --disabled-color-1: #202020;
+
+  /* Borders */
+  --border-color-1: #d0d0d0;
+  --border-color-2: #3c3c3c;
+  --border-color-3: #444444;
+
+  /* List separator */
+  --list-separator-color: #2a2a2a;
+
+  /* Header */
+  --header-bg-color: #181818;
+  --header-hover-btn-bg-color: #303030;
+
+  /* Navigation menus */
+  --nav-menu-separator-color: #444444;
+
+  /* Buttons */
+  --btn-bg: #3c3c3c;
+  --btn-hover-bg: #4a4a4a;
+  --icon-btn-hover-bg: #323232;
+
+  /* Inputs */
+  --input-bg-color: #181818;
+  --input-border-color: #2e2e2e;
+  --active-input-border-color: var(--accent-color-alt);
+
+  /* Disabled inputs */
+  --input-disabled-bg: var(--disabled-color-1);
+  --input-disabled-border: #2e2e2e;
+  --input-disabled-color: var(--text-color-5);
+
+  /* List item */
+  --list-item-text-color: #b0b0b0;
+  --list-item-bg-color: var(--alt-bg-color);
+  --list-item-disabled-bg-color: #292929;
+
+  /* List item icons */
+  --list-item-icon-fill: #888888;
+  --list-item-hover-icon-fill: #dddddd;
+
+  /* Popup menu */
+  --popup-menu-border: #444444;
+  --popup-menu-bg: #202020f8;
+  --popup-menu-box-shadow: 0 0 10px 0 #000000bb;
+}
+
+.white-theme {
+  /* Text colors */
+  --main-text-color: #000000;
+  --dimmed-text-color: #a7a7a7;
+  --hl-text-color: #000000;
+  --text-color-2: #202020;
+  --text-color-3: #202020;
+  --text-color-4: #404040;
+  --text-color-5: #b0b0b0;
+  --text-color-6: #a0a0a0;
+
+  /* Background colors */
+  --main-bg-color: #ffffff;
+  --semitrans-bg-color: #ffffff66;
+  --alt-bg-color: #f0f0f0;
+  --bg-color-2: #f2f2f2;
+  --bg-color-3: #e7e7e7;
+  --bg-color-4: #b0b0b0;
+  --bg-color-5: #d0d0d0;
+
+  /* Disabled colors */
+  --disabled-color-1: #eeeeee;
+
+  /* Borders */
+  --border-color-1: #888888;
+  --border-color-2: #b0b0b0;
+  --border-color-3: #c0c0c0;
+
+  /* List separator */
+  --list-separator-color: #ebebeb;
+
+  /* Header */
+  --header-bg-color: #404040;
+  --header-hover-btn-bg-color: #606060;
+
+  /* Navigation menus */
+  --nav-menu-separator-color: #c0c0c0;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
+  --icon-btn-hover-bg: #dddddd;
+
+  /* Inputs */
+  --input-bg-color: #f2f2f2;
+  --input-border-color: #b0b0b0;
+  --active-input-border-color: var(--accent-color-alt);
+
+  /* Disabled inputs */
+  --input-disabled-bg: var(--disabled-color-1);
+  --input-disabled-border: #dddddd;
+  --input-disabled-color: var(--text-color-5);
+
+  /* List item */
+  --list-item-text-color: #808080;
+  --list-item-bg-color: var(--alt-bg-color);
+  --list-item-disabled-bg-color: #e8e8e8;
+
+  /* List item icons */
+  --list-item-icon-fill: #a7a7a7;
+  --list-item-hover-icon-fill: #808080;
+
+  /* Popup menu */
+  --popup-menu-border: #b0b0b0;
+  --popup-menu-bg: #ffffffeb;
+  --popup-menu-box-shadow: 0 0 10px 0 #00000080;
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
+  color: var(--main-text-color);
+  background-color: var(--main-bg-color);
 }
 
 b {
@@ -115,11 +255,6 @@ svg * {
   flex-flow: column nowrap;
 }
 
-/* Icon */
-.icon {
-  fill: var(--main-text-color);
-}
-
 /* Input control fills all parent width */
 .stretch-input {
   display: flex;
@@ -142,16 +277,32 @@ svg * {
 }
 
 .stretch-input[disabled] {
-  color: var(--input-disabled-text-color);
-  -webkit-text-fill-color: var(--input-disabled-text-color);
-  border-color: var(--input-disabled-border-color);
-  background-color: var(--input-disabled-bg-color);
+  color: var(--input-disabled-color);
+  -webkit-text-fill-color: var(--input-disabled-color);
+  border-color: var(--input-disabled-border);
+  background-color: var(--input-disabled-bg);
 }
 
 /* Input group */
 .input-group,
+.rules-dialog .input-group,
 .import-form .input-group {
   --ig-height: var(--input-height);
+  --ig-border-color: var(--input-border-color);
+  --ig-input-bg: var(--input-bg-color);
+  --ig-input-active-border: var(--active-input-border-color);
+  --ig-input-disabled-color: var(--input-disabled-color);
+  --ig-input-disabled-bg: var(--input-disabled-bg);
+  --ig-input-disabled-border: var(--input-border-color);
+  --ig-inner-button-color: var(--neutral-color);
+  --ig-inner-button-active-color: var(--hl-text-color);
+  --ig-text-bg: var(--bg-color-3);
+  --ig-text-border: var(--input-border-color);
+  --ig-text-color: var(--main-text-color);
+
+  .input-group__input {
+    flex-grow: 1;
+  }
 
   .input-group__btn,
   .input-group__text {
@@ -180,8 +331,24 @@ svg * {
   }
 
   .btn.input-group__btn {
-    --btn-icon-color: var(--ig-button-color);
-    --btn-hover-icon-color: var(--ig-button-color);
+    --btn-icon-color: #ffffff;
+    --btn-hover-icon-color: #ffffff;
+    --btn-title-color: #ffffff;
+    --btn-background: var(--accent-color);
+    --btn-hover-title-color: #ffffff;
+    --btn-hover-background: var(--accent-hover-color);
+    --btn-active-background: var(--accent-active-color);
+    --btn-disabled-background: var(--accent-disabled-color);
+
+    overflow: visible;
+  }
+
+  .input.input-group__input {
+    --input-font-size: 0.9rem;
+    --input-color: var(--main-text-color);
+    --input-bg: var(--input-bg-color);
+    --input-focus-color: var(--main-text-color);
+    --input-focus-bg: var(--input-bg-color);
   }
 }
 
@@ -246,6 +413,7 @@ svg * {
   top: var(--header-size);
   z-index: 1000;
   padding: 10px 0;
+  background-color: var(--main-bg-color);
 }
 
 /* Aligned to right element */
@@ -286,9 +454,10 @@ svg * {
   padding: 24px 0 12px 0;
 }
 
-.form-controls .spinner {
-  --spinner-size: 20px;
-  --spinner-color: #dddddd;
+/* Request loading spinner indicator */
+.spinner.request-spinner {
+  --spinner-size: 1.5rem;
+  --spinner-color: var(--border-color-1);
 }
 
 .right-align-text {
@@ -353,6 +522,8 @@ svg * {
   --btn-padding: 5px;
   --btn-background: var(--accent-color);
   --btn-hover-background: var(--accent-hover-color);
+  --btn-active-background: var(--accent-active-color);
+  --btn-disabled-icon-color: var(--input-disabled-color);
 }
 
 .btn.submit-btn {
@@ -361,6 +532,7 @@ svg * {
   --btn-background: var(--accent-color);
   --btn-hover-title-color: #ffffff;
   --btn-hover-background: var(--accent-hover-color);
+  --btn-active-background: var(--accent-active-color);
   --btn-disabled-background: var(--accent-disabled-color);
   --btn-size: var(--input-height);
   --btn-padding: 0 24px;
@@ -426,6 +598,13 @@ svg * {
   margin: 16px 0;
 }
 
+.show-more-btn + .spinner {
+  --spinner-size: 2rem;
+  --spinner-width: 5px;
+
+  margin: 16px 0;
+}
+
 /* List footer */
 .list-footer {
   display: flex;
@@ -452,7 +631,8 @@ svg * {
   display: block;
 }
 
-.validation-block.invalid-block .stretch-input {
+.validation-block.invalid-block .stretch-input,
+.validation-block.invalid-block .input-group__input {
   border-color: var(--invalid-input-border-color);
 }
 
@@ -463,6 +643,7 @@ svg * {
   justify-content: center;
   padding: 12px 0;
   width: 100%;
+  color: var(--text-color-4);
 }
 
 .nodata-group {
@@ -503,6 +684,14 @@ svg * {
   border-bottom: 2px solid var(--accent-color-alt);
 }
 
+/* Checkbox */
+.checkbox {
+  --checkbox-text: var(--main-text-color);
+  --checkbox-bg: var(--input-bg-color);
+  --checkbox-border: var(--input-border-color);
+  --checkbox-checked-fill: var(--accent-color);
+}
+
 /* Radio */
 .radio {
   --radio-text: var(--main-text-color);
@@ -522,25 +711,68 @@ svg * {
 /* DropDown */
 .dd__container,
 .dd__container_attached {
+  --dd-bg-color: var(--input-bg-color);
+  --dd-border-color: var(--input-border-color);
+
+  /* Combo box */
   --dd-border-width: 1px;
-  --dd-list-border-radius: 5px;
-  --dd-selection-item-border-radius: 3px;
-  --dd-disabled-list-item-bg: none;
   --dd-combo-border-radius: 5px;
   --dd-combo-height: var(--input-height);
-  --dd-active-list-item-text: #ffffff;
-  --dd-active-list-item-bg: #3078e2;
+
+  /* Input element */
+  --dd-input-text: var(--main-text-color);
   --dd-input-font-size: 0.9rem;
   --dd-input-padding: var(--input-padding);
+
+  /* Clear and toggle buttons */
+  --dd-btn-fill: var(--neutral-color);
+  --dd-btn-hover-fill: var(--main-text-color);
+
+  /* List menu */
+  --dd-list-border-radius: 5px;
+
+  /* List item */
+  --dd-list-item-text: var(--main-text-color);
+  --dd-list-item-bg: var(--bg-color-2);
+  --dd-list-item-check: var(--main-text-color);
+  --dd-disabled-list-item-text: var(--input-disabled-color);
+
+  /* Active list item */
+  --dd-active-list-item-text: #ffffff;
+  --dd-active-list-item-bg: #3078e2;
+
+  /* Disabled list item */
+  --dd-disabled-list-item-bg: none;
+
+  /* List group */
+  --dd-list-group-text: var(--accent-color);
+  --dd-list-group-bg: var(--bg-color-2);
+
+  /* Selection */
+  --dd-selection-text: var(--main-text-color);
   --dd-selection-font-size: 15px;
+  --dd-selection-item-border-radius: 3px;
+
+  /* Active state */
+  --dd-active-bg: var(--input-bg-color);
+  --dd-active-border: var(--active-input-border-color);
+  --dd-active-input-text: var(--main-text-color);
+  --dd-active-selection-text: var(--main-text-color);
   --dd-active-selection-bg: var(--dd-active-bg);
+
+  /* Disabled state */
+  --dd-disabled-bg: var(--input-disabled-bg);
+  --dd-disabled-border: var(--input-disabled-border);
+  --dd-disabled-selection-color: var(--input-disabled-color);
+  --dd-disabled-input-text: var(--input-disabled-color);
+  --dd-disabled-btn-fill: var(--input-disabled-color);
+  --dd-disabled-selection-item-text: var(--input-disabled-color);
+  --dd-disabled-selection-item-bg: #dfdfdf;
 }
 
 .dd__list-group {
-  padding-left: 12px;
-
   .dd__list-group__label {
-    padding: 0;
+    padding: 5px 10px;
   }
 }
 
@@ -581,9 +813,24 @@ svg * {
 }
 
 /* Datepicker */
-.dp__wrapper {
-  border-width: 1px;
-  border-radius: 5px;
+.dp__container {
+  --dp-bg-color: var(--main-bg-color);
+  --dp-border-color: var(--border-color-1);
+  --dp-border-width: 1px;
+  --dp-text-color: var(--main-text-color);
+  --dp-other-text-color: var(--text-color-5);
+  --dp-active-color: var(--accent-color-alt);
+  --dp-today-color: var(--accent-color);
+  --dp-hover-bg-color: var(--accent-color-alt);
+  --dp-hover-color: #dddddd;
+  --dp-hl-bg-color: var(--accent-color-alt);
+  --dp-hl-color: #ffffff;
+  --dp-nav-fill: #b0b0b0;
+  --dp-nav-hover-fill: var(--accent-color);
+
+  .dp__wrapper {
+    border-radius: 5px;
+  }
 }
 
 .popup .dp__container {
@@ -599,6 +846,13 @@ svg * {
 .popup-menu-list {
   --popupmenu-border-width: 0;
   --popupmenu-border-radius: 5px;
+  --popupmenu-border-color: var(--popup-menu-border);
+  --popupmenu-separator-color: var(--list-separator-color);
+  --popupmenu-background: var(--popup-menu-bg);
+  --popupmenu-title-color: var(--main-text-color);
+  --popupmenu-icon-color: var(--main-text-color);
+  --popupmenu-hover-icon-color: #ffffff;
+  --popupmenu-hover-title-color: #ffffff;
 
   box-shadow: var(--popup-menu-box-shadow);
   backdrop-filter: var(--popup-menu-backdrop-filter);
@@ -666,6 +920,7 @@ svg * {
 .link-menu {
   --link-menu-icon-color: var(--accent-color);
   --link-menu-item-padding: 0;
+  --link-menu-selected-color: var(--main-text-color);
 }
 
 /* Counters */

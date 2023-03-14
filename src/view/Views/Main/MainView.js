@@ -36,7 +36,7 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions } from './reducer.js';
-import './style.scss';
+import './MainView.scss';
 
 /**
  * Main view
@@ -72,6 +72,7 @@ class MainView extends View {
                 type: 0,
             },
             loading: true,
+            showContextMenu: false,
             transactionContextItem: null,
             renderTime: Date.now(),
         };
@@ -109,7 +110,7 @@ class MainView extends View {
                 selectMode: listMode === 'select',
             }),
             className: 'tiles',
-            itemSelector: '.tile',
+            itemSelector: AccountTile.selector,
             listMode: 'list',
             noItemsMessage: () => this.renderAccountsNoData(),
         };
@@ -141,7 +142,7 @@ class MainView extends View {
                 selectMode: listMode === 'select',
             }),
             className: 'tiles',
-            itemSelector: '.tile',
+            itemSelector: Tile.selector,
             listMode: 'list',
             noItemsMessage: () => this.renderPersonsNoData(),
         };
@@ -244,7 +245,8 @@ class MainView extends View {
         this.transactionContextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxUpdateBtn',
                 type: 'link',
@@ -278,6 +280,11 @@ class MainView extends View {
     /** Shows context menu for specified item */
     showContextMenu(itemId) {
         this.store.dispatch(actions.showTransactionContextMenu(itemId));
+    }
+
+    /** Hides context menu */
+    hideContextMenu() {
+        this.store.dispatch(actions.hideTransactionContextMenu());
     }
 
     showCategoryDialog() {
@@ -555,12 +562,15 @@ class MainView extends View {
 
     /** Renders transaction context menu */
     renderTransactionContextMenu(state, prevState) {
-        if (state.transactionContextItem === prevState?.transactionContextItem) {
+        if (
+            state.transactionContextItem === prevState?.transactionContextItem
+            && state.showContextMenu === prevState?.showContextMenu
+        ) {
             return;
         }
 
         const itemId = state.transactionContextItem;
-        if (!itemId) {
+        if (!itemId || !state.showContextMenu) {
             this.transactionContextMenu.detach();
             return;
         }

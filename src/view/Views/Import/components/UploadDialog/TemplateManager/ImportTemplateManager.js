@@ -21,7 +21,7 @@ import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDi
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import { TemplateSelect } from '../TemplateSelect/TemplateSelect.js';
-import './style.scss';
+import './ImportTemplateManager.scss';
 
 /** CSS classes */
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
@@ -534,18 +534,74 @@ export class ImportTemplateManager extends Component {
         this.setState({ ...this.state, listLoading: false });
     }
 
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                importtemplates: {},
+                importrules: {},
+            },
+        };
+    }
+
+    getListDataFromResponse(response) {
+        const state = response?.data?.state;
+        return {
+            templates: state?.importtemplates?.data,
+            rules: state?.importrules?.data,
+        };
+    }
+
+    setListData(templatesData, rulesData) {
+        const { templates } = window.app.model;
+        templates.setData(templatesData);
+        this.setState({
+            ...this.state,
+            templates: templates.data,
+        });
+
+        if (window.app.model.templates.length > 0) {
+            // Find template with same name as currently selected
+            let template = null;
+            if (this.state.template) {
+                template = templates.find((item) => item.name === this.state.template.name);
+            }
+            if (!template) {
+                template = templates.getItemByIndex(0);
+            }
+            this.setTemplate(template.id);
+            this.setState({
+                ...this.state,
+                selectedTemplateId: template.id,
+            });
+            this.setSelectTemplateState();
+        } else {
+            this.setCreateTemplateState();
+        }
+
+        if (rulesData) {
+            window.app.model.rules.setData(rulesData);
+        }
+
+        this.stopListLoading();
+
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate();
+        }
+    }
+
     /** Send API request to create/update template */
     async requestSubmitTemplate(data) {
         this.startListLoading();
 
         try {
-            if (data.id) {
-                await API.importTemplate.update(data);
-            } else {
-                await API.importTemplate.create(data);
-            }
+            const request = this.prepareRequest(data);
+            const response = (data.id)
+                ? await API.importTemplate.update(request)
+                : await API.importTemplate.create(request);
 
-            await this.requestTemplatesList();
+            const { templates, rules } = this.getListDataFromResponse(response);
+            this.setListData(templates, rules);
         } catch (e) {
             window.app.createErrorNotification(e.message);
         }
@@ -556,10 +612,13 @@ export class ImportTemplateManager extends Component {
         this.startListLoading();
 
         try {
-            await API.importTemplate.del(id);
-            await this.requestTemplatesList();
+            const request = this.prepareRequest({ id });
+            const response = await API.importTemplate.del(request);
+            const { templates, rules } = this.getListDataFromResponse(response);
+            this.setListData(templates, rules);
         } catch (e) {
             window.app.createErrorNotification(e.message);
+            this.stopListLoading();
         }
     }
 
@@ -567,65 +626,10 @@ export class ImportTemplateManager extends Component {
     async requestTemplatesList() {
         try {
             const result = await API.importTemplate.list();
-            if (!Array.isArray(result.data)) {
-                const errorMessage = (result && 'msg' in result)
-                    ? result.msg
-                    : __('ERR_TPL_LIST_READ');
-                throw new Error(errorMessage);
-            }
-
-            const { templates } = window.app.model;
-            templates.setData(result.data);
-            this.setState({
-                ...this.state,
-                templates: templates.data,
-            });
-
-            if (window.app.model.templates.length > 0) {
-                // Find template with same name as currently selected
-                let template = null;
-                if (this.state.template) {
-                    template = templates.find((item) => item.name === this.state.template.name);
-                }
-                if (!template) {
-                    template = templates.getItemByIndex(0);
-                }
-                this.setTemplate(template.id);
-                this.setState({
-                    ...this.state,
-                    selectedTemplateId: template.id,
-                });
-                this.setSelectTemplateState();
-            } else {
-                this.setCreateTemplateState();
-            }
-
-            await this.requestRulesList();
-
+            this.setListData(result.data);
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
             this.stopListLoading();
-
-            if (isFunction(this.props.onUpdate)) {
-                this.props.onUpdate();
-            }
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-        }
-    }
-
-    /** Send API request to obain list of import rules */
-    async requestRulesList() {
-        try {
-            const result = await API.importRule.list({ extended: true });
-            if (!Array.isArray(result.data)) {
-                const errorMessage = (result && 'msg' in result)
-                    ? result.msg
-                    : __('ERR_RULE_LIST_READ');
-                throw new Error(errorMessage);
-            }
-
-            window.app.model.rules.setData(result.data);
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
         }
     }
 

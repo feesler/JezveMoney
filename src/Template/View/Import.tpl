@@ -1,20 +1,14 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page import-view">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");        ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");        ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
                         <h1><?= __("IMPORT") ?></h1>
-                        <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
-                            <?= Button::render($uploadBtn) ?>
-                        </div>
+                        <div class="heading-actions" <?= hidden(!$importAvailable) ?>></div>
                     </header>
 
                     <?php if (!$importAvailable) { ?>
@@ -55,8 +49,8 @@ include(TPL_PATH . "Header.tpl");    ?>
     </div>
 </div>
 
-<?php include(TPL_PATH . "Component/tpl/ImportUploadDialog.tpl");    ?>
-<?php include(TPL_PATH . "Component/tpl/ImportRulesDialog.tpl");    ?>
+<?php include(TPL_PATH . "Component/ImportUploadDialog.tpl");    ?>
+<?php include(TPL_PATH . "Component/ImportRulesDialog.tpl");    ?>
 
 <?php include(ICONS_PATH . "Common.tpl");    ?>
 <?php include(TPL_PATH . "Footer.tpl");    ?>

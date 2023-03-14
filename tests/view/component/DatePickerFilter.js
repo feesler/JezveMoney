@@ -26,7 +26,7 @@ export class DatePickerFilter extends TestComponent {
             res.value = { startDate, endDate };
         }
 
-        res.datePickerBtn = await query(this.elem, '.dp-btn');
+        res.datePickerBtn = await query(this.elem, '.input-group__btn');
         assert(res.datePickerBtn, 'Date picker button not found');
 
         res.datePicker = await DatePicker.create(this.parent, await query(this.elem, '.dp__container'));

@@ -1,0 +1,85 @@
+.import-form-popup {
+  --import-form-popup-zindex: 500;
+  --popup-max-width: 600px;
+}
+
+/* Transaction item */
+.import-form {
+  --input-disabled-border: var(--disabled-color-1);
+
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
+  .form-container {
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    align-items: normal;
+    gap: 12px;
+  }
+
+  .stretch-input {
+    border-color: var(--input-border-color);
+  }
+
+  .stretch-input[disabled] {
+    color: var(--input-disabled-color);
+    -webkit-text-fill-color: var(--input-disabled-color);
+    border-color: var(--input-disabled-border);
+    background-color: var(--input-disabled-bg);
+  }
+
+  .stretch-input:focus {
+    border-color: var(--border-color-1);
+    background-color: var(--input-bg-color);
+  }
+
+  /* Input field and label group */
+  .field {
+    max-width: 300px;
+  }
+
+  .field__title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .comment-field {
+    max-width: none;
+  }
+
+  .dd__container {
+    --dd-list-z-index: var(--import-form-popup-zindex);
+
+    display: flex;
+  }
+
+  .dp__wrapper {
+    z-index: var(--import-form-popup-zindex);
+  }
+
+  .input-group {
+    --ig-height: var(--input-height);
+  }
+
+  /* Toggle expand/collapse button */
+  .toggle-btn {
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+
+    margin-left: auto;
+  }
+
+  .collapsible-content {
+    flex-flow: column nowrap;
+    row-gap: 1rem;
+    border-top: 1px solid;
+    padding: 8px;
+    overflow: hidden;
+    color: var(--text-color-3);
+    border-color: var(--border-color-2);
+    background-color: var(--bg-color-3);
+  }
+}

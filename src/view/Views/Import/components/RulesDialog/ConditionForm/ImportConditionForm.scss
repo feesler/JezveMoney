@@ -1,0 +1,70 @@
+/* Import condition create/update form */
+.cond-form {
+  display: flex;
+  flex-flow: row nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px 0 12px 8px;
+  column-gap: 8px;
+  background-color: var(--list-item-bg-color);
+
+  /* Update and delete buttons */
+  .icon-btn {
+    background: none;
+  }
+
+  .checkbox {
+    --checkbox-label-size: 14px;
+
+    width: fit-content;
+  }
+}
+
+/* Form container */
+.cond-form__container {
+  display: flex;
+  flex-flow: column nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  row-gap: 8px;
+
+  .checkbox__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Fields container */
+.cond-form__fields {
+  display: flex;
+  flex-flow: row wrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  column-gap: 8px;
+  row-gap: 8px;
+}
+
+.property-field,
+.operator-field {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+/* Controls container */
+.cond-form__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .cond-form__fields {
+    flex-flow: row nowrap;
+    column-gap: 8px;
+  }
+}

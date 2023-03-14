@@ -5,8 +5,8 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './RegisterView.scss';
 
 /**
  * User registration view

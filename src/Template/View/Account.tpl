@@ -1,28 +1,14 @@
-<?php
-
-use JezveMoney\App\Template\Component\Tile;
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");        ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");        ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <header class="heading">
+                    <header id="heading" class="heading">
                         <h1><?= e($headString) ?></h1>
-                        <?php if ($this->action == "update") {    ?>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "deleteBtn",
-                                    "classNames" => "warning-btn",
-                                    "title" => __("DELETE"),
-                                    "icon" => "del",
-                                ]) ?>
-                            </div>
-                        <?php    }    ?>
+                        <div class="heading-actions"></div>
                     </header>
 
                     <main>
@@ -31,9 +17,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input id="accid" name="id" type="hidden" value="<?= e($accInfo->id) ?>">
                             <?php    }    ?>
 
-                            <div class="form-row">
-                                <?= Tile::render($tile) ?>
-                            </div>
+                            <div id="tileField" class="form-row"></div>
 
                             <div id="iconField" class="field form-row">
                                 <label class="field__title"><?= __("ACCOUNT_ICON") ?></label>
@@ -53,7 +37,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="initbal-inp-block" class="field validation-block form-row">
                                 <label for="balanceInp" class="field__title"><?= __("ACCOUNT_INITIAL_BALANCE") ?></label>
                                 <div class="input-group">
-                                    <input id="balanceInp" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
+                                    <input id="balanceInp" class="input input-group__input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
                                     <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
                                 </div>
                                 <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>

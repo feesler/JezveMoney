@@ -1,0 +1,153 @@
+.upload-popup {
+  --popup-max-width: 600px;
+
+  .popup__header {
+    padding-bottom: 0;
+    column-gap: 12px;
+
+    .close-btn {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.upload-dialog {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 12px;
+}
+
+/* File upload form */
+.upload-form {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.upload-form__browser {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  row-gap: 12px;
+  padding: 1rem 0;
+}
+
+.upload-form__browser.drag-over {
+  outline: 2px dashed;
+  outline-color: var(--text-color-2);
+}
+
+.upload-form__inner {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+
+  .input-group__btn {
+    padding: 6px 12px;
+  }
+}
+
+.upload-form__file {
+  position: relative;
+  text-align: center;
+  margin: 0 0 6px 0;
+
+  input[type="file"] {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  input[type="file"]::file-selector-button {
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
+.browse-btn {
+  --btn-background: var(--accent-color);
+  --btn-border-radius: var(--action-btn-border-radius);
+  --btn-disabled-background: var(--accent-disabled-color);
+  --btn-title-color: #ffffff;
+
+  height: var(--input-height);
+  padding: 6px 24px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.upload-form__descr {
+  font-size: 14px;
+  color: var(--text-color-4);
+}
+
+.upload-form__filename {
+  font-size: 14px;
+  color: #7b7b7b;
+}
+
+.upload-form__options {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 2px;
+
+  .checkbox {
+    height: 24px;
+  }
+}
+
+/* Server address input group */
+.upload-form__browser .input-group {
+  .submit-btn,
+  .submit-btn:focus {
+    padding: 6px 12px;
+  }
+}
+
+/* Extended popup title for Convert state */
+.upload-popup__convert-title {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  column-gap: 12px;
+}
+
+/* Back buton  */
+.back-btn {
+  --back-btn-size: 32px;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  width: var(--back-btn-size);
+  height: var(--back-btn-size);
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: 0 none;
+  border-radius: 100vh;
+
+  .back-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--main-text-color);
+  }
+}
+
+@media (hover: hover) {
+  .upload-form__file:hover .browse-btn {
+    background-color: #1e82cc;
+  }
+
+  .back-btn:hover {
+    background: var(--icon-btn-hover-bg);
+  }
+}

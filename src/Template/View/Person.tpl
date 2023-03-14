@@ -1,28 +1,16 @@
-<?php
-
-use JezveMoney\App\Template\Component\Button;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <header class="heading">
+                    <header id="heading" class="heading">
                         <h1><?= e($headString) ?></h1>
-                        <?php if ($this->action == "update") {        ?>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "deleteBtn",
-                                    "classNames" => "warning-btn",
-                                    "title" => __("DELETE"),
-                                    "icon" => "del",
-                                ]) ?>
-                            </div>
-                        <?php    }    ?>
+                        <div class="heading-actions"></div>
                     </header>
+
                     <main>
                         <form id="personForm" method="post" action="<?= e(BASEURL . "persons/" . $this->action) ?>/">
                             <?php if ($this->action == "update") {        ?>

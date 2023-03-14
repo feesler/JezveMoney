@@ -143,6 +143,13 @@ class UserSettingsModel extends CachedTable
             }
         } elseif (self::$user_id) {
             $res["user_id"] = self::$user_id;
+
+            if (!$item_id) {
+                $settings = $this->getSettings();
+                if (!is_null($settings)) {
+                    throw new \Error("Settings for user already exists");
+                }
+            }
         } else {
             throw new \Error("Can't obtain user_id");
         }
@@ -159,11 +166,6 @@ class UserSettingsModel extends CachedTable
      */
     protected function preCreate(array $params, bool $isMultiple = false)
     {
-        $settings = $this->getSettings();
-        if (!is_null($settings)) {
-            throw new \Error("Settings for user already exists");
-        }
-
         $res = $this->validateParams($params);
 
         return $res;

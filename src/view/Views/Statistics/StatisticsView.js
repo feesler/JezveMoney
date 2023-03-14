@@ -33,7 +33,7 @@ import {
     actions,
     reducer,
 } from './reducer.js';
-import './style.scss';
+import './StatisticsView.scss';
 
 /** CSS classes */
 /* Chart popup */
@@ -95,17 +95,16 @@ class StatisticsView extends View {
     onStart() {
         this.loadElementsByIds([
             'heading',
-            'filtersBtn',
             'contentHeader',
             // Filters
             'filtersContainer',
             'applyFiltersBtn',
-            'typeMenu',
-            'reportMenu',
+            'typeFilter',
+            'reportTypeFilter',
             'accountsFilter',
             'categoriesFilter',
             'currencyFilter',
-            'dateFrm',
+            'dateFilter',
             // Histogram
             'chart',
             // Pie chart
@@ -125,9 +124,14 @@ class StatisticsView extends View {
         });
 
         // Filters
-        this.filtersBtn = Button.fromElement(this.filtersBtn, {
+        this.filtersBtn = Button.create({
+            id: 'filtersBtn',
+            className: 'circle-btn',
+            icon: 'filter',
             onClick: () => this.filters.toggle(),
         });
+        this.heading.actionsContainer.prepend(this.filtersBtn.elem);
+
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
         });
@@ -136,18 +140,27 @@ class StatisticsView extends View {
         setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
 
         // Transaction type filter
-        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
+        this.typeMenu = TransactionTypeMenu.create({
+            id: 'typeMenu',
             multiple: true,
             allowActiveLink: true,
-            itemParam: 'type',
+            showAll: false,
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
+        this.typeFilter.append(this.typeMenu.elem);
 
         // Report type filter
-        this.reportMenu = LinkMenu.fromElement(this.reportMenu, {
+        this.reportMenu = LinkMenu.create({
+            id: 'reportMenu',
             itemParam: 'report',
+            items: [
+                { value: 'category', title: __('STAT_REPORT_CATEGORIES') },
+                { value: 'account', title: __('STAT_REPORT_ACCOUNTS') },
+                { value: 'currency', title: __('STAT_REPORT_CURRENCIES') },
+            ],
             onChange: (value) => this.onSelectReportType(value),
         });
+        this.reportTypeFilter.append(this.reportMenu.elem);
 
         // Currency filter
         this.currencyDropDown = DropDown.create({
@@ -190,11 +203,13 @@ class StatisticsView extends View {
         });
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
+        this.dateRangeFilter = DateRangeInput.create({
+            id: 'dateFrm',
             startPlaceholder: __('DATE_RANGE_FROM'),
             endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
+        this.dateFilter.append(this.dateRangeFilter.elem);
 
         // Chart
         this.noDataMessage = this.chart.querySelector('.nodata-message');
@@ -294,6 +309,14 @@ class StatisticsView extends View {
 
     /** Date range filter change handler */
     onChangeDateFilter(data) {
+        const { filter } = this.store.getState();
+        const stdate = filter.stdate ?? null;
+        const enddate = filter.enddate ?? null;
+
+        if (stdate === data.stdate && enddate === data.enddate) {
+            return;
+        }
+
         this.store.dispatch(actions.changeDateFilter(data));
         const state = this.store.getState();
         this.requestData(state.form);

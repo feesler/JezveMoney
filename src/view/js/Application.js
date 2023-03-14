@@ -132,9 +132,8 @@ export class Application {
     }
 
     setTheme(dark) {
-        const { baseURL, themesPath, themes } = this.props;
         const themeId = (dark) ? DARK_THEME : WHITE_THEME;
-        const theme = themes[themeId];
+        const theme = this.props.themes[themeId];
 
         if (this.isCurrentTheme(theme)) {
             return;
@@ -143,11 +142,6 @@ export class Application {
         const themeColor = ge('themeColor');
         if (themeColor) {
             themeColor.content = theme.color;
-        }
-
-        const linkElem = ge('theme-style');
-        if (linkElem) {
-            linkElem.href = `${baseURL}${themesPath}${theme.file}`;
         }
 
         document.body.className = theme.className;
@@ -295,7 +289,7 @@ export class Application {
         } = options;
 
         const itemsGroup = (typeof group === 'string' && group.length > 0)
-            ? ddlist.addGroup(group)
+            ? ddlist.addGroup({ title: group })
             : null;
         items.forEach(
             (item) => ddlist.addItem({

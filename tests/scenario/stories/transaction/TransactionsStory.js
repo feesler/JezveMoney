@@ -38,6 +38,7 @@ export class TransactionsStory extends TestStory {
         await this.update();
         await this.updateFromMainView();
         await this.setCategoryFromMainView();
+        await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
         await this.deleteFromMainView();
@@ -709,6 +710,12 @@ export class TransactionsStory extends TestStory {
         return App.scenario.runner.runGroup(TransactionTests.setTransactionCategory, data);
     }
 
+    async deleteFromContextMenu() {
+        setBlock('Delete transaction from context menu', 1);
+
+        await TransactionTests.deleteFromContextMenu(1);
+    }
+
     async deleteExpense() {
         setBlock('Delete expense transactions', 2);
 
@@ -937,7 +944,7 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Hide first account
-        await api.account.hide(account1);
+        await api.account.hide({ id: account1 });
         await App.state.fetch();
 
         setBlock('1 visible, 1 hidden account and 1 person', 2);
@@ -945,7 +952,7 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Hide second account
-        await api.account.hide(account2);
+        await api.account.hide({ id: account2 });
         await App.state.fetch();
 
         setBlock('2 hidden accounts and 1 person', 2);
@@ -953,8 +960,8 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Remove account
-        await api.account.show(account1);
-        await api.account.del(account2);
+        await api.account.show({ id: account1 });
+        await api.account.del({ id: account2 });
         await App.state.fetch();
 
         setBlock('1 account and 1 person', 2);
@@ -962,7 +969,7 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Remove account
-        await api.account.del(account1);
+        await api.account.del({ id: account1 });
         await App.state.fetch();
 
         setBlock('No accounts and 1 person', 2);
@@ -970,7 +977,7 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Hide person
-        await api.person.hide(person1);
+        await api.person.hide({ id: person1 });
         await App.state.fetch();
 
         setBlock('No accounts and 1 hidden person', 2);
@@ -980,7 +987,7 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.runAction({ action: 'swapSourceAndDest' });
 
         // Remove person
-        await api.person.del(person1);
+        await api.person.del({ id: person1 });
         await App.state.fetch();
 
         setBlock('No accounts and no persons', 2);

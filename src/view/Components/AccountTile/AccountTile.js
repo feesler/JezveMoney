@@ -6,6 +6,14 @@ import { Tile } from '../Tile/Tile.js';
  * @param {object} props
  */
 export class AccountTile extends Component {
+    static get selector() {
+        return Tile.selector;
+    }
+
+    static get sortSelector() {
+        return Tile.sortSelector;
+    }
+
     constructor(props) {
         super(props);
 

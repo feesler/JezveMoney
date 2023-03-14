@@ -4,7 +4,7 @@ import {
     createElement,
     px,
 } from 'jezvejs';
-import './style.scss';
+import './Heading.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'heading';

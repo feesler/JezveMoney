@@ -5,7 +5,7 @@ import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
 import { View } from '../../../../view/js/View.js';
 import '../../css/admin.scss';
-import './style.scss';
+import './BalanceView.scss';
 
 /**
  * Admin balance view

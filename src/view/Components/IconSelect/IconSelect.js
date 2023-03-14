@@ -1,7 +1,7 @@
 import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../js/utils.js';
 import { IconListItem } from './IconListItem.js';
-import './style.scss';
+import './IconSelect.scss';
 
 /**
  * Icon select component

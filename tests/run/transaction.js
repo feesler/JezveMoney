@@ -21,6 +21,7 @@ import {
 import { App } from '../Application.js';
 import { generateId } from '../common.js';
 import { __ } from '../model/locale.js';
+import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
 
 export const decimalInputTestStrings = [
     '.',
@@ -354,14 +355,37 @@ export const updateFromMainViewAndSubmit = async (pos, actions) => {
     await submit();
 };
 
+export const deleteFromContextMenu = async (index) => {
+    await test(`Delete transaction from context menu [${index}]`, async () => {
+        await App.view.navigateToTransactions();
+
+        await App.view.deleteFromContextMenu(index);
+
+        const id = App.state.transactions.indexesToIds(index);
+        App.state.deleteTransactions({ id });
+
+        App.view.model.data = App.state.transactions.clone();
+
+        const expectedItems = App.state.transactions.getPage(1);
+        const expected = {
+            transList: TransactionList.render(expectedItems.data, App.state),
+        };
+        App.view.checkState(expected);
+
+        await App.view.iteratePages();
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const del = async (type, transactions) => {
     setBlock(`Delete transactions [${transactions.join()}]`, 3);
 
     await App.goToMainView();
 
     const expectedState = App.state.clone();
-    const ids = expectedState.transactions.filterByType(type).indexesToIds(transactions);
-    expectedState.deleteTransactions(ids);
+    const id = expectedState.transactions.filterByType(type).indexesToIds(transactions);
+    expectedState.deleteTransactions({ id });
 
     // Navigate to transactions view and filter by specified type of transaction
     await App.view.navigateToTransactions();
@@ -424,8 +448,8 @@ export const delFromUpdate = async (type, pos) => {
     setBlock(`Delete ${Transaction.typeToString(type)} from update view [${ind}]`, 2);
 
     const expectedState = App.state.clone();
-    const ids = expectedState.transactions.filterByType(type).indexesToIds(ind);
-    expectedState.deleteTransactions(ids);
+    const id = expectedState.transactions.filterByType(type).indexesToIds(ind);
+    expectedState.deleteTransactions({ id });
 
     if (!(App.view instanceof TransactionListView)) {
         await App.view.navigateToTransactions();
@@ -471,8 +495,8 @@ export const deleteFromMainView = async (pos) => {
 
     await test(`Delete transaction [${ind}] from main view`, async () => {
         const expectedState = App.state.clone();
-        const ids = expectedState.transactions.indexesToIds(ind);
-        expectedState.deleteTransactions(ids);
+        const id = expectedState.transactions.indexesToIds(ind);
+        expectedState.deleteTransactions({ id });
 
         await App.goToMainView();
         await App.view.deleteTransactionByIndex(ind);

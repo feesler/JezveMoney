@@ -13,6 +13,7 @@ class AdminCurrencyListView extends AdminListView {
         super(...args);
 
         this.apiController = 'currency';
+        this.statePath = 'currency';
         this.deleteConfirmMessage = 'Are you sure want to delete selected currency?';
     }
 

@@ -38,9 +38,13 @@ const slice = createSlice({
     ),
 
     showContextMenu: (state, itemId) => (
-        (state.contextItem === itemId)
+        (state.contextItem === itemId && state.showContextMenu)
             ? state
-            : { ...state, contextItem: itemId }
+            : { ...state, contextItem: itemId, showContextMenu: true }
+    ),
+
+    hideContextMenu: (state) => (
+        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
     toggleSelectItem: (state, itemId) => ({
@@ -69,12 +73,12 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAllItems(newState) : newState;
     },
 
-    startLoading: (state) => (
-        (state.loading) ? state : { ...state, loading: true }
+    startLoading: (state, isLoadingMore = false) => (
+        (state.loading) ? state : { ...state, isLoadingMore, loading: true }
     ),
 
     stopLoading: (state) => (
-        (state.loading) ? { ...state, loading: false } : state
+        (state.loading) ? { ...state, loading: false, isLoadingMore: false } : state
     ),
 
     setRenderTime: (state) => ({

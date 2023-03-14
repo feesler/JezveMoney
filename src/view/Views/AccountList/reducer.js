@@ -50,9 +50,13 @@ const slice = createSlice({
     ),
 
     showContextMenu: (state, itemId) => (
-        (state.contextItem === itemId)
+        (state.contextItem === itemId && state.showContextMenu)
             ? state
-            : { ...state, contextItem: itemId }
+            : { ...state, contextItem: itemId, showContextMenu: true }
+    ),
+
+    hideContextMenu: (state) => (
+        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
     toggleSelectItem: (state, itemId) => {

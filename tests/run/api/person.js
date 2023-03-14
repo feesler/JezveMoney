@@ -1,4 +1,4 @@
-import { test } from 'jezve-test';
+import { assert, copyObject, test } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
@@ -15,11 +15,11 @@ export const create = async (params) => {
     await test(`Create person (${formatProps(params)})`, async () => {
         let createRes = null;
         const resExpected = App.state.createPerson(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
+
         try {
-            createRes = await api.person.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.person.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -43,26 +43,23 @@ export const createMultiple = async (params) => {
     await test('Create multiple persons', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
-            expectedResult = [];
+            expectedResult = { ids: [] };
             for (const item of params) {
                 const resExpected = App.state.createPerson(item);
                 if (!resExpected) {
-                    App.state.deletePersons(expectedResult);
+                    App.state.deletePersons({ id: expectedResult.ids });
                     expectedResult = false;
                     break;
                 }
 
-                expectedResult.push(resExpected);
+                expectedResult.ids.push(resExpected.id);
             }
         }
 
-        // Send API sequest to server
         let createRes;
         try {
             createRes = await api.person.createMultiple(params);
-            if (expectedResult && (!createRes || !createRes.ids)) {
-                return false;
-            }
+            assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
                 throw e;
@@ -88,13 +85,16 @@ export const update = async (params) => {
 
     await test(`Update person (${formatProps(params)})`, async () => {
         const resExpected = App.state.updatePerson(params);
-        const updParams = (resExpected) ? App.state.persons.getItem(params.id) : params;
+
+        const item = App.state.persons.getItem(params.id);
+        const updParams = (item) ? copyObject(item) : {};
+        Object.assign(updParams, params);
+
+        const reqParams = App.state.prepareChainedRequestData(updParams);
 
         try {
-            updateRes = await api.person.update(updParams);
-            if (resExpected !== updateRes) {
-                return false;
-            }
+            updateRes = await api.person.update(reqParams);
+            assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -111,18 +111,16 @@ export const update = async (params) => {
  * Delete specified person(s) and check expected state of app
  * @param {number[]} ids - array of person identificators
  */
-export const del = async (ids) => {
+export const del = async (params) => {
     let deleteRes = false;
 
-    await test(`Delete person (${ids})`, async () => {
-        const resExpected = App.state.deletePersons(ids);
+    await test(`Delete person (${params})`, async () => {
+        const resExpected = App.state.deletePersons(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            deleteRes = await api.person.del(ids);
-            if (resExpected !== deleteRes) {
-                return false;
-            }
+            deleteRes = await api.person.del(reqParams);
+            assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -141,13 +139,11 @@ export const setPos = async (params) => {
 
     await test(`Set position of person (${formatProps(params)})`, async () => {
         const resExpected = App.state.setPersonPos(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.person.setPos(params);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.person.setPos(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;

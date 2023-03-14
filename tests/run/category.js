@@ -145,6 +145,27 @@ export const submit = async () => {
     });
 };
 
+export const deleteFromContextMenu = async (index, removeChildren = true) => {
+    const options = (removeChildren) ? 'remove children' : 'keep children';
+    await test(`Delete category from context menu [${index}] ${options}`, async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+
+        const item = App.view.getItemByIndex(index);
+        const { id } = item.model;
+
+        await App.view.deleteFromContextMenu(index, removeChildren);
+
+        App.state.deleteCategories({ id, removeChildren });
+
+        const expected = CategoryListView.render(App.state);
+        App.view.checkState(expected);
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const del = async (indexes, removeChildren = true) => {
     const categories = asArray(indexes);
     assert(categories.length > 0, 'Invalid category indexes');
@@ -153,14 +174,14 @@ export const del = async (indexes, removeChildren = true) => {
     await test(`Delete categories [${categories.join()}] ${options}`, async () => {
         await checkNavigation();
 
-        const ids = categories.map((ind) => {
+        const id = categories.map((ind) => {
             const item = App.view.getItemByIndex(ind);
             return item.model.id;
         });
 
         await App.view.deleteCategories(categories, removeChildren);
 
-        App.state.deleteCategories(ids, removeChildren);
+        App.state.deleteCategories({ id, removeChildren });
 
         const expected = CategoryListView.render(App.state);
         App.view.checkState(expected);
@@ -181,7 +202,7 @@ export const delFromUpdate = async (index, removeChildren = true) => {
         assert.instanceOf(App.view, CategoryListView, 'Invalid view');
 
         const id = App.state.categories.indexToId(index);
-        App.state.deleteCategories(id, removeChildren);
+        App.state.deleteCategories({ id, removeChildren });
         const expected = CategoryListView.render(App.state);
         App.view.checkState(expected);
 

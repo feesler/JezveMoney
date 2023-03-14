@@ -21,7 +21,7 @@ import { listData, __ } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
-import './style.scss';
+import './ImportRuleForm.scss';
 
 /* CSS classes */
 const FORM_CLASS = 'rule-form';
@@ -137,7 +137,7 @@ export class ImportRuleForm extends Component {
             getItemProps: (action, state) => this.getActionProps(action, state),
         });
 
-        this.actionsCollapse = new Collapsible({
+        this.actionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
             header: [
                 createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
@@ -252,6 +252,7 @@ export class ImportRuleForm extends Component {
         );
         const showSetAccount = (
             ImportActionList.hasSetTransfer(state.items)
+            && (action.action_id !== IMPORT_ACTION_SET_TR_TYPE)
             && (!setAccountAction || setAccountAction === action)
         );
         if (!showSetAccount) {
@@ -263,6 +264,7 @@ export class ImportRuleForm extends Component {
         const showSetPerson = (
             window.app.model.persons.length > 0
             && ImportActionList.hasSetDebt(state.items)
+            && (action.action_id !== IMPORT_ACTION_SET_TR_TYPE)
             && (!setPersonAction || setPersonAction === action)
         );
         if (!showSetPerson) {

@@ -3,7 +3,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { __ } from '../../../../js/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
-import './style.scss';
+import './ImportTransactionList.scss';
 
 /* CSS classes */
 const LIST_CLASS = 'import-list';
@@ -32,8 +32,8 @@ export class ImportTransactionList extends ListContainer {
             return;
         }
 
-        this.listSortable = new Sortable({
-            onInsertAt: (orig, replaced) => this.onSort(orig, replaced),
+        this.listSortable = Sortable.create({
+            onSort: (info) => this.onSort(info),
             elem: this.elem,
             group: 'importTransactions',
             selector: state.itemSortSelector,
@@ -61,13 +61,13 @@ export class ImportTransactionList extends ListContainer {
      * @param {Object} original - original item object
      * @param {Object} replaced - new item object
      */
-    onSort(original, replaced) {
+    onSort(info) {
         if (this.state.items.length < 2 || !isFunction(this.props.onSort)) {
             return;
         }
 
-        const fromIndex = this.getItemIndexByElem(original);
-        const toIndex = this.getItemIndexByElem(replaced);
+        const fromIndex = this.getItemIndexByElem(info.elem);
+        const toIndex = this.getItemIndexByElem(info.targetElem);
         this.props.onSort(fromIndex, toIndex);
     }
 

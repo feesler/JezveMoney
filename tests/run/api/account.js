@@ -1,4 +1,4 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
@@ -17,13 +17,12 @@ export const create = async (params) => {
 
     await test(`Create account (${formatProps(params)})`, async () => {
         const resExpected = App.state.createAccount(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.account.create(params);
-            if (resExpected && (!createRes || !createRes.id)) {
-                return false;
-            }
+            createRes = await api.account.create(reqParams);
+            assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -47,26 +46,23 @@ export const createMultiple = async (params) => {
     await test('Create multiple accounts', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
-            expectedResult = [];
+            expectedResult = { ids: [] };
             for (const item of params) {
                 const resExpected = App.state.createAccount(item);
                 if (!resExpected) {
-                    App.state.deleteAccounts(expectedResult);
+                    App.state.deleteAccounts({ id: expectedResult.ids });
                     expectedResult = false;
                     break;
                 }
 
-                expectedResult.push(resExpected);
+                expectedResult.ids.push(resExpected.id);
             }
         }
 
-        // Send API sequest to server
         let createRes;
         try {
             createRes = await api.account.createMultiple(params);
-            if (expectedResult && (!createRes || !createRes.ids)) {
-                return false;
-            }
+            assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
                 throw e;
@@ -96,23 +92,16 @@ export const update = async (params) => {
 
     await test(`Update account (${formatProps(props)})`, async () => {
         const resExpected = App.state.updateAccount(props);
-        let updParams = {};
 
         const item = App.state.accounts.getItem(props.id);
-        if (item) {
-            updParams = copyObject(item);
-        }
+        let updParams = (item) ? copyObject(item) : {};
+        Object.assign(updParams, props);
 
-        if (!resExpected) {
-            Object.assign(updParams, props);
-        }
+        updParams = App.state.prepareChainedRequestData(updParams);
 
-        // Send API sequest to server
         try {
             updateRes = await api.account.update(updParams);
-            if (resExpected !== updateRes) {
-                return false;
-            }
+            assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -129,18 +118,16 @@ export const update = async (params) => {
  * Delete specified account(s) and check expected state of app
  * @param {number[]} ids - array of account identificators
  */
-export const del = async (ids) => {
+export const del = async (options) => {
     let deleteRes = false;
 
-    await test(`Delete account (${ids})`, async () => {
-        const resExpected = App.state.deleteAccounts(ids);
+    await test(`Delete account (${options})`, async () => {
+        const resExpected = App.state.deleteAccounts(options);
+        const reqParams = App.state.prepareChainedRequestData(options);
 
-        // Send API sequest to server
         try {
-            deleteRes = await api.account.del(ids);
-            if (resExpected !== deleteRes) {
-                return false;
-            }
+            deleteRes = await api.account.del(reqParams);
+            assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
@@ -159,13 +146,11 @@ export const setPos = async (params) => {
 
     await test(`Set position of account (${formatProps(params)})`, async () => {
         const resExpected = App.state.setAccountPos(params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
-        // Send API sequest to server
         try {
-            result = await api.account.setPos(params);
-            if (resExpected !== result) {
-                return false;
-            }
+            result = await api.account.setPos(reqParams);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;

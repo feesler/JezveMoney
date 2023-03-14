@@ -8,7 +8,7 @@ import { Field } from '../../../../Components/Field/Field.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
-import './style.scss';
+import './ImportTransactionItem.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';

@@ -6,7 +6,7 @@ import {
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../../../js/model/ImportAction.js';
-import './style.scss';
+import './ImportActionItem.scss';
 
 /**
  * ImportActionItem component

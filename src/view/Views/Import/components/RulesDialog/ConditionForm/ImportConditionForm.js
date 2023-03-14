@@ -14,7 +14,7 @@ import {
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../../js/model/ImportCondition.js';
 import { __ } from '../../../../../js/utils.js';
-import './style.scss';
+import './ImportConditionForm.scss';
 
 /** CSS classes */
 const FORM_CLASS = 'cond-form';

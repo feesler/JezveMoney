@@ -1,0 +1,44 @@
+/* Import condition item */
+.cond-item {
+  display: flex;
+  flex-flow: row wrap;
+  flex: 1 1 auto;
+  align-items: center;
+  padding: 8px 4px 8px 8px;
+  column-gap: 12px;
+  font-size: 16px;
+  overflow: hidden;
+  background-color: var(--list-item-bg-color);
+}
+
+/* Condition property */
+.cond-item__property,
+.cond-item__value-property {
+  white-space: nowrap;
+}
+
+/* Condition operator, value */
+.cond-item__operator {
+  font-style: italic;
+  white-space: nowrap;
+  color: var(--dimmed-text-color);
+}
+
+/* Condition value */
+.cond-item__value {
+  flex-grow: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cond-item__value::before,
+.cond-item__value::after {
+  content: "`";
+}
+
+/* Controls */
+.cond-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}

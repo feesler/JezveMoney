@@ -8,7 +8,7 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { timeToDate, __ } from '../../js/utils.js';
 import { Field } from '../Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
-import './style.scss';
+import './ItemDetails.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'list-item-details';

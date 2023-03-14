@@ -1,0 +1,127 @@
+/* Filters container */
+.filters-container {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  background-color: var(--main-bg-color);
+}
+
+/* Filters header */
+.filters-heading {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 4px;
+
+  label {
+    color: var(--main-text-color);
+  }
+
+  .filters-heading__title {
+    margin: 0 30px 0 0;
+    font-size: 26px;
+    font-weight: 300;
+  }
+
+  .btn.close-btn {
+    margin: calc((var(--btn-icon-size) - var(--btn-size)) / 2);
+  }
+}
+
+/* List of filter items */
+.filters-list {
+  display: flex;
+  flex-flow: column nowrap;
+  column-gap: 24px;
+}
+
+/* Filter item */
+.filter-item {
+  flex: 1 1 auto;
+  margin: 8px 0 12px 0;
+}
+
+.filter-item__title {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-bottom: 5px;
+  margin-left: 1px;
+  white-space: nowrap;
+  color: var(--dimmed-text-color);
+}
+
+/* Horizontal filters separator */
+.filters-separator {
+  width: 100%;
+  border: 0 none;
+  border-top: 1px solid var(--list-separator-color);
+  margin: 0.25rem 0;
+}
+
+/* Horizontal group of filters, on screen smaller 576px become vertical */
+.filters-row {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: normal;
+  flex-grow: 1;
+  column-gap: 24px;
+}
+
+/* Horizontal group of filters */
+.filters-row_fixed {
+  display: flex;
+  flex-flow: row nowrap;
+  column-gap: 24px;
+  align-items: normal;
+}
+
+/* Filters controls */
+.filters-controls {
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+/* Filters inside Collapsible container */
+.filters-collapsible {
+  display: none;
+
+  .collapsible-header,
+  .filters-heading {
+    display: none;
+  }
+}
+
+/* Filters inside Offcanvas */
+.filters-offcanvas {
+  --offcanvas-bg: var(--semitrans-bg-color);
+
+  width: 100%;
+
+  .filters-container {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 576px) {
+  .filters-row {
+    flex-flow: row nowrap;
+  }
+
+  .filters-separator {
+    display: none;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .filters-collapsible {
+    display: flex;
+  }
+
+  .filters-controls {
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+}

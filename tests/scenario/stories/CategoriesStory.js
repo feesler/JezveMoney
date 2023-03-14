@@ -34,6 +34,7 @@ export class CategoriesStory extends TestStory {
         await this.sort();
         await this.details();
         await this.update();
+        await this.deleteFromContextMenu();
         await this.del();
 
         await this.prepareTransactions();
@@ -140,12 +141,18 @@ export class CategoriesStory extends TestStory {
         await CategoryTests.submit();
     }
 
+    async deleteFromContextMenu() {
+        setBlock('Delete category from context menu', 1);
+
+        await CategoryTests.deleteFromContextMenu(0);
+    }
+
     async del() {
         setBlock('Delete categories', 1);
 
         await CategoryTests.del(0);
-        await CategoryTests.del(3, false);
-        await CategoryTests.del([0, 2]);
+        await CategoryTests.del(2, false);
+        await CategoryTests.del([0, 1]);
     }
 
     async deleteFromUpdate() {

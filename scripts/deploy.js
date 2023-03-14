@@ -25,17 +25,33 @@ const skipList = [
     'vendor',
 ];
 
+const createDirs = ['system/logs', 'system/uploads'];
+
 const option = (process.argv.length > 2) ? process.argv[2] : null;
 const isFullDeploy = option?.toLowerCase() === 'full';
 
 let res = 1;
 try {
-    console.log(`Deploy from: ${src} to: ${dest}`);
-
     await client.connect(config);
     client.on('upload', (info) => {
         console.log(`Uploaded ${info.source}`);
     });
+
+    if (isFullDeploy) {
+        const list = await client.list(dest);
+        for (const item of list) {
+            const itemPath = [dest, item.name].join('/');
+
+            console.log(`Removing ${itemPath}`);
+            if (item.type === 'd') {
+                await client.rmdir(itemPath, true);
+            } else {
+                await client.delete(itemPath, true);
+            }
+        }
+    }
+
+    console.log(`Deploy from: ${src} to: ${dest}`);
 
     await client.uploadDir(src, dest, {
         filter: (source, isDir) => {
@@ -47,6 +63,16 @@ try {
             return (!isDir || !skipList.includes(relPath));
         },
     });
+
+    if (isFullDeploy) {
+        for (const item of createDirs) {
+            const itemPath = [dest, item].join('/');
+            console.log(`Creating ${itemPath}`);
+
+            await client.mkdir(itemPath, true);
+            await client.chmod(itemPath, 0o0755);
+        }
+    }
 
     console.log('Done');
 

@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\API\Controller;
 
+use JezveMoney\App\API\Factory\TransactionsFactory;
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Model;
 use JezveMoney\App\Model\AccountModel;
@@ -11,6 +12,10 @@ use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
+use JezveMoney\App\Model\IconModel;
+use JezveMoney\App\Model\ImportActionModel;
+use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
 /**
@@ -40,6 +45,30 @@ class State extends ApiController
     }
 
     /**
+     * Returns currencies data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getCurrencies(array $options = [])
+    {
+        return $this->getList(CurrencyModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns icons data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getIcons(array $options = [])
+    {
+        return $this->getList(IconModel::getInstance(), $options);
+    }
+
+    /**
      * Returns accounts data for specified request
      *
      * @param array $options
@@ -65,11 +94,22 @@ class State extends ApiController
      */
     protected function getTransactions(array $options = [])
     {
+        $autoIncrement = $options["autoIncrement"] ?? false;
+        unset($options["autoIncrement"]);
+
         $options = array_merge([
             "onPage" => 0,
         ], $options);
 
-        return $this->getList(TransactionModel::getInstance(), $options);
+        $factory = TransactionsFactory::getInstance();
+        $res = $factory->getList($options);
+
+        if ($autoIncrement) {
+            $model = TransactionModel::getInstance();
+            $res->autoincrement = $model->autoIncrement();
+        }
+
+        return $res;
     }
 
     /**
@@ -126,6 +166,43 @@ class State extends ApiController
         ], $options);
 
         return $this->getList(ImportRuleModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns import conditions data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getImportConditions(array $options = [])
+    {
+        return $this->getList(ImportConditionModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns import actions data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getImportActions(array $options = [])
+    {
+        return $this->getList(ImportActionModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns users data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getUsers(array $options = [])
+    {
+        $this->checkAdminAccess();
+        return $this->getList(UserModel::getInstance(), $options);
     }
 
     /**
@@ -223,21 +300,15 @@ class State extends ApiController
      */
     public function index()
     {
-        $res = new \stdClass();
-        // Accounts
-        $res->accounts = $this->getAccounts(["autoIncrement" => true]);
-        // Transactions
-        $res->transactions = $this->getTransactions(["autoIncrement" => true]);
-        // Persons
-        $res->persons = $this->getPersons(["autoIncrement" => true]);
-        // Categories
-        $res->categories = $this->getCategories(["autoIncrement" => true]);
-        // Import templates
-        $res->templates = $this->getImportTemplates(["autoIncrement" => true]);
-        // Import rules
-        $res->rules = $this->getImportRules(["autoIncrement" => true]);
-        // User profile
-        $res->profile = $this->getProfile();
+        $res = $this->getData([
+            "accounts" => ["autoIncrement" => true],
+            "persons" => ["autoIncrement" => true],
+            "transactions" => ["count" => 0, "autoIncrement" => true],
+            "categories" => ["autoIncrement" => true],
+            "importtemplates" => ["autoIncrement" => true],
+            "importrules" => ["autoIncrement" => true],
+            "profile" => [],
+        ]);
 
         $this->ok($res);
     }
@@ -248,17 +319,87 @@ class State extends ApiController
      */
     public function main()
     {
-        $res = new \stdClass();
-        // Accounts
-        $res->accounts = $this->getAccounts();
-        // Transactions
-        $res->transactions = $this->getTransactions(["desc" => true, "onPage" => 5]);
-        // Persons
-        $res->persons = $this->getPersons();
+        $res = $this->getData([
+            "accounts" => [],
+            "persons" => [],
+            "transactions" => ["desc" => true, "onPage" => 5],
+        ]);
+
         // Statistics
-        $currencyId = $this->getMostFrequentCurrency($res->transactions->data);
+        $currencyId = $this->getMostFrequentCurrency($res->transactions->items);
         $res->histogram = $this->getStatistics($currencyId);
 
         $this->ok($res);
+    }
+
+    /**
+     * Returns state object for specified request
+     *
+     * @param array $request array of options
+     *
+     * @return object|null
+     */
+    public function getData(array $request = [])
+    {
+        if (!is_array($request) || !count(array_keys($request))) {
+            return null;
+        }
+
+        $res = new \stdClass();
+        // Currency
+        if (isset($request["currency"])) {
+            $res->currency = $this->getCurrencies($request["currency"]);
+        }
+        // Icons
+        if (isset($request["icons"])) {
+            $res->icons = $this->getIcons($request["icons"]);
+        }
+        // Accounts
+        if (isset($request["accounts"])) {
+            $res->accounts = $this->getAccounts($request["accounts"]);
+        }
+        // Persons
+        if (isset($request["persons"])) {
+            $res->persons = $this->getPersons($request["persons"]);
+        }
+        // Transactions
+        if (isset($request["transactions"])) {
+            $res->transactions = $this->getTransactions($request["transactions"]);
+        }
+        // Statistics
+        if (isset($request["statistics"])) {
+            $res->statistics = $this->getStatistics($request["getStatistics"]);
+        }
+        // Categories
+        if (isset($request["categories"])) {
+            $res->categories = $this->getCategories($request["categories"]);
+        }
+        // Import templates
+        if (isset($request["importtemplates"])) {
+            $res->importtemplates = $this->getImportTemplates($request["importtemplates"]);
+        }
+        // Import rules
+        if (isset($request["importrules"])) {
+            $res->importrules = $this->getImportRules($request["importrules"]);
+        }
+        // Import conditions
+        if (isset($request["importconditions"])) {
+            $res->importconditions = $this->getImportConditions($request["importconditions"]);
+        }
+        // Import actions
+        if (isset($request["importactions"])) {
+            $res->importactions = $this->getImportActions($request["importactions"]);
+        }
+        // User profile
+        if (isset($request["profile"])) {
+            $res->profile = $this->getProfile();
+        }
+
+        // Users
+        if (isset($request["users"])) {
+            $res->users = $this->getUsers($request["users"]);
+        }
+
+        return $res;
     }
 }

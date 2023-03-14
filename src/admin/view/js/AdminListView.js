@@ -165,10 +165,12 @@ export class AdminListView extends AdminView {
             content: popupContent,
             onConfirm: async () => {
                 const reqURL = `${window.app.baseURL}api/${this.apiController}/del`;
+                const data = this.prepareRequestData({ id: this.selectedItem.id });
+
                 const response = await fetch(reqURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: this.selectedItem.id }),
+                    body: JSON.stringify(data),
                 });
                 const apiResult = await response.json();
                 this.onSubmitResult(apiResult);
@@ -181,7 +183,14 @@ export class AdminListView extends AdminView {
      * @param {object} data - form data
      */
     prepareRequestData(data) {
-        return data;
+        return (this.statePath)
+            ? {
+                ...data,
+                returnState: {
+                    [this.statePath]: {},
+                },
+            }
+            : data;
     }
 
     /**
@@ -230,7 +239,13 @@ export class AdminListView extends AdminView {
             return;
         }
 
-        this.requestList();
+        const stateResult = apiResult.data?.state?.[this.statePath];
+        if (stateResult) {
+            this.setListData(apiResult.data.state[this.statePath].data);
+            this.dialogPopup.close();
+        } else {
+            this.requestList();
+        }
     }
 
     /**
@@ -255,9 +270,15 @@ export class AdminListView extends AdminView {
             return;
         }
 
-        this.setData(apiResult.data);
+        this.setListData(apiResult.data);
+
+        this.dialogPopup.close();
+    }
+
+    setListData(data) {
+        this.setData(data);
         removeChilds(this.itemsListElem);
-        const rows = apiResult.data.map((item) => {
+        const rows = data.map((item) => {
             const row = this.renderItem(item);
             row.dataset.id = item.id;
             return row;
@@ -266,7 +287,6 @@ export class AdminListView extends AdminView {
         addChilds(this.itemsListElem, rows);
         this.selectItem(null);
         show(this.itemsListElem, true);
-        this.dialogPopup.close();
     }
 
     /**

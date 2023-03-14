@@ -2,7 +2,7 @@
 
 <div class="page">
     <div class="page_wrapper">
-        <?php include(ADMIN_TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php include(ADMIN_TPL_PATH . "Component/Header.tpl");    ?>
         <div id="apiMenu" class="navigation navigation_closed">
             <nav class="navigation-content">
                 <div class="navigation-controls">
@@ -30,6 +30,8 @@
                             <li data-target="readAccForm">Read</li>
                             <li data-target="createAccForm">Create</li>
                             <li data-target="updateAccForm">Update</li>
+                            <li data-target="showAccForm">Show</li>
+                            <li data-target="hideAccForm">Hide</li>
                             <li data-target="delAccForm">Delete</li>
                             <li data-target="setAccPosForm">Set position</li>
                         </ul>
@@ -42,6 +44,8 @@
                             <li data-target="readPersonForm">Read</li>
                             <li data-target="createPersonForm">Create</li>
                             <li data-target="updatePersonForm">Update</li>
+                            <li data-target="showPersonForm">Show</li>
+                            <li data-target="hidePersonForm">Hide</li>
                             <li data-target="delPersonForm">Delete</li>
                             <li data-target="setPersonPosForm">Set position</li>
                         </ul>
@@ -177,31 +181,31 @@
                     <div class="api-console">
                         <div class="center-column">
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Common.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Common.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Accounts.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Accounts.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Persons.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Persons.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Transactions.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Transactions.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Categories.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Categories.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/ImportTemplates.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/ImportTemplates.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/ImportRules.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/ImportRules.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/ImportConditions.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/ImportConditions.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/ImportActions.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/ImportActions.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Currencies.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Currencies.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Icons.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Icons.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/User.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/User.tpl");    ?>
 
-                            <?php include(ADMIN_TPL_PATH . "Component/tpl/ApiConsole/Profile.tpl");    ?>
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Profile.tpl");    ?>
 
                         </div>
 

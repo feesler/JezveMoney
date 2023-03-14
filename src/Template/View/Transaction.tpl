@@ -1,71 +1,28 @@
-<?php
-
-use JezveMoney\App\Template\Component\AccountContainer;
-use JezveMoney\App\Template\Component\Button;
-use JezveMoney\App\Template\Component\LinkMenu;
-
-include(TPL_PATH . "Header.tpl");    ?>
+<?php include(TPL_PATH . "Header.tpl"); ?>
 
 <div class="page">
     <div class="page_wrapper">
-        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
+        <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <header class="heading">
+                    <header id="heading" class="heading">
                         <h1><?= e($headString) ?></h1>
-                        <?php if ($action == "update") {    ?>
-                            <div class="heading-actions">
-                                <?= Button::render([
-                                    "id" => "deleteBtn",
-                                    "classNames" => "warning-btn",
-                                    "icon" => "del",
-                                    "title" => __("DELETE"),
-                                ]) ?>
-                            </div>
-                        <?php    }    ?>
+                        <div class="heading-actions"></div>
                     </header>
 
                     <main>
                         <form id="form" method="post" action="<?= e($form["action"]) ?>">
-                            <?php if ($action == "update") {    ?>
-                                <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
-                            <?php    }    ?>
-                            <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
-                            <input id="debtOperationInp" name="op" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
-
-                            <?= LinkMenu::render([
-                                "id" => "typeMenu",
-                                "classNames" => "trtype-menu",
-                                "items" => $typeMenu,
-                            ]) ?>
-
                             <span id="notAvailMsg" class="nodata-message" <?= hidden($trAvailable) ?>><?= e($notAvailMessage) ?></span>
 
-                            <div class="accounts-section">
-                                <?= AccountContainer::render($debtSrcContainer) ?>
-                                <?php if ($tr["type"] == DEBT) {        ?>
-                                    <button id="swapBtn" class="swap-btn" type="button" <?= hidden(!$trAvailable) ?>>
-                                        <?= svgIcon("swap", "swap-icon") ?>
-                                    </button>
-                                <?php    }    ?>
-                                <?= AccountContainer::render($debtDestContainer) ?>
-
-                                <?= AccountContainer::render($sourceContainer) ?>
-                                <?php if ($tr["type"] != DEBT) {        ?>
-                                    <button id="swapBtn" class="swap-btn" type="button" <?= hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME) ?>>
-                                        <?= svgIcon("swap", "swap-icon") ?>
-                                    </button>
-                                <?php    }    ?>
-                                <?= AccountContainer::render($destContainer) ?>
-                            </div>
+                            <div id="accountsSection" class="accounts-section"></div>
 
                             <div id="srcAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showSrcAmount) ?>>
                                 <label for="srcAmountInput" class="field__title"><?= e($srcAmountLbl) ?></label>
                                 <div class="input-group">
-                                    <input id="srcAmountInput" name="src_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
+                                    <input id="srcAmountInput" name="src_amount" class="input input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
                                     <?php if ($tr["type"] == INCOME || ($tr["type"] == DEBT && $debtType)) { ?>
-                                        <button id="srcCurrBtn" class="input-group__btn" type="button" tabindex="-1">
+                                        <button id="srcCurrBtn" class="btn input-group__btn" type="button" tabindex="-1">
                                             <div id="srcAmountSign" class="input-group__btn-title"><?= e($form["srcCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
@@ -81,9 +38,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="destAmountRow" class="field form-row validation-block" <?= hidden(!$trAvailable || !$showDestAmount) ?>>
                                 <label for="destAmountInput" class="field__title"><?= e($destAmountLbl) ?></label>
                                 <div class="input-group">
-                                    <input id="destAmountInput" name="dest_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
+                                    <input id="destAmountInput" name="dest_amount" class="input input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
                                     <?php if ($tr["type"] == EXPENSE || ($tr["type"] == DEBT && !$debtType)) { ?>
-                                        <button id="destCurrBtn" class="input-group__btn" type="button" tabindex="-1">
+                                        <button id="destCurrBtn" class="btn input-group__btn" type="button" tabindex="-1">
                                             <div id="destAmountSign" class="input-group__btn-title"><?= e($form["destCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
@@ -99,15 +56,15 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="exchangeRow" class="field form-row" hidden>
                                 <label for="exchangeInput" class="field__title"><?= __("TR_EXCHANGE_RATE") ?></label>
                                 <div class="input-group">
-                                    <input id="exchangeInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
-                                    <button id="exchangeSign" class="input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
+                                    <input id="exchangeInput" class="input input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["exchange"]) ?>">
+                                    <button id="exchangeSign" class="btn input-group__btn" type="button"><?= e($form["exchSign"]) ?></button>
                                 </div>
                             </div>
 
                             <div id="srcResBalanceRow" class="field form-row" hidden>
                                 <label for="srcResBalanceInput" class="field__title"><?= e($srcBalTitle) ?></label>
                                 <div class="input-group">
-                                    <input id="srcResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["srcResult"]) ?>">
+                                    <input id="srcResBalanceInput" class="input input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["srcResult"]) ?>">
                                     <div id="srcResBalanceSign" class="input-group__text"><?= e($form["srcCurrSign"]) ?></div>
                                 </div>
                             </div>
@@ -115,7 +72,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <div id="destResBalanceRow" class="field form-row" hidden>
                                 <label for="destResBalanceInput" class="field__title"><?= e($destBalTitle) ?></label>
                                 <div class="input-group">
-                                    <input id="destResBalanceInput" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["destResult"]) ?>">
+                                    <input id="destResBalanceInput" class="input input-group__input right-align-text" type="text" autocomplete="off" value="<?= e($form["destResult"]) ?>">
                                     <div id="destResBalanceSign" class="input-group__text"><?= e($form["destCurrSign"]) ?></div>
                                 </div>
                             </div>
@@ -124,9 +81,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <label for="dateInput" class="field__title"><?= __("TR_DATE") ?></label>
                                 <div class="column-container">
                                     <div class="input-group">
-                                        <input id="dateInput" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
-                                        <button id="dateInputBtn" class="btn icon-btn input-group__btn" type="button">
-                                            <?= useIcon("calendar-icon", "btn__icon calendar-icon") ?>
+                                        <input id="dateInput" class="input input-group__input" name="date" type="text" autocomplete="off" value="<?= e($dateFmt) ?>">
+                                        <button id="dateInputBtn" class="btn input-group__btn" type="button">
+                                            <?= useIcon("calendar-icon", "btn__icon") ?>
                                         </button>
                                     </div>
                                     <div id="datePickerWrapper" class="calendar"></div>
@@ -148,6 +105,16 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
+
+                            <?php if ($action == "update") {    ?>
+                                <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
+                            <?php    }    ?>
+                            <input id="typeInp" type="hidden" value="<?= e($tr["type"]) ?>">
+                            <input id="srcIdInp" type="hidden" value="<?= e($tr["src_id"]) ?>">
+                            <input id="destIdInp" type="hidden" value="<?= e($tr["dest_id"]) ?>">
+                            <input id="personIdInp" type="hidden" value="<?= e($person_id) ?>">
+                            <input id="debtAccountInp" type="hidden" value="<?= e($acc_id) ?>">
+                            <input id="debtOperationInp" type="hidden" value="<?= ($debtType ? "1" : "2") ?>">
                         </form>
                     </main>
                 </div>

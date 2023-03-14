@@ -6,7 +6,7 @@ import {
 import { Checkbox } from 'jezvejs/Checkbox';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import { __ } from '../../js/utils.js';
-import './style.scss';
+import './DeleteCategoryDialog.scss';
 
 const MESSAGE_CLASS = 'confirm-message';
 

@@ -19,6 +19,7 @@ class AdminUserListView extends AdminListView {
         super(...args);
 
         this.apiController = 'user';
+        this.statePath = 'users';
         this.deleteConfirmMessage = 'Are you sure want to delete selected user?';
     }
 

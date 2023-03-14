@@ -86,9 +86,12 @@ class Account extends ApiSortableListController
             throw new \Error(__("ERR_ACCOUNT_SHOW"));
         }
 
+        $request = $this->getRequestData();
+        $result = $this->getStateResult($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 
     /**
@@ -111,8 +114,11 @@ class Account extends ApiSortableListController
             throw new \Error(__("ERR_ACCOUNT_HIDE"));
         }
 
+        $request = $this->getRequestData();
+        $result = $this->getStateResult($request);
+
         $this->commit();
 
-        $this->ok();
+        $this->ok($result);
     }
 }

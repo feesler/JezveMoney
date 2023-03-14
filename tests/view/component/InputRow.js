@@ -20,10 +20,11 @@ export class InputRow extends TestComponent {
         res.label = await prop(res.labelEl, 'textContent');
 
         const datePickerContainer = await query(this.elem, '.calendar');
+        const btn = await query(this.elem, '.input-group__btn');
         if (datePickerContainer) {
-            res.datePickerBtn = await query(this.elem, '.icon-btn');
+            res.datePickerBtn = btn;
         } else {
-            res.currElem = await query(this.elem, '.input-group__btn');
+            res.currElem = btn;
             if (res.currElem) {
                 const disabled = await hasAttr(res.currElem, 'disabled');
                 res.isCurrActive = !disabled;
@@ -50,7 +51,7 @@ export class InputRow extends TestComponent {
             res.hiddenValue = await prop(hiddenInpElem, 'value');
         }
 
-        res.valueInput = await query(this.elem, '.stretch-input');
+        res.valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
         res.value = await prop(res.valueInput, 'value');
 
         res.validationEnabled = await hasClass(this.elem, 'validation-block');

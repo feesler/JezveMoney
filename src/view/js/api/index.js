@@ -112,20 +112,20 @@ export const API = {
             return apiPost('account/update', data);
         },
 
-        async del(ids) {
-            return apiPost('account/delete', ids);
+        async del(data) {
+            return apiPost('account/delete', data);
         },
 
-        async show(ids) {
-            return apiPost('account/show', ids);
+        async show(data) {
+            return apiPost('account/show', data);
         },
 
-        async hide(ids) {
-            return apiPost('account/hide', ids);
+        async hide(data) {
+            return apiPost('account/hide', data);
         },
 
-        async setPos(id, pos) {
-            return apiPost('account/setpos', { id, pos });
+        async setPos(data) {
+            return apiPost('account/setpos', data);
         },
     },
 
@@ -146,20 +146,20 @@ export const API = {
             return apiPost('person/update', data);
         },
 
-        async del(ids) {
-            return apiPost('person/delete', ids);
+        async del(data) {
+            return apiPost('person/delete', data);
         },
 
-        async show(ids) {
-            return apiPost('person/show', ids);
+        async show(data) {
+            return apiPost('person/show', data);
         },
 
-        async hide(ids) {
-            return apiPost('person/hide', ids);
+        async hide(data) {
+            return apiPost('person/hide', data);
         },
 
-        async setPos(id, pos) {
-            return apiPost('person/setpos', { id, pos });
+        async setPos(data) {
+            return apiPost('person/setpos', data);
         },
     },
 
@@ -184,12 +184,12 @@ export const API = {
             return apiPost('category/update', data);
         },
 
-        async setPos(id, pos, parentId) {
-            return apiPost('category/setpos', { id, pos, parent_id: parentId });
+        async setPos(data) {
+            return apiPost('category/setpos', data);
         },
 
-        async del(ids) {
-            return apiPost('category/delete', ids);
+        async del(data) {
+            return apiPost('category/delete', data);
         },
     },
 
@@ -219,16 +219,16 @@ export const API = {
             return apiPost('transaction/update', data);
         },
 
-        async del(ids) {
-            return apiPost('transaction/delete', ids);
+        async del(data) {
+            return apiPost('transaction/delete', data);
         },
 
-        async setCategory(options = {}) {
-            return apiPost('transaction/setCategory', options);
+        async setCategory(data) {
+            return apiPost('transaction/setCategory', data);
         },
 
-        async setPos(id, pos) {
-            return apiPost('transaction/setpos', { id, pos });
+        async setPos(data) {
+            return apiPost('transaction/setpos', data);
         },
 
         async statistics(options = {}, requestOptions = {}) {
@@ -255,8 +255,8 @@ export const API = {
             return apiPost('importtpl/update', data);
         },
 
-        async del(id) {
-            return apiPost('importtpl/delete', { id });
+        async del(data) {
+            return apiPost('importtpl/delete', data);
         },
 
         async list(options = {}) {
@@ -277,8 +277,8 @@ export const API = {
             return apiPost('importrule/update', data);
         },
 
-        async del(id) {
-            return apiPost('importrule/delete', { id });
+        async del(data) {
+            return apiPost('importrule/delete', data);
         },
 
         async list(options = {}) {
