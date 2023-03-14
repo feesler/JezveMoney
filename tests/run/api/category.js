@@ -1,4 +1,9 @@
-import { test, copyObject, assert } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    asArray,
+} from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
@@ -75,6 +80,68 @@ export const createMultiple = async (params) => {
     });
 
     return ids;
+};
+
+/**
+ * Reads categories by ids and returns array of results
+ * @param {number} id - category id or array of ids
+ */
+export const read = async (id) => {
+    let res = [];
+
+    const ids = asArray(id)
+        .filter((item) => !!item)
+        .map((item) => item.toString());
+
+    await test(`Read categories [${ids}]`, async () => {
+        const resExpected = App.state.categories.filter((item) => (
+            ids.includes(item?.id?.toString())
+        ));
+
+        let createRes;
+        try {
+            createRes = await api.category.read(id);
+            assert.deepMeet(createRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = createRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
+};
+
+/**
+ * Reads list of categories
+ * @param {Object} params - list filter object
+ */
+export const list = async (params) => {
+    let res = [];
+
+    await test(`Categories list (${formatProps(params)})`, async () => {
+        const { data: resExpected } = App.state.getCategories(params);
+
+        let listRes;
+        try {
+            listRes = await api.category.list(params);
+            assert.deepMeet(listRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = listRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
 };
 
 /**

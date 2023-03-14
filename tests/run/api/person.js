@@ -1,4 +1,9 @@
-import { assert, copyObject, test } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    asArray,
+} from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
@@ -72,6 +77,68 @@ export const createMultiple = async (params) => {
     });
 
     return ids;
+};
+
+/**
+ * Reads persons by ids and returns array of results
+ * @param {number} id - person id or array of ids
+ */
+export const read = async (id) => {
+    let res = [];
+
+    const ids = asArray(id)
+        .filter((item) => !!item)
+        .map((item) => item.toString());
+
+    await test(`Read person(s) [${ids}]`, async () => {
+        const resExpected = App.state.persons.filter((item) => (
+            ids.includes(item?.id?.toString())
+        ));
+
+        let createRes;
+        try {
+            createRes = await api.person.read(id);
+            assert.deepMeet(createRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = createRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
+};
+
+/**
+ * Reads list of persons
+ * @param {Object} params - list filter object
+ */
+export const list = async (params) => {
+    let res = [];
+
+    await test(`Persons list (${formatProps(params)})`, async () => {
+        const { data: resExpected } = App.state.getPersons(params);
+
+        let listRes;
+        try {
+            listRes = await api.person.list(params);
+            assert.deepMeet(listRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = listRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
 };
 
 /**

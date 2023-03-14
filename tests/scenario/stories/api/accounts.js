@@ -186,6 +186,30 @@ const createMultipleInvalid = async () => {
     await App.scenario.runner.runGroup(AccountApiTests.createMultiple, data);
 };
 
+const read = async () => {
+    setBlock('Read accounts by ids', 2);
+
+    const data = [
+        App.scenario.ACC_RUB,
+        [App.scenario.CASH_RUB, App.scenario.ACC_USD],
+    ];
+
+    await App.scenario.runner.runGroup(AccountApiTests.read, data);
+};
+
+const list = async () => {
+    setBlock('Accounts list', 2);
+
+    const data = [
+        {},
+        { visibility: 'visible' },
+        { visibility: 'hidden' },
+        { visibility: 'all' },
+    ];
+
+    await App.scenario.runner.runGroup(AccountApiTests.list, data);
+};
+
 const update = async () => {
     setBlock('Update accounts', 2);
 
@@ -325,6 +349,11 @@ export const apiAccountsTests = {
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
+    },
+
+    async listTests() {
+        await read();
+        await list();
     },
 
     async updateAndDeleteTests() {

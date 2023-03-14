@@ -42,6 +42,10 @@ export class ApiStory extends TestStory {
 
         await apiSecurityTests.run();
 
+        await apiAccountsTests.listTests();
+        await apiPersonsTests.listTests();
+        await apiCategoriesTests.listTests();
+
         await apiTransactionsTests.updateTests();
         await apiImportTemplateTests.run();
         await apiImportRulesTests.run();

@@ -242,13 +242,9 @@ export const api = {
             return response.data ?? {};
         },
 
-        async list(full) {
-            let reqUrl = 'account/list';
-            if (full) {
-                reqUrl += '?owner=all';
-            }
-
-            const { data } = await apiGet(reqUrl);
+        async list(options = {}) {
+            const apiReq = `account/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
             return data;
         },
     },
@@ -295,8 +291,9 @@ export const api = {
             return response.data ?? {};
         },
 
-        async list() {
-            const { data } = await apiGet('person/list');
+        async list(options = {}) {
+            const apiReq = `person/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
             return data;
         },
     },

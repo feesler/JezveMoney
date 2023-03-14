@@ -107,6 +107,30 @@ const createMultipleInvalid = async () => {
     await App.scenario.runner.runGroup(PersonApiTests.createMultiple, data);
 };
 
+const read = async () => {
+    setBlock('Read persons by ids', 2);
+
+    const data = [
+        App.scenario.PERSON_X,
+        [App.scenario.PERSON_X, App.scenario.PERSON_Y],
+    ];
+
+    await App.scenario.runner.runGroup(PersonApiTests.read, data);
+};
+
+const list = async () => {
+    setBlock('Persons list', 2);
+
+    const data = [
+        {},
+        { visibility: 'visible' },
+        { visibility: 'hidden' },
+        { visibility: 'all' },
+    ];
+
+    await App.scenario.runner.runGroup(PersonApiTests.list, data);
+};
+
 const update = async () => {
     setBlock('Update persons', 2);
 
@@ -241,6 +265,11 @@ export const apiPersonsTests = {
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
+    },
+
+    async listTests() {
+        await read();
+        await list();
     },
 
     async updateAndDeleteTests() {
