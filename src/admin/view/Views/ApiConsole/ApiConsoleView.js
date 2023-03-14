@@ -16,7 +16,7 @@ import '../../../../view/css/app.scss';
 import '../../css/admin.scss';
 import { AdminView } from '../../js/AdminView.js';
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
-import './style.scss';
+import './ApiConsoleView.scss';
 
 /**
  * Admin currecny list view

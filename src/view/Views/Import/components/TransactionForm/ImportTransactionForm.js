@@ -22,7 +22,7 @@ import { Field } from '../../../../Components/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
-import './style.scss';
+import './ImportTransactionForm.scss';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';

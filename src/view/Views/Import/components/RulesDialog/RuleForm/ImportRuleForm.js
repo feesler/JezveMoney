@@ -21,7 +21,7 @@ import { listData, __ } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
-import './style.scss';
+import './ImportRuleForm.scss';
 
 /* CSS classes */
 const FORM_CLASS = 'rule-form';

@@ -56,9 +56,9 @@ import {
     updateStateExchange,
 } from './reducer.js';
 import * as STATE from './stateId.js';
-import '../../Components/Field/style.scss';
+import '../../Components/Field/Field.scss';
 import '../../css/app.scss';
-import './style.scss';
+import './TransactionView.scss';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;

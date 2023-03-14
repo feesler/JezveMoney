@@ -8,7 +8,7 @@ import {
 import { Icon } from 'jezvejs/Icon';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
-import './style.scss';
+import './SearchInput.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'search-field input-group__input-outer';

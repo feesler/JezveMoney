@@ -6,7 +6,7 @@ import {
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { __ } from '../../../../js/utils.js';
-import './style.scss';
+import './AccountContainer.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'field account-container';

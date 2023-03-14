@@ -33,7 +33,7 @@ import {
     actions,
     reducer,
 } from './reducer.js';
-import './style.scss';
+import './StatisticsView.scss';
 
 /** CSS classes */
 /* Chart popup */

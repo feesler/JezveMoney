@@ -36,7 +36,7 @@ import { TransactionDetails } from './components/TransactionDetails/TransactionD
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
-import './style.scss';
+import './TransactionListView.scss';
 
 const SEARCH_DELAY = 500;
 

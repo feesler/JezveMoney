@@ -17,8 +17,8 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './PersonView.scss';
 
 /**
  * Create/update person view

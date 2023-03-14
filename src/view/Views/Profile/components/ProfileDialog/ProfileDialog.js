@@ -6,7 +6,7 @@ import {
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { LoadingIndicator } from '../../../../Components/LoadingIndicator/LoadingIndicator.js';
-import './style.scss';
+import './ProfileDialog.scss';
 
 /* CSS classes */
 const DIALOG_CLASS = 'profile-dialog';

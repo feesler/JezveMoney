@@ -34,7 +34,7 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { AccountDetails } from './components/AccountDetails/AccountDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
-import './style.scss';
+import './AccountListView.scss';
 
 /**
  * List of accounts view

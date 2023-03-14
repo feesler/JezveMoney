@@ -9,7 +9,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
-import './style.scss';
+import './TemplateSelect.scss';
 
 /** CSS classes */
 const SELECT_CLASS = 'template-select';

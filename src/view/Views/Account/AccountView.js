@@ -25,8 +25,8 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './AccountView.scss';
 
 /**
  * Create/update account view

@@ -36,7 +36,7 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions } from './reducer.js';
-import './style.scss';
+import './MainView.scss';
 
 /**
  * Main view

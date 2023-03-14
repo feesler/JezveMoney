@@ -8,7 +8,7 @@ import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { listData } from '../../../../js/utils.js';
-import './style.scss';
+import './CategoryItem.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'category-item';

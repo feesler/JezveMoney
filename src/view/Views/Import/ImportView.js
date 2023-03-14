@@ -31,7 +31,7 @@ import { ImportTransactionForm } from './components/TransactionForm/ImportTransa
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 import '../../css/app.scss';
-import './style.scss';
+import './ImportView.scss';
 
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;

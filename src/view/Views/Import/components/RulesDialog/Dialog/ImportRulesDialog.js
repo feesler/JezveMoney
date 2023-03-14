@@ -19,7 +19,7 @@ import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/Loa
 import { SearchInput } from '../../../../../Components/SearchInput/SearchInput.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
-import './style.scss';
+import './ImportRulesDialog.scss';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';

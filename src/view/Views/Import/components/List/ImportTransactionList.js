@@ -3,7 +3,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { __ } from '../../../../js/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
-import './style.scss';
+import './ImportTransactionList.scss';
 
 /* CSS classes */
 const LIST_CLASS = 'import-list';

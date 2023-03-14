@@ -33,7 +33,7 @@ import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
-import './style.scss';
+import './PersonListView.scss';
 
 /**
  * List of persons view

@@ -21,7 +21,7 @@ import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDi
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import { TemplateSelect } from '../TemplateSelect/TemplateSelect.js';
-import './style.scss';
+import './ImportTemplateManager.scss';
 
 /** CSS classes */
 const VALID_FEEDBACK_CLASS = 'valid-feedback';

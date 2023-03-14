@@ -5,7 +5,7 @@ import {
     removeChilds,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import './style.scss';
+import './Tile.scss';
 
 /** CSS classes */
 const TILE_CLASS = 'tile';

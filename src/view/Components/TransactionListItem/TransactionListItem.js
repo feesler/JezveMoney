@@ -14,7 +14,7 @@ import {
     DEBT,
 } from '../../js/model/Transaction.js';
 import { Field } from '../Field/Field.js';
-import './style.scss';
+import './TransactionListItem.scss';
 
 /** CSS classes */
 const TRANS_ITEM_CLASS = 'trans-item';

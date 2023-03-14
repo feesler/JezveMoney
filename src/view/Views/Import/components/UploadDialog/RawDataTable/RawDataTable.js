@@ -5,7 +5,7 @@ import {
     removeChilds,
     Component,
 } from 'jezvejs';
-import './style.scss';
+import './RawDataTable.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'raw-data-table';

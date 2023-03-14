@@ -17,7 +17,7 @@ import {
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../../../js/model/ImportAction.js';
 import { CategorySelect } from '../../../../../Components/CategorySelect/CategorySelect.js';
-import './style.scss';
+import './ImportActionForm.scss';
 
 /** CSS classes */
 const FORM_CLASS = 'action-form';

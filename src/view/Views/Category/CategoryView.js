@@ -20,8 +20,8 @@ import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.j
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Field/Field.scss';
+import './CategoryView.scss';
 
 /**
  * Create/update category view

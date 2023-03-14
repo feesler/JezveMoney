@@ -4,7 +4,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import './style.scss';
+import './ApiRequest.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'request-item';

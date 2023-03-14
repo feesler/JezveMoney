@@ -4,7 +4,7 @@ import {
     removeChilds,
     Component,
 } from 'jezvejs';
-import './style.scss';
+import './Field.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'field';

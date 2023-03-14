@@ -12,9 +12,9 @@ import { ChangePasswordDialog } from './components/ChangePasswordDialog/ChangePa
 import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Heading/style.scss';
-import '../../Components/Field/style.scss';
-import './style.scss';
+import '../../Components/Heading/Heading.scss';
+import '../../Components/Field/Field.scss';
+import './ProfileView.scss';
 
 const titleMap = {
     name: __('PROFILE_CHANGE_NAME'),

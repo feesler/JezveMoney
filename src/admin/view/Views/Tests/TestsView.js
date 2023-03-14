@@ -3,7 +3,7 @@ import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
 import { AdminView } from '../../js/AdminView.js';
 import '../../css/admin.scss';
-import './style.scss';
+import './TestsView.scss';
 
 /**
  * Admin main view

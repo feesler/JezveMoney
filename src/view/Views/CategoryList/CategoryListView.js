@@ -35,7 +35,7 @@ import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
 import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
-import './style.scss';
+import './CategoryListView.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';

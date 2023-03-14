@@ -1,7 +1,7 @@
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { __ } from '../../js/utils.js';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
-import './style.scss';
+import './TransactionList.scss';
 
 /** CSS classes */
 const LIST_CLASS = 'trans-list';

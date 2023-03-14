@@ -16,7 +16,7 @@ import {
     timeToDate,
     __,
 } from '../../js/utils.js';
-import './style.scss';
+import './DateRangeInput.scss';
 
 const DATEPICKER_CONTAINER_CLASS = 'calendar';
 const FEEDBACK_CLASS = 'feedback invalid-feedback';

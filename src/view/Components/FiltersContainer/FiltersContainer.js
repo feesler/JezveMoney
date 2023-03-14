@@ -6,7 +6,7 @@ import {
 import { CloseButton } from 'jezvejs/CloseButton';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import './style.scss';
+import './FiltersContainer.scss';
 
 const RESIZE_DELAY = 200;
 

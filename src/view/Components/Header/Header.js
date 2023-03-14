@@ -12,7 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
-import './style.scss';
+import './Header.scss';
 
 /* CSS classes */
 const SHOW_ACTIONS_CLASS = 'show-actions';
