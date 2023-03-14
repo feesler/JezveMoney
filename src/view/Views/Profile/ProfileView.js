@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -14,6 +13,7 @@ import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
 import '../../Components/Field/Field.scss';
+import '../../css/app.scss';
 import './ProfileView.scss';
 
 const titleMap = {
