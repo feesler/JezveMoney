@@ -107,7 +107,7 @@ const slice = createSlice({
 
     listRequestLoaded: (state, data) => ({
         ...state,
-        transactions: data.transactions.data,
+        transactions: data.transactions.items,
         accounts: {
             ...state.accounts,
             visible: AccountList.create(window.app.model.visibleUserAccounts),

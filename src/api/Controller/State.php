@@ -326,7 +326,7 @@ class State extends ApiController
         ]);
 
         // Statistics
-        $currencyId = $this->getMostFrequentCurrency($res->transactions->data);
+        $currencyId = $this->getMostFrequentCurrency($res->transactions->items);
         $res->histogram = $this->getStatistics($currencyId);
 
         $this->ok($res);
