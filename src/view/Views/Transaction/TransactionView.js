@@ -763,6 +763,7 @@ class TransactionView extends View {
 
     /** Enable/disable specified currency button */
     enableCurrencySelect(currBtn, signElem, ddown, value) {
+        currBtn.classList.toggle('btn', value);
         currBtn.classList.toggle('input-group__btn', value);
         currBtn.classList.toggle('input-group__text', !value);
         signElem.classList.toggle('input-group__btn-title', value);
