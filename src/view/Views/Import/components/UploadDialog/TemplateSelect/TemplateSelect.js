@@ -72,6 +72,7 @@ export class TemplateSelect extends Component {
             elem: this.contentElem,
             listAttach: true,
             enableFilter: true,
+            isValidToggleTarget: (elem) => this.isValidToggleTarget(elem),
             noResultsMessage: __('NOT_FOUND'),
             onChange: (tpl) => this.onChange(tpl),
         });
@@ -97,6 +98,17 @@ export class TemplateSelect extends Component {
                 onClick: (e) => this.onDelete(e),
             }],
         });
+    }
+
+    /** Returns true if element is allowed to toggle menu list */
+    isValidToggleTarget(elem) {
+        return (
+            !this.menuButton.elem.contains(elem)
+            && (
+                !this.contextMenu
+                || !this.contextMenu.elem.contains(elem)
+            )
+        );
     }
 
     /**
