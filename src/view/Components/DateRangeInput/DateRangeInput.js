@@ -316,7 +316,8 @@ export class DateRangeInput extends Component {
     render(state) {
         this.startDateInput.value = state.form.stdate ?? '';
         this.endDateInput.value = state.form.enddate ?? '';
-        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
+
+        const isDateFilter = (state.form.stdate || state.form.enddate);
         this.clearBtn.show(isDateFilter);
 
         window.app.setValidation(this.elem, state.validation.valid);
