@@ -6,17 +6,17 @@ import {
     Component,
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
+import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import './style.scss';
 
 /** CSS classes */
-const CONTAINER_CLASS = 'search-field';
-const INPUT_CLASS = 'input-group__input';
-const INNER_BTN_CLASS = 'input-group__inner-btn';
-const INNER_BTN_ICON_CLASS = 'input-group__inner-btn__icon';
+const CONTAINER_CLASS = 'search-field input-group__input-outer';
+const INPUT_CLASS = 'input input-group__input';
+const INNER_BTN_CLASS = 'btn input-group__inner-btn';
+const BTN_ICON_CLASS = 'btn__icon';
 const CLEAR_BTN_CLASS = 'clear-btn';
 const SEARCH_BTN_CLASS = 'search-btn';
-const SEARCH_ICON_CLASS = 'search-icon';
 
 const defaultProps = {
     id: undefined,
@@ -74,7 +74,7 @@ export class SearchInput extends Component {
 
         const clearIcon = Icon.create({
             icon: 'close',
-            className: INNER_BTN_ICON_CLASS,
+            className: BTN_ICON_CLASS,
         });
         this.clearBtn = createElement('button', {
             props: {
@@ -87,7 +87,7 @@ export class SearchInput extends Component {
 
         const searchIcon = Icon.create({
             icon: 'search',
-            className: getClassName(INNER_BTN_ICON_CLASS, SEARCH_ICON_CLASS),
+            className: BTN_ICON_CLASS,
         });
         this.searchBtn = createElement('button', {
             props: {

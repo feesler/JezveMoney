@@ -5,7 +5,7 @@
 
 /* Transaction item */
 .import-form {
-  --input-disabled-border-color: var(--disabled-color-1);
+  --input-disabled-border: var(--disabled-color-1);
 
   display: flex;
   flex-flow: column nowrap;
@@ -24,10 +24,10 @@
   }
 
   .stretch-input[disabled] {
-    color: var(--input-disabled-text-color);
-    -webkit-text-fill-color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
+    color: var(--input-disabled-color);
+    -webkit-text-fill-color: var(--input-disabled-color);
+    border-color: var(--input-disabled-border);
+    background-color: var(--input-disabled-bg);
   }
 
   .stretch-input:focus {

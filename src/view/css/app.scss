@@ -97,12 +97,12 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   /* Inputs */
   --input-bg-color: #181818;
   --input-border-color: #2e2e2e;
-  --active-input-border-color: var(--border-color-1);
+  --active-input-border-color: var(--accent-color-alt);
 
   /* Disabled inputs */
-  --input-disabled-bg-color: var(--disabled-color-1);
-  --input-disabled-border-color: #2e2e2e;
-  --input-disabled-text-color: var(--text-color-5);
+  --input-disabled-bg: var(--disabled-color-1);
+  --input-disabled-border: #2e2e2e;
+  --input-disabled-color: var(--text-color-5);
 
   /* List item */
   --list-item-text-color: #b0b0b0;
@@ -165,12 +165,12 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   /* Inputs */
   --input-bg-color: #f2f2f2;
   --input-border-color: #b0b0b0;
-  --active-input-border-color: var(--border-color-1);
+  --active-input-border-color: var(--accent-color-alt);
 
   /* Disabled inputs */
-  --input-disabled-bg-color: var(--disabled-color-1);
-  --input-disabled-border-color: #dddddd;
-  --input-disabled-text-color: var(--text-color-5);
+  --input-disabled-bg: var(--disabled-color-1);
+  --input-disabled-border: #dddddd;
+  --input-disabled-color: var(--text-color-5);
 
   /* List item */
   --list-item-text-color: #808080;
@@ -277,10 +277,10 @@ svg * {
 }
 
 .stretch-input[disabled] {
-  color: var(--input-disabled-text-color);
-  -webkit-text-fill-color: var(--input-disabled-text-color);
-  border-color: var(--input-disabled-border-color);
-  background-color: var(--input-disabled-bg-color);
+  color: var(--input-disabled-color);
+  -webkit-text-fill-color: var(--input-disabled-color);
+  border-color: var(--input-disabled-border);
+  background-color: var(--input-disabled-bg);
 }
 
 /* Input group */
@@ -289,15 +289,11 @@ svg * {
 .import-form .input-group {
   --ig-height: var(--input-height);
   --ig-border-color: var(--input-border-color);
-  --ig-input-color: var(--main-text-color);
   --ig-input-bg: var(--input-bg-color);
   --ig-input-active-border: var(--active-input-border-color);
-  --ig-input-disabled-color: var(--input-disabled-text-color);
-  --ig-input-disabled-bg: var(--input-disabled-bg-color);
+  --ig-input-disabled-color: var(--input-disabled-color);
+  --ig-input-disabled-bg: var(--input-disabled-bg);
   --ig-input-disabled-border: var(--input-border-color);
-  --ig-button-disabled-color: var(--input-disabled-text-color);
-  --ig-button-disabled-border: var(--input-border-color);
-  --ig-button-disabled-bg: var(--bg-color-3);
   --ig-inner-button-color: var(--neutral-color);
   --ig-inner-button-active-color: var(--hl-text-color);
   --ig-text-bg: var(--bg-color-3);
@@ -343,6 +339,16 @@ svg * {
     --btn-hover-background: var(--accent-hover-color);
     --btn-active-background: var(--accent-active-color);
     --btn-disabled-background: var(--accent-disabled-color);
+
+    overflow: visible;
+  }
+
+  .input.input-group__input {
+    --input-font-size: 0.9rem;
+    --input-color: var(--main-text-color);
+    --input-bg: var(--input-bg-color);
+    --input-focus-color: var(--main-text-color);
+    --input-focus-bg: var(--input-bg-color);
   }
 }
 
@@ -517,7 +523,7 @@ svg * {
   --btn-background: var(--accent-color);
   --btn-hover-background: var(--accent-hover-color);
   --btn-active-background: var(--accent-active-color);
-  --btn-disabled-icon-color: var(--input-disabled-text-color);
+  --btn-disabled-icon-color: var(--input-disabled-color);
 }
 
 .btn.submit-btn {
@@ -729,7 +735,7 @@ svg * {
   --dd-list-item-text: var(--main-text-color);
   --dd-list-item-bg: var(--bg-color-2);
   --dd-list-item-check: var(--main-text-color);
-  --dd-disabled-list-item-text: var(--input-disabled-text-color);
+  --dd-disabled-list-item-text: var(--input-disabled-color);
 
   /* Active list item */
   --dd-active-list-item-text: #ffffff;
@@ -755,12 +761,12 @@ svg * {
   --dd-active-selection-bg: var(--dd-active-bg);
 
   /* Disabled state */
-  --dd-disabled-bg: var(--input-disabled-bg-color);
-  --dd-disabled-border: var(--input-disabled-border-color);
-  --dd-disabled-selection-color: var(--input-disabled-text-color);
-  --dd-disabled-input-text: var(--input-disabled-text-color);
-  --dd-disabled-btn-fill: var(--input-disabled-text-color);
-  --dd-disabled-selection-item-text: var(--input-disabled-text-color);
+  --dd-disabled-bg: var(--input-disabled-bg);
+  --dd-disabled-border: var(--input-disabled-border);
+  --dd-disabled-selection-color: var(--input-disabled-color);
+  --dd-disabled-input-text: var(--input-disabled-color);
+  --dd-disabled-btn-fill: var(--input-disabled-color);
+  --dd-disabled-selection-item-text: var(--input-disabled-color);
   --dd-disabled-selection-item-bg: #dfdfdf;
 }
 

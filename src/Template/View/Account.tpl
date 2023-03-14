@@ -37,7 +37,7 @@
                             <div id="initbal-inp-block" class="field validation-block form-row">
                                 <label for="balanceInp" class="field__title"><?= __("ACCOUNT_INITIAL_BALANCE") ?></label>
                                 <div class="input-group">
-                                    <input id="balanceInp" class="input-group__input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
+                                    <input id="balanceInp" class="input input-group__input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
                                     <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
                                 </div>
                                 <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>

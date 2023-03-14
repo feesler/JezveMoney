@@ -11,7 +11,7 @@
             </form>
             <?php if ($this->adminUser || $testerUser) { ?>
                 <div id="serverAddressBlock" class="input-group" hidden>
-                    <input id="serverAddress" class="input-group__input" type="text">
+                    <input id="serverAddress" class="input input-group__input" type="text">
                     <input id="serverUploadBtn" class="btn submit-btn input-group__btn" type="button" value="<?= __("IMPORT_UPLOAD") ?>">
                 </div>
             <?php   }   ?>
@@ -55,7 +55,7 @@
                 <label for="firstRowInp" class="field__title"><?= __("TEMPLATE_FIRST_ROW") ?></label>
                 <div class="input-group">
                     <button id="decFirstRowBtn" class="btn input-group__btn" type="button">-</button>
-                    <input id="firstRowInp" class="input-group__input right-align-text" type="text" autocomplete="off">
+                    <input id="firstRowInp" class="input input-group__input right-align-text" type="text" autocomplete="off">
                     <button id="incFirstRowBtn" class="btn input-group__btn" type="button">+</button>
                 </div>
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>

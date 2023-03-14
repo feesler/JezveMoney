@@ -14,6 +14,7 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
 import {
     CENTS_DIGITS,

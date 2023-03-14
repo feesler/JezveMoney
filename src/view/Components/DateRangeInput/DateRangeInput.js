@@ -8,6 +8,7 @@ import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
+import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import {
     dateStringToTime,
@@ -58,7 +59,7 @@ export class DateRangeInput extends Component {
 
     init() {
         this.startDateInput = DateInput.create({
-            className: 'input-group__input',
+            className: 'input input-group__input date-range-part',
             name: 'stdate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
@@ -73,7 +74,7 @@ export class DateRangeInput extends Component {
         });
 
         this.endDateInput = DateInput.create({
-            className: 'input-group__input',
+            className: 'input input-group__input',
             name: 'enddate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
@@ -91,12 +92,19 @@ export class DateRangeInput extends Component {
             onClick: () => this.showCalendar(),
         });
 
+        const endDateOuter = createElement('div', {
+            props: { className: 'input-group__input-outer date-range-part' },
+            children: [
+                this.endDateInput.elem,
+                this.clearBtn.elem,
+            ],
+        });
+
         this.inputGroup = InputGroup.create({
             children: [
                 this.startDateInput.elem,
                 textElem,
-                this.endDateInput.elem,
-                this.clearBtn.elem,
+                endDateOuter,
                 this.dateInputBtn.elem,
             ],
         });
