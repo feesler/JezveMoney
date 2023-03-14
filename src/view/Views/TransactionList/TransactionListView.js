@@ -741,6 +741,14 @@ class TransactionListView extends View {
 
     /** Date range filter change handler */
     onChangeDateFilter(data) {
+        const { filter } = this.store.getState();
+        const stdate = filter.stdate ?? null;
+        const enddate = filter.enddate ?? null;
+
+        if (stdate === data.stdate && enddate === data.enddate) {
+            return;
+        }
+
         this.store.dispatch(actions.changeDateFilter(data));
         const state = this.store.getState();
         this.requestTransactions(state.form);
