@@ -143,10 +143,27 @@ export class ImportView extends AppView {
         );
 
         const uploadDialogPopup = await query(this.uploadPopupId);
-        res.uploadDialog = await ImportUploadDialog.create(this, uploadDialogPopup);
-
         const rulesDialogPopup = await query(this.rulesPopupId);
-        res.rulesDialog = await ImportRulesDialog.create(this, rulesDialogPopup);
+
+        const [
+            uploadDialogVisible,
+            rulesDialogVisible,
+        ] = await evaluate((uploadDialog, rulesDialog) => ([
+            uploadDialog && !uploadDialog.hasAttribute('hidden'),
+            rulesDialog && !rulesDialog.hasAttribute('hidden'),
+        ]), uploadDialogPopup, rulesDialogPopup);
+
+        if (uploadDialogVisible) {
+            res.uploadDialog = await ImportUploadDialog.create(this, uploadDialogPopup);
+        } else {
+            res.uploadDialog = { elem: null };
+        }
+
+        if (rulesDialogVisible) {
+            res.rulesDialog = await ImportRulesDialog.create(this, rulesDialogPopup);
+        } else {
+            res.rulesDialog = { elem: null };
+        }
 
         return res;
     }
