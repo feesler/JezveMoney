@@ -131,6 +131,24 @@ export const submit = async () => {
     });
 };
 
+export const deleteFromContextMenu = async (index) => {
+    await test(`Delete account from context menu [${index}]`, async () => {
+        await checkNavigation();
+
+        await App.state.fetch();
+
+        await App.view.deleteFromContextMenu(index);
+
+        const id = App.state.getSortedAccountsByIndexes(index, true);
+        App.state.deleteAccounts({ id });
+
+        App.view.expectedState = AccountListView.render(App.state);
+        App.view.checkState();
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const del = async (accounts) => {
     const indexes = asArray(accounts);
 

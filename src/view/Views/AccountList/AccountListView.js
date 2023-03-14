@@ -63,6 +63,7 @@ class AccountListView extends View {
             listMode: 'list',
             showMenu: false,
             sortMode,
+            showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -240,7 +241,8 @@ class AccountListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -327,6 +329,10 @@ class AccountListView extends View {
 
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
+    }
+
+    hideContextMenu() {
+        this.store.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
@@ -612,7 +618,7 @@ class AccountListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }

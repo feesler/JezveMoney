@@ -209,15 +209,16 @@ export class AccountListView extends AppView {
             res.hideBtn = { visible: showSelectItems && (visibleSelected.length > 0) };
         }
 
+        res.contextMenu = {
+            visible: model.contextMenuVisible,
+        };
+
         if (model.contextMenuVisible) {
             const ctxAccount = App.state.accounts.getItem(model.contextItem);
             assert(ctxAccount, 'Invalid state');
 
             const isHidden = App.state.accounts.isHidden(ctxAccount);
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-            };
+            res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
@@ -545,6 +546,23 @@ export class AccountListView extends AppView {
         await this.performAction(() => this.content.deselectAllBtn.click());
 
         return this.checkState(expected);
+    }
+
+    /** Delete secified account from context menu */
+    async deleteFromContextMenu(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxDeleteBtn.click());
+
+        this.checkState(expected);
+
+        assert(this.content.delete_warning?.content?.visible, 'Delete account warning popup not appear');
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Delete secified accounts and return navigation promise */

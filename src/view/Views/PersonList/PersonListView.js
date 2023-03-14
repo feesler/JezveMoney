@@ -61,6 +61,7 @@ class PersonListView extends View {
             listMode: 'list',
             showMenu: false,
             sortMode,
+            showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -239,7 +240,8 @@ class PersonListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -326,6 +328,10 @@ class PersonListView extends View {
 
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
+    }
+
+    hideContextMenu() {
+        this.store.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
@@ -609,7 +615,7 @@ class PersonListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }

@@ -54,6 +54,7 @@ class TransactionListView extends View {
             isLoadingMore: false,
             listMode: 'list',
             showMenu: false,
+            showContextMenu: false,
             contextItem: null,
             selDateRange: null,
             showCategoryDialog: false,
@@ -336,7 +337,8 @@ class TransactionListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
@@ -400,6 +402,10 @@ class TransactionListView extends View {
 
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
+    }
+
+    hideContextMenu() {
+        this.store.dispatch(actions.hideContextMenu());
     }
 
     showCategoryDialog() {
@@ -842,7 +848,7 @@ class TransactionListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }

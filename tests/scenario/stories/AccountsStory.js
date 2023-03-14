@@ -40,6 +40,7 @@ export class AccountsStory extends TestStory {
         await this.show();
         await this.exportCSV();
         await this.update();
+        await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
     }
@@ -142,6 +143,12 @@ export class AccountsStory extends TestStory {
         await AccountTests.update(0);
         await AccountTests.inputName('Acc_1');
         await AccountTests.submit();
+    }
+
+    async deleteFromContextMenu() {
+        setBlock('Delete account from context menu', 1);
+
+        await AccountTests.deleteFromContextMenu(1);
     }
 
     async del() {

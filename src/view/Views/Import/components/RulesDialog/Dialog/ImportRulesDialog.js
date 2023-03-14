@@ -114,7 +114,8 @@ export class ImportRulesDialog extends Component {
 
         this.contextMenu = PopupMenu.create({
             fixed: false,
-            onClose: () => this.showContextMenu(null),
+            onItemClick: () => this.hideContextMenu(),
+            onClose: () => this.hideContextMenu(),
             items: [{
                 icon: 'update',
                 title: __('UPDATE'),
@@ -154,6 +155,7 @@ export class ImportRulesDialog extends Component {
                 pagesCount: 0,
                 total: 0,
             },
+            showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -261,11 +263,22 @@ export class ImportRulesDialog extends Component {
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId) {
+        if (this.state.contextItem === itemId && this.state.showContextMenu) {
             return;
         }
 
-        this.setState({ ...this.state, contextItem: itemId });
+        this.setState({
+            ...this.state,
+            contextItem: itemId,
+            showContextMenu: true,
+        });
+    }
+
+    hideContextMenu() {
+        this.setState({
+            ...this.state,
+            showContextMenu: false,
+        });
     }
 
     /** Rule 'submit' event handler */
@@ -388,7 +401,7 @@ export class ImportRulesDialog extends Component {
     }
 
     renderContextMenu(state) {
-        if (state.id !== this.LIST_STATE) {
+        if (state.id !== this.LIST_STATE || !state.showContextMenu) {
             this.contextMenu?.detach();
             return;
         }

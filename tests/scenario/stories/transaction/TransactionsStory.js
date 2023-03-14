@@ -38,6 +38,7 @@ export class TransactionsStory extends TestStory {
         await this.update();
         await this.updateFromMainView();
         await this.setCategoryFromMainView();
+        await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
         await this.deleteFromMainView();
@@ -707,6 +708,12 @@ export class TransactionsStory extends TestStory {
         ];
 
         return App.scenario.runner.runGroup(TransactionTests.setTransactionCategory, data);
+    }
+
+    async deleteFromContextMenu() {
+        setBlock('Delete transaction from context menu', 1);
+
+        await TransactionTests.deleteFromContextMenu(1);
     }
 
     async deleteExpense() {

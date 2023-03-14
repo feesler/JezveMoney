@@ -35,6 +35,7 @@ export class PersonsStory extends TestStory {
         await this.show();
         await this.exportCSV();
         await this.update();
+        await this.deleteFromContextMenu();
         await this.del();
 
         await this.prepareTransactions();
@@ -97,6 +98,12 @@ export class PersonsStory extends TestStory {
         await PersonTests.update(2);
         await PersonTests.inputName('MARIA');
         await PersonTests.submit();
+    }
+
+    async deleteFromContextMenu() {
+        setBlock('Delete person from context menu', 1);
+
+        await PersonTests.deleteFromContextMenu(0);
     }
 
     async del() {

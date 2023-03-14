@@ -545,14 +545,15 @@ export class TransactionListView extends AppView {
             res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
         }
 
+        res.contextMenu = {
+            visible: model.contextMenuVisible,
+        };
+
         if (model.contextMenuVisible) {
             const ctxTransaction = model.filtered.getItem(model.contextItem);
             assert(ctxTransaction, 'Invalid state');
 
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-            };
+            res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
@@ -1377,6 +1378,23 @@ export class TransactionListView extends AppView {
         await this.waitForList(() => (
             this.content.selectCategoryDialog.selectCategoryAndSubmit(category)
         ));
+    }
+
+    /** Delete secified transaction from context menu */
+    async deleteFromContextMenu(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxDeleteBtn.click());
+
+        this.checkState(expected);
+
+        assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     /** Delete specified transactions */

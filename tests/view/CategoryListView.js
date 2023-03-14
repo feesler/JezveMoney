@@ -318,14 +318,15 @@ export class CategoryListView extends AppView {
             res.deleteBtn = { visible: showSelectItems && totalSelected > 0 };
         }
 
+        res.contextMenu = {
+            visible: model.contextMenuVisible,
+        };
+
         if (model.contextMenuVisible) {
             const ctxCategory = App.state.categories.getItem(model.contextItem);
             assert(ctxCategory, 'Invalid state');
 
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-            };
+            res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
@@ -619,6 +620,27 @@ export class CategoryListView extends AppView {
         await this.performAction(() => this.content.deselectAllBtn.click());
 
         return this.checkState(expected);
+    }
+
+    /** Delete secified category from context menu */
+    async deleteFromContextMenu(index, removeChildren = true) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxDeleteBtn.click());
+
+        this.checkState(expected);
+
+        assert(this.content.delete_warning?.content?.visible, 'Delete account warning popup not appear');
+
+        if (removeChildren !== this.content.delete_warning.removeChildren) {
+            await this.content.delete_warning.toggleDeleteChilds();
+        }
+
+        await this.waitForList(() => this.content.delete_warning.clickOk());
     }
 
     async deleteCategories(categories, removeChildren = true) {

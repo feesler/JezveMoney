@@ -29,9 +29,13 @@ const slice = createSlice({
     ),
 
     showTransactionContextMenu: (state, itemId) => (
-        (state.transactionContextItem === itemId)
+        (state.transactionContextItem === itemId && state.showContextMenu)
             ? state
-            : { ...state, transactionContextItem: itemId }
+            : { ...state, transactionContextItem: itemId, showContextMenu: true }
+    ),
+
+    hideTransactionContextMenu: (state) => (
+        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
     startLoading: (state) => (
