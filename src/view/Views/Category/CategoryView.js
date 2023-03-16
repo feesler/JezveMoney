@@ -8,6 +8,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { Application } from '../../js/Application.js';
@@ -19,7 +20,6 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { actions, reducer } from './reducer.js';
-import { createStore } from '../../js/store.js';
 import '../../Components/Field/Field.scss';
 import './CategoryView.scss';
 

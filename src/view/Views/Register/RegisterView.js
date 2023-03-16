@@ -1,9 +1,9 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
+import { createStore } from 'jezvejs/Store';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
-import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import '../../Components/Field/Field.scss';
 import './RegisterView.scss';

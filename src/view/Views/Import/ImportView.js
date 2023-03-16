@@ -12,6 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { createStore } from 'jezvejs/Store';
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
@@ -28,7 +29,6 @@ import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploa
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionList } from './components/List/ImportTransactionList.js';
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
-import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 import '../../css/app.scss';
 import './ImportView.scss';

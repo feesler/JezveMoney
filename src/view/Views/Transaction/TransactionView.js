@@ -14,6 +14,7 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
 import {
@@ -47,7 +48,6 @@ import { AccountContainer } from './components/AccountContainer/AccountContainer
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { createStore } from '../../js/store.js';
 import {
     actions,
     reducer,

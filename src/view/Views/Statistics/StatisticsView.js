@@ -11,6 +11,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
+import { createStore } from 'jezvejs/Store';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { formatValueShort, normalize, __ } from '../../js/utils.js';
@@ -26,7 +27,6 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { createStore } from '../../js/store.js';
 import {
     getGroupTypeByName,
     isSameSelection,

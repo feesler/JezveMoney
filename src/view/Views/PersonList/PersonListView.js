@@ -8,6 +8,7 @@ import {
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { createStore } from 'jezvejs/Store';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import {
     listData,
@@ -31,7 +32,6 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { Heading } from '../../Components/Heading/Heading.js';
 import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
-import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
 import './PersonListView.scss';
 

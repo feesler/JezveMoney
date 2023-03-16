@@ -1,5 +1,5 @@
 import { asArray } from 'jezvejs';
-import { createSlice } from '../../js/store.js';
+import { createSlice } from 'jezvejs/Store';
 import { normalize } from '../../js/utils.js';
 
 const groupTypes = [null, 'day', 'week', 'month', 'year'];

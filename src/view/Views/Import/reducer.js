@@ -1,4 +1,4 @@
-import { createSlice } from '../../js/store.js';
+import { createSlice } from 'jezvejs/Store';
 import { ImportTransaction } from '../../js/model/ImportTransaction.js';
 
 /** Returns page number and relative index of specified absolute index */

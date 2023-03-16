@@ -7,6 +7,7 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -16,7 +17,6 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { actions, reducer } from './reducer.js';
-import { createStore } from '../../js/store.js';
 import '../../Components/Field/Field.scss';
 import './PersonView.scss';
 

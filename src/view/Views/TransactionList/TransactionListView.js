@@ -14,6 +14,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 import { __ } from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -34,7 +35,6 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './TransactionListView.scss';
 

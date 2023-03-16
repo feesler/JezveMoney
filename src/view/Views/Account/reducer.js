@@ -1,4 +1,4 @@
-import { createSlice } from '../../js/store.js';
+import { createSlice } from 'jezvejs/Store';
 import { normalize } from '../../js/utils.js';
 
 // Reducers
