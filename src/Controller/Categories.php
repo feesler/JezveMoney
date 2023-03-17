@@ -40,9 +40,7 @@ class Categories extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "CategoryListView.css";
-        $this->jsArr[] = "CategoryListView.js";
-
+        $this->initResources("CategoryListView");
         $this->render($data);
     }
 
@@ -94,9 +92,7 @@ class Categories extends ListViewController
             ]
         ];
 
-        $this->cssArr[] = "CategoryView.css";
-        $this->jsArr[] = "CategoryView.js";
-
+        $this->initResources("CategoryView");
         $this->render($data);
     }
 
@@ -137,9 +133,7 @@ class Categories extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "CategoryView.css";
-        $this->jsArr[] = "CategoryView.js";
-
+        $this->initResources("CategoryView");
         $this->render($data);
     }
 }

@@ -49,9 +49,7 @@ class User extends TemplateController
             "titleString" => __("APP_NAME") . " | " . __("LOG_IN"),
         ];
 
-        $this->cssArr[] = "LoginView.css";
-        $this->jsArr[] = "LoginView.js";
-
+        $this->initResources("LoginView");
         $this->render($data);
     }
 
@@ -109,9 +107,7 @@ class User extends TemplateController
             "titleString" =>  __("APP_NAME") . " | " . __("REGISTRATION"),
         ];
 
-        $this->cssArr[] = "RegisterView.css";
-        $this->jsArr[] = "RegisterView.js";
-
+        $this->initResources("RegisterView");
         $this->render($data);
     }
 

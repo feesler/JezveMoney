@@ -131,6 +131,12 @@ function defineHostConstants()
 
     define("BASEURL", APP_PROTOCOL . APP_HOST . APP_PATH);
 
+    define("JS_PATH", "view/js/");
+    define("CSS_PATH", "view/css/");
+    define("ADMIN_JS_PATH", "admin/view/js/");
+    define("ADMIN_CSS_PATH", "admin/view/css/");
+
+    define("VIEW_PATH", pathJoin(APP_ROOT, "view"));
     define("TPL_PATH", pathJoin(APP_ROOT, "Template"));
     define("VIEW_TPL_PATH", pathJoin(APP_ROOT, "Template", "View"));
     define("ICONS_PATH", pathJoin(APP_ROOT, "Template", "Icons"));

@@ -76,9 +76,7 @@ class Import extends TemplateController
             "templates" => $data["importTemplates"]
         ];
 
-        $this->cssArr[] = "ImportView.css";
-        $this->jsArr[] = "ImportView.js";
-
+        $this->initResources("ImportView");
         $this->render($data);
     }
 }

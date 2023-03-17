@@ -1,6 +1,7 @@
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 
 const filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(filename);
@@ -127,19 +128,52 @@ export default {
         },
     },
     output: {
-        filename: '[name].js',
         path: resolve(currentDir, '../dist'),
         clean: {
             keep: 'vendor',
         },
+        filename: (pathData) => (
+            `view/js/chunk.${pathData.chunk.renderedHash}.js`
+        ),
     },
     plugins: [
+        new WebpackManifestPlugin({
+            fileName: resolve(currentDir, '../dist/view/manifest.json'),
+            generate: (seed, files) => {
+                const entrypoints = new Set();
+                files.forEach(
+                    /* eslint-disable-next-line no-underscore-dangle */
+                    (file) => ((file.chunk || {})._groups || []).forEach(
+                        (group) => entrypoints.add(group),
+                    ),
+                );
+
+                const entries = [...entrypoints];
+                const entryArrayManifest = entries.reduce((acc, entry) => {
+                    const name = (entry.options || {}).name
+                        || (entry.runtimeChunk || {}).name;
+
+                    const entryFiles = [].concat(
+                        ...(entry.chunks || []).map((chunk) => chunk.files),
+                    ).filter(Boolean);
+
+                    return name ? { ...acc, [name]: entryFiles } : acc;
+                }, seed);
+
+                return entryArrayManifest;
+            },
+        }),
         new MiniCssExtractPlugin({
-            filename: ({ chunk }) => (
-                chunk.filenameTemplate
-                    .replace('/js/', '/css/')
-                    .replace('.js', '.css')
-            ),
+            filename: (pathData) => {
+                if (pathData.chunk.filenameTemplate) {
+                    return pathData.chunk.filenameTemplate
+                        .replace('/js/', '/css/')
+                        .replace('.js', '.css');
+                }
+
+                return `view/css/chunk.${pathData.chunk.renderedHash}.css`;
+            },
+            ignoreOrder: true,
         }),
     ],
     module: {
@@ -181,5 +215,17 @@ export default {
     },
     cache: {
         type: 'filesystem',
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    chunks: 'initial',
+                },
+            },
+        },
     },
 };

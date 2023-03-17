@@ -67,7 +67,7 @@
         "eslint-plugin-import": "^2.27.5",
         "jezve-test": "^1.5.2",
         "jezvejs-test": "^1.6.0",
-        "mini-css-extract-plugin": "^2.7.3",
+        "mini-css-extract-plugin": "^2.7.5",
         "npm-run-all": "^4.1.5",
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
@@ -80,12 +80,13 @@
         "stylelint-config-standard-scss": "^6.1.0",
         "webpack": "^5.76.2",
         "webpack-cli": "^4.10.0",
+        "webpack-manifest-plugin": "^5.0.0",
         "webpack-merge": "^5.8.0"
     },
     "dependencies": {
         "@babel/runtime": "^7.21.0",
         "core-js": "^3.29.1",
-        "jezvejs": "^1.88.1",
+        "jezvejs": "^1.89.0",
         "whatwg-fetch": "^3.6.2"
     }
 }

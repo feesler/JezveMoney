@@ -91,9 +91,7 @@ class Main extends TemplateController
             ]
         ];
 
-        $this->cssArr[] = "MainView.css";
-        $this->jsArr[] = "MainView.js";
-
+        $this->initResources("MainView");
         $this->render($data);
     }
 
@@ -113,9 +111,7 @@ class Main extends TemplateController
         $data["year"] = date("Y");
         $data["version"] = $app->getVersion();
 
-        $this->cssArr[] = "AboutView.css";
-        $this->jsArr[] = "AboutView.js";
-
+        $this->initResources("AboutView");
         $this->render($data);
     }
 }

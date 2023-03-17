@@ -48,9 +48,7 @@ class Accounts extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "AccountListView.css";
-        $this->jsArr[] = "AccountListView.js";
-
+        $this->initResources("AccountListView");
         $this->render($data);
     }
 
@@ -102,9 +100,7 @@ class Accounts extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "AccountView.css";
-        $this->jsArr[] = "AccountView.js";
-
+        $this->initResources("AccountView");
         $this->render($data);
     }
 
@@ -168,9 +164,7 @@ class Accounts extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "AccountView.css";
-        $this->jsArr[] = "AccountView.js";
-
+        $this->initResources("AccountView");
         $this->render($data);
     }
 }

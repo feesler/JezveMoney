@@ -105,9 +105,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionListView.css";
-        $this->jsArr[] = "TransactionListView.js";
-
+        $this->initResources("TransactionListView");
         $this->render($data);
     }
 
@@ -399,9 +397,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionView.css";
-        $this->jsArr[] = "TransactionView.js";
-
+        $this->initResources("TransactionView");
         $this->render($data);
     }
 
@@ -604,9 +600,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionView.css";
-        $this->jsArr[] = "TransactionView.js";
-
+        $this->initResources("TransactionView");
         $this->render($data);
     }
 
