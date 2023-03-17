@@ -79,6 +79,7 @@ class AdminApiConsoleView extends AdminView {
         this.initCurrencyForms();
         this.initIconForms();
         this.initUserForms();
+        this.initUserCurrencyForms();
         this.initProfileForms();
     }
 
@@ -345,6 +346,37 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setEvents(registerForm, { submit: (e) => this.onFormSubmit(e) });
+    }
+
+    /** Initialization of forms for User Currencies API controller */
+    initUserCurrencyForms() {
+        this.initForm(
+            '#listUserCurrencyForm > form',
+            this.getVerifyHandler(apiTypes.isUserCurrenciesArray),
+        );
+
+        const readBtn = ge('readUserCurrencyBtn');
+        if (!readBtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readBtn, {
+            click: (e) => (
+                this.onReadItemsSubmit(
+                    e,
+                    'read_user_currency_id',
+                    'usercurrency/',
+                    apiTypes.isUserCurrenciesArray,
+                )
+            ),
+        });
+
+        this.initForm(
+            '#createUserCurrencyForm > form',
+            this.getVerifyHandler(apiTypes.isCreateResult),
+        );
+        this.initForm('#updateUserCurrencyForm > form');
+        this.initIdsForm('#delUserCurrencyForm > form');
+        this.initForm('#setUserCurrencyPosForm > form');
     }
 
     /** Initialization of forms for Profile API controller */

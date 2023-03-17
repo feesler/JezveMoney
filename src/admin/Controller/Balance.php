@@ -105,9 +105,7 @@ class Balance extends AdminController
             ],
         ];
 
-        $this->cssAdmin[] = "BalanceView.css";
-        $this->jsAdmin[] = "BalanceView.js";
-
+        $this->initResources("BalanceView");
         $this->render($data);
     }
 }

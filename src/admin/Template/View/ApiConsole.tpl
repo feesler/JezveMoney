@@ -135,6 +135,18 @@
                     </li>
 
                     <li>
+                        <button>User currency</button>
+                        <ul class="sub-menu-list">
+                            <li data-target="listUserCurrencyForm">List</li>
+                            <li data-target="readUserCurrencyForm">Read</li>
+                            <li data-target="createUserCurrencyForm">Create</li>
+                            <li data-target="updateUserCurrencyForm">Update</li>
+                            <li data-target="delUserCurrencyForm">Delete</li>
+                            <li data-target="setUserCurrencyPosForm">Set position</li>
+                        </ul>
+                    </li>
+
+                    <li>
                         <button>Icon</button>
                         <ul class="sub-menu-list">
                             <li data-target="listIconForm">List</li>
@@ -204,6 +216,8 @@
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Icons.tpl");    ?>
 
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/User.tpl");    ?>
+
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/UserCurrency.tpl");    ?>
 
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Profile.tpl");    ?>
 

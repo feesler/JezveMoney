@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 16;
+    protected $latestVersion = 17;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -30,6 +30,7 @@ class DBVersion
         "transactions",
         "categories",
         "user_settings",
+        "user_currency",
         "users",
     ];
 
@@ -60,6 +61,7 @@ class DBVersion
             $this->createCategoriesTable();
             $this->createUsersTable();
             $this->createUserSettingsTable();
+            $this->createUserCurrencyTable();
             $this->createIconTable();
             $this->createImportTemplateTable();
             $this->createImportRuleTable();
@@ -215,6 +217,9 @@ class DBVersion
             }
             if ($current < 16) {
                 $current = $this->version16();
+            }
+            if ($current < 17) {
+                $current = $this->version17();
             }
 
             $this->setVersion($current);
@@ -655,6 +660,24 @@ class DBVersion
     }
 
     /**
+     * Creates database version 17
+     *
+     * @return int
+     */
+    private function version17()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        if (!$this->dbClient->isTableExist("user_currency")) {
+            $this->createUserCurrencyTable();
+        }
+
+        return 17;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -878,6 +901,38 @@ class DBVersion
                 "`sort_categories` INT(11) NOT NULL DEFAULT 0, " .
                 "PRIMARY KEY (`id`), " .
                 "UNIQUE KEY `user_id` (`user_id`)",
+            TABLE_OPTIONS
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates user currency table
+     */
+    private function createUserCurrencyTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "user_currency";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+                "`user_id` INT(11) NOT NULL, " .
+                "`curr_id` INT(11) NOT NULL, " .
+                "`pos` INT(11) NOT NULL, " .
+                "`flags` INT(11) NOT NULL DEFAULT 0, " .
+                "`createdate` DATETIME NOT NULL, " .
+                "`updatedate` DATETIME NOT NULL, " .
+                "PRIMARY KEY (`id`), " .
+                "INDEX `user_id` (`user_id`)",
             TABLE_OPTIONS
         );
         if (!$res) {

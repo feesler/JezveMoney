@@ -312,6 +312,21 @@ export const isCurrency = (obj) => verifyObject(obj, {
 /** Verify object is array of currencies */
 export const isCurrenciesArray = isArrayOf(isCurrency);
 
+/** Verify object is user currency */
+export const isUserCurrency = (obj) => verifyObject(obj, {
+    id: isInt,
+    curr_id: isInt,
+    pos: isInt,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is array of user currencies */
+export const isUserCurrenciesArray = isArrayOf(isUserCurrency);
+
 /** Verify object is icon */
 export const isIcon = (obj) => verifyObject(obj, {
     id: isInt,

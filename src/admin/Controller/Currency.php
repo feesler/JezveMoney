@@ -40,9 +40,7 @@ class Currency extends AdminController
             ],
         ];
 
-        $this->cssAdmin[] = "AdminCurrencyView.css";
-        $this->jsAdmin[] = "AdminCurrencyView.js";
-
+        $this->initResources("AdminCurrencyView");
         $this->render($data);
     }
 }

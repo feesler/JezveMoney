@@ -946,6 +946,7 @@ class UserModel extends CachedTable
 
         $tables = [
             "user_settings",
+            "user_currency",
             "accounts",
             "persons",
             "transactions",

@@ -34,9 +34,7 @@ class DBInstall extends AdminController
             "latestDBVersion" => $this->dbVer->getLatestVersion(),
         ];
 
-        $this->cssAdmin[] = "DBInstallView.css";
-        $this->jsAdmin[] = "DBInstallView.js";
-
+        $this->initResources("DBInstallView");
         $this->render($data);
     }
 

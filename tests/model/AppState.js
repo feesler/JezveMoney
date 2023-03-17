@@ -22,6 +22,7 @@ import { ImportRuleList } from './ImportRuleList.js';
 import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
+import { UserCurrencyList } from './UserCurrencyList.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
@@ -32,6 +33,9 @@ const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'f
 
 /** Persons */
 const pReqFields = ['name', 'flags'];
+
+/** User currencies */
+const uCurrReqFields = ['curr_id', 'flags'];
 
 /** Categories */
 const catReqFields = ['name', 'parent_id', 'type'];
@@ -103,6 +107,7 @@ export class AppState {
         this.transactions = null;
         this.templates = null;
         this.rules = null;
+        this.userCurrencies = null;
         this.profile = null;
     }
 
@@ -155,6 +160,12 @@ export class AppState {
         this.rules.setData(rules.data);
         this.rules.autoincrement = rules.autoincrement;
 
+        if (!this.userCurrencies) {
+            this.userCurrencies = UserCurrencyList.create();
+        }
+        this.userCurrencies.setData(state.userCurrencies.data);
+        this.userCurrencies.autoincrement = state.userCurrencies.autoincrement;
+
         this.profile = copyObject(state.profile);
     }
 
@@ -179,6 +190,7 @@ export class AppState {
         res.transactions = this.transactions.clone();
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
+        res.userCurrencies = this.userCurrencies.clone();
         res.profile = copyObject(this.profile);
 
         return res;
@@ -216,6 +228,7 @@ export class AppState {
         this.compareLists(this.persons, expected.persons);
         this.compareLists(this.categories, expected.categories);
         this.compareLists(this.templates, expected.templates);
+        this.compareLists(this.userCurrencies, expected.userCurrencies);
 
         assert(this.rules.length === expected.rules.length);
         this.rules.forEach((rule, index) => {
@@ -292,6 +305,7 @@ export class AppState {
         this.transactions?.reset();
         this.templates?.reset();
         this.rules?.reset();
+        this.userCurrencies?.reset();
     }
 
     changeName(name) {
@@ -398,6 +412,21 @@ export class AppState {
         return res;
     }
 
+    getUserCurrencies(options = {}) {
+        const res = {};
+
+        if (options.curr_id) {
+            const item = this.userCurrencies.findByCurrency(options.curr_id);
+            res.data = [item];
+        } else {
+            res.data = this.userCurrencies.data;
+        }
+
+        res.data = this.getNoDatesList(res.data);
+
+        return res;
+    }
+
     getProfile() {
         return copyObject(this.profile);
     }
@@ -493,6 +522,9 @@ export class AppState {
         if (request.importrules) {
             res.importrules = this.getImportRules(request.importrules);
         }
+        if (request.userCurrencies) {
+            res.userCurrencies = this.getUserCurrencies(request.userCurrencies);
+        }
         if (request.profile) {
             res.profile = this.getProfile();
         }
@@ -535,6 +567,118 @@ export class AppState {
         Object.assign(this.profile.settings, data);
 
         return true;
+    }
+
+    /**
+     * User currencies
+     */
+
+    checkUserCurrencyCorrectness(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        // Check currency exist
+        const currency = App.currency.getItem(params.curr_id);
+        if (!currency) {
+            return false;
+        }
+
+        // Check there is no entry for the same currency
+        const userCurrency = this.userCurrencies.findByCurrency(currency.id);
+        const isUpdate = !!params.id;
+        if (userCurrency && (!isUpdate || (isUpdate && params.id !== userCurrency.id))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    createUserCurrency(params) {
+        const resExpected = this.checkUserCurrencyCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, uCurrReqFields);
+
+        const ind = this.userCurrencies.create(data);
+        const item = this.userCurrencies.getItemByIndex(ind);
+
+        const res = { id: item.id };
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
+    }
+
+    updateUserCurrency(params) {
+        const original = this.userCurrencies.getItem(params.id);
+        if (!original) {
+            return false;
+        }
+
+        // Prepare expected item object
+        const expectedItem = copyObject(original);
+        const data = copyFields(params, uCurrReqFields);
+        Object.assign(expectedItem, data);
+
+        const resExpected = this.checkUserCurrencyCorrectness(expectedItem);
+        if (!resExpected) {
+            return false;
+        }
+
+        // Prepare expected updates of user currencies list
+        this.userCurrencies.update(expectedItem);
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
+    }
+
+    deleteUserCurrencies(params) {
+        const ids = asArray(params?.id).map((id) => parseInt(id, 10));
+        if (!ids.length) {
+            return false;
+        }
+        if (!ids.every((id) => this.userCurrencies.getItem(id))) {
+            return false;
+        }
+
+        this.userCurrencies.deleteItems(ids);
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
+    }
+
+    setUserCurrencyPos(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        const { id, pos } = params;
+        if (!parseInt(id, 10) || !parseInt(pos, 10)) {
+            return false;
+        }
+
+        if (!this.userCurrencies.setPos(id, pos)) {
+            return false;
+        }
+
+        const res = {};
+        if ('returnState' in params) {
+            res.state = this.getState(params.returnState);
+        }
+
+        return res;
     }
 
     /**
