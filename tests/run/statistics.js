@@ -60,9 +60,9 @@ export const filterByAccounts = async (ids) => {
 
 export const selectCurrency = async (id) => {
     const currency = App.currency.getItem(id);
-    const name = (currency) ? currency.name : `(${id})`;
+    const code = (currency) ? currency.code : `(${id})`;
 
-    await test(`Select currency [${name}]`, () => App.view.selectCurrency(id));
+    await test(`Select currency [${code}]`, () => App.view.selectCurrency(id));
 };
 
 export const groupByDay = async () => {

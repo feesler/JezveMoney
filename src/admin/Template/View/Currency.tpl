@@ -1,8 +1,8 @@
-<?php	include(ADMIN_TPL_PATH . "Header.tpl");	?>
+<?php include(ADMIN_TPL_PATH . "Header.tpl");    ?>
 
 <div class="page">
     <div class="page_wrapper">
-<?php	include(ADMIN_TPL_PATH . "Component/Header.tpl");	?>
+        <?php include(ADMIN_TPL_PATH . "Component/Header.tpl");    ?>
 
         <div class="container">
             <div class="content">
@@ -11,17 +11,24 @@
 
                     <table class="admin-tbl">
                         <thead>
-                            <tr><th>id</th><th>name</th><th>sign</th><th>flags</th></tr>
+                            <tr>
+                                <th>id</th>
+                                <th>name</th>
+                                <th>code</th>
+                                <th>sign</th>
+                                <th>flags</th>
+                            </tr>
                         </thead>
                         <tbody id="items-list">
-<?php	foreach($itemsData as $currInfo) {		?>
-                            <tr data-id=<?=e($currInfo->id)?>>
-                                <td><?=e($currInfo->id)?></td>
-                                <td><?=e($currInfo->name)?></td>
-                                <td><?=e($currInfo->sign)?></td>
-                                <td><?=e($currInfo->flags)?></td>
-                            </tr>
-<?php	}	?>
+                            <?php foreach ($itemsData as $currInfo) {        ?>
+                                <tr data-id=<?= e($currInfo->id) ?>>
+                                    <td><?= e($currInfo->id) ?></td>
+                                    <td><?= e($currInfo->name) ?></td>
+                                    <td><?= e($currInfo->code) ?></td>
+                                    <td><?= e($currInfo->sign) ?></td>
+                                    <td><?= e($currInfo->flags) ?></td>
+                                </tr>
+                            <?php    }    ?>
                         </tbody>
                     </table>
 
@@ -36,12 +43,17 @@
     </div>
 </div>
 
-<form id="item-frm" method="post" action="<?=BASEURL?>api/currency/create" hidden>
+<form id="item-frm" method="post" action="<?= BASEURL ?>api/currency/create" hidden>
     <input id="curr_id" name="id" type="hidden">
 
     <div class="field form-row">
         <label for="curr_name" class="field__title">Name</label>
         <input id="curr_name" class="stretch-input" name="name" type="text">
+    </div>
+
+    <div class="field form-row">
+        <label for="curr_code" class="field__title">Code</label>
+        <input id="curr_code" class="stretch-input" name="code" type="text">
     </div>
 
     <div class="field form-row">
@@ -63,4 +75,4 @@
     </div>
 </form>
 
-<?php	include(ADMIN_TPL_PATH . "Footer.tpl");	?>
+<?php include(ADMIN_TPL_PATH . "Footer.tpl");    ?>

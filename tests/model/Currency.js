@@ -1,5 +1,6 @@
 import { assert } from 'jezve-test';
 import { normalize, formatValue } from '../common.js';
+import { hasToken, __ } from './locale.js';
 
 /** Currency object */
 export class Currency {
@@ -11,7 +12,19 @@ export class Currency {
         });
     }
 
-    /** Format specified value using rules of currency */
+    /**
+     * Returns formatted name of currency
+     */
+    formatName(locale = 'en') {
+        return hasToken(this.name)
+            ? `${this.code} – ${__(this.name, locale)}`
+            : this.code;
+    }
+
+    /**
+     * Returns value formatted according to currency rules.
+     * @param {*} value - float value to format
+     */
     format(val) {
         let nval = normalize(val);
         if (Math.floor(nval) !== nval) {

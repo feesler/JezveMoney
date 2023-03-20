@@ -129,8 +129,10 @@ export class CurrencyItem extends Component {
             return;
         }
 
-        this.titleElem.textContent = currency.name;
-        this.titleElem.setAttribute('title', currency.name);
+        const name = currency.formatName();
+
+        this.titleElem.textContent = name;
+        this.titleElem.setAttribute('title', name);
     }
 
     render(state, prevState = {}) {

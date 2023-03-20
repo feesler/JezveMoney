@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 17;
+    protected $latestVersion = 18;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -220,6 +220,9 @@ class DBVersion
             }
             if ($current < 17) {
                 $current = $this->version17();
+            }
+            if ($current < 18) {
+                $current = $this->version18();
             }
 
             $this->setVersion($current);
@@ -678,6 +681,44 @@ class DBVersion
     }
 
     /**
+     * Creates database version 18
+     *
+     * @return int
+     */
+    private function version18()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "currency";
+
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Fail to obtian columns of '$tableName' table");
+        }
+
+        if (!isset($columns["code"])) {
+            $res = $this->dbClient->addColumns($tableName, ["code" => "VARCHAR(64) NOT NULL"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->updateQ($tableName, ["code=name"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->updateQ($tableName, ["name=CONCAT('CURRENCY_', name)"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 18;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -695,6 +736,7 @@ class DBVersion
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
                 "`name` VARCHAR(128) NOT NULL, " .
+                "`code` VARCHAR(64) NOT NULL, " .
                 "`sign` VARCHAR(64) NOT NULL, " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .
                 "`createdate` DATETIME NOT NULL, " .

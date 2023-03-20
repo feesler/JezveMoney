@@ -336,7 +336,7 @@ export const runFormAction = async (action) => {
         const currency = App.currency.getItem(action.data);
         assert(currency, `Currency (${action.data}) not found`);
 
-        descr = `${actDescr[action.action]} to '${currency.name}'`;
+        descr = `${actDescr[action.action]} to '${currency.code}'`;
     } else if (action.action === 'changeTransferAccount') {
         const userAccounts = App.state.getUserAccounts();
         const account = userAccounts.getItem(action.data);

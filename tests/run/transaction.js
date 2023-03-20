@@ -114,9 +114,9 @@ export const runAction = async ({ action, data }) => {
         assert(curr, `Currency (${data}) not found`);
 
         if (action === 'changeSourceCurrency') {
-            testDescr = `Change source currency to '${curr.name}'`;
+            testDescr = `Change source currency to '${curr.code}'`;
         } else {
-            testDescr = `Change destination currency to '${curr.name}'`;
+            testDescr = `Change destination currency to '${curr.code}'`;
         }
     }
 

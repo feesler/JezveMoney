@@ -457,7 +457,7 @@ export class ImportTransaction {
                 this.src_curr = mainAccountCurrency.id;
             }
         } else {
-            const currency = App.currency.findByName(this.original.transactionCurrency);
+            const currency = App.currency.findByCode(this.original.transactionCurrency);
             assert(currency, `Currency ${this.original.transactionCurrency} not found`);
             if (this.type === 'expense') {
                 this.dest_curr = currency.id;

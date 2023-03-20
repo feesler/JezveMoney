@@ -6,13 +6,14 @@ import {
     click,
     evaluate,
 } from 'jezve-test';
+import { App } from '../../../Application.js';
 
 export class CurrencyItem extends TestComponent {
     static render(currency) {
         assert(currency, 'Invalid currency');
 
         return {
-            title: currency.name,
+            title: currency.formatName(App.goToMainView.locale),
         };
     }
 

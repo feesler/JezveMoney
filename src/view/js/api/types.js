@@ -302,6 +302,7 @@ export const isImportRulesArray = isArrayOf(isImportRule);
 export const isCurrency = (obj) => verifyObject(obj, {
     id: isInt,
     name: isString,
+    code: isString,
     sign: isString,
     flags: isInt,
 }, {

@@ -100,7 +100,7 @@ export class ImportConditionItem extends Component {
                 throw new Error('Invalid currency');
             }
 
-            return valueItem.name;
+            return valueItem.code;
         }
 
         if (state.fieldType === IMPORT_COND_FIELD_MAIN_ACCOUNT) {

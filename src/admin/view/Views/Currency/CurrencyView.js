@@ -25,6 +25,7 @@ class AdminCurrencyListView extends AdminListView {
 
         this.idInput = ge('curr_id');
         this.nameInput = ge('curr_name');
+        this.codeInput = ge('curr_code');
         this.signInput = ge('curr_sign');
         this.beforeCheck = ge('isbefore');
         this.afterCheck = ge('isafter');
@@ -38,12 +39,14 @@ class AdminCurrencyListView extends AdminListView {
         if (item) {
             this.idInput.value = item.id;
             this.nameInput.value = item.name;
+            this.codeInput.value = item.code;
             this.signInput.value = item.sign;
             this.beforeCheck.checked = (item.flags === 1);
             this.afterCheck.checked = (item.flags === 0);
         } else { /* clean */
             this.idInput.value = '';
             this.nameInput.value = '';
+            this.codeInput.value = '';
             this.signInput.value = '';
             this.beforeCheck.checked = false;
             this.afterCheck.checked = true;
@@ -63,6 +66,7 @@ class AdminCurrencyListView extends AdminListView {
             children: [
                 createElement('td', { props: { textContent: item.id } }),
                 createElement('td', { props: { textContent: item.name } }),
+                createElement('td', { props: { textContent: item.code } }),
                 createElement('td', { props: { textContent: item.sign } }),
                 createElement('td', { props: { textContent: item.flags } }),
             ],

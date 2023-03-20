@@ -58,7 +58,7 @@ class CurrencyModel extends CachedTable
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = ["name", "sign", "flags"];
+        $avFields = ["name", "code", "sign", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
@@ -70,6 +70,13 @@ class CurrencyModel extends CachedTable
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
                 throw new \Error("Invalid name specified");
+            }
+        }
+
+        if (isset($params["code"])) {
+            $res["code"] = $this->dbObj->escape($params["code"]);
+            if (is_empty($res["code"])) {
+                throw new \Error("Invalid code specified");
             }
         }
 
@@ -101,11 +108,11 @@ class CurrencyModel extends CachedTable
      */
     protected function isSameItemExist(array $params, int $item_id = 0)
     {
-        if (!is_array($params) || !isset($params["name"])) {
+        if (!is_array($params) || !isset($params["code"])) {
             return false;
         }
 
-        $foundItem = $this->findByName($params["name"]);
+        $foundItem = $this->findByCode($params["code"]);
         return ($foundItem && $foundItem->id != $item_id);
     }
 
@@ -269,6 +276,33 @@ class CurrencyModel extends CachedTable
                 ($caseSens && $item->name == $name) ||
                 (!$caseSens && strtolower($item->name) == $name)
             ) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Search for currency with specified code
+     *
+     * @param string $code code of currency to find
+     *
+     * @return object|null
+     */
+    public function findByCode(string $code)
+    {
+        if (is_empty($code)) {
+            return null;
+        }
+
+        if (!$this->checkCache()) {
+            return null;
+        }
+
+        $code = strtolower($code);
+        foreach ($this->cache as $item) {
+            if (strtolower($item->code) == $code) {
                 return $item;
             }
         }

@@ -30,11 +30,19 @@ export class CurrencyList extends List {
         return currObj;
     }
 
-    getItemsByNames(names) {
-        const itemNames = asArray(names);
+    findByCode(code) {
+        const uCode = code?.toUpperCase() ?? null;
+        if (uCode === null) {
+            return null;
+        }
 
-        return itemNames.map((name) => {
-            const item = this.findByName(name);
+        const currObj = this.find((item) => item.code.toUpperCase() === uCode);
+        return currObj ?? null;
+    }
+
+    getItemsByCodes(codes) {
+        return asArray(codes).map((name) => {
+            const item = this.findByCode(name);
             assert(item, `Currency '${name}' not found`);
 
             return item.id;

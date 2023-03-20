@@ -6,6 +6,7 @@ class CurrencyItem
 {
     public $id = 0;
     public $name = null;
+    public $code = null;
     public $sign = null;
     public $flags = 0;
     public $createdate = 0;
@@ -27,6 +28,7 @@ class CurrencyItem
         $res = new static();
         $res->id = intval($row["id"]);
         $res->name = $row["name"];
+        $res->code = $row["code"];
         $res->sign = $row["sign"];
         $res->flags = intval($row["flags"]);
         $res->createdate = strtotime($row["createdate"]);

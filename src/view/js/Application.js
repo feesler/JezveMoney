@@ -316,7 +316,7 @@ export class Application {
         }
 
         this.model.currency.forEach(
-            (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
+            (curr) => ddlist.addItem({ id: curr.id, title: curr.formatName() }),
         );
     }
 
@@ -332,12 +332,20 @@ export class Application {
         this.model.userCurrencies.forEach((userCurr) => {
             const currency = this.model.currency.getItem(userCurr.curr_id);
             ids.push(currency.id);
-            items.push(currency);
+            items.push({ ...currency, name: currency.formatName() });
         });
 
         this.appendListItems(ddlist, items);
 
-        const otherCurrencies = this.model.currency.filter((item) => !ids.includes(item.id));
+        const otherCurrencies = [];
+        this.model.currency.forEach((currency) => {
+            if (ids.includes(currency.id)) {
+                return;
+            }
+
+            otherCurrencies.push({ ...currency, name: currency.formatName() });
+        });
+
         this.appendListItems(ddlist, otherCurrencies, { group: __('OTHER_CURRENCIES') });
     }
 
