@@ -170,59 +170,9 @@ class DBVersion
                 return;
             }
 
-            if ($current < 1) {
-                $current = $this->version1();
-            }
-            if ($current < 2) {
-                $current = $this->version2();
-            }
-            if ($current < 3) {
-                $current = $this->version3();
-            }
-            if ($current < 4) {
-                $current = $this->version4();
-            }
-            if ($current < 5) {
-                $current = $this->version5();
-            }
-            if ($current < 6) {
-                $current = $this->version6();
-            }
-            if ($current < 7) {
-                $current = $this->version7();
-            }
-            if ($current < 8) {
-                $current = $this->version8();
-            }
-            if ($current < 9) {
-                $current = $this->version9();
-            }
-            if ($current < 10) {
-                $current = $this->version10();
-            }
-            if ($current < 11) {
-                $current = $this->version11();
-            }
-            if ($current < 12) {
-                $current = $this->version12();
-            }
-            if ($current < 13) {
-                $current = $this->version13();
-            }
-            if ($current < 14) {
-                $current = $this->version14();
-            }
-            if ($current < 15) {
-                $current = $this->version15();
-            }
-            if ($current < 16) {
-                $current = $this->version16();
-            }
-            if ($current < 17) {
-                $current = $this->version17();
-            }
-            if ($current < 18) {
-                $current = $this->version18();
+            while ($current < $this->latestVersion) {
+                $next = "version" . ($current + 1);
+                $current = $this->$next();
             }
 
             $this->setVersion($current);
