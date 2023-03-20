@@ -67,7 +67,10 @@ export const update = async (index) => {
 };
 
 /** Navigate to update category view by id */
-export const updateById = (id) => update(App.state.categories.getIndexById(id));
+export const updateById = (id) => {
+    const sortedCategories = App.state.getSortedCategories();
+    return update(sortedCategories.getIndexById(id));
+};
 
 export const showDetails = async ({ index, directNavigate = false }) => {
     await App.state.fetch();

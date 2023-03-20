@@ -74,8 +74,6 @@ class Categories extends ListViewController
             "titleString" => __("APP_NAME") . " | " . __("CATEGORY_CREATE"),
         ];
 
-        $categories = $this->model->getData();
-
         $category = new \stdClass();
         $category->id = 0;
         $category->name = "";
@@ -86,9 +84,10 @@ class Categories extends ListViewController
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
-            "categories" => $categories,
+            "profile" => $this->getProfileData(),
+            "categories" => $this->model->getData(),
             "view" => [
-                "category" => $category
+                "category" => $category,
             ]
         ];
 
@@ -123,11 +122,10 @@ class Categories extends ListViewController
         }
         $data["category"] = $category;
 
-        $categories = $this->model->getData();
-
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
-            "categories" => $categories,
+            "profile" => $this->getProfileData(),
+            "categories" => $this->model->getData(),
             "view" => [
                 "category" => $category,
             ],
