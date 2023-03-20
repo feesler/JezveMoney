@@ -64,7 +64,7 @@ export class Heading extends Component {
             throw new Error('Invalid element specified');
         }
 
-        this.titleElem = this.elem.querySelector('h1');
+        this.titleElem = this.elem.querySelector('h1,h2');
         this.actionsContainer = this.elem.querySelector(`.${ACTIONS_CLASS}`);
 
         this.postInit();

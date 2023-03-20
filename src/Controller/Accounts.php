@@ -8,6 +8,7 @@ use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
+use JezveMoney\App\Model\UserCurrencyModel;
 
 /**
  * Accounts controller
@@ -69,6 +70,8 @@ class Accounts extends ListViewController
         ];
 
         $currMod = CurrencyModel::getInstance();
+        $userCurrModel = UserCurrencyModel::getInstance();
+        $iconModel = IconModel::getInstance();
 
         $accInfo = new \stdClass();
         $accInfo->id = 0;
@@ -88,12 +91,11 @@ class Accounts extends ListViewController
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
 
-        $iconModel = IconModel::getInstance();
-
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
+            "userCurrencies" => $userCurrModel->getData(),
             "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,
@@ -135,6 +137,8 @@ class Accounts extends ListViewController
         ];
 
         $currMod = CurrencyModel::getInstance();
+        $userCurrModel = UserCurrencyModel::getInstance();
+        $iconModel = IconModel::getInstance();
 
         $acc_id = intval($this->actionParam);
         if (!$acc_id) {
@@ -152,12 +156,11 @@ class Accounts extends ListViewController
         $accInfo->icon = $this->model->getIconFile($acc_id);
         $data["accInfo"] = $accInfo;
 
-        $iconModel = IconModel::getInstance();
-
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
+            "userCurrencies" => $userCurrModel->getData(),
             "icons" => $iconModel->getData(),
             "view" => [
                 "account" => $accInfo,

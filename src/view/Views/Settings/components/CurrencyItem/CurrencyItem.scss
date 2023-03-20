@@ -1,0 +1,118 @@
+/* User currency list item */
+.currency-item {
+  --currency-item-height: 3rem;
+  --currency-item-bg: var(--list-item-bg-color);
+  --currency-item-text-color: var(--accent-color-alt);
+  --currency-item-font-size: 1rem;
+  --currency-item-selected-color: var(--accent-color);
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  position: relative;
+  border: 0;
+  height: var(--currency-item-height);
+}
+
+/* Content */
+.currency-item__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px;
+  position: relative;
+  row-gap: 2px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  background-color: var(--list-item-bg-color);
+}
+
+/* Currency title */
+.currency-item__title {
+  color: var(--currency-item-text-color);
+  font-size: var(--currency-item-font-size);
+}
+
+/* Select controls */
+.currency-item__select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 0;
+  transition: width 0.2s ease;
+
+  .checkbox {
+    --checkbox-size: 24px;
+
+    margin: 0;
+  }
+
+  .checkbox__check {
+    margin: 0;
+    border-radius: 50%;
+  }
+}
+
+/* Select state */
+.currencies-list_select {
+  .currency-item {
+    cursor: pointer;
+  }
+
+  .currency-item__select {
+    width: 32px;
+  }
+}
+
+/* Sort mode */
+.currency-item_sort {
+  cursor: move;
+}
+
+/* Menu controls */
+.currency-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: var(--currency-item-bg);
+
+  .btn.menu-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 0;
+    --btn-background: none;
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    --btn-focus-icon-color: var(--list-item-hover-icon-fill);
+
+    margin: 0 4px;
+  }
+}
+
+/* Selected state */
+.currency-item.currency-item_selected::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 32px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid var(--currency-item-selected-color);
+  cursor: pointer;
+}
+
+.currency-item_placeholder {
+  --sort-placeholder-border-width: 2px;
+  --sort-placeholder-border-color: #143fff86;
+
+  outline-width: var(--sort-placeholder-border-width);
+  outline-style: dashed;
+  outline-offset: calc(var(--sort-placeholder-border-width) * -1);
+  outline-color: var(--sort-placeholder-border-color);
+
+  * {
+    visibility: hidden;
+  }
+}

@@ -423,6 +423,7 @@ export class AppState {
         }
 
         res.data = this.getNoDatesList(res.data);
+        res.data.sort((a, b) => a.id - b.id);
 
         return res;
     }
@@ -679,6 +680,14 @@ export class AppState {
         }
 
         return res;
+    }
+
+    getUserCurrenciesByIndexes(indexes, returnIds = false) {
+        return asArray(indexes).map((ind) => {
+            const item = this.userCurrencies.getItemByIndex(ind);
+            assert(item, `Invalid user currency index ${ind}`);
+            return (returnIds) ? item.id : item;
+        });
     }
 
     /**

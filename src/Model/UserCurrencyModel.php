@@ -203,6 +203,27 @@ class UserCurrencyModel extends CachedTable
     }
 
     /**
+     * Removes all currencies of user
+     *
+     * @return bool
+     */
+    public function reset()
+    {
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $condArr = ["user_id=" . self::$user_id];
+        if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    /**
      * Checks item with specified position is exists
      *
      * @param int $position position

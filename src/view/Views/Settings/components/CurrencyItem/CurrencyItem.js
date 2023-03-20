@@ -4,22 +4,17 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { ListContainer } from 'jezvejs/ListContainer';
-import { listData } from '../../../../js/utils.js';
-import './CategoryItem.scss';
+import './CurrencyItem.scss';
 
 /** CSS classes */
-const CONTAINER_CLASS = 'category-item';
-const MAIN_CONTAINER_CLASS = 'category-item__main';
-const CONTENT_CLASS = 'category-item__content';
-const TITLE_CLASS = 'category-item__title';
-const SELECT_CONTROLS_CLASS = 'category-item__select';
-const CONTROLS_CLASS = 'category-item__controls';
-const CHILD_CONTAINER_CLASS = 'category-item__children categories-list';
-const SELECTED_CLASS = 'category-item_selected';
-const SORT_CLASS = 'category-item_sort';
+const CONTAINER_CLASS = 'currency-item';
+const CONTENT_CLASS = 'currency-item__content';
+const TITLE_CLASS = 'currency-item__title';
+const SELECT_CONTROLS_CLASS = 'currency-item__select';
+const CONTROLS_CLASS = 'currency-item__controls';
+const SELECTED_CLASS = 'currency-item_selected';
+const SORT_CLASS = 'currency-item_sort';
 
 const defaultProps = {
     selected: false,
@@ -28,16 +23,14 @@ const defaultProps = {
 };
 
 /**
- * Categories list item component
+ * User currencies list item component
  */
-export class CategoryItem extends Component {
-    constructor(props) {
-        super(props);
-
-        this.props = {
+export class CurrencyItem extends Component {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
 
         this.state = { ...this.props };
 
@@ -59,17 +52,10 @@ export class CategoryItem extends Component {
             children: this.titleElem,
         });
 
-        this.mainContainer = createElement('div', {
-            props: { className: MAIN_CONTAINER_CLASS },
+        this.elem = createElement('div', {
+            props: { className: CONTAINER_CLASS },
             children: this.contentElem,
         });
-
-        this.collapse = Collapsible.create({
-            toggleOnClick: false,
-            className: CONTAINER_CLASS,
-            header: this.mainContainer,
-        });
-        this.elem = this.collapse.elem;
 
         this.render(this.state);
     }
@@ -85,7 +71,7 @@ export class CategoryItem extends Component {
             children: this.checkbox.elem,
         });
 
-        this.mainContainer.prepend(this.selectControls);
+        this.elem.prepend(this.selectControls);
     }
 
     createControls() {
@@ -99,7 +85,7 @@ export class CategoryItem extends Component {
             children: this.menuButton.elem,
         });
 
-        this.mainContainer.append(this.controlsElem);
+        this.elem.append(this.controlsElem);
     }
 
     renderSelectControls(state, prevState) {
@@ -137,59 +123,14 @@ export class CategoryItem extends Component {
     renderContent(state) {
         const { item } = state;
 
-        this.titleElem.textContent = item.name;
-        this.titleElem.setAttribute('title', item.name);
-    }
-
-    createChildContainer() {
-        if (this.childContainer) {
+        const currencyModel = window.app.model.currency;
+        const currency = currencyModel.getItem(item.curr_id);
+        if (!currency) {
             return;
         }
 
-        this.childContainer = ListContainer.create({
-            ItemComponent: CategoryItem,
-            getItemProps: (item, { listMode }) => ({
-                item,
-                selected: item.selected,
-                listMode,
-                showControls: (listMode === 'list'),
-            }),
-            className: CHILD_CONTAINER_CLASS,
-            itemSelector: '.category-item',
-            sortModeClass: 'categories-list_sort',
-            listMode: 'list',
-            noItemsMessage: null,
-        });
-
-        this.collapse.setContent(this.childContainer.elem);
-        this.collapse.expand();
-    }
-
-    renderChildren(state, prevState) {
-        const { item, listMode } = state;
-        const prevItem = prevState?.item;
-        if (
-            item.parent_id === prevItem?.parent_id
-            && item.children === prevItem?.children
-            && listMode === prevState?.listMode
-        ) {
-            return;
-        }
-
-        if (item.parent_id !== 0 || !item.children) {
-            this.collapse.setContent(null);
-            this.childContainer = null;
-            return;
-        }
-
-        this.createChildContainer();
-
-        this.childContainer.setState((listState) => ({
-            ...listState,
-            items: listData(item.children),
-            listMode,
-            renderTime: Date.now(),
-        }));
+        this.titleElem.textContent = currency.name;
+        this.titleElem.setAttribute('title', currency.name);
     }
 
     render(state, prevState = {}) {
@@ -199,7 +140,7 @@ export class CategoryItem extends Component {
 
         const { item } = state;
         if (!item) {
-            throw new Error('Invalid category object');
+            throw new Error('Invalid currency object');
         }
 
         this.elem.setAttribute('data-id', item.id);
@@ -207,7 +148,6 @@ export class CategoryItem extends Component {
         this.renderSelectControls(state, prevState);
         this.renderControls(state, prevState);
         this.renderContent(state, prevState);
-        this.renderChildren(state, prevState);
 
         const sortMode = state.listMode === 'sort';
         this.elem.classList.toggle(SORT_CLASS, sortMode);

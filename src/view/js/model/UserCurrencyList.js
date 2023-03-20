@@ -1,7 +1,11 @@
-import { SortableList } from './SortableList.js';
+import { List } from './List.js';
 import { UserCurrency } from './UserCurrency.js';
 
-export class UserCurrencyList extends SortableList {
+/**
+ * @constructor UserCurrencyList class
+ * @param {object[]} props - array of user currencies
+ */
+export class UserCurrencyList extends List {
     /**
      * Assign new data to the list
      * @param {Array} data - array of list items
@@ -9,10 +13,6 @@ export class UserCurrencyList extends SortableList {
     setData(data) {
         super.setData(data);
 
-        this.sort();
-    }
-
-    sort() {
         this.data.sort((a, b) => a.pos - b.pos);
     }
 

@@ -65,6 +65,10 @@ export default {
             import: './src/view/Views/Profile/ProfileView.js',
             filename: 'view/js/[name].js',
         },
+        SettingsView: {
+            import: './src/view/Views/Settings/SettingsView.js',
+            filename: 'view/js/[name].js',
+        },
         AboutView: {
             import: './src/view/Views/About/AboutView.js',
             filename: 'view/js/[name].js',

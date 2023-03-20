@@ -89,6 +89,32 @@ export const API = {
         },
     },
 
+    userCurrency: {
+        async list(options = {}) {
+            return apiGet('usercurrency/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('usercurrency/', data);
+        },
+
+        async create(data) {
+            return apiPost('usercurrency/create', data);
+        },
+
+        async update(data) {
+            return apiPost('usercurrency/update', data);
+        },
+
+        async del(data) {
+            return apiPost('usercurrency/delete', data);
+        },
+
+        async setPos(data) {
+            return apiPost('usercurrency/setpos', data);
+        },
+    },
+
     state: {
         async main() {
             return apiGet('state/main');

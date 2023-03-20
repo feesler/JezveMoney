@@ -12,27 +12,32 @@ import { LinkMenu } from 'jezvejs/LinkMenu';
 import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
 import { createStore } from 'jezvejs/Store';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
+
 import { formatValueShort, normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
+
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { Transaction } from '../../js/model/Transaction.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+
 import {
     getGroupTypeByName,
     isSameSelection,
     actions,
     reducer,
 } from './reducer.js';
+import '../../css/app.scss';
 import './StatisticsView.scss';
 
 /** CSS classes */
@@ -82,6 +87,7 @@ class StatisticsView extends View {
         };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
@@ -168,7 +174,7 @@ class StatisticsView extends View {
             onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });
-        window.app.initCurrencyList(this.currencyDropDown);
+        window.app.initUserCurrencyList(this.currencyDropDown);
 
         // Accounts filter
         this.accountDropDown = DropDown.create({

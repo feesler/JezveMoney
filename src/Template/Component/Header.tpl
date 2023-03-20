@@ -98,10 +98,11 @@
             </li>
             <li class="nav-separator"></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5"><?= __("PROFILE") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6"><?= __("LOGOUT") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>settings/" tabindex="6"><?= __("SETTINGS") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="7"><?= __("LOGOUT") ?></a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7"><?= __("ADMIN_PANEL") ?></a></li>
+                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="8"><?= __("ADMIN_PANEL") ?></a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>
