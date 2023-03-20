@@ -91,6 +91,7 @@ class StatisticsView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
     }
@@ -171,6 +172,7 @@ class StatisticsView extends View {
         // Currency filter
         this.currencyDropDown = DropDown.create({
             elem: 'curr_id',
+            enableFilter: true,
             onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });

@@ -86,6 +86,7 @@ class SettingsView extends View {
         this.currencySelect = DropDown.create({
             elem: this.createBtn.elem,
             listAttach: true,
+            enableFilter: true,
             onItemSelect: (sel) => this.onCurrencySelect(sel),
         });
 

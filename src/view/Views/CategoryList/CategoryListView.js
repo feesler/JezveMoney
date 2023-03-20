@@ -51,6 +51,7 @@ class CategoryListView extends View {
         super(...args);
 
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
 
         const { settings } = window.app.model.profile;
         const sortMode = settings.sort_categories;
@@ -742,12 +743,11 @@ class CategoryListView extends View {
         this.selItemsCount.textContent = selected.length;
 
         const categories = CategoryList.create(state.items);
+        categories.sortBy(state.sortMode);
         const mainCategories = CategoryList.create(categories.findByParent(0));
-        mainCategories.sortBy(state.sortMode);
         mainCategories.forEach((item) => {
             const children = categories.findByParent(item.id);
             item.setChildren(children);
-            item.children.sortBy(state.sortMode);
         });
 
         // List of categories

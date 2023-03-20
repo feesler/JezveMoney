@@ -83,6 +83,7 @@ class TransactionView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
 
         const currencyModel = window.app.model.currency;
         const accountModel = window.app.model.accounts;
@@ -541,6 +542,7 @@ class TransactionView extends View {
             elem,
             onItemSelect,
             listAttach: true,
+            enableFilter: true,
         });
 
         window.app.initUserCurrencyList(res);

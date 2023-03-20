@@ -753,13 +753,13 @@ export class ImportTemplateManager extends Component {
         }
         // Account currency
         value = template.getProperty('accountCurrency', data, true);
-        let currency = window.app.model.currency.findByName(value);
+        let currency = window.app.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'accountCurrency' };
         }
         // Transaction currency
         value = template.getProperty('transactionCurrency', data, true);
-        currency = window.app.model.currency.findByName(value);
+        currency = window.app.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'transactionCurrency' };
         }

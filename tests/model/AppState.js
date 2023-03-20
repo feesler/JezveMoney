@@ -117,6 +117,8 @@ export class AppState {
     }
 
     setState(state) {
+        this.profile = copyObject(state.profile);
+
         if (!this.accounts) {
             this.accounts = AccountsList.create();
         }
@@ -124,6 +126,7 @@ export class AppState {
         this.accounts.autoincrement = state.accounts.autoincrement;
         this.userAccountsCache = null;
         this.sortedAccountsCache = null;
+        this.sortAccounts();
 
         if (!this.persons) {
             this.persons = PersonsList.create();
@@ -132,6 +135,7 @@ export class AppState {
         this.persons.autoincrement = state.persons.autoincrement;
         this.personsCache = null;
         this.sortedPersonsCache = null;
+        this.sortPersons();
 
         if (!this.transactions) {
             this.transactions = TransactionsList.create();
@@ -145,6 +149,7 @@ export class AppState {
         }
         this.categories.setData(state.categories.data);
         this.categories.autoincrement = state.categories.autoincrement;
+        this.sortCategories();
 
         if (!this.templates) {
             this.templates = ImportTemplateList.create();
@@ -165,8 +170,6 @@ export class AppState {
         }
         this.userCurrencies.setData(state.userCurrencies.data);
         this.userCurrencies.autoincrement = state.userCurrencies.autoincrement;
-
-        this.profile = copyObject(state.profile);
     }
 
     async fetchAndTest() {
@@ -876,6 +879,15 @@ export class AppState {
         return this.userAccountsCache;
     }
 
+    getAccountsSortMode() {
+        return this.profile.settings.sort_accounts;
+    }
+
+    sortAccounts() {
+        const sortMode = this.getAccountsSortMode();
+        this.accounts.sortBy(sortMode);
+    }
+
     getSortedUserAccounts() {
         if (!this.sortedAccountsCache) {
             const sortMode = this.getAccountsSortMode();
@@ -891,10 +903,6 @@ export class AppState {
         }
 
         return this.sortedAccountsCache;
-    }
-
-    getAccountsSortMode() {
-        return this.profile.settings.sort_accounts;
     }
 
     getAccountsByIndexes(indexes, returnIds = false) {
@@ -1158,6 +1166,15 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
+    getPersonsSortMode() {
+        return this.profile.settings.sort_persons;
+    }
+
+    sortPersons() {
+        const sortMode = this.getPersonsSortMode();
+        this.persons.sortBy(sortMode);
+    }
+
     getSortedPersons() {
         if (!this.sortedPersonsCache) {
             const sortMode = this.getPersonsSortMode();
@@ -1172,10 +1189,6 @@ export class AppState {
         }
 
         return this.sortedPersonsCache;
-    }
-
-    getPersonsSortMode() {
-        return this.profile.settings.sort_persons;
     }
 
     getPersonsByIndexes(indexes, returnIds = false) {
@@ -1259,7 +1272,7 @@ export class AppState {
         const data = copyFields(params, catReqFields);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
-        this.categories.sortByParent();
+        this.sortCategories();
 
         const res = { id: item.id };
         if ('returnState' in params) {
@@ -1302,7 +1315,7 @@ export class AppState {
             this.categories.update(category);
         });
 
-        this.categories.sortByParent();
+        this.sortCategories();
 
         const res = {};
         if ('returnState' in params) {
@@ -1347,7 +1360,7 @@ export class AppState {
 
         this.categories.deleteItems(categoriesToDelete);
 
-        this.categories.sortByParent();
+        this.sortCategories();
 
         const res = {};
         if ('returnState' in params) {
@@ -1371,12 +1384,23 @@ export class AppState {
             return false;
         }
 
+        this.sortCategories();
+
         const res = {};
         if ('returnState' in params) {
             res.state = this.getState(params.returnState);
         }
 
         return res;
+    }
+
+    getCategoriesSortMode() {
+        return this.profile.settings.sort_categories;
+    }
+
+    sortCategories() {
+        const sortMode = this.getCategoriesSortMode();
+        this.categories.sortBy(sortMode);
     }
 
     getSortedCategories() {
@@ -1399,10 +1423,6 @@ export class AppState {
         }
 
         return this.sortedCategoriesCache;
-    }
-
-    getCategoriesSortMode() {
-        return this.profile.settings.sort_categories;
     }
 
     getCategoriesByNames(names, returnIds = false) {

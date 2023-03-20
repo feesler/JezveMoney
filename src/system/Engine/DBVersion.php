@@ -14,7 +14,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 17;
+    protected $latestVersion = 18;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -170,56 +170,9 @@ class DBVersion
                 return;
             }
 
-            if ($current < 1) {
-                $current = $this->version1();
-            }
-            if ($current < 2) {
-                $current = $this->version2();
-            }
-            if ($current < 3) {
-                $current = $this->version3();
-            }
-            if ($current < 4) {
-                $current = $this->version4();
-            }
-            if ($current < 5) {
-                $current = $this->version5();
-            }
-            if ($current < 6) {
-                $current = $this->version6();
-            }
-            if ($current < 7) {
-                $current = $this->version7();
-            }
-            if ($current < 8) {
-                $current = $this->version8();
-            }
-            if ($current < 9) {
-                $current = $this->version9();
-            }
-            if ($current < 10) {
-                $current = $this->version10();
-            }
-            if ($current < 11) {
-                $current = $this->version11();
-            }
-            if ($current < 12) {
-                $current = $this->version12();
-            }
-            if ($current < 13) {
-                $current = $this->version13();
-            }
-            if ($current < 14) {
-                $current = $this->version14();
-            }
-            if ($current < 15) {
-                $current = $this->version15();
-            }
-            if ($current < 16) {
-                $current = $this->version16();
-            }
-            if ($current < 17) {
-                $current = $this->version17();
+            while ($current < $this->latestVersion) {
+                $next = "version" . ($current + 1);
+                $current = $this->$next();
             }
 
             $this->setVersion($current);
@@ -678,6 +631,44 @@ class DBVersion
     }
 
     /**
+     * Creates database version 18
+     *
+     * @return int
+     */
+    private function version18()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "currency";
+
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Fail to obtian columns of '$tableName' table");
+        }
+
+        if (!isset($columns["code"])) {
+            $res = $this->dbClient->addColumns($tableName, ["code" => "VARCHAR(64) NOT NULL"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->updateQ($tableName, ["code=name"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->updateQ($tableName, ["name=CONCAT('CURRENCY_', name)"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 18;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -695,6 +686,7 @@ class DBVersion
             $tableName,
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
                 "`name` VARCHAR(128) NOT NULL, " .
+                "`code` VARCHAR(64) NOT NULL, " .
                 "`sign` VARCHAR(64) NOT NULL, " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .
                 "`createdate` DATETIME NOT NULL, " .

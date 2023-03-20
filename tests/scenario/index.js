@@ -85,7 +85,7 @@ export class Scenario {
             this.CNY,
             this.JPY,
             this.SEK,
-        ] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK']);
+        ] = App.currency.getItemsByCodes(['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK']);
     }
 
     async run() {

@@ -279,7 +279,7 @@ export class SettingsView extends AppView {
         assert(currency, `Invalid currency id: ${id}`);
 
         const newItem = {
-            title: currency.name,
+            title: currency.formatName(this.locale),
         };
         this.model.currenciesList.items.push(newItem);
         const expected = this.getExpectedState();

@@ -89,9 +89,9 @@ export const inputBalance = async (value) => {
 
 export const changeCurrency = async (value) => {
     const currency = App.currency.getItem(value);
-    const name = (currency) ? currency.name : `(${value})`;
+    const code = (currency) ? currency.code : `(${value})`;
 
-    await test(`Change currency to '${name}'`, () => App.view.changeCurrency(value));
+    await test(`Change currency to '${code}'`, () => App.view.changeCurrency(value));
 };
 
 export const changeIcon = async (value) => {

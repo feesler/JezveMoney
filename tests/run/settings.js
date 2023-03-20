@@ -12,7 +12,7 @@ export const addCurrencyById = async (id) => {
     const currency = App.currency.getItem(id);
     assert(currency, `Invalid currency id: ${id}`);
 
-    await test(`Add currency ${currency.name}`, async () => {
+    await test(`Add currency ${currency.code}`, async () => {
         await checkNavigation();
 
         App.state.createUserCurrency({ curr_id: currency.id, flags: 0 });

@@ -44,6 +44,7 @@ class CategoryView extends View {
         }
 
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
     }

@@ -80,11 +80,11 @@ export class ImportTemplate {
             const [row] = data.slice(start, start + 1);
             const rowData = this.getRowData(row);
 
-            const accCurrency = App.currency.findByName(rowData.accountCurrency);
+            const accCurrency = App.currency.findByCode(rowData.accountCurrency);
             if (!accCurrency) {
                 return false;
             }
-            const trCurrency = App.currency.findByName(rowData.transactionCurrency);
+            const trCurrency = App.currency.findByCode(rowData.transactionCurrency);
             if (!trCurrency) {
                 return false;
             }
@@ -125,13 +125,13 @@ export class ImportTemplate {
                     template: this.id,
                 };
 
-                const accCurrency = App.currency.findByName(original.accountCurrency);
+                const accCurrency = App.currency.findByCode(original.accountCurrency);
                 original.accountCurrencyId = accCurrency ? accCurrency.id : null;
                 if (original.accountCurrencyId !== mainAccount.curr_id) {
                     throw new ImportTemplateError();
                 }
 
-                const trCurrency = App.currency.findByName(original.transactionCurrency);
+                const trCurrency = App.currency.findByCode(original.transactionCurrency);
                 original.transactionCurrencyId = trCurrency ? trCurrency.id : null;
 
                 if (Number.isNaN(original.accountAmount) || original.accountAmount === 0) {

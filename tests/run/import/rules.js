@@ -147,7 +147,7 @@ const runOnRuleCondition = async (params) => {
             const currency = App.currency.getItem(action.data);
             assert(currency, `Currency (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${currency.name}'`;
+            descr = `${actDescr[action.action]} to '${currency.code}'`;
         } else if (action.action === 'togglePropValue') {
             descr = `${actDescr[action.action]}`;
         } else {

@@ -230,6 +230,12 @@ export const formatTokenString = (value, ...args) => (
     })
 );
 
+/** Returns true if specified token is exists */
+export const hasToken = (token) => (
+    (typeof token === 'string')
+    && (typeof window.localeTokens[token] === 'string')
+);
+
 /* eslint-disable no-underscore-dangle */
 /** Returns locale string for specified token */
 export const __ = (token, ...args) => {

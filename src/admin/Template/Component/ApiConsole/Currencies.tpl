@@ -27,6 +27,11 @@
         </div>
 
         <div class="std_margin">
+            <label for="create_currency_code">Code</label>
+            <input id="create_currency_code" class="stretch-input" name="code" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="create_currency_sign">Sign</label>
             <input id="create_currency_sign" class="stretch-input" name="sign" type="text">
         </div>
@@ -62,6 +67,11 @@
         <div class="std_margin">
             <label for="update_currency_name">Name</label>
             <input id="update_currency_name" class="stretch-input" name="name" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="update_currency_code">Code</label>
+            <input id="update_currency_code" class="stretch-input" name="code" type="text">
         </div>
 
         <div class="std_margin">

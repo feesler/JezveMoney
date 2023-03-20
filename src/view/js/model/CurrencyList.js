@@ -40,4 +40,17 @@ export class CurrencyList extends List {
     findByName(name) {
         return this.find((item) => item.name === name);
     }
+
+    /**
+     * Search for currency with specified code
+     * @param {string} code - currency code
+     */
+    findByCode(code) {
+        const uCode = code?.toUpperCase() ?? null;
+        if (uCode === null) {
+            return null;
+        }
+
+        return this.find((item) => item.code.toUpperCase() === uCode);
+    }
 }

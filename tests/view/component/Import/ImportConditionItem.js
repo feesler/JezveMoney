@@ -79,7 +79,7 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = template.id;
             } else if (ImportCondition.isCurrencyField(field.id)) {
-                const currency = App.currency.findByName(value);
+                const currency = App.currency.findByCode(value);
                 assert(currency, `Currency not found: '${value}'`);
 
                 res.value = currency.id;
@@ -130,7 +130,7 @@ export class ImportConditionItem extends TestComponent {
             const currency = App.currency.getItem(model.value);
             assert(currency, `Currency not found: '${model.value}'`);
 
-            value = currency.name;
+            value = currency.code;
         } else {
             value = model.value;
         }

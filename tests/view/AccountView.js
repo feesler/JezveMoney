@@ -187,7 +187,10 @@ export class AccountView extends AppView {
             tile: accTile,
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
-            currDropDown: { textValue: model.currObj.name, visible: true },
+            currDropDown: {
+                textValue: model.currObj.formatName(this.locale),
+                visible: true,
+            },
             iconDropDown: {
                 textValue: __(model.tileIcon.name, this.locale),
                 visible: true,

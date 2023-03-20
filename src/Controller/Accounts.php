@@ -93,6 +93,7 @@ class Accounts extends ListViewController
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),
@@ -158,6 +159,7 @@ class Accounts extends ListViewController
 
         $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),

@@ -188,7 +188,7 @@ export class StatisticsView extends AppView {
             const currency = App.currency.getItem(model.filter.curr_id);
             res.currencyDropDown = {
                 visible: filtersVisible,
-                textValue: currency.name,
+                textValue: currency.formatName(this.locale),
             };
         } else if (report === 'account') {
             res.accountsDropDown = {

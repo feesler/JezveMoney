@@ -243,11 +243,25 @@ export class Application {
         const userAccounts = ModelClass.create(
             this.model.accounts.getUserAccounts(this.model.profile.owner_id),
         );
-        // Sort user accounts by visibility: [...visible, ...hidden]
-        userAccounts.sort((a, b) => a.flags - b.flags);
+
+        // Sort user accounts according to current settings
+        const { settings } = this.model.profile;
+        userAccounts.sortBy(settings.sort_accounts);
+
+        const visibleUserAccounts = ModelClass.create(userAccounts.getVisible());
+        visibleUserAccounts.sortBy(settings.sort_accounts);
+
+        const hiddenUserAccounts = ModelClass.create(userAccounts.getHidden());
+        hiddenUserAccounts.sortBy(settings.sort_accounts);
+
+        userAccounts.setData([
+            ...visibleUserAccounts.data,
+            ...hiddenUserAccounts.data,
+        ]);
+
         this.model.userAccounts = userAccounts;
-        this.model.visibleUserAccounts = ModelClass.create(userAccounts.getVisible());
-        this.model.hiddenUserAccounts = ModelClass.create(userAccounts.getHidden());
+        this.model.visibleUserAccounts = visibleUserAccounts;
+        this.model.hiddenUserAccounts = hiddenUserAccounts;
     }
 
     checkPersonModels() {
@@ -261,10 +275,38 @@ export class Application {
         }
 
         const { persons } = this.model;
-        // Sort persons by visibility: [...visible, ...hidden]
-        persons.sort((a, b) => a.flags - b.flags);
-        this.model.visiblePersons = ModelClass.create(persons.getVisible());
-        this.model.hiddenPersons = ModelClass.create(persons.getHidden());
+
+        // Sort persons according to current settings
+        const { settings } = this.model.profile;
+        persons.sortBy(settings.sort_persons);
+
+        const visiblePersons = ModelClass.create(persons.getVisible());
+        visiblePersons.sortBy(settings.sort_persons);
+
+        const hiddenPersons = ModelClass.create(persons.getHidden());
+        hiddenPersons.sortBy(settings.sort_persons);
+
+        persons.setData([
+            ...visiblePersons.data,
+            ...hiddenPersons.data,
+        ]);
+
+        this.model.visiblePersons = visiblePersons;
+        this.model.hiddenPersons = hiddenPersons;
+    }
+
+    initCategoriesModel() {
+        if (this.model.categoriesSorted) {
+            return;
+        }
+
+        const { categories } = this.model;
+
+        // Sort categories according to current settings
+        const { settings } = this.model.profile;
+        categories.sortBy(settings.sort_categories);
+
+        this.model.categoriesSorted = true;
     }
 
     /** Initialize currency DropDown */
@@ -274,7 +316,7 @@ export class Application {
         }
 
         this.model.currency.forEach(
-            (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
+            (curr) => ddlist.addItem({ id: curr.id, title: curr.formatName() }),
         );
     }
 
@@ -290,12 +332,20 @@ export class Application {
         this.model.userCurrencies.forEach((userCurr) => {
             const currency = this.model.currency.getItem(userCurr.curr_id);
             ids.push(currency.id);
-            items.push(currency);
+            items.push({ ...currency, name: currency.formatName() });
         });
 
         this.appendListItems(ddlist, items);
 
-        const otherCurrencies = this.model.currency.filter((item) => !ids.includes(item.id));
+        const otherCurrencies = [];
+        this.model.currency.forEach((currency) => {
+            if (ids.includes(currency.id)) {
+                return;
+            }
+
+            otherCurrencies.push({ ...currency, name: currency.formatName() });
+        });
+
         this.appendListItems(ddlist, otherCurrencies, { group: __('OTHER_CURRENCIES') });
     }
 
@@ -357,7 +407,7 @@ export class Application {
         this.appendAccounts(ddlist, { visible: false, group: __('LIST_HIDDEN') });
     }
 
-    /** Initialize DropDown for debt account tile */
+    /** Initialize persons DropDown */
     initPersonsList(ddlist) {
         this.appendPersons(ddlist, { visible: true });
         this.appendPersons(ddlist, { visible: false, group: __('LIST_HIDDEN') });

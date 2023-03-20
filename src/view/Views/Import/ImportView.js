@@ -62,6 +62,7 @@ class ImportView extends View {
         window.app.checkUserAccountModels();
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
         window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
         window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
 

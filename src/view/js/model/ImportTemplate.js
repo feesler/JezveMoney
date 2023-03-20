@@ -158,7 +158,7 @@ export class ImportTemplate extends ListItem {
             template: this.id,
         };
 
-        const accCurrency = currencyModel.findByName(res.accountCurrency);
+        const accCurrency = currencyModel.findByCode(res.accountCurrency);
         res.accountCurrencyId = (accCurrency) ? accCurrency.id : null;
 
         // Check account currency is same as at main account
@@ -166,7 +166,7 @@ export class ImportTemplate extends ListItem {
             throw new ImportTemplateError(__('ERR_CONVERT_ACCOUNT_CURRENCY'), 'accountCurrency');
         }
 
-        const trCurrency = currencyModel.findByName(res.transactionCurrency);
+        const trCurrency = currencyModel.findByCode(res.transactionCurrency);
         res.transactionCurrencyId = (trCurrency) ? trCurrency.id : null;
 
         const amount = parseFloat(fixFloat(res.accountAmount));

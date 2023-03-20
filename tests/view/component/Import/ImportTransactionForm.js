@@ -457,7 +457,7 @@ export class ImportTransactionForm extends TestComponent {
                 res.srcCurrId = mainAccountCurrency.id;
             }
         } else {
-            const currency = App.currency.findByName(res.original.transactionCurrency);
+            const currency = App.currency.findByCode(res.original.transactionCurrency);
             assert(currency, `Currency ${res.original.transactionCurrency} not found`);
             if (res.type === 'expense') {
                 res.destCurrId = currency.id;

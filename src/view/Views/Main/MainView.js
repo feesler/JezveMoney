@@ -51,6 +51,7 @@ class MainView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.checkPersonModels();
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.initCategoriesModel();
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         const initialState = {
