@@ -189,7 +189,7 @@ class MainView extends View {
         // Totals widget
         this.totalWidget = ge('totalWidget');
         if (this.totalWidget) {
-            this.totalList = createElement('div', {
+            this.totalList = createElement('ul', {
                 props: { className: 'total-list' },
             });
             this.totalWidget.append(this.totalList);
