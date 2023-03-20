@@ -38,7 +38,7 @@ class UserCurrencyModel extends CachedTable
      *
      * @param array|null $row array of table row fields
      *
-     * @return UserSettingsItem|null
+     * @return UserCurrrencyItem|null
      */
     protected function rowToObj(?array $row)
     {

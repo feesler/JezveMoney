@@ -29,6 +29,7 @@ trait Singleton
     public static function getInstance()
     {
         if (self::$instance === null) {
+            /* @phan-suppress-next-line PhanTypeInstantiateTraitStaticOrSelf */
             self::$instance = new self();
             self::$instance->onStart();
         }
