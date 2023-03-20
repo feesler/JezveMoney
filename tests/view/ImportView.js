@@ -242,9 +242,6 @@ export class ImportView extends AppView {
         const hasItems = this.items.length > 0;
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             notAvailMsg: { visible: !model.enabled },
             menuBtn: { visible: model.enabled },
             listMenu: { visible: showMenuItems },

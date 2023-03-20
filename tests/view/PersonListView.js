@@ -180,9 +180,6 @@ export class PersonListView extends AppView {
         );
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

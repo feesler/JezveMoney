@@ -322,6 +322,7 @@
     "RESET_IMPORT_TEMPLATES": "Шаблоны импорта",
     "RESET_IMPORT_RULES": "Правила импорта",
     "SETTINGS": "Настройки",
+    "SETTINGS_MAIN": "Основное",
     "SETTINGS_CURRENCIES": "Валюты",
     "USER_CURRENCIES_NO_DATA": "Валюты не выбраны",
     "OTHER_CURRENCIES": "Другие валюты",

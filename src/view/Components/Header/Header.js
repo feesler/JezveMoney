@@ -8,10 +8,7 @@ import {
     re,
     isFunction,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
-import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import { DARK_THEME } from '../../js/Application.js';
 import './Header.scss';
 
 /* CSS classes */
@@ -83,22 +80,6 @@ export class Header extends Component {
         this.navUserNameElem = this.userNavContent.querySelector('.user-btn__title');
         this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
         setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
-
-        // Locale select
-        this.localeSelect = DropDown.create({
-            elem: 'localeSelect',
-            onChange: (locale) => this.onLocaleChange(locale),
-            data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
-        });
-        const currentLocale = window.app.getCurrrentLocale();
-        this.localeSelect.setSelection(currentLocale);
-
-        // Theme swtich
-        this.themeSwitch = Switch.fromElement(ge('theme-check'), {
-            onChange: (checked) => this.onToggleTheme(checked),
-        });
-        const currentTheme = window.app.getCurrentTheme();
-        this.themeSwitch.check(currentTheme === DARK_THEME);
     }
 
     onContentTransitionEnd() {
@@ -165,26 +146,6 @@ export class Header extends Component {
     onUserNavigationClosed() {
         show(this.userNavContent, false);
         removeEmptyClick(this.userNavEmptyClick);
-    }
-
-    /**
-     * Locale select 'change' event handler
-     * @param {Object} locale - selected locale
-     */
-    onLocaleChange(locale) {
-        if (!locale) {
-            return;
-        }
-
-        window.app.setLocale(locale.id);
-    }
-
-    /**
-     * Theme switch 'change' event handler
-     * @param {Boolean} checked - current state
-     */
-    onToggleTheme(checked) {
-        window.app.setTheme(checked);
     }
 
     /**

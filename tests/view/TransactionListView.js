@@ -479,9 +479,6 @@ export class TransactionListView extends AppView {
         const pageNum = this.currentPage(model);
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,

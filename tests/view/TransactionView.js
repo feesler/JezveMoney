@@ -508,9 +508,6 @@ export class TransactionView extends AppView {
         const { locale } = this;
 
         const res = {
-            header: {
-                localeSelect: { value: this.model.locale },
-            },
             typeMenu: { value: this.model.type },
             personContainer: {
                 tile: {},

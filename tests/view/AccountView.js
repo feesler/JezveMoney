@@ -180,9 +180,6 @@ export class AccountView extends AppView {
         accTile.visible = true;
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             heading: { visible: true },
             tile: accTile,
             name: { value: model.name.toString(), visible: true },

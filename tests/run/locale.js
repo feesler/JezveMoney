@@ -9,6 +9,7 @@ import { ImportView } from '../view/ImportView.js';
 import { MainView } from '../view/MainView.js';
 import { PersonListView } from '../view/PersonListView.js';
 import { PersonView } from '../view/PersonView.js';
+import { SettingsView } from '../view/SettingsView.js';
 import { StatisticsView } from '../view/StatisticsView.js';
 import { TransactionListView } from '../view/TransactionListView.js';
 import { TransactionView } from '../view/TransactionView.js';
@@ -61,14 +62,15 @@ const checkViewLocale = (locale) => {
 
 export const changeLocale = async (locale) => {
     await test(`Change locale to '${locale}'`, async () => {
-        await App.view.navigateToAccounts();
-        assert.instanceOf(App.view, AccountListView, 'Invalid view');
+        await App.view.goToSettings();
+        assert.instanceOf(App.view, SettingsView, 'Invalid view');
 
+        App.view.content.locale = locale;
         App.view.model.locale = locale;
         const expected = App.view.getExpectedState();
 
         await App.view.changeLocale(locale);
-        assert.instanceOf(App.view, AccountListView, 'Invalid view');
+        assert.instanceOf(App.view, SettingsView, 'Invalid view');
 
         return App.view.checkState(expected);
     });

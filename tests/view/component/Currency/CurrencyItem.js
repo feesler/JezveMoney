@@ -13,7 +13,7 @@ export class CurrencyItem extends TestComponent {
         assert(currency, 'Invalid currency');
 
         return {
-            title: currency.formatName(App.goToMainView.locale),
+            title: currency.formatName(App.view.locale),
         };
     }
 

@@ -263,9 +263,6 @@ export class CategoryListView extends AppView {
         );
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

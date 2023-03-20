@@ -7,6 +7,7 @@ import {
     waitForFunction,
     wait,
     asArray,
+    navigation,
 } from 'jezve-test';
 import { Button, DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -36,6 +37,7 @@ const contextMenuItems = [
 export class SettingsView extends AppView {
     async parseContent() {
         const res = {
+            localeSelect: await DropDown.createFromChild(this, await query('#localeSelect')),
             createBtn: { elem: await query('#createBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
@@ -114,15 +116,26 @@ export class SettingsView extends AppView {
         const showSortItems = model.listMenuVisible && isListMode && currenciesCount > 1;
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             currenciesList: {
                 visible: true,
                 mode: model.currenciesList.mode,
-                items: model.currenciesList.items.map((item) => ({ ...item })),
+                items: model.currenciesList.items.map((item) => {
+                    const expectedItem = { ...item };
+
+                    if (!item.id) {
+                        return expectedItem;
+                    }
+
+                    const userCurrency = App.state.userCurrencies.getItem(item.id);
+                    const currency = App.currency.getItem(userCurrency?.curr_id);
+                    assert(currency, 'Invalid user currency item');
+
+                    expectedItem.title = currency.formatName(model.locale);
+
+                    return expectedItem;
+                }),
             },
         };
 
@@ -197,6 +210,10 @@ export class SettingsView extends AppView {
         });
 
         await this.parse();
+    }
+
+    async changeLocale(value) {
+        await navigation(() => this.content.localeSelect.setSelection(value));
     }
 
     async openCurrencyContextMenu(index) {

@@ -85,24 +85,12 @@
 
     <?php if ($this->user_id != 0) {        ?>
         <ul class="nav-list">
-            <li class="nav-item locale-select">
-                <span class="nav-item__title"><?= __("LANGUAGE") ?></span>
-                <select id="localeSelect"></select>
-            </li>
-            <li class="nav-item theme-switch">
-                <span class="nav-item__title"><?= __("DARK_THEME") ?></span>
-                <label id="theme-check" class="switch">
-                    <input type="checkbox" tabindex="4" <?= checked($this->userTheme == DARK_THEME) ?>>
-                    <div class="switch-slider"></div>
-                </label>
-            </li>
-            <li class="nav-separator"></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5"><?= __("PROFILE") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>settings/" tabindex="6"><?= __("SETTINGS") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="7"><?= __("LOGOUT") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="4"><?= __("PROFILE") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>settings/" tabindex="5"><?= __("SETTINGS") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6"><?= __("LOGOUT") ?></a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="8"><?= __("ADMIN_PANEL") ?></a></li>
+                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7"><?= __("ADMIN_PANEL") ?></a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>
