@@ -253,6 +253,7 @@ export class ImportTransactionForm extends Component {
         this.srcCurrencyDropDown = DropDown.create({
             elem: this.srcCurrencySign,
             listAttach: true,
+            enableFilter: true,
             onChange: (currency) => this.onSrcCurrChanged(currency),
         });
         window.app.initUserCurrencyList(this.srcCurrencyDropDown);
@@ -301,6 +302,7 @@ export class ImportTransactionForm extends Component {
         this.destCurrencyDropDown = DropDown.create({
             elem: this.destCurrencySign,
             listAttach: true,
+            enableFilter: true,
             onChange: (currency) => this.onDestCurrChanged(currency),
         });
         window.app.initUserCurrencyList(this.destCurrencyDropDown);

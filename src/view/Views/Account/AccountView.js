@@ -102,6 +102,7 @@ class AccountView extends View {
 
         this.currencySelect = DropDown.create({
             elem: 'currency',
+            enableFilter: true,
             onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });

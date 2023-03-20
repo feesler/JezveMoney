@@ -172,6 +172,7 @@ class StatisticsView extends View {
         // Currency filter
         this.currencyDropDown = DropDown.create({
             elem: 'curr_id',
+            enableFilter: true,
             onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });

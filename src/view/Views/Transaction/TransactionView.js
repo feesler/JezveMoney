@@ -542,6 +542,7 @@ class TransactionView extends View {
             elem,
             onItemSelect,
             listAttach: true,
+            enableFilter: true,
         });
 
         window.app.initUserCurrencyList(res);

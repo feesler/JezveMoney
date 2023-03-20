@@ -236,9 +236,10 @@ export class ImportConditionForm extends Component {
     createCurrencyField() {
         this.currencyDropDown = DropDown.create({
             className: CURRENCY_FIELD_CLASS,
+            enableFilter: true,
             onChange: () => this.onValueChange(),
         });
-        window.app.initCurrencyList(this.currencyDropDown);
+        window.app.initUserCurrencyList(this.currencyDropDown);
     }
 
     /** Create value property field */
