@@ -9,6 +9,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
+import { createStore } from 'jezvejs/Store';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -32,7 +33,6 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { AccountDetails } from './components/AccountDetails/AccountDetails.js';
-import { createStore } from '../../js/store.js';
 import { actions, createList, reducer } from './reducer.js';
 import './AccountListView.scss';
 

@@ -278,6 +278,27 @@ export class Application {
         );
     }
 
+    /** Initialize user currencies DropDown */
+    initUserCurrencyList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        const ids = [];
+        const items = [];
+
+        this.model.userCurrencies.forEach((userCurr) => {
+            const currency = this.model.currency.getItem(userCurr.curr_id);
+            ids.push(currency.id);
+            items.push(currency);
+        });
+
+        this.appendListItems(ddlist, items);
+
+        const otherCurrencies = this.model.currency.filter((item) => !ids.includes(item.id));
+        this.appendListItems(ddlist, otherCurrencies, { group: __('OTHER_CURRENCIES') });
+    }
+
     appendListItems(ddlist, items, options = {}) {
         if (!ddlist || !items || items.length === 0) {
             return;

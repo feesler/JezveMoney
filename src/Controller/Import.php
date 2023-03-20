@@ -10,6 +10,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\UserCurrencyModel;
 
 /**
  * Import controller
@@ -40,6 +41,7 @@ class Import extends TemplateController
     {
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
+        $userCurrModel = UserCurrencyModel::getInstance();
 
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
 
@@ -70,15 +72,14 @@ class Import extends TemplateController
             "profile" => $this->getProfileData(),
             "accounts" => $data["accounts"],
             "currency" => $currMod->getData(),
+            "userCurrencies" => $userCurrModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
             "rules" => $data["importRules"],
             "templates" => $data["importTemplates"]
         ];
 
-        $this->cssArr[] = "ImportView.css";
-        $this->jsArr[] = "ImportView.js";
-
+        $this->initResources("ImportView");
         $this->render($data);
     }
 }

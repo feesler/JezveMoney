@@ -12,23 +12,28 @@ import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { createStore } from 'jezvejs/Store';
+
 import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
+
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionList } from './components/List/ImportTransactionList.js';
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
-import { createStore } from '../../js/store.js';
+
 import { actions, reducer, getPageIndex } from './reducer.js';
 import '../../css/app.scss';
 import './ImportView.scss';
@@ -52,6 +57,7 @@ class ImportView extends View {
         super(...args);
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);

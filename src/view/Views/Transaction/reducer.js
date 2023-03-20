@@ -1,4 +1,5 @@
 import { isObject } from 'jezvejs';
+import { createSlice } from 'jezvejs/Store';
 import {
     normalize,
     normalizeExch,
@@ -12,7 +13,6 @@ import {
     TRANSFER,
 } from '../../js/model/Transaction.js';
 import * as STATE from './stateId.js';
-import { createSlice } from '../../js/store.js';
 
 // Tools
 

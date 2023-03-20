@@ -10,6 +10,7 @@ use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
 /**
@@ -134,6 +135,23 @@ class Profile extends ApiController
     }
 
     /**
+     * Removes all currencies of user
+     */
+    private function resetUserCurrencies()
+    {
+        $model = UserCurrencyModel::getInstance();
+        $result = false;
+        try {
+            $result = $model->reset();
+        } catch (\Error $e) {
+            wlog("Reset user currencies error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(__("ERR_PROFILE_RESET"));
+        }
+    }
+
+    /**
      * Removes all accounts of user
      *
      * @param bool $deletePersons delete persons flag
@@ -246,6 +264,7 @@ class Profile extends ApiController
         }
 
         $resetOptions = [
+            "currencies",
             "accounts",
             "persons",
             "categories",
@@ -261,6 +280,9 @@ class Profile extends ApiController
 
         $this->begin();
 
+        if ($request["currencies"]) {
+            $this->resetUserCurrencies();
+        }
         if ($request["accounts"]) {
             $this->resetAccounts($request["persons"]);
         }

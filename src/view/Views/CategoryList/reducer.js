@@ -1,6 +1,6 @@
+import { createSlice } from 'jezvejs/Store';
 import { Category } from '../../js/model/Category.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
-import { createSlice } from '../../js/store.js';
 import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
 
 /** Prepare data from categories list model for list component */

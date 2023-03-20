@@ -1,4 +1,4 @@
-import { createSlice } from '../../js/store.js';
+import { createSlice } from 'jezvejs/Store';
 
 // Reducers
 const slice = createSlice({

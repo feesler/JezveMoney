@@ -67,9 +67,7 @@ class Query extends AdminController
 
         $data["latestQueries"] = $this->getLatestQueries();
 
-        $this->cssAdmin[] = "QueriesView.css";
-        $this->jsAdmin[] = "QueriesView.js";
-
+        $this->initResources("QueriesView");
         $this->render($data);
     }
 

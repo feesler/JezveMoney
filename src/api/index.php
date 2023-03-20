@@ -9,6 +9,7 @@ $router = new Core\Router();
 $router->setNamespace("JezveMoney\\App\\API\\Controller");
 $router->setRoutes([
     "currency" => "Currency",
+    "usercurrency" => "UserCurrency",
     "icon" => "Icon",
     "import" => "Import",
     "importtpl" => "ImportTemplate",

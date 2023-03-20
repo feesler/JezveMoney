@@ -193,6 +193,45 @@ export const api = {
         },
     },
 
+    usercurrency: {
+        async read(ids) {
+            const apiReq = idsRequest('usercurrency/', ids);
+            const { data } = await apiGet(apiReq);
+            return data;
+        },
+
+        async create(options) {
+            const { data } = await apiPost('usercurrency/create', options);
+            return data;
+        },
+
+        async createMultiple(options) {
+            const { data } = await apiPost('usercurrency/createMultiple', options);
+            return data;
+        },
+
+        async update(options) {
+            const response = await apiPost('usercurrency/update', options);
+            return response.data ?? {};
+        },
+
+        async del(options) {
+            const response = await apiPost('usercurrency/delete', options);
+            return response.data ?? {};
+        },
+
+        async setPos(options) {
+            const response = await apiPost('usercurrency/setpos', options);
+            return response.data ?? {};
+        },
+
+        async list(options = {}) {
+            const apiReq = `usercurrency/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
+            return data;
+        },
+    },
+
     state: {
         async read() {
             const { data } = await apiGet('state');
@@ -242,13 +281,9 @@ export const api = {
             return response.data ?? {};
         },
 
-        async list(full) {
-            let reqUrl = 'account/list';
-            if (full) {
-                reqUrl += '?owner=all';
-            }
-
-            const { data } = await apiGet(reqUrl);
+        async list(options = {}) {
+            const apiReq = `account/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
             return data;
         },
     },
@@ -295,8 +330,9 @@ export const api = {
             return response.data ?? {};
         },
 
-        async list() {
-            const { data } = await apiGet('person/list');
+        async list(options = {}) {
+            const apiReq = `person/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
             return data;
         },
     },

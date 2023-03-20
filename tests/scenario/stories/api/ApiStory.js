@@ -10,6 +10,7 @@ import { apiImportTemplateTests } from './template.js';
 import { apiImportRulesTests } from './rules.js';
 import { apiSecurityTests } from './security.js';
 import { apiProfileTests } from './profile.js';
+import { apiUserCurrenciesTests } from './userCurrencies.js';
 
 export class ApiStory extends TestStory {
     async beforeRun() {
@@ -35,6 +36,7 @@ export class ApiStory extends TestStory {
 
         await ApiTests.resetData({});
 
+        await apiUserCurrenciesTests.createTests();
         await apiAccountsTests.createTests();
         await apiPersonsTests.createTests();
         await apiCategoriesTests.createTests();
@@ -42,11 +44,17 @@ export class ApiStory extends TestStory {
 
         await apiSecurityTests.run();
 
+        await apiUserCurrenciesTests.listTests();
+        await apiAccountsTests.listTests();
+        await apiPersonsTests.listTests();
+        await apiCategoriesTests.listTests();
+
         await apiTransactionsTests.updateTests();
         await apiImportTemplateTests.run();
         await apiImportRulesTests.run();
         await apiTransactionsTests.filterTests();
 
+        await apiUserCurrenciesTests.updateAndDeleteTests();
         await apiAccountsTests.updateAndDeleteTests();
         await apiPersonsTests.updateAndDeleteTests();
         await apiCategoriesTests.updateAndDeleteTests();

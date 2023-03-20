@@ -11,21 +11,26 @@ import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
+
 import { normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
+
 import { IconList } from '../../js/model/IconList.js';
 import { AccountList } from '../../js/model/AccountList.js';
+import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
-import { createStore } from '../../js/store.js';
+
 import { actions, reducer } from './reducer.js';
 import '../../Components/Field/Field.scss';
+import '../../css/app.scss';
 import './AccountView.scss';
 
 /**
@@ -52,6 +57,7 @@ class AccountView extends View {
         }
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
@@ -99,7 +105,7 @@ class AccountView extends View {
             onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
-        window.app.initCurrencyList(this.currencySelect);
+        window.app.initUserCurrencyList(this.currencySelect);
 
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,

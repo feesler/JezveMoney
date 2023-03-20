@@ -255,7 +255,7 @@ export class ImportTransactionForm extends Component {
             listAttach: true,
             onChange: (currency) => this.onSrcCurrChanged(currency),
         });
-        window.app.initCurrencyList(this.srcCurrencyDropDown);
+        window.app.initUserCurrencyList(this.srcCurrencyDropDown);
 
         this.srcAmountGroup = InputGroup.create({
             children: [this.srcAmountInp, this.srcCurrencyBtn],
@@ -303,7 +303,7 @@ export class ImportTransactionForm extends Component {
             listAttach: true,
             onChange: (currency) => this.onDestCurrChanged(currency),
         });
-        window.app.initCurrencyList(this.destCurrencyDropDown);
+        window.app.initUserCurrencyList(this.destCurrencyDropDown);
 
         this.destAmountGroup = InputGroup.create({
             children: [this.destAmountInp, this.destCurrencyBtn],

@@ -13,12 +13,14 @@ import { TransactionListView } from './view/TransactionListView.js';
 import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
+import { SettingsView } from './view/SettingsView.js';
 
 const routeMap = {
     index: MainView,
     login: LoginView,
     register: RegisterView,
     profile: ProfileView,
+    settings: SettingsView,
     about: AboutView,
     import: ImportView,
     statistics: StatisticsView,

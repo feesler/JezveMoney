@@ -42,9 +42,7 @@ class User extends AdminController
             ],
         ];
 
-        $this->cssAdmin[] = "AdminUserView.css";
-        $this->jsAdmin[] = "AdminUserView.js";
-
+        $this->initResources("AdminUserView");
         $this->render($data);
     }
 }

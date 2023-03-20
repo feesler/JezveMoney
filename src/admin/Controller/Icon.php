@@ -40,9 +40,7 @@ class Icon extends AdminController
             ],
         ];
 
-        $this->cssAdmin[] = "AdminIconView.css";
-        $this->jsAdmin[] = "AdminIconView.js";
-
+        $this->initResources("AdminIconView");
         $this->render($data);
     }
 }

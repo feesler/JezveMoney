@@ -199,7 +199,7 @@ export class CategoryItem extends Component {
 
         const { item } = state;
         if (!item) {
-            throw new Error('Invalid transaction object');
+            throw new Error('Invalid category object');
         }
 
         this.elem.setAttribute('data-id', item.id);

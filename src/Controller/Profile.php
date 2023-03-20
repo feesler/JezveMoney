@@ -57,9 +57,7 @@ class Profile extends TemplateController
             "view" => $viewProps,
         ];
 
-        $this->cssArr[] = "ProfileView.css";
-        $this->jsArr[] = "ProfileView.js";
-
+        $this->initResources("ProfileView");
         $this->render($data);
     }
 

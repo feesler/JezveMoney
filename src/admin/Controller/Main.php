@@ -21,9 +21,7 @@ class Main extends AdminController
             "titleString" => "Admin panel",
         ];
 
-        $this->cssAdmin[] = "AdminMainView.css";
-        $this->jsAdmin[] = "AdminMainView.js";
-
+        $this->initResources("AdminMainView");
         $this->render($data);
     }
 }

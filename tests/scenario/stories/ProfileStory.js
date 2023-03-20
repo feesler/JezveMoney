@@ -115,7 +115,14 @@ export class ProfileStory extends TestStory {
     async resetWithData() {
         setBlock('Reset precreated data', 2);
 
+        await App.scenario.resetData({
+            accounts: true,
+            persons: true,
+            categories: true,
+            currencies: true,
+        });
         await App.scenario.createTestData();
+
         await App.scenario.runner.runGroup(ProfileTests.resetData, [
             { accounts: true },
             resetAllOptions,

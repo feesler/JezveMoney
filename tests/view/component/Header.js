@@ -50,6 +50,9 @@ export class Header extends TestComponent {
                 if (item.href.endsWith('/profile/')) {
                     res.userNav.profileBtn = item;
                 }
+                if (item.href.endsWith('/settings/')) {
+                    res.userNav.settingsBtn = item;
+                }
                 if (item.href.endsWith('/logout/')) {
                     res.userNav.logoutBtn = item;
                 }
@@ -77,6 +80,11 @@ export class Header extends TestComponent {
     async clickProfileMenuItem() {
         await this.clickUserButton();
         await click(this.content.userNav.profileBtn.elem);
+    }
+
+    async clickSettingsMenuItem() {
+        await this.clickUserButton();
+        await click(this.content.userNav.settingsBtn.elem);
     }
 
     async clickLogoutMenuItem() {

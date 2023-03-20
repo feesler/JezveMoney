@@ -16,6 +16,7 @@ use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\UserModel;
+use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
 /**
@@ -206,6 +207,18 @@ class State extends ApiController
     }
 
     /**
+     * Returns user currencies data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getUserCurrencies(array $options = [])
+    {
+        return $this->getList(UserCurrencyModel::getInstance(), $options);
+    }
+
+    /**
      * Returns user profile data
      *
      * @return object
@@ -307,6 +320,7 @@ class State extends ApiController
             "categories" => ["autoIncrement" => true],
             "importtemplates" => ["autoIncrement" => true],
             "importrules" => ["autoIncrement" => true],
+            "userCurrencies" => ["autoIncrement" => true],
             "profile" => [],
         ]);
 
@@ -389,6 +403,10 @@ class State extends ApiController
         // Import actions
         if (isset($request["importactions"])) {
             $res->importactions = $this->getImportActions($request["importactions"]);
+        }
+        // User currencies
+        if (isset($request["userCurrencies"])) {
+            $res->userCurrencies = $this->getUserCurrencies($request["userCurrencies"]);
         }
         // User profile
         if (isset($request["profile"])) {

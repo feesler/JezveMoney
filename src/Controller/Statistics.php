@@ -72,9 +72,7 @@ class Statistics extends TemplateController
             ],
         ];
 
-        $this->cssArr[] = "StatisticsView.css";
-        $this->jsArr[] = "StatisticsView.js";
-
+        $this->initResources("StatisticsView");
         $this->render($data);
     }
 

@@ -9,6 +9,7 @@ export class LocalesStory extends TestStory {
             accounts: true,
             persons: true,
             categories: true,
+            currencies: true,
         });
         await App.scenario.createTestData();
 

@@ -44,9 +44,7 @@ class Persons extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "PersonListView.css";
-        $this->jsArr[] = "PersonListView.js";
-
+        $this->initResources("PersonListView");
         $this->render($data);
     }
 
@@ -96,9 +94,7 @@ class Persons extends ListViewController
             ]
         ];
 
-        $this->cssArr[] = "PersonView.css";
-        $this->jsArr[] = "PersonView.js";
-
+        $this->initResources("PersonView");
         $this->render($data);
     }
 
@@ -139,9 +135,7 @@ class Persons extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "PersonView.css";
-        $this->jsArr[] = "PersonView.js";
-
+        $this->initResources("PersonView");
         $this->render($data);
     }
 }

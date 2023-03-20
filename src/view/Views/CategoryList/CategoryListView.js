@@ -10,6 +10,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
+import { createStore } from 'jezvejs/Store';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -33,7 +34,6 @@ import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/Dele
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
-import { createStore } from '../../js/store.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import './CategoryListView.scss';
 

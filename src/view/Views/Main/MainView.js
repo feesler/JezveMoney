@@ -11,6 +11,7 @@ import 'jezvejs/style/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 import { API } from '../../js/api/index.js';
 import {
@@ -34,7 +35,6 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import { createStore } from '../../js/store.js';
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';
 

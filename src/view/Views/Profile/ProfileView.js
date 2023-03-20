@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
+import { createStore } from 'jezvejs/Store';
 import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -9,7 +10,6 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { ChangeNameDialog } from './components/ChangeNameDialog/ChangeNameDialog.js';
 import { ChangePasswordDialog } from './components/ChangePasswordDialog/ChangePasswordDialog.js';
 import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js';
-import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
 import '../../Components/Field/Field.scss';

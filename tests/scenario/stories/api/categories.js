@@ -144,6 +144,29 @@ const createMultipleInvalid = async () => {
     await App.scenario.runner.runGroup(CategoryApiTests.createMultiple, data);
 };
 
+const read = async () => {
+    setBlock('Read categories by ids', 2);
+
+    const data = [
+        App.scenario.CAFE_CATEGORY,
+        [App.scenario.BIKE_CATEGORY, App.scenario.LEARN_CATEGORY],
+    ];
+
+    await App.scenario.runner.runGroup(CategoryApiTests.read, data);
+};
+
+const list = async () => {
+    setBlock('Categories list', 2);
+
+    const data = [
+        {},
+        { parent_id: 0 },
+        { parent_id: App.scenario.TRANSPORT_CATEGORY },
+    ];
+
+    await App.scenario.runner.runGroup(CategoryApiTests.list, data);
+};
+
 const update = async () => {
     setBlock('Update categories', 2);
 
@@ -319,6 +342,11 @@ export const apiCategoriesTests = {
         await createInvalid();
         await createMultiple();
         await createMultipleInvalid();
+    },
+
+    async listTests() {
+        await read();
+        await list();
     },
 
     async updateAndDeleteTests() {

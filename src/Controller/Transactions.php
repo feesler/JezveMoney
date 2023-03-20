@@ -10,6 +10,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\UserCurrencyModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -23,6 +24,7 @@ class Transactions extends ListViewController
     protected $model = null;
     protected $accModel = null;
     protected $currModel = null;
+    protected $userCurrModel = null;
     protected $catModel = null;
 
     /**
@@ -33,6 +35,7 @@ class Transactions extends ListViewController
         $this->model = TransactionModel::getInstance();
         $this->accModel = AccountModel::getInstance();
         $this->currModel = CurrencyModel::getInstance();
+        $this->userCurrModel = UserCurrencyModel::getInstance();
         $this->catModel = CategoryModel::getInstance();
     }
 
@@ -105,9 +108,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionListView.css";
-        $this->jsArr[] = "TransactionListView.js";
-
+        $this->initResources("TransactionListView");
         $this->render($data);
     }
 
@@ -389,6 +390,7 @@ class Transactions extends ListViewController
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
+            "userCurrencies" => $this->userCurrModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
@@ -399,9 +401,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionView.css";
-        $this->jsArr[] = "TransactionView.js";
-
+        $this->initResources("TransactionView");
         $this->render($data);
     }
 
@@ -593,6 +593,7 @@ class Transactions extends ListViewController
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
+            "userCurrencies" => $this->userCurrModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
@@ -604,9 +605,7 @@ class Transactions extends ListViewController
             ],
         ];
 
-        $this->cssArr[] = "TransactionView.css";
-        $this->jsArr[] = "TransactionView.js";
-
+        $this->initResources("TransactionView");
         $this->render($data);
     }
 

@@ -61,6 +61,12 @@
     <h3>Reset data</h3>
     <form class="column-container" action="<?= BASEURL ?>api/profile/reset" method="post">
         <label class="checkbox std_margin">
+            <input type="checkbox" name="currencies">
+            <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+            <span class="checkbox__label">Currencies</span>
+        </label>
+
+        <label class="checkbox std_margin">
             <input type="checkbox" name="accounts">
             <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
             <span class="checkbox__label">Accounts</span>

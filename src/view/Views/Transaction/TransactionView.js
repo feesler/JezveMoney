@@ -14,6 +14,7 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
 import {
@@ -39,6 +40,7 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
@@ -47,7 +49,6 @@ import { AccountContainer } from './components/AccountContainer/AccountContainer
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { createStore } from '../../js/store.js';
 import {
     actions,
     reducer,
@@ -77,6 +78,7 @@ class TransactionView extends View {
         }
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
@@ -541,7 +543,7 @@ class TransactionView extends View {
             listAttach: true,
         });
 
-        window.app.initCurrencyList(res);
+        window.app.initUserCurrencyList(res);
         if (currId) {
             res.setSelection(currId);
         }

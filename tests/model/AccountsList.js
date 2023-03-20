@@ -68,7 +68,7 @@ export class AccountsList extends SortableList {
     }
 
     async fetch() {
-        return api.account.list(true);
+        return api.account.list({ owner: 'all' });
     }
 
     createTransaction(transaction, returnRaw = false) {

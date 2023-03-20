@@ -6,6 +6,8 @@ import {
 } from 'jezve-test';
 import { api } from '../model/api.js';
 import { App } from '../Application.js';
+
+import { createUserCurrencies } from './data/userCurrencies.js';
 import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createCategories } from './data/categories.js';
@@ -13,13 +15,16 @@ import { createTransactions } from './data/transactions.js';
 import { getAccountCSV, getCardCSV, getLargeCSV } from './data/importfiles.js';
 import { createImportRules } from './data/rules.js';
 import { createImportTemplates } from './data/templates.js';
+
 import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
 import { putFile, removeFile } from '../run/import/index.js';
+
 import { UnitTestsStory } from './stories/UnitTestsStory.js';
 import { SecurityStory } from './stories/SecurityStory.js';
 import { ApiStory } from './stories/api/ApiStory.js';
 import { ProfileStory } from './stories/ProfileStory.js';
+import { SettingsStory } from './stories/SettingsStory.js';
 import { MainStory } from './stories/MainStory.js';
 import { AccountsStory } from './stories/AccountsStory.js';
 import { PersonsStory } from './stories/PersonsStory.js';
@@ -39,6 +44,7 @@ const storiesMap = {
     api: ApiStory,
     locales: LocalesStory,
     profile: ProfileStory,
+    settings: SettingsStory,
     main: MainStory,
     accounts: AccountsStory,
     persons: PersonsStory,
@@ -76,7 +82,10 @@ export class Scenario {
             this.EUR,
             this.PLN,
             this.KRW,
-        ] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW']);
+            this.CNY,
+            this.JPY,
+            this.SEK,
+        ] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK']);
     }
 
     async run() {
@@ -193,6 +202,11 @@ export class Scenario {
         await App.state.fetch();
     }
 
+    /** Creates common test user currencies */
+    async createUserCurrencies() {
+        await createUserCurrencies();
+    }
+
     /** Creates common test accounts */
     async createAccounts() {
         await createAccounts();
@@ -225,6 +239,7 @@ export class Scenario {
 
     /** Creates all common test data */
     async createTestData() {
+        await createUserCurrencies();
         await createAccounts();
         await createPersons();
         await createCategories();
