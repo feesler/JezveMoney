@@ -12,6 +12,7 @@ export const stateLoop = async () => {
         ACC_USD,
         ACC_EUR,
         CARD_RUB,
+        ACC_BTC,
     } = App.scenario;
 
     // Navigate to create income view
@@ -31,10 +32,10 @@ export const stateLoop = async () => {
 
     await TransactionTests.runActions([
         // Transition 7: Change destination account to another one with same currency
-        //  as source (EUR)
+        //  as source (RUB)
         { action: 'changeDestAccount', data: ACC_3 },
         // Transition 5: Change source account to another one with same currency as
-        //  destination (USD)
+        //  destination (RUB)
         { action: 'changeSrcAccount', data: ACC_3 },
         // Transition 1: Click by source balance and move from State 0 to State 1
         { action: 'clickSrcResultBalance' },
@@ -49,7 +50,7 @@ export const stateLoop = async () => {
         { action: 'changeSrcAccount', data: CARD_RUB },
         // Transition 13: Change destination account to another one with same currency as source
         //  and stay on State 1
-        { action: 'changeDestAccount', data: CARD_RUB },
+        { action: 'changeDestAccount', data: ACC_3 },
         // Transition 9: Click by destination balance and move from State 1 to State 2
         { action: 'clickDestResultBalance' },
     ]);
@@ -85,7 +86,7 @@ export const stateLoop = async () => {
         // Transition 29: Change destination account to another one with same currency as source
         //  and move from State 5 to State 2
         { action: 'changeDestAccount', data: ACC_3 },
-        // Transition 10: Click by source balance and move from State 1 to State 2
+        // Transition 10: Click by source balance and move from State 2 to State 1
         { action: 'clickSrcResultBalance' },
         // Transition 2: Click by source amount and move from State 1 to State 0
         { action: 'clickSrcAmount' },
@@ -233,5 +234,11 @@ export const stateLoop = async () => {
         { action: 'changeDestAccount', data: ACC_USD }, // move from State 1 to State 4
         { action: 'clickDestResultBalance' }, // move from State 4 to State 6
         { action: 'changeDestAccount', data: ACC_RUB },
+        // Test input values for precise currency
+        { action: 'changeDestAccount', data: ACC_BTC },
+        { action: 'clickDestAmount' },
+        { action: 'inputDestAmount', data: '0.12345678' },
+        { action: 'clickDestResultBalance' },
+        { action: 'inputDestResBalance', data: '555.12345678' },
     ]);
 };

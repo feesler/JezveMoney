@@ -1,8 +1,10 @@
 import 'jezvejs/style';
-import { ge, createElement } from 'jezvejs';
+import { ge, createElement, hasFlag } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
-import '../../../../view/css/app.scss';
+import { CURRENCY_SIGN_BEFORE_VALUE, CURRENCY_FORMAT_TRAILING_ZEROS } from '../../../../view/js/model/Currency.js';
 import { AdminListView } from '../../js/AdminListView.js';
+import '../../../../view/Components/Field/Field.scss';
+import '../../../../view/css/app.scss';
 import '../../css/admin.scss';
 
 /**
@@ -27,8 +29,10 @@ class AdminCurrencyListView extends AdminListView {
         this.nameInput = ge('curr_name');
         this.codeInput = ge('curr_code');
         this.signInput = ge('curr_sign');
+        this.precisionInput = ge('curr_precision');
         this.beforeCheck = ge('isbefore');
         this.afterCheck = ge('isafter');
+        this.trailingZerosCheck = ge('trailingZerosCheck');
     }
 
     /**
@@ -41,17 +45,36 @@ class AdminCurrencyListView extends AdminListView {
             this.nameInput.value = item.name;
             this.codeInput.value = item.code;
             this.signInput.value = item.sign;
-            this.beforeCheck.checked = (item.flags === 1);
-            this.afterCheck.checked = (item.flags === 0);
+            this.precisionInput.value = item.precision;
+            this.beforeCheck.checked = hasFlag(item.flags, CURRENCY_SIGN_BEFORE_VALUE);
+            this.afterCheck.checked = !hasFlag(item.flags, CURRENCY_SIGN_BEFORE_VALUE);
+            this.trailingZerosCheck.checked = hasFlag(item.flags, CURRENCY_FORMAT_TRAILING_ZEROS);
         } else { /* clean */
             this.idInput.value = '';
             this.nameInput.value = '';
             this.codeInput.value = '';
             this.signInput.value = '';
+            this.precisionInput.value = '';
             this.beforeCheck.checked = false;
             this.afterCheck.checked = true;
+            this.trailingZerosCheck.checked = false;
         }
     }
+
+    /* eslint-disable no-bitwise */
+    /**
+     * Process from data if needed and return request data
+     * @param {object} data - form data
+     */
+    prepareRequestData(data) {
+        return super.prepareRequestData({
+            ...data,
+            flags: (this.trailingZerosCheck.checked)
+                ? (data.flags | CURRENCY_FORMAT_TRAILING_ZEROS)
+                : data.flags,
+        });
+    }
+    /* eslint-enable no-bitwise */
 
     /**
      * Render list element for specified item
@@ -68,6 +91,7 @@ class AdminCurrencyListView extends AdminListView {
                 createElement('td', { props: { textContent: item.name } }),
                 createElement('td', { props: { textContent: item.code } }),
                 createElement('td', { props: { textContent: item.sign } }),
+                createElement('td', { props: { textContent: item.precision } }),
                 createElement('td', { props: { textContent: item.flags } }),
             ],
         });

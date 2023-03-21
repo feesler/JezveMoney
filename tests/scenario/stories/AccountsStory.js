@@ -49,16 +49,25 @@ export class AccountsStory extends TestStory {
     async stateLoop() {
         setBlock('View state loop', 2);
 
-        const { RUB, USD, EUR } = App.scenario;
+        const {
+            RUB,
+            USD,
+            EUR,
+            BTC,
+        } = App.scenario;
 
         await AccountTests.create();
         await AccountTests.changeCurrency(EUR);
         await AccountTests.inputBalance('100.01');
         await AccountTests.changeIcon(1);
         await AccountTests.inputName('acc_1');
+
         await AccountTests.changeCurrency(USD);
         await AccountTests.inputBalance('100000.01');
         await AccountTests.inputBalance('100000.012');
+
+        await AccountTests.changeCurrency(BTC);
+        await AccountTests.inputBalance('0.00123');
         // Change currency back to RUB
         await AccountTests.changeCurrency(RUB);
 
@@ -78,7 +87,7 @@ export class AccountsStory extends TestStory {
     async create() {
         setBlock('Create accounts', 1);
 
-        const { RUB, EUR } = App.scenario;
+        const { RUB, EUR, BTC } = App.scenario;
 
         setBlock('Create account with point at initial balance', 2);
         await AccountTests.create();
@@ -92,6 +101,13 @@ export class AccountsStory extends TestStory {
         await AccountTests.inputName('acc_2');
         await AccountTests.changeCurrency(EUR);
         await AccountTests.inputBalance('1000,01');
+        await AccountTests.submit();
+
+        setBlock('Create account with precise currency', 2);
+        await AccountTests.create();
+        await AccountTests.inputName('acc_3');
+        await AccountTests.changeCurrency(BTC);
+        await AccountTests.inputBalance('0.00123');
         await AccountTests.submit();
 
         setBlock('Create account with empty name', 2);
@@ -116,7 +132,7 @@ export class AccountsStory extends TestStory {
     async update() {
         setBlock('Update accounts', 1);
 
-        const { RUB, USD } = App.scenario;
+        const { RUB, USD, BTC } = App.scenario;
 
         setBlock('Change icon and currency of account', 2);
         await AccountTests.update(0);
@@ -128,6 +144,12 @@ export class AccountsStory extends TestStory {
         await AccountTests.update(0);
         await AccountTests.changeCurrency(RUB);
         await AccountTests.inputBalance('555,55');
+        await AccountTests.submit();
+
+        setBlock('Update account with precise currency', 2);
+        await AccountTests.update(6);
+        await AccountTests.changeCurrency(BTC);
+        await AccountTests.inputBalance('0.00345678');
         await AccountTests.submit();
 
         setBlock('Submit account with empty name', 2);

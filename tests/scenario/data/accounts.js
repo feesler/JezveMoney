@@ -3,7 +3,12 @@ import { ACCOUNT_HIDDEN } from '../../model/AccountsList.js';
 import { api } from '../../model/api.js';
 
 export const createAccounts = async () => {
-    const { RUB, USD, EUR } = App.scenario;
+    const {
+        RUB,
+        USD,
+        EUR,
+        BTC,
+    } = App.scenario;
 
     const accList = [{
         name: 'ACC_3',
@@ -41,6 +46,12 @@ export const createAccounts = async () => {
         initbalance: '100',
         icon_id: 0,
         flags: ACCOUNT_HIDDEN,
+    }, {
+        name: 'ACC_BTC',
+        curr_id: BTC,
+        initbalance: '0.005746',
+        icon_id: 5,
+        flags: 0,
     }];
 
     const createRes = await api.account.createMultiple(accList);
@@ -51,6 +62,7 @@ export const createAccounts = async () => {
         App.scenario.ACC_EUR,
         App.scenario.CARD_RUB,
         App.scenario.HIDDEN_ACC,
+        App.scenario.ACC_BTC,
     ] = createRes.ids;
 
     await App.state.fetch();

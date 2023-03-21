@@ -9,7 +9,7 @@
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
-        "test-settings": "node ./tests/index.js settings",
+        "test-tr": "node ./tests/index.js transactions",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
@@ -87,7 +87,7 @@
     "dependencies": {
         "@babel/runtime": "^7.21.0",
         "core-js": "^3.29.1",
-        "jezvejs": "^1.89.1",
+        "jezvejs": "^1.89.2",
         "whatwg-fetch": "^3.6.2"
     }
 }

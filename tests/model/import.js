@@ -137,3 +137,11 @@ export function findSimilarTransaction(transaction, skipList) {
 
     return res;
 }
+
+/** Returns precision of specified currency */
+export const getCurrencyPrecision = (id) => {
+    const currency = App.currency.getItem(id);
+    assert(currency, `Invalid currency id: ${id}`);
+
+    return currency.precision;
+};

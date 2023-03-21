@@ -80,6 +80,7 @@
     "CURRENCY_INR": "Indian Rupee",
     "CURRENCY_KZT": "Tenge",
     "CURRENCY_AED": "UAE Dirham",
+    "CURRENCY_BTC": "Bitcoin",
     "ACCOUNTS": "Accounts",
     "ACCOUNTS_NO_DATA": "You have no one account. Please create one.",
     "ACCOUNTS_HIDDEN": "Hidden accounts",

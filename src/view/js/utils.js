@@ -151,15 +151,15 @@ export const amountFix = (value, thSep = ' ') => {
     return parseFloat(fixFloat(res));
 };
 
-export const CENTS_DIGITS = 2;
-export const EXCHANGE_DIGITS = 4;
+export const DEFAULT_PRECISION = 2;
+export const EXCHANGE_PRECISION = 4;
 
 /**
  * Correct calculated value
  * @param {string|Number} val - value to correct
  * @param {Number} prec - precision
  */
-export const correct = (val, prec = CENTS_DIGITS) => (
+export const correct = (val, prec = DEFAULT_PRECISION) => (
     parseFloat(parseFloat(val).toFixed(prec))
 );
 
@@ -167,20 +167,20 @@ export const correct = (val, prec = CENTS_DIGITS) => (
  * Correct calculated exchange rate value
  * @param {string|Number} val - exchange rate value
  */
-export const correctExch = (val) => correct(val, EXCHANGE_DIGITS);
+export const correctExch = (val) => correct(val, EXCHANGE_PRECISION);
 
 /**
  * Normalize monetary value from string
  * @param {string|Number} val - value to normalize
  * @param {Number} prec - precision of result decimal
  */
-export const normalize = (val, prec = CENTS_DIGITS) => correct(fixFloat(val), prec);
+export const normalize = (val, prec = DEFAULT_PRECISION) => correct(fixFloat(val), prec);
 
 /**
  * Normalize exchange rate value from string
  * @param {string|Number} val - exchange rate value
  */
-export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_DIGITS));
+export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_PRECISION));
 
 /**
  * Check value is valid
@@ -270,6 +270,16 @@ export const formatPersonDebts = (person) => {
     return debtAccounts.map((account) => (
         currency.formatCurrency(account.balance, account.curr_id)
     ));
+};
+
+/** Returns precision of specified currency */
+export const getCurrencyPrecision = (id) => {
+    const currency = window.app.model.currency.getItem(id);
+    if (!currency) {
+        throw new Error(__('ERR_CURR_NOT_FOUND'));
+    }
+
+    return currency.precision;
 };
 
 /** Returns selected item object */

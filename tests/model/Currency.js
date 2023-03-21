@@ -1,6 +1,9 @@
-import { assert } from 'jezve-test';
+import { assert, hasFlag } from 'jezve-test';
 import { normalize, formatValue } from '../common.js';
 import { hasToken, __ } from './locale.js';
+
+const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
+const CURRENCY_FORMAT_TRAILING_ZEROS = 0x02;
 
 /** Currency object */
 export class Currency {
@@ -26,13 +29,13 @@ export class Currency {
      * @param {*} value - float value to format
      */
     format(val) {
-        let nval = normalize(val);
-        if (Math.floor(nval) !== nval) {
+        let nval = normalize(val, this.precision);
+        if (Math.floor(nval) !== nval && hasFlag(this.flags, CURRENCY_FORMAT_TRAILING_ZEROS)) {
             nval = nval.toFixed(2);
         }
 
         const fmtVal = formatValue(nval);
-        if (this.flags) {
+        if (hasFlag(this.flags, CURRENCY_SIGN_BEFORE_VALUE)) {
             return `${this.sign} ${fmtVal}`;
         }
 

@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { normalize } from '../../js/utils.js';
+import { getCurrencyPrecision, normalize } from '../../js/utils.js';
 
 // Reducers
 const slice = createSlice({
@@ -29,7 +29,10 @@ const slice = createSlice({
         data: {
             ...state.data,
             initbalance: value,
-            fInitBalance: normalize(value),
+            fInitBalance: normalize(
+                value,
+                getCurrencyPrecision(state.data.curr_id),
+            ),
         },
     }),
 

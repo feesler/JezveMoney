@@ -304,6 +304,7 @@ export const isCurrency = (obj) => verifyObject(obj, {
     name: isString,
     code: isString,
     sign: isString,
+    precision: isInt,
     flags: isInt,
 }, {
     createdate: isInt,

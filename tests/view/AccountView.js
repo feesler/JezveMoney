@@ -81,10 +81,13 @@ export class AccountView extends AppView {
         res.name = cont.name.content.value;
         res.nameTyped = this.nameTyped;
 
+        // Currency
+        this.setModelCurrency(cont.currDropDown.value, res);
+
         // Iniital balance
         res.initbalance = cont.balance.content.value;
         res.fInitBalance = isValidValue(res.initbalance)
-            ? normalize(res.initbalance)
+            ? normalize(res.initbalance, res.currObj.precision)
             : res.initbalance;
 
         const origBalance = (res.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
@@ -94,9 +97,6 @@ export class AccountView extends AppView {
 
         res.balance = origBalance + res.fInitBalance - origInitBalance;
         res.fBalance = res.balance;
-
-        // Currency
-        this.setModelCurrency(cont.currDropDown.value, res);
 
         // Icon
         this.setModelIcon(cont.iconDropDown.value, res);
@@ -134,13 +134,14 @@ export class AccountView extends AppView {
 
         this.model.name = account.name.toString();
 
+        this.setModelCurrency(account.curr_id);
+
         this.model.initbalance = account.initbalance.toString();
-        this.model.fInitBalance = normalize(account.initbalance);
+        this.model.fInitBalance = normalize(account.initbalance, this.model.currObj.precision);
 
         this.model.balance = account.balance.toString();
         this.model.fBalance = account.balance;
 
-        this.setModelCurrency(account.curr_id);
         this.setModelIcon(account.icon_id);
     }
 
@@ -164,7 +165,10 @@ export class AccountView extends AppView {
             ? this.origAccount.initbalance
             : 0;
 
-        res.balance = normalize(origBalance + res.initbalance - origInitBalance);
+        res.balance = normalize(
+            origBalance + res.initbalance - origInitBalance,
+            model.currObj.precision,
+        );
 
         return res;
     }
@@ -242,11 +246,17 @@ export class AccountView extends AppView {
         return this.checkState();
     }
 
-    async inputBalance(val) {
-        const decimal = trimToDigitsLimit(val, 2);
-        const fNewValue = isValidValue(decimal) ? normalize(decimal) : decimal;
-        this.model.initbalance = decimal;
+    onBalanceChanged(value) {
+        const { precision } = this.model.currObj;
+        const fNewValue = isValidValue(value) ? normalize(value, precision) : value;
+        this.model.initbalance = value;
         this.model.fInitBalance = fNewValue;
+    }
+
+    async inputBalance(val) {
+        const { precision } = this.model.currObj;
+        const decimal = trimToDigitsLimit(val, precision);
+        this.onBalanceChanged(decimal);
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.balance.input(val));
@@ -259,6 +269,10 @@ export class AccountView extends AppView {
         assert(this.model.currObj, `Unexpected currency ${val}`);
 
         this.model.curr_id = this.model.currObj.id;
+
+        const { precision } = this.model.currObj;
+        const decimal = trimToDigitsLimit(this.model.initbalance, precision);
+        this.onBalanceChanged(decimal);
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.currDropDown.setSelection(val));

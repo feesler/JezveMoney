@@ -10,10 +10,12 @@ export const stateLoop = async () => {
         RUB,
         USD,
         EUR,
+        BTC,
         ACC_3,
         ACC_RUB,
         ACC_USD,
         ACC_EUR,
+        ACC_BTC,
     } = App.scenario;
 
     // Navigate to create income view
@@ -132,5 +134,16 @@ export const stateLoop = async () => {
         { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
         { action: 'clickDestResultBalance' }, // move from State 2 to State 4
         { action: 'changeSourceCurrency', data: RUB },
+        // Transition 4: Click on source amount block and move from State 1 to State 0
+        { action: 'clickSrcAmount' },
+    ]);
+
+    // Test input values for precise currency
+    await TransactionTests.runActions([
+        { action: 'changeSourceCurrency', data: BTC },
+        { action: 'inputSrcAmount', data: '0.12345678' },
+        { action: 'changeDestAccount', data: ACC_BTC },
+        { action: 'clickDestResultBalance' },
+        { action: 'inputDestResBalance', data: '555.12345678' },
     ]);
 };

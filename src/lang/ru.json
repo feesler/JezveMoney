@@ -80,6 +80,7 @@
     "CURRENCY_INR": "Индийская рупия",
     "CURRENCY_KZT": "Тенге",
     "CURRENCY_AED": "Дирхам (ОАЭ)",
+    "CURRENCY_BTC": "Биткойн",
     "ACCOUNTS": "Счета",
     "ACCOUNTS_NO_DATA": "Нет счетов",
     "ACCOUNTS_HIDDEN": "Скрытые счета",

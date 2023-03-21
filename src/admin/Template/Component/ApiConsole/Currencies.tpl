@@ -37,6 +37,11 @@
         </div>
 
         <div class="std_margin">
+            <label for="create_currency_precision">Precision</label>
+            <input id="create_currency_precision" class="stretch-input" name="precision" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="create_currency_flags">Flags (0 - sign on right, 1 - sign on left)</label>
             <input id="create_currency_flags" class="stretch-input" name="flags" type="text">
         </div>
@@ -77,6 +82,11 @@
         <div class="std_margin">
             <label for="update_currency_sign">Sign</label>
             <input id="update_currency_sign" class="stretch-input" name="sign" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="update_currency_precision">Precision</label>
+            <input id="update_currency_precision" class="stretch-input" name="precision" type="text">
         </div>
 
         <div class="std_margin">

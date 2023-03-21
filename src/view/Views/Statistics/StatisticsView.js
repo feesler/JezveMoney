@@ -464,7 +464,7 @@ class StatisticsView extends View {
     }
 
     formatPercent(value) {
-        return `${normalize(value)} %`;
+        return `${normalize(value, 2)} %`;
     }
 
     renderPopupListItem(item) {

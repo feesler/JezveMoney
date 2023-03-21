@@ -6,6 +6,7 @@ import {
     fixFloat,
     normalize,
 } from '../common.js';
+import { getCurrencyPrecision } from './import.js';
 import { __ } from './locale.js';
 import {
     EXPENSE,
@@ -491,24 +492,27 @@ export class ImportTransaction {
             res.dest_id = this.dest_id;
         }
 
+        const srcPrecision = getCurrencyPrecision(this.src_curr);
+        const destPrecision = getCurrencyPrecision(this.dest_curr);
+
         if (res.type === EXPENSE) {
-            res.dest_amount = normalize(this.dest_amount);
+            res.dest_amount = normalize(this.dest_amount, destPrecision);
             if (this.isDiff()) {
-                res.src_amount = normalize(this.src_amount);
+                res.src_amount = normalize(this.src_amount, srcPrecision);
             } else {
                 res.src_amount = res.dest_amount;
             }
         } else if (res.type === INCOME) {
-            res.src_amount = normalize(this.src_amount);
+            res.src_amount = normalize(this.src_amount, srcPrecision);
             if (this.isDiff()) {
-                res.dest_amount = normalize(this.dest_amount);
+                res.dest_amount = normalize(this.dest_amount, destPrecision);
             } else {
                 res.dest_amount = res.src_amount;
             }
         } else if (res.type === TRANSFER) {
-            res.src_amount = normalize(this.src_amount);
+            res.src_amount = normalize(this.src_amount, srcPrecision);
             res.dest_amount = (this.isDiff())
-                ? normalize(this.dest_amount)
+                ? normalize(this.dest_amount, destPrecision)
                 : res.src_amount;
         } else if (res.type === DEBT) {
             assert(this.person_id, 'Invalid person id');
@@ -516,7 +520,7 @@ export class ImportTransaction {
             res.acc_id = this.acc_id;
             res.person_id = this.person_id;
             res.op = this.op;
-            res.src_amount = normalize(this.src_amount);
+            res.src_amount = normalize(this.src_amount, srcPrecision);
             res.dest_amount = res.src_amount;
         }
 

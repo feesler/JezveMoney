@@ -161,22 +161,22 @@ export const fixFloat = (str) => {
     return res;
 };
 
-export const CENTS_DIGITS = 2;
-export const EXCHANGE_DIGITS = 4;
+export const DEFAULT_PRECISION = 2;
+export const EXCHANGE_PRECISION = 4;
 
 /** Correct calculated value */
-export const correct = (val, prec = CENTS_DIGITS) => parseFloat(parseFloat(val).toFixed(prec));
+export const correct = (val, prec = DEFAULT_PRECISION) => parseFloat(parseFloat(val).toFixed(prec));
 
 /** Correct calculated exchange rate value */
-export const correctExch = (val) => correct(val, EXCHANGE_DIGITS);
+export const correctExch = (val) => correct(val, EXCHANGE_PRECISION);
 
 /** Normalize monetary value from string */
-export const normalize = (val, prec = CENTS_DIGITS) => (
+export const normalize = (val, prec = DEFAULT_PRECISION) => (
     parseFloat(parseFloat(fixFloat(val)).toFixed(prec))
 );
 
 /** Normalize exchange rate value from string */
-export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_DIGITS));
+export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_PRECISION));
 
 /** Check value is valid */
 export const isValidValue = (val) => (

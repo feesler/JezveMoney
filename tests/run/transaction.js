@@ -24,7 +24,6 @@ import { __ } from '../model/locale.js';
 import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
 
 export const decimalInputTestStrings = [
-    '.',
     '-',
     '-.',
     '-.0',
@@ -35,6 +34,7 @@ export const decimalInputTestStrings = [
     '-0.0',
     '-0.01',
     '-0.015',
+    '.',
     '.0',
     '.01',
     '.015',
