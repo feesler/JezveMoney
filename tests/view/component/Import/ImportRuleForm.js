@@ -24,7 +24,7 @@ import {
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
-import { trimToDigitsLimit } from '../../../common.js';
+import { MAX_PRECISION, trimToDigitsLimit } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 
@@ -497,7 +497,7 @@ export class ImportRuleForm extends TestComponent {
         assert(conditionModel.state === name, `Invalid state ${conditionModel.state} expected ${name}`);
 
         if (name === 'amount') {
-            conditionModel[name] = trimToDigitsLimit(value, 2);
+            conditionModel[name] = trimToDigitsLimit(value, MAX_PRECISION);
         } else {
             conditionModel[name] = value;
         }
@@ -708,7 +708,7 @@ export class ImportRuleForm extends TestComponent {
 
         const actionModel = this.model.actions[ind];
         if (name === 'amount') {
-            actionModel[name] = trimToDigitsLimit(value, 2);
+            actionModel[name] = trimToDigitsLimit(value, MAX_PRECISION);
         } else {
             actionModel[name] = value;
         }

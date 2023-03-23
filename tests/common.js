@@ -22,6 +22,11 @@ export const availSortTypes = [
     SORT_MANUALLY,
 ];
 
+/* Decimal values precision */
+export const DEFAULT_PRECISION = 2;
+export const EXCHANGE_PRECISION = 4;
+export const MAX_PRECISION = 8;
+
 /** Check object is empty */
 export const isEmpty = (obj) => {
     if (typeof obj === 'object') {
@@ -160,9 +165,6 @@ export const fixFloat = (str) => {
     }
     return res;
 };
-
-export const DEFAULT_PRECISION = 2;
-export const EXCHANGE_PRECISION = 4;
 
 /** Correct calculated value */
 export const correct = (val, prec = DEFAULT_PRECISION) => parseFloat(parseFloat(val).toFixed(prec));

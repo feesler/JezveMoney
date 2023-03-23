@@ -13,7 +13,7 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../../js/model/ImportCondition.js';
-import { __ } from '../../../../../js/utils.js';
+import { MAX_PRECISION, __ } from '../../../../../js/utils.js';
 import './ImportConditionForm.scss';
 
 /** CSS classes */
@@ -106,7 +106,7 @@ export class ImportConditionForm extends Component {
         });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            digits: 2,
+            digits: MAX_PRECISION,
             onInput: () => this.onValueChange(),
         });
         // Create text value input element

@@ -325,7 +325,7 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
-            { action: 'inputAmount', data: '500' },
+            { action: 'inputAmount', data: '500.1234' },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
@@ -383,7 +383,7 @@ export class ImportRulesStory extends TestStory {
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_DEST_AMOUNT },
-            { action: 'inputAmount', data: '500.5' },
+            { action: 'inputAmount', data: '500.5678' },
         ]);
         await ImportTests.submitRule();
     }

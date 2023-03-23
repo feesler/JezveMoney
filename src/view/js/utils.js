@@ -8,6 +8,11 @@ export const SORT_BY_NAME_ASC = 3;
 export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
 
+/* Decimal values precision */
+export const DEFAULT_PRECISION = 2;
+export const EXCHANGE_PRECISION = 4;
+export const MAX_PRECISION = 8;
+
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
     const entries = document.cookie.split(';');
@@ -150,9 +155,6 @@ export const amountFix = (value, thSep = ' ') => {
 
     return parseFloat(fixFloat(res));
 };
-
-export const DEFAULT_PRECISION = 2;
-export const EXCHANGE_PRECISION = 4;
 
 /**
  * Correct calculated value

@@ -8,7 +8,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
-import { __ } from '../../../../../js/utils.js';
+import { MAX_PRECISION, __ } from '../../../../../js/utils.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -101,7 +101,7 @@ export class ImportActionForm extends Component {
         });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            digits: 2,
+            digits: MAX_PRECISION,
             onInput: () => this.onValueChange(),
         });
         // Create value input element
