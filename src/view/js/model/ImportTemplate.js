@@ -1,6 +1,6 @@
+import { fixFloat } from 'jezvejs';
 import {
     amountFix,
-    fixFloat,
     timestampFromString,
     __,
 } from '../utils.js';

@@ -1,6 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
 import {
-    fixFloatTest,
     amountFixTest,
     correctTest,
     correctPrecTest,
@@ -35,64 +34,12 @@ export class UnitTestsStory extends TestStory {
     async run() {
         setBlock('Unit tests', 1);
 
-        await this.fixFloatTests();
         await this.amountFixTests();
         await this.correctTests();
         await this.correctPrecTests();
         await this.normalizeTests();
         await this.normalizePrecTests();
         await this.isValidValueTests();
-    }
-
-    async fixFloatTests() {
-        setBlock('fixFloat', 1);
-
-        setBlock('Number values', 2);
-        await fixFloatTest('Integer number', 100, '100');
-        await fixFloatTest('Float number', 100.5, '100.5');
-
-        setBlock('Invalid values', 2);
-        await fixFloatTest('null value', null, null);
-        await fixFloatTest('undefined value', undefined, null);
-        await fixFloatTest('NaN value', NaN, null);
-
-        setBlock('Zero strings', 2);
-        // [value, expected result]
-        const zeroPairs = [
-            ['.', '0.'],
-            ['.0', '0.0'],
-            ['.00', '0.00'],
-            ['0', '0'],
-            ['0.', '0.'],
-            ['0.0', '0.0'],
-            ['0.00', '0.00'],
-        ];
-        const negZeroPairs = [
-            ['-', '-0'],
-            ['-.', '-0.'],
-            ['-.0', '-0.0'],
-            ['-0', '-0'],
-            ['-0.', '-0.'],
-            ['-0.0', '-0.0'],
-            ['-0.00', '-0.00'],
-        ];
-
-        await App.scenario.runner.runGroup(([value, expected]) => (
-            fixFloatTest(`Zero string '${value}'`, value, expected)
-        ), zeroPairs);
-
-        setBlock('Negative zero strings', 2);
-        await App.scenario.runner.runGroup(([value, expected]) => (
-            fixFloatTest(`Negative zero string '${value}'`, value, expected)
-        ), negZeroPairs);
-
-        setBlock('Strings', 2);
-        await fixFloatTest('Empty string', '', '0');
-        await fixFloatTest('Integer number string', '123', '123');
-        await fixFloatTest('Float number string with point', '123.5', '123.5');
-        await fixFloatTest('Float number string with comma', '123,5', '123.5');
-        await fixFloatTest('Float number string starts with point', '.56', '0.56');
-        await fixFloatTest('Float number string starts with comma', ',56', '0.56');
     }
 
     async amountFixTests() {

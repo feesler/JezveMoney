@@ -6,6 +6,7 @@ import {
     checkDate,
     Component,
     getClassName,
+    fixFloat,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -16,7 +17,7 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
-import { fixFloat, getCurrencyPrecision, __ } from '../../../../js/utils.js';
+import { getCurrencyPrecision, __ } from '../../../../js/utils.js';
 import { transTypeMap, typeNames } from '../../../../js/model/ImportTransaction.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';

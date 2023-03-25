@@ -3,8 +3,9 @@ import {
     isObject,
     hasFlag,
     checkDate,
+    fixFloat,
 } from 'jezvejs';
-import { timestampFromString, fixFloat, __ } from '../utils.js';
+import { timestampFromString, __ } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */

@@ -1,4 +1,9 @@
-import { isDate, isObject, shiftDate } from 'jezvejs';
+import {
+    fixFloat,
+    isDate,
+    isObject,
+    shiftDate,
+} from 'jezvejs';
 
 export const MS_IN_SECOND = 1000;
 
@@ -108,32 +113,6 @@ export const timeToDate = (value) => {
 export const cutTime = (value) => {
     const fixedDate = shiftDate(timeToDate(value), 0);
     return fixedDate.getTime() / MS_IN_SECOND;
-};
-
-/**
- * Fix string to correct float number format
- * @param {string} str - decimal value string
- */
-export const fixFloat = (str) => {
-    if (typeof str === 'number' && !Number.isNaN(str) && Number.isFinite(str)) {
-        return str.toString();
-    }
-    if (typeof str !== 'string') {
-        return null;
-    }
-
-    let res = str.replace(/,/g, '.');
-    if (res.indexOf('-') === 0
-        && (
-            res.length === 1
-            || res.indexOf('.') === 1
-        )) {
-        res = `-0${res.substring(1)}`;
-    }
-    if (res.indexOf('.') === 0 || !res.length) {
-        res = `0${res}`;
-    }
-    return res;
 };
 
 /** Convert string to amount value */

@@ -1,7 +1,11 @@
-import { copyObject, checkDate, trimDecimalPlaces } from 'jezvejs';
+import {
+    copyObject,
+    checkDate,
+    trimDecimalPlaces,
+    fixFloat,
+} from 'jezvejs';
 import {
     dateStringToTime,
-    fixFloat,
     getCurrencyPrecision,
     __,
 } from '../utils.js';
