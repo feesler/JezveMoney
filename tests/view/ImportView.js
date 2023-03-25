@@ -1134,6 +1134,8 @@ export class ImportView extends AppView {
         const form = new ImportTransaction({
             enabled: true,
             mainAccount,
+            rulesApplied: false,
+            modifiedByUser: false,
             type: 'expense',
             src_id: mainAccount.id,
             dest_id: 0,
@@ -1201,7 +1203,10 @@ export class ImportView extends AppView {
         }
 
         const origItem = this.items[this.formIndex];
-        const savedItem = new ImportTransaction(itemData);
+        const savedItem = new ImportTransaction({
+            ...origItem,
+            ...itemData,
+        });
         const isAppend = (this.formIndex === this.items.length);
         if (isAppend || savedItem.isChanged(origItem)) {
             savedItem.setModified(true);

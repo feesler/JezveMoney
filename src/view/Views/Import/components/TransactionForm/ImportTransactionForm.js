@@ -639,8 +639,8 @@ export class ImportTransactionForm extends Component {
             return;
         }
 
+        this.collapse?.show(!!originalData);
         if (!originalData) {
-            this.collapse?.hide();
             return;
         }
 

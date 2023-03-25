@@ -43,6 +43,7 @@ export class ImportListStory extends TestStory {
         await this.enableDisableRules();
         await this.del();
         await this.submit();
+        await this.formOrigDataCollapsible();
         await this.stateLoop();
         await this.currencyPrecision();
 
@@ -282,6 +283,26 @@ export class ImportListStory extends TestStory {
         await ImportTests.selectAllItems();
         await ImportTests.enableSelectedItems(false);
         await ImportTests.submit();
+    }
+
+    async formOrigDataCollapsible() {
+        setBlock('Form original data collapsible', 2);
+
+        await ImportTests.updateItemAndSave({
+            pos: 2,
+            action: [
+                { action: 'toggleOriginalData' },
+                { action: 'toggleOriginalData' },
+            ],
+        });
+        await ImportTests.updateItemAndSave({ pos: 0 });
+        await ImportTests.updateItemAndSave({
+            pos: 2,
+            action: [
+                { action: 'toggleOriginalData' },
+                { action: 'toggleOriginalData' },
+            ],
+        });
     }
 
     async stateLoop() {

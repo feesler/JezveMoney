@@ -11,7 +11,7 @@ import {
     evaluate,
     hasClass,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
+import { Collapsible, DropDown } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -128,6 +128,7 @@ export class ImportTransactionForm extends TestComponent {
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
+        res.origDataCollapsible = await Collapsible.create(this, await query(this.elem, '.collapsible'));
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
         assert(
@@ -233,6 +234,7 @@ export class ImportTransactionForm extends TestComponent {
         res.invalidated = !(srcAmount && destAmount && date);
 
         res.imported = cont.toggleBtn.visible;
+        res.origDataCollapsed = !!cont.origDataCollapsible?.collapsed;
         if (cont.originalData && res.imported) {
             res.original = {
                 ...cont.originalData.model,
@@ -357,6 +359,14 @@ export class ImportTransactionForm extends TestComponent {
         }
         if (!res.personField.disabled) {
             res.personField.value = model.personId.toString();
+        }
+
+        if (model.imported) {
+            res.toggleBtn = { visible: true };
+            res.origDataCollapsible = {
+                visible: true,
+                collapsed: model.origDataCollapsed,
+            };
         }
 
         return res;
@@ -799,6 +809,18 @@ export class ImportTransactionForm extends TestComponent {
 
     async clickCancel() {
         return click(this.content.cancelBtn);
+    }
+
+    async toggleOriginalData() {
+        assert(this.content.toggleBtn.visible, 'Toggle button not visible');
+
+        this.model.origDataCollapsed = !this.model.origDataCollapsed;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await click(this.content.toggleBtn.elem);
+        await this.parse();
+
+        return this.checkState();
     }
 
     /**
