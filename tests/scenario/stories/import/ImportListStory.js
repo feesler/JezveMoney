@@ -54,9 +54,11 @@ export class ImportListStory extends TestStory {
     async create() {
         setBlock('Add item', 2);
 
+        const { TRANSPORT_CATEGORY } = App.scenario;
+
         await ImportTests.addItem([
             { action: 'inputDestAmount', data: '1' },
-            { action: 'changeCategory', data: App.scenario.TRANSPORT_CATEGORY },
+            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
         ]);
 
         setBlock('Save item', 2);
@@ -73,24 +75,27 @@ export class ImportListStory extends TestStory {
     async uploadAccount() {
         setBlock('Upload CSV with invalid account', 2);
 
-        await ImportTests.uploadFile(App.scenario.cardFile);
+        const { cardFile, ACC_USD, ACC_RUB } = App.scenario;
+
+        await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
-            ...App.scenario.cardFile,
-            account: App.scenario.ACC_USD,
+            ...cardFile,
+            account: ACC_USD,
         });
 
         setBlock('Check main account is updated after select it at upload dialog', 2);
-        await ImportTests.selectUploadAccount(App.scenario.ACC_RUB);
+        await ImportTests.selectUploadAccount(ACC_RUB);
     }
 
     async convert() {
         setBlock('Convert transactions', 2);
 
-        const { cardFile } = App.scenario;
+        const { cardFile, ACC_3 } = App.scenario;
+
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
             ...cardFile,
-            account: App.scenario.ACC_3,
+            account: ACC_3,
         });
 
         setBlock('Cancel changes', 2);
@@ -106,10 +111,10 @@ export class ImportListStory extends TestStory {
     async pagination() {
         setBlock('Pagination', 1);
 
-        const { largeFile } = App.scenario;
+        const { largeFile, ACC_RUB } = App.scenario;
         const itemsOnPage = App.config.importTransactionsOnPage;
 
-        await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
+        await ImportTests.changeMainAccount(ACC_RUB);
 
         await ImportTests.uploadFile(largeFile);
         await ImportTests.submitUploaded(largeFile);
@@ -176,13 +181,13 @@ export class ImportListStory extends TestStory {
     async checkSimilar() {
         setBlock('Enable/disable check similar transactions', 1);
 
-        const { cardFile } = App.scenario;
+        const { cardFile, ACC_RUB } = App.scenario;
 
         // Check option change is correctly update already uploaded transactions
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
             ...cardFile,
-            account: App.scenario.ACC_RUB,
+            account: ACC_RUB,
         });
         await ImportTests.enableCheckSimilar(false);
         await ImportTests.enableCheckSimilar(true);
@@ -192,7 +197,7 @@ export class ImportListStory extends TestStory {
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
             ...cardFile,
-            account: App.scenario.ACC_RUB,
+            account: ACC_RUB,
         });
         await ImportTests.enableCheckSimilar(true);
         await ImportTests.deleteAllItems();
@@ -201,12 +206,12 @@ export class ImportListStory extends TestStory {
     async enableDisableRules() {
         setBlock('Enable/disable rules', 1);
 
-        const { cardFile } = App.scenario;
+        const { cardFile, ACC_RUB } = App.scenario;
 
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
             ...cardFile,
-            account: App.scenario.ACC_RUB,
+            account: ACC_RUB,
         });
 
         await ImportTests.enableRules(false);
@@ -221,6 +226,8 @@ export class ImportListStory extends TestStory {
 
     async submit() {
         setBlock('Submit import transactions', 1);
+
+        const { cardFile, USD } = App.scenario;
 
         // Disable all items except 0 and 1 and submit
         // As result two first transactions will be found as similar
@@ -254,7 +261,7 @@ export class ImportListStory extends TestStory {
         // Valid amount, different currencies and empty source amount
         await ImportTests.runFormActions([
             { action: 'inputDestAmount', data: '1' },
-            { action: 'changeDestCurrency', data: App.scenario.USD },
+            { action: 'changeDestCurrency', data: USD },
             { action: 'inputSourceAmount', data: '' },
         ]);
         await ImportTests.saveItem();
@@ -275,9 +282,9 @@ export class ImportListStory extends TestStory {
 
         // Verify submit is disabled for list with no enabled items
         setBlock('Verify submit is disabled for list with no enabled items', 2);
-        await ImportTests.uploadFile(App.scenario.cardFile);
+        await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
-            ...App.scenario.cardFile,
+            ...cardFile,
             template: 0,
         });
         await ImportTests.selectAllItems();
@@ -309,12 +316,18 @@ export class ImportListStory extends TestStory {
         const {
             RUB,
             USD,
+            ACC_RUB,
+            ACC_3,
+            ACC_USD,
+            ACC_EUR,
+            IVAN,
+            MARIA,
             TRANSPORT_CATEGORY,
         } = App.scenario;
 
         setBlock('Import item state loop', 1);
 
-        await ImportTests.changeMainAccount(App.scenario.ACC_3);
+        await ImportTests.changeMainAccount(ACC_3);
 
         await ImportTests.updateItemAndSave({
             pos: 0,
@@ -364,23 +377,23 @@ export class ImportListStory extends TestStory {
                 { action: 'changeType', data: 'income' }, // 10-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
                 { action: 'changeType', data: 'transfer_out' }, // 4-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
                 { action: 'changeType', data: 'expense' }, // 6-1
                 { action: 'changeType', data: 'transfer_out' }, // 1-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
                 { action: 'changeType', data: 'income' }, // 6-3
                 { action: 'changeType', data: 'transfer_out' }, // 3-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
-                { action: 'changeTransferAccount', data: App.scenario.ACC_RUB }, // 6-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_RUB }, // 6-5
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
                 { action: 'changeType', data: 'transfer_in' }, // 6-8
                 { action: 'changeType', data: 'expense' }, // 8-1
                 { action: 'changeType', data: 'transfer_in' }, // 1-7
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
                 { action: 'changeType', data: 'income' }, // 8-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
                 { action: 'changeType', data: 'transfer_in' }, // 4-7
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
                 { action: 'inputSourceAmount', data: '100' },
                 { action: 'inputDestAmount', data: '6000' },
             ],
@@ -420,7 +433,7 @@ export class ImportListStory extends TestStory {
             pos: 5,
             action: [
                 { action: 'changeType', data: 'transfer_out' }, // 1-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
                 { action: 'inputDestAmount', data: '0.9' },
                 { action: 'inputSourceAmount', data: '50.03' },
             ],
@@ -435,7 +448,7 @@ export class ImportListStory extends TestStory {
             pos: 7,
             action: [
                 { action: 'changeType', data: 'debt_out' }, // 1-9
-                { action: 'changePerson', data: App.scenario.IVAN },
+                { action: 'changePerson', data: IVAN },
             ],
         });
 
@@ -444,26 +457,26 @@ export class ImportListStory extends TestStory {
             action: { action: 'changeType', data: 'debt_in' }, // 1-10
         });
 
-        await ImportTests.changeMainAccount(App.scenario.ACC_EUR);
+        await ImportTests.changeMainAccount(ACC_EUR);
 
         await ImportTests.updateItemAndSave({
             pos: 0,
             action: [
-                { action: 'changeTransferAccount', data: App.scenario.ACC_3 }, // 8-8
+                { action: 'changeTransferAccount', data: ACC_3 }, // 8-8
             ],
         });
 
-        await ImportTests.changeMainAccount(App.scenario.ACC_3); // for item 0: 8-8
+        await ImportTests.changeMainAccount(ACC_3); // for item 0: 8-8
 
         await ImportTests.updateItemAndSave({
             pos: 0,
             action: [
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
                 { action: 'changeType', data: 'transfer_out' }, // 8-6
                 { action: 'changeType', data: 'debt_out' }, // 6-9
                 { action: 'changeType', data: 'debt_in' }, // 9-10
                 { action: 'changeType', data: 'transfer_in' }, // 10-7
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
                 { action: 'changeType', data: 'debt_out' }, // 8-9
                 { action: 'changeType', data: 'income' }, // 9-3
                 { action: 'changeSourceCurrency', data: USD }, // 3-4
@@ -473,10 +486,10 @@ export class ImportListStory extends TestStory {
                 { action: 'changeType', data: 'debt_in' }, // 4-10
                 { action: 'changeType', data: 'debt_out' }, // 10-9
                 { action: 'changeType', data: 'transfer_out' }, // 9-5
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 5-6
                 { action: 'changeType', data: 'debt_in' }, // 6-10
                 { action: 'changeType', data: 'transfer_in' }, // 10-7
-                { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
                 { action: 'changeType', data: 'debt_in' }, // 8-10
                 { action: 'changeType', data: 'expense' }, // 10-1
                 { action: 'changeDestCurrency', data: USD }, // 1-2
@@ -491,7 +504,7 @@ export class ImportListStory extends TestStory {
             pos: 7,
             action: [
                 { action: 'changeType', data: 'debt_in' },
-                { action: 'changePerson', data: App.scenario.MARIA },
+                { action: 'changePerson', data: MARIA },
             ],
         });
 

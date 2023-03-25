@@ -639,8 +639,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.typeField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => this.content.typeField.dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -672,8 +671,9 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.transferAccountField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => (
+            this.content.transferAccountField.dropDown.selectItem(value)
+        ));
 
         return this.checkState();
     }
@@ -686,8 +686,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.personField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => this.content.personField.dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -703,8 +702,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.srcAmountField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.srcAmountField.inputElem, value));
 
         return this.checkState();
     }
@@ -720,8 +718,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.destAmountField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.destAmountField.inputElem, value));
 
         return this.checkState();
     }
@@ -739,8 +736,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -758,8 +754,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -771,8 +766,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.dateField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.dateField.inputElem, value));
 
         return this.checkState();
     }
@@ -785,8 +779,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -797,8 +790,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.comment = value;
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.commentField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.commentField.inputElem, value));
 
         return this.checkState();
     }
@@ -817,8 +809,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.origDataCollapsed = !this.model.origDataCollapsed;
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.toggleBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.toggleBtn.elem));
 
         return this.checkState();
     }

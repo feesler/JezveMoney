@@ -48,8 +48,7 @@ export class DatePickerFilter extends TestComponent {
         assert.isDate(date1, 'Invalid parameters');
         assert.isDate(date2, 'Invalid parameters');
 
-        await click(this.content.datePickerBtn);
-        await this.parse();
+        await this.performAction(() => click(this.content.datePickerBtn));
 
         assert(this.content.datePicker, 'Date picker component not found');
         await this.content.datePicker.selectRange(date1, date2);

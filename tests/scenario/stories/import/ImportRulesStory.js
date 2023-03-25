@@ -75,6 +75,8 @@ export class ImportRulesStory extends TestStory {
     async validation() {
         setBlock('Import rule validation', 1);
 
+        const { ACC_3 } = App.scenario;
+
         setBlock('Submit empty rule', 2);
         await ImportTests.createRule();
         await ImportTests.submitRule();
@@ -288,7 +290,7 @@ export class ImportRulesStory extends TestStory {
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-            { action: 'changeAccount', data: App.scenario.ACC_3 },
+            { action: 'changeAccount', data: ACC_3 },
         ]);
         await ImportTests.submitRule();
 
@@ -309,6 +311,8 @@ export class ImportRulesStory extends TestStory {
     // Create import rule tests
     async create() {
         setBlock('Create import rules', 1);
+
+        const { MARIA, TRANSPORT_CATEGORY } = App.scenario;
 
         setBlock('Create import rule #1', 2);
         await ImportTests.createRule();
@@ -347,11 +351,11 @@ export class ImportRulesStory extends TestStory {
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: App.scenario.MARIA },
+            { action: 'changePerson', data: MARIA },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_CATEGORY },
-            { action: 'changeCategory', data: App.scenario.TRANSPORT_CATEGORY },
+            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
@@ -392,12 +396,14 @@ export class ImportRulesStory extends TestStory {
     async update() {
         setBlock('Update import rules', 1);
 
+        const { ACC_3 } = App.scenario;
+
         setBlock('Add conditions and actions', 2);
         await ImportTests.updateRule(0);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-            { action: 'changeAccount', data: App.scenario.ACC_3 },
+            { action: 'changeAccount', data: ACC_3 },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
