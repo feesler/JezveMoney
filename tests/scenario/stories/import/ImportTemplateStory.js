@@ -187,6 +187,7 @@ export class ImportTemplateStory extends TestStory {
         const { RUB, cardFile } = App.scenario;
 
         const { id: account1 } = await api.account.create({
+            type: 0,
             name: 'Tpl Test Account 1',
             curr_id: RUB,
             initbalance: '1',
@@ -194,6 +195,7 @@ export class ImportTemplateStory extends TestStory {
             flags: 0,
         });
         const { id: account2 } = await api.account.create({
+            type: 0,
             name: 'Tpl Test Account 2',
             curr_id: RUB,
             initbalance: '1',
@@ -245,6 +247,7 @@ export class ImportTemplateStory extends TestStory {
         });
         // Create account to load import view
         await api.account.create({
+            type: 0,
             name: 'Tpl Test Account 3',
             curr_id: RUB,
             initbalance: '1',

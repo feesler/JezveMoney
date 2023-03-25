@@ -834,6 +834,7 @@ export class TransactionsStory extends TestStory {
 
         // Create user account
         const account = await api.account.create({
+            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1000',
@@ -893,6 +894,7 @@ export class TransactionsStory extends TestStory {
 
         // Create first account
         const { id: account1 } = await api.account.create({
+            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1',
@@ -915,6 +917,7 @@ export class TransactionsStory extends TestStory {
 
         // Create second account
         const { id: account2 } = await api.account.create({
+            type: 0,
             name: 'Account 2',
             curr_id: RUB,
             initbalance: '2',

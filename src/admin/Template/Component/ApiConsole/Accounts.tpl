@@ -55,6 +55,11 @@
     <h3>Create account</h3>
     <form action="<?= BASEURL ?>api/account/create" method="post">
         <div class="std_margin">
+            <label for="create_account_type">Type</label>
+            <input id="create_account_type" class="input stretch-input" name="type" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="create_account_name">Name</label>
             <input id="create_account_name" class="input stretch-input" name="name" type="text">
         </div>
@@ -100,6 +105,11 @@
         <div class="std_margin">
             <label for="update_account_id">Id</label>
             <input id="update_account_id" class="input stretch-input" name="id" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="update_account_type">Type</label>
+            <input id="update_account_type" class="input stretch-input" name="type" type="text">
         </div>
 
         <div class="std_margin">

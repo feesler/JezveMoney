@@ -8,9 +8,11 @@ import {
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { secondsToDateString } from '../../../common.js';
+import { getAccountTypeName } from '../../../model/AccountsList.js';
 import { __ } from '../../../model/locale.js';
 
 const fieldSelectors = [
+    '.type-field',
     '.balance-field',
     '.initbalance-field',
     '.visibility-field',
@@ -40,6 +42,7 @@ export class AccountDetails extends TestComponent {
         ]), res.title.elem, res.transactionsLink.elem);
 
         [
+            res.typeField,
             res.balanceField,
             res.initialBalanceField,
             res.visibilityField,
@@ -88,6 +91,10 @@ export class AccountDetails extends TestComponent {
             title: {
                 visible: true,
                 value: item.name,
+            },
+            typeField: {
+                visible: true,
+                value: getAccountTypeName(item.type),
             },
             balanceField: {
                 visible: true,

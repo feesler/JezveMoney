@@ -2,8 +2,10 @@ import { createElement } from 'jezvejs';
 import { __ } from '../../../../js/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { accountTypes } from '../../../../js/model/Account.js';
 
 /** CSS classes */
+const TYPE_FIELD_CLASS = 'type-field';
 const BALANCE_FIELD_CLASS = 'balance-field';
 const INITIAL_BALANCE_FIELD_CLASS = 'initbalance-field';
 const VISIBILITY_FIELD_CLASS = 'visibility-field';
@@ -16,6 +18,11 @@ const VHIDDEN_CLASS = 'vhidden';
 export class AccountDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
+        this.typeField = Field.create({
+            title: __('ACCOUNT_TYPE'),
+            className: TYPE_FIELD_CLASS,
+        });
+
         this.initBalanceField = Field.create({
             title: __('ACCOUNT_INITIAL_BALANCE'),
             className: INITIAL_BALANCE_FIELD_CLASS,
@@ -44,6 +51,7 @@ export class AccountDetails extends ItemDetails {
         });
 
         return [
+            this.typeField.elem,
             this.balanceField.elem,
             this.initBalanceField.elem,
             this.visibilityField.elem,
@@ -74,6 +82,12 @@ export class AccountDetails extends ItemDetails {
 
         // Title
         this.heading.setTitle(item.name);
+
+        // Type
+        if (typeof accountTypes[item.type] !== 'string') {
+            throw new Error('Invalid account type');
+        }
+        this.typeField.setContent(accountTypes[item.type]);
 
         // Initial balance
         this.initBalanceField.setContent(

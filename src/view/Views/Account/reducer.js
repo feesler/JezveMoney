@@ -3,6 +3,14 @@ import { getCurrencyPrecision, normalize } from '../../js/utils.js';
 
 // Reducers
 const slice = createSlice({
+    changeType: (state, type) => ({
+        ...state,
+        data: {
+            ...state.data,
+            type,
+        },
+    }),
+
     changeIcon: (state, iconId) => ({
         ...state,
         data: {

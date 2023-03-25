@@ -15,7 +15,7 @@ import {
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { ImportRule } from './ImportRule.js';
-import { ACCOUNT_HIDDEN, AccountsList } from './AccountsList.js';
+import { ACCOUNT_HIDDEN, AccountsList, accountTypes } from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
 import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
@@ -29,7 +29,7 @@ const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
 const availSettings = sortSettings;
 
 /** Accounts */
-const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
+const accReqFields = ['type', 'name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
 
 /** Persons */
 const pReqFields = ['name', 'flags'];
@@ -706,6 +706,11 @@ export class AppState {
             return false;
         }
 
+        const type = parseInt(params.type, 10);
+        if (typeof accountTypes[type] !== 'string') {
+            return false;
+        }
+
         // Check there is no account with same name
         const accObj = this.accounts.findByName(params.name);
         if (accObj && (!params.id || (params.id && params.id !== accObj.id))) {
@@ -766,8 +771,13 @@ export class AppState {
             return false;
         }
 
+        const currency = App.currency.getItem(params.curr_id);
+        if (!currency) {
+            return false;
+        }
+
         const balDiff = expAccount.initbalance - origAcc.initbalance;
-        if (balDiff.toFixed(2) !== 0) {
+        if (balDiff.toFixed(currency.precision) !== 0) {
             expAccount.balance = origAcc.balance + balDiff;
         }
 

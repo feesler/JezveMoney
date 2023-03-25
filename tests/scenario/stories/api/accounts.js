@@ -1,6 +1,13 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { ACCOUNT_HIDDEN } from '../../../model/AccountsList.js';
+import {
+    ACCOUNT_HIDDEN,
+    ACCOUNT_TYPE_OTHER,
+    ACCOUNT_TYPE_CASH,
+    ACCOUNT_TYPE_DEBIT_CARD,
+    ACCOUNT_TYPE_CREDIT_CARD,
+    ACCOUNT_TYPE_CREDIT,
+} from '../../../model/AccountsList.js';
 import * as AccountApiTests from '../../../run/api/account.js';
 
 const create = async () => {
@@ -9,18 +16,21 @@ const create = async () => {
     const { RUB, USD } = App.scenario;
 
     const data = [{
+        type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'acc ru',
         curr_id: RUB,
         initbalance: 100,
         icon_id: 1,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CASH,
         name: 'cash ru',
         curr_id: RUB,
         initbalance: 5000,
         icon_id: 3,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'acc usd',
         curr_id: USD,
         initbalance: 10.5,
@@ -41,6 +51,7 @@ const createWithChainedRequest = async () => {
     const { RUB, USD } = App.scenario;
 
     const data = [{
+        type: ACCOUNT_TYPE_OTHER,
         name: 'Chained rub',
         curr_id: RUB,
         initbalance: 100,
@@ -50,6 +61,7 @@ const createWithChainedRequest = async () => {
             accounts: { visibility: 'visible' },
         },
     }, {
+        type: ACCOUNT_TYPE_OTHER,
         name: 'Chained usd',
         curr_id: USD,
         initbalance: 50,
@@ -80,6 +92,7 @@ const createInvalid = async () => {
         flags: 0,
     }, {
         // Try to create account without some of fields
+        type: ACCOUNT_TYPE_OTHER,
         curr_id: USD,
         initbalance: 10.5,
         icon_id: 0,
@@ -89,6 +102,7 @@ const createInvalid = async () => {
         initbalance: 10.5,
     }, {
         // Try to create account with excess properties
+        type: ACCOUNT_TYPE_OTHER,
         name: 'acc tst',
         curr_id: USD,
         initbalance: 10.5,
@@ -98,18 +112,28 @@ const createInvalid = async () => {
         yyy: 2,
     }, {
         // Try to create account with invalid data
+        type: ACCOUNT_TYPE_OTHER,
         name: '',
         curr_id: USD,
         initbalance: 10.5,
         icon_id: 5,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_OTHER,
         name: 'acc tst',
         curr_id: 9999,
         initbalance: 10.5,
         icon_id: 5,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_OTHER,
+        name: 'acc tst',
+        curr_id: USD,
+        initbalance: 'fff',
+        icon_id: 5,
+        flags: 0,
+    }, {
+        type: -1,
         name: 'acc tst',
         curr_id: USD,
         initbalance: 'fff',
@@ -126,18 +150,21 @@ const createMultiple = async () => {
     const { RUB, USD } = App.scenario;
 
     const data = [{
+        type: ACCOUNT_TYPE_CASH,
         name: 'Account 1',
         curr_id: RUB,
         initbalance: 100,
         icon_id: 0,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'Account 2',
         curr_id: RUB,
         initbalance: 0,
         icon_id: 4,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CREDIT_CARD,
         name: 'Account 3',
         curr_id: USD,
         initbalance: 100,
@@ -162,12 +189,14 @@ const createMultipleInvalid = async () => {
         [null],
         [null, null],
         [{
+            type: ACCOUNT_TYPE_OTHER,
             name: '',
             curr_id: USD,
             initbalance: 10.5,
             icon_id: 5,
             flags: 0,
         }, {
+            type: ACCOUNT_TYPE_OTHER,
             name: 'Account 3',
             curr_id: 999,
             initbalance: 100,
@@ -175,6 +204,7 @@ const createMultipleInvalid = async () => {
             flags: 0,
         }],
         [{
+            type: ACCOUNT_TYPE_CASH,
             name: 'Account 4',
             curr_id: RUB,
             initbalance: 0,
@@ -233,6 +263,7 @@ const updateWithChainedRequest = async () => {
 
     const data = [{
         id: ACC_CHAINED_RUB,
+        type: ACCOUNT_TYPE_CREDIT,
         name: 'Acc chain',
         curr_id: RUB,
         initbalance: 101,

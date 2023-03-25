@@ -16,8 +16,35 @@ import { api } from './api.js';
 import { SortableList } from './SortableList.js';
 import { App } from '../Application.js';
 import { getCurrencyPrecision } from './import.js';
+import { __ } from './locale.js';
 
 export const ACCOUNT_HIDDEN = 1;
+
+/** Account types */
+export const ACCOUNT_TYPE_OTHER = 0;
+export const ACCOUNT_TYPE_CASH = 1;
+export const ACCOUNT_TYPE_DEBIT_CARD = 2;
+export const ACCOUNT_TYPE_CREDIT_CARD = 3;
+export const ACCOUNT_TYPE_CREDIT = 4;
+export const ACCOUNT_TYPE_DEPOSIT = 5;
+
+/** Account type names map */
+export const accountTypes = {
+    [ACCOUNT_TYPE_OTHER]: 'ACCOUNT_TYPE_OTHER',
+    [ACCOUNT_TYPE_CASH]: 'ACCOUNT_TYPE_CASH',
+    [ACCOUNT_TYPE_DEBIT_CARD]: 'ACCOUNT_TYPE_DEBIT_CARD',
+    [ACCOUNT_TYPE_CREDIT_CARD]: 'ACCOUNT_TYPE_CREDIT_CARD',
+    [ACCOUNT_TYPE_CREDIT]: 'ACCOUNT_TYPE_CREDIT',
+    [ACCOUNT_TYPE_DEPOSIT]: 'ACCOUNT_TYPE_DEPOSIT',
+};
+
+/** Returns string for account type name */
+export const getAccountTypeName = (value) => {
+    const type = parseInt(value, 10);
+    assert.isString(accountTypes[type], `Invalid account type: ${value}`);
+
+    return __(accountTypes[type], App.view.locale);
+};
 
 export class AccountsList extends SortableList {
     /** Apply transaction to accounts */

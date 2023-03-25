@@ -1,5 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
+import { ACCOUNT_TYPE_OTHER } from '../../../model/AccountsList.js';
 import {
     EXPENSE,
     INCOME,
@@ -20,12 +21,14 @@ const prepareTests = async () => {
         App.scenario.API_USER_ACC_RUB,
         App.scenario.API_USER_ACC_USD,
     ] = await App.scenario.runner.runGroup(AccountApiTests.create, [{
+        type: ACCOUNT_TYPE_OTHER,
         name: 'RUB',
         curr_id: RUB,
         initbalance: 100.1,
         icon_id: 5,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_OTHER,
         name: 'USD',
         curr_id: USD,
         initbalance: 50,

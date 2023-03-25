@@ -1,5 +1,11 @@
 import { App } from '../../Application.js';
-import { ACCOUNT_HIDDEN } from '../../model/AccountsList.js';
+import {
+    ACCOUNT_HIDDEN,
+    ACCOUNT_TYPE_CASH,
+    ACCOUNT_TYPE_CREDIT,
+    ACCOUNT_TYPE_DEBIT_CARD,
+    ACCOUNT_TYPE_OTHER,
+} from '../../model/AccountsList.js';
 import { api } from '../../model/api.js';
 
 export const createAccounts = async () => {
@@ -11,42 +17,49 @@ export const createAccounts = async () => {
     } = App.scenario;
 
     const accList = [{
+        type: ACCOUNT_TYPE_OTHER,
         name: 'ACC_3',
         curr_id: RUB,
         initbalance: '500.99',
         icon_id: 2,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CASH,
         name: 'ACC_RUB',
         curr_id: RUB,
         initbalance: '500.99',
         icon_id: 5,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CASH,
         name: 'ACC_USD',
         curr_id: USD,
         initbalance: '500.99',
         icon_id: 4,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CASH,
         name: 'ACC_EUR',
         curr_id: EUR,
         initbalance: '10000.99',
         icon_id: 3,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'CARD_RUB',
         curr_id: RUB,
         initbalance: '35000.40',
         icon_id: 3,
         flags: 0,
     }, {
+        type: ACCOUNT_TYPE_CREDIT,
         name: 'HIDDEN_ACC',
         curr_id: RUB,
         initbalance: '100',
         icon_id: 0,
         flags: ACCOUNT_HIDDEN,
     }, {
+        type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'ACC_BTC',
         curr_id: BTC,
         initbalance: '0.005746',

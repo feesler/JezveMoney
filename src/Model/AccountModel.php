@@ -11,6 +11,13 @@ use function JezveMoney\Core\inSetCondition;
 
 define("ACCOUNT_HIDDEN", 1);
 
+define("ACCOUNT_TYPE_OTHER", 0);
+define("ACCOUNT_TYPE_CASH", 1);
+define("ACCOUNT_TYPE_DEBIT_CARD", 2);
+define("ACCOUNT_TYPE_CREDIT_CARD", 3);
+define("ACCOUNT_TYPE_CREDIT", 4);
+define("ACCOUNT_TYPE_DEPOSIT", 5);
+
 /**
  * Accounts model
  */
@@ -20,6 +27,15 @@ class AccountModel extends CachedTable
 
     private static $user_id = 0;
     private static $owner_id = 0;
+
+    private static $availTypes = [
+        ACCOUNT_TYPE_OTHER,
+        ACCOUNT_TYPE_CASH,
+        ACCOUNT_TYPE_DEBIT_CARD,
+        ACCOUNT_TYPE_CREDIT_CARD,
+        ACCOUNT_TYPE_CREDIT,
+        ACCOUNT_TYPE_DEPOSIT,
+    ];
 
     protected $tbl_name = "accounts";
     protected $currMod = null;
@@ -78,7 +94,7 @@ class AccountModel extends CachedTable
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = ["owner_id", "name", "initbalance", "curr_id", "icon_id", "flags"];
+        $avFields = ["owner_id", "type", "name", "initbalance", "curr_id", "icon_id", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
@@ -90,6 +106,13 @@ class AccountModel extends CachedTable
             $res["owner_id"] = intval($params["owner_id"]);
             if (!$res["owner_id"]) {
                 throw new \Error("Invalid owner_id specified");
+            }
+        }
+
+        if (isset($params["type"])) {
+            $res["type"] = intval($params["type"]);
+            if (!in_array($res["type"], self::$availTypes)) {
+                throw new \Error("Invalid type specified");
             }
         }
 
@@ -523,6 +546,7 @@ class AccountModel extends CachedTable
         }
 
         $createRes = $this->create([
+            "type" => 0,
             "owner_id" => $person_id,
             "name" => "acc_" . $person_id . "_" . $curr_id,
             "initbalance" => 0.0,
@@ -716,6 +740,7 @@ class AccountModel extends CachedTable
      * @param array $params array of options:
      *     - 'visibility' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
      *     - 'owner' => (string|int) - select accounts by owner. Possible values: "all", "user" or (int) for id
+     *     - 'type' => (int) - select accounts by type
      *     - 'sort' => (string) - sort result array. Possible value: "visibility"
      *
      * @return AccountItem[]
@@ -731,6 +756,7 @@ class AccountModel extends CachedTable
         $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
         $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
         $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
+        $typeFilter = (isset($params["type"]) && is_numeric($params["type"])) ? intval($params["type"]) : null;
         $person_id = (isset($params["owner"]) && is_numeric($params["owner"])) ? intval($params["owner"]) : 0;
         if ($person_id) {
             $includePersons = true;
@@ -755,6 +781,9 @@ class AccountModel extends CachedTable
                 continue;
             }
             if (!$includePersons && $item->owner_id != self::$owner_id) {
+                continue;
+            }
+            if (!is_null($typeFilter) && $item->type != $typeFilter) {
                 continue;
             }
             $hidden = $this->isHidden($item);
@@ -797,7 +826,8 @@ class AccountModel extends CachedTable
      * Returns count of accounts
      *
      * @param array $params array of options:
-     *     - 'type' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'visibility' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'type' => (int) - select accounts by type
      *     - 'full' => (bool) - include person accounts, default is false
      *
      * @return int
@@ -811,9 +841,10 @@ class AccountModel extends CachedTable
         }
 
         $includePersons = (isset($params["full"]) && $params["full"] == true);
-        $requestedType = isset($params["type"]) ? $params["type"] : "visible";
-        $includeVisible = in_array($requestedType, ["all", "visible"]);
-        $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $requestedVisibility = isset($params["visibility"]) ? $params["visibility"] : "visible";
+        $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
+        $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
+        $typeFilter = (isset($params["type"]) && is_numeric($params["type"])) ? intval($params["type"]) : 0;
 
         foreach ($this->cache as $item) {
             if (!$includePersons && $item->owner_id != self::$owner_id) {
@@ -821,6 +852,9 @@ class AccountModel extends CachedTable
             }
             $hidden = $this->isHidden($item);
             if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden)) {
+                continue;
+            }
+            if (!is_null($typeFilter) && $item->type != $typeFilter) {
                 continue;
             }
 

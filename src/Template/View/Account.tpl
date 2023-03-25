@@ -19,6 +19,11 @@
 
                             <div id="tileField" class="form-row"></div>
 
+                            <div id="typeField" class="field form-row">
+                                <label for="type" class="field__title"><?= __("ACCOUNT_TYPE") ?></label>
+                                <select id="type" name="type"></select>
+                            </div>
+
                             <div id="iconField" class="field form-row">
                                 <label class="field__title"><?= __("ACCOUNT_ICON") ?></label>
                             </div>

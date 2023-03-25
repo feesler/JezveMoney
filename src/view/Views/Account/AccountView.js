@@ -19,6 +19,7 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 
 import { IconList } from '../../js/model/IconList.js';
+import { accountTypes } from '../../js/model/Account.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -97,6 +98,16 @@ class AccountView extends View {
         });
         this.tileField.append(this.tile.elem);
 
+        this.typeSelect = DropDown.create({
+            elem: 'type',
+            onItemSelect: (o) => this.onTypeSelect(o),
+            className: 'dd_fullwidth',
+            data: Object.keys(accountTypes).map((type) => ({
+                id: type,
+                title: accountTypes[type],
+            })),
+        });
+
         this.iconSelect = IconSelect.create({
             className: 'dd_fullwidth',
             onItemSelect: (o) => this.onIconSelect(o),
@@ -136,6 +147,15 @@ class AccountView extends View {
         }
 
         this.subscribeToStore(this.store);
+    }
+
+    /** Type select event handler */
+    onTypeSelect(obj) {
+        if (!obj) {
+            return;
+        }
+
+        this.store.dispatch(actions.changeType(obj.id));
     }
 
     /** Icon select event handler */
@@ -210,6 +230,7 @@ class AccountView extends View {
 
         const { data, original } = state;
         const account = {
+            type: data.type,
             name: data.name,
             initbalance: data.fInitBalance,
             curr_id: data.curr_id,
@@ -281,6 +302,11 @@ class AccountView extends View {
             throw new Error('Invalid state');
         }
 
+        const currencyObj = window.app.model.currency.getItem(state.data.curr_id);
+        if (!currencyObj) {
+            throw new Error(__('ERR_CURR_NOT_FOUND'));
+        }
+
         // Render account tile
         const balance = state.original.balance
             + state.data.fInitBalance - state.original.initbalance;
@@ -299,13 +325,9 @@ class AccountView extends View {
             },
         }));
 
-        // Currency sign
-        const currencyObj = window.app.model.currency.getItem(state.data.curr_id);
-        if (!currencyObj) {
-            throw new Error(__('ERR_CURR_NOT_FOUND'));
-        }
-
-        this.currencySign.textContent = currencyObj.sign;
+        // Type select
+        this.typeSelect.setSelection(state.data.type);
+        this.typeSelect.enable(!state.submitStarted);
 
         // Name input
         window.app.setValidation('name-inp-block', (state.validation.name === true));
@@ -329,6 +351,8 @@ class AccountView extends View {
         // Currency select
         this.currencySelect.setSelection(state.data.curr_id);
         this.currencySelect.enable(!state.submitStarted);
+        // Currency sign
+        this.currencySign.textContent = currencyObj.sign;
 
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);

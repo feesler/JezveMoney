@@ -7,6 +7,7 @@ class AccountItem
     public $id = 0;
     public $user_id = 0;
     public $owner_id = 0;
+    public $type = 0;
     public $name = null;
     public $curr_id = 0;
     public $initbalance = 0;
@@ -33,6 +34,7 @@ class AccountItem
         $res = new static();
         $res->id = intval($row["id"]);
         $res->user_id = intval($row["user_id"]);
+        $res->type = intval($row["type"]);
         $res->name = $row["name"];
         $res->owner_id = intval($row["owner_id"]);
         $res->curr_id = intval($row["curr_id"]);

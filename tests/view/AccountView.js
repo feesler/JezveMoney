@@ -15,6 +15,7 @@ import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
+import { accountTypes, getAccountTypeName } from '../model/AccountsList.js';
 
 /** Account view class */
 export class AccountView extends AppView {
@@ -42,6 +43,8 @@ export class AccountView extends AppView {
             res.id = parseInt(await prop(hiddenEl, 'value'), 10);
             assert(res.id, 'Wrong account id');
         }
+
+        res.typeDropDown = await DropDown.createFromChild(this, await query('#type'));
 
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
@@ -77,6 +80,9 @@ export class AccountView extends AppView {
             res.id = cont.id;
         }
 
+        // Type
+        this.setModelType(cont.typeDropDown.value, res);
+
         // Name
         res.name = cont.name.content.value;
         res.nameTyped = this.nameTyped;
@@ -107,6 +113,15 @@ export class AccountView extends AppView {
         return res;
     }
 
+    setModelType(value, model = this.model) {
+        const res = model;
+
+        res.type = parseInt(value, 10);
+        assert.isString(accountTypes[res.type], `Invalid account type: ${res.type}`);
+
+        return res;
+    }
+
     setModelCurrency(value, model = this.model) {
         const res = model;
 
@@ -132,8 +147,8 @@ export class AccountView extends AppView {
     setExpectedAccount(account) {
         this.origAccount = copyObject(account);
 
+        this.setModelType(account.type);
         this.model.name = account.name.toString();
-
         this.setModelCurrency(account.curr_id);
 
         this.model.initbalance = account.initbalance.toString();
@@ -147,6 +162,7 @@ export class AccountView extends AppView {
 
     getExpectedAccount(model = this.model) {
         const res = {
+            type: model.type,
             name: model.name,
             initbalance: model.fInitBalance,
             curr_id: model.curr_id,
@@ -188,6 +204,10 @@ export class AccountView extends AppView {
             tile: accTile,
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
+            typeDropDown: {
+                textValue: getAccountTypeName(model.type),
+                visible: true,
+            },
             currDropDown: {
                 textValue: model.currObj.formatName(this.locale),
                 visible: true,
@@ -276,6 +296,17 @@ export class AccountView extends AppView {
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.currDropDown.setSelection(val));
+        return this.checkState();
+    }
+
+    async changeType(val) {
+        const type = parseInt(val, 10);
+        assert.isString(accountTypes[type], `Invalid account type: ${val}`);
+
+        this.model.type = type;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.typeDropDown.setSelection(val));
         return this.checkState();
     }
 
