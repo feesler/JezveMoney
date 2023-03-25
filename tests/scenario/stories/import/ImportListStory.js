@@ -44,6 +44,7 @@ export class ImportListStory extends TestStory {
         await this.del();
         await this.submit();
         await this.stateLoop();
+        await this.currencyPrecision();
 
         await this.submitError();
         await this.noAccounts();
@@ -52,10 +53,10 @@ export class ImportListStory extends TestStory {
     async create() {
         setBlock('Add item', 2);
 
-        await ImportTests.addItem(
+        await ImportTests.addItem([
             { action: 'inputDestAmount', data: '1' },
             { action: 'changeCategory', data: App.scenario.TRANSPORT_CATEGORY },
-        );
+        ]);
 
         setBlock('Save item', 2);
         await ImportTests.saveItem();
@@ -111,9 +112,9 @@ export class ImportListStory extends TestStory {
 
         await ImportTests.uploadFile(largeFile);
         await ImportTests.submitUploaded(largeFile);
-        await ImportTests.createItemAndSave(
+        await ImportTests.createItemAndSave([
             { action: 'inputDestAmount', data: '1' },
-        );
+        ]);
         await ImportTests.goToPrevPage(); // page 2
 
         setBlock('Update item on 2nd page', 2);
@@ -231,10 +232,10 @@ export class ImportListStory extends TestStory {
         await ImportTests.submit();
 
         setBlock('Verify validation is resetted after close dialog', 2);
-        await ImportTests.createItemAndSave(
+        await ImportTests.createItemAndSave([
             { action: 'inputDestAmount', data: '' },
             { action: 'inputDate', data: '' },
-        );
+        ]);
         await ImportTests.cancelItem();
         await ImportTests.addItem();
         await ImportTests.cancelItem();
@@ -476,15 +477,59 @@ export class ImportListStory extends TestStory {
         await ImportTests.submit();
     }
 
+    async currencyPrecision() {
+        setBlock('Trim amount value according to precision of selected currency', 1);
+
+        const {
+            USD,
+            BTC,
+            ACC_3,
+            ACC_RUB,
+            ACC_USD,
+            ACC_BTC,
+        } = App.scenario;
+
+        setBlock('Update on change currency', 2);
+        await ImportTests.createItemAndSave([
+            { action: 'changeDestCurrency', data: BTC },
+            { action: 'inputDestAmount', data: '0.12345678' },
+            { action: 'inputSourceAmount', data: '100' },
+            { action: 'changeDestCurrency', data: USD },
+            { action: 'inputSourceAmount', data: '200' },
+            { action: 'changeDestCurrency', data: BTC },
+            { action: 'inputSourceAmount', data: '300' },
+            { action: 'inputDestAmount', data: '0.12345678' },
+        ]);
+
+        setBlock('Update on change main account', 2);
+        await ImportTests.changeMainAccount(ACC_USD);
+        await ImportTests.changeMainAccount(ACC_BTC);
+        await ImportTests.changeMainAccount(ACC_3);
+
+        setBlock('Update on change transfer account', 2);
+        await ImportTests.updateItemAndSave({
+            pos: 0,
+            action: [
+                { action: 'changeType', data: 'transfer_in' },
+                { action: 'changeTransferAccount', data: ACC_BTC },
+                { action: 'inputDestAmount', data: '0.12345678' },
+                { action: 'changeTransferAccount', data: ACC_USD },
+                { action: 'changeTransferAccount', data: ACC_RUB },
+            ],
+        });
+
+        await ImportTests.deleteAllItems();
+    }
+
     async submitError() {
         setBlock('Handling submit errors', 2);
 
         const { ACC_3 } = App.scenario;
 
         await ImportTests.changeMainAccount(ACC_3);
-        await ImportTests.createItemAndSave(
+        await ImportTests.createItemAndSave([
             { action: 'inputDestAmount', data: '1' },
-        );
+        ]);
         // Remove selected account
         await api.account.del({ id: ACC_3 });
 

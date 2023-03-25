@@ -1,11 +1,32 @@
-import { copyObject, checkDate } from 'jezvejs';
-import { dateStringToTime, fixFloat, __ } from '../utils.js';
+import { copyObject, checkDate, trimDecimalPlaces } from 'jezvejs';
+import {
+    dateStringToTime,
+    fixFloat,
+    getCurrencyPrecision,
+    __,
+} from '../utils.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from './Transaction.js';
+
+/** Trims values of amounts according to currencies */
+const trimAmounts = (state) => {
+    const res = state;
+
+    res.sourceAmount = trimDecimalPlaces(
+        state.sourceAmount,
+        getCurrencyPrecision(state.srcCurrId),
+    );
+    res.destAmount = trimDecimalPlaces(
+        state.destAmount,
+        getCurrencyPrecision(state.destCurrId),
+    );
+
+    return res;
+};
 
 export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
 export const transTypeMap = {
@@ -437,7 +458,8 @@ export class ImportTransaction {
             }
         }
 
-        return new ImportTransaction(state);
+        const res = trimAmounts(state);
+        return new ImportTransaction(res);
     }
 
     /** Set source currency */
@@ -455,10 +477,12 @@ export class ImportTransaction {
             return this;
         }
 
-        return new ImportTransaction({
+        const state = trimAmounts({
             ...copyObject(this),
             srcCurrId,
         });
+
+        return new ImportTransaction(state);
     }
 
     /** Set destination currency */
@@ -475,10 +499,12 @@ export class ImportTransaction {
             return this;
         }
 
-        return new ImportTransaction({
+        const state = trimAmounts({
             ...copyObject(this),
             destCurrId,
         });
+
+        return new ImportTransaction(state);
     }
 
     /** Set main account */
@@ -548,7 +574,8 @@ export class ImportTransaction {
             }
         }
 
-        return new ImportTransaction(state);
+        const res = trimAmounts(state);
+        return new ImportTransaction(res);
     }
 
     /** Set transfer account */
@@ -580,7 +607,8 @@ export class ImportTransaction {
             state.srcCurrId = account.curr_id;
         }
 
-        return new ImportTransaction(state);
+        const res = trimAmounts(state);
+        return new ImportTransaction(res);
     }
 
     /** Set person */

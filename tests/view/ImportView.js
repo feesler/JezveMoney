@@ -65,7 +65,6 @@ export class ImportView extends AppView {
         this.transactionPopupId = '#transactionFormPopup';
         this.uploadPopupId = '#fileupload_popup';
         this.rulesPopupId = '#rules_popup';
-        this.originalItemData = null;
         this.items = [];
         this.formIndex = -1;
     }
@@ -1473,9 +1472,6 @@ export class ImportView extends AppView {
         const items = asArray(index);
         assert(items.length > 0, 'No items specified');
         items.sort();
-        if (items.includes(this.formIndex)) {
-            this.originalItemData = null;
-        }
 
         let removed = 0;
         for (const ind of items) {
@@ -1533,7 +1529,6 @@ export class ImportView extends AppView {
 
         this.items = [];
         this.formIndex = -1;
-        this.originalItemData = null;
         this.model.listMode = 'list';
         this.model.menuOpen = false;
         this.expectedState = this.getExpectedState();
@@ -1581,7 +1576,6 @@ export class ImportView extends AppView {
         if (resExpected) {
             this.items = [];
             this.formIndex = -1;
-            this.originalItemData = null;
         }
 
         const expected = this.getExpectedState();

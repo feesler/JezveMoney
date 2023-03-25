@@ -15,7 +15,7 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
-import { fixFloat, __ } from '../../../../js/utils.js';
+import { fixFloat, getCurrencyPrecision, __ } from '../../../../js/utils.js';
 import { transTypeMap, typeNames } from '../../../../js/model/ImportTransaction.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';
@@ -234,7 +234,6 @@ export class ImportTransactionForm extends Component {
         });
         this.srcAmountDecimalInput = DecimalInput.create({
             elem: this.srcAmountInp,
-            digits: 2,
             onInput: () => this.onSrcAmountInput(),
         });
 
@@ -283,7 +282,6 @@ export class ImportTransactionForm extends Component {
         });
         this.destAmountDecimalInput = DecimalInput.create({
             elem: this.destAmountInp,
-            digits: 2,
             onInput: () => this.onDestAmountInput(),
         });
 
@@ -709,6 +707,11 @@ export class ImportTransactionForm extends Component {
         this.srcAmountInp.value = transaction.sourceAmount;
         this.srcAmountInp.placeholder = srcAmountLabel;
 
+        this.srcAmountDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: getCurrencyPrecision(transaction.srcCurrId),
+        }));
+
         this.enableSourceCurrency(isIncome);
         this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
         enable(this.srcCurrencyBtn, transaction.enabled);
@@ -731,6 +734,11 @@ export class ImportTransactionForm extends Component {
         enable(this.destAmountInp, transaction.enabled && showDestAmount);
         this.destAmountInp.value = transaction.destAmount;
         this.destAmountInp.placeholder = destAmountLabel;
+
+        this.destAmountDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: getCurrencyPrecision(transaction.destCurrId),
+        }));
 
         this.enableDestCurrency(isExpense);
         this.destCurrencyDropDown.enable(isExpense && transaction.enabled);

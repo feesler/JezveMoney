@@ -203,7 +203,12 @@ const handleNegative = (val, allowNegative) => {
 /** Trims string value of decimal to specified number of digits after decimal point */
 export const trimToDigitsLimit = (val, limit, allowNegative = true) => {
     const digits = digitsAfterPoint(val);
-    const trimmed = (digits > limit) ? val.substring(0, val.length - (digits - limit)) : val;
+    const length = (digits === 0) ? 0 : (digits + 1);
+    const diff = (limit === 0) ? length : (digits - limit);
+    const trimmed = (diff > 0)
+        ? val.substring(0, val.length - diff)
+        : val;
+
     return handleNegative(trimmed, allowNegative);
 };
 
