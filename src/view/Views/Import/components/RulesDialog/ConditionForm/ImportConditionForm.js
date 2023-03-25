@@ -13,7 +13,7 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../../js/model/ImportCondition.js';
-import { __ } from '../../../../../js/utils.js';
+import { MAX_PRECISION, __ } from '../../../../../js/utils.js';
 import './ImportConditionForm.scss';
 
 /** CSS classes */
@@ -21,8 +21,8 @@ const FORM_CLASS = 'cond-form';
 const CONTAINER_CLASS = 'cond-form__container';
 const PROP_FIELD_CLASS = 'property-field';
 const OPERATOR_FILED_CLASS = 'operator-field';
-const TEXT_FIELD_CLASS = 'text-field';
-const AMOUNT_FIELD_CLASS = 'amount-field';
+const TEXT_FIELD_CLASS = 'input stretch-input text-field';
+const AMOUNT_FIELD_CLASS = 'input stretch-input amount-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
 const TEMPLATE_FIELD_CLASS = 'tpl-field';
 const CURRENCY_FIELD_CLASS = 'currency-field';
@@ -102,16 +102,16 @@ export class ImportConditionForm extends Component {
 
         // Create amount input element
         this.amountInput = createElement('input', {
-            props: { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' },
+            props: { className: AMOUNT_FIELD_CLASS, type: 'text' },
         });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            digits: 2,
+            digits: MAX_PRECISION,
             onInput: () => this.onValueChange(),
         });
         // Create text value input element
         this.valueInput = createElement('input', {
-            props: { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
+            props: { className: TEXT_FIELD_CLASS, type: 'text' },
             events: { input: () => this.onValueChange() },
         });
 

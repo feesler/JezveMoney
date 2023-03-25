@@ -1,18 +1,10 @@
 import { assert, test } from 'jezve-test';
 import {
-    fixFloat,
     amountFix,
     correct,
     normalize,
     isValidValue,
 } from '../../src/view/js/utils.js';
-
-export const fixFloatTest = async (descr, value, result) => {
-    await test(descr, () => {
-        assert.equal(fixFloat(value), result);
-        return true;
-    });
-};
 
 export const amountFixTest = async (descr, value, result) => {
     await test(descr, () => {

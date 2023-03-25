@@ -12,7 +12,7 @@
     <form action="<?= BASEURL ?>api/profile/changename" method="post">
         <div class="std_margin">
             <label for="change_name">Name</label>
-            <input id="change_name" class="stretch-input" name="name" type="text">
+            <input id="change_name" class="input stretch-input" name="name" type="text">
         </div>
 
         <div class="form-controls">
@@ -26,11 +26,11 @@
     <form action="<?= BASEURL ?>api/profile/changepass" method="post">
         <div class="std_margin">
             <label for="change_pass_current">Current password</label>
-            <input id="change_pass_current" class="stretch-input" name="current" type="text">
+            <input id="change_pass_current" class="input stretch-input" name="current" type="text">
         </div>
         <div class="std_margin">
             <label for="change_pass_new">New password</label>
-            <input id="change_pass_new" class="stretch-input" name="new" type="text">
+            <input id="change_pass_new" class="input stretch-input" name="new" type="text">
         </div>
 
         <div class="form-controls">
@@ -44,11 +44,11 @@
     <form action="<?= BASEURL ?>api/profile/updateSettings" method="post">
         <div class="std_margin">
             <label for="upd_settings_name">Settings name</label>
-            <input id="upd_settings_name" class="stretch-input" type="text">
+            <input id="upd_settings_name" class="input stretch-input" type="text">
         </div>
         <div class="std_margin">
             <label for="upd_settings_value">Value</label>
-            <input id="upd_settings_value" class="stretch-input" type="text">
+            <input id="upd_settings_value" class="input stretch-input" type="text">
         </div>
 
         <div class="form-controls">

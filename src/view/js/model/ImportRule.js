@@ -1,4 +1,5 @@
-import { fixFloat, __ } from '../utils.js';
+import { fixFloat } from 'jezvejs';
+import { __ } from '../utils.js';
 import { ListItem } from './ListItem.js';
 import {
     IMPORT_COND_OP_EQUAL,

@@ -8,6 +8,7 @@ class CurrencyItem
     public $name = null;
     public $code = null;
     public $sign = null;
+    public $precision = 0;
     public $flags = 0;
     public $createdate = 0;
     public $updatedate = 0;
@@ -30,6 +31,7 @@ class CurrencyItem
         $res->name = $row["name"];
         $res->code = $row["code"];
         $res->sign = $row["sign"];
+        $res->precision = intval($row["precision"]);
         $res->flags = intval($row["flags"]);
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);

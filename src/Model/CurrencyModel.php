@@ -9,6 +9,11 @@ use JezveMoney\App\Item\CurrencyItem;
 
 use function JezveMoney\Core\orJoin;
 
+const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
+const CURRENCY_FORMAT_TRAILING_ZEROS = 0x02;
+
+const MAX_PRECISION = 8;
+
 /**
  * Currency model
  */
@@ -84,6 +89,13 @@ class CurrencyModel extends CachedTable
             $res["sign"] = $this->dbObj->escape($params["sign"]);
             if (is_empty($res["sign"])) {
                 throw new \Error("Invalid sign specified");
+            }
+        }
+
+        if (isset($params["precision"])) {
+            $res["precision"] = intval($params["precision"]);
+            if ($res["precision"] < 0 || $res["precision"] > MAX_PRECISION) {
+                throw new \Error("Invalid precision value");
             }
         }
 
@@ -224,8 +236,14 @@ class CurrencyModel extends CachedTable
             return null;
         }
 
-        $sfmt = (($currObj->flags) ? ($currObj->sign . " %s") : ("%s " . $currObj->sign));
-        return valFormat($sfmt, $value);
+        $signBeforeValue = ($currObj->flags & CURRENCY_SIGN_BEFORE_VALUE) === CURRENCY_SIGN_BEFORE_VALUE;
+        $trailingZeros = ($currObj->flags & CURRENCY_FORMAT_TRAILING_ZEROS) === CURRENCY_FORMAT_TRAILING_ZEROS;
+
+        $valueFmt = valFormat($value, $currObj->precision, $trailingZeros);
+
+        return ($signBeforeValue)
+            ? ($currObj->sign . " " . $valueFmt)
+            : ($valueFmt . " " . $currObj->sign);
     }
 
     /**

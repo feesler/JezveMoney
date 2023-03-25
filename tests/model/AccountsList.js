@@ -15,6 +15,7 @@ import {
 import { api } from './api.js';
 import { SortableList } from './SortableList.js';
 import { App } from '../Application.js';
+import { getCurrencyPrecision } from './import.js';
 
 export const ACCOUNT_HIDDEN = 1;
 
@@ -30,14 +31,16 @@ export class AccountsList extends SortableList {
             ? res.find((item) => item.id === transaction.src_id)
             : null;
         if (srcAcc) {
-            srcAcc.balance = normalize(srcAcc.balance - transaction.src_amount);
+            const precision = getCurrencyPrecision(srcAcc.curr_id);
+            srcAcc.balance = normalize(srcAcc.balance - transaction.src_amount, precision);
         }
 
         const destAcc = (transaction.dest_id)
             ? res.find((item) => item.id === transaction.dest_id)
             : null;
         if (destAcc) {
-            destAcc.balance = normalize(destAcc.balance + transaction.dest_amount);
+            const precision = getCurrencyPrecision(destAcc.curr_id);
+            destAcc.balance = normalize(destAcc.balance + transaction.dest_amount, precision);
         }
 
         return res;
@@ -54,14 +57,16 @@ export class AccountsList extends SortableList {
             ? res.find((item) => item.id === transaction.src_id)
             : null;
         if (srcAcc) {
-            srcAcc.balance = normalize(srcAcc.balance + transaction.src_amount);
+            const precision = getCurrencyPrecision(srcAcc.curr_id);
+            srcAcc.balance = normalize(srcAcc.balance + transaction.src_amount, precision);
         }
 
         const destAcc = (transaction.dest_id)
             ? res.find((item) => item.id === transaction.dest_id)
             : null;
         if (destAcc) {
-            destAcc.balance = normalize(destAcc.balance - transaction.dest_amount);
+            const precision = getCurrencyPrecision(destAcc.curr_id);
+            destAcc.balance = normalize(destAcc.balance - transaction.dest_amount, precision);
         }
 
         return res;

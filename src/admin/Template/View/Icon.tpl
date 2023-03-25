@@ -46,12 +46,12 @@
 
     <div class="field form-row">
         <label for="icon_name" class="field__title">Name</label>
-        <input id="icon_name" class="stretch-input" name="name" type="text">
+        <input id="icon_name" class="input stretch-input" name="name" type="text">
     </div>
 
     <div class="field form-row">
         <label for="icon_file" class="field__title">File name</label>
-        <input id="icon_file" class="stretch-input" name="file" type="text">
+        <input id="icon_file" class="input stretch-input" name="file" type="text">
     </div>
 
     <div id="admin_block" class="field form-row">

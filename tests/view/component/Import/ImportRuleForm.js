@@ -24,7 +24,7 @@ import {
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
-import { trimToDigitsLimit } from '../../../common.js';
+import { MAX_PRECISION, trimToDigitsLimit } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 
@@ -262,10 +262,11 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async openConditions() {
-        if (this.content.conditionsList.collapsed) {
-            await this.content.conditionsList.toggle();
-            await this.parse();
+        if (!this.content.conditionsList.collapsed) {
+            return;
         }
+
+        await this.performAction(() => this.content.conditionsList.toggle());
     }
 
     /** Search for first condition field type not used in rule */
@@ -402,8 +403,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openConditions();
 
-        await this.content.conditionsList.create();
-        await this.parse();
+        await this.performAction(() => this.content.conditionsList.create());
 
         return this.checkState();
     }
@@ -418,10 +418,10 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openConditions();
 
-        const item = this.content.conditionsList.items[index];
-
-        await item.clickDelete();
-        await this.parse();
+        await this.performAction(() => {
+            const item = this.content.conditionsList.items[index];
+            return item.clickDelete();
+        });
 
         return this.checkState();
     }
@@ -497,7 +497,7 @@ export class ImportRuleForm extends TestComponent {
         assert(conditionModel.state === name, `Invalid state ${conditionModel.state} expected ${name}`);
 
         if (name === 'amount') {
-            conditionModel[name] = trimToDigitsLimit(value, 2);
+            conditionModel[name] = trimToDigitsLimit(value, MAX_PRECISION);
         } else {
             conditionModel[name] = value;
         }
@@ -578,10 +578,11 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async openActions() {
-        if (this.content.actionsList.collapsed) {
-            await this.content.actionsList.toggle();
-            await this.parse();
+        if (!this.content.actionsList.collapsed) {
+            return;
         }
+
+        await this.performAction(() => this.content.actionsList.toggle());
     }
 
     async addAction() {
@@ -596,8 +597,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openActions();
 
-        await this.content.actionsList.create();
-        await this.parse();
+        await this.performAction(() => this.content.actionsList.create());
 
         return this.checkState();
     }
@@ -622,10 +622,10 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openActions();
 
-        const item = this.content.actionsList.items[index];
-
-        await item.clickDelete();
-        await this.parse();
+        await this.performAction(() => {
+            const item = this.content.actionsList.items[index];
+            return item.clickDelete();
+        });
 
         return this.checkState();
     }
@@ -708,7 +708,7 @@ export class ImportRuleForm extends TestComponent {
 
         const actionModel = this.model.actions[ind];
         if (name === 'amount') {
-            actionModel[name] = trimToDigitsLimit(value, 2);
+            actionModel[name] = trimToDigitsLimit(value, MAX_PRECISION);
         } else {
             actionModel[name] = value;
         }

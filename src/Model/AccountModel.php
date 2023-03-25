@@ -209,9 +209,15 @@ class AccountModel extends CachedTable
 
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $item->curr_id);
 
+        $currObj = $this->currMod->getItem($item->curr_id);
+        if (!$currObj) {
+            throw new \Error("Currency not found");
+        }
+
         // get initial balance to calc difference
-        $diff = normalize($res["initbalance"] - $item->initbalance);
-        if (abs($diff) >= 0.01) {
+        $diff = normalize($res["initbalance"] - $item->initbalance, $currObj->precision);
+        $minDiff = pow(0.1, $currObj->precision);
+        if (abs($diff) >= $minDiff) {
             $this->balanceUpdated = true;
             $res["balance"] = $item->balance + $diff;
         } else {

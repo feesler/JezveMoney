@@ -12,6 +12,26 @@
 
                     <main>
                         <section class="settings-block">
+                            <header id="mainHeading" class="heading">
+                                <h2><?= __("SETTINGS_MAIN") ?></h2>
+                            </header>
+                            <div id="mainContainer">
+                                <div id="localeField" class="field form-row locale-field">
+                                    <label class="locale-field__label"><?= __("LANGUAGE") ?></label>
+                                    <select id="localeSelect"></select>
+                                </div>
+
+                                <div id="themeSwitchField" class="field form-row switch-field">
+                                    <span class="switch-field__label"><?= __("DARK_THEME") ?></span>
+                                    <label id="themeSwitch" class="switch">
+                                        <input type="checkbox" <?= checked($this->userTheme == DARK_THEME) ?>>
+                                        <div class="switch-slider"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="settings-block">
                             <header id="userCurrenciesHeading" class="heading">
                                 <h2><?= __("SETTINGS_CURRENCIES") ?></h2>
                                 <div class="heading-actions"></div>

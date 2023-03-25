@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.52.0",
+    "version": "1.53.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -9,7 +9,7 @@
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
-        "test-settings": "node ./tests/index.js settings",
+        "test-tr": "node ./tests/index.js transactions",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
@@ -72,14 +72,14 @@
         "npm-run-all": "^4.1.5",
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
-        "sass": "^1.59.3",
+        "sass": "^1.60.0",
         "sass-loader": "^13.2.1",
         "ssh2-sftp-client": "^9.0.4",
         "style-loader": "^2.0.0",
         "stylelint": "^14.16.1",
         "stylelint-config-prettier-scss": "^0.0.1",
         "stylelint-config-standard-scss": "^6.1.0",
-        "webpack": "^5.76.2",
+        "webpack": "^5.76.3",
         "webpack-cli": "^4.10.0",
         "webpack-manifest-plugin": "^5.0.0",
         "webpack-merge": "^5.8.0"
@@ -87,7 +87,7 @@
     "dependencies": {
         "@babel/runtime": "^7.21.0",
         "core-js": "^3.29.1",
-        "jezvejs": "^1.89.1",
+        "jezvejs": "^1.89.6",
         "whatwg-fetch": "^3.6.2"
     }
 }

@@ -28,7 +28,6 @@
   max-height: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  overflow: hidden;
   row-gap: 8px;
 
   .checkbox__label {
@@ -54,6 +53,14 @@
   flex-shrink: 0;
 }
 
+.account-field,
+.tpl-field,
+.currency-field,
+.amount-field,
+.text-field {
+  flex: 1 1 30px;
+}
+
 /* Controls container */
 .cond-form__controls {
   display: flex;
@@ -64,7 +71,6 @@
 /* Desktop */
 @media (min-width: 768px) {
   .cond-form__fields {
-    flex-flow: row nowrap;
     column-gap: 8px;
   }
 }

@@ -47,7 +47,7 @@
         <section id="templateForm" hidden>
             <div id="nameField" class="field form-row validation-block">
                 <label for="tplNameInp" class="field__title"><?= __("TEMPLATE_NAME") ?></label>
-                <input id="tplNameInp" class="stretch-input" type="text" autocomplete="off">
+                <input id="tplNameInp" class="input stretch-input" type="text" autocomplete="off">
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
             </div>
 

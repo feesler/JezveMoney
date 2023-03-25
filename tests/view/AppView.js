@@ -42,10 +42,6 @@ export class AppView extends TestView {
         await this.performAction(() => this.content.notification.close());
     }
 
-    async changeLocale(value) {
-        await navigation(() => this.content.header.selectLocale(value));
-    }
-
     async goToProfile() {
         assert(this.isUserLoggedIn(), 'User is not logged in');
 

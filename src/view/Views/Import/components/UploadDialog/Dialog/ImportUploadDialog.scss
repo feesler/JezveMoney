@@ -41,10 +41,6 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-
-  .input-group__btn {
-    padding: 6px 12px;
-  }
 }
 
 .upload-form__file {
@@ -75,9 +71,8 @@
   --btn-border-radius: var(--action-btn-border-radius);
   --btn-disabled-background: var(--accent-disabled-color);
   --btn-title-color: #ffffff;
+  --btn-padding: 0 24px;
 
-  height: var(--input-height);
-  padding: 6px 24px;
   margin: 0;
   white-space: nowrap;
 }
@@ -104,9 +99,8 @@
 
 /* Server address input group */
 .upload-form__browser .input-group {
-  .submit-btn,
-  .submit-btn:focus {
-    padding: 6px 12px;
+  .submit-btn {
+    --btn-padding: 0 12px;
   }
 }
 

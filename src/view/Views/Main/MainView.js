@@ -17,6 +17,7 @@ import { API } from '../../js/api/index.js';
 import {
     formatPersonDebts,
     formatValueShort,
+    getCurrencyPrecision,
     listData,
     normalize,
     __,
@@ -189,7 +190,7 @@ class MainView extends View {
         // Totals widget
         this.totalWidget = ge('totalWidget');
         if (this.totalWidget) {
-            this.totalList = createElement('div', {
+            this.totalList = createElement('ul', {
                 props: { className: 'total-list' },
             });
             this.totalWidget.append(this.totalList);
@@ -521,7 +522,8 @@ class MainView extends View {
             }
 
             const item = totals[account.curr_id];
-            item.balance = normalize(item.balance + account.balance);
+            const precision = getCurrencyPrecision(account.curr_id);
+            item.balance = normalize(item.balance + account.balance, precision);
         });
 
         const elems = Object.values(totals).map((item) => this.renderTotalsListItem(item));

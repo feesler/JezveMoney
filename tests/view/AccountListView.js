@@ -174,9 +174,6 @@ export class AccountListView extends AppView {
         const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

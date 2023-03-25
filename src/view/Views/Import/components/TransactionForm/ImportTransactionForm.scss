@@ -19,22 +19,6 @@
     gap: 12px;
   }
 
-  .stretch-input {
-    border-color: var(--input-border-color);
-  }
-
-  .stretch-input[disabled] {
-    color: var(--input-disabled-color);
-    -webkit-text-fill-color: var(--input-disabled-color);
-    border-color: var(--input-disabled-border);
-    background-color: var(--input-disabled-bg);
-  }
-
-  .stretch-input:focus {
-    border-color: var(--border-color-1);
-    background-color: var(--input-bg-color);
-  }
-
   /* Input field and label group */
   .field {
     max-width: 300px;

@@ -255,38 +255,23 @@ svg * {
   flex-flow: column nowrap;
 }
 
+/* Input */
+.input {
+  --input-font-size: 0.9rem;
+  --input-color: var(--main-text-color);
+  --input-bg: var(--input-bg-color);
+  --input-focus-color: var(--main-text-color);
+  --input-focus-bg: var(--input-bg-color);
+  --input-focus-border: var(--active-input-border-color);
+}
+
 /* Input control fills all parent width */
 .stretch-input {
-  display: flex;
-  flex-basis: 100%;
   width: 100%;
-  height: var(--input-height);
-  min-height: var(--input-height);
-  font-size: 0.9rem;
-  border-width: 1px;
-  border-style: solid;
-  padding: var(--input-padding);
-  border-radius: 5px;
-  color: var(--main-text-color);
-  border-color: var(--input-border-color);
-  background-color: var(--input-bg-color);
-}
-
-.stretch-input:focus {
-  border-color: var(--active-input-border-color);
-}
-
-.stretch-input[disabled] {
-  color: var(--input-disabled-color);
-  -webkit-text-fill-color: var(--input-disabled-color);
-  border-color: var(--input-disabled-border);
-  background-color: var(--input-disabled-bg);
 }
 
 /* Input group */
-.input-group,
-.rules-dialog .input-group,
-.import-form .input-group {
+.input-group {
   --ig-height: var(--input-height);
   --ig-border-color: var(--input-border-color);
   --ig-input-bg: var(--input-bg-color);
@@ -307,6 +292,12 @@ svg * {
   .input-group__btn,
   .input-group__text {
     font-size: 1rem;
+  }
+
+  .input-group__input,
+  .input-group__btn,
+  .input-group__text {
+    border-radius: 0;
   }
 
   .input-group__btn-title {
@@ -631,8 +622,7 @@ svg * {
   display: block;
 }
 
-.validation-block.invalid-block .stretch-input,
-.validation-block.invalid-block .input-group__input {
+.validation-block.invalid-block .input {
   border-color: var(--invalid-input-border-color);
 }
 

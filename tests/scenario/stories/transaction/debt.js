@@ -10,6 +10,7 @@ export const stateLoop = async () => {
         RUB,
         USD,
         EUR,
+        BTC,
         ACC_3,
         ACC_RUB,
         ACC_USD,
@@ -787,5 +788,14 @@ export const stateLoop = async () => {
     setBlock('Transition 136', 2);
     await TransactionTests.runActions([
         { action: 'swapSourceAndDest' },
+    ]);
+
+    // Test input values for precise currency
+    await TransactionTests.runActions([
+        { action: 'clickDestAmount' }, // move from State 15 to State 10
+        { action: 'changeSourceCurrency', data: BTC },
+        { action: 'inputSrcAmount', data: '0.12345678' },
+        { action: 'clickSrcResultBalance' },
+        { action: 'inputResBalance', data: '555.12345678' },
     ]);
 };

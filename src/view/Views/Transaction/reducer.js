@@ -20,6 +20,7 @@ import * as STATE from './stateId.js';
 export const calculateSourceResult = (state) => {
     const result = state;
     const { transaction } = result;
+    const precision = result.srcCurrency?.precision;
 
     const sourceAmount = transaction.src_amount;
     let sourceResult = result.form.fSourceResult;
@@ -29,16 +30,16 @@ export const calculateSourceResult = (state) => {
             return result;
         }
 
-        sourceResult = normalize(result.srcAccount.balance - sourceAmount);
+        sourceResult = normalize(result.srcAccount.balance - sourceAmount, precision);
     } else if (result.srcAccount && !transaction.noAccount) {
-        sourceResult = normalize(result.srcAccount.balance - sourceAmount);
+        sourceResult = normalize(result.srcAccount.balance - sourceAmount, precision);
     } else if (result.transaction.noAccount) {
         if (result.transaction.debtType) {
-            sourceResult = normalize(result.personAccount.balance - sourceAmount);
+            sourceResult = normalize(result.personAccount.balance - sourceAmount, precision);
         } else {
             const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            sourceResult = normalize(accBalance - sourceAmount);
+            sourceResult = normalize(accBalance - sourceAmount, precision);
         }
     }
 
@@ -54,6 +55,7 @@ export const calculateSourceResult = (state) => {
 export const calculateDestResult = (state) => {
     const result = state;
     const { transaction } = result;
+    const precision = result.destCurrency?.precision;
 
     const destAmount = transaction.dest_amount;
     let destResult = result.form.fDestResult;
@@ -63,16 +65,16 @@ export const calculateDestResult = (state) => {
             return result;
         }
 
-        destResult = normalize(result.destAccount.balance + destAmount);
+        destResult = normalize(result.destAccount.balance + destAmount, precision);
     } else if (result.destAccount && !transaction.noAccount) {
-        destResult = normalize(result.destAccount.balance + destAmount);
+        destResult = normalize(result.destAccount.balance + destAmount, precision);
     } else if (transaction.noAccount) {
         if (transaction.debtType) {
             const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            destResult = normalize(accBalance + destAmount);
+            destResult = normalize(accBalance + destAmount, precision);
         } else {
-            destResult = normalize(result.personAccount.balance + destAmount);
+            destResult = normalize(result.personAccount.balance + destAmount, precision);
         }
     }
 
@@ -87,8 +89,9 @@ export const calculateDestResult = (state) => {
 /** Set new source amount and calculate source result balance */
 const setStateSourceAmount = (state, amount) => {
     const result = state;
+    const precision = result.srcCurrency?.precision;
 
-    const sourceAmount = normalize(amount);
+    const sourceAmount = normalize(amount, precision);
     result.transaction.src_amount = sourceAmount;
     result.form.sourceAmount = amount;
 
@@ -98,8 +101,9 @@ const setStateSourceAmount = (state, amount) => {
 /** Set new destination amount and calculate destination result balance */
 const setStateDestAmount = (state, amount) => {
     const result = state;
+    const precision = result.destCurrency?.precision;
 
-    const destAmount = normalize(amount);
+    const destAmount = normalize(amount, precision);
     result.transaction.dest_amount = destAmount;
     result.form.destAmount = amount;
 
@@ -139,23 +143,25 @@ const setStateNextDestAccount = (state, accountId) => {
 const calculateSourceAmountByExchange = (state) => {
     const { useBackExchange, fExchange, fBackExchange } = state.form;
     const destination = state.transaction.dest_amount;
+    const precision = state.srcCurrency?.precision;
 
     if (useBackExchange) {
-        return normalize(destination * fBackExchange);
+        return normalize(destination * fBackExchange, precision);
     }
 
-    return (fExchange === 0) ? 0 : normalize(destination / fExchange);
+    return (fExchange === 0) ? 0 : normalize(destination / fExchange, precision);
 };
 
 const calculateDestAmountByExchange = (state) => {
     const { useBackExchange, fExchange, fBackExchange } = state.form;
     const source = state.transaction.src_amount;
+    const precision = state.destCurrency?.precision;
 
     if (useBackExchange) {
-        return (fBackExchange === 0) ? 0 : normalize(source / fBackExchange);
+        return (fBackExchange === 0) ? 0 : normalize(source / fBackExchange, precision);
     }
 
-    return normalize(source * fExchange);
+    return normalize(source * fExchange, precision);
 };
 
 export const calculateExchange = (state) => {
@@ -420,8 +426,6 @@ const slice = createSlice({
                 newState.destCurrency = srcCurrency;
             }
 
-            updateStateExchange(newState);
-
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
             if (state.isDiff && !newState.isDiff) {
                 newState.id = stateTransition(state, {
@@ -465,9 +469,9 @@ const slice = createSlice({
                 const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
                 newState.id = stateTransition(state, stateMap);
             }
-
-            updateStateExchange(newState);
         }
+
+        updateStateExchange(newState);
 
         return newState;
     },
@@ -506,8 +510,6 @@ const slice = createSlice({
                 newState.transaction.src_curr = destAccount.curr_id;
                 newState.srcCurrency = destCurrency;
             }
-
-            updateStateExchange(newState);
 
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
             if (state.isDiff && !newState.isDiff) {
@@ -550,9 +552,9 @@ const slice = createSlice({
                 const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
                 newState.id = stateTransition(state, stateMap);
             }
-
-            updateStateExchange(newState);
         }
+
+        updateStateExchange(newState);
 
         return newState;
     },
@@ -894,8 +896,9 @@ const slice = createSlice({
                 sourceAmount: value,
             },
         };
+        const precision = state.srcCurrency?.precision;
 
-        const newValue = normalize(value);
+        const newValue = normalize(value, precision);
         if (newState.transaction.src_amount === newValue) {
             return newState;
         }
@@ -929,8 +932,9 @@ const slice = createSlice({
                 destAmount: value,
             },
         };
+        const precision = state.destCurrency?.precision;
 
-        const newValue = normalize(value);
+        const newValue = normalize(value, precision);
         if (newState.transaction.dest_amount === newValue) {
             return newState;
         }
@@ -964,14 +968,15 @@ const slice = createSlice({
                 sourceResult: value,
             },
         };
+        const precision = state.srcCurrency?.precision;
 
-        const newValue = normalize(value);
+        const newValue = normalize(value, precision);
         if (newState.form.fSourceResult === newValue) {
             return newState;
         }
 
         newState.form.fSourceResult = newValue;
-        const srcAmount = normalize(newState.srcAccount.balance - newValue);
+        const srcAmount = normalize(newState.srcAccount.balance - newValue, precision);
         setStateSourceAmount(newState, srcAmount);
 
         if (newState.isDiff) {
@@ -995,15 +1000,16 @@ const slice = createSlice({
                 destResult: value,
             },
         };
+        const precision = state.destCurrency?.precision;
 
-        const newValue = normalize(value);
+        const newValue = normalize(value, precision);
         if (newState.form.fDestResult === newValue) {
             return newState;
         }
 
         newState.form.fDestResult = newValue;
 
-        const destAmount = normalize(newValue - newState.destAccount.balance);
+        const destAmount = normalize(newValue - newState.destAccount.balance, precision);
         setStateDestAmount(newState, destAmount);
 
         if (newState.isDiff) {

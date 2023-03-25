@@ -16,6 +16,7 @@
                                 <th>name</th>
                                 <th>code</th>
                                 <th>sign</th>
+                                <th>precision</th>
                                 <th>flags</th>
                             </tr>
                         </thead>
@@ -26,6 +27,7 @@
                                     <td><?= e($currInfo->name) ?></td>
                                     <td><?= e($currInfo->code) ?></td>
                                     <td><?= e($currInfo->sign) ?></td>
+                                    <td><?= e($currInfo->precision) ?></td>
                                     <td><?= e($currInfo->flags) ?></td>
                                 </tr>
                             <?php    }    ?>
@@ -48,26 +50,39 @@
 
     <div class="field form-row">
         <label for="curr_name" class="field__title">Name</label>
-        <input id="curr_name" class="stretch-input" name="name" type="text">
+        <input id="curr_name" class="input stretch-input" name="name" type="text">
     </div>
 
     <div class="field form-row">
         <label for="curr_code" class="field__title">Code</label>
-        <input id="curr_code" class="stretch-input" name="code" type="text">
+        <input id="curr_code" class="input stretch-input" name="code" type="text">
     </div>
 
     <div class="field form-row">
         <label for="curr_sign" class="field__title">Sign</label>
-        <input id="curr_sign" class="stretch-input" name="sign" type="text">
+        <input id="curr_sign" class="input stretch-input" name="sign" type="text">
     </div>
 
-    <div id="admin_block" class="form-row">
-        <div id="admin_block" class="checkbox-wrap">
+    <div class="field form-row">
+        <label for="curr_precision" class="field__title">Precision</label>
+        <input id="curr_precision" class="input stretch-input" name="precision" type="text">
+    </div>
+
+    <div class="field form-row">
+        <div class="checkbox-wrap">
             <label for="isbefore"><input id="isbefore" name="flags" type="radio" value="1">Sign before value</label>
         </div>
-        <div id="admin_block" class="checkbox-wrap">
+        <div class="checkbox-wrap">
             <label for="isafter"><input id="isafter" name="flags" type="radio" value="0">Sign after value</label>
         </div>
+    </div>
+
+    <div class="field form-row">
+        <label class="checkbox std_margin">
+            <input id="trailingZerosCheck" type="checkbox">
+            <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+            <span class="checkbox__label">Format trailing zeros</span>
+        </label>
     </div>
 
     <div class="form-controls">

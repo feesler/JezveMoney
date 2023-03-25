@@ -18,9 +18,8 @@ import { createStore } from 'jezvejs/Store';
 import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
 import {
-    CENTS_DIGITS,
     cutTime,
-    EXCHANGE_DIGITS,
+    EXCHANGE_PRECISION,
     normalizeExch,
     timeToDate,
     __,
@@ -367,7 +366,6 @@ class TransactionView extends View {
         if (this.srcAmountInput) {
             this.srcAmountInput = DecimalInput.create({
                 elem: this.srcAmountInput,
-                digits: CENTS_DIGITS,
                 onInput: (e) => this.onSourceAmountInput(e),
             });
         }
@@ -376,38 +374,29 @@ class TransactionView extends View {
         if (this.destAmountInput) {
             this.destAmountInput = DecimalInput.create({
                 elem: this.destAmountInput,
-                digits: CENTS_DIGITS,
                 onInput: (e) => this.onDestAmountInput(e),
             });
         }
 
         this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
-        if (this.srcResBalanceInput) {
-            this.srcResBalanceInput = DecimalInput.create({
-                elem: this.srcResBalanceInput,
-                digits: CENTS_DIGITS,
-                onInput: (e) => this.onSourceResultInput(e),
-            });
-        }
+        this.srcResBalanceInput = DecimalInput.create({
+            elem: this.srcResBalanceInput,
+            onInput: (e) => this.onSourceResultInput(e),
+        });
 
         this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
-        if (this.destResBalanceInput) {
-            this.destResBalanceInput = DecimalInput.create({
-                elem: this.destResBalanceInput,
-                digits: CENTS_DIGITS,
-                onInput: (e) => this.onDestResultInput(e),
-            });
-        }
+        this.destResBalanceInput = DecimalInput.create({
+            elem: this.destResBalanceInput,
+            onInput: (e) => this.onDestResultInput(e),
+        });
 
         this.exchangeRowLabel = this.exchangeRow.querySelector('label');
-        if (this.exchangeInput) {
-            this.exchangeInput = DecimalInput.create({
-                elem: this.exchangeInput,
-                digits: EXCHANGE_DIGITS,
-                allowNegative: false,
-                onInput: (e) => this.onExchangeInput(e),
-            });
-        }
+        this.exchangeInput = DecimalInput.create({
+            elem: this.exchangeInput,
+            digits: EXCHANGE_PRECISION,
+            allowNegative: false,
+            onInput: (e) => this.onExchangeInput(e),
+        });
         setEvents(this.exchangeSign, { click: () => this.onToggleExchange() });
 
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
@@ -1525,6 +1514,10 @@ class TransactionView extends View {
         if (this.srcAmountRowLabel) {
             this.srcAmountRowLabel.textContent = sourceAmountLbl;
         }
+        this.srcAmountInput.setState((inpState) => ({
+            ...inpState,
+            digits: srcCurrency.precision,
+        }));
         this.srcAmountInput.value = state.form.sourceAmount;
         enable(this.srcAmountInput.elem, !state.submitStarted);
         window.app.setValidation(this.srcAmountRow, state.validation.sourceAmount);
@@ -1544,6 +1537,10 @@ class TransactionView extends View {
         if (this.destAmountRowLabel) {
             this.destAmountRowLabel.textContent = destAmountLbl;
         }
+        this.destAmountInput.setState((inpState) => ({
+            ...inpState,
+            digits: destCurrency.precision,
+        }));
         this.destAmountInput.value = state.form.destAmount;
         enable(this.destAmountInput.elem, !state.submitStarted);
         window.app.setValidation(this.destAmountRow, state.validation.destAmount);
@@ -1560,25 +1557,27 @@ class TransactionView extends View {
         enable(this.destCurrBtn, !state.submitStarted);
 
         // Exchange rate field
-        if (this.exchangeInput) {
-            this.exchangeInput.value = (state.form.useBackExchange)
-                ? state.form.backExchange
-                : state.form.exchange;
-        }
+        this.exchangeInput.value = (state.form.useBackExchange)
+            ? state.form.backExchange
+            : state.form.exchange;
         enable(this.exchangeInput.elem, !state.submitStarted);
         this.renderExchangeRate(state);
 
         // Source result field
-        if (this.srcResBalanceInput) {
-            this.srcResBalanceInput.value = state.form.sourceResult;
-        }
+        this.srcResBalanceInput.setState((inpState) => ({
+            ...inpState,
+            digits: srcCurrency.precision,
+        }));
+        this.srcResBalanceInput.value = state.form.sourceResult;
         enable(this.srcResBalanceInput.elem, !state.submitStarted);
         this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
 
         // Destination result field
-        if (this.destResBalanceInput) {
-            this.destResBalanceInput.value = state.form.destResult;
-        }
+        this.destResBalanceInput.setState((inpState) => ({
+            ...inpState,
+            digits: destCurrency.precision,
+        }));
+        this.destResBalanceInput.value = state.form.destResult;
         enable(this.destResBalanceInput.elem, !state.submitStarted);
         this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
 

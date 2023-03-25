@@ -24,9 +24,6 @@ export class CategoryView extends AppView {
         const availParentCategories = [{ id: '0' }, ...topCategories];
 
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             nameInput: {
                 visible: true,
                 value: model.name.toString(),

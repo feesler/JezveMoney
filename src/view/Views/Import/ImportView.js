@@ -438,6 +438,7 @@ class ImportView extends View {
             !state.checkSimilarEnabled
             || !state.items.some((item) => item.originalData)
         ) {
+            this.setRenderTime();
             return;
         }
 

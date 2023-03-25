@@ -20,8 +20,7 @@ import {
     isValidValue,
     normalizeExch,
     trimToDigitsLimit,
-    EXCHANGE_DIGITS,
-    CENTS_DIGITS,
+    EXCHANGE_PRECISION,
     dateStringToSeconds,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
@@ -215,17 +214,25 @@ export class TransactionView extends AppView {
 
         res.srcAmount = cont.srcAmountRow.value;
         res.srcAmountInvalidated = cont.srcAmountRow.isInvalid;
-        res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
+        res.fSrcAmount = (res.isAvailable && isValidValue(res.srcAmount))
+            ? normalize(res.srcAmount, res.srcCurr.precision)
+            : res.srcAmount;
 
         res.destAmount = cont.destAmountRow.value;
         res.destAmountInvalidated = cont.destAmountRow.isInvalid;
-        res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
+        res.fDestAmount = (res.isAvailable && isValidValue(res.destAmount))
+            ? normalize(res.destAmount, res.destCurr.precision)
+            : res.destAmount;
 
         res.srcResBal = cont.srcResBalanceRow.value;
-        res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
+        res.fSrcResBal = (res.isAvailable && isValidValue(res.srcResBal))
+            ? normalize(res.srcResBal, res.srcCurr.precision)
+            : res.srcResBal;
 
         res.destResBal = cont.destResBalanceRow.value;
-        res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
+        res.fDestResBal = (res.isAvailable && isValidValue(res.destResBal))
+            ? normalize(res.destResBal, res.destCurr.precision)
+            : res.destResBal;
 
         if (res.isAvailable) {
             res.exchSign = `${res.destCurr.sign}/${res.srcCurr.sign}`;
@@ -508,9 +515,6 @@ export class TransactionView extends AppView {
         const { locale } = this;
 
         const res = {
-            header: {
-                localeSelect: { value: this.model.locale },
-            },
             typeMenu: { value: this.model.type },
             personContainer: {
                 tile: {},
@@ -1035,7 +1039,9 @@ export class TransactionView extends AppView {
      */
     setSrcAmount(val) {
         this.model.srcAmount = val;
-        this.model.fSrcAmount = normalize(val);
+        this.model.fSrcAmount = (this.model.isAvailable && this.model.srcCurr)
+            ? normalize(val, this.model.srcCurr.precision)
+            : val;
         this.calculateSourceResult();
     }
 
@@ -1045,7 +1051,9 @@ export class TransactionView extends AppView {
      */
     setDestAmount(val) {
         this.model.destAmount = val;
-        this.model.fDestAmount = normalize(val);
+        this.model.fDestAmount = (this.model.isAvailable && this.model.destCurr)
+            ? normalize(val, this.model.destCurr.precision)
+            : val;
         this.calculateDestResult();
     }
 
@@ -1055,7 +1063,9 @@ export class TransactionView extends AppView {
      */
     setSourceResult(val) {
         this.model.srcResBal = val;
-        this.model.fSrcResBal = normalize(val);
+        this.model.fSrcResBal = (this.model.isAvailable && this.model.srcCurr)
+            ? normalize(val, this.model.srcCurr.precision)
+            : val;
     }
 
     /**
@@ -1064,7 +1074,9 @@ export class TransactionView extends AppView {
      */
     setDestResult(val) {
         this.model.destResBal = val;
-        this.model.fDestResBal = normalize(val);
+        this.model.fDestResBal = (this.model.isAvailable && this.model.destCurr)
+            ? normalize(val, this.model.destCurr.precision)
+            : val;
     }
 
     getLastAccountBalance() {
@@ -1084,18 +1096,31 @@ export class TransactionView extends AppView {
         }
 
         const sourceAmount = this.model.fSrcAmount;
+        const { precision } = this.model.srcCurr;
         let sourceResult;
 
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
-            sourceResult = normalize(this.model.srcAccount.balance - sourceAmount);
+            sourceResult = normalize(
+                this.model.srcAccount.balance - sourceAmount,
+                precision,
+            );
         } else if (this.model.type === DEBT) {
             if (this.model.srcAccount && !this.model.noAccount) {
-                sourceResult = normalize(this.model.srcAccount.balance - sourceAmount);
+                sourceResult = normalize(
+                    this.model.srcAccount.balance - sourceAmount,
+                    precision,
+                );
             } else if (this.model.noAccount) {
                 if (this.model.debtType) {
-                    sourceResult = normalize(this.model.personAccount.balance - sourceAmount);
+                    sourceResult = normalize(
+                        this.model.personAccount.balance - sourceAmount,
+                        precision,
+                    );
                 } else {
-                    sourceResult = normalize(this.getLastAccountBalance() - sourceAmount);
+                    sourceResult = normalize(
+                        this.getLastAccountBalance() - sourceAmount,
+                        precision,
+                    );
                 }
             }
         }
@@ -1111,18 +1136,31 @@ export class TransactionView extends AppView {
         }
 
         const destAmount = this.model.fDestAmount;
+        const { precision } = this.model.destCurr;
         let destResult;
 
         if (this.model.type === INCOME || this.model.type === TRANSFER) {
-            destResult = normalize(this.model.destAccount.balance + destAmount);
+            destResult = normalize(
+                this.model.destAccount.balance + destAmount,
+                precision,
+            );
         } else if (this.model.type === DEBT) {
             if (this.model.destAccount && !this.model.noAccount) {
-                destResult = normalize(this.model.destAccount.balance + destAmount);
+                destResult = normalize(
+                    this.model.destAccount.balance + destAmount,
+                    precision,
+                );
             } else if (this.model.noAccount) {
                 if (this.model.debtType) {
-                    destResult = normalize(this.getLastAccountBalance() + destAmount);
+                    destResult = normalize(
+                        this.getLastAccountBalance() + destAmount,
+                        precision,
+                    );
                 } else {
-                    destResult = normalize(this.model.personAccount.balance + destAmount);
+                    destResult = normalize(
+                        this.model.personAccount.balance + destAmount,
+                        precision,
+                    );
                 }
             }
         }
@@ -1793,9 +1831,10 @@ export class TransactionView extends AppView {
             );
         }
 
-        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
+        const { precision } = this.model.srcCurr;
+        const cutVal = trimToDigitsLimit(val, precision);
         this.model.srcAmount = cutVal;
-        const fNewValue = normalize(cutVal);
+        const fNewValue = normalize(cutVal, precision);
         if (this.model.fSrcAmount !== fNewValue) {
             this.setSrcAmount(cutVal);
 
@@ -1872,8 +1911,9 @@ export class TransactionView extends AppView {
             );
         }
 
-        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
-        const fNewValue = normalize(cutVal);
+        const { precision } = this.model.destCurr;
+        const cutVal = trimToDigitsLimit(val, precision);
+        const fNewValue = normalize(cutVal, precision);
         this.model.destAmount = cutVal;
         if (this.model.fDestAmount !== fNewValue) {
             this.setDestAmount(cutVal);
@@ -2021,13 +2061,21 @@ export class TransactionView extends AppView {
     async inputResBalance(val) {
         assert(this.model.type !== INCOME, 'Unexpected action: can\'t input source result balance');
 
-        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
-        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        const { precision } = this.model.srcCurr;
+        const cutVal = trimToDigitsLimit(val, precision);
+        const fNewValue = isValidValue(cutVal)
+            ? normalize(cutVal, precision)
+            : cutVal;
+
         this.model.srcResBal = cutVal;
         if (this.model.fSrcResBal !== fNewValue) {
             this.model.fSrcResBal = fNewValue;
 
-            const newSrcAmount = normalize(this.model.srcAccount.balance - fNewValue);
+            const newSrcAmount = normalize(
+                this.model.srcAccount.balance - fNewValue,
+                precision,
+            );
+
             this.model.srcAmount = newSrcAmount;
             this.model.fSrcAmount = newSrcAmount;
 
@@ -2049,15 +2097,23 @@ export class TransactionView extends AppView {
     async inputDestResBalance(val) {
         assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t input destination result balance');
 
-        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
-        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        const { precision } = this.model.destCurr;
+        const cutVal = trimToDigitsLimit(val, precision);
+        const fNewValue = isValidValue(cutVal)
+            ? normalize(cutVal, precision)
+            : cutVal;
+
         this.model.destResBal = cutVal;
         const valueChanged = this.model.fDestResBal !== fNewValue;
         if (valueChanged) {
             this.model.fDestResBal = fNewValue;
 
             if (this.model.type === INCOME) {
-                const newSrcAmount = normalize(fNewValue - this.model.destAccount.balance);
+                const newSrcAmount = normalize(
+                    fNewValue - this.model.destAccount.balance,
+                    precision,
+                );
+
                 this.model.srcAmount = newSrcAmount;
                 this.model.fSrcAmount = newSrcAmount;
 
@@ -2068,7 +2124,11 @@ export class TransactionView extends AppView {
                     this.setDestAmount(this.model.fSrcAmount);
                 }
             } else if (this.model.type === TRANSFER) {
-                const newDestAmount = normalize(fNewValue - this.model.destAccount.balance);
+                const newDestAmount = normalize(
+                    fNewValue - this.model.destAccount.balance,
+                    precision,
+                );
+
                 this.model.destAmount = newDestAmount;
                 this.model.fDestAmount = newDestAmount;
 
@@ -2079,7 +2139,11 @@ export class TransactionView extends AppView {
                     this.setSrcAmount(this.model.destAmount);
                 }
             } else if (this.model.type === DEBT) {
-                const newDestAmount = normalize(fNewValue - this.model.destAccount.balance);
+                const newDestAmount = normalize(
+                    fNewValue - this.model.destAccount.balance,
+                    precision,
+                );
+
                 this.model.destAmount = newDestAmount;
                 this.model.fDestAmount = newDestAmount;
 
@@ -2275,7 +2339,7 @@ export class TransactionView extends AppView {
         assert(this.isExchangeInputVisible(), `Unexpected state ${this.model.state} to input exchange rate`);
 
         const { useBackExchange } = this.model;
-        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS, false);
+        const cutVal = trimToDigitsLimit(val, EXCHANGE_PRECISION, false);
         if (useBackExchange) {
             this.model.backExchRate = cutVal;
         } else {

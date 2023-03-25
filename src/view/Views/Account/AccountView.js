@@ -13,7 +13,7 @@ import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
-import { normalize, __ } from '../../js/utils.js';
+import { getCurrencyPrecision, normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
@@ -40,6 +40,11 @@ class AccountView extends View {
     constructor(...args) {
         super(...args);
 
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(IconList, 'icons', window.app.props.icons);
+
         const initialState = {
             nameChanged: false,
             validation: {
@@ -53,13 +58,11 @@ class AccountView extends View {
         if (this.props.account) {
             initialState.original = this.props.account;
             initialState.data = { ...initialState.original };
-            initialState.data.fInitBalance = normalize(initialState.data.initbalance);
+            initialState.data.fInitBalance = normalize(
+                initialState.data.initbalance,
+                getCurrencyPrecision(initialState.data.curr_id),
+            );
         }
-
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         this.store = createStore(reducer, { initialState });
     }
@@ -110,7 +113,6 @@ class AccountView extends View {
 
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
-            digits: 2,
             onInput: (e) => this.onInitBalanceInput(e),
         });
 
@@ -313,6 +315,10 @@ class AccountView extends View {
         enable(this.nameInp, !state.submitStarted);
 
         // Initial balance input
+        this.initBalanceDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: currencyObj.precision,
+        }));
         window.app.setValidation('initbal-inp-block', state.validation.initbalance);
         enable(this.balanceInp, !state.submitStarted);
 

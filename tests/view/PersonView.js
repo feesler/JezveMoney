@@ -84,9 +84,6 @@ export class PersonView extends AppView {
 
     getExpectedState(model = this.model) {
         const res = {
-            header: {
-                localeSelect: { value: model.locale },
-            },
             name: {
                 visible: true,
                 value: model.name.toString(),

@@ -7,7 +7,6 @@ import {
     click,
     asyncMap,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
 
 export class Header extends TestComponent {
     async parseContent() {
@@ -32,11 +31,6 @@ export class Header extends TestComponent {
 
         res.userNav = { elem: await query('.user-navigation') };
         assert(res.userNav.elem, 'User navigation not found');
-
-        const localeSelectElem = await query('#localeSelect');
-        if (localeSelectElem) {
-            res.localeSelect = await DropDown.createFromChild(this, localeSelectElem);
-        }
 
         res.userNav.menuEl = await query(res.userNav.elem, '.nav-list');
         if (res.userNav.menuEl) {
@@ -68,13 +62,6 @@ export class Header extends TestComponent {
 
     async clickUserButton() {
         await click(this.content.userBtn.elem);
-    }
-
-    async selectLocale(locale) {
-        assert(this.content.localeSelect, 'Locales select not available');
-
-        await this.clickUserButton();
-        await this.content.localeSelect.setSelection(locale);
     }
 
     async clickProfileMenuItem() {

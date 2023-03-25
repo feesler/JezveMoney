@@ -5,6 +5,8 @@ import {
     insertAfter,
     checkDate,
     Component,
+    getClassName,
+    fixFloat,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -15,7 +17,7 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
-import { fixFloat, __ } from '../../../../js/utils.js';
+import { getCurrencyPrecision, __ } from '../../../../js/utils.js';
 import { transTypeMap, typeNames } from '../../../../js/model/ImportTransaction.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';
@@ -29,10 +31,10 @@ const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
-const IG_INPUT_CLASS = 'input input-group__input';
+const IG_INPUT_CLASS = 'input stretch-input input-group__input';
 const IG_BUTTON_CLASS = 'btn input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
-const DEFAULT_INPUT_CLASS = 'stretch-input';
+const DEFAULT_INPUT_CLASS = 'input stretch-input';
 const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const TYPE_FIELD_CLASS = 'form-row type-field';
@@ -224,7 +226,7 @@ export class ImportTransactionForm extends Component {
     createSourceAmountField() {
         this.srcAmountInp = createElement('input', {
             props: {
-                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
                 type: 'text',
                 name: 'src_amount[]',
                 disabled: true,
@@ -234,7 +236,6 @@ export class ImportTransactionForm extends Component {
         });
         this.srcAmountDecimalInput = DecimalInput.create({
             elem: this.srcAmountInp,
-            digits: 2,
             onInput: () => this.onSrcAmountInput(),
         });
 
@@ -274,7 +275,7 @@ export class ImportTransactionForm extends Component {
     createDestAmountField() {
         this.destAmountInp = createElement('input', {
             props: {
-                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
                 type: 'text',
                 name: 'dest_amount[]',
                 placeholder: __('TR_DEST_AMOUNT'),
@@ -283,7 +284,6 @@ export class ImportTransactionForm extends Component {
         });
         this.destAmountDecimalInput = DecimalInput.create({
             elem: this.destAmountInp,
-            digits: 2,
             onInput: () => this.onDestAmountInput(),
         });
 
@@ -323,7 +323,7 @@ export class ImportTransactionForm extends Component {
     /** Create date field */
     createDateField() {
         this.dateInp = DateInput.create({
-            className: [DEFAULT_INPUT_CLASS, IG_INPUT_CLASS],
+            className: IG_INPUT_CLASS,
             name: 'date[]',
             placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
@@ -641,8 +641,8 @@ export class ImportTransactionForm extends Component {
             return;
         }
 
+        this.collapse?.show(!!originalData);
         if (!originalData) {
-            this.collapse?.hide();
             return;
         }
 
@@ -660,7 +660,6 @@ export class ImportTransactionForm extends Component {
         if (!this.collapse) {
             this.collapse = Collapsible.create({
                 toggleOnClick: false,
-                className: CONTAINER_CLASS,
                 header: null,
             });
 
@@ -709,6 +708,11 @@ export class ImportTransactionForm extends Component {
         this.srcAmountInp.value = transaction.sourceAmount;
         this.srcAmountInp.placeholder = srcAmountLabel;
 
+        this.srcAmountDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: getCurrencyPrecision(transaction.srcCurrId),
+        }));
+
         this.enableSourceCurrency(isIncome);
         this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
         enable(this.srcCurrencyBtn, transaction.enabled);
@@ -731,6 +735,11 @@ export class ImportTransactionForm extends Component {
         enable(this.destAmountInp, transaction.enabled && showDestAmount);
         this.destAmountInp.value = transaction.destAmount;
         this.destAmountInp.placeholder = destAmountLabel;
+
+        this.destAmountDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: getCurrencyPrecision(transaction.destCurrId),
+        }));
 
         this.enableDestCurrency(isExpense);
         this.destCurrencyDropDown.enable(isExpense && transaction.enabled);

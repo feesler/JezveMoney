@@ -1,3 +1,4 @@
+import { hasFlag } from 'jezvejs';
 import {
     formatValue,
     normalize,
@@ -5,6 +6,9 @@ import {
     __,
 } from '../utils.js';
 import { ListItem } from './ListItem.js';
+
+export const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
+export const CURRENCY_FORMAT_TRAILING_ZEROS = 0x02;
 
 /**
  * Currency class
@@ -16,7 +20,7 @@ export class Currency extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = ['id', 'name', 'code', 'sign', 'flags'];
+        const availFields = ['id', 'name', 'code', 'sign', 'precision', 'flags'];
 
         return typeof field === 'string' && availFields.includes(field);
     }
@@ -35,16 +39,14 @@ export class Currency extends ListItem {
      * @param {*} value - float value to format
      */
     formatValue(value) {
-        let nval = normalize(value);
-        if (Math.floor(nval) !== nval) {
-            nval = nval.toFixed(2);
+        let nval = normalize(value, this.precision);
+        if (Math.floor(nval) !== nval && hasFlag(this.flags, CURRENCY_FORMAT_TRAILING_ZEROS)) {
+            nval = nval.toFixed(this.precision);
         }
 
         const fmtVal = formatValue(nval);
-        if (this.flags) {
-            return `${this.sign} ${fmtVal}`;
-        }
-
-        return `${fmtVal} ${this.sign}`;
+        return (hasFlag(this.flags, CURRENCY_SIGN_BEFORE_VALUE))
+            ? `${this.sign} ${fmtVal}`
+            : `${fmtVal} ${this.sign}`;
     }
 }

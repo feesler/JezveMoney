@@ -329,6 +329,7 @@ export const runFormAction = async (action) => {
         inputDate: 'Input date',
         changeCategory: 'Change category',
         inputComment: 'Input comment',
+        toggleOriginalData: 'Toggle expand/collapse original data',
     };
 
     let descr;
@@ -353,8 +354,10 @@ export const runFormAction = async (action) => {
         assert(category, `Category (${action.data}) not found`);
 
         descr = `${actDescr[action.action]} to '${category.name}'`;
-    } else {
+    } else if (typeof action.data !== 'undefined') {
         descr = `${actDescr[action.action]} '${action.data}'`;
+    } else {
+        descr = `${actDescr[action.action]}`;
     }
 
     await test(descr, () => App.view.runFormAction(action));

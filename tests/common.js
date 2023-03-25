@@ -22,6 +22,11 @@ export const availSortTypes = [
     SORT_MANUALLY,
 ];
 
+/* Decimal values precision */
+export const DEFAULT_PRECISION = 2;
+export const EXCHANGE_PRECISION = 4;
+export const MAX_PRECISION = 8;
+
 /** Check object is empty */
 export const isEmpty = (obj) => {
     if (typeof obj === 'object') {
@@ -161,22 +166,19 @@ export const fixFloat = (str) => {
     return res;
 };
 
-export const CENTS_DIGITS = 2;
-export const EXCHANGE_DIGITS = 4;
-
 /** Correct calculated value */
-export const correct = (val, prec = CENTS_DIGITS) => parseFloat(parseFloat(val).toFixed(prec));
+export const correct = (val, prec = DEFAULT_PRECISION) => parseFloat(parseFloat(val).toFixed(prec));
 
 /** Correct calculated exchange rate value */
-export const correctExch = (val) => correct(val, EXCHANGE_DIGITS);
+export const correctExch = (val) => correct(val, EXCHANGE_PRECISION);
 
 /** Normalize monetary value from string */
-export const normalize = (val, prec = CENTS_DIGITS) => (
+export const normalize = (val, prec = DEFAULT_PRECISION) => (
     parseFloat(parseFloat(fixFloat(val)).toFixed(prec))
 );
 
 /** Normalize exchange rate value from string */
-export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_DIGITS));
+export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_PRECISION));
 
 /** Check value is valid */
 export const isValidValue = (val) => (
@@ -201,7 +203,12 @@ const handleNegative = (val, allowNegative) => {
 /** Trims string value of decimal to specified number of digits after decimal point */
 export const trimToDigitsLimit = (val, limit, allowNegative = true) => {
     const digits = digitsAfterPoint(val);
-    const trimmed = (digits > limit) ? val.substring(0, val.length - (digits - limit)) : val;
+    const length = (digits === 0) ? 0 : (digits + 1);
+    const diff = (limit === 0) ? length : (digits - limit);
+    const trimmed = (diff > 0)
+        ? val.substring(0, val.length - diff)
+        : val;
+
     return handleNegative(trimmed, allowNegative);
 };
 

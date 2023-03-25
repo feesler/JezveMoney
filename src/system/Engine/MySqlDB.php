@@ -140,7 +140,7 @@ function assignJoin(mixed $assignments)
     $res = [];
     foreach ($assignments as $key => $value) {
         if (is_string($key)) {
-            $res[] = $key . "=" . qnull($value);
+            $res[] = "`" . $key . "`=" . qnull($value);
         } elseif (is_numeric($key)) {
             $res[] = $value;
         } else {
@@ -880,7 +880,7 @@ class MySqlDB
                 wlog("String key for column name is expected");
                 return false;
             }
-            $colDefs[] = $columnName . " " . $columnDef;
+            $colDefs[] = "`" . $columnName . "` " . $columnDef;
         }
 
         $query = "ALTER TABLE `" . $table . "` ADD COLUMN (" . implode(", ", $colDefs) . ");";

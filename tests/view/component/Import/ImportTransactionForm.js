@@ -11,7 +11,7 @@ import {
     evaluate,
     hasClass,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
+import { Collapsible, DropDown } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -25,6 +25,7 @@ import {
     dateStringToSeconds,
     secondsToDateString,
     convDate,
+    trimToDigitsLimit,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
@@ -127,6 +128,7 @@ export class ImportTransactionForm extends TestComponent {
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
+        res.origDataCollapsible = await Collapsible.create(this, await query(this.elem, '.collapsible'));
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
         assert(
@@ -232,7 +234,8 @@ export class ImportTransactionForm extends TestComponent {
         res.invalidated = !(srcAmount && destAmount && date);
 
         res.imported = cont.toggleBtn.visible;
-        if (cont.originalData) {
+        res.origDataCollapsed = !!cont.origDataCollapsible?.collapsed;
+        if (cont.originalData && res.imported) {
             res.original = {
                 ...cont.originalData.model,
             };
@@ -249,6 +252,15 @@ export class ImportTransactionForm extends TestComponent {
             date: true,
         };
         res.invalidated = false;
+        return res;
+    }
+
+    trimAmounts(model = this.model) {
+        const res = model;
+
+        res.srcAmount = trimToDigitsLimit(res.srcAmount, res.srcCurrency.precision);
+        res.destAmount = trimToDigitsLimit(res.destAmount, res.destCurrency.precision);
+
         return res;
     }
 
@@ -349,6 +361,14 @@ export class ImportTransactionForm extends TestComponent {
             res.personField.value = model.personId.toString();
         }
 
+        if (model.imported) {
+            res.toggleBtn = { visible: true };
+            res.origDataCollapsible = {
+                visible: true,
+                collapsed: model.origDataCollapsed,
+            };
+        }
+
         return res;
     }
 
@@ -356,8 +376,8 @@ export class ImportTransactionForm extends TestComponent {
         return ImportTransactionForm.getExpectedState(model);
     }
 
-    getAmountValue(value) {
-        return (value === '') ? value : normalize(value);
+    getAmountValue(value, currency) {
+        return (value === '') ? value : normalize(value, currency.precision);
     }
 
     getExpectedTransaction(model = this.model) {
@@ -370,9 +390,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = 0;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.destCurrency.id;
-            res.dest_amount = this.getAmountValue(model.destAmount);
+            res.dest_amount = this.getAmountValue(model.destAmount, model.destCurrency);
             if (model.isDifferent) {
-                res.src_amount = this.getAmountValue(model.srcAmount);
+                res.src_amount = this.getAmountValue(model.srcAmount, model.srcCurrency);
             } else {
                 res.src_amount = res.dest_amount;
             }
@@ -381,9 +401,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = model.mainAccount.id;
             res.src_curr = model.srcCurrency.id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = this.getAmountValue(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount, model.srcCurrency);
             if (model.isDifferent) {
-                res.dest_amount = this.getAmountValue(model.destAmount);
+                res.dest_amount = this.getAmountValue(model.destAmount, model.destCurrency);
             } else {
                 res.dest_amount = res.src_amount;
             }
@@ -398,9 +418,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = destAccount.id;
             res.src_curr = srcAccount.curr_id;
             res.dest_curr = destAccount.curr_id;
-            res.src_amount = this.getAmountValue(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount, model.srcCurrency);
             res.dest_amount = (model.isDifferent)
-                ? this.getAmountValue(model.destAmount)
+                ? this.getAmountValue(model.destAmount, model.destCurrency)
                 : res.src_amount;
         } else if (res.type === DEBT) {
             assert(model.person, 'Person not found');
@@ -410,7 +430,7 @@ export class ImportTransactionForm extends TestComponent {
             res.op = (model.type === 'debt_in') ? 1 : 2;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = this.getAmountValue(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount, model.srcCurrency);
             res.dest_amount = res.src_amount;
         }
 
@@ -483,58 +503,6 @@ export class ImportTransactionForm extends TestComponent {
     checkEnabled(field) {
         assert(field, 'Invalid field');
         assert(!field.disabled, `'${field.title}' field is disabled`);
-    }
-
-    onChangeMainAccount(model, value) {
-        assert(model, 'Invalid model specified');
-
-        const res = copyObject(model);
-
-        res.mainAccount = App.state.accounts.getItem(value);
-        assert(res.mainAccount, `Invalid account ${value}`);
-        const mainAccountCurrency = App.currency.getItem(res.mainAccount.curr_id);
-        assert(mainAccountCurrency, `Currency ${res.mainAccount.curr_id} not found`);
-
-        if (sourceTransactionTypes.includes(res.type)) {
-            res.sourceId = res.mainAccount.id;
-            res.srcCurrId = res.mainAccount.curr_id;
-        } else {
-            res.destId = res.mainAccount.id;
-            res.destCurrId = res.mainAccount.curr_id;
-        }
-
-        if (res.type === 'expense' && !res.isDifferent) {
-            res.destCurrId = res.srcCurrId;
-        }
-        if (res.type === 'income' && !res.isDifferent) {
-            res.srcCurrId = res.destCurrId;
-        }
-        if (res.type === 'transfer_out' || res.type === 'transfer_in') {
-            if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
-                const accId = App.state.getNextAccount(res.mainAccount.id);
-                res.transferAccount = App.state.accounts.getItem(accId);
-
-                if (res.type === 'transfer_out') {
-                    res.destId = res.transferAccount.id;
-                    res.destCurrId = res.transferAccount.curr_id;
-                } else {
-                    res.sourceId = res.transferAccount.id;
-                    res.srcCurrId = res.transferAccount.curr_id;
-                }
-            }
-        }
-        if (res.type === 'debt_out') {
-            res.destCurrId = res.srcCurrId;
-        }
-        if (res.type === 'debt_in') {
-            res.srcCurrId = res.destCurrId;
-        }
-
-        res.srcCurrency = App.currency.getItem(res.srcCurrId);
-        res.destCurrency = App.currency.getItem(res.destCurrId);
-        res.isDifferent = (res.srcCurrId !== res.destCurrId);
-
-        return res;
     }
 
     async changeType(value) {
@@ -667,11 +635,11 @@ export class ImportTransactionForm extends TestComponent {
             }
         }
 
+        this.trimAmounts();
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.typeField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => this.content.typeField.dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -699,11 +667,13 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
         this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
+        this.trimAmounts();
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.transferAccountField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => (
+            this.content.transferAccountField.dropDown.selectItem(value)
+        ));
 
         return this.checkState();
     }
@@ -716,8 +686,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.personField.dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => this.content.personField.dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -725,15 +694,15 @@ export class ImportTransactionForm extends TestComponent {
     async inputSourceAmount(value) {
         this.checkEnabled(this.content.srcAmountField);
 
-        this.model.srcAmount = value;
+        const cutValue = trimToDigitsLimit(value, this.model.srcCurrency.precision);
+        this.model.srcAmount = cutValue;
         if (!this.model.isDifferent) {
-            this.model.destAmount = value;
+            this.model.destAmount = cutValue;
         }
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.srcAmountField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.srcAmountField.inputElem, value));
 
         return this.checkState();
     }
@@ -741,15 +710,15 @@ export class ImportTransactionForm extends TestComponent {
     async inputDestAmount(value) {
         this.checkEnabled(this.content.destAmountField);
 
-        this.model.destAmount = value;
+        const cutValue = trimToDigitsLimit(value, this.model.destCurrency.precision);
+        this.model.destAmount = cutValue;
         if (!this.model.isDifferent) {
-            this.model.srcAmount = value;
+            this.model.srcAmount = cutValue;
         }
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.destAmountField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.destAmountField.inputElem, value));
 
         return this.checkState();
     }
@@ -763,11 +732,11 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrId = parseInt(value, 10);
         this.model.srcCurrency = App.currency.getItem(value);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
+        this.trimAmounts();
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -781,11 +750,11 @@ export class ImportTransactionForm extends TestComponent {
         this.model.destCurrId = parseInt(value, 10);
         this.model.destCurrency = App.currency.getItem(value);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
+        this.trimAmounts();
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -797,8 +766,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.dateField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.dateField.inputElem, value));
 
         return this.checkState();
     }
@@ -811,8 +779,7 @@ export class ImportTransactionForm extends TestComponent {
         this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
-        await dropDown.selectItem(value);
-        await this.parse();
+        await this.performAction(() => dropDown.selectItem(value));
 
         return this.checkState();
     }
@@ -823,8 +790,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.comment = value;
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.commentField.inputElem, value);
-        await this.parse();
+        await this.performAction(() => input(this.content.commentField.inputElem, value));
 
         return this.checkState();
     }
@@ -835,6 +801,17 @@ export class ImportTransactionForm extends TestComponent {
 
     async clickCancel() {
         return click(this.content.cancelBtn);
+    }
+
+    async toggleOriginalData() {
+        assert(this.content.toggleBtn.visible, 'Toggle button not visible');
+
+        this.model.origDataCollapsed = !this.model.origDataCollapsed;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => click(this.content.toggleBtn.elem));
+
+        return this.checkState();
     }
 
     /**

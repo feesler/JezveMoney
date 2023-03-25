@@ -133,8 +133,10 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     buildModel(cont) {
+        const mainAccountId = this.model?.mainAccount?.id ?? this.mainAccount;
+
         const res = {
-            mainAccount: App.state.accounts.getItem(this.mainAccount),
+            mainAccount: App.state.accounts.getItem(mainAccountId),
         };
         assert(res.mainAccount, 'Main account not found');
 
@@ -204,7 +206,7 @@ export class ImportTransactionItem extends TestComponent {
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
         res.imported = cont.toggleBtn.visible;
-        if (cont.originalData) {
+        if (cont.originalData && res.imported) {
             res.original = {
                 ...cont.originalData.model,
             };
@@ -286,14 +288,17 @@ export class ImportTransactionItem extends TestComponent {
             type: ImportTransaction.typeFromString(model.type),
         };
 
+        const srcPrecision = model.srcCurrency.precision;
+        const destPrecision = model.destCurrency.precision;
+
         if (res.type === EXPENSE) {
             res.src_id = model.mainAccount.id;
             res.dest_id = 0;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.destCurrency.id;
-            res.dest_amount = normalize(model.destAmount);
+            res.dest_amount = normalize(model.destAmount, destPrecision);
             if (model.isDifferent) {
-                res.src_amount = normalize(model.srcAmount);
+                res.src_amount = normalize(model.srcAmount, srcPrecision);
             } else {
                 res.src_amount = res.dest_amount;
             }
@@ -302,9 +307,9 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_id = model.mainAccount.id;
             res.src_curr = model.srcCurrency.id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = normalize(model.srcAmount, srcPrecision);
             if (model.isDifferent) {
-                res.dest_amount = normalize(model.destAmount);
+                res.dest_amount = normalize(model.destAmount, destPrecision);
             } else {
                 res.dest_amount = res.src_amount;
             }
@@ -319,9 +324,9 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_id = destAccount.id;
             res.src_curr = srcAccount.curr_id;
             res.dest_curr = destAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = normalize(model.srcAmount, srcPrecision);
             res.dest_amount = (model.isDifferent)
-                ? normalize(model.destAmount)
+                ? normalize(model.destAmount, destPrecision)
                 : res.src_amount;
         } else if (res.type === DEBT) {
             assert(model.person, 'Person not found');
@@ -331,7 +336,7 @@ export class ImportTransactionItem extends TestComponent {
             res.op = (model.type === 'debt_in') ? 1 : 2;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = normalize(model.srcAmount, srcPrecision);
             res.dest_amount = res.src_amount;
         }
 
@@ -404,66 +409,6 @@ export class ImportTransactionItem extends TestComponent {
         res.enabled = !res.enabled;
         res.srcCurrency = App.currency.getItem(res.srcCurrId);
         res.destCurrency = App.currency.getItem(res.destCurrId);
-
-        return res;
-    }
-
-    onChangeMainAccount(model, value) {
-        assert(model, 'Invalid model specified');
-
-        const res = copyObject(model);
-
-        res.mainAccount = App.state.accounts.getItem(value);
-        assert(res.mainAccount, `Invalid account ${value}`);
-        const mainAccountCurrency = App.currency.getItem(res.mainAccount.curr_id);
-        assert(mainAccountCurrency, `Currency ${res.mainAccount.curr_id} not found`);
-
-        if (sourceTransactionTypes.includes(res.type)) {
-            res.sourceId = res.mainAccount.id;
-            res.srcCurrId = res.mainAccount.curr_id;
-        } else {
-            res.destId = res.mainAccount.id;
-            res.destCurrId = res.mainAccount.curr_id;
-        }
-
-        if (res.type === 'expense') {
-            if (!res.isDifferent) {
-                res.destCurrId = res.srcCurrId;
-            } else if (res.destCurrId === res.srcCurrId) {
-                res.srcAmount = res.destAmount;
-            }
-        }
-        if (res.type === 'income') {
-            if (!res.isDifferent) {
-                res.srcCurrId = res.destCurrId;
-            } else if (res.destCurrId === res.srcCurrId) {
-                res.destAmount = res.srcAmount;
-            }
-        }
-        if (res.type === 'transfer_out' || res.type === 'transfer_in') {
-            if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
-                const accId = App.state.getNextAccount(res.mainAccount.id);
-                res.transferAccount = App.state.accounts.getItem(accId);
-
-                if (res.type === 'transfer_out') {
-                    res.destId = res.transferAccount.id;
-                    res.destCurrId = res.transferAccount.curr_id;
-                } else {
-                    res.sourceId = res.transferAccount.id;
-                    res.srcCurrId = res.transferAccount.curr_id;
-                }
-            }
-        }
-        if (res.type === 'debt_out') {
-            res.destCurrId = res.srcCurrId;
-        }
-        if (res.type === 'debt_in') {
-            res.srcCurrId = res.destCurrId;
-        }
-
-        res.srcCurrency = App.currency.getItem(res.srcCurrId);
-        res.destCurrency = App.currency.getItem(res.destCurrId);
-        res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
         return res;
     }

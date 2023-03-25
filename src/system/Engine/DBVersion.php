@@ -4,7 +4,12 @@ namespace JezveMoney\Core;
 
 use JezveMoney\App\Model\IconModel;
 
+use const JezveMoney\App\Model\CURRENCY_FORMAT_TRAILING_ZEROS;
+use const JezveMoney\App\Model\MAX_PRECISION;
+
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
+
+const DECIMAL_TYPE = "DECIMAL(25," . MAX_PRECISION . ")";
 
 /**
  * Database version manager class
@@ -14,7 +19,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 18;
+    protected $latestVersion = 19;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -668,6 +673,59 @@ class DBVersion
         return 18;
     }
 
+    private function updateColumnDecimalType($table, $column)
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $res = $this->dbClient->changeColumn(
+            $table,
+            $column,
+            $column,
+            DECIMAL_TYPE . " NOT NULL",
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$table' table");
+        }
+    }
+
+    /**
+     * Creates database version 19
+     *
+     * @return int
+     */
+    private function version19()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "currency";
+        $res = $this->dbClient->addColumns($tableName, ["precision" => "INT NOT NULL DEFAULT '2'"]);
+        if (!$res) {
+            throw new \Error("Fail to update currency table");
+        }
+
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["flags=flags|" . CURRENCY_FORMAT_TRAILING_ZEROS],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update '$tableName' table");
+        }
+
+        $this->updateColumnDecimalType("accounts", "balance");
+        $this->updateColumnDecimalType("accounts", "initbalance");
+
+        $this->updateColumnDecimalType("transactions", "src_amount");
+        $this->updateColumnDecimalType("transactions", "dest_amount");
+        $this->updateColumnDecimalType("transactions", "src_result");
+        $this->updateColumnDecimalType("transactions", "dest_result");
+
+        return 19;
+    }
+
     /**
      * Creates currency table
      */
@@ -688,6 +746,7 @@ class DBVersion
                 "`name` VARCHAR(128) NOT NULL, " .
                 "`code` VARCHAR(64) NOT NULL, " .
                 "`sign` VARCHAR(64) NOT NULL, " .
+                "`precision` INT NOT NULL DEFAULT '2', " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
@@ -719,8 +778,8 @@ class DBVersion
                 "`owner_id` INT(11) NOT NULL, " .
                 "`user_id` INT(11) NOT NULL, " .
                 "`curr_id` INT(11) NOT NULL, " .
-                "`balance` DECIMAL(15,2) NOT NULL, " .
-                "`initbalance` DECIMAL(15,2) NOT NULL, " .
+                "`balance` " . DECIMAL_TYPE . " NOT NULL, " .
+                "`initbalance` " . DECIMAL_TYPE . " NOT NULL, " .
                 "`name` VARCHAR(255) NOT NULL, " .
                 "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .
@@ -788,8 +847,8 @@ class DBVersion
                 "`src_id` INT(11) NOT NULL, " .
                 "`dest_id` INT(11) NOT NULL, " .
                 "`type` INT(11) NOT NULL, " .
-                "`src_amount` DECIMAL(15,2) NOT NULL, " .
-                "`dest_amount` DECIMAL(15,2) NOT NULL, " .
+                "`src_amount` " . DECIMAL_TYPE . " NOT NULL, " .
+                "`dest_amount` " . DECIMAL_TYPE . " NOT NULL, " .
                 "`src_curr` INT(11) NOT NULL, " .
                 "`dest_curr` INT(11) NOT NULL, " .
                 "`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " .
@@ -797,8 +856,8 @@ class DBVersion
                 "`pos` INT(11) NOT NULL, " .
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
-                "`src_result` DECIMAL(15,2) NOT NULL, " .
-                "`dest_result` DECIMAL(15,2) NOT NULL, " .
+                "`src_result` " . DECIMAL_TYPE . " NOT NULL, " .
+                "`dest_result` " . DECIMAL_TYPE . " NOT NULL, " .
                 "PRIMARY KEY (`id`)",
             TABLE_OPTIONS
         );
