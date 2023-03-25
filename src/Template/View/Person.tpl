@@ -18,7 +18,7 @@
                             <?php    }    ?>
                             <div id="name-inp-block" class="field form-row validation-block">
                                 <label for="nameInp" class="field__title"><?= __("PERSON_NAME") ?></label>
-                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
+                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
                                 <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
 

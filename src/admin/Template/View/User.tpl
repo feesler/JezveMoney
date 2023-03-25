@@ -44,15 +44,15 @@
     <input id="user_id" name="id" type="hidden">
     <div id="login_block" class="field form-row">
         <label for="user_login" class="field__title">Login</label>
-        <input id="user_login" class="stretch-input" name="login" type="text">
+        <input id="user_login" class="input stretch-input" name="login" type="text">
     </div>
     <div id="name_block" class="field form-row">
         <label for="user_name" class="field__title">Name</label>
-        <input id="user_name" class="stretch-input" name="name" type="text">
+        <input id="user_name" class="input stretch-input" name="name" type="text">
     </div>
     <div id="pwd_block" class="field form-row">
         <label for="user_pass" class="field__title">Password</label>
-        <input id="user_pass" class="stretch-input" name="password" type="password">
+        <input id="user_pass" class="input stretch-input" name="password" type="password">
     </div>
     <div id="admin_block" class="form-row">
         <div class="checkbox-wrap">

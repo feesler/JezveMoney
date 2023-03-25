@@ -25,12 +25,12 @@ const CONTAINER_CLASS = 'action-form__container';
 /* Fields */
 const FIELDS_CLASS = 'action-form__fields';
 const ACTION_FIELD_CLASS = 'action-type-field';
-const AMOUNT_FIELD_CLASS = 'amount-field';
+const AMOUNT_FIELD_CLASS = 'input stretch-input amount-field';
 const TRANS_TYPE_FIELD_CLASS = 'trans-type-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
 const PERSON_FIELD_CLASS = 'person-field';
 const CATEGORY_FIELD_CLASS = 'category-field';
-const VALUE_FIELD_CLASS = 'action-value-field';
+const VALUE_FIELD_CLASS = 'input stretch-input action-value-field';
 /* Validation */
 const VALIDATION_BLOCK_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
@@ -97,7 +97,7 @@ export class ImportActionForm extends Component {
 
         // Create amount input element
         this.amountInput = createElement('input', {
-            props: { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' },
+            props: { className: AMOUNT_FIELD_CLASS, type: 'text' },
         });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
@@ -106,7 +106,7 @@ export class ImportActionForm extends Component {
         });
         // Create value input element
         this.valueInput = createElement('input', {
-            props: { className: `stretch-input ${VALUE_FIELD_CLASS}`, type: 'text' },
+            props: { className: VALUE_FIELD_CLASS, type: 'text' },
             events: { input: () => this.onValueChange() },
         });
         // Form fields container

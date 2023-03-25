@@ -50,22 +50,22 @@
 
     <div class="field form-row">
         <label for="curr_name" class="field__title">Name</label>
-        <input id="curr_name" class="stretch-input" name="name" type="text">
+        <input id="curr_name" class="input stretch-input" name="name" type="text">
     </div>
 
     <div class="field form-row">
         <label for="curr_code" class="field__title">Code</label>
-        <input id="curr_code" class="stretch-input" name="code" type="text">
+        <input id="curr_code" class="input stretch-input" name="code" type="text">
     </div>
 
     <div class="field form-row">
         <label for="curr_sign" class="field__title">Sign</label>
-        <input id="curr_sign" class="stretch-input" name="sign" type="text">
+        <input id="curr_sign" class="input stretch-input" name="sign" type="text">
     </div>
 
     <div class="field form-row">
         <label for="curr_precision" class="field__title">Precision</label>
-        <input id="curr_precision" class="stretch-input" name="precision" type="text">
+        <input id="curr_precision" class="input stretch-input" name="precision" type="text">
     </div>
 
     <div class="field form-row">

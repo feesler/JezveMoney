@@ -25,7 +25,7 @@
 
                             <div id="name-inp-block" class="field validation-block form-row">
                                 <label for="nameInp" class="field__title"><?= __("ACCOUNT_NAME") ?></label>
-                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
+                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
                                 <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
 

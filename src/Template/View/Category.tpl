@@ -25,7 +25,7 @@
 
                             <div id="name-inp-block" class="field form-row validation-block">
                                 <label for="nameInp" class="field__title"><?= __("CATEGORY_NAME") ?></label>
-                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
+                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
                                 <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
 

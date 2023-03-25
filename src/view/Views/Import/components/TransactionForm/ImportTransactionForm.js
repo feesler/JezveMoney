@@ -5,6 +5,7 @@ import {
     insertAfter,
     checkDate,
     Component,
+    getClassName,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -29,10 +30,10 @@ const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
-const IG_INPUT_CLASS = 'input input-group__input';
+const IG_INPUT_CLASS = 'input stretch-input input-group__input';
 const IG_BUTTON_CLASS = 'btn input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
-const DEFAULT_INPUT_CLASS = 'stretch-input';
+const DEFAULT_INPUT_CLASS = 'input stretch-input';
 const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const TYPE_FIELD_CLASS = 'form-row type-field';
@@ -224,7 +225,7 @@ export class ImportTransactionForm extends Component {
     createSourceAmountField() {
         this.srcAmountInp = createElement('input', {
             props: {
-                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
                 type: 'text',
                 name: 'src_amount[]',
                 disabled: true,
@@ -273,7 +274,7 @@ export class ImportTransactionForm extends Component {
     createDestAmountField() {
         this.destAmountInp = createElement('input', {
             props: {
-                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
                 type: 'text',
                 name: 'dest_amount[]',
                 placeholder: __('TR_DEST_AMOUNT'),
@@ -321,7 +322,7 @@ export class ImportTransactionForm extends Component {
     /** Create date field */
     createDateField() {
         this.dateInp = DateInput.create({
-            className: [DEFAULT_INPUT_CLASS, IG_INPUT_CLASS],
+            className: IG_INPUT_CLASS,
             name: 'date[]',
             placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
@@ -658,7 +659,6 @@ export class ImportTransactionForm extends Component {
         if (!this.collapse) {
             this.collapse = Collapsible.create({
                 toggleOnClick: false,
-                className: CONTAINER_CLASS,
                 header: null,
             });
 

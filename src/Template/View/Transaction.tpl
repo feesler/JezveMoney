@@ -98,7 +98,7 @@
 
                             <div id="commentRow" class="field form-row" <?= hidden(!$trAvailable) ?>>
                                 <label for="commentInput" class="field__title"><?= __("TR_COMMENT") ?></label>
-                                <input id="commentInput" class="stretch-input" name="comment" type="text" value="<?= e($tr["comment"]) ?>">
+                                <input id="commentInput" class="input stretch-input" name="comment" type="text" value="<?= e($tr["comment"]) ?>">
                             </div>
 
                             <div id="submitControls" class="form-controls" <?= hidden(!$trAvailable) ?>>
