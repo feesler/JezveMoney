@@ -21,6 +21,7 @@ export const createAccounts = async () => {
         name: 'ACC_3',
         curr_id: RUB,
         initbalance: '500.99',
+        limit: 0,
         icon_id: 2,
         flags: 0,
     }, {
@@ -28,6 +29,7 @@ export const createAccounts = async () => {
         name: 'ACC_RUB',
         curr_id: RUB,
         initbalance: '500.99',
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }, {
@@ -35,6 +37,7 @@ export const createAccounts = async () => {
         name: 'ACC_USD',
         curr_id: USD,
         initbalance: '500.99',
+        limit: 0,
         icon_id: 4,
         flags: 0,
     }, {
@@ -42,6 +45,7 @@ export const createAccounts = async () => {
         name: 'ACC_EUR',
         curr_id: EUR,
         initbalance: '10000.99',
+        limit: 0,
         icon_id: 3,
         flags: 0,
     }, {
@@ -49,6 +53,7 @@ export const createAccounts = async () => {
         name: 'CARD_RUB',
         curr_id: RUB,
         initbalance: '35000.40',
+        limit: 0,
         icon_id: 3,
         flags: 0,
     }, {
@@ -56,6 +61,7 @@ export const createAccounts = async () => {
         name: 'HIDDEN_ACC',
         curr_id: RUB,
         initbalance: '100',
+        limit: 0,
         icon_id: 0,
         flags: ACCOUNT_HIDDEN,
     }, {
@@ -63,6 +69,7 @@ export const createAccounts = async () => {
         name: 'ACC_BTC',
         curr_id: BTC,
         initbalance: '0.005746',
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }];

@@ -838,6 +838,7 @@ export class TransactionsStory extends TestStory {
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1000',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -898,6 +899,7 @@ export class TransactionsStory extends TestStory {
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -921,6 +923,7 @@ export class TransactionsStory extends TestStory {
             name: 'Account 2',
             curr_id: RUB,
             initbalance: '2',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });

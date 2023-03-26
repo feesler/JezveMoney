@@ -70,6 +70,11 @@
         </div>
 
         <div class="std_margin">
+            <label for="create_account_limit">Limit</label>
+            <input id="create_account_limit" class="input stretch-input" name="limit" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="create_account_curr">Currency (1-5, 10-22)</label>
             <input id="create_account_curr" class="input stretch-input" name="curr_id" type="text">
         </div>
@@ -120,6 +125,11 @@
         <div class="std_margin">
             <label for="update_account_initbalance">Initial balance</label>
             <input id="update_account_initbalance" class="input stretch-input" name="initbalance" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="update_account_limit">Limit</label>
+            <input id="update_account_limit" class="input stretch-input" name="limit" type="text">
         </div>
 
         <div class="std_margin">

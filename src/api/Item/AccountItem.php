@@ -11,6 +11,7 @@ class AccountItem
     public $name = null;
     public $curr_id = 0;
     public $initbalance = 0;
+    public $limit = 0;
     public $balance = 0;
     public $icon_id = 0;
     public $flags = 0;
@@ -40,6 +41,7 @@ class AccountItem
         $res->curr_id = intval($row["curr_id"]);
         $res->balance = floatval($row["balance"]);
         $res->initbalance = floatval($row["initbalance"]);
+        $res->limit = floatval($row["limit"]);
         $res->icon_id = intval($row["icon_id"]);
         $res->flags = intval($row["flags"]);
         $res->pos = intval($row["pos"]);

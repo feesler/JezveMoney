@@ -44,6 +44,23 @@ const slice = createSlice({
         },
     }),
 
+    changeLimit: (state, value) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            limit: true,
+            valid: true,
+        },
+        data: {
+            ...state.data,
+            limit: value,
+            fLimit: normalize(
+                value,
+                getCurrencyPrecision(state.data.curr_id),
+            ),
+        },
+    }),
+
     changeName: (state, value) => ({
         ...state,
         nameChanged: true,
@@ -72,6 +89,15 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             initbalance: false,
+            valid: false,
+        },
+    }),
+
+    invalidateLimitField: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            limit: false,
             valid: false,
         },
     }),

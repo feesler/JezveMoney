@@ -31,6 +31,7 @@ const availFields = [
     'name',
     'balance',
     'initbalance',
+    'limit',
     'curr_id',
     'icon_id',
     'flags',

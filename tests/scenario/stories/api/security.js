@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { assert, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { ACCOUNT_TYPE_OTHER } from '../../../model/AccountsList.js';
 import {
@@ -25,6 +25,7 @@ const prepareTests = async () => {
         name: 'RUB',
         curr_id: RUB,
         initbalance: 100.1,
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }, {
@@ -32,9 +33,15 @@ const prepareTests = async () => {
         name: 'USD',
         curr_id: USD,
         initbalance: 50,
+        limit: 0,
         icon_id: 2,
         flags: 0,
     }]);
+
+    assert(
+        App.scenario.API_USER_ACC_RUB && App.scenario.API_USER_ACC_USD,
+        'Failed to create accounts',
+    );
 
     [
         App.scenario.API_USER_PERSON,
@@ -42,6 +49,7 @@ const prepareTests = async () => {
         name: 'API user Person',
         flags: 0,
     }]);
+    assert(App.scenario.API_USER_PERSON, 'Failed to create person');
 
     [
         App.scenario.API_USER_CATEGORY,
@@ -50,6 +58,7 @@ const prepareTests = async () => {
         parent_id: 0,
         type: EXPENSE,
     }]);
+    assert(App.scenario.API_USER_CATEGORY, 'Failed to create category');
 
     [
         App.scenario.API_USER_TRANSACTION,
@@ -58,6 +67,7 @@ const prepareTests = async () => {
         src_id: App.scenario.API_USER_ACC_RUB,
         src_amount: 100,
     }]);
+    assert(App.scenario.API_USER_TRANSACTION, 'Failed to create transaction');
 };
 
 const accountsTests = async () => {

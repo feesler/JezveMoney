@@ -94,7 +94,7 @@ class AccountModel extends CachedTable
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = ["owner_id", "type", "name", "initbalance", "curr_id", "icon_id", "flags"];
+        $avFields = ["owner_id", "type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
@@ -125,6 +125,10 @@ class AccountModel extends CachedTable
 
         if (isset($params["initbalance"])) {
             $res["initbalance"] = floatval($params["initbalance"]);
+        }
+
+        if (isset($params["limit"])) {
+            $res["limit"] = floatval($params["limit"]);
         }
 
         if (isset($params["curr_id"])) {
@@ -242,7 +246,7 @@ class AccountModel extends CachedTable
         $minDiff = pow(0.1, $currObj->precision);
         if (abs($diff) >= $minDiff) {
             $this->balanceUpdated = true;
-            $res["balance"] = $item->balance + $diff;
+            $res["balance"] = normalize($item->balance + $diff, $currObj->precision);
         } else {
             $this->balanceUpdated = false;
             unset($res["balance"]);
@@ -550,6 +554,7 @@ class AccountModel extends CachedTable
             "owner_id" => $person_id,
             "name" => "acc_" . $person_id . "_" . $curr_id,
             "initbalance" => 0.0,
+            "limit" => 0,
             "curr_id" => $curr_id,
             "icon_id" => 0,
             "flags" => 0

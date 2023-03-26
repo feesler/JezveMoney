@@ -191,6 +191,7 @@ export class ImportTemplateStory extends TestStory {
             name: 'Tpl Test Account 1',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -199,6 +200,7 @@ export class ImportTemplateStory extends TestStory {
             name: 'Tpl Test Account 2',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -251,6 +253,7 @@ export class ImportTemplateStory extends TestStory {
             name: 'Tpl Test Account 3',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });

@@ -48,6 +48,15 @@
                                 <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>
                             </div>
 
+                            <div id="limitField" class="field validation-block form-row">
+                                <label for="limitInp" class="field__title"><?= __("ACCOUNT_CREDIT_LIMIT") ?></label>
+                                <div class="input-group">
+                                    <input id="limitInp" class="input input-group__input right-align-text" name="limit" type="text" autocomplete="off" value="<?= e($accInfo->limit) ?>">
+                                    <div id="limitCurrencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
+                                </div>
+                                <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_LIMIT") ?></div>
+                            </div>
+
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>

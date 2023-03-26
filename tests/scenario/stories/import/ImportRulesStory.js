@@ -526,6 +526,7 @@ export class ImportRulesStory extends TestStory {
             name: 'Test Account 1',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });

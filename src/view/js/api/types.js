@@ -111,6 +111,7 @@ export const isAccount = (obj) => verifyObject(obj, {
     curr_id: isInt,
     balance: isNum,
     initbalance: isNum,
+    limit: isNum,
     name: isString,
     icon_id: isInt,
     flags: isInt,

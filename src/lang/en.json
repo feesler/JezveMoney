@@ -109,6 +109,8 @@
     "ACCOUNT_INITIAL_BALANCE": "Initial balance",
     "ACCOUNT_INVALID_BALANCE": "Input correct initial balance",
     "ACCOUNT_CURRENT_BALANCE": "Current balance",
+    "ACCOUNT_CREDIT_LIMIT": "Credit limit",
+    "ACCOUNT_INVALID_LIMIT": "Input correct limit",
     "ACCOUNT_SELECT": "Select account",
     "ACCOUNT_DELETE": "Delete account",
     "ACCOUNT_DELETE_MULTIPLE": "Delete accounts",

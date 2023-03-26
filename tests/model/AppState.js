@@ -5,7 +5,7 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { isValidValue, availSortTypes } from '../common.js';
+import { isValidValue, availSortTypes, normalize } from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -29,7 +29,7 @@ const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
 const availSettings = sortSettings;
 
 /** Accounts */
-const accReqFields = ['type', 'name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
+const accReqFields = ['type', 'name', 'balance', 'initbalance', 'limit', 'curr_id', 'icon_id', 'flags'];
 
 /** Persons */
 const pReqFields = ['name', 'flags'];
@@ -729,6 +729,9 @@ export class AppState {
         if (!isValidValue(params.initbalance)) {
             return false;
         }
+        if (!isValidValue(params.limit)) {
+            return false;
+        }
 
         return true;
     }
@@ -776,9 +779,10 @@ export class AppState {
             return false;
         }
 
-        const balDiff = expAccount.initbalance - origAcc.initbalance;
-        if (balDiff.toFixed(currency.precision) !== 0) {
-            expAccount.balance = origAcc.balance + balDiff;
+        const { precision } = currency;
+        const balDiff = normalize(expAccount.initbalance - origAcc.initbalance, precision);
+        if (parseFloat(balDiff.toFixed(precision)) !== 0) {
+            expAccount.balance = normalize(origAcc.balance + balDiff, precision);
         }
 
         // Prepare expected updates of transactions list

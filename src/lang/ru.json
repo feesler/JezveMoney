@@ -109,6 +109,8 @@
     "ACCOUNT_INITIAL_BALANCE": "Начальный баланс",
     "ACCOUNT_INVALID_BALANCE": "Введите корректный начальный баланс",
     "ACCOUNT_CURRENT_BALANCE": "Текущий баланс",
+    "ACCOUNT_CREDIT_LIMIT": "Кредитный лимит",
+    "ACCOUNT_INVALID_LIMIT": "Введите корректный лимит",
     "ACCOUNT_SELECT": "Выбрать счёт",
     "ACCOUNT_DELETE": "Удалить счёт",
     "ACCOUNT_DELETE_MULTIPLE": "Удалить счета",

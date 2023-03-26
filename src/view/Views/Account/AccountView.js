@@ -19,7 +19,7 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 
 import { IconList } from '../../js/model/IconList.js';
-import { accountTypes } from '../../js/model/Account.js';
+import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -51,18 +51,22 @@ class AccountView extends View {
             validation: {
                 initbalance: true,
                 name: true,
+                limit: true,
                 valid: true,
             },
             submitStarted: false,
         };
 
         if (this.props.account) {
-            initialState.original = this.props.account;
-            initialState.data = { ...initialState.original };
-            initialState.data.fInitBalance = normalize(
-                initialState.data.initbalance,
-                getCurrencyPrecision(initialState.data.curr_id),
-            );
+            const original = this.props.account;
+            const precision = getCurrencyPrecision(original.curr_id);
+
+            initialState.original = original;
+            initialState.data = {
+                ...original,
+                fInitBalance: normalize(original.initbalance, precision),
+                fLimit: normalize(original.limit, precision),
+            };
         }
 
         this.store = createStore(reducer, { initialState });
@@ -81,6 +85,9 @@ class AccountView extends View {
             'iconField',
             'currencySign',
             'balanceInp',
+            'limitField',
+            'limitInp',
+            'limitCurrencySign',
             'nameInp',
             'nameFeedback',
             'submitBtn',
@@ -125,6 +132,11 @@ class AccountView extends View {
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
             onInput: (e) => this.onInitBalanceInput(e),
+        });
+
+        this.limitDecimalInput = DecimalInput.create({
+            elem: this.limitInp,
+            onInput: (e) => this.onLimitInput(e),
         });
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
@@ -182,6 +194,12 @@ class AccountView extends View {
         this.store.dispatch(actions.changeInitialBalance(value));
     }
 
+    /** Limit input event handler */
+    onLimitInput(e) {
+        const { value } = e.target;
+        this.store.dispatch(actions.changeLimit(value));
+    }
+
     /** Account name input event handler */
     onNameInput() {
         const { value } = this.nameInp;
@@ -197,7 +215,7 @@ class AccountView extends View {
             return;
         }
 
-        const { name, initbalance } = state.data;
+        const { name, initbalance, limit } = state.data;
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_INVALID_NAME')));
             this.nameInp.focus();
@@ -211,6 +229,11 @@ class AccountView extends View {
 
         if (initbalance.length === 0) {
             this.store.dispatch(actions.invalidateInitialBalanceField());
+            this.balanceInp.focus();
+        }
+
+        if (limit.length === 0) {
+            this.store.dispatch(actions.invalidateLimitField());
             this.balanceInp.focus();
         }
 
@@ -233,6 +256,7 @@ class AccountView extends View {
             type: data.type,
             name: data.name,
             initbalance: data.fInitBalance,
+            limit: data.fLimit,
             curr_id: data.curr_id,
             icon_id: data.icon_id,
             flags: original.flags,
@@ -343,6 +367,16 @@ class AccountView extends View {
         }));
         window.app.setValidation('initbal-inp-block', state.validation.initbalance);
         enable(this.balanceInp, !state.submitStarted);
+
+        // Limit input
+        const isCreditCard = parseInt(state.data.type, 10) === ACCOUNT_TYPE_CREDIT_CARD;
+        show(this.limitField, isCreditCard);
+        this.limitDecimalInput.setState((inpState) => ({
+            ...inpState,
+            digits: currencyObj.precision,
+        }));
+        window.app.setValidation(this.limitField, state.validation.limit);
+        enable(this.limitInp, !state.submitStarted);
 
         // Icon select
         this.iconSelect.setSelection(state.data.icon_id);

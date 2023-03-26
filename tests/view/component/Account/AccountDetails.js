@@ -8,13 +8,14 @@ import {
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { secondsToDateString } from '../../../common.js';
-import { getAccountTypeName } from '../../../model/AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../../../model/AccountsList.js';
 import { __ } from '../../../model/locale.js';
 
 const fieldSelectors = [
     '.type-field',
     '.balance-field',
     '.initbalance-field',
+    '.limit-field',
     '.visibility-field',
     '.trans-count-field',
     '.create-date-field',
@@ -45,6 +46,7 @@ export class AccountDetails extends TestComponent {
             res.typeField,
             res.balanceField,
             res.initialBalanceField,
+            res.limitField,
             res.visibilityField,
             res.transactionsField,
             res.createDateField,
@@ -87,6 +89,8 @@ export class AccountDetails extends TestComponent {
             accounts: item.id,
         });
 
+        const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
+
         const res = {
             title: {
                 visible: true,
@@ -104,6 +108,9 @@ export class AccountDetails extends TestComponent {
                 visible: true,
                 value: currency.format(item.initbalance),
             },
+            limitField: {
+                visible: isCreditCard,
+            },
             visibilityField: {
                 visible: true,
                 value: __(visibilityToken, App.view.locale),
@@ -112,7 +119,9 @@ export class AccountDetails extends TestComponent {
                 value: itemTransactions.length.toString(),
                 visible: true,
             },
-            transactionsLink: { visible: true },
+            transactionsLink: {
+                visible: true,
+            },
             createDateField: {
                 value: secondsToDateString(item.createdate),
                 visible: true,
@@ -122,6 +131,10 @@ export class AccountDetails extends TestComponent {
                 visible: true,
             },
         };
+
+        if (isCreditCard) {
+            res.limitField.value = currency.format(item.limit);
+        }
 
         return res;
     }

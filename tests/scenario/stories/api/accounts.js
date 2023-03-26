@@ -20,6 +20,7 @@ const create = async () => {
         name: 'acc ru',
         curr_id: RUB,
         initbalance: 100,
+        limit: 0,
         icon_id: 1,
         flags: 0,
     }, {
@@ -27,6 +28,7 @@ const create = async () => {
         name: 'cash ru',
         curr_id: RUB,
         initbalance: 5000,
+        limit: 0,
         icon_id: 3,
         flags: 0,
     }, {
@@ -34,6 +36,7 @@ const create = async () => {
         name: 'acc usd',
         curr_id: USD,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }];
@@ -55,6 +58,7 @@ const createWithChainedRequest = async () => {
         name: 'Chained rub',
         curr_id: RUB,
         initbalance: 100,
+        limit: 0,
         icon_id: 0,
         flags: ACCOUNT_HIDDEN,
         returnState: {
@@ -65,6 +69,7 @@ const createWithChainedRequest = async () => {
         name: 'Chained usd',
         curr_id: USD,
         initbalance: 50,
+        limit: 0,
         icon_id: 2,
         flags: 0,
         returnState: {
@@ -88,6 +93,7 @@ const createInvalid = async () => {
         name: 'acc ru',
         curr_id: USD,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 0,
         flags: 0,
     }, {
@@ -95,6 +101,7 @@ const createInvalid = async () => {
         type: ACCOUNT_TYPE_OTHER,
         curr_id: USD,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 0,
         flags: 0,
     }, {
@@ -106,6 +113,7 @@ const createInvalid = async () => {
         name: 'acc tst',
         curr_id: USD,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 5,
         flags: 0,
         xxx: 1,
@@ -116,6 +124,7 @@ const createInvalid = async () => {
         name: '',
         curr_id: USD,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }, {
@@ -123,6 +132,7 @@ const createInvalid = async () => {
         name: 'acc tst',
         curr_id: 9999,
         initbalance: 10.5,
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }, {
@@ -130,6 +140,7 @@ const createInvalid = async () => {
         name: 'acc tst',
         curr_id: USD,
         initbalance: 'fff',
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }, {
@@ -137,6 +148,7 @@ const createInvalid = async () => {
         name: 'acc tst',
         curr_id: USD,
         initbalance: 'fff',
+        limit: 0,
         icon_id: 5,
         flags: 0,
     }];
@@ -154,6 +166,7 @@ const createMultiple = async () => {
         name: 'Account 1',
         curr_id: RUB,
         initbalance: 100,
+        limit: 0,
         icon_id: 0,
         flags: 0,
     }, {
@@ -161,6 +174,7 @@ const createMultiple = async () => {
         name: 'Account 2',
         curr_id: RUB,
         initbalance: 0,
+        limit: 0,
         icon_id: 4,
         flags: 0,
     }, {
@@ -168,6 +182,7 @@ const createMultiple = async () => {
         name: 'Account 3',
         curr_id: USD,
         initbalance: 100,
+        limit: 100,
         icon_id: 5,
         flags: 0,
     }];
@@ -193,6 +208,7 @@ const createMultipleInvalid = async () => {
             name: '',
             curr_id: USD,
             initbalance: 10.5,
+            limit: 0,
             icon_id: 5,
             flags: 0,
         }, {
@@ -200,6 +216,7 @@ const createMultipleInvalid = async () => {
             name: 'Account 3',
             curr_id: 999,
             initbalance: 100,
+            limit: 0,
             icon_id: 5,
             flags: 0,
         }],
@@ -208,6 +225,7 @@ const createMultipleInvalid = async () => {
             name: 'Account 4',
             curr_id: RUB,
             initbalance: 0,
+            limit: 0,
             icon_id: 4,
             flags: 0,
         }, null],

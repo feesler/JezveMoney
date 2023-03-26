@@ -15,7 +15,7 @@ use JezveMoney\App\Model\UserCurrencyModel;
  */
 class Accounts extends ListViewController
 {
-    protected $requiredFields = ["name", "initbalance", "curr_id", "icon_id", "flags"];
+    protected $requiredFields = ["type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
 
     /**
      * Controller initialization
@@ -75,10 +75,12 @@ class Accounts extends ListViewController
 
         $accInfo = new \stdClass();
         $accInfo->id = 0;
+        $accInfo->type = 0;
         $accInfo->name = "";
         $accInfo->curr_id = $currMod->getIdByPos(0);
         $accInfo->balance = 0;
         $accInfo->initbalance = "";
+        $accInfo->limit = 0;
         $accInfo->icon_id = 0;
         $accInfo->icon = null;
         $accInfo->flags = 0;
