@@ -25,6 +25,7 @@ import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import './ImportTransactionForm.scss';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -155,19 +156,7 @@ export class ImportTransactionForm extends Component {
 
     /** Create transaction type field */
     createTypeField() {
-        const transferDisabled = window.app.model.accounts.length < 2;
-        const debtDisabled = !window.app.model.persons.length;
-        const typeItems = Object.keys(typeNames).map((id) => ({
-            id,
-            title: typeNames[id],
-            disabled: (
-                (id.startsWith('transfer') && transferDisabled)
-                || (id.startsWith('debt') && debtDisabled)
-            ),
-        }));
-
         this.typeDropDown = DropDown.create({
-            data: typeItems,
             onChange: (type) => this.onTrTypeChanged(type),
         });
 
@@ -542,23 +531,25 @@ export class ImportTransactionForm extends Component {
 
     /** Validate transaction object */
     validate() {
-        const { state } = this;
-        const isDiff = state.transaction.isDiff();
-        const { transaction } = state;
+        const { transaction } = this.state;
+        const isDiff = transaction.isDiff();
         const isExpense = (transaction.type === 'expense');
+        const isLimit = (transaction.type === 'limit');
 
-        const sourceAmount = (!isExpense || isDiff)
-            ? this.validateAmount(transaction.sourceAmount)
+        const sourceAmount = ((!isExpense && !isLimit) || isDiff)
+            ? transaction.validateSourceAmount()
             : true;
-        const destAmount = (isExpense || isDiff)
-            ? this.validateAmount(transaction.destAmount)
+
+        const destAmount = (isExpense || isLimit || isDiff)
+            ? transaction.validateDestAmount()
             : true;
+
         const date = checkDate(transaction.date);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {
             this.setState({
-                ...state,
+                ...this.state,
                 validation: {
                     sourceAmount,
                     destAmount,
@@ -669,6 +660,31 @@ export class ImportTransactionForm extends Component {
         this.collapse.setContent(content);
     }
 
+    renderTypeSelect(state, prevState) {
+        const transferDisabled = window.app.model.accounts.length < 2;
+        const debtDisabled = !window.app.model.persons.length;
+        const { mainAccount } = state.transaction;
+
+        if (mainAccount.id !== prevState?.transaction?.mainAccount?.id) {
+            const typeItems = Object.entries(typeNames).map(([id, title]) => ({
+                id,
+                title,
+                disabled: (
+                    (id.startsWith('transfer') && transferDisabled)
+                    || (id.startsWith('debt') && debtDisabled)
+                ),
+            })).filter((item) => (
+                item.id !== 'limit' || mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD
+            ));
+
+            this.typeDropDown.removeAll();
+            this.typeDropDown.append(typeItems);
+        }
+
+        this.typeDropDown.enable(state.transaction.enabled);
+        this.typeDropDown.setSelection(state.transaction.type);
+    }
+
     renderForm(state, prevState) {
         if (
             state.transaction === prevState?.transaction
@@ -687,15 +703,15 @@ export class ImportTransactionForm extends Component {
         const isIncome = transaction.type === 'income';
         const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
         const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
+        const isLimit = (transaction.type === 'limit');
 
         enable(this.elem, transaction.enabled);
 
         // Type field
-        this.typeDropDown.enable(transaction.enabled);
-        this.typeDropDown.setSelection(transaction.type);
+        this.renderTypeSelect(state, prevState);
 
         // Source amount field
-        const showSrcAmount = (!isExpense || isDiff);
+        const showSrcAmount = ((!isExpense && !isLimit) || isDiff);
         const srcAmountLabel = (!isExpense && !isDiff)
             ? __('TR_AMOUNT')
             : __('TR_SRC_AMOUNT');
@@ -723,8 +739,8 @@ export class ImportTransactionForm extends Component {
         );
 
         // Destination amount field
-        const showDestAmount = (isExpense || isDiff);
-        const destAmountLabel = (isExpense && !isDiff)
+        const showDestAmount = (isExpense || isLimit || isDiff);
+        const destAmountLabel = ((isExpense || isLimit) && !isDiff)
             ? __('TR_AMOUNT')
             : __('TR_DEST_AMOUNT');
 

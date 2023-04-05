@@ -61,6 +61,7 @@ export class ImportAction extends ListItem {
         { id: 'transfer_in', title: __('TR_TRANSFER_IN') },
         { id: 'debt_out', title: __('TR_DEBT_OUT') },
         { id: 'debt_in', title: __('TR_DEBT_IN') },
+        { id: 'limit', title: __('TR_LIMIT_CHANGE') },
     ];
 
     /** Return array of available action types */

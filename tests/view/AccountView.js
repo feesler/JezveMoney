@@ -15,6 +15,7 @@ import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
+import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../model/AccountsList.js';
 
 /** Account view class */
 export class AccountView extends AppView {
@@ -43,6 +44,8 @@ export class AccountView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
+        res.typeDropDown = await DropDown.createFromChild(this, await query('#type'));
+
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
         res.name = await InputRow.create(this, await query('#name-inp-block'));
@@ -52,6 +55,9 @@ export class AccountView extends AppView {
 
         res.balance = await InputRow.create(this, await query('#initbal-inp-block'));
         assert(res.name, 'Account balance input not found');
+
+        res.limit = await InputRow.create(this, await query('#limitField'));
+        assert(res.limit, 'Credit limit field not found');
 
         res.flagsInp = await query('#flags');
         res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
@@ -77,15 +83,18 @@ export class AccountView extends AppView {
             res.id = cont.id;
         }
 
+        // Type
+        this.setModelType(cont.typeDropDown.value, res);
+
         // Name
-        res.name = cont.name.content.value;
+        res.name = cont.name.value;
         res.nameTyped = this.nameTyped;
 
         // Currency
         this.setModelCurrency(cont.currDropDown.value, res);
 
         // Iniital balance
-        res.initbalance = cont.balance.content.value;
+        res.initbalance = cont.balance.value;
         res.fInitBalance = isValidValue(res.initbalance)
             ? normalize(res.initbalance, res.currObj.precision)
             : res.initbalance;
@@ -98,11 +107,26 @@ export class AccountView extends AppView {
         res.balance = origBalance + res.fInitBalance - origInitBalance;
         res.fBalance = res.balance;
 
+        // Credit limit
+        res.limit = cont.limit.value;
+        res.fLimit = isValidValue(res.limit)
+            ? normalize(res.limit, res.currObj.precision)
+            : res.limit;
+
         // Icon
         this.setModelIcon(cont.iconDropDown.value, res);
 
         // Flags
         res.flags = cont.flags;
+
+        return res;
+    }
+
+    setModelType(value, model = this.model) {
+        const res = model;
+
+        res.type = parseInt(value, 10);
+        assert.isString(accountTypes[res.type], `Invalid account type: ${res.type}`);
 
         return res;
     }
@@ -132,8 +156,8 @@ export class AccountView extends AppView {
     setExpectedAccount(account) {
         this.origAccount = copyObject(account);
 
+        this.setModelType(account.type);
         this.model.name = account.name.toString();
-
         this.setModelCurrency(account.curr_id);
 
         this.model.initbalance = account.initbalance.toString();
@@ -147,8 +171,10 @@ export class AccountView extends AppView {
 
     getExpectedAccount(model = this.model) {
         const res = {
+            type: model.type,
             name: model.name,
             initbalance: model.fInitBalance,
+            limit: model.fLimit,
             curr_id: model.curr_id,
             icon_id: model.icon_id,
             flags: model.flags,
@@ -183,11 +209,21 @@ export class AccountView extends AppView {
 
         accTile.visible = true;
 
+        const isCreditCard = model.type === ACCOUNT_TYPE_CREDIT_CARD;
+
         const res = {
             heading: { visible: true },
             tile: accTile,
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
+            limit: {
+                value: model.limit.toString(),
+                visible: isCreditCard,
+            },
+            typeDropDown: {
+                textValue: getAccountTypeName(model.type),
+                visible: true,
+            },
             currDropDown: {
                 textValue: model.currObj.formatName(this.locale),
                 visible: true,
@@ -215,6 +251,8 @@ export class AccountView extends AppView {
         return (
             this.model.initbalance.length > 0
             && isValidValue(this.model.initbalance)
+            && this.model.limit.length > 0
+            && isValidValue(this.model.limit)
         );
     }
 
@@ -253,6 +291,13 @@ export class AccountView extends AppView {
         this.model.fInitBalance = fNewValue;
     }
 
+    onLimitChanged(value) {
+        const { precision } = this.model.currObj;
+        const fNewValue = isValidValue(value) ? normalize(value, precision) : value;
+        this.model.limit = value;
+        this.model.fLimit = fNewValue;
+    }
+
     async inputBalance(val) {
         const { precision } = this.model.currObj;
         const decimal = trimToDigitsLimit(val, precision);
@@ -260,6 +305,16 @@ export class AccountView extends AppView {
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.balance.input(val));
+        return this.checkState();
+    }
+
+    async inputLimit(val) {
+        const { precision } = this.model.currObj;
+        const decimal = trimToDigitsLimit(val, precision);
+        this.onLimitChanged(decimal);
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.limit.input(val));
         return this.checkState();
     }
 
@@ -276,6 +331,17 @@ export class AccountView extends AppView {
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.currDropDown.setSelection(val));
+        return this.checkState();
+    }
+
+    async changeType(val) {
+        const type = parseInt(val, 10);
+        assert.isString(accountTypes[type], `Invalid account type: ${val}`);
+
+        this.model.type = type;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.typeDropDown.setSelection(val));
         return this.checkState();
     }
 

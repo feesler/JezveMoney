@@ -35,6 +35,7 @@ import {
     TRANSFER,
     DEBT,
     availTransTypes,
+    LIMIT_CHANGE,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { AccountsList } from '../model/AccountsList.js';
@@ -420,6 +421,18 @@ export class TransactionView extends AppView {
             }
         }
 
+        if (res.type === LIMIT_CHANGE) {
+            if (!res.isAvailable) {
+                res.state = -1;
+            } else if (destResRowVisible && !destAmountRowVisible) {
+                res.state = 0;
+            } else if (destAmountRowVisible && !destResRowVisible) {
+                res.state = 1;
+            } else {
+                throw new Error('Unexpected state');
+            }
+        }
+
         if (res.isAvailable && res.srcAccount) {
             assert(
                 res.srcAccount.curr_id === res.src_curr_id,
@@ -453,12 +466,15 @@ export class TransactionView extends AppView {
 
     isValid() {
         const startFromDestAmount = (
-            (this.model.type === EXPENSE)
+            (this.model.type === EXPENSE || this.model.type === LIMIT_CHANGE)
             || (this.model.type === DEBT && !this.model.debtType)
         );
 
-        const srcAmountValid = this.isValidAmount(this.model.fSrcAmount);
-        const destAmountValid = this.isValidAmount(this.model.fDestAmount);
+        const srcAmount = this.getExpectedSourceAmount();
+        const srcAmountValid = this.isValidAmount(srcAmount);
+
+        const destAmount = this.getExpectedDestAmount();
+        const destAmountValid = this.isValidAmount(destAmount);
 
         if (startFromDestAmount) {
             if (!destAmountValid || (this.model.isDiffCurr && !srcAmountValid)) {
@@ -475,6 +491,14 @@ export class TransactionView extends AppView {
         return true;
     }
 
+    getExpectedSourceAmount(model = this.model) {
+        return (model.type === LIMIT_CHANGE) ? Math.abs(model.fSrcAmount) : model.fSrcAmount;
+    }
+
+    getExpectedDestAmount(model = this.model) {
+        return (model.type === LIMIT_CHANGE) ? Math.abs(model.fDestAmount) : model.fDestAmount;
+    }
+
     getExpectedTransaction() {
         const res = {};
 
@@ -487,13 +511,17 @@ export class TransactionView extends AppView {
             res.person_id = this.model.person.id;
             res.acc_id = this.model.noAccount ? 0 : this.model.account.id;
             res.op = this.model.debtType ? 1 : 2;
+        } else if (res.type === LIMIT_CHANGE) {
+            const increaseLimit = this.model.fDestAmount > 0;
+            res.src_id = (increaseLimit) ? 0 : this.model.destAccount.id;
+            res.dest_id = (increaseLimit) ? this.model.destAccount.id : 0;
         } else {
             res.src_id = (this.model.srcAccount) ? this.model.srcAccount.id : 0;
             res.dest_id = (this.model.destAccount) ? this.model.destAccount.id : 0;
         }
 
-        res.src_amount = this.model.fSrcAmount;
-        res.dest_amount = this.model.fDestAmount;
+        res.src_amount = this.getExpectedSourceAmount();
+        res.dest_amount = this.getExpectedDestAmount();
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
         res.date = dateStringToSeconds(this.model.date);
@@ -511,6 +539,7 @@ export class TransactionView extends AppView {
         const isIncome = this.model.type === INCOME;
         const isTransfer = this.model.type === TRANSFER;
         const isDebt = this.model.type === DEBT;
+        const isLimitChange = this.model.type === LIMIT_CHANGE;
         const { isAvailable, isDiffCurr } = this.model;
         const { locale } = this;
 
@@ -539,7 +568,7 @@ export class TransactionView extends AppView {
             destContainer: {
                 visible: (
                     isAvailable
-                    && (isIncome || isTransfer)
+                    && (isIncome || isTransfer || isLimitChange)
                 ),
             },
             swapBtn: {
@@ -622,7 +651,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        if (isIncome || isTransfer) {
+        if (isIncome || isTransfer || isLimitChange) {
             res.destContainer.tile = {
                 visible: isAvailable,
             };
@@ -635,7 +664,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        if (this.model.type !== INCOME && isAvailable) {
+        if ((isExpense || isTransfer || isDebt) && isAvailable) {
             res.srcResBalanceRow.value = this.model.srcResBal.toString();
             res.srcResBalanceRow.isCurrActive = false;
 
@@ -647,6 +676,7 @@ export class TransactionView extends AppView {
         if (this.model.type !== EXPENSE && isAvailable) {
             res.srcAmountInfo.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
             res.destResBalanceRow.value = this.model.destResBal.toString();
+
             res.destResBalanceRow.isCurrActive = false;
 
             res.destResBalanceInfo.value = (this.model.destCurr)
@@ -658,8 +688,13 @@ export class TransactionView extends AppView {
         }
 
         if (isAvailable) {
-            res.srcAmountRow.label = (isDiffCurr) ? __('TR_SRC_AMOUNT', locale) : __('TR_AMOUNT', locale);
-            res.destAmountRow.label = (isDiffCurr) ? __('TR_DEST_AMOUNT', locale) : __('TR_AMOUNT', locale);
+            if (this.model.type === LIMIT_CHANGE) {
+                res.srcAmountRow.label = '';
+                res.destAmountRow.label = __('TR_LIMIT_DELTA', locale);
+            } else {
+                res.srcAmountRow.label = (isDiffCurr) ? __('TR_SRC_AMOUNT', locale) : __('TR_AMOUNT', locale);
+                res.destAmountRow.label = (isDiffCurr) ? __('TR_DEST_AMOUNT', locale) : __('TR_AMOUNT', locale);
+            }
         }
 
         const resultBalanceTok = __('TR_RESULT', locale);
@@ -993,6 +1028,23 @@ export class TransactionView extends AppView {
             }
         }
 
+        if (isLimitChange) {
+            this.hideInputRow(res, 'srcAmount');
+            this.hideInputRow(res, 'exchange');
+            this.hideInputRow(res, 'srcResBalance');
+
+            if (state === -1) {
+                this.hideInputRow(res, 'destAmount');
+                this.hideInputRow(res, 'destResBalance');
+            } else if (state === 0) {
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'destResBalance', true);
+            } else if (state === 1) {
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'destResBalance', false);
+            }
+        }
+
         return res;
     }
 
@@ -1139,7 +1191,7 @@ export class TransactionView extends AppView {
         const { precision } = this.model.destCurr;
         let destResult;
 
-        if (this.model.type === INCOME || this.model.type === TRANSFER) {
+        if ([INCOME, TRANSFER, LIMIT_CHANGE].includes(this.model.type)) {
             destResult = normalize(
                 this.model.destAccount.balance + destAmount,
                 precision,
@@ -1271,7 +1323,14 @@ export class TransactionView extends AppView {
         if (type === EXPENSE) {
             if (!this.model.isAvailable) {
                 this.model.state = -1;
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
+                if (currentType === LIMIT_CHANGE) {
+                    this.stateTransition(this.model, {
+                        0: 1,
+                        1: 0,
+                    }, false);
+                }
+
                 const srcCurrId = this.model.src_curr_id;
                 const { srcCurr, srcAmount, destAmount } = this.model;
 
@@ -1355,6 +1414,11 @@ export class TransactionView extends AppView {
                 this.model.srcCurr = this.model.destCurr;
 
                 this.calculateDestResult();
+            } else if (currentType === LIMIT_CHANGE) {
+                this.stateTransition(this.model, {
+                    0: 1,
+                    1: 0,
+                }, false);
             }
 
             this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
@@ -1371,7 +1435,7 @@ export class TransactionView extends AppView {
                 this.model.state = -1;
             } else if (currentType === EXPENSE) {
                 this.setNextDestAccount(this.model.srcAccount.id);
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
                 this.setNextSourceAccount(this.model.destAccount.id);
             } else if (currentType === DEBT) {
                 if (this.model.account && this.model.debtType) {
@@ -1429,7 +1493,7 @@ export class TransactionView extends AppView {
 
                 this.model.dest_curr_id = this.model.src_curr_id;
                 this.model.destCurr = this.model.srcCurr;
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
                 this.model.debtType = true;
                 this.model.account = this.model.destAccount;
                 if (this.model.destAccount) {
@@ -1476,6 +1540,86 @@ export class TransactionView extends AppView {
             this.updateExch();
         }
 
+        if (type === LIMIT_CHANGE) {
+            if (currentType === EXPENSE) {
+                this.stateTransition(this.model, {
+                    0: 1,
+                    1: 0,
+                    2: 1,
+                    3: 1,
+                    4: 0,
+                }, false);
+
+                this.model.destAccount = this.model.srcAccount;
+                this.model.dest_curr_id = this.model.src_curr_id;
+                this.model.destCurr = this.model.srcCurr;
+            } else if (currentType === INCOME) {
+                this.stateTransition(this.model, {
+                    0: 1,
+                    1: 0,
+                    2: 1,
+                    3: 1,
+                    4: 0,
+                }, false);
+
+                this.setDestAmount(this.model.srcAmount);
+            } else if (currentType === TRANSFER) {
+                this.stateTransition(this.model, {
+                    0: 1,
+                    1: 0,
+                    2: 0,
+                    3: 1,
+                    4: 0,
+                    5: 0,
+                    6: 0,
+                    7: 1,
+                    8: 0,
+                }, false);
+            } else if (currentType === DEBT) {
+                this.stateTransition(this.model, {
+                    0: 1,
+                    1: 0,
+                    2: 0,
+                    3: 1,
+                    4: 0,
+                    5: 0,
+                    6: 1,
+                    7: 1,
+                    8: 0,
+                    9: 0,
+                    10: 1,
+                    11: 0,
+                    12: 1,
+                    13: 0,
+                    14: 0,
+                    15: 0,
+                    16: 1,
+                    17: 0,
+                    18: 1,
+                    19: 0,
+                    20: 0,
+                    21: 1,
+                }, false);
+
+                let { account } = this.model;
+                if (!account) {
+                    account = this.appState().getFirstAccount();
+                }
+
+                this.model.destAccount = account;
+            }
+
+            this.model.state = 1;
+
+            this.model.srcAccount = null;
+            this.model.src_curr_id = this.model.dest_curr_id;
+            this.model.srcCurr = this.model.destCurr;
+
+            this.setSrcAmount(this.model.destAmount);
+            this.calcExchByAmounts();
+            this.updateExch();
+        }
+
         // Delete Debt specific fields
         if (currentType === DEBT) {
             delete this.model.account;
@@ -1518,7 +1662,8 @@ export class TransactionView extends AppView {
     }
 
     validateSourceAmount() {
-        this.model.srcAmountInvalidated = !this.isValidAmount(this.model.fSrcAmount);
+        const sourceAmount = this.getExpectedSourceAmount();
+        this.model.srcAmountInvalidated = !this.isValidAmount(sourceAmount);
         if (!this.model.srcAmountInvalidated) {
             return;
         }
@@ -1552,7 +1697,8 @@ export class TransactionView extends AppView {
     }
 
     validateDestAmount() {
-        this.model.destAmountInvalidated = !this.isValidAmount(this.model.fDestAmount);
+        const destAmount = this.getExpectedDestAmount();
+        this.model.destAmountInvalidated = !this.isValidAmount(destAmount);
         if (!this.model.destAmountInvalidated) {
             return;
         }
@@ -1593,7 +1739,7 @@ export class TransactionView extends AppView {
 
     async submit() {
         const startFromDestAmount = (
-            (this.model.type === EXPENSE)
+            (this.model.type === EXPENSE || this.model.type === LIMIT_CHANGE)
             || (this.model.type === DEBT && !this.model.debtType)
         );
 
@@ -1725,7 +1871,7 @@ export class TransactionView extends AppView {
     }
 
     async changeDestAccount(val) {
-        const availTypes = [INCOME, TRANSFER];
+        const availTypes = [INCOME, TRANSFER, LIMIT_CHANGE];
         assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination account');
 
         const newAcc = this.appState().accounts.getItem(val);
@@ -1741,8 +1887,10 @@ export class TransactionView extends AppView {
         this.calculateDestResult();
 
         // Copy destination currency to source currency if needed
-        // Transition 1 or 23
-        if (this.model.type === INCOME && !this.model.isDiffCurr) {
+        if (
+            (this.model.type === INCOME && !this.model.isDiffCurr)
+            || (this.model.type === LIMIT_CHANGE)
+        ) {
             this.model.src_curr_id = this.model.dest_curr_id;
             this.model.srcCurr = this.model.destCurr;
         }
@@ -1784,7 +1932,7 @@ export class TransactionView extends AppView {
                 }
             } else {
                 if (this.model.fSrcAmount !== this.model.fDestAmount) {
-                    this.setDestAmount(this.model, this.model.fSrcAmount);
+                    this.setDestAmount(this.model.fSrcAmount);
                 }
 
                 const sameStates = [0, 1, 2]; // Transition 7, 13 or 17
@@ -1799,6 +1947,13 @@ export class TransactionView extends AppView {
                     });
                 }
             }
+        } else if (this.model.type === LIMIT_CHANGE) {
+            const { precision } = this.model.destCurr;
+            const cutVal = trimToDigitsLimit(this.model.destAmount, precision);
+            this.model.destAmount = normalize(cutVal, precision);
+
+            this.setDestAmount(this.model.destAmount);
+            this.setSrcAmount(this.model.destAmount);
         }
 
         // Update exchange rate
@@ -1891,6 +2046,8 @@ export class TransactionView extends AppView {
     }
 
     async inputDestAmount(val) {
+        assert(this.content.destAmountRow?.content?.visible, 'Destination amount field not visible');
+
         if (this.model.type === INCOME) {
             assert(this.model.isDiffCurr, `Invalid state: can't input destination amount on state ${this.model.state}`);
         }
@@ -2008,6 +2165,10 @@ export class TransactionView extends AppView {
                 18: 19, // Transition 107
                 21: 20, // Transition 119
             });
+        } else if (this.model.type === LIMIT_CHANGE) {
+            this.stateTransition(this.model, {
+                1: 0, // Transition 2
+            });
         }
 
         this.expectedState = this.getExpectedState();
@@ -2048,6 +2209,10 @@ export class TransactionView extends AppView {
                 17: 16, // Transition 92
                 19: 18, // Transition 108
                 20: 21, // Transition 118
+            });
+        } else if (this.model.type === LIMIT_CHANGE) {
+            this.stateTransition(this.model, {
+                0: 1, // Transition 1
             });
         }
 
@@ -2123,7 +2288,7 @@ export class TransactionView extends AppView {
                 } else {
                     this.setDestAmount(this.model.fSrcAmount);
                 }
-            } else if (this.model.type === TRANSFER) {
+            } else if ([TRANSFER, DEBT, LIMIT_CHANGE].includes(this.model.type)) {
                 const newDestAmount = normalize(
                     fNewValue - this.model.destAccount.balance,
                     precision,
@@ -2138,16 +2303,6 @@ export class TransactionView extends AppView {
                 } else {
                     this.setSrcAmount(this.model.destAmount);
                 }
-            } else if (this.model.type === DEBT) {
-                const newDestAmount = normalize(
-                    fNewValue - this.model.destAccount.balance,
-                    precision,
-                );
-
-                this.model.destAmount = newDestAmount;
-                this.model.fDestAmount = newDestAmount;
-
-                this.setSrcAmount(this.model.destAmount);
             }
         }
 

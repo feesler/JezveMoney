@@ -312,7 +312,7 @@ export class ImportRulesStory extends TestStory {
     async create() {
         setBlock('Create import rules', 1);
 
-        const { MARIA, TRANSPORT_CATEGORY } = App.scenario;
+        const { CREDIT_CARD, MARIA, TRANSPORT_CATEGORY } = App.scenario;
 
         setBlock('Create import rule #1', 2);
         await ImportTests.createRule();
@@ -388,6 +388,24 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_DEST_AMOUNT },
             { action: 'inputAmount', data: '500.5678' },
+        ]);
+        await ImportTests.submitRule();
+
+        setBlock('Create import rule #4', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+            { action: 'changeAccount', data: CREDIT_CARD },
+        ]);
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'CREDIT LIMIT' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+            { action: 'changeTransactionType', data: 'limit' },
         ]);
         await ImportTests.submitRule();
     }
@@ -522,9 +540,11 @@ export class ImportRulesStory extends TestStory {
 
         // Create at least one account
         await api.account.create({
+            type: 0,
             name: 'Test Account 1',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });

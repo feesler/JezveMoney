@@ -43,6 +43,15 @@ const create = async () => {
         conditions: [taxiCondition],
         actions: [taxiAction],
     }, {
+        flags: 0,
+        conditions: [
+            conditions.mainAccount.is.value(App.scenario.ACCOUNT_3),
+            conditions.comment.includes.value('CREDIT LIMIT'),
+        ],
+        actions: [
+            actions.setTransactionType('limit'),
+        ],
+    }, {
         // Invalid rules
         flags: 0,
     }, {

@@ -1,10 +1,11 @@
-import { setBlock, TestStory } from 'jezve-test';
+import { assert, setBlock, TestStory } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-    availTransTypes,
+    basicTransTypes,
+    LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
@@ -13,6 +14,7 @@ import * as expenseTests from './expense.js';
 import * as incomeTests from './income.js';
 import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
+import * as creditLimitTests from './creditLimit.js';
 import * as AccountTests from '../../../run/account.js';
 
 export class TransactionsStory extends TestStory {
@@ -55,6 +57,7 @@ export class TransactionsStory extends TestStory {
         await incomeTests.stateLoop();
         await transferTests.stateLoop();
         await debtTests.stateLoop();
+        await creditLimitTests.stateLoop();
 
         await this.typeChangeLoop();
     }
@@ -66,6 +69,7 @@ export class TransactionsStory extends TestStory {
         await this.createIncome();
         await this.createTransfer();
         await this.createDebt();
+        await this.createLimitChange();
     }
 
     async update() {
@@ -75,6 +79,7 @@ export class TransactionsStory extends TestStory {
         await this.updateIncome();
         await this.updateTransfer();
         await this.updateDebt();
+        await this.updateLimitChange();
     }
 
     async del() {
@@ -84,6 +89,7 @@ export class TransactionsStory extends TestStory {
         await this.deleteIncome();
         await this.deleteTransfer();
         await this.deleteDebt();
+        await this.deleteLimitChange();
     }
 
     async createExpense() {
@@ -501,6 +507,28 @@ export class TransactionsStory extends TestStory {
         ]);
     }
 
+    async createLimitChange() {
+        setBlock('Create credit limit change transactions', 1);
+
+        const {
+            CREDIT_CARD,
+        } = App.scenario;
+
+        const accounts = App.state.getSortedUserAccounts();
+        const index = accounts.getIndexById(CREDIT_CARD);
+        assert(index !== -1, 'Account not found');
+
+        await TransactionTests.createFromAccountAndSubmit(index, [
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'inputDestAmount', data: '10000' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(index, [
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'inputDestAmount', data: '-5000' },
+        ]);
+    }
+
     async updateExpense() {
         setBlock('Update expense transactions', 2);
 
@@ -681,17 +709,31 @@ export class TransactionsStory extends TestStory {
         ]);
     }
 
+    async updateLimitChange() {
+        setBlock('Update credit limit transactions', 2);
+
+        await TransactionTests.updateAndSubmit(LIMIT_CHANGE, 0, [
+            { action: 'clickDestAmount' },
+            { action: 'inputDestAmount', data: '100000' },
+        ]);
+        await TransactionTests.updateAndSubmit(LIMIT_CHANGE, 1, [
+            { action: 'clickDestAmount' },
+            { action: 'inputDestAmount', data: '5000' },
+            { action: 'changeDestAccount', data: App.scenario.BTC_CREDIT },
+        ]);
+    }
+
     async updateFromMainView() {
         setBlock('Update transactions from main view', 2);
 
         const { MARIA } = App.scenario;
 
-        await TransactionTests.updateFromMainViewAndSubmit(0, [
+        await TransactionTests.updateFromMainViewAndSubmit(2, [
             { action: 'changePerson', data: MARIA },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
-        await TransactionTests.updateFromMainViewAndSubmit(3, [
+        await TransactionTests.updateFromMainViewAndSubmit(4, [
             { action: 'inputSrcAmount', data: '555' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
@@ -760,6 +802,12 @@ export class TransactionsStory extends TestStory {
         await App.scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
     }
 
+    async deleteLimitChange() {
+        setBlock('Delete credit limit transactions', 2);
+
+        await TransactionTests.del(LIMIT_CHANGE, [0]);
+    }
+
     async deleteFromMainView() {
         setBlock('Delete transactions from main view', 2);
 
@@ -782,7 +830,7 @@ export class TransactionsStory extends TestStory {
         await App.goToMainView();
         await App.view.goToNewTransactionByAccount(0);
 
-        const { CAFE_CATEGORY } = App.scenario;
+        const { CREDIT_CARD, CAFE_CATEGORY } = App.scenario;
 
         // Start from Expense type
         await TransactionTests.runActions([
@@ -801,6 +849,15 @@ export class TransactionsStory extends TestStory {
             { action: 'changeTransactionType', data: DEBT },
             // Disable account to check obtaining first visible account on switch to expense
             { action: 'toggleAccount' },
+            { action: 'changeTransactionType', data: EXPENSE },
+            { action: 'changeSrcAccount', data: CREDIT_CARD },
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'changeTransactionType', data: EXPENSE },
         ]);
 
@@ -834,9 +891,11 @@ export class TransactionsStory extends TestStory {
 
         // Create user account
         const account = await api.account.create({
+            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1000',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -893,9 +952,11 @@ export class TransactionsStory extends TestStory {
 
         // Create first account
         const { id: account1 } = await api.account.create({
+            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -903,7 +964,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 account and no person', 2);
         // Only Expense and Income must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Expense
@@ -915,9 +976,11 @@ export class TransactionsStory extends TestStory {
 
         // Create second account
         const { id: account2 } = await api.account.create({
+            type: 0,
             name: 'Account 2',
             curr_id: RUB,
             initbalance: '2',
+            limit: 0,
             icon_id: 1,
             flags: 0,
         });
@@ -925,7 +988,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 accounts and no person', 2);
         // Expense, Income and Transfer must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Transfer
@@ -941,7 +1004,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 accounts and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         // Hide first account
         await api.account.hide({ id: account1 });
@@ -949,7 +1012,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 visible, 1 hidden account and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         // Hide second account
         await api.account.hide({ id: account2 });
@@ -957,7 +1020,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 hidden accounts and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         // Remove account
         await api.account.show({ id: account1 });
@@ -966,7 +1029,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 account and 1 person', 2);
         // Expense, Income and Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         // Remove account
         await api.account.del({ id: account1 });
@@ -974,7 +1037,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and 1 person', 2);
         // Only Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
 
         // Hide person
         await api.person.hide({ id: person1 });
@@ -982,7 +1045,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and 1 hidden person', 2);
         // Only Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
         // Check state of Debt transaction after swap source and destination
         await TransactionTests.runAction({ action: 'swapSourceAndDest' });
 
@@ -992,6 +1055,6 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and no persons', 2);
         // Expected no transaction available
-        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
     }
 }

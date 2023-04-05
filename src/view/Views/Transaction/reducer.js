@@ -11,8 +11,10 @@ import {
     INCOME,
     DEBT,
     TRANSFER,
+    LIMIT_CHANGE,
 } from '../../js/model/Transaction.js';
 import * as STATE from './stateId.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
 
 // Tools
 
@@ -302,6 +304,7 @@ const slice = createSlice({
             [STATE.DT_D_RESULT_EXCH]: STATE.DT_D_AMOUNT_EXCH,
             [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_D_AMOUNT_S_RESULT,
             [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+            [STATE.L_RESULT]: STATE.L_AMOUNT,
         };
 
         const newId = stateTransition(state, stateMap);
@@ -359,6 +362,7 @@ const slice = createSlice({
             [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_D_RESULT_EXCH,
             [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_S_RESULT_D_RESULT,
             [STATE.DG_S_RESULT_EXCH]: STATE.DG_S_RESULT_D_RESULT,
+            [STATE.L_AMOUNT]: STATE.L_RESULT,
         };
 
         const newId = stateTransition(state, stateMap);
@@ -477,7 +481,7 @@ const slice = createSlice({
     },
 
     destAccountChange: (state, accountId) => {
-        const availTypes = [INCOME, TRANSFER];
+        const availTypes = [INCOME, TRANSFER, LIMIT_CHANGE];
         if (
             !availTypes.includes(state.transaction.type)
             || state.transaction.dest_id === accountId
@@ -503,14 +507,17 @@ const slice = createSlice({
         // Update result balance of destination
         calculateDestResult(newState);
 
-        if (transaction.type === INCOME) {
-            // If currencies are same before account was changed
-            // then copy destination currency to source
-            if (!state.isDiff) {
-                newState.transaction.src_curr = destAccount.curr_id;
-                newState.srcCurrency = destCurrency;
-            }
+        // If currencies are same before account was changed
+        // then copy destination currency to source
+        if (
+            (transaction.type === INCOME && !state.isDiff)
+            || (transaction.type === LIMIT_CHANGE)
+        ) {
+            transaction.src_curr = destAccount.curr_id;
+            newState.srcCurrency = destCurrency;
+        }
 
+        if (transaction.type === INCOME) {
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
             if (state.isDiff && !newState.isDiff) {
                 setStateSourceAmount(newState, transaction.dest_amount);
@@ -552,6 +559,14 @@ const slice = createSlice({
                 const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
                 newState.id = stateTransition(state, stateMap);
             }
+        }
+
+        if (transaction.type === LIMIT_CHANGE) {
+            const { precision } = destCurrency;
+            transaction.dest_amount = normalize(transaction.dest_amount, precision);
+
+            setStateDestAmount(newState, transaction.dest_amount);
+            setStateSourceAmount(newState, transaction.dest_amount);
         }
 
         updateStateExchange(newState);
@@ -1197,6 +1212,7 @@ const slice = createSlice({
             },
         };
         const { transaction } = newState;
+        const currentType = state.transaction.type;
 
         // Check availability of selected type of transaction
         if (type === EXPENSE || type === INCOME) {
@@ -1205,13 +1221,17 @@ const slice = createSlice({
             newState.isAvailable = userAccounts.length > 1;
         } else if (type === DEBT) {
             newState.isAvailable = persons.length > 0;
+        } else if (type === LIMIT_CHANGE) {
+            if (currentType === EXPENSE) {
+                newState.isAvailable = state.srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD;
+            } else if (currentType === INCOME) {
+                newState.isAvailable = state.destAccount?.type === ACCOUNT_TYPE_CREDIT_CARD;
+            }
         }
 
         if (!newState.isAvailable) {
             return newState;
         }
-
-        const currentType = state.transaction.type;
 
         if (type === EXPENSE) {
             transaction.dest_id = 0;
@@ -1235,7 +1255,7 @@ const slice = createSlice({
                 setStateSourceAmount(newState, state.form.sourceAmount);
                 setStateDestAmount(newState, state.form.destAmountz);
                 updateStateExchange(newState);
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
                 transaction.src_id = state.transaction.dest_id;
                 transaction.src_curr = state.transaction.dest_curr;
                 transaction.dest_curr = state.transaction.src_curr;
@@ -1257,7 +1277,9 @@ const slice = createSlice({
                     [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.E_S_AMOUNT_D_AMOUNT,
                     [STATE.I_S_AMOUNT_EXCH]: STATE.E_S_AMOUNT_EXCH,
                     [STATE.I_S_AMOUNT_D_RESULT]: STATE.E_S_AMOUNT_S_RESULT,
-                });
+                    [STATE.L_RESULT]: STATE.E_S_RESULT,
+                    [STATE.L_AMOUNT]: STATE.E_D_AMOUNT,
+                }, false);
             } else if (currentType === TRANSFER) {
                 newState.id = STATE.E_D_AMOUNT;
                 transaction.dest_curr = transaction.src_curr;
@@ -1354,6 +1376,11 @@ const slice = createSlice({
                 newState.srcCurrency = newState.destCurrency;
 
                 calculateDestResult(newState);
+            } else if (currentType === LIMIT_CHANGE) {
+                newState.id = stateTransition(state, {
+                    [STATE.L_RESULT]: STATE.I_D_RESULT,
+                    [STATE.L_AMOUNT]: STATE.I_S_AMOUNT,
+                });
             }
 
             if (state.isAvailable) {
@@ -1366,7 +1393,7 @@ const slice = createSlice({
         if (type === TRANSFER) {
             if (currentType === EXPENSE) {
                 setStateNextDestAccount(newState, transaction.src_id);
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
                 setStateNextSourceAccount(newState, transaction.dest_id);
             } else if (currentType === DEBT) {
                 if (!state.isAvailable) {
@@ -1433,7 +1460,7 @@ const slice = createSlice({
                 transaction.dest_curr = state.srcAccount.curr_id;
 
                 transaction.noAccount = false;
-            } else if (currentType === INCOME) {
+            } else if (currentType === INCOME || currentType === LIMIT_CHANGE) {
                 transaction.debtType = true;
                 newState.account = state.destAccount;
                 transaction.dest_id = state.destAccount.id;
@@ -1471,6 +1498,78 @@ const slice = createSlice({
             updateStateExchange(newState);
         }
 
+        if (type === LIMIT_CHANGE) {
+            transaction.src_id = 0;
+            if (currentType === EXPENSE) {
+                transaction.dest_id = state.transaction.src_id;
+                transaction.dest_curr = state.transaction.src_curr;
+            } else if (currentType === INCOME) {
+                transaction.dest_id = state.transaction.dest_id;
+                setStateDestAmount(newState, state.form.sourceAmount);
+            } else if (currentType === DEBT) {
+                const account = (state.account)
+                    ? state.account
+                    : userAccounts.getItemByIndex(0);
+                transaction.dest_id = account.id;
+            }
+            transaction.src_curr = state.transaction.dest_curr;
+
+            newState.srcAccount = null;
+            newState.destAccount = accountModel.getItem(transaction.dest_id);
+            newState.srcCurrency = currencyModel.getItem(transaction.src_curr);
+            newState.destCurrency = currencyModel.getItem(transaction.dest_curr);
+
+            setStateSourceAmount(newState, state.form.destAmount);
+
+            newState.id = stateTransition(state, {
+                [STATE.E_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.E_S_RESULT]: STATE.L_RESULT,
+                [STATE.E_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.E_S_AMOUNT_EXCH]: STATE.L_AMOUNT,
+                [STATE.E_S_AMOUNT_S_RESULT]: STATE.L_RESULT,
+
+                [STATE.I_D_RESULT]: STATE.L_RESULT,
+                [STATE.I_S_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.I_S_AMOUNT_EXCH]: STATE.L_AMOUNT,
+                [STATE.I_S_AMOUNT_D_RESULT]: STATE.L_RESULT,
+                [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+
+                [STATE.T_S_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.T_S_RESULT]: STATE.L_RESULT,
+                [STATE.T_D_RESULT]: STATE.L_RESULT,
+                [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.T_D_AMOUNT_S_RESULT]: STATE.L_RESULT,
+                [STATE.T_S_AMOUNT_D_RESULT]: STATE.L_RESULT,
+                [STATE.T_S_RESULT_D_RESULT]: STATE.L_RESULT,
+                [STATE.T_S_AMOUNT_EXCH]: STATE.L_AMOUNT,
+                [STATE.T_EXCH_S_RESULT]: STATE.L_RESULT,
+
+                [STATE.DG_S_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DG_S_RESULT]: STATE.L_RESULT,
+                [STATE.DG_D_RESULT]: STATE.L_RESULT,
+                [STATE.DT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DT_D_RESULT]: STATE.L_RESULT,
+                [STATE.DT_S_RESULT]: STATE.L_RESULT,
+                [STATE.DG_NOACC_S_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DT_NOACC_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DT_NOACC_D_RESULT]: STATE.L_RESULT,
+                [STATE.DG_NOACC_S_RESULT]: STATE.L_RESULT,
+                [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DG_D_AMOUNT_S_RESULT]: STATE.L_RESULT,
+                [STATE.DG_S_AMOUNT_EXCH]: STATE.L_AMOUNT,
+                [STATE.DG_S_RESULT_EXCH]: STATE.L_RESULT,
+                [STATE.DG_S_RESULT_D_RESULT]: STATE.L_RESULT,
+                [STATE.DG_S_AMOUNT_D_RESULT]: STATE.L_RESULT,
+                [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.L_AMOUNT,
+                [STATE.DT_S_AMOUNT_D_RESULT]: STATE.L_RESULT,
+                [STATE.DT_D_AMOUNT_EXCH]: STATE.L_AMOUNT,
+                [STATE.DT_D_RESULT_EXCH]: STATE.L_RESULT,
+                [STATE.DT_S_RESULT_D_RESULT]: STATE.L_RESULT,
+                [STATE.DT_D_AMOUNT_S_RESULT]: STATE.L_AMOUNT,
+            });
+        }
+
         // Delete Debt specific fields
         if (currentType === DEBT) {
             delete newState.account;
@@ -1493,7 +1592,8 @@ const slice = createSlice({
     },
 
     swapSourceAndDest: (state) => {
-        if (state.transaction.type === EXPENSE || state.transaction.type === INCOME) {
+        const swapTypes = [TRANSFER, DEBT];
+        if (!swapTypes.includes(state.transaction.type)) {
             return state;
         }
 

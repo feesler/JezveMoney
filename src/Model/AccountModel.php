@@ -11,6 +11,13 @@ use function JezveMoney\Core\inSetCondition;
 
 define("ACCOUNT_HIDDEN", 1);
 
+define("ACCOUNT_TYPE_OTHER", 0);
+define("ACCOUNT_TYPE_CASH", 1);
+define("ACCOUNT_TYPE_DEBIT_CARD", 2);
+define("ACCOUNT_TYPE_CREDIT_CARD", 3);
+define("ACCOUNT_TYPE_CREDIT", 4);
+define("ACCOUNT_TYPE_DEPOSIT", 5);
+
 /**
  * Accounts model
  */
@@ -20,6 +27,15 @@ class AccountModel extends CachedTable
 
     private static $user_id = 0;
     private static $owner_id = 0;
+
+    private static $availTypes = [
+        ACCOUNT_TYPE_OTHER,
+        ACCOUNT_TYPE_CASH,
+        ACCOUNT_TYPE_DEBIT_CARD,
+        ACCOUNT_TYPE_CREDIT_CARD,
+        ACCOUNT_TYPE_CREDIT,
+        ACCOUNT_TYPE_DEPOSIT,
+    ];
 
     protected $tbl_name = "accounts";
     protected $currMod = null;
@@ -78,7 +94,7 @@ class AccountModel extends CachedTable
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = ["owner_id", "name", "initbalance", "curr_id", "icon_id", "flags"];
+        $avFields = ["owner_id", "type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
@@ -93,6 +109,13 @@ class AccountModel extends CachedTable
             }
         }
 
+        if (isset($params["type"])) {
+            $res["type"] = intval($params["type"]);
+            if (!in_array($res["type"], self::$availTypes)) {
+                throw new \Error("Invalid type specified");
+            }
+        }
+
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
@@ -102,6 +125,10 @@ class AccountModel extends CachedTable
 
         if (isset($params["initbalance"])) {
             $res["initbalance"] = floatval($params["initbalance"]);
+        }
+
+        if (isset($params["limit"])) {
+            $res["limit"] = floatval($params["limit"]);
         }
 
         if (isset($params["curr_id"])) {
@@ -209,7 +236,7 @@ class AccountModel extends CachedTable
 
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $item->curr_id);
 
-        $currObj = $this->currMod->getItem($item->curr_id);
+        $currObj = $this->currMod->getItem($res["curr_id"] ?? $item->curr_id);
         if (!$currObj) {
             throw new \Error("Currency not found");
         }
@@ -219,7 +246,7 @@ class AccountModel extends CachedTable
         $minDiff = pow(0.1, $currObj->precision);
         if (abs($diff) >= $minDiff) {
             $this->balanceUpdated = true;
-            $res["balance"] = $item->balance + $diff;
+            $res["balance"] = normalize($item->balance + $diff, $currObj->precision);
         } else {
             $this->balanceUpdated = false;
             unset($res["balance"]);
@@ -523,9 +550,11 @@ class AccountModel extends CachedTable
         }
 
         $createRes = $this->create([
+            "type" => 0,
             "owner_id" => $person_id,
             "name" => "acc_" . $person_id . "_" . $curr_id,
             "initbalance" => 0.0,
+            "limit" => 0,
             "curr_id" => $curr_id,
             "icon_id" => 0,
             "flags" => 0
@@ -640,18 +669,24 @@ class AccountModel extends CachedTable
      * Sets balance of account
      *
      * @param int $acc_id account id
-     * @param float $balance new balance
+     * @param float $balance new balance value
+     * @param float|null $limit optional new credit limit value
      *
      * @return bool
      */
-    public function setBalance(int $acc_id, float $balance)
+    public function setBalance(int $acc_id, float $balance, ?float $limit = null)
     {
         $accObj = $this->getItem($acc_id);
         if (!$accObj) {
             return false;
         }
 
-        if (!$this->dbObj->updateQ($this->tbl_name, ["balance" => $balance], "id=" . $acc_id)) {
+        $data = ["balance" => $balance];
+        if (!is_null($limit)) {
+            $data["limit"] = $limit;
+        }
+
+        if (!$this->dbObj->updateQ($this->tbl_name, $data, "id=" . $acc_id)) {
             return false;
         }
 
@@ -679,17 +714,21 @@ class AccountModel extends CachedTable
 
         $curDate = date("Y-m-d H:i:s");
         $accounts = [];
-        foreach ($balanceChanges as $acc_id => $balance) {
+        foreach ($balanceChanges as $acc_id => $accountChanges) {
             $accObj = $this->getItem($acc_id);
             if (!$accObj) {
                 return false;
             }
 
             if ($updateInitial) {
-                $accObj->initbalance = $balance;
+                $accObj->initbalance = $accountChanges["balance"];
             }
 
-            $accObj->balance = $balance;
+            if (isset($accountChanges["limit"])) {
+                $accObj->limit = $accountChanges["limit"];
+            }
+
+            $accObj->balance = $accountChanges["balance"];
             $accObj->createdate = date("Y-m-d H:i:s", $accObj->createdate);
             $accObj->updatedate = $curDate;
 
@@ -698,7 +737,7 @@ class AccountModel extends CachedTable
 
         if (count($accounts) == 1 && !$updateInitial) {
             $account = $accounts[0];
-            $this->setBalance($account["id"], $account["balance"]);
+            $this->setBalance($account["id"], $account["balance"], $account["limit"]);
         } else {
             if (!$this->dbObj->updateMultipleQ($this->tbl_name, $accounts)) {
                 return false;
@@ -716,6 +755,7 @@ class AccountModel extends CachedTable
      * @param array $params array of options:
      *     - 'visibility' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
      *     - 'owner' => (string|int) - select accounts by owner. Possible values: "all", "user" or (int) for id
+     *     - 'type' => (int) - select accounts by type
      *     - 'sort' => (string) - sort result array. Possible value: "visibility"
      *
      * @return AccountItem[]
@@ -731,6 +771,7 @@ class AccountModel extends CachedTable
         $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
         $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
         $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
+        $typeFilter = (isset($params["type"]) && is_numeric($params["type"])) ? intval($params["type"]) : null;
         $person_id = (isset($params["owner"]) && is_numeric($params["owner"])) ? intval($params["owner"]) : 0;
         if ($person_id) {
             $includePersons = true;
@@ -755,6 +796,9 @@ class AccountModel extends CachedTable
                 continue;
             }
             if (!$includePersons && $item->owner_id != self::$owner_id) {
+                continue;
+            }
+            if (!is_null($typeFilter) && $item->type != $typeFilter) {
                 continue;
             }
             $hidden = $this->isHidden($item);
@@ -797,7 +841,8 @@ class AccountModel extends CachedTable
      * Returns count of accounts
      *
      * @param array $params array of options:
-     *     - 'type' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'visibility' => (string) - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *     - 'type' => (int) - select accounts by type
      *     - 'full' => (bool) - include person accounts, default is false
      *
      * @return int
@@ -811,9 +856,10 @@ class AccountModel extends CachedTable
         }
 
         $includePersons = (isset($params["full"]) && $params["full"] == true);
-        $requestedType = isset($params["type"]) ? $params["type"] : "visible";
-        $includeVisible = in_array($requestedType, ["all", "visible"]);
-        $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $requestedVisibility = isset($params["visibility"]) ? $params["visibility"] : "visible";
+        $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
+        $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
+        $typeFilter = (isset($params["type"]) && is_numeric($params["type"])) ? intval($params["type"]) : 0;
 
         foreach ($this->cache as $item) {
             if (!$includePersons && $item->owner_id != self::$owner_id) {
@@ -821,6 +867,9 @@ class AccountModel extends CachedTable
             }
             $hidden = $this->isHidden($item);
             if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden)) {
+                continue;
+            }
+            if (!is_null($typeFilter) && $item->type != $typeFilter) {
                 continue;
             }
 
@@ -888,11 +937,18 @@ class AccountModel extends CachedTable
     /**
      * Returns array of user accounts sorted by visibility
      *
-     * @return array
+     * @param array $params additional parameters
+     *
+     * @return AccountItem[]
      */
-    public function getUserAccounts()
+    public function getUserAccounts(array $params = [])
     {
-        return $this->getData(["visibility" => "all", "sort" => "visibility"]);
+        $params = array_merge($params, [
+            "visibility" => "all",
+            "sort" => "visibility",
+        ]);
+
+        return $this->getData($params);
     }
 
     /**

@@ -19,7 +19,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 19;
+    protected $latestVersion = 21;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -727,6 +727,48 @@ class DBVersion
     }
 
     /**
+     * Creates database version 20
+     *
+     * @return int
+     */
+    private function version20()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "accounts";
+        $res = $this->dbClient->addColumns($tableName, ["type" => "INT NOT NULL DEFAULT '0'"]);
+        if (!$res) {
+            throw new \Error("Fail to update accounts table");
+        }
+
+        return 20;
+    }
+
+    /**
+     * Creates database version 21
+     *
+     * @return int
+     */
+    private function version21()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+        $tableName = "accounts";
+        $res = $this->dbClient->addColumns(
+            $tableName,
+            ["limit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'"],
+        );
+        if (!$res) {
+            throw new \Error("Fail to update accounts table");
+        }
+
+        return 21;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -777,9 +819,11 @@ class DBVersion
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
                 "`owner_id` INT(11) NOT NULL, " .
                 "`user_id` INT(11) NOT NULL, " .
+                "`type` INT NOT NULL DEFAULT '0', " .
                 "`curr_id` INT(11) NOT NULL, " .
                 "`balance` " . DECIMAL_TYPE . " NOT NULL, " .
                 "`initbalance` " . DECIMAL_TYPE . " NOT NULL, " .
+                "`limit` " . DECIMAL_TYPE . " NOT NULL DEFAULT '0', " .
                 "`name` VARCHAR(255) NOT NULL, " .
                 "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
                 "`flags` INT(11) NOT NULL DEFAULT '0', " .

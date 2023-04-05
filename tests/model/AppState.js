@@ -5,17 +5,23 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { isValidValue, availSortTypes } from '../common.js';
+import { isValidValue, availSortTypes, normalize } from '../common.js';
 import {
     EXPENSE,
     INCOME,
     DEBT,
     availTransTypes,
     TRANSFER,
+    LIMIT_CHANGE,
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { ImportRule } from './ImportRule.js';
-import { ACCOUNT_HIDDEN, AccountsList } from './AccountsList.js';
+import {
+    ACCOUNT_HIDDEN,
+    ACCOUNT_TYPE_CREDIT_CARD,
+    AccountsList,
+    accountTypes,
+} from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
 import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
@@ -29,7 +35,7 @@ const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
 const availSettings = sortSettings;
 
 /** Accounts */
-const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'flags'];
+const accReqFields = ['type', 'name', 'balance', 'initbalance', 'limit', 'curr_id', 'icon_id', 'flags'];
 
 /** Persons */
 const pReqFields = ['name', 'flags'];
@@ -706,6 +712,11 @@ export class AppState {
             return false;
         }
 
+        const type = parseInt(params.type, 10);
+        if (typeof accountTypes[type] !== 'string') {
+            return false;
+        }
+
         // Check there is no account with same name
         const accObj = this.accounts.findByName(params.name);
         if (accObj && (!params.id || (params.id && params.id !== accObj.id))) {
@@ -722,6 +733,9 @@ export class AppState {
         }
 
         if (!isValidValue(params.initbalance)) {
+            return false;
+        }
+        if (!isValidValue(params.limit)) {
             return false;
         }
 
@@ -766,9 +780,15 @@ export class AppState {
             return false;
         }
 
-        const balDiff = expAccount.initbalance - origAcc.initbalance;
-        if (balDiff.toFixed(2) !== 0) {
-            expAccount.balance = origAcc.balance + balDiff;
+        const currency = App.currency.getItem(params.curr_id);
+        if (!currency) {
+            return false;
+        }
+
+        const { precision } = currency;
+        const balDiff = normalize(expAccount.initbalance - origAcc.initbalance, precision);
+        if (parseFloat(balDiff.toFixed(precision)) !== 0) {
+            expAccount.balance = normalize(origAcc.balance + balDiff, precision);
         }
 
         // Prepare expected updates of transactions list
@@ -1528,6 +1548,13 @@ export class AppState {
                 ) {
                     return false;
                 }
+
+                if (
+                    params.type === LIMIT_CHANGE
+                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+                ) {
+                    return false;
+                }
             } else if (params.type === EXPENSE || params.type === TRANSFER) {
                 return false;
             }
@@ -1542,6 +1569,13 @@ export class AppState {
                     !account
                     || destCurr.id !== account.curr_id
                     || account.owner_id !== this.profile.owner_id
+                ) {
+                    return false;
+                }
+
+                if (
+                    params.type === LIMIT_CHANGE
+                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
                 ) {
                     return false;
                 }
@@ -1842,9 +1876,12 @@ export class AppState {
         if (type === TRANSFER) {
             return (this.userAccountsCache.length > 1);
         }
+        if (type === DEBT) {
+            return (this.persons.length > 0);
+        }
 
-        // DEBT
-        return (this.persons.length > 0);
+        // LIMIT_CHANGE
+        return this.userAccountsCache.some((item) => item.type === ACCOUNT_TYPE_CREDIT_CARD);
     }
 
     /**

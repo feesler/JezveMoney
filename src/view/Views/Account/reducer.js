@@ -3,6 +3,14 @@ import { getCurrencyPrecision, normalize } from '../../js/utils.js';
 
 // Reducers
 const slice = createSlice({
+    changeType: (state, type) => ({
+        ...state,
+        data: {
+            ...state.data,
+            type,
+        },
+    }),
+
     changeIcon: (state, iconId) => ({
         ...state,
         data: {
@@ -30,6 +38,23 @@ const slice = createSlice({
             ...state.data,
             initbalance: value,
             fInitBalance: normalize(
+                value,
+                getCurrencyPrecision(state.data.curr_id),
+            ),
+        },
+    }),
+
+    changeLimit: (state, value) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            limit: true,
+            valid: true,
+        },
+        data: {
+            ...state.data,
+            limit: value,
+            fLimit: normalize(
                 value,
                 getCurrencyPrecision(state.data.curr_id),
             ),
@@ -64,6 +89,15 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             initbalance: false,
+            valid: false,
+        },
+    }),
+
+    invalidateLimitField: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            limit: false,
             valid: false,
         },
     }),

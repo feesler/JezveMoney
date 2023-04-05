@@ -13,6 +13,7 @@ import { generateId } from '../common.js';
 import { App } from '../Application.js';
 import { AccountView } from '../view/AccountView.js';
 import { __ } from '../model/locale.js';
+import { getAccountTypeName } from '../model/AccountsList.js';
 
 /** Navigate to accounts list page */
 const checkNavigation = async () => {
@@ -28,6 +29,7 @@ export const create = async () => {
 
         await App.state.fetch();
         const expAccount = {
+            type: 0,
             name: '',
             owner_id: App.owner_id,
             initbalance: '',
@@ -85,6 +87,11 @@ export const inputName = async (value) => {
 
 export const inputBalance = async (value) => {
     await test(`Input initial balance '${value}'`, () => App.view.inputBalance(value));
+};
+
+export const changeType = async (value) => {
+    const typeName = getAccountTypeName(value);
+    await test(`Change type to '${typeName}'`, () => App.view.changeType(value));
 };
 
 export const changeCurrency = async (value) => {

@@ -55,6 +55,11 @@
     <h3>Create account</h3>
     <form action="<?= BASEURL ?>api/account/create" method="post">
         <div class="std_margin">
+            <label for="create_account_type">Type</label>
+            <input id="create_account_type" class="input stretch-input" name="type" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="create_account_name">Name</label>
             <input id="create_account_name" class="input stretch-input" name="name" type="text">
         </div>
@@ -62,6 +67,11 @@
         <div class="std_margin">
             <label for="create_account_initbalance">Initial balance</label>
             <input id="create_account_initbalance" class="input stretch-input" name="initbalance" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="create_account_limit">Limit</label>
+            <input id="create_account_limit" class="input stretch-input" name="limit" type="text">
         </div>
 
         <div class="std_margin">
@@ -103,6 +113,11 @@
         </div>
 
         <div class="std_margin">
+            <label for="update_account_type">Type</label>
+            <input id="update_account_type" class="input stretch-input" name="type" type="text">
+        </div>
+
+        <div class="std_margin">
             <label for="update_account_name">Name</label>
             <input id="update_account_name" class="input stretch-input" name="name" type="text">
         </div>
@@ -110,6 +125,11 @@
         <div class="std_margin">
             <label for="update_account_initbalance">Initial balance</label>
             <input id="update_account_initbalance" class="input stretch-input" name="initbalance" type="text">
+        </div>
+
+        <div class="std_margin">
+            <label for="update_account_limit">Limit</label>
+            <input id="update_account_limit" class="input stretch-input" name="limit" type="text">
         </div>
 
         <div class="std_margin">

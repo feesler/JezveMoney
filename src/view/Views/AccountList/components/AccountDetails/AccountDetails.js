@@ -2,10 +2,13 @@ import { createElement } from 'jezvejs';
 import { __ } from '../../../../js/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
 
 /** CSS classes */
+const TYPE_FIELD_CLASS = 'type-field';
 const BALANCE_FIELD_CLASS = 'balance-field';
 const INITIAL_BALANCE_FIELD_CLASS = 'initbalance-field';
+const LIMIT_FIELD_CLASS = 'limit-field';
 const VISIBILITY_FIELD_CLASS = 'visibility-field';
 const TR_COUNT_FIELD_CLASS = 'trans-count-field inline-field';
 const VHIDDEN_CLASS = 'vhidden';
@@ -16,6 +19,11 @@ const VHIDDEN_CLASS = 'vhidden';
 export class AccountDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
+        this.typeField = Field.create({
+            title: __('ACCOUNT_TYPE'),
+            className: TYPE_FIELD_CLASS,
+        });
+
         this.initBalanceField = Field.create({
             title: __('ACCOUNT_INITIAL_BALANCE'),
             className: INITIAL_BALANCE_FIELD_CLASS,
@@ -24,6 +32,11 @@ export class AccountDetails extends ItemDetails {
         this.balanceField = Field.create({
             title: __('ACCOUNT_CURRENT_BALANCE'),
             className: BALANCE_FIELD_CLASS,
+        });
+
+        this.limitField = Field.create({
+            title: __('ACCOUNT_CREDIT_LIMIT'),
+            className: LIMIT_FIELD_CLASS,
         });
 
         this.visibilityField = Field.create({
@@ -44,8 +57,10 @@ export class AccountDetails extends ItemDetails {
         });
 
         return [
+            this.typeField.elem,
             this.balanceField.elem,
             this.initBalanceField.elem,
+            this.limitField.elem,
             this.visibilityField.elem,
             this.transactionsField.elem,
             this.transactionsLink,
@@ -75,6 +90,12 @@ export class AccountDetails extends ItemDetails {
         // Title
         this.heading.setTitle(item.name);
 
+        // Type
+        if (typeof accountTypes[item.type] !== 'string') {
+            throw new Error('Invalid account type');
+        }
+        this.typeField.setContent(accountTypes[item.type]);
+
         // Initial balance
         this.initBalanceField.setContent(
             currency.formatCurrency(item.initbalance, item.curr_id),
@@ -84,6 +105,15 @@ export class AccountDetails extends ItemDetails {
         this.balanceField.setContent(
             currency.formatCurrency(item.balance, item.curr_id),
         );
+
+        // Credit limit
+        const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
+        this.limitField.show(isCreditCard);
+        if (isCreditCard) {
+            this.limitField.setContent(
+                currency.formatCurrency(item.limit, item.curr_id),
+            );
+        }
 
         // Visibility
         const visibililty = item.isVisible() ? __('ITEM_VISIBLE') : __('ITEM_HIDDEN');

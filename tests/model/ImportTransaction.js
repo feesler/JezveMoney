@@ -13,6 +13,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
 } from './Transaction.js';
 
 export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
@@ -26,6 +27,7 @@ export class ImportTransaction {
         { id: 'transfer_in', titleToken: 'TR_TRANSFER_IN' },
         { id: 'debt_out', titleToken: 'TR_DEBT_OUT' },
         { id: 'debt_in', titleToken: 'TR_DEBT_IN' },
+        { id: 'limit', titleToken: 'TR_LIMIT_CHANGE' },
     ];
 
     /** Map transaction types from import to normal */
@@ -36,6 +38,7 @@ export class ImportTransaction {
         transfer_in: TRANSFER,
         debt_out: DEBT,
         debt_in: DEBT,
+        limit: LIMIT_CHANGE,
     };
 
     /** Convert import data to transaction object */
@@ -241,11 +244,14 @@ export class ImportTransaction {
                 }
             }
         } else if (this.type === 'debt_out' || this.type === 'debt_in') {
+            this.acc_id = this.mainAccount.id;
             if (this.type === 'debt_out') {
                 this.dest_curr = this.src_curr;
             } else {
                 this.src_curr = this.dest_curr;
             }
+        } else if (this.type === 'limit') {
+            this.src_curr = this.dest_curr;
         }
 
         this.trimAmounts();
@@ -352,6 +358,13 @@ export class ImportTransaction {
             if (category.type !== 0 && category.type !== realType) {
                 this.category_id = 0;
             }
+        } else if (value === 'limit') {
+            this.src_id = 0;
+            this.src_curr = before.dest_curr;
+            if (this.type === 'income') {
+                this.destAmount = this.sourceAmount;
+            }
+            this.sourceAmount = this.destAmount;
         }
 
         this.trimAmounts();
@@ -369,8 +382,9 @@ export class ImportTransaction {
         };
 
         const invertedType = invertMap[this.type];
-
-        this.setTransactionType(invertedType);
+        if (invertedType) {
+            this.setTransactionType(invertedType);
+        }
     }
 
     setAccount(value) {
@@ -535,6 +549,15 @@ export class ImportTransaction {
             res.op = this.op;
             res.src_amount = normalize(this.src_amount, srcPrecision);
             res.dest_amount = res.src_amount;
+        } else if (res.type === LIMIT_CHANGE) {
+            const decrease = (this.dest_amount < 0);
+            if (decrease) {
+                res.src_id = this.dest_id;
+                res.dest_id = 0;
+            }
+
+            res.src_amount = normalize(Math.abs(this.src_amount), srcPrecision);
+            res.dest_amount = normalize(Math.abs(this.dest_amount), destPrecision);
         }
 
         return res;

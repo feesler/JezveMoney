@@ -19,6 +19,7 @@ define("EXPENSE", 1);
 define("INCOME", 2);
 define("TRANSFER", 3);
 define("DEBT", 4);
+define("LIMIT_CHANGE", 5);
 
 // Statistics group types
 define("GROUP_BY_DAY", 1);
@@ -42,11 +43,11 @@ class TransactionModel extends CachedTable
 
     private static $user_id = 0;
     private static $owner_id = 0;
-    private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
-    private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT];
+    private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+    private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
     private static $srcMandatoryTypes = [EXPENSE, TRANSFER];
 
-    private static $destAvailTypes = [INCOME, TRANSFER, DEBT];
+    private static $destAvailTypes = [INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
     private static $destMandatoryTypes = [INCOME, TRANSFER];
 
     private static $availReports = ["account", "currency", "category"];
@@ -480,8 +481,12 @@ class TransactionModel extends CachedTable
 
         $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
-        $res["src_result"] = ($res["src_id"] != 0) ? $this->balanceChanges[$res["src_id"]] : 0;
-        $res["dest_result"] = ($res["dest_id"] != 0) ? $this->balanceChanges[$res["dest_id"]] : 0;
+        $res["src_result"] = ($res["src_id"] != 0)
+            ? $this->balanceChanges[$res["src_id"]]["balance"]
+            : 0;
+        $res["dest_result"] = ($res["dest_id"] != 0)
+            ? $this->balanceChanges[$res["dest_id"]]["balance"]
+            : 0;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
 
@@ -558,11 +563,11 @@ class TransactionModel extends CachedTable
 
         if (!isset($res[$account_id])) {
             $account = $this->getAffectedAccount($account_id);
-            if ($account) {
-                $res[$account_id] = $account->balance;
-            } else {
-                $res[$account_id] = 0;
-            }
+
+            $res[$account_id] = [
+                "balance" => ($account->balance ?? 0),
+                "limit" => ($account->limit ?? 0),
+            ];
         }
 
         return $res;
@@ -588,12 +593,58 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = normalize($res[$trans->src_id] - $trans->src_amount);
+
+            $srcCurrency = $this->currMod->getItem($trans->src_curr);
+            if (!$srcCurrency) {
+                throw new \Error("Currency not found");
+            }
+
+            $srcBalance = $res[$trans->src_id]["balance"];
+            $res[$trans->src_id]["balance"] = normalize(
+                $srcBalance - $trans->src_amount,
+                $srcCurrency->precision,
+            );
+
+            if ($trans->type === LIMIT_CHANGE) {
+                $sourceAccount = $this->accModel->getItem($trans->src_id);
+                if ($sourceAccount->type !== ACCOUNT_TYPE_CREDIT_CARD) {
+                    throw new \Error("Invalid account type for 'Change credit limit' transaction");
+                }
+
+                $srcLimit = $res[$trans->src_id]["limit"];
+                $res[$trans->src_id]["limit"] = normalize(
+                    $srcLimit - $trans->src_amount,
+                    $srcCurrency->precision,
+                );
+            }
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = normalize($res[$trans->dest_id] + $trans->dest_amount);
+
+            $destCurrency = $this->currMod->getItem($trans->dest_curr);
+            if (!$destCurrency) {
+                throw new \Error("Currency not found");
+            }
+
+            $destBalance = $res[$trans->dest_id]["balance"];
+            $res[$trans->dest_id]["balance"] = normalize(
+                $destBalance + $trans->dest_amount,
+                $destCurrency->precision,
+            );
+
+            if ($trans->type === LIMIT_CHANGE) {
+                $destAccount = $this->accModel->getItem($trans->dest_id);
+                if ($destAccount->type !== ACCOUNT_TYPE_CREDIT_CARD) {
+                    throw new \Error("Invalid account type for 'Change credit limit' transaction");
+                }
+
+                $destLimit = $res[$trans->dest_id]["limit"];
+                $res[$trans->dest_id]["limit"] = normalize(
+                    $destLimit + $trans->dest_amount,
+                    $destCurrency->precision,
+                );
+            }
         }
 
         return $res;
@@ -619,12 +670,58 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = normalize($res[$trans->src_id] + $trans->src_amount);
+
+            $srcCurrency = $this->currMod->getItem($trans->src_curr);
+            if (!$srcCurrency) {
+                throw new \Error("Currency not found");
+            }
+
+            $srcBalance = $res[$trans->src_id]["balance"];
+            $res[$trans->src_id]["balance"] = normalize(
+                $srcBalance + $trans->src_amount,
+                $srcCurrency->precision,
+            );
+
+            if ($trans->type === LIMIT_CHANGE) {
+                $sourceAccount = $this->accModel->getItem($trans->src_id);
+                if ($sourceAccount->type !== ACCOUNT_TYPE_CREDIT_CARD) {
+                    throw new \Error("Invalid account type for 'Change credit limit' transaction");
+                }
+
+                $srcLimit = $res[$trans->src_id]["limit"];
+                $res[$trans->src_id]["limit"] = normalize(
+                    $srcLimit + $trans->src_amount,
+                    $srcCurrency->precision,
+                );
+            }
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = normalize($res[$trans->dest_id] - $trans->dest_amount);
+
+            $destCurrency = $this->currMod->getItem($trans->dest_curr);
+            if (!$destCurrency) {
+                throw new \Error("Currency not found");
+            }
+
+            $destBalance = $res[$trans->dest_id]["balance"];
+            $res[$trans->dest_id]["balance"] = normalize(
+                $destBalance - $trans->dest_amount,
+                $destCurrency->precision,
+            );
+
+            if ($trans->type === LIMIT_CHANGE) {
+                $destAccount = $this->accModel->getItem($trans->dest_id);
+                if ($destAccount->type !== ACCOUNT_TYPE_CREDIT_CARD) {
+                    throw new \Error("Invalid account type for 'Change credit limit' transaction");
+                }
+
+                $destLimit = $res[$trans->dest_id]["limit"];
+                $res[$trans->dest_id]["limit"] = normalize(
+                    $destLimit - $trans->dest_amount,
+                    $destCurrency->precision,
+                );
+            }
         }
 
         return $res;
@@ -671,8 +768,12 @@ class TransactionModel extends CachedTable
         if (isset($res["date"])) {
             $res["date"] = date("Y-m-d H:i:s", $res["date"]);
         }
-        $res["src_result"] = ($res["src_id"] != 0) ? $this->balanceChanges[$res["src_id"]] : 0;
-        $res["dest_result"] = ($res["dest_id"] != 0) ? $this->balanceChanges[$res["dest_id"]] : 0;
+        $res["src_result"] = ($res["src_id"] != 0)
+            ? $this->balanceChanges[$res["src_id"]]["balance"]
+            : 0;
+        $res["dest_result"] = ($res["dest_id"] != 0)
+            ? $this->balanceChanges[$res["dest_id"]]["balance"]
+            : 0;
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
@@ -981,11 +1082,15 @@ class TransactionModel extends CachedTable
         // Get previous results
         $results = [];
         foreach ($accounts as $account_id) {
-            if (!$account_id) {
+            $account = $this->getAffectedAccount($account_id);
+            if (!$account) {
                 continue;
             }
 
-            $results[$account_id] = $this->getLatestResult($account_id, $pos);
+            $results[$account_id] = [
+                "balance" => $this->getLatestResult($account_id, $pos),
+                "limit" => $account->limit,
+            ];
         }
 
         // Request affected transactions
@@ -993,7 +1098,7 @@ class TransactionModel extends CachedTable
             return false;
         }
 
-        foreach ($this->cache as $item_id => $item) {
+        foreach ($this->cache as $item) {
             $tr = $this->getAffected($item);
 
             if (!in_array($tr->src_id, $accounts) && !in_array($tr->dest_id, $accounts)) {
@@ -1015,7 +1120,7 @@ class TransactionModel extends CachedTable
                     $queryItem = clone $tr;
                 }
 
-                $queryItem->src_result = $results[$tr->src_id];
+                $queryItem->src_result = $results[$tr->src_id]["balance"];
             }
 
             if (
@@ -1027,7 +1132,7 @@ class TransactionModel extends CachedTable
                     $queryItem = clone $tr;
                 }
 
-                $queryItem->dest_result = $results[$tr->dest_id];
+                $queryItem->dest_result = $results[$tr->dest_id]["balance"];
             }
 
             if (!is_null($queryItem)) {
@@ -1139,11 +1244,11 @@ class TransactionModel extends CachedTable
         $userAccounts = $this->accModel->getData(["owner" => "all", "visibility" => "all"]);
         $balanceChanges = [];
         foreach ($userAccounts as $account) {
-            if ($keepAccountBalance) {
-                $balanceChanges[$account->id] = $account->balance;
-            } else {
-                $balanceChanges[$account->id] = $account->initbalance;
-            }
+            $balance = ($keepAccountBalance) ? $account->balance : $account->initbalance;
+            $balanceChanges[$account->id] = [
+                "balance" => $balance,
+                "limit" => $account->limit,
+            ];
         }
         $this->accModel->updateBalances($balanceChanges);
 
@@ -2373,6 +2478,7 @@ class TransactionModel extends CachedTable
             "income" => INCOME,
             "transfer" => TRANSFER,
             "debt" => DEBT,
+            "limit" => LIMIT_CHANGE,
         ];
 
         if (!is_string($value) || $value === "" || !isset($stringTypes[$value])) {
@@ -2411,6 +2517,7 @@ class TransactionModel extends CachedTable
             INCOME => __("TR_INCOME"),
             TRANSFER => __("TR_TRANSFER"),
             DEBT => __("TR_DEBT"),
+            LIMIT_CHANGE => __("TR_LIMIT_CHANGE"),
         ];
     }
 

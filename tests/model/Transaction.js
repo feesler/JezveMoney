@@ -8,8 +8,10 @@ export const EXPENSE = 1;
 export const INCOME = 2;
 export const TRANSFER = 3;
 export const DEBT = 4;
+export const LIMIT_CHANGE = 5;
 
-export const availTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
+export const basicTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
+export const availTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
 
 export class Transaction {
     /** Return string for specified type of transaction */
@@ -19,6 +21,7 @@ export class Transaction {
             [INCOME]: 'TR_INCOME',
             [TRANSFER]: 'TR_TRANSFER',
             [DEBT]: 'TR_DEBT',
+            [LIMIT_CHANGE]: 'TR_LIMIT_CHANGE',
         };
 
         assert(type && (type in typesMap), `Unknown transaction type ${type}`);
@@ -33,6 +36,7 @@ export class Transaction {
             INCOME,
             TRANSFER,
             DEBT,
+            LIMIT_CHANGE,
         };
 
         if (!str) {
@@ -55,6 +59,7 @@ export class Transaction {
             [INCOME]: Transaction.income,
             [TRANSFER]: Transaction.transfer,
             [DEBT]: Transaction.debt,
+            [LIMIT_CHANGE]: Transaction.limitChange,
         };
 
         assert(params?.type && (params.type in extractMap), 'Invalid data specified');
@@ -182,6 +187,31 @@ export class Transaction {
             if (!('src_amount' in res)) {
                 res.src_amount = res.dest_amount;
             }
+        }
+
+        return res;
+    }
+
+    static limitChange(params, state) {
+        const res = {
+            ...params,
+            type: LIMIT_CHANGE,
+        };
+
+        if (!('src_id' in res)) {
+            res.src_id = 0;
+        }
+        if (!('src_amount' in res)) {
+            res.src_amount = res.dest_amount;
+        }
+
+        const acc = state.accounts.getItem(res.dest_id);
+        if (acc) {
+            res.dest_curr = acc.curr_id;
+        }
+
+        if (!('src_curr' in res)) {
+            res.src_curr = res.dest_curr;
         }
 
         return res;

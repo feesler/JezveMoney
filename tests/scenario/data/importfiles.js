@@ -15,6 +15,8 @@ const getCardData = (date) => ([
     [date, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
     [date, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5 000.00'],
     [date, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10 000.00'],
+    [date, 'CREDIT LIMIT', 'MOSKVA', 'RU', 'RUB', '100 000.00'],
+    [date, 'CREDIT LIMIT', 'MOSKVA', 'RU', 'RUB', '-5 000.00'],
 ]);
 
 export const getCardCSV = () => {

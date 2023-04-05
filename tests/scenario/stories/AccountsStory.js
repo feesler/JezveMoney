@@ -91,6 +91,7 @@ export class AccountsStory extends TestStory {
 
         setBlock('Create account with point at initial balance', 2);
         await AccountTests.create();
+        await AccountTests.changeType(1);
         await AccountTests.inputName('acc_1');
         await AccountTests.changeCurrency(RUB);
         await AccountTests.inputBalance(1000.01);
@@ -98,6 +99,7 @@ export class AccountsStory extends TestStory {
 
         setBlock('Create account with comma at initial balance', 2);
         await AccountTests.create();
+        await AccountTests.changeType(2);
         await AccountTests.inputName('acc_2');
         await AccountTests.changeCurrency(EUR);
         await AccountTests.inputBalance('1000,01');
@@ -105,6 +107,7 @@ export class AccountsStory extends TestStory {
 
         setBlock('Create account with precise currency', 2);
         await AccountTests.create();
+        await AccountTests.changeType(2);
         await AccountTests.inputName('acc_3');
         await AccountTests.changeCurrency(BTC);
         await AccountTests.inputBalance('0.00123');
@@ -134,8 +137,9 @@ export class AccountsStory extends TestStory {
 
         const { RUB, USD, BTC } = App.scenario;
 
-        setBlock('Change icon and currency of account', 2);
+        setBlock('Change type, icon and currency of account', 2);
         await AccountTests.update(0);
+        await AccountTests.changeType(3);
         await AccountTests.changeIcon(1);
         await AccountTests.changeCurrency(USD);
         await AccountTests.submit();

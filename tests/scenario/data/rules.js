@@ -67,6 +67,15 @@ export const createImportRules = async () => {
         actions: [
             actions.setDestAmount('500.5'),
         ],
+    }, {
+        flags: 0,
+        conditions: [
+            conditions.mainAccount.is.value(App.scenario.CREDIT_CARD),
+            conditions.comment.includes.value('CREDIT LIMIT'),
+        ],
+        actions: [
+            actions.setTransactionType('limit'),
+        ],
     }];
 
     await App.scenario.runner.runGroup(api.importrule.create, rulesList);

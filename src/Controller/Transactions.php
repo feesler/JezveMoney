@@ -186,6 +186,7 @@ class Transactions extends ListViewController
         // Check availability of selected type of transaction
         $notAvailMessage = null;
         $trAvailable = false;
+        $creditCardAccounts = null;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
             $trAvailable = $acc_count > 0;
             $notAvailMessage = __("TR_NO_ACCOUNTS");
@@ -195,6 +196,11 @@ class Transactions extends ListViewController
         } elseif ($tr["type"] == DEBT) {
             $trAvailable = is_array($persons) && count($persons) > 0;
             $notAvailMessage = __("TR_DEBT_NO_PERSONS");
+        } elseif ($tr["type"] == LIMIT_CHANGE) {
+            $creditCardAccounts = $this->accModel->getUserAccounts([
+                "type" => ACCOUNT_TYPE_CREDIT_CARD,
+            ]);
+            $trAvailable = count($creditCardAccounts) > 0;
         }
         $data["trAvailable"] = $trAvailable;
         $data["notAvailMessage"] = $notAvailMessage;
@@ -210,8 +216,14 @@ class Transactions extends ListViewController
             }
         }
         // Use first account if nothing is specified
-        if (!$acc_id && $acc_count > 0 && !$accountRequested) {
-            $acc_id = $userAccounts[0]->id;
+        if (!$acc_id && !$accountRequested) {
+            if ($tr["type"] == LIMIT_CHANGE) {
+                if (count($creditCardAccounts) > 0) {
+                    $acc_id = $creditCardAccounts[0]->id;
+                }
+            } elseif ($acc_count > 0) {
+                $acc_id = $userAccounts[0]->id;
+            }
         }
 
         // Check person parameter
@@ -264,6 +276,8 @@ class Transactions extends ListViewController
                 $src_id = ($acc_id ? $acc_id : $this->accModel->getAnother());
             } elseif ($tr["type"] == INCOME) {       // income
                 $dest_id = ($acc_id ? $acc_id : $this->accModel->getAnother());
+            } elseif ($tr["type"] == LIMIT_CHANGE) {
+                $dest_id = $acc_id;
             }
 
             if ($tr["type"] == TRANSFER) {
@@ -291,7 +305,7 @@ class Transactions extends ListViewController
 
             if ($tr["type"] == EXPENSE) {
                 $tr["dest_curr"] = $tr["src_curr"];
-            } elseif ($tr["type"] == INCOME) {
+            } elseif ($tr["type"] == INCOME || $tr["type"] == LIMIT_CHANGE) {
                 $tr["src_curr"] = $tr["dest_curr"];
             }
 
@@ -343,6 +357,9 @@ class Transactions extends ListViewController
         } elseif ($tr["type"] == DEBT) {
             $showSrcAmount = true;
             $showDestAmount = false;
+        } elseif ($tr["type"] == LIMIT_CHANGE) {
+            $showSrcAmount = false;
+            $showDestAmount = true;
         }
 
         $form["src_amount"] = "";
@@ -351,9 +368,14 @@ class Transactions extends ListViewController
         $data["showSrcAmount"] = $showSrcAmount;
         $data["showDestAmount"] = $showDestAmount;
 
-        $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
-        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
+        if ($tr["type"] == LIMIT_CHANGE) {
+            $data["srcAmountLbl"] = "";
+            $data["destAmountLbl"] = __("TR_LIMIT_DELTA");
+        } else {
+            $showBothAmounts = $showSrcAmount && $showDestAmount;
+            $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+            $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
+        }
 
         $currObj = $this->currModel->getItem($tr["src_curr"]);
         $srcAmountSign = $currObj ? $currObj->sign : null;
@@ -470,6 +492,9 @@ class Transactions extends ListViewController
         } elseif ($tr["type"] == DEBT) {
             $showSrcAmount = true;
             $showDestAmount = false;
+        } elseif ($tr["type"] == LIMIT_CHANGE) {
+            $showSrcAmount = false;
+            $showDestAmount = true;
         }
 
         if ($tr["type"] == DEBT) {
@@ -552,9 +577,14 @@ class Transactions extends ListViewController
 
         $data["tr"] = $tr;
 
-        $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
-        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
+        if ($tr["type"] == LIMIT_CHANGE) {
+            $data["srcAmountLbl"] = "";
+            $data["destAmountLbl"] = __("TR_LIMIT_DELTA");
+        } else {
+            $showBothAmounts = $showSrcAmount && $showDestAmount;
+            $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+            $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
+        }
 
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
 

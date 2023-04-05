@@ -107,9 +107,11 @@ export const isDateString = (obj) => checkDate(obj);
 export const isAccount = (obj) => verifyObject(obj, {
     id: isInt,
     owner_id: isInt,
+    type: isInt,
     curr_id: isInt,
     balance: isNum,
     initbalance: isNum,
+    limit: isNum,
     name: isString,
     icon_id: isInt,
     flags: isInt,

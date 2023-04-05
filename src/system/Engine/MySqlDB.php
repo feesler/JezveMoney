@@ -605,7 +605,7 @@ class MySqlDB
                     continue;
                 }
 
-                $valuesUpdate[] = "$field=VALUES($field)";
+                $valuesUpdate[] = "`$field`=VALUES(`$field`)";
             }
             $query .= implode(",", $valuesUpdate);
         }
