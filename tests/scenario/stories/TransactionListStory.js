@@ -5,7 +5,7 @@ import {
     DEBT,
     availTransTypes,
 } from '../../model/Transaction.js';
-import * as TransactionListTests from '../../run/transactionList.js';
+import * as Actions from '../../run/transactionList.js';
 import { App } from '../../Application.js';
 
 export class TransactionListStory extends TestStory {
@@ -28,11 +28,7 @@ export class TransactionListStory extends TestStory {
     }
 
     async runTests(directNavigate = false) {
-        const {
-            FOOD_CATEGORY,
-            TRANSPORT_CATEGORY,
-            TAXES_CATEGORY,
-        } = App.scenario;
+        const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
 
         if (directNavigate) {
             setBlock('Transaction List view: direct navigation', 1);
@@ -40,133 +36,113 @@ export class TransactionListStory extends TestStory {
             setBlock('Transaction List view: manual navigation', 1);
         }
 
-        await App.scenario.runner.runTasks([
-            { action: TransactionListTests.checkInitialState, data: directNavigate },
-            { action: TransactionListTests.goToNextPage, data: directNavigate },
-            { action: TransactionListTests.setDetailsMode, data: directNavigate },
-            { action: TransactionListTests.goToNextPage, data: directNavigate },
-        ]);
+        await Actions.checkInitialState(directNavigate);
+        await Actions.goToNextPage(directNavigate);
+        await Actions.setDetailsMode(directNavigate);
+        await Actions.goToNextPage(directNavigate);
 
         if (!directNavigate) {
-            const toggleSelectData = [
-                0,
-                [1, 2],
-            ];
-
-            await App.scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
-
-            await TransactionListTests.selectAll();
-            await TransactionListTests.deselectAll();
-            await TransactionListTests.setListMode();
-            await TransactionListTests.setSortMode();
-            await TransactionListTests.setListMode();
-
-            await TransactionListTests.goToFirstPage();
-            await TransactionListTests.showMore();
-            await TransactionListTests.showMore();
-            await TransactionListTests.goToNextPage();
-            await TransactionListTests.goToLastPage();
-            await TransactionListTests.goToPrevPage();
-            await TransactionListTests.showMore();
-
-            await TransactionListTests.goToFirstPage();
-
-            await TransactionListTests.showDetails({ index: 0 });
-            await TransactionListTests.closeDetails();
-            await TransactionListTests.showDetails({ index: 1 });
-            await TransactionListTests.closeDetails();
-            await TransactionListTests.showDetails({ index: 0, directNavigate: true });
-            await TransactionListTests.showDetails({ index: 1, directNavigate: true });
-            await TransactionListTests.closeDetails();
-
-            await TransactionListTests.setCategory({
-                items: [0, 1],
-                category: TAXES_CATEGORY,
-            });
-
-            await TransactionListTests.filterByType({ type: EXPENSE, iteratePages: false });
-            await TransactionListTests.setTransactionCategory({
-                index: 1,
-                category: FOOD_CATEGORY,
-            });
-            await TransactionListTests.setCategory({
-                items: [3, 5],
-                category: FOOD_CATEGORY,
-            });
-            await TransactionListTests.setCategory({
-                items: [1, 2],
-                category: 0,
-            });
-            // Show all types
-            await TransactionListTests.filterByType({ type: 0, iteratePages: false });
+            await this.manualTests();
         }
 
         await App.scenario.runner.runGroup(
-            TransactionListTests.filterByType,
+            Actions.filterByType,
             availTransTypes.map((type) => ({ type, directNavigate })),
         );
 
         // Show all types
-        await TransactionListTests.filterByType({ type: 0, iteratePages: false });
+        await Actions.filterByType({ type: 0, iteratePages: false });
 
-        await App.scenario.runner.runTasks([{
-            action: TransactionListTests.filterByAccounts,
-            data: { accounts: App.scenario.ACC_3 },
-        }, {
-            action: TransactionListTests.filterByAccounts,
-            data: { accounts: [App.scenario.ACC_3, App.scenario.ACC_USD], directNavigate },
-        }, {
-            action: TransactionListTests.filterByPersons,
-            data: { persons: App.scenario.MARIA, directNavigate },
-        }]);
+        await Actions.filterByAccounts({ accounts: App.scenario.ACC_3 });
+        await Actions.filterByAccounts({
+            accounts: [App.scenario.ACC_3, App.scenario.ACC_USD], directNavigate,
+        });
+        await Actions.filterByPersons({
+            persons: App.scenario.MARIA, directNavigate,
+        });
 
         if (!directNavigate) {
-            await TransactionListTests.exportTest();
+            await Actions.exportTest();
         }
 
-        await App.scenario.runner.runTasks([{
-            action: TransactionListTests.filterByType,
-            data: { type: 0, directNavigate },
-        }, {
-            action: TransactionListTests.filterByType,
-            data: { type: EXPENSE, directNavigate },
-        }, {
-            action: TransactionListTests.filterByType,
-            data: { type: [INCOME, DEBT], directNavigate },
-        }, {
-            action: TransactionListTests.filterByCategories,
-            data: { categories: FOOD_CATEGORY, directNavigate },
-        }, {
-            action: TransactionListTests.filterByCategories,
-            data: {
-                categories: [FOOD_CATEGORY, TRANSPORT_CATEGORY],
-                directNavigate,
-            },
-        }, {
-            action: TransactionListTests.filterByDate,
-            data: { start: App.datesFmt.weekAgo, end: App.datesFmt.now, directNavigate },
-        }, {
-            action: TransactionListTests.filterByDate,
-            data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
-        }]);
+        await Actions.filterByType({ type: 0, directNavigate });
+        await Actions.filterByType({ type: EXPENSE, directNavigate });
+        await Actions.filterByType({ type: [INCOME, DEBT], directNavigate });
+        await Actions.filterByCategories({ categories: FOOD_CATEGORY, directNavigate });
+        await Actions.filterByCategories({
+            categories: [FOOD_CATEGORY, TRANSPORT_CATEGORY],
+            directNavigate,
+        });
 
-        const searchData = [
-            { text: '1', directNavigate },
-            { text: 'la', directNavigate },
-            { text: 'кк ', directNavigate },
-        ];
+        await Actions.filterByDate({
+            start: App.datesFmt.weekAgo, end: App.datesFmt.now, directNavigate,
+        });
+        await Actions.filterByDate({
+            start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate,
+        });
 
-        await App.scenario.runner.runGroup(TransactionListTests.search, searchData);
+        await Actions.search({ text: '1', directNavigate });
+        await Actions.search({ text: 'la', directNavigate });
+        await Actions.search({ text: 'кк', directNavigate });
+        await Actions.clearSearchForm(directNavigate);
+        await Actions.clearDateRange(directNavigate);
+        await Actions.search({ text: '1', directNavigate });
 
-        await App.scenario.runner.runTasks([
-            { action: TransactionListTests.clearSearchForm, data: directNavigate },
-            { action: TransactionListTests.clearDateRange },
-            { action: TransactionListTests.search, data: { text: '1', directNavigate } },
-            {
-                action: TransactionListTests.filterByDate,
-                data: { start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate },
-            },
-            { action: TransactionListTests.clearAllFilters, directNavigate },
-        ]);
+        await Actions.filterByDate({
+            start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate,
+        });
+        await Actions.clearAllFilters(directNavigate);
+    }
+
+    async manualTests() {
+        const { FOOD_CATEGORY, TAXES_CATEGORY } = App.scenario;
+
+        await Actions.toggleSelect(0);
+        await Actions.toggleSelect([1, 2]);
+
+        await Actions.selectAll();
+        await Actions.deselectAll();
+        await Actions.setListMode();
+        await Actions.setSortMode();
+        await Actions.setListMode();
+
+        await Actions.goToFirstPage();
+        await Actions.showMore();
+        await Actions.showMore();
+        await Actions.goToNextPage();
+        await Actions.goToLastPage();
+        await Actions.goToPrevPage();
+        await Actions.showMore();
+
+        await Actions.goToFirstPage();
+
+        await Actions.showDetails({ index: 0 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 1 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 0, directNavigate: true });
+        await Actions.showDetails({ index: 1, directNavigate: true });
+        await Actions.closeDetails();
+
+        await Actions.setCategory({
+            items: [0, 1],
+            category: TAXES_CATEGORY,
+        });
+
+        await Actions.filterByType({ type: EXPENSE, iteratePages: false });
+        await Actions.setTransactionCategory({
+            index: 1,
+            category: FOOD_CATEGORY,
+        });
+        await Actions.setCategory({
+            items: [3, 5],
+            category: FOOD_CATEGORY,
+        });
+        await Actions.setCategory({
+            items: [1, 2],
+            category: 0,
+        });
+        // Show all types
+        await Actions.filterByType({ type: 0, iteratePages: false });
     }
 }
