@@ -17,10 +17,12 @@ import {
     TRANSFER,
     DEBT,
     Transaction,
+    LIMIT_CHANGE,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { generateId } from '../common.js';
 import { __ } from '../model/locale.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../model/AccountsList.js';
 import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
 
 export const decimalInputTestStrings = [
@@ -565,6 +567,18 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             await App.view.goToCreateTransaction();
             assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
+            if (type === LIMIT_CHANGE) {
+                const { srcAccount, destAccount } = App.view.model;
+                const isCreditCard = (
+                    (srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
+                    || (destAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
+                );
+
+                if (!isCreditCard) {
+                    return true;
+                }
+            }
+
             return App.view.changeTransactionType(type);
         }
 
@@ -590,6 +604,8 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             if (App.state.persons.length > 0) {
                 stateId = (userAccounts.length > 0) ? 0 : 6;
             }
+        } else if (type === LIMIT_CHANGE) {
+            stateId = 0;
         }
 
         App.view.model.state = stateId;

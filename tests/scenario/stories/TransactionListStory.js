@@ -106,6 +106,9 @@ export class TransactionListStory extends TestStory {
             availTransTypes.map((type) => ({ type, directNavigate })),
         );
 
+        // Show all types
+        await TransactionListTests.filterByType({ type: 0, iteratePages: false });
+
         await App.scenario.runner.runTasks([{
             action: TransactionListTests.filterByAccounts,
             data: { accounts: App.scenario.ACC_3 },

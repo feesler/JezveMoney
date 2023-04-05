@@ -316,10 +316,12 @@ export class ImportListStory extends TestStory {
         const {
             RUB,
             USD,
+            EUR,
             ACC_RUB,
             ACC_3,
             ACC_USD,
             ACC_EUR,
+            CREDIT_CARD,
             IVAN,
             MARIA,
             TRANSPORT_CATEGORY,
@@ -508,6 +510,38 @@ export class ImportListStory extends TestStory {
             ],
         });
 
+        await ImportTests.changeMainAccount(CREDIT_CARD);
+
+        await ImportTests.updateItemAndSave({
+            pos: 0,
+            action: [
+                { action: 'changeType', data: 'limit' }, // 10-11
+                { action: 'changeType', data: 'expense' }, // 11-1
+                { action: 'changeType', data: 'limit' }, // 1-11
+                { action: 'changeType', data: 'expense' }, // 11-1
+                { action: 'changeDestCurrency', data: EUR }, // 1-2
+                { action: 'changeType', data: 'limit' }, // 2-11
+                { action: 'changeType', data: 'income' }, // 11-3
+                { action: 'changeType', data: 'limit' }, // 3-11
+                { action: 'changeType', data: 'income' }, // 11-3
+                { action: 'changeSourceCurrency', data: EUR }, // 3-4
+                { action: 'changeType', data: 'limit' }, // 4-11
+                { action: 'changeType', data: 'transfer_out' }, // 11-6
+                { action: 'changeType', data: 'limit' }, // 6-11
+                { action: 'changeType', data: 'transfer_out' }, // 11-6
+                { action: 'changeTransferAccount', data: ACC_USD }, // 6-5
+                { action: 'changeType', data: 'limit' }, // 5-11
+                { action: 'changeType', data: 'transfer_in' }, // 11-8
+                { action: 'changeType', data: 'limit' }, // 8-11
+                { action: 'changeType', data: 'transfer_in' }, // 11-8
+                { action: 'changeTransferAccount', data: ACC_USD }, // 8-7
+                { action: 'changeType', data: 'limit' }, // 7-11
+                { action: 'changeType', data: 'debt_out' }, // 11-9
+                { action: 'changeType', data: 'limit' }, // 9-11
+                { action: 'changeType', data: 'debt_in' }, // 11-10
+            ],
+        });
+
         await ImportTests.submit();
     }
 
@@ -524,6 +558,7 @@ export class ImportListStory extends TestStory {
         } = App.scenario;
 
         setBlock('Update on change currency', 2);
+        await ImportTests.changeMainAccount(ACC_3);
         await ImportTests.createItemAndSave([
             { action: 'changeDestCurrency', data: BTC },
             { action: 'inputDestAmount', data: '0.12345678' },

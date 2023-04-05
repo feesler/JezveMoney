@@ -136,6 +136,7 @@ class TransactionListView extends View {
             id: 'typeMenu',
             multiple: true,
             allowActiveLink: true,
+            showChangeLimit: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
         this.typeFilter.append(this.typeMenu.elem);

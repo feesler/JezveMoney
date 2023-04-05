@@ -138,7 +138,8 @@ class ImportActionModel extends CachedTable
             "transfer_out",
             "transfer_in",
             "debt_out",
-            "debt_in"
+            "debt_in",
+            "limit",
         ];
 
         $action = intval($actionId);

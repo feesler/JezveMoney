@@ -1,13 +1,14 @@
-import { setBlock } from 'jezve-test';
+import { assert, setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 import * as TransactionApiTests from '../../../run/api/transaction.js';
-import { dateToSeconds } from '../../../common.js';
+import { dateToSeconds, formatProps } from '../../../common.js';
 
 const create = async () => {
     setBlock('Create transactions', 2);
@@ -19,6 +20,7 @@ const create = async () => {
         ACC_RUB,
         ACC_USD,
         CASH_RUB,
+        ACCOUNT_3,
         PERSON_X,
         PERSON_Y,
         FOOD_CATEGORY,
@@ -128,6 +130,14 @@ const create = async () => {
         dest_amount: 91,
         dest_curr: EUR,
     }, {
+        type: LIMIT_CHANGE,
+        src_id: 0,
+        dest_id: ACCOUNT_3,
+        src_amount: 100,
+        dest_amount: 100,
+        src_curr: USD,
+        dest_curr: USD,
+    }, {
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 123,
@@ -138,6 +148,10 @@ const create = async () => {
         src_amount: 456,
         date: dateToSeconds(weekDate2),
     }];
+
+    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    // Double check all transactions created
+    res.forEach((item) => assert(item, 'Failed to create transaction'));
 
     [
         App.scenario.TR_EXPENSE_1,
@@ -154,7 +168,8 @@ const create = async () => {
         App.scenario.TR_DEBT_5,
         App.scenario.TR_DEBT_6,
         App.scenario.TR_DEBT_7,
-    ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+        App.scenario.TR_LIMIT_1,
+    ] = res;
 };
 
 const createWithChainedRequest = async () => {
@@ -184,10 +199,14 @@ const createWithChainedRequest = async () => {
         },
     }];
 
+    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    // Double check all transactions created
+    res.forEach((item) => assert(item, 'Failed to create transaction'));
+
     [
         App.scenario.TR_EXPENSE_CHAINED_1,
         App.scenario.TR_EXPENSE_CHAINED_2,
-    ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    ] = res;
 };
 
 const createInvalid = async () => {
@@ -283,7 +302,7 @@ const createInvalid = async () => {
         type: TRANSFER,
         src_id: ACC_RUB,
         dest_id: ACC_RUB,
-        src_amount: 6500,
+        src_amount: 100,
         dest_amount: 100,
     }, {
         type: TRANSFER,
@@ -299,7 +318,7 @@ const createInvalid = async () => {
         type: TRANSFER,
         src_id: ACC_RUB,
         dest_id: CASH_RUB,
-        src_amount: 100,
+        src_amount: 6500,
         dest_amount: 100,
     }, {
         type: TRANSFER,
@@ -352,7 +371,11 @@ const createInvalid = async () => {
         dest_curr: EUR,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    // Double check all transactions not created
+    res.forEach((item, index) => {
+        assert(!item, `Created transaction with invalid data: { ${formatProps(data[index])} }`);
+    });
 };
 
 const createMultiple = async () => {
@@ -500,6 +523,10 @@ const update = async () => {
     }, {
         id: App.scenario.TR_DEBT_6,
         src_curr: EUR,
+    }, {
+        id: App.scenario.TR_LIMIT_1,
+        src_amount: 150,
+        dest_amount: 150,
     }];
 
     await App.scenario.runner.runGroup(TransactionApiTests.update, data);
@@ -622,9 +649,18 @@ const updateInvalid = async () => {
 const del = async () => {
     setBlock('Delete transactions', 2);
 
+    const {
+        TR_EXPENSE_2,
+        TR_INCOME_1,
+        TR_TRANSFER_1,
+        TR_DEBT_3,
+        TR_LIMIT_1,
+    } = App.scenario;
+
     const data = [
-        { id: App.scenario.TR_EXPENSE_2 },
-        { id: [App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3] },
+        { id: TR_EXPENSE_2 },
+        { id: TR_INCOME_1 },
+        { id: [TR_TRANSFER_1, TR_DEBT_3, TR_LIMIT_1] },
     ];
 
     await App.scenario.runner.runGroup(TransactionApiTests.del, data);

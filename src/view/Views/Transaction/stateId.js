@@ -43,3 +43,6 @@ export const DT_D_AMOUNT_EXCH = 418;
 export const DT_D_RESULT_EXCH = 419;
 export const DT_S_RESULT_D_RESULT = 420;
 export const DT_D_AMOUNT_S_RESULT = 421;
+/* Limit change */
+export const L_RESULT = 500;
+export const L_AMOUNT = 501;

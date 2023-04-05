@@ -19,6 +19,7 @@ import {
     DEBT,
     availTransTypes,
     Transaction,
+    LIMIT_CHANGE,
 } from './Transaction.js';
 import { AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
@@ -438,14 +439,23 @@ export class TransactionsList extends SortableList {
             const srcRemoved = itemIds.includes(trans.src_id);
             const destRemoved = itemIds.includes(trans.dest_id);
 
-            if (trans.type === EXPENSE && srcRemoved) {
+            if (
+                (trans.type === EXPENSE || trans.type === LIMIT_CHANGE)
+                && srcRemoved
+            ) {
                 continue;
             }
-            if (trans.type === INCOME && destRemoved) {
+            if (
+                (trans.type === INCOME || trans.type === LIMIT_CHANGE)
+                && destRemoved
+            ) {
                 continue;
             }
-            if ((trans.type === TRANSFER || trans.type === DEBT)
-                && srcRemoved && destRemoved) {
+            if (
+                (trans.type === TRANSFER || trans.type === DEBT)
+                && srcRemoved
+                && destRemoved
+            ) {
                 continue;
             }
             if (trans.type === DEBT && srcRemoved && trans.dest_id === 0) {

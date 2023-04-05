@@ -17,6 +17,7 @@ import { SortableList } from './SortableList.js';
 import { App } from '../Application.js';
 import { getCurrencyPrecision } from './import.js';
 import { __ } from './locale.js';
+import { LIMIT_CHANGE } from './Transaction.js';
 
 export const ACCOUNT_HIDDEN = 1;
 
@@ -60,6 +61,10 @@ export class AccountsList extends SortableList {
         if (srcAcc) {
             const precision = getCurrencyPrecision(srcAcc.curr_id);
             srcAcc.balance = normalize(srcAcc.balance - transaction.src_amount, precision);
+
+            if (srcAcc.type === ACCOUNT_TYPE_CREDIT_CARD && transaction.type === LIMIT_CHANGE) {
+                srcAcc.limit = normalize(srcAcc.limit - transaction.src_amount, precision);
+            }
         }
 
         const destAcc = (transaction.dest_id)
@@ -68,6 +73,10 @@ export class AccountsList extends SortableList {
         if (destAcc) {
             const precision = getCurrencyPrecision(destAcc.curr_id);
             destAcc.balance = normalize(destAcc.balance + transaction.dest_amount, precision);
+
+            if (destAcc.type === ACCOUNT_TYPE_CREDIT_CARD && transaction.type === LIMIT_CHANGE) {
+                destAcc.limit = normalize(destAcc.limit + transaction.dest_amount, precision);
+            }
         }
 
         return res;
@@ -86,6 +95,10 @@ export class AccountsList extends SortableList {
         if (srcAcc) {
             const precision = getCurrencyPrecision(srcAcc.curr_id);
             srcAcc.balance = normalize(srcAcc.balance + transaction.src_amount, precision);
+
+            if (srcAcc.type === ACCOUNT_TYPE_CREDIT_CARD && transaction.type === LIMIT_CHANGE) {
+                srcAcc.limit = normalize(srcAcc.limit + transaction.src_amount, precision);
+            }
         }
 
         const destAcc = (transaction.dest_id)
@@ -94,6 +107,10 @@ export class AccountsList extends SortableList {
         if (destAcc) {
             const precision = getCurrencyPrecision(destAcc.curr_id);
             destAcc.balance = normalize(destAcc.balance - transaction.dest_amount, precision);
+
+            if (destAcc.type === ACCOUNT_TYPE_CREDIT_CARD && transaction.type === LIMIT_CHANGE) {
+                destAcc.limit = normalize(destAcc.limit - transaction.dest_amount, precision);
+            }
         }
 
         return res;

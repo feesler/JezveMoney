@@ -187,6 +187,8 @@ export class ImportTransactionItem extends TestComponent {
             } else if (res.type === 'debt_in') {
                 res.srcCurrId = res.destCurrId;
             }
+        } else if (res.type === 'limit') {
+            res.srcCurrId = res.destCurrId;
         }
 
         res.srcCurrency = App.currency.getItem(res.srcCurrId);

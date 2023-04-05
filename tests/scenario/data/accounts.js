@@ -3,6 +3,7 @@ import {
     ACCOUNT_HIDDEN,
     ACCOUNT_TYPE_CASH,
     ACCOUNT_TYPE_CREDIT,
+    ACCOUNT_TYPE_CREDIT_CARD,
     ACCOUNT_TYPE_DEBIT_CARD,
     ACCOUNT_TYPE_OTHER,
 } from '../../model/AccountsList.js';
@@ -72,6 +73,22 @@ export const createAccounts = async () => {
         limit: 0,
         icon_id: 5,
         flags: 0,
+    }, {
+        type: ACCOUNT_TYPE_CREDIT_CARD,
+        name: 'CREDIT_CARD',
+        curr_id: USD,
+        initbalance: '100',
+        limit: 100,
+        icon_id: 1,
+        flags: 0,
+    }, {
+        type: ACCOUNT_TYPE_CREDIT_CARD,
+        name: 'BTC_CREDIT',
+        curr_id: BTC,
+        initbalance: '0.123456',
+        limit: 0.125,
+        icon_id: 3,
+        flags: 0,
     }];
 
     const createRes = await api.account.createMultiple(accList);
@@ -83,6 +100,8 @@ export const createAccounts = async () => {
         App.scenario.CARD_RUB,
         App.scenario.HIDDEN_ACC,
         App.scenario.ACC_BTC,
+        App.scenario.CREDIT_CARD,
+        App.scenario.BTC_CREDIT,
     ] = createRes.ids;
 
     await App.state.fetch();

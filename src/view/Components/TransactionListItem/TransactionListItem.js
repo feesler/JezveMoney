@@ -12,6 +12,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
 } from '../../js/model/Transaction.js';
 import { Field } from '../Field/Field.js';
 import './TransactionListItem.scss';
@@ -287,6 +288,10 @@ export class TransactionListItem extends Component {
             return `${srcAcc.name} → ${destAcc.name}`;
         }
 
+        if (item.type === LIMIT_CHANGE) {
+            return srcAcc?.name ?? destAcc?.name;
+        }
+
         if (item.type !== DEBT) {
             throw new Error('Invalid type of transaction');
         }
@@ -333,6 +338,10 @@ export class TransactionListItem extends Component {
             if (!acc) {
                 sign = (debtType) ? '- ' : '+ ';
             }
+        }
+
+        if (item.type === LIMIT_CHANGE) {
+            sign = (item.src_id !== 0) ? '- ' : '+ ';
         }
 
         return (diffCurrency)

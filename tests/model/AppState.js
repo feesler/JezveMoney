@@ -12,10 +12,16 @@ import {
     DEBT,
     availTransTypes,
     TRANSFER,
+    LIMIT_CHANGE,
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { ImportRule } from './ImportRule.js';
-import { ACCOUNT_HIDDEN, AccountsList, accountTypes } from './AccountsList.js';
+import {
+    ACCOUNT_HIDDEN,
+    ACCOUNT_TYPE_CREDIT_CARD,
+    AccountsList,
+    accountTypes,
+} from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
 import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
@@ -1542,6 +1548,13 @@ export class AppState {
                 ) {
                     return false;
                 }
+
+                if (
+                    params.type === LIMIT_CHANGE
+                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+                ) {
+                    return false;
+                }
             } else if (params.type === EXPENSE || params.type === TRANSFER) {
                 return false;
             }
@@ -1556,6 +1569,13 @@ export class AppState {
                     !account
                     || destCurr.id !== account.curr_id
                     || account.owner_id !== this.profile.owner_id
+                ) {
+                    return false;
+                }
+
+                if (
+                    params.type === LIMIT_CHANGE
+                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
                 ) {
                     return false;
                 }
@@ -1856,9 +1876,12 @@ export class AppState {
         if (type === TRANSFER) {
             return (this.userAccountsCache.length > 1);
         }
+        if (type === DEBT) {
+            return (this.persons.length > 0);
+        }
 
-        // DEBT
-        return (this.persons.length > 0);
+        // LIMIT_CHANGE
+        return this.userAccountsCache.some((item) => item.type === ACCOUNT_TYPE_CREDIT_CARD);
     }
 
     /**

@@ -360,15 +360,16 @@ class AccountView extends View {
             : state.validation.name;
         enable(this.nameInp, !state.submitStarted);
 
-        // Initial balance input
+        // Initial balance field
         this.initBalanceDecimalInput.setState((inpState) => ({
             ...inpState,
             digits: currencyObj.precision,
         }));
         window.app.setValidation('initbal-inp-block', state.validation.initbalance);
         enable(this.balanceInp, !state.submitStarted);
+        this.currencySign.textContent = currencyObj.sign;
 
-        // Limit input
+        // Credit limit field
         const isCreditCard = parseInt(state.data.type, 10) === ACCOUNT_TYPE_CREDIT_CARD;
         show(this.limitField, isCreditCard);
         this.limitDecimalInput.setState((inpState) => ({
@@ -377,6 +378,7 @@ class AccountView extends View {
         }));
         window.app.setValidation(this.limitField, state.validation.limit);
         enable(this.limitInp, !state.submitStarted);
+        this.limitCurrencySign.textContent = currencyObj.sign;
 
         // Icon select
         this.iconSelect.setSelection(state.data.icon_id);
@@ -385,8 +387,6 @@ class AccountView extends View {
         // Currency select
         this.currencySelect.setSelection(state.data.curr_id);
         this.currencySelect.enable(!state.submitStarted);
-        // Currency sign
-        this.currencySign.textContent = currencyObj.sign;
 
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);

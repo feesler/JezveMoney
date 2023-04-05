@@ -109,9 +109,11 @@ export class AccountDetails extends ItemDetails {
         // Credit limit
         const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
         this.limitField.show(isCreditCard);
-        this.limitField.setContent(
-            currency.formatCurrency(item.balance, item.curr_id),
-        );
+        if (isCreditCard) {
+            this.limitField.setContent(
+                currency.formatCurrency(item.limit, item.curr_id),
+            );
+        }
 
         // Visibility
         const visibililty = item.isVisible() ? __('ITEM_VISIBLE') : __('ITEM_HIDDEN');

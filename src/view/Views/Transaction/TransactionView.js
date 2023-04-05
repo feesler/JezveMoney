@@ -30,6 +30,7 @@ import {
     DEBT,
     TRANSFER,
     Transaction,
+    LIMIT_CHANGE,
 } from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -59,6 +60,7 @@ import * as STATE from './stateId.js';
 import '../../Components/Field/Field.scss';
 import '../../css/app.scss';
 import './TransactionView.scss';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
@@ -136,11 +138,6 @@ class TransactionView extends View {
             submitStarted: false,
         };
 
-        if (transaction.id) {
-            initialState.form.sourceAmount = transaction.src_amount;
-            initialState.form.destAmount = transaction.dest_amount;
-        }
-
         if (transaction.type === EXPENSE) {
             initialState.id = (initialState.isDiff) ? STATE.E_S_AMOUNT_D_AMOUNT : STATE.E_D_AMOUNT;
         } else if (transaction.type === INCOME) {
@@ -188,6 +185,24 @@ class TransactionView extends View {
                         : STATE.DT_D_AMOUNT;
                 }
             }
+        } else if (transaction.type === LIMIT_CHANGE) {
+            initialState.id = STATE.L_RESULT;
+
+            if (transaction.src_id !== 0) {
+                initialState.destAccount = initialState.srcAccount;
+                initialState.srcAccount = null;
+                initialState.destCurrency = initialState.srcCurrency;
+
+                transaction.dest_id = transaction.src_id;
+                transaction.src_id = 0;
+                transaction.dest_curr = transaction.src_curr;
+                transaction.dest_amount = transaction.src_amount;
+            }
+        }
+
+        if (transaction.id) {
+            initialState.form.sourceAmount = transaction.src_amount;
+            initialState.form.destAmount = transaction.dest_amount;
         }
 
         calculateSourceResult(initialState);
@@ -436,22 +451,25 @@ class TransactionView extends View {
 
     /** Initialize DropDown for source account tile */
     initSrcAccList(state) {
-        if (!this.sourceTile || this.srcDDList) {
+        if (!this.sourceTile) {
             return;
         }
 
         const { transaction } = state;
-        this.srcDDList = DropDown.create({
-            elem: this.sourceTile.elem,
-            listAttach: true,
-            enableFilter: true,
-            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
-            useSingleSelectionAsPlaceholder: false,
-            noResultsMessage: __('NOT_FOUND'),
-            onItemSelect: (item) => this.onSrcAccountSelect(item),
-        });
 
-        window.app.initAccountsList(this.srcDDList);
+        if (!this.srcDDList) {
+            this.srcDDList = DropDown.create({
+                elem: this.sourceTile.elem,
+                listAttach: true,
+                enableFilter: true,
+                placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+                useSingleSelectionAsPlaceholder: false,
+                noResultsMessage: __('NOT_FOUND'),
+                onItemSelect: (item) => this.onSrcAccountSelect(item),
+            });
+
+            window.app.initAccountsList(this.srcDDList);
+        }
 
         if (transaction.src_id) {
             this.srcDDList.setSelection(transaction.src_id);
@@ -459,23 +477,35 @@ class TransactionView extends View {
     }
 
     /** Initialize DropDown for destination account tile */
-    initDestAccList(state) {
-        if (!this.destTile || this.destDDList) {
+    initDestAccList(state, prevState) {
+        if (!this.destTile) {
             return;
         }
 
         const { transaction } = state;
-        this.destDDList = DropDown.create({
-            elem: this.destTile.elem,
-            listAttach: true,
-            enableFilter: true,
-            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
-            useSingleSelectionAsPlaceholder: false,
-            noResultsMessage: __('NOT_FOUND'),
-            onItemSelect: (item) => this.onDestAccountSelect(item),
-        });
+        const updateList = (!this.destDDList || transaction.type !== prevState.transaction.type);
 
-        window.app.initAccountsList(this.destDDList);
+        if (!this.destDDList) {
+            this.destDDList = DropDown.create({
+                elem: this.destTile.elem,
+                listAttach: true,
+                enableFilter: true,
+                placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+                useSingleSelectionAsPlaceholder: false,
+                noResultsMessage: __('NOT_FOUND'),
+                onItemSelect: (item) => this.onDestAccountSelect(item),
+            });
+        }
+
+        if (updateList) {
+            const options = {};
+            if (state.transaction.type === LIMIT_CHANGE) {
+                options.filter = (account) => (account.type === ACCOUNT_TYPE_CREDIT_CARD);
+            }
+
+            this.destDDList.removeAll();
+            window.app.initAccountsList(this.destDDList, options);
+        }
 
         if (transaction.dest_id) {
             this.destDDList.setSelection(transaction.dest_id);
@@ -788,14 +818,24 @@ class TransactionView extends View {
     }
 
     validateSourceAmount(state) {
-        const valid = (state.transaction.src_amount > 0);
+        let amount = state.transaction.src_amount;
+        if (state.transaction.type === LIMIT_CHANGE) {
+            amount = Math.abs(amount);
+        }
+
+        const valid = (amount > 0);
         if (!valid) {
             this.store.dispatch(actions.invalidateSourceAmount());
         }
     }
 
     validateDestAmount(state) {
-        const valid = (state.transaction.dest_amount > 0);
+        let amount = state.transaction.dest_amount;
+        if (state.transaction.type === LIMIT_CHANGE) {
+            amount = Math.abs(amount);
+        }
+
+        const valid = (amount > 0);
         if (!valid) {
             this.store.dispatch(actions.invalidateDestAmount());
         }
@@ -858,6 +898,7 @@ class TransactionView extends View {
         const startFromDestAmount = (
             (state.transaction.type === EXPENSE)
             || (state.transaction.type === DEBT && !state.transaction.debtType)
+            || (state.transaction.type === LIMIT_CHANGE)
         );
 
         if (startFromDestAmount) {
@@ -914,6 +955,13 @@ class TransactionView extends View {
         } else {
             request.src_id = transaction.src_id;
             request.dest_id = transaction.dest_id;
+        }
+
+        if (request.type === LIMIT_CHANGE && request.dest_amount < 0) {
+            request.src_amount = Math.abs(request.src_amount);
+            request.dest_amount = Math.abs(request.dest_amount);
+            request.src_id = request.dest_id;
+            request.dest_id = 0;
         }
 
         try {
@@ -1378,7 +1426,33 @@ class TransactionView extends View {
         }
     }
 
-    render(state) {
+    renderLimitChange(state) {
+        if (state.id === STATE.L_RESULT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.L_AMOUNT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        }
+
+        addChilds(this.destContainer.infoBlock, [
+            this.destAmountInfo.elem,
+            this.destResBalanceInfo.elem,
+        ]);
+
+        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
+
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(false);
+    }
+
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
@@ -1401,11 +1475,14 @@ class TransactionView extends View {
         }
         show(this.notAvailMsg, !state.isAvailable);
 
+        const scrTypes = [EXPENSE, TRANSFER];
+        const destTypes = [INCOME, TRANSFER, LIMIT_CHANGE];
+
         this.sourceContainer.show(
-            state.isAvailable && (transaction.type === EXPENSE || transaction.type === TRANSFER),
+            state.isAvailable && scrTypes.includes(transaction.type),
         );
         this.destContainer.show(
-            state.isAvailable && (transaction.type === INCOME || transaction.type === TRANSFER),
+            state.isAvailable && destTypes.includes(transaction.type),
         );
         this.personContainer.show(state.isAvailable && transaction.type === DEBT);
         this.debtAccountContainer.show(state.isAvailable && transaction.type === DEBT);
@@ -1416,6 +1493,13 @@ class TransactionView extends View {
 
         // Type menu
         this.typeMenu.setActive(transaction.type);
+        this.typeMenu.setState((menuState) => ({
+            ...menuState,
+            showChangeLimit: (
+                (state.srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
+                || (state.destAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
+            ),
+        }));
         this.typeMenu.enable(!state.submitStarted);
         this.typeInp.value = transaction.type;
 
@@ -1428,6 +1512,8 @@ class TransactionView extends View {
                 this.renderTransfer(state);
             } else if (transaction.type === DEBT) {
                 this.renderDebt(state);
+            } else if (transaction.type === LIMIT_CHANGE) {
+                this.renderLimitChange(state);
             }
         } else {
             show(this.srcAmountRow, false);
@@ -1452,8 +1538,15 @@ class TransactionView extends View {
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
         const destCurrency = currencyModel.getItem(transaction.dest_curr);
 
-        const sourceAmountLbl = (state.isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
-        const destAmountLbl = (state.isDiff) ? __('TR_DEST_AMOUNT') : __('TR_AMOUNT');
+        let sourceAmountLbl;
+        let destAmountLbl;
+        if (transaction.type === LIMIT_CHANGE) {
+            sourceAmountLbl = '';
+            destAmountLbl = __('TR_LIMIT_DELTA');
+        } else {
+            sourceAmountLbl = (state.isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+            destAmountLbl = (state.isDiff) ? __('TR_DEST_AMOUNT') : __('TR_AMOUNT');
+        }
 
         // Tile info items
         if (this.srcAmountInfo) {
@@ -1484,29 +1577,23 @@ class TransactionView extends View {
 
         // Source account
         this.srcIdInp.value = transaction.src_id;
-        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+        if (scrTypes.includes(transaction.type)) {
             if (this.sourceTile && state.srcAccount) {
                 this.sourceTile.setState({ account: state.srcAccount });
             }
 
             this.initSrcAccList(state);
-            if (this.srcDDList && transaction.src_id) {
-                this.srcDDList.setSelection(transaction.src_id);
-            }
             this.srcDDList?.enable(!state.submitStarted);
         }
 
         // Destination account
         this.destIdInp.value = transaction.dest_id;
-        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+        if (destTypes.includes(transaction.type)) {
             if (this.destTile && state.destAccount) {
                 this.destTile.setState({ account: state.destAccount });
             }
 
-            this.initDestAccList(state);
-            if (this.destDDList && transaction.dest_id) {
-                this.destDDList.setSelection(transaction.dest_id);
-            }
+            this.initDestAccList(state, prevState);
             this.destDDList?.enable(!state.submitStarted);
         }
 

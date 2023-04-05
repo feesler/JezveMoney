@@ -4,6 +4,7 @@ import {
     getClassName,
     isDate,
     formatDate,
+    isFunction,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 import { parseCookies, setCookie, __ } from './utils.js';
@@ -376,11 +377,15 @@ export class Application {
             return;
         }
 
-        const { visible = true, ...rest } = options;
+        const { visible = true, filter = null, ...rest } = options;
 
         this.checkUserAccountModels();
         const { visibleUserAccounts, hiddenUserAccounts } = this.model;
-        const items = (visible) ? visibleUserAccounts : hiddenUserAccounts;
+        let items = (visible) ? visibleUserAccounts : hiddenUserAccounts;
+        if (isFunction(filter)) {
+            items = items.filter(filter);
+        }
+
         this.appendListItems(ddlist, items, rest);
     }
 
@@ -389,27 +394,27 @@ export class Application {
             return;
         }
 
-        const { visible = true, ...rest } = options;
+        const { visible = true, filter = null, ...rest } = options;
 
         this.checkPersonModels();
         const { visiblePersons, hiddenPersons } = this.model;
-        const items = (visible) ? visiblePersons : hiddenPersons;
+        let items = (visible) ? visiblePersons : hiddenPersons;
+        if (isFunction(filter)) {
+            items = items.filter(filter);
+        }
+
         this.appendListItems(ddlist, items, rest);
     }
 
     /** Initialize acconts DropDown */
-    initAccountsList(ddlist) {
-        if (!ddlist) {
-            return;
-        }
-
-        this.appendAccounts(ddlist, { visible: true });
-        this.appendAccounts(ddlist, { visible: false, group: __('LIST_HIDDEN') });
+    initAccountsList(ddlist, options = {}) {
+        this.appendAccounts(ddlist, { ...options, visible: true });
+        this.appendAccounts(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
     }
 
     /** Initialize persons DropDown */
-    initPersonsList(ddlist) {
-        this.appendPersons(ddlist, { visible: true });
-        this.appendPersons(ddlist, { visible: false, group: __('LIST_HIDDEN') });
+    initPersonsList(ddlist, options = {}) {
+        this.appendPersons(ddlist, { ...options, visible: true });
+        this.appendPersons(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
     }
 }

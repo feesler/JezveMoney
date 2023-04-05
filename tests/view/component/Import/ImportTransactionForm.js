@@ -17,6 +17,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import {
@@ -29,6 +30,7 @@ import {
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
 
 const sourceTransactionTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -212,6 +214,9 @@ export class ImportTransactionForm extends TestComponent {
             } else if (res.type === 'debt_in') {
                 res.srcCurrId = res.destCurrId;
             }
+        } else if (res.type === 'limit') {
+            res.sourceId = 0;
+            res.srcCurrId = res.destCurrId;
         }
 
         res.srcCurrency = App.currency.getItem(res.srcCurrId);
@@ -269,9 +274,15 @@ export class ImportTransactionForm extends TestComponent {
         const isIncome = (model.type === 'income');
         const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
         const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
+        const isLimit = (model.type === 'limit');
+        const isCreditCard = (model.mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD);
 
-        const showSrcAmount = (isExpense && model.isDifferent) || !isExpense;
-        const showDestAmount = isExpense || (!isExpense && model.isDifferent);
+        const visibleTypes = ImportTransaction.availTypes.filter((item) => (
+            item.id !== 'limit' || isCreditCard
+        )).map((item) => ({ id: item.id.toString() }));
+
+        const showSrcAmount = (!isExpense && !isLimit) || model.isDifferent;
+        const showDestAmount = isExpense || isLimit || model.isDifferent;
 
         const realType = ImportTransaction.typeFromString(model.type);
         const visibleCategories = App.state
@@ -282,6 +293,7 @@ export class ImportTransactionForm extends TestComponent {
             typeField: {
                 disabled: false,
                 visible: true,
+                dropDown: { items: visibleTypes },
             },
             srcAmountField: {
                 disabled: !showSrcAmount,
@@ -432,6 +444,12 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_curr = model.mainAccount.curr_id;
             res.src_amount = this.getAmountValue(model.srcAmount, model.srcCurrency);
             res.dest_amount = res.src_amount;
+        } else if (res.type === LIMIT_CHANGE) {
+            const decrease = (model.destAmount < 0);
+            res.src_id = (decrease) ? model.mainAccount.id : 0;
+            res.dest_id = (decrease) ? 0 : model.mainAccount.id;
+            res.src_amount = Math.abs(this.getAmountValue(model.srcAmount, model.srcCurrency));
+            res.dest_amount = Math.abs(this.getAmountValue(model.destAmount, model.destCurrency));
         }
 
         const isValidDate = convDate(model.date) !== null;
@@ -620,7 +638,15 @@ export class ImportTransactionForm extends TestComponent {
             this.model.srcCurrId = this.model.mainAccount.curr_id;
             this.model.destCurrId = this.model.mainAccount.curr_id;
             this.model.transferAccount = null;
+        } else if (value === 'limit') {
+            this.model.sourceId = 0;
+            this.model.srcCurrId = this.model.destCurrId;
+            if (typeBefore === 'income') {
+                this.model.destAmount = this.model.srcAmount;
+            }
+            this.model.srcAmount = this.model.destAmount;
         }
+
         this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
         this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
@@ -830,10 +856,11 @@ export class ImportTransactionForm extends TestComponent {
         const isIncome = (item.type === 'income');
         const isTransfer = (item.type === 'transfer_out' || item.type === 'transfer_in');
         const isDebt = (item.type === 'debt_out' || item.type === 'debt_in');
+        const isLimit = (item.type === 'limit');
         const isDiff = (item.src_curr !== item.dest_curr);
 
-        const showSrcAmount = (isExpense && isDiff) || !isExpense;
-        const showDestAmount = isExpense || (!isExpense && isDiff);
+        const showSrcAmount = (!isExpense && !isLimit) || isDiff;
+        const showDestAmount = isExpense || isLimit || isDiff;
 
         const res = {
             typeField: { disabled: false },

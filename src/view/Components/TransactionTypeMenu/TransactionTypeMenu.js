@@ -6,6 +6,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
 } from '../../js/model/Transaction.js';
 
 const CONTAINER_CLASS = 'link-menu trtype-menu';
@@ -13,6 +14,7 @@ const CONTAINER_CLASS = 'link-menu trtype-menu';
 const defaultProps = {
     itemParam: 'type',
     showAll: true,
+    showChangeLimit: false,
 };
 
 /**
@@ -32,17 +34,18 @@ export class TransactionTypeMenu extends LinkMenu {
         this.setUserProps();
         this.setClassNames();
 
-        const items = [];
-
-        if (this.props.showAll) {
-            items.push({ title: __('SHOW_ALL') });
-        }
-        items.push(
+        const items = [
+            { title: __('SHOW_ALL'), hidden: !this.props.showAll },
             { value: EXPENSE, title: __('TR_EXPENSE') },
             { value: INCOME, title: __('TR_INCOME') },
             { value: TRANSFER, title: __('TR_TRANSFER') },
             { value: DEBT, title: __('TR_DEBT') },
-        );
+            {
+                value: LIMIT_CHANGE,
+                title: __('TR_LIMIT_CHANGE'),
+                hidden: !this.props.showChangeLimit,
+            },
+        ];
 
         this.setState({
             ...this.state,
@@ -78,5 +81,18 @@ export class TransactionTypeMenu extends LinkMenu {
         }
 
         return url;
+    }
+
+    render(state, prevState = {}) {
+        super.render({
+            ...state,
+            items: state.items.map((item) => ({
+                ...item,
+                hidden: (
+                    (item.value === LIMIT_CHANGE && !state.showChangeLimit)
+                    || (!item.value && !state.showAll)
+                ),
+            })),
+        }, prevState);
     }
 }

@@ -236,7 +236,7 @@ class AccountModel extends CachedTable
 
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $item->curr_id);
 
-        $currObj = $this->currMod->getItem($item->curr_id);
+        $currObj = $this->currMod->getItem($res["curr_id"] ?? $item->curr_id);
         if (!$currObj) {
             throw new \Error("Currency not found");
         }
@@ -669,18 +669,24 @@ class AccountModel extends CachedTable
      * Sets balance of account
      *
      * @param int $acc_id account id
-     * @param float $balance new balance
+     * @param float $balance new balance value
+     * @param float|null $limit optional new credit limit value
      *
      * @return bool
      */
-    public function setBalance(int $acc_id, float $balance)
+    public function setBalance(int $acc_id, float $balance, ?float $limit = null)
     {
         $accObj = $this->getItem($acc_id);
         if (!$accObj) {
             return false;
         }
 
-        if (!$this->dbObj->updateQ($this->tbl_name, ["balance" => $balance], "id=" . $acc_id)) {
+        $data = ["balance" => $balance];
+        if (!is_null($limit)) {
+            $data["limit"] = $limit;
+        }
+
+        if (!$this->dbObj->updateQ($this->tbl_name, $data, "id=" . $acc_id)) {
             return false;
         }
 
@@ -708,17 +714,21 @@ class AccountModel extends CachedTable
 
         $curDate = date("Y-m-d H:i:s");
         $accounts = [];
-        foreach ($balanceChanges as $acc_id => $balance) {
+        foreach ($balanceChanges as $acc_id => $accountChanges) {
             $accObj = $this->getItem($acc_id);
             if (!$accObj) {
                 return false;
             }
 
             if ($updateInitial) {
-                $accObj->initbalance = $balance;
+                $accObj->initbalance = $accountChanges["balance"];
             }
 
-            $accObj->balance = $balance;
+            if (isset($accountChanges["limit"])) {
+                $accObj->limit = $accountChanges["limit"];
+            }
+
+            $accObj->balance = $accountChanges["balance"];
             $accObj->createdate = date("Y-m-d H:i:s", $accObj->createdate);
             $accObj->updatedate = $curDate;
 
@@ -727,7 +737,7 @@ class AccountModel extends CachedTable
 
         if (count($accounts) == 1 && !$updateInitial) {
             $account = $accounts[0];
-            $this->setBalance($account["id"], $account["balance"]);
+            $this->setBalance($account["id"], $account["balance"], $account["limit"]);
         } else {
             if (!$this->dbObj->updateMultipleQ($this->tbl_name, $accounts)) {
                 return false;
@@ -927,11 +937,18 @@ class AccountModel extends CachedTable
     /**
      * Returns array of user accounts sorted by visibility
      *
-     * @return array
+     * @param array $params additional parameters
+     *
+     * @return AccountItem[]
      */
-    public function getUserAccounts()
+    public function getUserAccounts(array $params = [])
     {
-        return $this->getData(["visibility" => "all", "sort" => "visibility"]);
+        $params = array_merge($params, [
+            "visibility" => "all",
+            "sort" => "visibility",
+        ]);
+
+        return $this->getData($params);
     }
 
     /**
