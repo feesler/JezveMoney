@@ -10,18 +10,19 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
-import { Switch } from 'jezvejs/Switch';
 
 import { __ } from '../../js/utils.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
-import { Application, DARK_THEME } from '../../js/Application.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
+import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
@@ -66,20 +67,10 @@ class SettingsView extends View {
         ]);
 
         // Locale select
-        this.localeSelect = DropDown.create({
-            elem: this.localeSelect,
-            onChange: (locale) => this.onLocaleChange(locale),
-            data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
-        });
-        const currentLocale = window.app.getCurrrentLocale();
-        this.localeSelect.setSelection(currentLocale);
+        this.localeSelect = LocaleSelect.fromElement(this.localeSelect);
 
         // Theme swtich
-        this.themeSwitch = Switch.fromElement(this.themeSwitch, {
-            onChange: (checked) => this.onToggleTheme(checked),
-        });
-        const currentTheme = window.app.getCurrentTheme();
-        this.themeSwitch.check(currentTheme === DARK_THEME);
+        this.themeSwitch = ThemeSwitch.fromElement(this.themeSwitch);
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
@@ -212,24 +203,6 @@ class SettingsView extends View {
                 onClick: () => this.deleteItems(),
             }],
         });
-    }
-
-    /**
-     * Locale select 'change' event handler
-     * @param {Object} locale - selected locale
-     */
-    onLocaleChange(locale) {
-        if (locale) {
-            window.app.setLocale(locale.id);
-        }
-    }
-
-    /**
-     * Theme switch 'change' event handler
-     * @param {Boolean} checked - current state
-     */
-    onToggleTheme(checked) {
-        window.app.setTheme(checked);
     }
 
     showMenu() {
