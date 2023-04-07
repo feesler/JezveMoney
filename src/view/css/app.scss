@@ -427,29 +427,6 @@ svg * {
   margin: var(--form-field-margin);
 }
 
-/* Horizontal field */
-.field.horizontal-field {
-  --field-title-font-size: 1.15rem;
-  --field-title-font-weight: 300;
-  --field-title-color: var(--main-text-color);
-
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  column-gap: 2rem;
-
-  .field__title {
-    white-space: nowrap;
-    padding: 0.5rem 0;
-  }
-
-  .dd__container {
-    align-self: center;
-  }
-}
-
 /* Horizontal form separator */
 .form-separator {
   border: 0;
@@ -848,6 +825,29 @@ svg * {
 
 .popup .dp__container {
   position: static;
+}
+
+/* Horizontal field */
+.field.horizontal-field {
+  --field-title-font-size: 1.15rem;
+  --field-title-font-weight: 300;
+  --field-title-color: var(--main-text-color);
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  column-gap: 2rem;
+
+  .field__title {
+    white-space: nowrap;
+    padding: 0.5rem 0;
+  }
+
+  .dd__container {
+    align-self: center;
+  }
 }
 
 /* Checkboxes list sub-option */
