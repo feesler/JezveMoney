@@ -6,7 +6,7 @@
         <div id="apiMenu" class="navigation navigation_closed">
             <nav class="navigation-content">
                 <div class="navigation-controls">
-                    <button class="navigation__close-btn"><?= svgIcon("back", "navigation__close-btn-icon") ?></button>
+                    <button class="btn close-btn"><?= svgIcon("back", "btn__icon") ?></button>
                     <div class="navigation-logo">
                         <div class="header-logo">
                             <span class="header-logo__title">API Methods</span>

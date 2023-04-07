@@ -45,7 +45,7 @@ export class Header extends Component {
 
         this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
         setEvents(this.navToggleBtn, { click: () => this.onToggleNav() });
-        this.closeNavBtn = this.navigationContent.querySelector('.navigation__close-btn');
+        this.closeNavBtn = this.navigationContent.querySelector('.close-btn');
         setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
         // Actions
@@ -62,7 +62,7 @@ export class Header extends Component {
 
         this.actionsContainer = null;
 
-        this.userNameElem = this.userBtn.querySelector('.user-btn__title');
+        this.userNameElem = this.userBtn.querySelector('.btn__content');
         if (this.userNameElem) {
             this.userName = this.userNameElem.textContent;
         }
@@ -77,8 +77,8 @@ export class Header extends Component {
         });
         show(this.userNavContent, false);
 
-        this.navUserNameElem = this.userNavContent.querySelector('.user-btn__title');
-        this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
+        this.navUserNameElem = this.userNavContent.querySelector('.user-btn .btn__content');
+        this.closeUserNavBtn = this.userNavContent.querySelector('.close-btn');
         setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
     }
 
