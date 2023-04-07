@@ -2,11 +2,14 @@ import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
 import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { Field } from '../../Components/Field/Field.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
+import '../../css/app.scss';
 import './RegisterView.scss';
+import { __ } from '../../js/utils.js';
+import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
+import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 
 /**
  * User registration view
@@ -41,6 +44,22 @@ class RegisterView extends View {
             'passwordInp',
             'nameInp',
         ]);
+
+        this.localeSelect = LocaleSelect.create();
+        this.localeField = Field.create({
+            className: 'horizontal-field',
+            title: __('LANGUAGE'),
+            content: this.localeSelect.elem,
+        });
+
+        this.themeSwitch = ThemeSwitch.create();
+        this.themeField = Field.create({
+            className: 'horizontal-field',
+            title: __('DARK_THEME'),
+            content: this.themeSwitch.elem,
+        });
+
+        this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
         setEvents(this.loginInp, { input: () => this.onLoginInput() });

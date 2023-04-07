@@ -8,7 +8,7 @@
     <div class="header__container">
         <div class="header__content">
             <button id="userbtn" class="btn user-btn right-align" type="button">
-                <span class="btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+                <?= svgIcon("user", "btn__icon") ?>
                 <span class="btn__content"><?= e($this->user_name) ?></span>
             </button>
         </div>
@@ -46,7 +46,7 @@
 <div class="user-navigation-content" hidden>
     <div class="user-navigation-controls">
         <div class="btn user-btn">
-            <span class="btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+            <?= svgIcon("user", "btn__icon") ?>
             <span class="btn__content"><?= e($this->user_name) ?></span>
         </div>
         <button class="btn close-btn right-align" tabindex="3"><?= svgIcon("close", "btn__icon") ?></button>
