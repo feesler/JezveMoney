@@ -67,7 +67,11 @@ export class AccountsStory extends TestStory {
         await AccountTests.inputBalance('100000.012');
 
         await AccountTests.changeCurrency(BTC);
-        await AccountTests.inputBalance('0.00123');
+        await AccountTests.inputBalance('0.12345678');
+        // Check values on change currency to RUB and back to BTC
+        await AccountTests.changeCurrency(RUB);
+        await AccountTests.changeCurrency(BTC);
+
         // Change currency back to RUB
         await AccountTests.changeCurrency(RUB);
 

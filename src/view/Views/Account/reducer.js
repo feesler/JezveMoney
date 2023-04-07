@@ -19,13 +19,29 @@ const slice = createSlice({
         },
     }),
 
-    changeCurrency: (state, currencyId) => ({
-        ...state,
-        data: {
-            ...state.data,
-            curr_id: currencyId,
-        },
-    }),
+    changeCurrency: (state, currencyId) => {
+        const precision = getCurrencyPrecision(currencyId);
+
+        const newState = {
+            ...state,
+            data: {
+                ...state.data,
+                curr_id: currencyId,
+                fInitBalance: normalize(state.data.fInitBalance, precision),
+                fLimit: normalize(state.data.fLimit, precision),
+            },
+        };
+
+        if (state.data.fInitBalance !== newState.data.fInitBalance) {
+            newState.data.initbalance = newState.data.fInitBalance;
+        }
+
+        if (state.data.fLimit !== newState.data.fLimit) {
+            newState.data.limit = newState.data.fLimit;
+        }
+
+        return newState;
+    },
 
     changeInitialBalance: (state, value) => ({
         ...state,
