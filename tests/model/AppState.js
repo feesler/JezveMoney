@@ -542,6 +542,16 @@ export class AppState {
         return res;
     }
 
+    returnState(request, result = {}) {
+        const res = { ...result };
+
+        if (isObject(request)) {
+            res.state = this.getState(request);
+        }
+
+        return res;
+    }
+
     prepareChainedRequestData(request) {
         if (!request?.returnState?.transactions) {
             return request;
@@ -615,12 +625,7 @@ export class AppState {
         const ind = this.userCurrencies.create(data);
         const item = this.userCurrencies.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateUserCurrency(params) {
@@ -642,12 +647,7 @@ export class AppState {
         // Prepare expected updates of user currencies list
         this.userCurrencies.update(expectedItem);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteUserCurrencies(params) {
@@ -661,12 +661,7 @@ export class AppState {
 
         this.userCurrencies.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setUserCurrencyPos(params) {
@@ -683,12 +678,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getUserCurrenciesByIndexes(indexes, returnIds = false) {
@@ -766,12 +756,7 @@ export class AppState {
         const item = this.accounts.getItemByIndex(ind);
         this.updatePersonAccounts();
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateAccount(params) {
@@ -811,12 +796,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteAccounts(params) {
@@ -838,12 +818,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /* eslint-disable no-bitwise */
@@ -865,12 +840,7 @@ export class AppState {
             this.accounts.update(account);
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
 
@@ -888,12 +858,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     cacheUserAccounts() {
@@ -1032,12 +997,7 @@ export class AppState {
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updatePerson(params) {
@@ -1057,12 +1017,7 @@ export class AppState {
 
         this.persons.update(expPerson);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deletePersons(params) {
@@ -1085,12 +1040,7 @@ export class AppState {
         this.accounts.deleteItems(accountsToDelete);
         this.transactions.updateResults(this.accounts);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /* eslint-disable no-bitwise */
@@ -1111,12 +1061,7 @@ export class AppState {
             this.persons.update(person);
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
 
@@ -1134,12 +1079,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getPersonAccounts(personId) {
@@ -1321,12 +1261,7 @@ export class AppState {
         const item = this.categories.getItemByIndex(ind);
         this.sortCategories();
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateCategory(params) {
@@ -1364,12 +1299,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteCategories(params) {
@@ -1409,12 +1339,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setCategoryPos(params) {
@@ -1433,12 +1358,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getCategoriesSortMode() {
@@ -1784,12 +1704,7 @@ export class AppState {
 
         const item = this.transactions.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateTransaction(params) {
@@ -1822,12 +1737,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteTransactions(params) {
@@ -1847,12 +1757,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setTransactionCategory(params) {
@@ -1874,12 +1779,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setTransactionPos(params) {
@@ -1893,12 +1793,7 @@ export class AppState {
 
         this.transactions.updateResults(this.accounts);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     isAvailableTransactionType(type) {
@@ -2006,12 +1901,7 @@ export class AppState {
         const ind = this.templates.create(data);
         const item = this.templates.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     getUpdateTemplateRequest(params) {
@@ -2065,12 +1955,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteTemplates(params) {
@@ -2085,12 +1970,7 @@ export class AppState {
         this.rules.deleteTemplate(ids);
         this.templates.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /**
@@ -2149,12 +2029,7 @@ export class AppState {
         const ind = this.rules.create(data);
         const item = this.rules.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateRule(params) {
@@ -2177,12 +2052,7 @@ export class AppState {
 
         this.rules.update(expRule);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteRules(params) {
@@ -2196,11 +2066,6 @@ export class AppState {
 
         this.rules.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 }
