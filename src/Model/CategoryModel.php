@@ -3,7 +3,7 @@
 namespace JezveMoney\App\Model;
 
 use JezveMoney\Core\MySqlDB;
-use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\SortableModel;
 use JezveMoney\Core\Singleton;
 use JezveMoney\App\Item\CategoryItem;
 
@@ -14,15 +14,12 @@ define("NO_CATEGORY", 0);
 /**
  * Transaction category model
  */
-class CategoryModel extends CachedTable
+class CategoryModel extends SortableModel
 {
     use Singleton;
 
-    private static $user_id = 0;
-
     protected $tbl_name = "categories";
     public $removeChild = true;
-    protected $latestPos = null;
 
     /**
      * Model initialization
@@ -145,31 +142,11 @@ class CategoryModel extends CachedTable
     {
         $res = $this->validateParams($params);
 
-        if (is_null($this->latestPos)) {
-            $this->latestPos = $this->getLatestPos();
-        }
-        $this->latestPos++;
-
-        $res["pos"] = $this->latestPos;
+        $res["pos"] = $this->getNextPos();
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
 
         return $res;
-    }
-
-    /**
-     * Performs final steps after new item was successfully created
-     *
-     * @param int|int[]|null $items id or array of created item ids
-     *
-     * @return bool
-     */
-    protected function postCreate(mixed $items)
-    {
-        $this->cleanCache();
-        $this->latestPos = null;
-
-        return true;
     }
 
     /**
@@ -298,108 +275,6 @@ class CategoryModel extends CachedTable
     }
 
     /**
-     * Checks item with specified position is exists
-     *
-     * @param int $position position
-     *
-     * @return bool
-     */
-    public function isPosExist(int $position)
-    {
-        $pos = intval($position);
-
-        if (!$this->checkCache()) {
-            return false;
-        }
-
-        foreach ($this->cache as $item) {
-            if ($item->pos == $pos) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns latest position of accounts
-     *
-     * @return int
-     */
-    public function getLatestPos()
-    {
-        if (!$this->checkCache()) {
-            return 0;
-        }
-
-        $res = 0;
-        foreach ($this->cache as $item) {
-            $res = max($item->pos, $res);
-        }
-
-        return $res;
-    }
-
-    /**
-     * Updates position of item and fix position of items between old and new position
-     *
-     * @param int $item_id
-     * @param int $new_pos
-     *
-     * @return bool
-     */
-    protected function updatePos(int $item_id, int $new_pos)
-    {
-        $item_id = intval($item_id);
-        $new_pos = intval($new_pos);
-        if (!$item_id || !$new_pos) {
-            return false;
-        }
-
-        $item = $this->getItem($item_id);
-        if (!$item || $item->user_id != self::$user_id) {
-            return false;
-        }
-
-        $old_pos = $item->pos;
-        if ($old_pos == $new_pos) {
-            return true;
-        }
-
-        if ($this->isPosExist($new_pos)) {
-            $updRes = false;
-            if ($old_pos == 0) {           // insert with specified position
-                $updRes = $this->dbObj->updateQ(
-                    $this->tbl_name,
-                    ["pos=pos+1"],
-                    ["user_id=" . self::$user_id, "pos >= $new_pos"],
-                );
-            } elseif ($new_pos < $old_pos) {       // moving up
-                $updRes = $this->dbObj->updateQ(
-                    $this->tbl_name,
-                    ["pos=pos+1"],
-                    ["user_id=" . self::$user_id, "pos >= $new_pos", "pos < $old_pos"],
-                );
-            } elseif ($new_pos > $old_pos) {        // moving down
-                $updRes = $this->dbObj->updateQ(
-                    $this->tbl_name,
-                    ["pos=pos-1"],
-                    ["user_id=" . self::$user_id, "pos > $old_pos", "pos <= $new_pos"],
-                );
-            }
-            if (!$updRes) {
-                return false;
-            }
-        }
-
-        if (!$this->dbObj->updateQ($this->tbl_name, ["pos" => $new_pos], "id=" . $item_id)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Updates position of item
      *
      * @param array $request
@@ -432,12 +307,16 @@ class CategoryModel extends CachedTable
             $this->update($item_id, $category);
         }
 
-        $this->updatePos($item_id, $new_pos);
+        if (!parent::updatePosition($request)) {
+            return false;
+        }
 
         $pos = $new_pos;
         foreach ($children as $child) {
             $pos++;
-            $this->updatePos($child->id, $pos);
+            if (!parent::updatePosition(["id" => $child->id, "pos" => $pos])) {
+                return false;
+            }
         }
 
         $this->cleanCache();
