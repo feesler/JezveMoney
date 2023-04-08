@@ -97,10 +97,12 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $this->tbl_name,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`version` INT(11) NOT NULL DEFAULT '0', " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "version" => "INT(11) NOT NULL DEFAULT '0'",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
 
         return $res;
@@ -784,16 +786,18 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`name` VARCHAR(128) NOT NULL, " .
-                "`code` VARCHAR(64) NOT NULL, " .
-                "`sign` VARCHAR(64) NOT NULL, " .
-                "`precision` INT NOT NULL DEFAULT '2', " .
-                "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "name" => "VARCHAR(128) NOT NULL",
+                "code" => "VARCHAR(64) NOT NULL",
+                "sign" => "VARCHAR(64) NOT NULL",
+                "precision" => "INT NOT NULL DEFAULT '2'",
+                "flags" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -816,23 +820,25 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`owner_id` INT(11) NOT NULL, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`type` INT NOT NULL DEFAULT '0', " .
-                "`curr_id` INT(11) NOT NULL, " .
-                "`balance` " . DECIMAL_TYPE . " NOT NULL, " .
-                "`initbalance` " . DECIMAL_TYPE . " NOT NULL, " .
-                "`limit` " . DECIMAL_TYPE . " NOT NULL DEFAULT '0', " .
-                "`name` VARCHAR(255) NOT NULL, " .
-                "`icon_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                "`pos` INT(11) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "owner_id" => "INT(11) NOT NULL",
+                "user_id" => "INT(11) NOT NULL",
+                "type" => "INT NOT NULL DEFAULT '0'",
+                "curr_id" => "INT(11) NOT NULL",
+                "balance" => DECIMAL_TYPE . " NOT NULL",
+                "initbalance" => DECIMAL_TYPE . " NOT NULL",
+                "limit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'",
+                "name" => "VARCHAR(255) NOT NULL",
+                "icon_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "flags" => "INT(11) NOT NULL DEFAULT '0'",
+                "pos" => "INT(11) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`), " .
-                "KEY `user_id` (`user_id`)",
-            TABLE_OPTIONS
+                    "KEY `user_id` (`user_id`)",
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -855,15 +861,17 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`name` VARCHAR(255) NOT NULL, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`flags` INT(11) NOT NULL, " .
-                "`pos` INT(11) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "name" => "VARCHAR(255) NOT NULL",
+                "user_id" => "INT(11) NOT NULL",
+                "flags" => "INT(11) NOT NULL",
+                "pos" => "INT(11) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -886,24 +894,26 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`src_id` INT(11) NOT NULL, " .
-                "`dest_id` INT(11) NOT NULL, " .
-                "`type` INT(11) NOT NULL, " .
-                "`src_amount` " . DECIMAL_TYPE . " NOT NULL, " .
-                "`dest_amount` " . DECIMAL_TYPE . " NOT NULL, " .
-                "`src_curr` INT(11) NOT NULL, " .
-                "`dest_curr` INT(11) NOT NULL, " .
-                "`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " .
-                "`comment` text NOT NULL, " .
-                "`pos` INT(11) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
-                "`src_result` " . DECIMAL_TYPE . " NOT NULL, " .
-                "`dest_result` " . DECIMAL_TYPE . " NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "src_id" => "INT(11) NOT NULL",
+                "dest_id" => "INT(11) NOT NULL",
+                "type" => "INT(11) NOT NULL",
+                "src_amount" => "" . DECIMAL_TYPE . " NOT NULL",
+                "dest_amount" => "" . DECIMAL_TYPE . " NOT NULL",
+                "src_curr" => "INT(11) NOT NULL",
+                "dest_curr" => "INT(11) NOT NULL",
+                "date" => "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
+                "comment" => "text NOT NULL",
+                "pos" => "INT(11) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
+                "src_result" => "" . DECIMAL_TYPE . " NOT NULL",
+                "dest_result" => "" . DECIMAL_TYPE . " NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -926,16 +936,18 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`parent_id` INT(11) NOT NULL, " .
-                "`type` INT(11) NOT NULL, " .
-                "`name` VARCHAR(255) NOT NULL, " .
-                "`pos` INT(11) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "parent_id" => "INT(11) NOT NULL",
+                "type" => "INT(11) NOT NULL",
+                "name" => "VARCHAR(255) NOT NULL",
+                "pos" => "INT(11) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -958,15 +970,17 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`login` VARCHAR(255) NOT NULL, " .
-                "`passhash` VARCHAR(64) NOT NULL, " .
-                "`owner_id` INT(11) NOT NULL, " .
-                "`access` INT(11) NOT NULL DEFAULT '0', " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "login" => "VARCHAR(255) NOT NULL",
+                "passhash" => "VARCHAR(64) NOT NULL",
+                "owner_id" => "INT(11) NOT NULL",
+                "access" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -989,14 +1003,16 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`sort_accounts` INT(11) NOT NULL DEFAULT 0, " .
-                "`sort_persons` INT(11) NOT NULL DEFAULT 0, " .
-                "`sort_categories` INT(11) NOT NULL DEFAULT 0, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "sort_accounts" => "INT(11) NOT NULL DEFAULT 0",
+                "sort_persons" => "INT(11) NOT NULL DEFAULT 0",
+                "sort_categories" => "INT(11) NOT NULL DEFAULT 0",
                 "PRIMARY KEY (`id`), " .
-                "UNIQUE KEY `user_id` (`user_id`)",
-            TABLE_OPTIONS
+                    "UNIQUE KEY `user_id` (`user_id`)",
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1019,16 +1035,18 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL, " .
-                "`curr_id` INT(11) NOT NULL, " .
-                "`pos` INT(11) NOT NULL, " .
-                "`flags` INT(11) NOT NULL DEFAULT 0, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "curr_id" => "INT(11) NOT NULL",
+                "pos" => "INT(11) NOT NULL",
+                "flags" => "INT(11) NOT NULL DEFAULT 0",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`), " .
-                "INDEX `user_id` (`user_id`)",
-            TABLE_OPTIONS
+                    "INDEX `user_id` (`user_id`)",
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1051,14 +1069,16 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`name` VARCHAR(128) NOT NULL, " .
-                "`file` VARCHAR(256) NOT NULL, " .
-                "`type` INT(11) NOT NULL DEFAULT '0', " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "name" => "VARCHAR(128) NOT NULL",
+                "file" => "VARCHAR(256) NOT NULL",
+                "type" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1094,23 +1114,25 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`name` VARCHAR(128) NOT NULL, " .
-                "`type_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`user_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`account_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`first_row` INT(11) NOT NULL DEFAULT '0', " .
-                "`date_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`comment_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`trans_curr_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`trans_amount_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`account_curr_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`account_amount_col` INT(11) NOT NULL DEFAULT '0', " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "name" => "VARCHAR(128) NOT NULL",
+                "type_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "user_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "account_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "first_row" => "INT(11) NOT NULL DEFAULT '0'",
+                "date_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "comment_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "trans_curr_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "trans_amount_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "account_curr_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "account_amount_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`), " .
-                "KEY `user_id` (`user_id`)",
-            TABLE_OPTIONS
+                    "KEY `user_id` (`user_id`)",
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1132,13 +1154,15 @@ class DBVersion
         }
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "flags" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1160,17 +1184,19 @@ class DBVersion
         }
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`rule_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`field_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`operator` INT(11) NOT NULL DEFAULT '0', " .
-                "`flags` INT(11) NOT NULL DEFAULT '0', " .
-                "`value` VARCHAR(255) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "rule_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "field_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "operator" => "INT(11) NOT NULL DEFAULT '0'",
+                "flags" => "INT(11) NOT NULL DEFAULT '0'",
+                "value" => "VARCHAR(255) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1192,15 +1218,17 @@ class DBVersion
         }
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`user_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`rule_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`action_id` INT(11) NOT NULL DEFAULT '0', " .
-                "`value` VARCHAR(255) NOT NULL, " .
-                "`createdate` DATETIME NOT NULL, " .
-                "`updatedate` DATETIME NOT NULL, " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "rule_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "action_id" => "INT(11) NOT NULL DEFAULT '0'",
+                "value" => "VARCHAR(255) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
-            TABLE_OPTIONS
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -1223,12 +1251,14 @@ class DBVersion
 
         $res = $this->dbClient->createTableQ(
             $tableName,
-            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
-                "`title` VARCHAR(255) NOT NULL, " .
-                "`query` TEXT NOT NULL, " .
-                "`flags` INT(11) NOT NULL DEFAULT '0', " .
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "title" => "VARCHAR(255) NOT NULL",
+                "query" => "TEXT NOT NULL",
+                "flags" => "INT(11) NOT NULL DEFAULT '0'",
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci"
+            ],
+            TABLE_OPTIONS,
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");

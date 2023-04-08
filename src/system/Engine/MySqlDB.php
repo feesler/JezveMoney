@@ -124,6 +124,30 @@ function orJoin(mixed $pieces)
 }
 
 /**
+ * Returns string of joined column definition of specified array
+ * Result is used for CREATE TABLE and ALTER TABLE ADD COLUMNS queries
+ *
+ * @param mixed $columns
+ *
+ * @return string
+ */
+function columnsJoin(mixed $columns)
+{
+    $res = [];
+    foreach ($columns as $key => $value) {
+        if (is_string($key)) {
+            $res[] = "`" . $key . "` " . $value;
+        } elseif (is_numeric($key)) {
+            $res[] = $value;
+        } else {
+            throw new \Error("Incorrect syntax");
+        }
+    }
+
+    return implode(", ", $res);
+}
+
+/**
  * Returns string of joined 'key' = 'value' entries of specified array
  * Result is used as expressions for UPDATE query
  *
@@ -774,17 +798,21 @@ class MySqlDB
      * Executes CREATE TABLE query
      *
      * @param string $table table name
-     * @param string $defs columns
+     * @param array|string|null $columns columns
      * @param string $options
      *
      * @return bool
      */
-    public function createTableQ(string $table, string $defs, string $options)
+    public function createTableQ(string $table, mixed $columns, string $options)
     {
         $table = $this->escape($table);
-        $defs = $this->escape($defs);
         $options = $this->escape($options);
-        if (!$table || $table == "" || !$defs || $defs == "") {
+        if (!$table || $table == "") {
+            return false;
+        }
+
+        $defs = columnsJoin($columns);
+        if (!is_string($defs) || $defs == "") {
             return false;
         }
 
@@ -874,16 +902,12 @@ class MySqlDB
             return false;
         }
 
-        $colDefs = [];
-        foreach ($columns as $columnName => $columnDef) {
-            if (!is_string($columnName)) {
-                wlog("String key for column name is expected");
-                return false;
-            }
-            $colDefs[] = "`" . $columnName . "` " . $columnDef;
+        $defs = columnsJoin($columns);
+        if (!is_string($defs) || $defs == "") {
+            return false;
         }
 
-        $query = "ALTER TABLE `" . $table . "` ADD COLUMN (" . implode(", ", $colDefs) . ");";
+        $query = "ALTER TABLE `" . $table . "` ADD COLUMN (" . $defs . ");";
         $this->rawQ($query);
 
         return ($this->errno == 0);
