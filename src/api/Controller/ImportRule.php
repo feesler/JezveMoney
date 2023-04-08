@@ -17,6 +17,9 @@ class ImportRule extends ApiListController
         "conditions",
         "actions"
     ];
+    protected $defaultValues = [
+        "flags" => 0,
+    ];
 
     protected $condModel = null;
     protected $actionModel = null;

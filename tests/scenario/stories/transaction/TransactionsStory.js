@@ -891,18 +891,14 @@ export class TransactionsStory extends TestStory {
 
         // Create user account
         const account = await api.account.create({
-            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1000',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         // Create person
         const person = await api.person.create({
             name: 'Person 1',
-            flags: 0,
         });
         // Create debt transaction to obtain account of person
         await api.transaction.create({
@@ -915,8 +911,6 @@ export class TransactionsStory extends TestStory {
             src_curr: RUB,
             dest_curr: RUB,
             date: App.datesSec.now,
-            category_id: 0,
-            comment: '',
         });
 
         await App.state.fetch();
@@ -952,13 +946,10 @@ export class TransactionsStory extends TestStory {
 
         // Create first account
         const { id: account1 } = await api.account.create({
-            type: 0,
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         await App.state.fetch();
 
@@ -976,13 +967,10 @@ export class TransactionsStory extends TestStory {
 
         // Create second account
         const { id: account2 } = await api.account.create({
-            type: 0,
             name: 'Account 2',
             curr_id: RUB,
             initbalance: '2',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         await App.state.fetch();
 
@@ -998,7 +986,6 @@ export class TransactionsStory extends TestStory {
         // Create person
         const { id: person1 } = await api.person.create({
             name: 'Person 1',
-            flags: 0,
         });
         await App.state.fetch();
 

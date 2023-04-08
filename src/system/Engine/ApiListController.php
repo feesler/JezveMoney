@@ -10,6 +10,7 @@ use JezveMoney\App\API\Controller\State;
 class ApiListController extends ApiController
 {
     protected $requiredFields = [];
+    protected $defaultValues = [];
     protected $model = null;
     protected $createErrorMsg = null;
     protected $updateErrorMsg = null;
@@ -95,13 +96,25 @@ class ApiListController extends ApiController
     /**
      * Returns array of mandatory fields
      *
-     * @param array $request
+     * @param array $item
      *
      * @return array
      */
-    protected function getExpectedFields(array $request)
+    protected function getExpectedFields(array $item)
     {
         return $this->requiredFields;
+    }
+
+    /**
+     * Returns array of default field values
+     *
+     * @param array $item
+     *
+     * @return array
+     */
+    protected function getDefaultValues(array $item)
+    {
+        return $this->defaultValues;
     }
 
     /**
@@ -206,14 +219,16 @@ class ApiListController extends ApiController
         }
 
         $expectedFields = $this->getExpectedFields($request);
-        $checkResult = checkFields($request, $expectedFields);
+        $default = $this->getDefaultValues($request);
+        $itemData = array_merge($default, $request);
+        $checkResult = checkFields($itemData, $expectedFields);
         if ($checkResult === false) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
-        $itemData = $this->preCreate($request);
+        $itemData = $this->preCreate($itemData);
 
         $item_id = null;
         try {
@@ -255,13 +270,14 @@ class ApiListController extends ApiController
             }
 
             $expectedFields = $this->getExpectedFields($item);
-            $checkResult = checkFields($item, $expectedFields);
+            $default = $this->getDefaultValues($item);
+            $itemData = array_merge($default, $item);
+            $checkResult = checkFields($itemData, $expectedFields);
             if ($checkResult === false) {
                 throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
             }
 
-            $itemData = $this->preCreate($item);
-            $items[] = $itemData;
+            $items[] = $this->preCreate($itemData);
         }
 
         $ids = null;
@@ -319,7 +335,7 @@ class ApiListController extends ApiController
         }
 
         $expectedFields = $this->getExpectedFields($request);
-        $reqData = checkFields($request, $expectedFields);
+        $reqData = copyFields($request, $expectedFields);
         if ($reqData === false) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }

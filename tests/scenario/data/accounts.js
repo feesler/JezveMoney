@@ -22,57 +22,43 @@ export const createAccounts = async () => {
         name: 'ACC_3',
         curr_id: RUB,
         initbalance: '500.99',
-        limit: 0,
         icon_id: 2,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CASH,
         name: 'ACC_RUB',
         curr_id: RUB,
         initbalance: '500.99',
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CASH,
         name: 'ACC_USD',
         curr_id: USD,
         initbalance: '500.99',
-        limit: 0,
         icon_id: 4,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CASH,
         name: 'ACC_EUR',
         curr_id: EUR,
         initbalance: '10000.99',
-        limit: 0,
         icon_id: 3,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'CARD_RUB',
         curr_id: RUB,
         initbalance: '35000.40',
-        limit: 0,
         icon_id: 3,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CREDIT,
         name: 'HIDDEN_ACC',
         curr_id: RUB,
         initbalance: '100',
-        limit: 0,
-        icon_id: 0,
         flags: ACCOUNT_HIDDEN,
     }, {
         type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'ACC_BTC',
         curr_id: BTC,
         initbalance: '0.005746',
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CREDIT_CARD,
         name: 'CREDIT_CARD',
@@ -80,7 +66,6 @@ export const createAccounts = async () => {
         initbalance: '100',
         limit: 100,
         icon_id: 1,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CREDIT_CARD,
         name: 'BTC_CREDIT',
@@ -88,7 +73,6 @@ export const createAccounts = async () => {
         initbalance: '0.123456',
         limit: 0.125,
         icon_id: 3,
-        flags: 0,
     }];
 
     const createRes = await api.account.createMultiple(accList);

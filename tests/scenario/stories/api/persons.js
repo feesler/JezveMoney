@@ -7,10 +7,8 @@ const create = async () => {
 
     const data = [{
         name: 'Person X',
-        flags: 0,
     }, {
         name: 'Y',
-        flags: 0,
     }];
 
     [
@@ -24,13 +22,11 @@ const createWithChainedRequest = async () => {
 
     const data = [{
         name: 'Person Z',
-        flags: 0,
         returnState: {
             persons: { visibility: 'visible' },
         },
     }, {
         name: 'AA',
-        flags: 0,
         returnState: {
             persons: { visibility: 'all' },
             accounts: { visibility: 'all' },
@@ -49,12 +45,8 @@ const createInvalid = async () => {
     const data = [{
         // Try to create person with existing name
         name: 'Y',
-        flags: 0,
     }, {
         // Invalid data tests
-        flags: 0,
-    }, {
-        name: 'ZZZ',
     }, {
         name: '',
         flags: 1,
@@ -72,13 +64,10 @@ const createMultiple = async () => {
 
     const data = [{
         name: 'Person 1',
-        flags: 0,
     }, {
         name: 'Person 2',
-        flags: 0,
     }, {
         name: 'Person 3',
-        flags: 0,
     }];
 
     await PersonApiTests.createMultiple(data);
@@ -93,14 +82,11 @@ const createMultipleInvalid = async () => {
         [null, null],
         [{
             name: '',
-            flags: 0,
         }, {
             name: 'Person 2',
-            flags: 0,
         }],
         [{
             name: 'Person 4',
-            flags: 0,
         }, null],
     ];
 

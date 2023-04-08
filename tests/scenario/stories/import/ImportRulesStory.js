@@ -471,12 +471,10 @@ export class ImportRulesStory extends TestStory {
         const data = [];
         const RULES_TO_CREATE = 25;
         const ruleBase = {
-            flags: 0,
             conditions: [{
                 field_id: IMPORT_COND_FIELD_COMMENT,
                 operator: IMPORT_COND_OP_EQUAL,
                 value: '',
-                flags: 0,
             }],
             actions: [{
                 action_id: IMPORT_ACTION_SET_COMMENT,
@@ -546,7 +544,6 @@ export class ImportRulesStory extends TestStory {
             initbalance: '1',
             limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         // Remove all persons
         await App.scenario.resetData({

@@ -36,6 +36,10 @@ class Transaction extends ApiSortableListController
         "category_id",
         "comment"
     ];
+    protected $defaultValues = [
+        "category_id" => 0,
+        "comment" => "",
+    ];
 
     /**
      * Controller initialization

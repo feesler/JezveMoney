@@ -4,9 +4,7 @@ import { App } from '../../Application.js';
 export const createImportTemplates = async () => {
     const data = [{
         name: 'Template_dup',
-        type_id: 0,
         first_row: 2,
-        account_id: 0,
         account_amount_col: 11,
         account_curr_col: 10,
         trans_amount_col: 9,
@@ -15,7 +13,6 @@ export const createImportTemplates = async () => {
         comment_col: 4,
     }, {
         name: 'Template_Account',
-        type_id: 0,
         first_row: 3,
         account_id: App.scenario.ACC_RUB,
         account_amount_col: 6,

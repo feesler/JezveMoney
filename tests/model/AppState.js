@@ -743,12 +743,23 @@ export class AppState {
     }
 
     createAccount(params) {
-        const resExpected = this.checkAccountCorrectness(params);
+        const defaults = {
+            type: 0,
+            limit: 0,
+            icon_id: 0,
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkAccountCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, accReqFields);
+        const data = copyFields(itemData, accReqFields);
         data.owner_id = this.profile.owner_id;
 
         const ind = this.accounts.create(data);
@@ -1003,12 +1014,20 @@ export class AppState {
     }
 
     createPerson(params) {
-        const resExpected = this.checkPersonCorrectness(params);
+        const defaults = {
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkPersonCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, pReqFields);
+        const data = copyFields(itemData, pReqFields);
         const ind = this.persons.create(data);
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
@@ -1284,12 +1303,20 @@ export class AppState {
     }
 
     createCategory(params) {
-        const resExpected = this.checkCategoryCorrectness(params);
+        const defaults = {
+            parent_id: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkCategoryCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, catReqFields);
+        const data = copyFields(itemData, catReqFields);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
         this.sortCategories();
@@ -1721,13 +1748,22 @@ export class AppState {
     }
 
     createTransaction(params) {
-        let resExpected = this.checkTransactionCorrectness(params);
+        const defaults = {
+            category_id: 0,
+            comment: '',
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        let resExpected = this.checkTransactionCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
         // Prepare expected transaction object
-        const expTrans = this.getExpectedTransaction(params);
+        const expTrans = this.getExpectedTransaction(itemData);
         if (!expTrans) {
             return false;
         }
@@ -1947,15 +1983,24 @@ export class AppState {
     }
 
     createTemplate(params) {
-        const resExpected = this.checkTemplateCorrectness(params);
+        const defaults = {
+            type_id: 0,
+            account_id: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkTemplateCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(itemData, tplReqFields);
         data.columns = {};
         Object.values(tplReqColumns).forEach((columnName) => {
-            data.columns[columnName] = params.columns[columnName];
+            data.columns[columnName] = itemData.columns[columnName];
         });
 
         const ind = this.templates.create(data);
@@ -2084,12 +2129,20 @@ export class AppState {
     }
 
     createRule(params) {
-        const resExpected = this.checkRuleCorrectness(params);
+        const defaults = {
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkRuleCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, ruleReqFields);
+        const data = copyFields(itemData, ruleReqFields);
         data.conditions = this.prepareConditions(data.conditions);
         data.actions = this.prepareActions(data.actions);
 

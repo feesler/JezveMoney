@@ -11,8 +11,8 @@ use JezveMoney\App\Model\TransactionModel;
  */
 class Account extends ApiSortableListController
 {
-    protected $requiredFields = ["type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
     protected $transModel = null;
+    protected $requiredFields = ["type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
 
     /**
      * Controller initialization
@@ -27,6 +27,23 @@ class Account extends ApiSortableListController
         $this->updateErrorMsg = __("ERR_ACCOUNT_UPDATE");
         $this->deleteErrorMsg = __("ERR_ACCOUNT_DELETE");
         $this->changePosErrorMsg = __("ERR_ACCOUNT_CHANGE_POS");
+    }
+
+    /**
+     * Returns array of default field values
+     *
+     * @param array $item
+     *
+     * @return array
+     */
+    protected function getDefaultValues(array $item)
+    {
+        return [
+            "type" => ACCOUNT_TYPE_OTHER,
+            "limit" => 0,
+            "icon_id" => 0,
+            "flags" => 0,
+        ];
     }
 
     /**

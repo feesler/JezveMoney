@@ -323,6 +323,39 @@ function skipZeros(mixed $arr)
 }
 
 /**
+ * Copies specified fields from source object and returns result
+ *
+ * @param mixed $obj
+ * @param array $fields
+ * @param bool $throw
+ *
+ * @return array|bool
+ */
+function copyFields(mixed $obj, array $fields, bool $throw = false)
+{
+    if (is_null($obj) || !isset($fields) || !is_array($fields)) {
+        if ($throw) {
+            throw new \Error("Invalid input");
+        } else {
+            return false;
+        }
+    }
+
+    if (!is_array($obj)) {
+        $obj = (array)$obj;
+    }
+
+    $res = [];
+    foreach ($fields as $field) {
+        if (array_key_exists($field, $obj)) {
+            $res[$field] = $obj[$field];
+        }
+    }
+
+    return $res;
+}
+
+/**
  * Checks is all of expected fields present in the array or object
  * Returns array with only expected fields or false if something goes wrong
  *

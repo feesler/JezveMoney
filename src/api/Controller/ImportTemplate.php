@@ -22,6 +22,10 @@ class ImportTemplate extends ApiListController
         "account_curr_col",
         "account_amount_col",
     ];
+    protected $defaultValues = [
+        "type_id" => 0,
+        "account_id" => 0,
+    ];
 
     /**
      * Controller initialization
