@@ -1,9 +1,6 @@
 import {
     TestComponent,
     assert,
-    query,
-    prop,
-    hasClass,
     click,
     evaluate,
 } from 'jezve-test';
@@ -12,19 +9,19 @@ import { __ } from '../../../model/locale.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
-        const validClass = await hasClass(this.elem, 'tile');
-        assert(validClass, 'Invalid structure of tile');
+        const res = await evaluate((elem) => {
+            if (!elem?.classList?.contains('tile')) {
+                return null;
+            }
 
-        const subtitleElem = await query(this.elem, '.tile__subtitle');
-        const titleElem = await query(this.elem, '.tile__title');
-
-        const res = await evaluate((elem, titleEl, subtitleEl) => {
             const props = {
                 id: parseInt(elem.dataset.id, 10),
-                title: titleEl.textContent,
+                title: elem.querySelector('.tile__title')?.textContent,
                 subtitle: '',
                 isActive: elem.classList.contains('tile_selected'),
             };
+
+            const subtitleEl = elem.querySelector('.tile__subtitle');
 
             if (subtitleEl) {
                 props.subtitle = (subtitleEl?.childElementCount > 0)
@@ -34,23 +31,19 @@ export class Tile extends TestComponent {
                     : subtitleEl.textContent;
             }
 
-            return props;
-        }, this.elem, titleElem, subtitleElem);
-
-        res.iconElem = await query(this.elem, '.tile__icon > svg');
-        if (res.iconElem) {
-            const svgUseElem = await query(res.iconElem, 'use');
-
-            let iconHRef = await prop(svgUseElem, 'href.baseVal');
-            if (typeof iconHRef === 'string' && iconHRef.startsWith('#')) {
-                iconHRef = iconHRef.substring(1);
+            const svgUseElem = elem.querySelector('.tile__icon use');
+            let iconName = svgUseElem?.href?.baseVal;
+            if (typeof iconName === 'string' && iconName.startsWith('#')) {
+                iconName = iconName.substring(1);
             }
+            props.iconName = iconName;
 
-            const iconObj = App.icons.findByFile(iconHRef);
-            res.icon_id = (iconObj) ? iconObj.id : 0;
-        } else {
-            res.icon_id = 0;
-        }
+            return props;
+        }, this.elem);
+        assert(res, 'Invalid structure of tile');
+
+        const icon = App.icons.findByFile(res.iconName);
+        res.icon_id = icon?.id ?? 0;
 
         return res;
     }

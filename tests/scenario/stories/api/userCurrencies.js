@@ -7,10 +7,8 @@ const create = async () => {
 
     const data = [{
         curr_id: App.scenario.RUB,
-        flags: 0,
     }, {
         curr_id: App.scenario.USD,
-        flags: 0,
     }];
 
     [
@@ -24,7 +22,6 @@ const createWithChainedRequest = async () => {
 
     const data = [{
         curr_id: App.scenario.EUR,
-        flags: 0,
         returnState: {
             userCurrencies: {},
         },
@@ -41,10 +38,8 @@ const createInvalid = async () => {
     const data = [{
         // Try to create entry for already existing currency
         curr_id: App.scenario.EUR,
-        flags: 0,
     }, {
         // Invalid data tests
-        flags: 0,
     }, {
         curr_id: 0,
     }];
@@ -57,10 +52,8 @@ const createMultiple = async () => {
 
     const data = [{
         curr_id: App.scenario.PLN,
-        flags: 0,
     }, {
         curr_id: App.scenario.KRW,
-        flags: 0,
     }];
 
     [
@@ -78,10 +71,8 @@ const createMultipleInvalid = async () => {
         [null, null],
         [{
             curr_id: 0,
-            flags: 0,
         }, {
             curr_id: App.scenario.EUR,
-            flags: 0,
         }, null],
     ];
 

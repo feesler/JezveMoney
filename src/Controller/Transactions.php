@@ -218,7 +218,7 @@ class Transactions extends ListViewController
         // Use first account if nothing is specified
         if (!$acc_id && !$accountRequested) {
             if ($tr["type"] == LIMIT_CHANGE) {
-                if (count($creditCardAccounts) > 0) {
+                if (is_array($creditCardAccounts) && count($creditCardAccounts) > 0) {
                     $acc_id = $creditCardAccounts[0]->id;
                 }
             } elseif ($acc_count > 0) {

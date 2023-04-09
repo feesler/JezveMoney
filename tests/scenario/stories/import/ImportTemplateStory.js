@@ -138,7 +138,6 @@ export class ImportTemplateStory extends TestStory {
 
         await api.importtemplate.create({
             name: 'Template_Account',
-            type_id: 0,
             first_row: 2,
             account_id: App.scenario.ACC_RUB,
             account_amount_col: 6,
@@ -191,18 +190,14 @@ export class ImportTemplateStory extends TestStory {
             name: 'Tpl Test Account 1',
             curr_id: RUB,
             initbalance: '1',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         const { id: account2 } = await api.account.create({
             type: 0,
             name: 'Tpl Test Account 2',
             curr_id: RUB,
             initbalance: '1',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         // Remove all templates
         await App.scenario.resetData({
@@ -212,7 +207,6 @@ export class ImportTemplateStory extends TestStory {
         // Create template with first account
         await api.importtemplate.create({
             name: 'Template_Acc_1',
-            type_id: 0,
             first_row: 2,
             account_id: account1,
             account_amount_col: 11,
@@ -225,7 +219,6 @@ export class ImportTemplateStory extends TestStory {
         // Create template with second account
         await api.importtemplate.create({
             name: 'Template_Acc_2',
-            type_id: 0,
             first_row: 2,
             account_id: account2,
             account_amount_col: 11,
@@ -249,13 +242,10 @@ export class ImportTemplateStory extends TestStory {
         });
         // Create account to load import view
         await api.account.create({
-            type: 0,
             name: 'Tpl Test Account 3',
             curr_id: RUB,
             initbalance: '1',
-            limit: 0,
             icon_id: 1,
-            flags: 0,
         });
         // Reload page
         await App.view.navigateToImport();

@@ -22,7 +22,7 @@
 
 .tile-base {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   column-gap: 6px;
 
   .dd__container_attached {

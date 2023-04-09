@@ -7,7 +7,7 @@ use DateInterval;
 use DateTimeZone;
 use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\Core\MySqlDB;
-use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\SortableModel;
 use JezveMoney\Core\Singleton;
 
 use function JezveMoney\Core\inSetCondition;
@@ -37,12 +37,10 @@ const DEFAULT_GROUP_TYPE = GROUP_BY_WEEK;
 /**
  * Transaction model
  */
-class TransactionModel extends CachedTable
+class TransactionModel extends SortableModel
 {
     use Singleton;
 
-    private static $user_id = 0;
-    private static $owner_id = 0;
     private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
     private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
     private static $srcMandatoryTypes = [EXPENSE, TRANSFER];
@@ -65,7 +63,6 @@ class TransactionModel extends CachedTable
     protected $catModel = null;
     protected $affectedTransactions = null;
     protected $balanceChanges = null;
-    protected $latestPos = null;
     protected $removedItems = null;
     protected $originalTrans = null;
 
@@ -502,14 +499,13 @@ class TransactionModel extends CachedTable
      */
     protected function postCreate(mixed $items)
     {
-        $this->cleanCache();
+        parent::postCreate($items);
 
         $items = asArray($items);
 
         // Commit balance changes for affected accounts
         $this->accModel->updateBalances($this->balanceChanges);
         $this->balanceChanges = null;
-        $this->latestPos = null;
 
         foreach ($items as $item_id) {
             $trObj = $this->getItem($item_id);
@@ -820,32 +816,6 @@ class TransactionModel extends CachedTable
 
         return true;
     }
-
-    /**
-     * Checks transaction with specified position is exists
-     *
-     * @param int $trans_pos position
-     *
-     * @return bool
-     */
-    public function isPosExist(int $trans_pos)
-    {
-        $tr_pos = intval($trans_pos);
-
-        if (!$this->checkCache()) {
-            return false;
-        }
-
-        foreach ($this->cache as $item) {
-            $trans = $this->getAffected($item);
-            if ($trans->pos == $tr_pos) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Sets category for specified transactions

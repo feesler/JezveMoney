@@ -25,17 +25,13 @@ const prepareTests = async () => {
         name: 'RUB',
         curr_id: RUB,
         initbalance: 100.1,
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_OTHER,
         name: 'USD',
         curr_id: USD,
         initbalance: 50,
-        limit: 0,
         icon_id: 2,
-        flags: 0,
     }]);
 
     assert(
@@ -47,7 +43,6 @@ const prepareTests = async () => {
         App.scenario.API_USER_PERSON,
     ] = await App.scenario.runner.runGroup(PersonApiTests.create, [{
         name: 'API user Person',
-        flags: 0,
     }]);
     assert(App.scenario.API_USER_PERSON, 'Failed to create person');
 
@@ -55,7 +50,6 @@ const prepareTests = async () => {
         App.scenario.API_USER_CATEGORY,
     ] = await App.scenario.runner.runGroup(CategoryApiTests.create, [{
         name: 'API user Category',
-        parent_id: 0,
         type: EXPENSE,
     }]);
     assert(App.scenario.API_USER_CATEGORY, 'Failed to create category');
@@ -81,7 +75,6 @@ const accountsTests = async () => {
         curr_id: EUR,
         initbalance: 10,
         icon_id: 2,
-        flags: 0,
     });
     await AccountApiTests.del(API_USER_ACC_RUB);
     await AccountApiTests.setPos({ id: API_USER_ACC_RUB, pos: 1 });
@@ -95,7 +88,6 @@ const personsTests = async () => {
     await PersonApiTests.update({
         id: API_USER_PERSON,
         name: 'API Person',
-        flags: 0,
     });
     await PersonApiTests.del(API_USER_PERSON);
     await PersonApiTests.setPos({ id: API_USER_PERSON, pos: 1 });
@@ -109,7 +101,6 @@ const categoriesTests = async () => {
     await CategoryApiTests.update({
         id: API_USER_CATEGORY,
         name: 'API Category',
-        parent_id: 0,
         type: EXPENSE,
     });
     await CategoryApiTests.del(API_USER_CATEGORY);

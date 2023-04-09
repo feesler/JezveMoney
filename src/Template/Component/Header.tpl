@@ -9,10 +9,10 @@
         <div class="header__content">
             <button id="userbtn" class="btn user-btn right-align" type="button" tabindex="2">
                 <?php if ($this->user_id != 0) {        ?>
-                    <span class="btn__icon user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
-                    <span class="user-btn__title"><?= e($this->user_name) ?></span>
+                    <?= svgIcon("user", "btn__icon") ?>
+                    <span class="btn__content"><?= e($this->user_name) ?></span>
                 <?php    } else {        ?>
-                    <span class="btn__icon user-btn__icon"><?= svgIcon("ellipsis", "user-icon") ?></span>
+                    <?= svgIcon("ellipsis", "btn__icon") ?>
                 <?php    }        ?>
             </button>
         </div>
@@ -25,9 +25,7 @@
 
 <nav class="main-navigation navigation-content">
     <div class="navigation-controls">
-        <button class="navigation__close-btn">
-            <?= svgIcon("back", "navigation__close-btn-icon") ?>
-        </button>
+        <button class="btn close-btn"><?= svgIcon("back", "btn__icon") ?></button>
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>">
                 <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
@@ -74,13 +72,11 @@
     <div class="user-navigation-controls">
         <?php if ($this->user_id != 0) {        ?>
             <div class="btn user-btn">
-                <span class="btn__icon user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
-                <span class="user-btn__title"><?= e($this->user_name) ?></span>
+                <?= svgIcon("user", "btn__icon") ?>
+                <span class="btn__content"><?= e($this->user_name) ?></span>
             </div>
         <?php    }    ?>
-        <button class="btn user-navigation__close-btn" tabindex="3">
-            <?= svgIcon("close", "user-navigation__close-btn-icon") ?>
-        </button>
+        <button class="btn close-btn right-align" tabindex="3"><?= svgIcon("close", "btn__icon") ?></button>
     </div>
 
     <?php if ($this->user_id != 0) {        ?>

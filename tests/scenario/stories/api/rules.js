@@ -15,13 +15,11 @@ const create = async () => {
     const taxiAction = actions.setComment('Rule');
 
     const data = [{
-        flags: 0,
         conditions: [
             conditions.mainAccount.isNot.value(App.scenario.CASH_RUB),
         ],
         actions: [taxiAction],
     }, {
-        flags: 0,
         conditions: [
             conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount),
             conditions.comment.includes.value('BANK MESSAGE'),
@@ -31,7 +29,6 @@ const create = async () => {
             actions.setComment('Bank'),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('ANOTHER BANK'),
         ],
@@ -39,11 +36,9 @@ const create = async () => {
             actions.setCategory(App.scenario.INVEST_CATEGORY),
         ],
     }, {
-        flags: 0,
         conditions: [taxiCondition],
         actions: [taxiAction],
     }, {
-        flags: 0,
         conditions: [
             conditions.mainAccount.is.value(App.scenario.ACCOUNT_3),
             conditions.comment.includes.value('CREDIT LIMIT'),
@@ -53,82 +48,62 @@ const create = async () => {
         ],
     }, {
         // Invalid rules
-        flags: 0,
     }, {
-        flags: 0,
         conditions: null,
     }, {
-        flags: 0,
         actions: null,
     }, {
-        flags: 0,
         conditions: [],
         actions: [],
     }, {
-        flags: 0,
         conditions: [taxiCondition],
         actions: [],
     }, {
-        flags: 0,
         conditions: [],
         actions: [taxiAction],
     }, {
-        flags: 0,
         conditions: [null],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // Invalid field type
             field_id: 100,
             operator: ConditionOperators.includes,
             value: 'TEST',
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // Invalid operator
             field_id: ConditionFields.comment,
             operator: 100,
             value: 'TEST',
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // Invalid value for 'includes' operator
             field_id: ConditionFields.comment,
             operator: ConditionOperators.includes,
             value: null,
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // No field_id
             operator: ConditionOperators.includes,
             value: 'TEST',
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // No operator
             field_id: ConditionFields.comment,
             value: 'TEST',
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // No value
             field_id: ConditionFields.comment,
             operator: ConditionOperators.includes,
-            flags: 0,
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [{ // No flags
             field_id: ConditionFields.comment,
             operator: ConditionOperators.includes,
@@ -136,7 +111,6 @@ const create = async () => {
         }],
         actions: [null],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('TEST'),
         ],
@@ -145,7 +119,6 @@ const create = async () => {
             action_id: ImportActionTypes.setComment,
         }],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('TEST'),
         ],
@@ -154,7 +127,6 @@ const create = async () => {
             value: 'Rule',
         }],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('TEST'),
         ],
@@ -164,7 +136,6 @@ const create = async () => {
             value: 'Rule',
         }],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('TEST'),
         ],
@@ -185,7 +156,6 @@ const createWithChainedRequest = async () => {
     setBlock('Create import rule with chained request', 2);
 
     const data = [{
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('Chained'),
         ],
@@ -214,12 +184,10 @@ const update = async () => {
             field_id: ConditionFields.mainAccount,
             operator: ConditionOperators.is,
             value: App.scenario.CASH_RUB,
-            flags: 0,
         }, {
             field_id: ConditionFields.comment,
             operator: ConditionOperators.includes,
             value: 'MARKET',
-            flags: 0,
         }],
         actions: [
             actions.setTransactionType('transfer_in'),

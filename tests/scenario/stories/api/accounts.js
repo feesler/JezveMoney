@@ -20,25 +20,19 @@ const create = async () => {
         name: 'acc ru',
         curr_id: RUB,
         initbalance: 100,
-        limit: 0,
         icon_id: 1,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CASH,
         name: 'cash ru',
         curr_id: RUB,
         initbalance: 5000,
-        limit: 0,
         icon_id: 3,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'acc usd',
         curr_id: USD,
         initbalance: 10.5,
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }];
 
     [
@@ -58,8 +52,6 @@ const createWithChainedRequest = async () => {
         name: 'Chained rub',
         curr_id: RUB,
         initbalance: 100,
-        limit: 0,
-        icon_id: 0,
         flags: ACCOUNT_HIDDEN,
         returnState: {
             accounts: { visibility: 'visible' },
@@ -69,9 +61,7 @@ const createWithChainedRequest = async () => {
         name: 'Chained usd',
         curr_id: USD,
         initbalance: 50,
-        limit: 0,
         icon_id: 2,
-        flags: 0,
         returnState: {
             accounts: { visibility: 'all' },
         },
@@ -89,68 +79,56 @@ const createInvalid = async () => {
     const { USD } = App.scenario;
 
     const data = [{
-        // Try to create account with existing name
+        // Existing name
         name: 'acc ru',
         curr_id: USD,
         initbalance: 10.5,
-        limit: 0,
-        icon_id: 0,
-        flags: 0,
     }, {
-        // Try to create account without some of fields
+        // No name
         type: ACCOUNT_TYPE_OTHER,
         curr_id: USD,
         initbalance: 10.5,
-        limit: 0,
-        icon_id: 0,
-        flags: 0,
     }, {
+        // No currency
         name: 'acc tst',
         initbalance: 10.5,
     }, {
-        // Try to create account with excess properties
+        // Excess properties
         type: ACCOUNT_TYPE_OTHER,
         name: 'acc tst',
         curr_id: USD,
         initbalance: 10.5,
-        limit: 0,
         icon_id: 5,
-        flags: 0,
         xxx: 1,
         yyy: 2,
     }, {
-        // Try to create account with invalid data
+        // Empty name
         type: ACCOUNT_TYPE_OTHER,
         name: '',
         curr_id: USD,
         initbalance: 10.5,
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
+        // Invalid currency
         type: ACCOUNT_TYPE_OTHER,
         name: 'acc tst',
         curr_id: 9999,
         initbalance: 10.5,
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
+        // Invalid balance
         type: ACCOUNT_TYPE_OTHER,
         name: 'acc tst',
         curr_id: USD,
         initbalance: 'fff',
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }, {
+        // Invalid type
         type: -1,
         name: 'acc tst',
         curr_id: USD,
         initbalance: 'fff',
-        limit: 0,
         icon_id: 5,
-        flags: 0,
     }];
 
     await App.scenario.runner.runGroup(AccountApiTests.create, data);
@@ -166,17 +144,12 @@ const createMultiple = async () => {
         name: 'Account 1',
         curr_id: RUB,
         initbalance: 100,
-        limit: 0,
-        icon_id: 0,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_DEBIT_CARD,
         name: 'Account 2',
         curr_id: RUB,
         initbalance: 0,
-        limit: 0,
         icon_id: 4,
-        flags: 0,
     }, {
         type: ACCOUNT_TYPE_CREDIT_CARD,
         name: 'Account 3',
@@ -184,7 +157,6 @@ const createMultiple = async () => {
         initbalance: 100,
         limit: 100,
         icon_id: 5,
-        flags: 0,
     }];
 
     [
@@ -204,30 +176,27 @@ const createMultipleInvalid = async () => {
         [null],
         [null, null],
         [{
+            // Empty name
             type: ACCOUNT_TYPE_OTHER,
             name: '',
             curr_id: USD,
             initbalance: 10.5,
-            limit: 0,
             icon_id: 5,
-            flags: 0,
         }, {
+            // Invalid currency
             type: ACCOUNT_TYPE_OTHER,
             name: 'Account 3',
             curr_id: 999,
             initbalance: 100,
-            limit: 0,
             icon_id: 5,
-            flags: 0,
         }],
+        // Valid and invalid items in array
         [{
             type: ACCOUNT_TYPE_CASH,
             name: 'Account 4',
             curr_id: RUB,
             initbalance: 0,
-            limit: 0,
             icon_id: 4,
-            flags: 0,
         }, null],
     ];
 

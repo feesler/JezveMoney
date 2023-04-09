@@ -1,15 +1,12 @@
 import {
     TestComponent,
     query,
-    prop,
     click,
     input,
-    isVisible,
     assert,
     copyObject,
     asyncMap,
     evaluate,
-    hasClass,
 } from 'jezve-test';
 import { Collapsible, DropDown } from 'jezvejs-test';
 import {
@@ -55,57 +52,61 @@ export class ImportTransactionForm extends TestComponent {
     }
 
     async parseField(elem) {
-        const res = { elem };
+        assert(elem, 'Invalid field element');
 
-        assert(res.elem, 'Invalid field element');
+        const res = await evaluate((el) => {
+            const field = {
+                title: el.querySelector('.field__title')?.textContent,
+            };
 
-        res.labelElem = await query(elem, '.field__title');
-        assert(res.labelElem, 'Invalid structure of field');
-        res.title = await prop(res.labelElem, 'textContent');
+            if (el.classList.contains('validation-block')) {
+                const feedbackEl = el.querySelector('.invalid-feedback');
+                field.invalidated = el.classList.contains('invalid-block');
+                field.invFeedback = {
+                    visible: feedbackEl && field.invalidated,
+                };
+            }
 
-        const isValidation = await hasClass(elem, 'validation-block');
-        if (isValidation) {
-            res.invFeedback = { elem: await query(elem, '.invalid-feedback') };
-            res.invFeedback.visible = await isVisible(res.invFeedback.elem);
-            res.invalidated = await hasClass(elem, 'invalid-block');
-        }
+            const inputGroup = el.querySelector('.input-group');
+            const dropDownSelector = (inputGroup) ? '.dd__container_attached' : '.dd__container';
+            const dropDownEl = el.querySelector(dropDownSelector);
 
-        const inputGroup = await query(elem, '.input-group');
-        const dropDownSelector = (inputGroup) ? '.dd__container_attached' : '.dd__container';
-        const dropDownElem = await query(elem, dropDownSelector);
-        if (dropDownElem) {
-            res.dropDown = await DropDown.create(this, dropDownElem);
+            field.dropDownSelector = (dropDownEl) ? dropDownSelector : null;
+
+            if (inputGroup && !dropDownEl) {
+                const button = el.querySelector('.input-group__btn');
+                field.button = {
+                    visible: button && !button.hidden,
+                    disabled: button?.disabled,
+                };
+            }
+
+            if (!dropDownEl || inputGroup) {
+                const inputEl = el.querySelector('input[type=text]');
+                field.inputSelector = (inputEl) ? 'input[type=text]' : null;
+                field.name = inputEl?.name;
+                field.disabled = inputEl?.disabled;
+                field.value = inputEl?.value;
+            }
+
+            return field;
+        }, elem);
+        res.elem = elem;
+
+        if (res.dropDownSelector) {
+            res.dropDown = await DropDown.create(this, await query(elem, res.dropDownSelector));
             assert(res.dropDown, 'Invalid structure of field');
 
             // If field is select only, then save values from DropDown
-            if (!inputGroup) {
+            if (!res.inputSelector) {
                 res.disabled = res.dropDown.disabled;
                 res.value = res.dropDown.value;
             }
         }
-        if (inputGroup) {
-            if (!res.dropDown) {
-                res.button = { elem: await query(inputGroup, '.input-group__btn') };
-                res.button.visible = await isVisible(res.button.elem);
-                if (res.button.elem) {
-                    res.button.disabled = await prop(res.button.elem, 'disabled');
-                }
-            }
-        }
 
-        if (!dropDownElem || inputGroup) {
-            res.inputElem = await query(elem, 'input[type=text]');
+        if (res.inputSelector) {
+            res.inputElem = await query(elem, res.inputSelector);
             assert(res.inputElem, 'Invalid structure of field');
-
-            [
-                res.name,
-                res.disabled,
-                res.value,
-            ] = await evaluate((inputEl) => ([
-                inputEl.name,
-                inputEl.disabled,
-                inputEl.value,
-            ]), res.inputElem);
         }
 
         return res;

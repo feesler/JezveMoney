@@ -11,9 +11,12 @@ use JezveMoney\App\Model\TransactionModel;
  */
 class Category extends ApiSortableListController
 {
+    protected $transModel = null;
     protected $requiredFields = ["name", "parent_id", "type"];
     protected $changePosFields = ["id", "pos", "parent_id"];
-    protected $transModel = null;
+    protected $defaultValues = [
+        "parent_id" => 0,
+    ];
 
     /**
      * Controller initialization

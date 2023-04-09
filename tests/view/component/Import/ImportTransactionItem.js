@@ -2,13 +2,9 @@ import {
     TestComponent,
     query,
     click,
-    isVisible,
     assert,
     copyObject,
     evaluate,
-    hasClass,
-    asyncMap,
-    prop,
 } from 'jezve-test';
 import {
     EXPENSE,
@@ -50,28 +46,44 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     async parseContent() {
-        const res = await evaluate((elem) => ({
-            selected: elem.classList.contains('import-item_selected'),
-            enabled: !elem.hasAttribute('disabled'),
-        }), this.elem);
+        const res = await evaluate((el, selectors) => {
+            const selectedControls = el.querySelector('.select-controls');
+            const item = {
+                selected: el.classList.contains('import-item_selected'),
+                enabled: !el.hasAttribute('disabled'),
+                selectMode: selectedControls && !selectedControls.hidden,
+            };
 
-        const selectedControls = await query(this.elem, '.select-controls');
-        res.selectMode = await isVisible(selectedControls);
+            [
+                item.typeField,
+                item.transferAccountField,
+                item.personField,
+                item.srcAmountField,
+                item.destAmountField,
+                item.dateField,
+                item.categoryField,
+                item.commentField,
+            ] = selectors.map((selector) => {
+                const fieldEl = el.querySelector(selector);
+                const field = {
+                    title: fieldEl.querySelector('.field__title')?.textContent,
+                    value: fieldEl.querySelector('.field__content')?.textContent,
+                    visible: !fieldEl.hidden,
+                };
 
-        [
-            res.typeField,
-            res.transferAccountField,
-            res.personField,
-            res.srcAmountField,
-            res.destAmountField,
-            res.dateField,
-            res.categoryField,
-            res.commentField,
-        ] = await asyncMap(fieldSelectors, async (selector) => (
-            this.parseField(await query(this.elem, selector))
-        ));
+                if (fieldEl.classList.contains('type-field')) {
+                    field.type = fieldEl.dataset.type;
+                }
+                if (fieldEl.classList.contains('amount-field')) {
+                    field.amount = fieldEl.dataset.amount;
+                    field.currencyId = fieldEl.dataset.curr;
+                }
 
-        res.typeField.type = await prop(res.typeField.elem, 'dataset.type');
+                return field;
+            });
+
+            return item;
+        }, this.elem, fieldSelectors);
 
         res.menuBtn = await query(this.elem, '.menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
@@ -86,31 +98,6 @@ export class ImportTransactionItem extends TestComponent {
         res.originalData = null;
         if (res.origDataTable) {
             res.originalData = await OriginalImportData.create(this, res.origDataTable);
-        }
-
-        return res;
-    }
-
-    async parseField(elem) {
-        assert(elem, 'Invalid field element');
-
-        const titleElem = await query(elem, '.field__title');
-        const contentElem = await query(elem, '.field__content');
-        assert(titleElem && contentElem, 'Invalid structure of field');
-
-        const res = await evaluate((titleEl, contEl) => ({
-            title: titleEl.textContent,
-            value: contEl.textContent,
-        }), titleElem, contentElem);
-        res.elem = elem;
-
-        const isAmountField = await hasClass(elem, 'amount-field');
-        if (isAmountField) {
-            const props = await evaluate((el) => ({
-                amount: el.dataset.amount,
-                currencyId: el.dataset.curr,
-            }), elem);
-            Object.assign(res, props);
         }
 
         return res;

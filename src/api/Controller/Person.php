@@ -11,8 +11,11 @@ use JezveMoney\App\Model\TransactionModel;
  */
 class Person extends ApiSortableListController
 {
-    protected $requiredFields = ["name", "flags"];
     protected $transModel = null;
+    protected $requiredFields = ["name", "flags"];
+    protected $defaultValues = [
+        "flags" => 0,
+    ];
 
     /**
      * Controller initialization

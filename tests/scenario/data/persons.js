@@ -5,10 +5,8 @@ import { PERSON_HIDDEN } from '../../model/PersonsList.js';
 export const createPersons = async () => {
     const personsList = [{
         name: 'Maria',
-        flags: 0,
     }, {
         name: 'Ivan<',
-        flags: 0,
     }, {
         name: 'Hidden person',
         flags: PERSON_HIDDEN,

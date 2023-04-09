@@ -18,23 +18,6 @@
   }
 }
 
-.locale-field,
-.switch-field {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.locale-field__label,
-.switch-field__label {
-  white-space: nowrap;
-  padding: 0.5rem 0;
-  font-size: 1.15rem;
-  font-weight: 300;
-}
-
 .currencies-list {
   display: flex;
   flex-flow: column nowrap;

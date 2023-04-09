@@ -10,8 +10,12 @@ use JezveMoney\App\Model\CurrencyModel;
  */
 class Currency extends ApiListController
 {
-    protected $requiredFields = ["name", "sign", "precision", "flags"];
     protected $model = null;
+    protected $requiredFields = ["name", "sign", "precision", "flags"];
+    protected $defaultValues = [
+        "precision" => 2,
+        "flags" => 0,
+    ];
 
     /**
      * Controller initialization

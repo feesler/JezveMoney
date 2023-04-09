@@ -10,6 +10,7 @@ use JezveMoney\App\Model\ImportConditionModel;
  */
 class ImportCondition extends ApiListController
 {
+    protected $model = null;
     protected $requiredFields = [
         "rule_id",
         "field_id",
@@ -17,7 +18,9 @@ class ImportCondition extends ApiListController
         "value",
         "flags"
     ];
-    protected $model = null;
+    protected $defaultValues = [
+        "flags" => 0,
+    ];
 
     /**
      * Controller initialization

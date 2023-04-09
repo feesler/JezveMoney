@@ -5,19 +5,15 @@ import { EXPENSE, INCOME } from '../../model/Transaction.js';
 export const createCategories = async () => {
     const categoriesList = [{
         name: 'Food',
-        parent_id: 0,
         type: EXPENSE,
     }, {
         name: 'Investments',
-        parent_id: 0,
         type: INCOME,
     }, {
         name: 'Taxes',
-        parent_id: 0,
         type: 0,
     }, {
         name: 'Transpost',
-        parent_id: 0,
         type: EXPENSE,
     }];
 

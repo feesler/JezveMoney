@@ -5,7 +5,6 @@ import { api } from '../../model/api.js';
 
 export const createImportRules = async () => {
     const rulesList = [{
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('MOBILE'),
             conditions.mainAccount.is.value(App.scenario.ACC_3),
@@ -15,7 +14,6 @@ export const createImportRules = async () => {
             actions.setComment('Mobile'),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.mainAccount.isNot.value(App.scenario.ACC_EUR),
             conditions.transactionAmount.is.value(80),
@@ -25,7 +23,6 @@ export const createImportRules = async () => {
             actions.setAccount(App.scenario.ACC_EUR),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.mainAccount.isNot.value(App.scenario.ACC_USD),
             conditions.comment.includes.value('SIGMA'),
@@ -37,7 +34,6 @@ export const createImportRules = async () => {
             actions.setComment('Local shop'),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('TAXI'),
             conditions.transactionAmount.greater.value(-100),
@@ -50,7 +46,6 @@ export const createImportRules = async () => {
             actions.setCategory(App.scenario.TRANSPORT_CATEGORY),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('MAGAZIN'),
         ],
@@ -59,7 +54,6 @@ export const createImportRules = async () => {
             actions.setPerson(App.scenario.IVAN),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.comment.includes.value('BOOKING'),
             conditions.accountAmount.isNot.prop(ConditionFields.transactionAmount),
@@ -68,7 +62,6 @@ export const createImportRules = async () => {
             actions.setDestAmount('500.5'),
         ],
     }, {
-        flags: 0,
         conditions: [
             conditions.mainAccount.is.value(App.scenario.CREDIT_CARD),
             conditions.comment.includes.value('CREDIT LIMIT'),

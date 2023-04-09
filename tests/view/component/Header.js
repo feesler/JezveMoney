@@ -24,7 +24,7 @@ export class Header extends TestComponent {
         res.userBtn = { elem: await query(this.elem, '.header .user-btn') };
         assert(res.userBtn.elem, 'User button not found');
 
-        res.userBtn.titleElem = await query(res.userBtn.elem, '.user-btn__title');
+        res.userBtn.titleElem = await query(res.userBtn.elem, '.btn__content');
         if (res.userBtn.titleElem) {
             res.userBtn.title = await prop(res.userBtn.titleElem, 'textContent');
         }

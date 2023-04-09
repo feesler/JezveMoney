@@ -542,6 +542,16 @@ export class AppState {
         return res;
     }
 
+    returnState(request, result = {}) {
+        const res = { ...result };
+
+        if (isObject(request)) {
+            res.state = this.getState(request);
+        }
+
+        return res;
+    }
+
     prepareChainedRequestData(request) {
         if (!request?.returnState?.transactions) {
             return request;
@@ -615,12 +625,7 @@ export class AppState {
         const ind = this.userCurrencies.create(data);
         const item = this.userCurrencies.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateUserCurrency(params) {
@@ -642,12 +647,7 @@ export class AppState {
         // Prepare expected updates of user currencies list
         this.userCurrencies.update(expectedItem);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteUserCurrencies(params) {
@@ -661,12 +661,7 @@ export class AppState {
 
         this.userCurrencies.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setUserCurrencyPos(params) {
@@ -683,12 +678,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getUserCurrenciesByIndexes(indexes, returnIds = false) {
@@ -743,24 +733,30 @@ export class AppState {
     }
 
     createAccount(params) {
-        const resExpected = this.checkAccountCorrectness(params);
+        const defaults = {
+            type: 0,
+            limit: 0,
+            icon_id: 0,
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkAccountCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, accReqFields);
+        const data = copyFields(itemData, accReqFields);
         data.owner_id = this.profile.owner_id;
 
         const ind = this.accounts.create(data);
         const item = this.accounts.getItemByIndex(ind);
         this.updatePersonAccounts();
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateAccount(params) {
@@ -800,12 +796,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteAccounts(params) {
@@ -827,12 +818,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /* eslint-disable no-bitwise */
@@ -854,12 +840,7 @@ export class AppState {
             this.accounts.update(account);
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
 
@@ -877,12 +858,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     cacheUserAccounts() {
@@ -1003,22 +979,25 @@ export class AppState {
     }
 
     createPerson(params) {
-        const resExpected = this.checkPersonCorrectness(params);
+        const defaults = {
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkPersonCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, pReqFields);
+        const data = copyFields(itemData, pReqFields);
         const ind = this.persons.create(data);
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updatePerson(params) {
@@ -1038,12 +1017,7 @@ export class AppState {
 
         this.persons.update(expPerson);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deletePersons(params) {
@@ -1066,12 +1040,7 @@ export class AppState {
         this.accounts.deleteItems(accountsToDelete);
         this.transactions.updateResults(this.accounts);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /* eslint-disable no-bitwise */
@@ -1092,12 +1061,7 @@ export class AppState {
             this.persons.update(person);
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
 
@@ -1115,12 +1079,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getPersonAccounts(personId) {
@@ -1284,22 +1243,25 @@ export class AppState {
     }
 
     createCategory(params) {
-        const resExpected = this.checkCategoryCorrectness(params);
+        const defaults = {
+            parent_id: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkCategoryCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, catReqFields);
+        const data = copyFields(itemData, catReqFields);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
         this.sortCategories();
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateCategory(params) {
@@ -1337,12 +1299,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteCategories(params) {
@@ -1382,12 +1339,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setCategoryPos(params) {
@@ -1406,12 +1358,7 @@ export class AppState {
 
         this.sortCategories();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     getCategoriesSortMode() {
@@ -1721,13 +1668,22 @@ export class AppState {
     }
 
     createTransaction(params) {
-        let resExpected = this.checkTransactionCorrectness(params);
+        const defaults = {
+            category_id: 0,
+            comment: '',
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        let resExpected = this.checkTransactionCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
         // Prepare expected transaction object
-        const expTrans = this.getExpectedTransaction(params);
+        const expTrans = this.getExpectedTransaction(itemData);
         if (!expTrans) {
             return false;
         }
@@ -1748,12 +1704,7 @@ export class AppState {
 
         const item = this.transactions.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateTransaction(params) {
@@ -1786,12 +1737,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteTransactions(params) {
@@ -1811,12 +1757,7 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setTransactionCategory(params) {
@@ -1838,12 +1779,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     setTransactionPos(params) {
@@ -1857,12 +1793,7 @@ export class AppState {
 
         this.transactions.updateResults(this.accounts);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     isAvailableTransactionType(type) {
@@ -1947,26 +1878,30 @@ export class AppState {
     }
 
     createTemplate(params) {
-        const resExpected = this.checkTemplateCorrectness(params);
+        const defaults = {
+            type_id: 0,
+            account_id: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkTemplateCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(itemData, tplReqFields);
         data.columns = {};
         Object.values(tplReqColumns).forEach((columnName) => {
-            data.columns[columnName] = params.columns[columnName];
+            data.columns[columnName] = itemData.columns[columnName];
         });
 
         const ind = this.templates.create(data);
         const item = this.templates.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     getUpdateTemplateRequest(params) {
@@ -2020,12 +1955,7 @@ export class AppState {
             return false;
         }
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteTemplates(params) {
@@ -2040,12 +1970,7 @@ export class AppState {
         this.rules.deleteTemplate(ids);
         this.templates.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     /**
@@ -2084,24 +2009,27 @@ export class AppState {
     }
 
     createRule(params) {
-        const resExpected = this.checkRuleCorrectness(params);
+        const defaults = {
+            flags: 0,
+        };
+        const itemData = {
+            ...defaults,
+            ...params,
+        };
+
+        const resExpected = this.checkRuleCorrectness(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, ruleReqFields);
+        const data = copyFields(itemData, ruleReqFields);
         data.conditions = this.prepareConditions(data.conditions);
         data.actions = this.prepareActions(data.actions);
 
         const ind = this.rules.create(data);
         const item = this.rules.getItemByIndex(ind);
 
-        const res = { id: item.id };
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState, { id: item.id });
     }
 
     updateRule(params) {
@@ -2124,12 +2052,7 @@ export class AppState {
 
         this.rules.update(expRule);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 
     deleteRules(params) {
@@ -2143,11 +2066,6 @@ export class AppState {
 
         this.rules.deleteItems(ids);
 
-        const res = {};
-        if ('returnState' in params) {
-            res.state = this.getState(params.returnState);
-        }
-
-        return res;
+        return this.returnState(params.returnState);
     }
 }

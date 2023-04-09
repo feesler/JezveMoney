@@ -46,7 +46,7 @@ class AdminApiConsoleView extends AdminView {
 
         this.toggleMethodsBtn = ge('toggleMethodsBtn');
         setEvents(this.toggleMethodsBtn, { click: () => this.toggleMethodsMenu() });
-        this.closeMethodsBtn = apiMenuContainer.querySelector('.navigation__close-btn');
+        this.closeMethodsBtn = apiMenuContainer.querySelector('.close-btn');
         setEvents(this.closeMethodsBtn, { click: () => this.hideMethodsMenu() });
 
         this.controllersList = ge('controllersList');

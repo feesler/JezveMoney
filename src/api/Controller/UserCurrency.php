@@ -11,6 +11,9 @@ use JezveMoney\App\Model\UserCurrencyModel;
 class UserCurrency extends ApiSortableListController
 {
     protected $requiredFields = ["curr_id", "flags"];
+    protected $defaultValues = [
+        "flags" => 0,
+    ];
 
     /**
      * Controller initialization
