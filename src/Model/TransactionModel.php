@@ -1246,10 +1246,12 @@ class TransactionModel extends SortableModel
             return false;
         }
 
-        $new_curr = $accObj->curr_id;
         if (!$this->checkCache()) {
             return false;
         }
+
+        $new_curr = $accObj->curr_id;
+        $isCreditCard = $accObj->type === ACCOUNT_TYPE_CREDIT_CARD;
 
         foreach ($this->cache as $item) {
             $trans = $this->getAffected($item);
@@ -1263,12 +1265,20 @@ class TransactionModel extends SortableModel
                 if ($trans->dest_curr == $new_curr) {
                     $trans->src_amount = $trans->dest_amount;
                 }
+
+                if ($trans->type === LIMIT_CHANGE && !$isCreditCard) {
+                    $trans->type = EXPENSE;
+                }
             }
 
             if ($trans->dest_id == $acc_id) {
                 $trans->dest_curr = $new_curr;
                 if ($trans->src_curr == $new_curr) {
                     $trans->dest_amount = $trans->src_amount;
+                }
+
+                if ($trans->type === LIMIT_CHANGE && !$isCreditCard) {
+                    $trans->type = INCOME;
                 }
             }
 

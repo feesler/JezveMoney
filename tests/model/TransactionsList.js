@@ -21,7 +21,7 @@ import {
     Transaction,
     LIMIT_CHANGE,
 } from './Transaction.js';
-import { AccountsList } from './AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
 
 const WEEKS_IN_YEAR = 52;
@@ -399,9 +399,14 @@ export class TransactionsList extends SortableList {
         const origAcc = accList.find((item) => item.id === account.id);
         assert(origAcc, 'Specified account not found in the original list');
 
-        if (origAcc.curr_id === account.curr_id) {
+        if (
+            origAcc.curr_id === account.curr_id
+            && origAcc.type === account.type
+        ) {
             return list;
         }
+
+        const isCreditCard = account.type === ACCOUNT_TYPE_CREDIT_CARD;
 
         return list.map((item) => {
             const res = { ...item };
@@ -411,11 +416,20 @@ export class TransactionsList extends SortableList {
                 if (res.dest_curr === account.curr_id) {
                     res.src_amount = res.dest_amount;
                 }
+
+                if (res.type === LIMIT_CHANGE && !isCreditCard) {
+                    res.type = EXPENSE;
+                }
             }
+
             if (res.dest_id === account.id) {
                 res.dest_curr = account.curr_id;
                 if (res.src_curr === account.curr_id) {
                     res.dest_amount = res.src_amount;
+                }
+
+                if (res.type === LIMIT_CHANGE && !isCreditCard) {
+                    res.type = INCOME;
                 }
             }
 

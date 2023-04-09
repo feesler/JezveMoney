@@ -230,7 +230,7 @@ const list = async () => {
 const update = async () => {
     setBlock('Update accounts', 2);
 
-    const { ACC_RUB, USD } = App.scenario;
+    const { ACC_RUB, BTC_CREDIT, USD } = App.scenario;
 
     const data = [{
         id: ACC_RUB,
@@ -238,6 +238,9 @@ const update = async () => {
         curr_id: USD,
         initbalance: 101,
         icon_id: 2,
+    }, {
+        id: BTC_CREDIT,
+        type: ACCOUNT_TYPE_CREDIT,
     }];
 
     await App.scenario.runner.runGroup(AccountApiTests.update, data);

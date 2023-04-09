@@ -205,8 +205,10 @@ export class Transaction {
             res.src_amount = res.dest_amount;
         }
 
-        const acc = state.accounts.getItem(res.dest_id);
+        const accountId = (res.src_id) ? res.src_id : res.dest_id;
+        const acc = state.accounts.getItem(accountId);
         if (acc) {
+            res.src_curr = acc.curr_id;
             res.dest_curr = acc.curr_id;
         }
 
