@@ -5,6 +5,7 @@ namespace JezveMoney\App\API\Controller;
 use JezveMoney\App\API\Factory\TransactionsFactory;
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Model;
+use JezveMoney\Core\DBVersion;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
@@ -419,5 +420,22 @@ class State extends ApiController
         }
 
         return $res;
+    }
+
+    /**
+     * /api/state/version route handler
+     * Returns application version
+     */
+    public function version()
+    {
+        $dbVer = DBVersion::getInstance();
+        $dbVer->autoUpdate();
+
+        $res = [
+            "current" => $dbVer->getCurrentVersion(),
+            "latest" => $dbVer->getLatestVersion(),
+        ];
+
+        $this->ok($res);
     }
 }

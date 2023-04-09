@@ -109,6 +109,7 @@ class AdminApiConsoleView extends AdminView {
     initCommonForms() {
         this.initForm('#readStateForm > form');
         this.initForm('#mainStateForm > form');
+        this.initForm('#dbVersionForm > form');
     }
 
     /** Initialization of forms for Account API controller */

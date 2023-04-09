@@ -2,14 +2,13 @@
 
 namespace JezveMoney\Core;
 
+use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 
-use const JezveMoney\App\Model\CURRENCY_FORMAT_TRAILING_ZEROS;
-use const JezveMoney\App\Model\MAX_PRECISION;
-
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
+const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-const DECIMAL_TYPE = "DECIMAL(25," . MAX_PRECISION . ")";
+define("DB_VERSION", 21);
 
 /**
  * Database version manager class
@@ -19,7 +18,6 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 21;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -75,7 +73,7 @@ class DBVersion
             $this->createAdminQueryTable();
 
             $this->createDBVersionTable();
-            $this->setVersion($this->latestVersion);
+            $this->setVersion(DB_VERSION);
 
             Model::commit();
         } catch (\Error $e) {
@@ -159,7 +157,7 @@ class DBVersion
      */
     public function getLatestVersion()
     {
-        return $this->latestVersion;
+        return DB_VERSION;
     }
 
     /**
@@ -177,7 +175,7 @@ class DBVersion
                 return;
             }
 
-            while ($current < $this->latestVersion) {
+            while ($current < $latest) {
                 $next = "version" . ($current + 1);
                 $current = $this->$next();
             }
@@ -711,7 +709,7 @@ class DBVersion
 
         $res = $this->dbClient->updateQ(
             $tableName,
-            ["flags=flags|" . CURRENCY_FORMAT_TRAILING_ZEROS],
+            ["flags=flags|" . CurrencyModel::CURRENCY_FORMAT_TRAILING_ZEROS],
         );
         if (!$res) {
             throw new \Error("Fail to update '$tableName' table");

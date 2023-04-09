@@ -38,7 +38,7 @@ $router->setActionsMap([
 
 $router->onStart(function ($controller, $contrStr, $routeParts) {
     // Check correct user authentication for controller
-    $loggedOutControllers = ["user/login", "user/register"];
+    $loggedOutControllers = ["user/login", "user/register", "state/version"];
     $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
     $isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
     $controller->authRequired = !$isLogOutCont;

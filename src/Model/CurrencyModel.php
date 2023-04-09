@@ -9,17 +9,17 @@ use JezveMoney\App\Item\CurrencyItem;
 
 use function JezveMoney\Core\orJoin;
 
-const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
-const CURRENCY_FORMAT_TRAILING_ZEROS = 0x02;
-
-const MAX_PRECISION = 8;
-
 /**
  * Currency model
  */
 class CurrencyModel extends CachedTable
 {
     use Singleton;
+
+    public const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
+    public const CURRENCY_FORMAT_TRAILING_ZEROS = 0x02;
+
+    public const MAX_PRECISION = 8;
 
     protected $tbl_name = "currency";
 
@@ -94,7 +94,7 @@ class CurrencyModel extends CachedTable
 
         if (isset($params["precision"])) {
             $res["precision"] = intval($params["precision"]);
-            if ($res["precision"] < 0 || $res["precision"] > MAX_PRECISION) {
+            if ($res["precision"] < 0 || $res["precision"] > self::MAX_PRECISION) {
                 throw new \Error("Invalid precision value");
             }
         }
@@ -236,8 +236,11 @@ class CurrencyModel extends CachedTable
             return null;
         }
 
-        $signBeforeValue = ($currObj->flags & CURRENCY_SIGN_BEFORE_VALUE) === CURRENCY_SIGN_BEFORE_VALUE;
-        $trailingZeros = ($currObj->flags & CURRENCY_FORMAT_TRAILING_ZEROS) === CURRENCY_FORMAT_TRAILING_ZEROS;
+        $signFlag = self::CURRENCY_SIGN_BEFORE_VALUE;
+        $signBeforeValue = ($currObj->flags & $signFlag) === $signFlag;
+
+        $zerosFlag = self::CURRENCY_FORMAT_TRAILING_ZEROS;
+        $trailingZeros = ($currObj->flags & $zerosFlag) === $zerosFlag;
 
         $valueFmt = valFormat($value, $currObj->precision, $trailingZeros);
 
