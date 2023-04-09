@@ -115,9 +115,9 @@ export class ImportUploadDialog extends TestComponent {
 
         res.useServerAddress = res.useServerCheck.checked;
         res.encode = res.isEncodeCheck.checked;
-        res.templateBlock.visible = await isVisible(res.templateBlock.elem);
-        res.uploadProgress.visible = await isVisible(res.uploadProgress.elem);
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem);
+        res.templateBlock.visible = await isVisible(res.templateBlock.elem, true);
+        res.uploadProgress.visible = await isVisible(res.uploadProgress.elem, true);
+        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
         res.isLoading = (
             res.uploadProgress.visible
             || (res.templateBlock.visible && res.loadingIndicator.visible)
