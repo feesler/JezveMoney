@@ -18,6 +18,8 @@ export class CategorySelect extends DropDown {
             ...props,
         });
 
+        this.elem.classList.add('dd_offset-group');
+
         this.state = {
             ...this.state,
             transactionType: this.props.transactionType,
