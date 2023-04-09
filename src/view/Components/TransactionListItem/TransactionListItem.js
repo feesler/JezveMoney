@@ -503,6 +503,7 @@ export class TransactionListItem extends Component {
 
         this.elem.setAttribute('data-id', item.id);
         this.elem.setAttribute('data-type', item.type);
+        this.elem.setAttribute('data-group', item.date);
 
         this.renderSelectControls(state, prevState);
         this.renderControls(state, prevState);
