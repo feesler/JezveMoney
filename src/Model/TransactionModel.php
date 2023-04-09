@@ -1679,8 +1679,8 @@ class TransactionModel extends SortableModel
         }
 
         // Date range filter
-        $stDate = (isset($_GET["stdate"]) ? intval($_GET["stdate"]) : null);
-        $endDate = (isset($_GET["enddate"]) ? intval($_GET["enddate"]) : null);
+        $stDate = (isset($request["stdate"]) ? intval($request["stdate"]) : null);
+        $endDate = (isset($request["enddate"]) ? intval($request["enddate"]) : null);
         if (!is_null($stDate) && !is_null($endDate)) {
             $res["startDate"] = $stDate;
             $res["endDate"] = $endDate;
