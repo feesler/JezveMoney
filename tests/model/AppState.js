@@ -1787,10 +1787,11 @@ export class AppState {
             return false;
         }
 
-        if (!this.transactions.setPos(params.id, params.pos)) {
+        const transactions = this.transactions.clone();
+        if (!transactions.setPos(params.id, params.pos)) {
             return false;
         }
-
+        this.transactions = transactions;
         this.transactions.updateResults(this.accounts);
 
         return this.returnState(params.returnState);

@@ -935,6 +935,10 @@ class TransactionModel extends SortableModel
 
                 $affectedRange = $this->getRange($new_pos, true, $latest, true);
                 foreach ($affectedRange as $item) {
+                    if ($item->date < $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
@@ -942,6 +946,10 @@ class TransactionModel extends SortableModel
             } elseif ($new_pos < $old_pos) {       // moving up
                 $affectedRange = $this->getRange($new_pos, true, $old_pos, false);
                 foreach ($affectedRange as $item) {
+                    if ($item->date < $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
@@ -949,6 +957,10 @@ class TransactionModel extends SortableModel
             } elseif ($new_pos > $old_pos) {        // moving down
                 $affectedRange = $this->getRange($old_pos, false, $new_pos, true);
                 foreach ($affectedRange as $item) {
+                    if ($item->date > $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos--;
                     $this->pushAffected($queryItem);

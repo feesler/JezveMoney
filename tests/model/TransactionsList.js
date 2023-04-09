@@ -66,6 +66,14 @@ export class TransactionsList extends SortableList {
         return res;
     }
 
+    isMoveUpAllowed(item, nextItem) {
+        return item.date <= nextItem.date;
+    }
+
+    isMoveDownAllowed(item, prevItem) {
+        return item.date >= prevItem.date;
+    }
+
     update(data) {
         if (!data?.id) {
             return false;
