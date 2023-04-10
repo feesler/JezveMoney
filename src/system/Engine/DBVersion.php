@@ -833,8 +833,8 @@ class DBVersion
                 "pos" => "INT(11) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
-                "PRIMARY KEY (`id`), " .
-                    "KEY `user_id` (`user_id`)",
+                "PRIMARY KEY (`id`)",
+                "KEY `user_id` (`user_id`)",
             ],
             TABLE_OPTIONS,
         );
@@ -898,8 +898,8 @@ class DBVersion
                 "src_id" => "INT(11) NOT NULL",
                 "dest_id" => "INT(11) NOT NULL",
                 "type" => "INT(11) NOT NULL",
-                "src_amount" => "" . DECIMAL_TYPE . " NOT NULL",
-                "dest_amount" => "" . DECIMAL_TYPE . " NOT NULL",
+                "src_amount" => DECIMAL_TYPE . " NOT NULL",
+                "dest_amount" => DECIMAL_TYPE . " NOT NULL",
                 "src_curr" => "INT(11) NOT NULL",
                 "dest_curr" => "INT(11) NOT NULL",
                 "date" => "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
@@ -907,8 +907,8 @@ class DBVersion
                 "pos" => "INT(11) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
-                "src_result" => "" . DECIMAL_TYPE . " NOT NULL",
-                "dest_result" => "" . DECIMAL_TYPE . " NOT NULL",
+                "src_result" => DECIMAL_TYPE . " NOT NULL",
+                "dest_result" => DECIMAL_TYPE . " NOT NULL",
                 "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,
@@ -1007,8 +1007,8 @@ class DBVersion
                 "sort_accounts" => "INT(11) NOT NULL DEFAULT 0",
                 "sort_persons" => "INT(11) NOT NULL DEFAULT 0",
                 "sort_categories" => "INT(11) NOT NULL DEFAULT 0",
-                "PRIMARY KEY (`id`), " .
-                    "UNIQUE KEY `user_id` (`user_id`)",
+                "PRIMARY KEY (`id`)",
+                "UNIQUE KEY `user_id` (`user_id`)",
             ],
             TABLE_OPTIONS,
         );
@@ -1041,8 +1041,8 @@ class DBVersion
                 "flags" => "INT(11) NOT NULL DEFAULT 0",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
-                "PRIMARY KEY (`id`), " .
-                    "INDEX `user_id` (`user_id`)",
+                "PRIMARY KEY (`id`)",
+                "INDEX `user_id` (`user_id`)",
             ],
             TABLE_OPTIONS,
         );
@@ -1127,8 +1127,8 @@ class DBVersion
                 "account_amount_col" => "INT(11) NOT NULL DEFAULT '0'",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
-                "PRIMARY KEY (`id`), " .
-                    "KEY `user_id` (`user_id`)",
+                "PRIMARY KEY (`id`)",
+                "KEY `user_id` (`user_id`)",
             ],
             TABLE_OPTIONS,
         );
