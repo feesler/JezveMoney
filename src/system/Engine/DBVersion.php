@@ -143,7 +143,7 @@ class DBVersion
 
         $qResult = $this->dbClient->selectQ("version", $this->tbl_name, "id=1");
         if (!$qResult) {
-            throw new \Error("Fail to obtain DB version");
+            throw new \Error("Failed to obtain DB version");
         }
 
         $row = $this->dbClient->fetchRow($qResult);
@@ -202,7 +202,7 @@ class DBVersion
 
         $res = $this->dbClient->changeColumn("currency", "format", "flags", "INT(11) NOT NULL DEFAULT '0'");
         if (!$res) {
-            throw new \Error("Fail to update currency table");
+            throw new \Error("Failed to update currency table");
         }
 
         return 1;
@@ -221,7 +221,7 @@ class DBVersion
 
         $res = $this->dbClient->addColumns("accounts", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
         if (!$res) {
-            throw new \Error("Fail to update accounts table");
+            throw new \Error("Failed to update accounts table");
         }
 
         return 2;
@@ -240,7 +240,7 @@ class DBVersion
 
         $res = $this->dbClient->addColumns("persons", ["flags" => "INT(11) NOT NULL DEFAULT '0'"]);
         if (!$res) {
-            throw new \Error("Fail to update persons table");
+            throw new \Error("Failed to update persons table");
         }
 
         return 3;
@@ -259,7 +259,7 @@ class DBVersion
 
         $res = $this->dbClient->changeColumn("accounts", "icon", "icon_id", "INT(11) NOT NULL DEFAULT '0'");
         if (!$res) {
-            throw new \Error("Fail to update accounts table");
+            throw new \Error("Failed to update accounts table");
         }
 
         $this->createIconTable();
@@ -306,18 +306,18 @@ class DBVersion
         $tableName = "import_tpl";
         $columns = $this->dbClient->getColumns($tableName);
         if (!$columns) {
-            throw new \Error("Fail to obtian columns of '$tableName' table");
+            throw new \Error("Failed to obtain columns of table '$tableName'");
         }
 
         if (!isset($columns["user_id"])) {
             $res = $this->dbClient->addColumns($tableName, ["user_id" => "INT(11) NOT NULL"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
 
             $res = $this->dbClient->addKeys($tableName, ["user_id" => "user_id"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -346,7 +346,7 @@ class DBVersion
 
             $columns = $this->dbClient->getColumns($tableName);
             if (!$columns) {
-                throw new \Error("Fail to obtian columns of '$tableName' table");
+                throw new \Error("Failed to obtain columns of table '$tableName'");
             }
 
             $toDrop = [];
@@ -359,7 +359,7 @@ class DBVersion
             if (count($toDrop) > 0) {
                 $res = $this->dbClient->dropColumns($tableName, $toDrop);
                 if (!$res) {
-                    throw new \Error("Fail to update '$tableName' table");
+                    throw new \Error("Failed to update table '$tableName'");
                 }
             }
         } else {
@@ -403,13 +403,13 @@ class DBVersion
         $tableName = "import_tpl";
         $columns = $this->dbClient->getColumns($tableName);
         if (!$columns) {
-            throw new \Error("Fail to obtian columns of '$tableName' table");
+            throw new \Error("Failed to obtain columns of table '$tableName'");
         }
 
         if (!isset($columns["first_row"])) {
             $res = $this->dbClient->addColumns($tableName, ["first_row" => "INT(11) NOT NULL"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -450,7 +450,7 @@ class DBVersion
         $tableName = "import_tpl";
         $columns = $this->dbClient->getColumns($tableName);
         if (!$columns) {
-            throw new \Error("Fail to obtian columns of '$tableName' table");
+            throw new \Error("Failed to obtain columns of table '$tableName'");
         }
 
         if (!isset($columns["account_id"])) {
@@ -458,7 +458,7 @@ class DBVersion
                 "account_id" => "INT(11) NOT NULL DEFAULT '0'"
             ]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -481,18 +481,18 @@ class DBVersion
         $tableName = "transactions";
         $columns = $this->dbClient->getColumns($tableName);
         if (!$columns) {
-            throw new \Error("Fail to obtian columns of '$tableName' table");
+            throw new \Error("Failed to obtain columns of table '$tableName'");
         }
 
         if (!isset($columns["category_id"])) {
             $res = $this->dbClient->addColumns($tableName, ["category_id" => "INT(11) NOT NULL"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
 
             $res = $this->dbClient->addKeys($tableName, ["category_id" => "category_id"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -525,7 +525,7 @@ class DBVersion
                 ["action_id=1", "value='$currentType'"],
             );
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -561,7 +561,7 @@ class DBVersion
                 ["file=" . qnull($file)],
             );
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -588,7 +588,7 @@ class DBVersion
                 $data = ["user_id" => intval($row["id"])];
                 $insRes = $this->dbClient->insertQ("user_settings", $data);
                 if (!$insRes) {
-                    throw new \Error("Fail to create user settings");
+                    throw new \Error("Failed to create user settings");
                 }
             }
         }
@@ -598,19 +598,19 @@ class DBVersion
         foreach ($tables as $tableName) {
             $columns = $this->dbClient->getColumns($tableName);
             if (!$columns) {
-                throw new \Error("Fail to obtian columns of '$tableName' table");
+                throw new \Error("Failed to obtain columns of table '$tableName'");
             }
 
             if (!isset($columns["pos"])) {
                 $res = $this->dbClient->addColumns($tableName, ["pos" => "INT(11) NOT NULL"]);
                 if (!$res) {
-                    throw new \Error("Fail to update '$tableName' table");
+                    throw new \Error("Failed to update table '$tableName'");
                 }
             }
 
             $res = $this->dbClient->updateQ($tableName, ["pos=id"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -650,23 +650,23 @@ class DBVersion
 
         $columns = $this->dbClient->getColumns($tableName);
         if (!$columns) {
-            throw new \Error("Fail to obtian columns of '$tableName' table");
+            throw new \Error("Failed to obtian columns of table '$tableName'");
         }
 
         if (!isset($columns["code"])) {
             $res = $this->dbClient->addColumns($tableName, ["code" => "VARCHAR(64) NOT NULL"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
 
             $res = $this->dbClient->updateQ($tableName, ["code=name"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
 
             $res = $this->dbClient->updateQ($tableName, ["name=CONCAT('CURRENCY_', name)"]);
             if (!$res) {
-                throw new \Error("Fail to update '$tableName' table");
+                throw new \Error("Failed to update table '$tableName'");
             }
         }
 
@@ -686,7 +686,7 @@ class DBVersion
             DECIMAL_TYPE . " NOT NULL",
         );
         if (!$res) {
-            throw new \Error("Fail to update '$table' table");
+            throw new \Error("Failed to update '$table' table");
         }
     }
 
@@ -704,7 +704,7 @@ class DBVersion
         $tableName = "currency";
         $res = $this->dbClient->addColumns($tableName, ["precision" => "INT NOT NULL DEFAULT '2'"]);
         if (!$res) {
-            throw new \Error("Fail to update currency table");
+            throw new \Error("Failed to update table '$tableName'");
         }
 
         $res = $this->dbClient->updateQ(
@@ -712,7 +712,7 @@ class DBVersion
             ["flags=flags|" . CurrencyModel::CURRENCY_FORMAT_TRAILING_ZEROS],
         );
         if (!$res) {
-            throw new \Error("Fail to update '$tableName' table");
+            throw new \Error("Failed to update table '$tableName'");
         }
 
         $this->updateColumnDecimalType("accounts", "balance");
@@ -740,7 +740,7 @@ class DBVersion
         $tableName = "accounts";
         $res = $this->dbClient->addColumns($tableName, ["type" => "INT NOT NULL DEFAULT '0'"]);
         if (!$res) {
-            throw new \Error("Fail to update accounts table");
+            throw new \Error("Failed to update table '$tableName'");
         }
 
         return 20;
@@ -762,7 +762,7 @@ class DBVersion
             ["limit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'"],
         );
         if (!$res) {
-            throw new \Error("Fail to update accounts table");
+            throw new \Error("Failed to update table '$tableName'");
         }
 
         return 21;
@@ -798,7 +798,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -839,7 +839,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -872,7 +872,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -914,7 +914,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -948,7 +948,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -981,7 +981,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1013,7 +1013,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1047,7 +1047,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1079,7 +1079,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
 
         $data = [
@@ -1133,7 +1133,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1163,7 +1163,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1197,7 +1197,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1229,7 +1229,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 
@@ -1259,7 +1259,7 @@ class DBVersion
             TABLE_OPTIONS,
         );
         if (!$res) {
-            throw new \Error("Fail to create table '$tableName'");
+            throw new \Error("Failed to create table '$tableName'");
         }
     }
 }
