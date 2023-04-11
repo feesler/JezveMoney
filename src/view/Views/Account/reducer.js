@@ -28,7 +28,7 @@ const slice = createSlice({
                 ...state.data,
                 curr_id: currencyId,
                 fInitBalance: normalize(state.data.fInitBalance, precision),
-                fLimit: normalize(state.data.fLimit, precision),
+                fInitLimit: normalize(state.data.fInitLimit, precision),
             },
         };
 
@@ -36,8 +36,8 @@ const slice = createSlice({
             newState.data.initbalance = newState.data.fInitBalance;
         }
 
-        if (state.data.fLimit !== newState.data.fLimit) {
-            newState.data.limit = newState.data.fLimit;
+        if (state.data.fInitLimit !== newState.data.fInitLimit) {
+            newState.data.initlimit = newState.data.fInitLimit;
         }
 
         return newState;
@@ -64,13 +64,13 @@ const slice = createSlice({
         ...state,
         validation: {
             ...state.validation,
-            limit: true,
+            initlimit: true,
             valid: true,
         },
         data: {
             ...state.data,
-            limit: value,
-            fLimit: normalize(
+            initlimit: value,
+            fInitLimit: normalize(
                 value,
                 getCurrencyPrecision(state.data.curr_id),
             ),
@@ -113,7 +113,7 @@ const slice = createSlice({
         ...state,
         validation: {
             ...state.validation,
-            limit: false,
+            initlimit: false,
             valid: false,
         },
     }),

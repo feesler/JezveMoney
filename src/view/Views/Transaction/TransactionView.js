@@ -624,7 +624,13 @@ class TransactionView extends View {
             return;
         }
 
-        this.datePicker.show(!this.datePicker.visible());
+        const visible = this.datePicker.visible();
+        if (!visible) {
+            const { transaction } = this.store.getState();
+            this.datePicker.setSelection(timeToDate(transaction.date));
+        }
+
+        this.datePicker.show(!visible);
     }
 
     /**

@@ -17,15 +17,20 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
-import { getCurrencyPrecision, __ } from '../../../../js/utils.js';
+import {
+    getCurrencyPrecision,
+    __,
+    dateStringToTime,
+    timeToDate,
+} from '../../../../js/utils.js';
 import { transTypeMap, typeNames } from '../../../../js/model/ImportTransaction.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import './ImportTransactionForm.scss';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -623,7 +628,14 @@ export class ImportTransactionForm extends Component {
             insertAfter(this.datePicker.elem, this.dateGroup.elem);
         }
 
-        this.datePicker.show(!this.datePicker.visible());
+        const visible = this.datePicker.visible();
+        if (!visible) {
+            const { transaction } = this.state;
+            const time = dateStringToTime(transaction.date);
+            this.datePicker.setSelection(timeToDate(time));
+        }
+
+        this.datePicker.show(!visible);
     }
 
     renderOriginalData(state, prevState) {

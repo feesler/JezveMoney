@@ -109,6 +109,7 @@
     "ACCOUNT_INITIAL_BALANCE": "Initial balance",
     "ACCOUNT_INVALID_BALANCE": "Input correct initial balance",
     "ACCOUNT_CURRENT_BALANCE": "Current balance",
+    "ACCOUNT_INITIAL_CREDIT_LIMIT": "Initial credit limit",
     "ACCOUNT_CREDIT_LIMIT": "Credit limit",
     "ACCOUNT_INVALID_LIMIT": "Input correct limit",
     "ACCOUNT_SELECT": "Select account",

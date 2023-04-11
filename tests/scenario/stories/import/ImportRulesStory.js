@@ -538,11 +538,9 @@ export class ImportRulesStory extends TestStory {
 
         // Create at least one account
         await api.account.create({
-            type: 0,
             name: 'Test Account 1',
             curr_id: RUB,
             initbalance: '1',
-            limit: 0,
             icon_id: 1,
         });
         // Remove all persons

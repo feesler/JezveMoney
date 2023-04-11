@@ -70,8 +70,8 @@
         </div>
 
         <div class="std_margin">
-            <label for="create_account_limit">Limit</label>
-            <input id="create_account_limit" class="input stretch-input" name="limit" type="text">
+            <label for="create_account_initlimit">Limit</label>
+            <input id="create_account_initlimit" class="input stretch-input" name="initlimit" type="text">
         </div>
 
         <div class="std_margin">
@@ -128,8 +128,8 @@
         </div>
 
         <div class="std_margin">
-            <label for="update_account_limit">Limit</label>
-            <input id="update_account_limit" class="input stretch-input" name="limit" type="text">
+            <label for="update_account_initlimit">Limit</label>
+            <input id="update_account_initlimit" class="input stretch-input" name="initlimit" type="text">
         </div>
 
         <div class="std_margin">

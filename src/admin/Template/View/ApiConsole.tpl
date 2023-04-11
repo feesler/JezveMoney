@@ -20,6 +20,7 @@
                         <ul class="sub-menu-list">
                             <li data-target="readStateForm">Read state</li>
                             <li data-target="mainStateForm">Main state</li>
+                            <li data-target="dbVersionForm">DB version</li>
                         </ul>
                     </li>
 

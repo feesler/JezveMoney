@@ -935,6 +935,10 @@ class TransactionModel extends SortableModel
 
                 $affectedRange = $this->getRange($new_pos, true, $latest, true);
                 foreach ($affectedRange as $item) {
+                    if ($item->date < $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
@@ -942,6 +946,10 @@ class TransactionModel extends SortableModel
             } elseif ($new_pos < $old_pos) {       // moving up
                 $affectedRange = $this->getRange($new_pos, true, $old_pos, false);
                 foreach ($affectedRange as $item) {
+                    if ($item->date < $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
@@ -949,6 +957,10 @@ class TransactionModel extends SortableModel
             } elseif ($new_pos > $old_pos) {        // moving down
                 $affectedRange = $this->getRange($old_pos, false, $new_pos, true);
                 foreach ($affectedRange as $item) {
+                    if ($item->date > $trObj->date) {
+                        return false;
+                    }
+
                     $queryItem = clone $item;
                     $queryItem->pos--;
                     $this->pushAffected($queryItem);
@@ -1246,10 +1258,12 @@ class TransactionModel extends SortableModel
             return false;
         }
 
-        $new_curr = $accObj->curr_id;
         if (!$this->checkCache()) {
             return false;
         }
+
+        $new_curr = $accObj->curr_id;
+        $isCreditCard = $accObj->type === ACCOUNT_TYPE_CREDIT_CARD;
 
         foreach ($this->cache as $item) {
             $trans = $this->getAffected($item);
@@ -1263,12 +1277,20 @@ class TransactionModel extends SortableModel
                 if ($trans->dest_curr == $new_curr) {
                     $trans->src_amount = $trans->dest_amount;
                 }
+
+                if ($trans->type === LIMIT_CHANGE && !$isCreditCard) {
+                    $trans->type = EXPENSE;
+                }
             }
 
             if ($trans->dest_id == $acc_id) {
                 $trans->dest_curr = $new_curr;
                 if ($trans->src_curr == $new_curr) {
                     $trans->dest_amount = $trans->src_amount;
+                }
+
+                if ($trans->type === LIMIT_CHANGE && !$isCreditCard) {
+                    $trans->type = INCOME;
                 }
             }
 
@@ -1657,8 +1679,8 @@ class TransactionModel extends SortableModel
         }
 
         // Date range filter
-        $stDate = (isset($_GET["stdate"]) ? intval($_GET["stdate"]) : null);
-        $endDate = (isset($_GET["enddate"]) ? intval($_GET["enddate"]) : null);
+        $stDate = (isset($request["stdate"]) ? intval($request["stdate"]) : null);
+        $endDate = (isset($request["enddate"]) ? intval($request["enddate"]) : null);
         if (!is_null($stDate) && !is_null($endDate)) {
             $res["startDate"] = $stDate;
             $res["endDate"] = $endDate;

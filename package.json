@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.55.0",
+    "version": "1.56.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -9,17 +9,14 @@
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
-        "test-tr": "node ./tests/index.js transactions",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
         "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
-        "debug": "node --inspect-brk ./tests/index.js",
         "deploy": "node ./scripts/deploy.js",
         "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
-        "rm-cache": "powershell -c \"rm ./node_modules/.cache/ -r -force\"",
         "copy-admin": "powershell -c \"cp ./src/admin/Controller,./src/admin/Template,./src/admin/.htaccess,./src/admin/index.php -Destination ./dist/admin/ -Force -Recurse\"",
         "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/lang,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
         "copy-client": "powershell -c \"cp ./src/view/img -Destination ./dist/view -Force -Recurse\"",
@@ -69,6 +66,7 @@
         "jezve-test": "^1.5.4",
         "jezvejs-test": "^1.7.3",
         "mini-css-extract-plugin": "^2.7.5",
+        "node-fetch": "^3.3.1",
         "npm-run-all": "^4.1.5",
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
@@ -87,7 +85,7 @@
     "dependencies": {
         "@babel/runtime": "^7.21.0",
         "core-js": "^3.30.0",
-        "jezvejs": "^1.91.0",
+        "jezvejs": "^1.91.1",
         "whatwg-fetch": "^3.6.2"
     }
 }

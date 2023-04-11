@@ -33,6 +33,7 @@ export class TransactionList extends SortableListContainer {
         super({
             ...defaultProps,
             ...props,
+            sortGroup: (elem) => elem?.dataset.group,
         });
     }
 

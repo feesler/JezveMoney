@@ -12,7 +12,7 @@ use JezveMoney\App\Model\TransactionModel;
 class Account extends ApiSortableListController
 {
     protected $transModel = null;
-    protected $requiredFields = ["type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
+    protected $requiredFields = ["type", "name", "initbalance", "initlimit", "curr_id", "icon_id", "flags"];
 
     /**
      * Controller initialization
@@ -40,7 +40,7 @@ class Account extends ApiSortableListController
     {
         return [
             "type" => ACCOUNT_TYPE_OTHER,
-            "limit" => 0,
+            "initlimit" => 0,
             "icon_id" => 0,
             "flags" => 0,
         ];

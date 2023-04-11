@@ -35,7 +35,7 @@ const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
 const availSettings = sortSettings;
 
 /** Accounts */
-const accReqFields = ['type', 'name', 'balance', 'initbalance', 'limit', 'curr_id', 'icon_id', 'flags'];
+const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
 
 /** Persons */
 const pReqFields = ['name', 'flags'];
@@ -725,7 +725,7 @@ export class AppState {
         if (!isValidValue(params.initbalance)) {
             return false;
         }
-        if (!isValidValue(params.limit)) {
+        if (!isValidValue(params.initlimit)) {
             return false;
         }
 
@@ -735,7 +735,7 @@ export class AppState {
     createAccount(params) {
         const defaults = {
             type: 0,
-            limit: 0,
+            initlimit: 0,
             icon_id: 0,
             flags: 0,
         };
@@ -751,6 +751,8 @@ export class AppState {
 
         const data = copyFields(itemData, accReqFields);
         data.owner_id = this.profile.owner_id;
+        data.balance = data.initbalance;
+        data.limit = data.initlimit;
 
         const ind = this.accounts.create(data);
         const item = this.accounts.getItemByIndex(ind);
@@ -785,6 +787,11 @@ export class AppState {
         const balDiff = normalize(expAccount.initbalance - origAcc.initbalance, precision);
         if (parseFloat(balDiff.toFixed(precision)) !== 0) {
             expAccount.balance = normalize(origAcc.balance + balDiff, precision);
+        }
+
+        const limitDiff = normalize(expAccount.initlimit - origAcc.initlimit, precision);
+        if (parseFloat(limitDiff.toFixed(precision)) !== 0) {
+            expAccount.limit = normalize(origAcc.limit + limitDiff, precision);
         }
 
         // Prepare expected updates of transactions list
@@ -1787,10 +1794,11 @@ export class AppState {
             return false;
         }
 
-        if (!this.transactions.setPos(params.id, params.pos)) {
+        const transactions = this.transactions.clone();
+        if (!transactions.setPos(params.id, params.pos)) {
             return false;
         }
-
+        this.transactions = transactions;
         this.transactions.updateResults(this.accounts);
 
         return this.returnState(params.returnState);

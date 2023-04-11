@@ -502,8 +502,15 @@ svg * {
   --btn-border-radius: 100vh;
   --btn-hover-background: var(--icon-btn-hover-bg);
   --btn-active-background: var(--icon-btn-hover-bg);
+  --btn-icon-size: calc(1.275rem + 0.3vw);
 
   width: var(--btn-size);
+}
+
+@media (min-width: 768px) {
+  .btn.circle-btn {
+    --btn-icon-size: 1.5rem;
+  }
 }
 
 /* flat square button with icon */
@@ -762,7 +769,14 @@ svg * {
 
 .dd__list-group {
   .dd__list-group__label {
-    padding: 5px 10px;
+    padding: 0 10px;
+  }
+}
+
+/* Offset group items */
+.dd_offset-group {
+  .dd__list-group .dd__list-item {
+    margin-left: 1.25rem;
   }
 }
 

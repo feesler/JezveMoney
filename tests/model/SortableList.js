@@ -39,6 +39,14 @@ export class SortableList extends List {
         return this.data.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
     }
 
+    isMoveUpAllowed() {
+        return true;
+    }
+
+    isMoveDownAllowed() {
+        return true;
+    }
+
     updatePos(itemId, pos) {
         const index = this.getIndexById(itemId);
         if (index === -1) {
@@ -58,14 +66,26 @@ export class SortableList extends List {
             for (const item of this.data) {
                 if (oldPos === 0) { // insert with specified position
                     if (item.pos >= pos) {
+                        if (!this.isMoveUpAllowed(movingItem, item)) {
+                            return false;
+                        }
+
                         item.pos += 1;
                     }
                 } else if (pos < oldPos) { // moving up
                     if (item.pos >= pos && item.pos < oldPos) {
+                        if (!this.isMoveUpAllowed(movingItem, item)) {
+                            return false;
+                        }
+
                         item.pos += 1;
                     }
                 } else if (pos > oldPos) { // moving down
                     if (item.pos > oldPos && item.pos <= pos) {
+                        if (!this.isMoveDownAllowed(movingItem, item)) {
+                            return false;
+                        }
+
                         item.pos -= 1;
                     }
                 }

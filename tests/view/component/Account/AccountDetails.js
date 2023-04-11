@@ -16,6 +16,7 @@ const fieldSelectors = [
     '.balance-field',
     '.initbalance-field',
     '.limit-field',
+    '.initlimit-field',
     '.visibility-field',
     '.trans-count-field',
     '.create-date-field',
@@ -47,6 +48,7 @@ export class AccountDetails extends TestComponent {
             res.balanceField,
             res.initialBalanceField,
             res.limitField,
+            res.initialLimitField,
             res.visibilityField,
             res.transactionsField,
             res.createDateField,
@@ -111,6 +113,9 @@ export class AccountDetails extends TestComponent {
             limitField: {
                 visible: isCreditCard,
             },
+            initialLimitField: {
+                visible: isCreditCard,
+            },
             visibilityField: {
                 visible: true,
                 value: __(visibilityToken, App.view.locale),
@@ -134,6 +139,7 @@ export class AccountDetails extends TestComponent {
 
         if (isCreditCard) {
             res.limitField.value = currency.format(item.limit);
+            res.initialLimitField.value = currency.format(item.initlimit);
         }
 
         return res;

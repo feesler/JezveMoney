@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import fetch from 'node-fetch';
 import Client from 'ssh2-sftp-client';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -72,6 +73,12 @@ try {
             await client.mkdir(itemPath, true);
             await client.chmod(itemPath, 0o0755);
         }
+    }
+
+    const response = await fetch(process.env.DB_VERSION_URL);
+    const apiRes = await response.json();
+    if (apiRes?.result !== 'ok' || apiRes.data.current !== apiRes.data.latest) {
+        throw new Error('Version check failed');
     }
 
     console.log('Done');

@@ -6,6 +6,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    LIMIT_CHANGE,
     Transaction,
 } from '../../model/Transaction.js';
 
@@ -15,6 +16,8 @@ export const createTransactions = async () => {
         ACC_RUB,
         ACC_USD,
         ACC_EUR,
+        CREDIT_CARD,
+        BTC_CREDIT,
         MARIA,
         IVAN,
         FOOD_CATEGORY,
@@ -168,6 +171,19 @@ export const createTransactions = async () => {
         acc_id: ACC_EUR,
         src_amount: '4',
         comment: '111 кккк',
+    }, {
+        type: LIMIT_CHANGE,
+        dest_id: CREDIT_CARD,
+        src_amount: '10000',
+        dest_amount: '10000',
+        comment: 'Credit limit update',
+    }, {
+        type: LIMIT_CHANGE,
+        src_id: BTC_CREDIT,
+        dest_id: 0,
+        src_amount: '0.01',
+        dest_amount: '0.01',
+        comment: 'Credit limit update',
     }];
 
     const multi = [];

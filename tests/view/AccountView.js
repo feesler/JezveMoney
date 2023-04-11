@@ -92,11 +92,12 @@ export class AccountView extends AppView {
 
         // Currency
         this.setModelCurrency(cont.currDropDown.value, res);
+        const { precision } = res.currObj;
 
         // Iniital balance
         res.initbalance = cont.balance.value;
         res.fInitBalance = isValidValue(res.initbalance)
-            ? normalize(res.initbalance, res.currObj.precision)
+            ? normalize(res.initbalance, precision)
             : res.initbalance;
 
         const origBalance = (res.isUpdate && this.origAccount) ? this.origAccount.balance : 0;
@@ -104,14 +105,22 @@ export class AccountView extends AppView {
             ? this.origAccount.initbalance
             : 0;
 
-        res.balance = origBalance + res.fInitBalance - origInitBalance;
+        res.balance = normalize(origBalance + res.fInitBalance - origInitBalance, precision);
         res.fBalance = res.balance;
 
         // Credit limit
-        res.limit = cont.limit.value;
-        res.fLimit = isValidValue(res.limit)
-            ? normalize(res.limit, res.currObj.precision)
-            : res.limit;
+        res.initlimit = cont.limit.value;
+        res.fInitLimit = isValidValue(res.initlimit)
+            ? normalize(res.initlimit, precision)
+            : res.initlimit;
+
+        const origLimit = (res.isUpdate && this.origAccount) ? this.origAccount.limit : 0;
+        const origInitLimit = (res.isUpdate && this.origAccount)
+            ? this.origAccount.initlimit
+            : 0;
+
+        res.limit = normalize(origLimit + res.fInitLimit - origInitLimit, precision);
+        res.fLimit = res.limit;
 
         // Icon
         this.setModelIcon(cont.iconDropDown.value, res);
@@ -159,12 +168,13 @@ export class AccountView extends AppView {
         this.setModelType(account.type);
         this.model.name = account.name.toString();
         this.setModelCurrency(account.curr_id);
+        const { precision } = this.model.currObj;
 
         this.model.initbalance = account.initbalance.toString();
-        this.model.fInitBalance = normalize(account.initbalance, this.model.currObj.precision);
+        this.model.fInitBalance = normalize(account.initbalance, precision);
 
         this.model.balance = account.balance.toString();
-        this.model.fBalance = account.balance;
+        this.model.fBalance = normalize(account.balance, precision);
 
         this.setModelIcon(account.icon_id);
     }
@@ -174,11 +184,12 @@ export class AccountView extends AppView {
             type: model.type,
             name: model.name,
             initbalance: model.fInitBalance,
-            limit: model.fLimit,
+            initlimit: model.fInitLimit,
             curr_id: model.curr_id,
             icon_id: model.icon_id,
             flags: model.flags,
         };
+        const { precision } = model.currObj;
 
         if (model.isUpdate) {
             res.id = model.id;
@@ -191,10 +202,14 @@ export class AccountView extends AppView {
             ? this.origAccount.initbalance
             : 0;
 
-        res.balance = normalize(
-            origBalance + res.initbalance - origInitBalance,
-            model.currObj.precision,
-        );
+        res.balance = normalize(origBalance + res.initbalance - origInitBalance, precision);
+
+        const origLimit = (model.isUpdate && this.origAccount) ? this.origAccount.limit : 0;
+        const origInitLimit = (model.isUpdate && this.origAccount)
+            ? this.origAccount.initlimit
+            : 0;
+
+        res.limit = normalize(origLimit + res.initlimit - origInitLimit, precision);
 
         return res;
     }
@@ -217,7 +232,7 @@ export class AccountView extends AppView {
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
             limit: {
-                value: model.limit.toString(),
+                value: model.initlimit.toString(),
                 visible: isCreditCard,
             },
             typeDropDown: {
@@ -248,12 +263,19 @@ export class AccountView extends AppView {
             return false;
         }
 
-        return (
-            this.model.initbalance.length > 0
-            && isValidValue(this.model.initbalance)
-            && this.model.limit.length > 0
-            && isValidValue(this.model.limit)
-        );
+        if (this.model.initbalance.length === 0 || !isValidValue(this.model.initbalance)) {
+            return false;
+        }
+
+        const isCreditCard = this.model.type === ACCOUNT_TYPE_CREDIT_CARD;
+        if (
+            isCreditCard
+            && (this.model.initlimit.length === 0 || !isValidValue(this.model.initlimit))
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     async clickDeleteButton() {
@@ -294,8 +316,8 @@ export class AccountView extends AppView {
     onLimitChanged(value) {
         const { precision } = this.model.currObj;
         const fNewValue = isValidValue(value) ? normalize(value, precision) : value;
-        this.model.limit = value;
-        this.model.fLimit = fNewValue;
+        this.model.initlimit = value;
+        this.model.fInitLimit = fNewValue;
     }
 
     async inputBalance(val) {

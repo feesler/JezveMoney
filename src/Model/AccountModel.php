@@ -40,6 +40,7 @@ class AccountModel extends SortableModel
     protected $iconModel = null;
     protected $currencyUpdated = false;
     protected $balanceUpdated = false;
+    protected $limitUpdated = false;
     protected $removedItems = null;
     protected $latestPos = null;
 
@@ -91,7 +92,7 @@ class AccountModel extends SortableModel
      */
     protected function validateParams(array $params, int $item_id = 0)
     {
-        $avFields = ["owner_id", "type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
+        $avFields = ["owner_id", "type", "name", "initbalance", "initlimit", "curr_id", "icon_id", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
@@ -124,8 +125,8 @@ class AccountModel extends SortableModel
             $res["initbalance"] = floatval($params["initbalance"]);
         }
 
-        if (isset($params["limit"])) {
-            $res["limit"] = floatval($params["limit"]);
+        if (isset($params["initlimit"])) {
+            $res["initlimit"] = floatval($params["initlimit"]);
         }
 
         if (isset($params["curr_id"])) {
@@ -185,6 +186,7 @@ class AccountModel extends SortableModel
 
         $res["pos"] = $this->getNextPos();
         $res["balance"] = $res["initbalance"];
+        $res["limit"] = $res["initlimit"];
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
 
@@ -218,16 +220,25 @@ class AccountModel extends SortableModel
             throw new \Error("Currency not found");
         }
 
+        $minDiff = pow(0.1, $currObj->precision);
+
         // get initial balance to calc difference
         $diff = normalize($res["initbalance"] - $item->initbalance, $currObj->precision);
-        $minDiff = pow(0.1, $currObj->precision);
-        if (abs($diff) >= $minDiff) {
-            $this->balanceUpdated = true;
+        $this->balanceUpdated = abs($diff) >= $minDiff;
+        if ($this->balanceUpdated) {
             $res["balance"] = normalize($item->balance + $diff, $currObj->precision);
         } else {
-            $this->balanceUpdated = false;
             unset($res["balance"]);
             unset($res["initbalance"]);
+        }
+
+        $limitDiff = normalize($res["initlimit"] - $item->initlimit, $currObj->precision);
+        $this->limitUpdated = abs($limitDiff) >= $minDiff;
+        if ($this->limitUpdated) {
+            $res["limit"] = normalize($item->limit + $limitDiff, $currObj->precision);
+        } else {
+            unset($res["limit"]);
+            unset($res["initlimit"]);
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -246,7 +257,7 @@ class AccountModel extends SortableModel
     {
         $this->cleanCache();
 
-        if ($this->currencyUpdated || $this->balanceUpdated) {
+        if ($this->currencyUpdated || $this->balanceUpdated || $this->limitUpdated) {
             $transMod = TransactionModel::getInstance();
 
             $transMod->onAccountUpdate($item_id);
@@ -254,6 +265,7 @@ class AccountModel extends SortableModel
 
         $this->currencyUpdated = false;
         $this->balanceUpdated = false;
+        $this->limitUpdated = false;
 
         return true;
     }
@@ -425,7 +437,7 @@ class AccountModel extends SortableModel
             "owner_id" => $person_id,
             "name" => "acc_" . $person_id . "_" . $curr_id,
             "initbalance" => 0.0,
-            "limit" => 0,
+            "initlimit" => 0,
             "curr_id" => $curr_id,
             "icon_id" => 0,
             "flags" => 0

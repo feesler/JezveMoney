@@ -32,6 +32,7 @@ const availFields = [
     'balance',
     'initbalance',
     'limit',
+    'initlimit',
     'curr_id',
     'icon_id',
     'flags',
@@ -46,6 +47,14 @@ const availFields = [
  * @param {*} props
  */
 export class Account extends ListItem {
+    /**
+     * Returns true if specified type is credit card
+     * @param {*} type
+     */
+    static isCreditCard(type) {
+        return parseInt(type, 10) === ACCOUNT_TYPE_CREDIT_CARD;
+    }
+
     /**
      * Check specified field name is available
      * @param {string} field - field name to check

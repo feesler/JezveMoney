@@ -8,6 +8,7 @@ import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Acc
 const TYPE_FIELD_CLASS = 'type-field';
 const BALANCE_FIELD_CLASS = 'balance-field';
 const INITIAL_BALANCE_FIELD_CLASS = 'initbalance-field';
+const INITIAL_LIMIT_FIELD_CLASS = 'initlimit-field';
 const LIMIT_FIELD_CLASS = 'limit-field';
 const VISIBILITY_FIELD_CLASS = 'visibility-field';
 const TR_COUNT_FIELD_CLASS = 'trans-count-field inline-field';
@@ -32,6 +33,11 @@ export class AccountDetails extends ItemDetails {
         this.balanceField = Field.create({
             title: __('ACCOUNT_CURRENT_BALANCE'),
             className: BALANCE_FIELD_CLASS,
+        });
+
+        this.initLimitField = Field.create({
+            title: __('ACCOUNT_INITIAL_CREDIT_LIMIT'),
+            className: INITIAL_LIMIT_FIELD_CLASS,
         });
 
         this.limitField = Field.create({
@@ -61,6 +67,7 @@ export class AccountDetails extends ItemDetails {
             this.balanceField.elem,
             this.initBalanceField.elem,
             this.limitField.elem,
+            this.initLimitField.elem,
             this.visibilityField.elem,
             this.transactionsField.elem,
             this.transactionsLink,
@@ -109,9 +116,13 @@ export class AccountDetails extends ItemDetails {
         // Credit limit
         const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
         this.limitField.show(isCreditCard);
+        this.initLimitField.show(isCreditCard);
         if (isCreditCard) {
             this.limitField.setContent(
                 currency.formatCurrency(item.limit, item.curr_id),
+            );
+            this.initLimitField.setContent(
+                currency.formatCurrency(item.initlimit, item.curr_id),
             );
         }
 
