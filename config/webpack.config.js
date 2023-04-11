@@ -2,6 +2,8 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+import ImageMinimizerPlugin from 'image-minimizer-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(filename);
@@ -179,6 +181,13 @@ export default {
             },
             ignoreOrder: true,
         }),
+        new CopyWebpackPlugin({
+            patterns: [{
+                context: resolve(currentDir, '../src/view/img').replace(/\\/g, '/'),
+                from: '**/*',
+                to: '../dist/view/img/',
+            }],
+        }),
     ],
     module: {
         rules: [
@@ -231,5 +240,53 @@ export default {
                 },
             },
         },
+        minimize: true,
+        minimizer: [
+            '...',
+            new ImageMinimizerPlugin({
+                test: /\.svg$/i,
+                deleteOriginalAssets: false,
+                minimizer: {
+                    implementation: ImageMinimizerPlugin.imageminMinify,
+                    options: {
+                        plugins: [
+                            [
+                                'svgo',
+                                {
+                                    plugins: [
+                                        {
+                                            name: 'preset-default',
+                                            params: {
+                                                overrides: {
+                                                    removeViewBox: false,
+                                                    inlineStyles: false,
+                                                },
+                                            },
+                                        },
+                                        {
+                                            name: 'removeAttrs',
+                                            params: {
+                                                attrs: '(fill|stroke|style)',
+                                            },
+                                        },
+                                    ],
+                                },
+                            ],
+                        ],
+                    },
+                },
+                generator: [
+                    {
+                        type: 'asset',
+                        implementation: ImageMinimizerPlugin.imageminGenerate,
+                        options: {
+                            plugins: [
+                                'imagemin-svgo',
+                            ],
+                        },
+                    },
+                ],
+            }),
+        ],
     },
 };
