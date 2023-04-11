@@ -53,10 +53,13 @@
       margin: 0;
     }
 
+    .create-btn,
     .toggle-btn {
       --btn-icon-color: var(--list-item-icon-fill);
       --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    }
 
+    .toggle-btn {
       margin-left: 0;
     }
   }
