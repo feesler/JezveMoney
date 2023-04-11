@@ -19,7 +19,7 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 
 import { IconList } from '../../js/model/IconList.js';
-import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
+import { accountTypes, Account } from '../../js/model/Account.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -51,7 +51,7 @@ class AccountView extends View {
             validation: {
                 initbalance: true,
                 name: true,
-                limit: true,
+                initlimit: true,
                 valid: true,
             },
             submitStarted: false,
@@ -65,7 +65,7 @@ class AccountView extends View {
             initialState.data = {
                 ...original,
                 fInitBalance: normalize(original.initbalance, precision),
-                fLimit: normalize(original.limit, precision),
+                fInitLimit: normalize(original.initlimit, precision),
             };
         }
 
@@ -215,7 +215,7 @@ class AccountView extends View {
             return;
         }
 
-        const { name, initbalance, limit } = state.data;
+        const { name, initbalance, initlimit } = state.data;
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_INVALID_NAME')));
             this.nameInp.focus();
@@ -232,7 +232,8 @@ class AccountView extends View {
             this.balanceInp.focus();
         }
 
-        if (limit.length === 0) {
+        const isCreditCard = Account.isCreditCard(state.data.type);
+        if (isCreditCard && initlimit.length === 0) {
             this.store.dispatch(actions.invalidateLimitField());
             this.balanceInp.focus();
         }
@@ -256,7 +257,7 @@ class AccountView extends View {
             type: data.type,
             name: data.name,
             initbalance: data.fInitBalance,
-            limit: data.fLimit,
+            initlimit: data.fInitLimit,
             curr_id: data.curr_id,
             icon_id: data.icon_id,
             flags: original.flags,
@@ -370,13 +371,13 @@ class AccountView extends View {
         this.currencySign.textContent = currencyObj.sign;
 
         // Credit limit field
-        const isCreditCard = parseInt(state.data.type, 10) === ACCOUNT_TYPE_CREDIT_CARD;
+        const isCreditCard = Account.isCreditCard(state.data.type);
         show(this.limitField, isCreditCard);
         this.limitDecimalInput.setState((inpState) => ({
             ...inpState,
             digits: currencyObj.precision,
         }));
-        window.app.setValidation(this.limitField, state.validation.limit);
+        window.app.setValidation(this.limitField, state.validation.initlimit);
         enable(this.limitInp, !state.submitStarted);
         this.limitCurrencySign.textContent = currencyObj.sign;
 

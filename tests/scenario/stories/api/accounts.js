@@ -155,7 +155,7 @@ const createMultiple = async () => {
         name: 'Account 3',
         curr_id: USD,
         initbalance: 100,
-        limit: 100,
+        initlimit: 100,
         icon_id: 5,
     }];
 

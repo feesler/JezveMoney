@@ -81,6 +81,7 @@ class Accounts extends ListViewController
         $accInfo->balance = 0;
         $accInfo->initbalance = "";
         $accInfo->limit = 0;
+        $accInfo->initlimit = "";
         $accInfo->icon_id = 0;
         $accInfo->icon = null;
         $accInfo->flags = 0;

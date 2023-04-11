@@ -64,14 +64,14 @@ export const createAccounts = async () => {
         name: 'CREDIT_CARD',
         curr_id: USD,
         initbalance: '100',
-        limit: 100,
+        initlimit: 100,
         icon_id: 1,
     }, {
         type: ACCOUNT_TYPE_CREDIT_CARD,
         name: 'BTC_CREDIT',
         curr_id: BTC,
         initbalance: '0.123456',
-        limit: 0.125,
+        initlimit: 0.125,
         icon_id: 3,
     }];
 

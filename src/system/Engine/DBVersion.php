@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 21);
+define("DB_VERSION", 22);
 
 /**
  * Database version manager class
@@ -769,6 +769,28 @@ class DBVersion
     }
 
     /**
+     * Creates database version 22
+     *
+     * @return int
+     */
+    private function version22()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+        $tableName = "accounts";
+        $res = $this->dbClient->addColumns(
+            $tableName,
+            ["initlimit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'"],
+        );
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        return 22;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -826,6 +848,7 @@ class DBVersion
                 "curr_id" => "INT(11) NOT NULL",
                 "balance" => DECIMAL_TYPE . " NOT NULL",
                 "initbalance" => DECIMAL_TYPE . " NOT NULL",
+                "initlimit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'",
                 "limit" => DECIMAL_TYPE . " NOT NULL DEFAULT '0'",
                 "name" => "VARCHAR(255) NOT NULL",
                 "icon_id" => "INT(11) NOT NULL DEFAULT '0'",
