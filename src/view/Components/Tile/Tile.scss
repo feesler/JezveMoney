@@ -3,6 +3,8 @@
   --tile-size: 100px;
   --tile-content-color: #ffffff;
   --tile-bg-color: var(--accent-color-alt);
+  --tile-hover-bg-color: var(--accent-hover-color);
+  --tile-active-bg-color: var(--accent-active-color);
 
   width: var(--tile-size);
   height: var(--tile-size);
@@ -16,6 +18,10 @@
   font-weight: normal;
   text-decoration: none;
   cursor: pointer;
+
+  &:active {
+    background-color: var(--tile-active-bg-color);
+  }
 
   &:focus-visible {
     box-shadow: var(--focus-shadow);
@@ -104,6 +110,10 @@
 
 @media (hover: hover) {
   .tile:hover {
-    background-color: #1e82cc;
+    background-color: var(--tile-hover-bg-color);
+  }
+
+  .tile:active:hover {
+    background-color: var(--tile-active-bg-color);
   }
 }
