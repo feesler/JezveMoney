@@ -1,10 +1,10 @@
 import {
     TestComponent,
     query,
-    prop,
     click,
     assert,
     copyObject,
+    evaluate,
 } from 'jezve-test';
 import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
@@ -25,19 +25,31 @@ export class ImportRuleItem extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import rule item');
 
-        const res = {
-            ruleId: await prop(this.elem, 'dataset.id'),
-            propertyElem: { elem: await query(this.elem, '.rule-item__property') },
-            operatorElem: { elem: await query(this.elem, '.rule-item__operator') },
-            valueElem: { elem: await query(this.elem, '.rule-item__value') },
-            infoElem: { elem: await query(this.elem, '.rule-item__info') },
-            menuBtn: { elem: await query(this.elem, '.menu-btn') },
-            toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
-        };
+        const res = await evaluate((el) => {
+            const propertyEl = el.querySelector('.rule-item__property');
+            const operatorEl = el.querySelector('.rule-item__operator');
+            let valueEl = el.querySelector('.rule-item__value');
+            if (!valueEl) {
+                valueEl = el.querySelector('.rule-item__value-property');
+            }
+            const infoEl = el.querySelector('.rule-item__info');
 
-        if (!res.valueElem.elem) {
-            res.valueElem.elem = await query(this.elem, '.rule-item__value-property');
-        }
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
+
+            return {
+                ruleId: el.dataset.id,
+                propertyElem: textElemState(propertyEl),
+                operatorElem: textElemState(operatorEl),
+                valueElem: textElemState(valueEl),
+                infoElem: textElemState(infoEl),
+            };
+        }, this.elem);
+
+        res.menuBtn = { elem: await query(this.elem, '.menu-btn') };
+        res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
 
         const conditionsElem = await query(this.elem, '.rule-item__conditions');
         res.conditions = await ImportRuleItemConditions.create(this, conditionsElem);
@@ -46,10 +58,10 @@ export class ImportRuleItem extends TestComponent {
         res.actions = await ImportRuleItemActions.create(this, actionsElem);
 
         assert(
-            res.propertyElem.elem
-            && res.operatorElem.elem
-            && res.valueElem.elem
-            && res.infoElem.elem
+            res.propertyElem.visible
+            && res.operatorElem.visible
+            && res.valueElem.visible
+            && res.infoElem.visible
             && res.menuBtn.elem
             && res.toggleBtn.elem
             && res.conditions.elem

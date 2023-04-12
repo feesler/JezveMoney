@@ -76,7 +76,7 @@ export class ImportTransactionForm extends TestComponent {
             if (inputGroup && !dropDownEl) {
                 const button = el.querySelector('.input-group__btn');
                 field.button = {
-                    visible: button && !button.hidden,
+                    visible: !!button && !button.hidden,
                     disabled: button?.disabled,
                 };
             }

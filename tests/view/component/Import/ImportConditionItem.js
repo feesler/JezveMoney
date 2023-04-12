@@ -1,9 +1,4 @@
-import {
-    TestComponent,
-    query,
-    assert,
-    evaluate,
-} from 'jezve-test';
+import { TestComponent, assert, evaluate } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
 
@@ -11,31 +6,25 @@ export class ImportConditionItem extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import condition item');
 
-        const res = {
-            propertyTitle: { elem: await query(this.elem, '.cond-item__property') },
-            operatorTitle: { elem: await query(this.elem, '.cond-item__operator') },
-            valueTitle: { elem: await query(this.elem, '.cond-item__value') },
-            valuePropTitle: { elem: await query(this.elem, '.cond-item__value-property') },
-        };
+        const res = await evaluate((el) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
+
+            return {
+                propertyTitle: textElemState(el.querySelector('.cond-item__property')),
+                operatorTitle: textElemState(el.querySelector('.cond-item__operator')),
+                valueTitle: textElemState(el.querySelector('.cond-item__value')),
+                valuePropTitle: textElemState(el.querySelector('.cond-item__value-property')),
+            };
+        }, this.elem);
 
         assert(
-            res.propertyTitle.elem
-            && res.operatorTitle.elem
-            && (res.valueTitle.elem || res.valuePropTitle.elem),
+            res.propertyTitle.visible
+            && res.operatorTitle.visible
+            && (res.valueTitle.visible || res.valuePropTitle.visible),
             'Invalid structure of condition item',
-        );
-
-        [
-            res.propertyTitle.value,
-            res.operatorTitle.value,
-            res.valueTitle.value,
-            res.valuePropTitle.value,
-        ] = await evaluate(
-            (...elems) => elems.map((el) => el?.textContent),
-            res.propertyTitle.elem,
-            res.operatorTitle.elem,
-            res.valueTitle.elem,
-            res.valuePropTitle.elem,
         );
 
         return res;

@@ -1,29 +1,22 @@
-import {
-    TestComponent,
-    assert,
-    query,
-    hasClass,
-    evaluate,
-} from 'jezve-test';
+import { TestComponent, assert, evaluate } from 'jezve-test';
 
+/** Counter component */
 export class Counter extends TestComponent {
     async parseContent() {
-        const validClass = await hasClass(this.elem, 'counter');
-        assert(validClass, 'Invalid structure of counter');
+        assert(this.elem, 'Invalid counter element');
 
-        const res = {
-            titleElem: await query(this.elem, '.counter__title'),
-            valueElem: await query(this.elem, '.counter__value'),
-        };
-        assert(res.titleElem && res.valueElem, 'Invalid structure of counter');
+        const res = await evaluate((el) => {
+            if (!el?.classList?.contains('counter')) {
+                return null;
+            }
+            const titleEl = el.querySelector('.counter__title');
+            const valueEl = el.querySelector('.counter__value');
 
-        [
-            res.title,
-            res.value,
-        ] = await evaluate((titleEl, valueEl) => ([
-            titleEl.textContent,
-            parseInt(valueEl.textContent, 10),
-        ]), res.titleElem, res.valueElem);
+            return {
+                title: titleEl?.textContent,
+                value: parseInt(valueEl?.textContent, 10),
+            };
+        }, this.elem);
 
         return res;
     }

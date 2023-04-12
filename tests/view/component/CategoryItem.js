@@ -2,7 +2,6 @@ import {
     TestComponent,
     assert,
     query,
-    hasClass,
     click,
     evaluate,
 } from 'jezve-test';
@@ -18,18 +17,23 @@ export class CategoryItem extends TestComponent {
     }
 
     async parseContent() {
-        const validClass = await hasClass(this.elem, 'category-item');
-        assert(validClass, 'Invalid category item element');
+        assert(this.elem, 'Invalid category item element');
 
-        const titleElem = await query(this.elem, '.category-item__title');
-        assert(titleElem, 'Title element not found');
+        const res = await evaluate((el) => {
+            if (!el?.classList?.contains('category-item')) {
+                return null;
+            }
 
-        const res = await evaluate((elem, titleEl) => ({
-            id: parseInt(elem.dataset.id, 10),
-            title: titleEl.textContent,
-            selected: elem.classList.contains('category-item_selected'),
-            isChild: !!elem.closest('.category-item__children'),
-        }), this.elem, titleElem);
+            const titleEl = el.querySelector('.category-item__title');
+
+            return {
+                id: parseInt(el.dataset.id, 10),
+                title: titleEl?.textContent,
+                selected: el.classList.contains('category-item_selected'),
+                isChild: !!el.closest('.category-item__children'),
+            };
+        }, this.elem);
+        assert(res, 'Invalid category item element');
 
         res.menuBtn = await query(this.elem, '.menu-btn');
 

@@ -2,7 +2,6 @@ import {
     TestComponent,
     assert,
     query,
-    hasClass,
     click,
     evaluate,
 } from 'jezve-test';
@@ -18,17 +17,22 @@ export class CurrencyItem extends TestComponent {
     }
 
     async parseContent() {
-        const validClass = await hasClass(this.elem, 'currency-item');
-        assert(validClass, 'Invalid currency item element');
+        assert(this.elem, 'Invalid currency item element');
 
-        const titleElem = await query(this.elem, '.currency-item__title');
-        assert(titleElem, 'Title element not found');
+        const res = await evaluate((el) => {
+            if (!el?.classList?.contains('currency-item')) {
+                return null;
+            }
 
-        const res = await evaluate((elem, titleEl) => ({
-            id: parseInt(elem.dataset.id, 10),
-            title: titleEl.textContent,
-            selected: elem.classList.contains('currency-item_selected'),
-        }), this.elem, titleElem);
+            const titleEl = el.querySelector('.currency-item__title');
+
+            return {
+                id: parseInt(el.dataset.id, 10),
+                title: titleEl?.textContent,
+                selected: el.classList.contains('currency-item_selected'),
+            };
+        }, this.elem);
+        assert(res, 'Invalid currency item element');
 
         res.menuBtn = await query(this.elem, '.menu-btn');
 

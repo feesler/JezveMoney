@@ -2,7 +2,6 @@ import {
     TestComponent,
     query,
     click,
-    assert,
     evaluate,
     asyncMap,
     queryAll,
@@ -13,14 +12,14 @@ import { secondsToDateString } from '../../../common.js';
 import { Category } from '../../../model/Category.js';
 import { __ } from '../../../model/locale.js';
 
-const fieldSelectors = [
-    '.parent-field',
-    '.type-field',
-    '.subcategories-field',
-    '.trans-count-field',
-    '.create-date-field',
-    '.update-date-field',
-];
+const fieldSelectors = {
+    parentField: '.parent-field',
+    typeField: '.type-field',
+    subcategoriesField: '.subcategories-field',
+    transactionsField: '.trans-count-field',
+    createDateField: '.create-date-field',
+    updateDateField: '.update-date-field',
+};
 
 export class CategoryDetails extends TestComponent {
     get loading() {
@@ -28,50 +27,41 @@ export class CategoryDetails extends TestComponent {
     }
 
     async parseContent() {
-        const res = {
-            closeBtn: { elem: await query(this.elem, '.close-btn') },
-            title: { elem: await query(this.elem, '.heading h1') },
-            subcategoriesList: { elem: await query(this.elem, '.subcategories-list') },
-            transactionsLink: { elem: await query(this.elem, '.transactions-link') },
-        };
+        const res = await evaluate((el, selectors) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
+
+            const trLinkEl = el.querySelector('.transactions-link');
+
+            const state = {
+                title: textElemState(el.querySelector('.heading h1')),
+                loading: trLinkEl?.classList.contains('vhidden'),
+                transactionsLink: {
+                    visible: !!trLinkEl && !trLinkEl.hidden,
+                },
+            };
+
+            Object.entries(selectors).forEach(([field, selector]) => {
+                const elem = el.querySelector(selector);
+                const titleEl = elem?.querySelector('.field__title');
+                const contentEl = elem?.querySelector('.field__content');
+                state[field] = {
+                    title: titleEl?.textContent,
+                    value: contentEl?.textContent,
+                    visible: !!elem && !elem.hidden,
+                };
+            });
+
+            return state;
+        }, this.elem, fieldSelectors);
+
+        res.closeBtn = { elem: await query(this.elem, '.close-btn') };
+        res.subcategoriesList = { elem: await query(this.elem, '.subcategories-list') };
 
         const childElems = await queryAll(this.elem, '.subcategory-item');
         res.subcategories = await asyncMap(childElems, (el) => prop(el, 'textContent'));
-
-        [
-            res.title.value,
-            res.loading,
-        ] = await evaluate((titleEl, linkEl) => ([
-            titleEl.textContent,
-            linkEl.classList.contains('vhidden'),
-        ]), res.title.elem, res.transactionsLink.elem);
-
-        [
-            res.parentField,
-            res.typeField,
-            res.subcategoriesField,
-            res.transactionsField,
-            res.createDateField,
-            res.updateDateField,
-        ] = await asyncMap(fieldSelectors, async (selector) => (
-            this.parseField(await query(this.elem, selector))
-        ));
-
-        return res;
-    }
-
-    async parseField(elem) {
-        assert(elem, 'Invalid field element');
-
-        const titleElem = await query(elem, '.field__title');
-        const contentElem = await query(elem, '.field__content');
-        assert(titleElem && contentElem, 'Invalid structure of field');
-
-        const res = await evaluate((titleEl, contEl) => ({
-            title: titleEl.textContent,
-            value: contEl.textContent,
-        }), titleElem, contentElem);
-        res.elem = elem;
 
         return res;
     }
