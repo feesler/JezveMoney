@@ -85,7 +85,7 @@ class AdminApiConsoleView extends AdminView {
 
     /** Initialization of checkboxes of specified form */
     initCheckboxes(form) {
-        const checkboxes = Array.from(form.querySelectorAll('input[type="checkbox"]'));
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
     }
 
