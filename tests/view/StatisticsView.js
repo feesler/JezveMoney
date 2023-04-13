@@ -58,7 +58,7 @@ export class StatisticsView extends AppView {
             res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
 
-        res.groupDropDown = await DropDown.createFromChild(this, await query('#groupsel'));
+        res.groupTypeMenu = await LinkMenu.create(this, await query('#groupTypeMenu'));
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
@@ -125,9 +125,9 @@ export class StatisticsView extends AppView {
             res.filter.categories = this.getDropDownFilter(cont.categoryDropDown);
         }
 
-        const [selectedGroup] = cont.groupDropDown.getSelectedValues();
-        const groupType = parseInt(selectedGroup, 10);
-        assert(!Number.isNaN(groupType) && availGroupTypes.includes(groupType), 'Invalid group type');
+        const selectedGroup = cont.groupTypeMenu.value;
+        const groupType = this.getGroupTypeByName(selectedGroup);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
         res.filter.group = groupType;
 
         res.chart = {
@@ -140,7 +140,7 @@ export class StatisticsView extends AppView {
         return res;
     }
 
-    getGroupTypeString(groupType) {
+    getGroupTypeName(groupType) {
         const groupTypesMap = {
             [GROUP_BY_DAY]: 'day',
             [GROUP_BY_WEEK]: 'week',
@@ -153,9 +153,22 @@ export class StatisticsView extends AppView {
         return groupTypesMap[groupType];
     }
 
+    getGroupTypeByName(groupName) {
+        const groupTypesMap = {
+            day: GROUP_BY_DAY,
+            week: GROUP_BY_WEEK,
+            month: GROUP_BY_MONTH,
+            year: GROUP_BY_YEAR,
+        };
+
+        assert(groupName in groupTypesMap, 'Invalid group type');
+
+        return groupTypesMap[groupName];
+    }
+
     getExpectedState(model = this.model) {
         const { filtersVisible } = model;
-        const { report } = model.filter;
+        const { report, group } = model.filter;
 
         const res = {
             typeMenu: {
@@ -165,6 +178,10 @@ export class StatisticsView extends AppView {
             reportMenu: {
                 visible: filtersVisible,
                 value: report,
+            },
+            groupTypeMenu: {
+                visible: filtersVisible,
+                value: this.getGroupTypeName(group),
             },
             dateFilter: {
                 visible: filtersVisible,
@@ -205,7 +222,7 @@ export class StatisticsView extends AppView {
         const params = {
             type: model.filter.type,
             report,
-            group: this.getGroupTypeString(model.filter.group),
+            group: this.getGroupTypeName(model.filter.group),
         };
         if (report === 'currency') {
             params.curr_id = model.filter.curr_id;
@@ -459,10 +476,12 @@ export class StatisticsView extends AppView {
     async groupBy(group) {
         await this.openFilters();
 
+        const groupName = this.getGroupTypeName(group);
+
         this.model.filter.group = group;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.groupDropDown.setSelection(group));
+        await this.waitForData(() => this.content.groupTypeMenu.selectItemByValue(groupName));
 
         return App.view.checkState(expected);
     }

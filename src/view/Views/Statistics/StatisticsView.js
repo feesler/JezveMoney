@@ -31,12 +31,7 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 
-import {
-    getGroupTypeByName,
-    isSameSelection,
-    actions,
-    reducer,
-} from './reducer.js';
+import { isSameSelection, actions, reducer } from './reducer.js';
 import '../../css/app.scss';
 import './StatisticsView.scss';
 
@@ -108,6 +103,7 @@ class StatisticsView extends View {
             'applyFiltersBtn',
             'typeFilter',
             'reportTypeFilter',
+            'groupTypeFilter',
             'accountsFilter',
             'categoriesFilter',
             'currencyFilter',
@@ -204,11 +200,17 @@ class StatisticsView extends View {
         });
 
         // 'Group by' filter
-        this.groupDropDown = DropDown.create({
-            elem: 'groupsel',
-            onItemSelect: (obj) => this.onGroupSel(obj),
-            className: 'dd_fullwidth',
+        const { groupTypes } = this.props;
+        this.groupTypeMenu = LinkMenu.create({
+            id: 'groupTypeMenu',
+            itemParam: 'group',
+            items: Object.values(groupTypes).map(({ name, title }) => ({
+                value: name,
+                title,
+            })),
+            onChange: (value) => this.onSelectGroupType(value),
         });
+        this.groupTypeFilter.append(this.groupTypeMenu.elem);
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.create({
@@ -389,15 +391,11 @@ class StatisticsView extends View {
     }
 
     /**
-     * Group select callback
-     * @param {object} obj - selected group item
+     * Group type select callback
+     * @param {string} value - selected group item
      */
-    onGroupSel(obj) {
-        if (!obj) {
-            return;
-        }
-
-        this.store.dispatch(actions.changeGroupType(obj.id));
+    onSelectGroupType(value) {
+        this.store.dispatch(actions.changeGroupType(value));
         const { form } = this.store.getState();
         this.requestData(form);
     }
@@ -629,8 +627,7 @@ class StatisticsView extends View {
             this.currencyDropDown.setSelection(state.form.curr_id);
         }
 
-        const groupType = getGroupTypeByName(state.form.group);
-        this.groupDropDown.setSelection(groupType);
+        this.groupTypeMenu.setActive(state.form.group);
 
         // Render date
         const dateFilter = {

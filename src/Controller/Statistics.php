@@ -33,17 +33,7 @@ class Statistics extends TemplateController
         $selectedReport = $filterObj->report;
         $data["report"] = $selectedReport;
 
-        $groupTypes = TransactionModel::getHistogramGroupNames();
-        $data["groupTypes"] = $groupTypes;
-
-        $groupType_id = GROUP_BY_WEEK;
-        if (isset($filterObj->group)) {
-            $groupType = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
-            if ($groupType !== false) {
-                $groupType_id = $groupType;
-            }
-        }
-        $data["groupType_id"] = $groupType_id;
+        $groupTypes = TransactionModel::getHistogramGroupTypes();
 
         if ($selectedReport === "currency") {
             $accCurr = $filterObj->curr_id;
@@ -68,6 +58,7 @@ class Statistics extends TemplateController
             "categories" => $catMod->getData(),
             "view" => [
                 "accountCurrency" => $accCurr,
+                "groupTypes" => $groupTypes,
                 "filter" => $filterObj,
             ],
         ];

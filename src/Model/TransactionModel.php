@@ -2615,17 +2615,29 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns array of histogram group names
+     * Returns array of histogram group types
      *
      * @return array
      */
-    public static function getHistogramGroupNames()
+    public static function getHistogramGroupTypes()
     {
         return [
-            GROUP_BY_DAY => __("STAT_GROUP_BY_DAY"),
-            GROUP_BY_WEEK => __("STAT_GROUP_BY_WEEK"),
-            GROUP_BY_MONTH => __("STAT_GROUP_BY_MONTH"),
-            GROUP_BY_YEAR => __("STAT_GROUP_BY_YEAR"),
+            GROUP_BY_DAY => [
+                "name" => self::getHistogramGroupName(GROUP_BY_DAY),
+                "title" => __("STAT_GROUP_BY_DAY"),
+            ],
+            GROUP_BY_WEEK => [
+                "name" => self::getHistogramGroupName(GROUP_BY_WEEK),
+                "title" => __("STAT_GROUP_BY_WEEK"),
+            ],
+            GROUP_BY_MONTH => [
+                "name" => self::getHistogramGroupName(GROUP_BY_MONTH),
+                "title" => __("STAT_GROUP_BY_MONTH"),
+            ],
+            GROUP_BY_YEAR => [
+                "name" => self::getHistogramGroupName(GROUP_BY_YEAR),
+                "title" => __("STAT_GROUP_BY_YEAR"),
+            ],
         ];
     }
 
