@@ -57,6 +57,13 @@ class TransactionModel extends SortableModel
         GROUP_BY_YEAR => "year",
     ];
 
+    private static $durationMap = [
+        GROUP_BY_DAY => "D",
+        GROUP_BY_WEEK => "W",
+        GROUP_BY_MONTH => "M",
+        GROUP_BY_YEAR => "Y",
+    ];
+
     protected $tbl_name = "transactions";
     protected $accModel = null;
     protected $currMod = null;
@@ -2014,6 +2021,7 @@ class TransactionModel extends SortableModel
     {
         $info = getdate($time);
         $info["week"] = intval(date("W", $time));
+        $info["wday"] = ($info["wday"] === 6) ? 0 : ($info["wday"] + 1);
         $res = [
             "time" => $time,
             "info" => $info,
@@ -2093,19 +2101,12 @@ class TransactionModel extends SortableModel
      */
     protected function getNextDate(int $time, int $groupType)
     {
-        $durationMap = [
-            GROUP_BY_DAY => "P1D",
-            GROUP_BY_WEEK => "P1W",
-            GROUP_BY_MONTH => "P1M",
-            GROUP_BY_YEAR => "P1Y",
-        ];
-
-        if (!isset($durationMap[$groupType])) {
+        if (!isset(self::$durationMap[$groupType])) {
             throw new \Error("Invalid group type");
         }
 
         $date = new DateTime("@" . $time, new DateTimeZone('UTC'));
-        $duration = $durationMap[$groupType];
+        $duration = "P1" . self::$durationMap[$groupType];
 
         if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
             $dateInfo = $this->getDateInfo($time, $groupType);
@@ -2114,6 +2115,33 @@ class TransactionModel extends SortableModel
         }
 
         return $date->add(new DateInterval($duration))->getTimestamp();
+    }
+
+    /**
+     * Returns timestamp start date of range for specified group type
+     *
+     * @param int $time timestamp
+     * @param int $time limit
+     * @param int $groupType group type
+     *
+     * @return int
+     */
+    protected function getLimitStartDate(int $endTime, int $limit, int $groupType)
+    {
+        if (!isset(self::$durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $date = new DateTime("@" . $endTime, new DateTimeZone('UTC'));
+        $duration = "P" . $limit . self::$durationMap[$groupType];
+
+        if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
+            $dateInfo = $this->getDateInfo($endTime, $groupType);
+            $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
+            $date->setDate($dateInfo["info"]["year"], $month, 1);
+        }
+
+        return $date->sub(new DateInterval($duration))->getTimestamp();
     }
 
     /**
@@ -2320,6 +2348,10 @@ class TransactionModel extends SortableModel
         ) {
             $dataParams["startDate"] = $params["startDate"];
             $dataParams["endDate"] = $params["endDate"];
+        } elseif ($limit > 0) {
+            $now = time();
+            $dataParams["startDate"] = $this->getLimitStartDate($now, $limit, $group_type);
+            $dataParams["endDate"] = $now;
         }
 
         $items = $this->getData($dataParams);

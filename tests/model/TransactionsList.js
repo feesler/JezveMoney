@@ -661,6 +661,35 @@ export class TransactionsList extends SortableList {
         return new Date(timestamp);
     }
 
+    getLimitStartDate(endDate, limit, groupType) {
+        assert.isDate(endDate);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
+
+        let timestamp = 0;
+        if (groupType === 'day') {
+            timestamp = Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate() - limit,
+            );
+        }
+        if (groupType === 'week') {
+            timestamp = Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate() - (DAYS_IN_WEEK * limit),
+            );
+        }
+        if (groupType === 'month') {
+            timestamp = Date.UTC(endDate.getFullYear(), endDate.getMonth() - limit, 1);
+        }
+        if (groupType === 'year') {
+            timestamp = Date.UTC(endDate.getFullYear() - limit, 0, 1);
+        }
+
+        return new Date(timestamp);
+    }
+
     getStatisticsLabel(date, groupType) {
         if (!date) {
             return null;
@@ -766,6 +795,10 @@ export class TransactionsList extends SortableList {
         if (params.startDate && params.endDate) {
             itemsFilter.startDate = params.startDate;
             itemsFilter.endDate = params.endDate;
+        } else if (limit > 0) {
+            const now = new Date();
+            itemsFilter.startDate = this.getLimitStartDate(now, limit, groupType);
+            itemsFilter.endDate = now;
         }
 
         const list = this.applyFilter(itemsFilter);
