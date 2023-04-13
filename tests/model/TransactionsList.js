@@ -636,6 +636,33 @@ export class TransactionsList extends SortableList {
         throw new Error('Invalid group type');
     }
 
+    getGroupStart(date, groupType) {
+        assert.isDate(date);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
+
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthDay = date.getDate();
+        let timestamp = 0;
+
+        if (groupType === 'day') {
+            timestamp = Date.UTC(year, month, monthDay);
+        }
+        if (groupType === 'week') {
+            let weekday = date.getDay();
+            weekday = (weekday === 0) ? 6 : (weekday - 1);
+            timestamp = Date.UTC(year, month, monthDay - weekday);
+        }
+        if (groupType === 'month') {
+            timestamp = Date.UTC(year, month, 1);
+        }
+        if (groupType === 'year') {
+            timestamp = Date.UTC(year, 0, 1);
+        }
+
+        return new Date(timestamp);
+    }
+
     getNextDate(date, groupType) {
         assert.isDate(date);
         assert(availGroupTypes.includes(groupType), 'Invalid group type');
@@ -720,6 +747,7 @@ export class TransactionsList extends SortableList {
         let groupArr = [];
         let sumDate = null;
         let curDate = null;
+        let groupStart = null;
         const curSum = {};
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
@@ -840,6 +868,7 @@ export class TransactionsList extends SortableList {
 
             if (!sumDate) {
                 sumDate = curDate;
+                groupStart = this.getGroupStart(sumDate.date, groupType);
             } else if (sumDate && sumDate.id !== curDate.id) {
                 const dateDiff = this.getDateDiff(sumDate, curDate, groupType);
                 for (const type of transTypes) {
@@ -853,10 +882,10 @@ export class TransactionsList extends SortableList {
                     }
                 }
 
-                let label = this.getStatisticsLabel(sumDate.date, groupType);
+                let label = this.getStatisticsLabel(groupStart, groupType);
                 groupArr.push([label, 1]);
                 // Append series for empty values
-                let groupDate = sumDate.date;
+                let groupDate = groupStart;
                 for (let i = 1; i < dateDiff; i += 1) {
                     groupDate = this.getNextDate(groupDate, groupType);
                     label = this.getStatisticsLabel(groupDate, groupType);
@@ -864,6 +893,7 @@ export class TransactionsList extends SortableList {
                 }
 
                 sumDate = curDate;
+                groupStart = this.getGroupStart(sumDate.date, groupType);
             }
 
             curSum[item.type][category] += amount;
@@ -881,7 +911,7 @@ export class TransactionsList extends SortableList {
                 }
             }
 
-            const label = this.getStatisticsLabel(sumDate.date, groupType);
+            const label = this.getStatisticsLabel(groupStart, groupType);
             groupArr.push([label, 1]);
         }
 

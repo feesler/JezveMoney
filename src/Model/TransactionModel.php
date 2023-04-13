@@ -1973,8 +1973,9 @@ class TransactionModel extends SortableModel
      *
      * @return string|null
      */
-    protected function getLabel(int $time, int $groupType)
+    protected function getLabel(mixed $dateInfo, int $groupType)
     {
+        $time = $dateInfo["time"];
         if ($groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
             return date("d.m.Y", $time);
         }
@@ -2021,7 +2022,7 @@ class TransactionModel extends SortableModel
     {
         $info = getdate($time);
         $info["week"] = intval(date("W", $time));
-        $info["wday"] = ($info["wday"] === 6) ? 0 : ($info["wday"] + 1);
+        $info["wday"] = ($info["wday"] === 0) ? 6 : ($info["wday"] - 1);
         $res = [
             "time" => $time,
             "info" => $info,
@@ -2092,29 +2093,59 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns next date timestamp for specified group type
+     * Returns date info object for group start in specified group type
      *
-     * @param int $time timestamp
+     * @param mixed $dateInfo date info object
      * @param int $groupType group type
      *
-     * @return int
+     * @return mixed
      */
-    protected function getNextDate(int $time, int $groupType)
+    protected function getGroupStart(mixed $dateInfo, int $groupType)
     {
         if (!isset(self::$durationMap[$groupType])) {
             throw new \Error("Invalid group type");
         }
 
-        $date = new DateTime("@" . $time, new DateTimeZone('UTC'));
-        $duration = "P1" . self::$durationMap[$groupType];
+        $date = new DateTime("@" . $dateInfo["time"], new DateTimeZone('UTC'));
+        $info = $dateInfo["info"];
+        $date->setTime(0, 0);
 
-        if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
-            $dateInfo = $this->getDateInfo($time, $groupType);
-            $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
-            $date->setDate($dateInfo["info"]["year"], $month, 1);
+        if ($groupType === GROUP_BY_WEEK) {
+            $date->sub(new DateInterval("P" . $info["wday"] . "D"));
         }
 
-        return $date->add(new DateInterval($duration))->getTimestamp();
+        if ($groupType === GROUP_BY_MONTH) {
+            $date->setDate($info["year"], $info["mon"], 1);
+        }
+
+        if ($groupType === GROUP_BY_YEAR) {
+            $date->setDate($info["year"], 1, 1);
+        }
+
+        $timestamp = $date->getTimestamp();
+        return $this->getDateInfo($timestamp, $groupType);
+    }
+
+    /**
+     * Returns date info object for next date in specified group type
+     *
+     * @param mixed $dateInfo date info object
+     * @param int $groupType group type
+     *
+     * @return int
+     */
+    protected function getNextDate(mixed $dateInfo, int $groupType)
+    {
+        if (!isset(self::$durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $groupStart = $this->getGroupStart($dateInfo, $groupType);
+        $date = new DateTime("@" . $groupStart["time"], new DateTimeZone('UTC'));
+        $duration = "P1" . self::$durationMap[$groupType];
+
+        $timestamp = $date->add(new DateInterval($duration))->getTimestamp();
+        return $this->getDateInfo($timestamp, $groupType);
     }
 
     /**
@@ -2304,6 +2335,7 @@ class TransactionModel extends SortableModel
         $groupArr = [];
         $sumDate = null;
         $curDate = null;
+        $groupStart = null;
         $curSum = [];
 
         $typesReq = (isset($params["type"])) ? $params["type"] : DEFAULT_TRANSACTION_TYPE;
@@ -2393,6 +2425,7 @@ class TransactionModel extends SortableModel
             $curDate = $dateInfo;
 
             if (is_null($sumDate)) {        // first iteration
+                $groupStart = $this->getGroupStart($curDate, $group_type);
                 $sumDate = $curDate;
             } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
                 $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
@@ -2408,17 +2441,18 @@ class TransactionModel extends SortableModel
                     }
                 }
 
-                $label = $this->getLabel($sumDate["time"], $group_type);
+                $label = $this->getLabel($groupStart, $group_type);
                 $groupArr[] = [$label, 1];
                 // Append series for empty values
-                $groupTime = $sumDate["time"];
+                $groupDate = $groupStart;
                 for ($i = 1; $i < $dateDiff; $i++) {
-                    $groupTime = $this->getNextDate($groupTime, $group_type);
-                    $label = $this->getLabel($groupTime, $group_type);
+                    $groupDate = $this->getNextDate($groupDate, $group_type);
+                    $label = $this->getLabel($groupDate, $group_type);
                     $groupArr[] = [$label, 1];
                 }
 
                 $sumDate = $curDate;
+                $groupStart = $this->getGroupStart($sumDate, $group_type);
             }
 
             $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);
@@ -2429,14 +2463,14 @@ class TransactionModel extends SortableModel
         foreach ($transTypes as $type) {
             $remainSum += array_sum($curSum[$type]);
         }
-        if ($remainSum != 0.0 && is_array($sumDate)) {
+        if ($remainSum != 0.0 && is_array($groupStart)) {
             foreach ($transTypes as $type) {
                 foreach ($dataCategories as $cat) {
                     $amountArr[$type][$cat][] = $curSum[$type][$cat];
                 }
             }
 
-            $label = $this->getLabel($sumDate["time"], $group_type);
+            $label = $this->getLabel($groupStart, $group_type);
             $groupArr[] = [$label, 1];
         }
 
