@@ -77,9 +77,10 @@ export const dateToSeconds = (date) => {
 };
 
 /** Converts date string to seconds */
-export const dateStringToSeconds = (date, locales = []) => (
-    dateToSeconds(new Date(convDate(date, locales)))
-);
+export const dateStringToSeconds = (dateStr, locales = []) => {
+    const date = parseDateString(dateStr, locales);
+    return (isDate(date)) ? dateToSeconds(date) : null;
+};
 
 /** Converts seconds to Date instance */
 export const secondsToDate = (seconds) => {

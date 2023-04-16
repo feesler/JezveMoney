@@ -17,7 +17,7 @@ import {
 import { ImportCondition } from '../../../../../js/model/ImportCondition.js';
 import { ImportConditionList } from '../../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../../js/model/ImportActionList.js';
-import { listData, __ } from '../../../../../js/utils.js';
+import { listData, __, dateStringToTime } from '../../../../../js/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
@@ -497,7 +497,17 @@ export class ImportRuleForm extends Component {
 
         const res = {
             flags: 0,
-            conditions: copyObject(state.rule.conditions.data),
+            conditions: state.rule.conditions.map((item) => {
+                const condition = {
+                    ...item,
+                };
+
+                if (ImportCondition.isDateField(item.field_id)) {
+                    condition.value = dateStringToTime(item.value);
+                }
+
+                return condition;
+            }),
             actions: copyObject(state.rule.actions.data),
         };
         if (state.rule.id) {

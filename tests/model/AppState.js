@@ -5,7 +5,12 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { isValidValue, availSortTypes, normalize } from '../common.js';
+import {
+    isValidValue,
+    availSortTypes,
+    normalize,
+    dateStringToSeconds,
+} from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -29,6 +34,7 @@ import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
+import { ImportCondition } from './ImportCondition.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
@@ -2001,10 +2007,19 @@ export class AppState {
     prepareConditions(conditions) {
         assert.isArray(conditions, 'Invalid conditions parameter');
 
-        return conditions.map((condition) => ({
-            ...condition,
-            value: condition.value?.toString(),
-        }));
+        return conditions.map((item) => {
+            const condition = {
+                ...item,
+                value: item.value?.toString(),
+            };
+
+            if (ImportCondition.isDateField(item.field_id)) {
+                const time = dateStringToSeconds(item.value, App.view.locale);
+                condition.value = time?.toString() ?? null;
+            }
+
+            return condition;
+        });
     }
 
     prepareActions(actions) {

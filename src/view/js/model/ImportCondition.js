@@ -4,10 +4,10 @@ import {
     hasFlag,
     fixFloat,
     isValidDateString,
+    isDate,
 } from 'jezvejs';
-import { timestampFromString, __ } from '../utils.js';
+import { __, getSeconds } from '../utils.js';
 import { ListItem } from './ListItem.js';
-import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -164,7 +164,12 @@ export class ImportCondition extends ListItem {
 
         const dataProp = this.fieldsMap[field];
 
-        return data[dataProp];
+        const res = data[dataProp];
+        if (this.isDateField(fieldId) && isDate(res)) {
+            return getSeconds(res);
+        }
+
+        return res;
     }
 
     /** Check value for specified field type is account, template or currency */
@@ -448,14 +453,11 @@ export class ImportCondition extends ListItem {
         if (this.isPropertyValue()) {
             return ImportCondition.getFieldValue(this.value, data);
         }
-        if (this.isItemField()) {
+        if (this.isItemField() || this.isDateField()) {
             return parseInt(this.value, 10);
         }
         if (this.isAmountField()) {
             return parseFloat(this.value);
-        }
-        if (this.isDateField()) {
-            return timestampFromString(this.value, IMPORT_DATE_LOCALE);
         }
 
         return this.value;

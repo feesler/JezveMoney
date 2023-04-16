@@ -69,6 +69,14 @@ export const createImportRules = async () => {
         actions: [
             actions.setTransactionType('limit'),
         ],
+    }, {
+        conditions: [
+            conditions.date.is.value(App.datesSec.now),
+            conditions.comment.includes.value('BAR'),
+        ],
+        actions: [
+            actions.setComment('Bar date'),
+        ],
     }];
 
     await App.scenario.runner.runGroup(api.importrule.create, rulesList);

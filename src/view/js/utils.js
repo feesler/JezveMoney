@@ -94,10 +94,19 @@ export const timestampFromString = (str, locales = []) => {
     return fixDate(tmpDate, locales);
 };
 
+/** Returns Unix timestamp in seconds for specified date */
+export const getSeconds = (date) => {
+    if (!isDate(date)) {
+        throw new Error('Invalid date');
+    }
+
+    return date.getTime() / MS_IN_SECOND;
+};
+
 /** Convert date string to Unix timestamp in seconds */
 export const dateStringToTime = (value) => {
     const res = fixDate(value);
-    return (res) ? (res / MS_IN_SECOND) : null;
+    return (res) ? getSeconds(res) : null;
 };
 
 /** Convert Unix timestamp in seconds to date string */
@@ -113,7 +122,7 @@ export const timeToDate = (value) => {
 /** Returns time for start of the day */
 export const cutTime = (value) => {
     const fixedDate = shiftDate(timeToDate(value), 0);
-    return fixedDate.getTime() / MS_IN_SECOND;
+    return getSeconds(fixedDate);
 };
 
 /** Convert string to amount value */
