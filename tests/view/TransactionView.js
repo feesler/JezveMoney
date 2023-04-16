@@ -460,7 +460,7 @@ export class TransactionView extends AppView {
     }
 
     isValidDate(value) {
-        const timestamp = convDate(value);
+        const timestamp = convDate(value, this.locale);
         return timestamp > 0;
     }
 
@@ -524,7 +524,7 @@ export class TransactionView extends AppView {
         res.dest_amount = this.getExpectedDestAmount();
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
-        res.date = dateStringToSeconds(this.model.date);
+        res.date = dateStringToSeconds(this.model.date, this.locale);
         res.category_id = this.model.categoryId;
         res.comment = this.model.comment;
 
@@ -2579,7 +2579,7 @@ export class TransactionView extends AppView {
     async selectDate(val) {
         assert.isDate(val, 'Invalid date');
 
-        this.model.date = formatDate(val);
+        this.model.date = formatDate(val, this.locale, App.dateFormatOptions);
         this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 

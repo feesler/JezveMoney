@@ -588,7 +588,7 @@ export class TransactionsList extends SortableList {
         const res = { time, date };
 
         if (groupType === 'day') {
-            res.id = formatDate(date);
+            res.id = formatDate(date, App.view.locale);
         } else if (groupType === 'week') {
             const week = getWeek(time);
             const fixedYear = this.getFixedWeekYear(date);
@@ -723,7 +723,7 @@ export class TransactionsList extends SortableList {
         }
 
         if (groupType === 'day' || groupType === 'week') {
-            return formatDate(date);
+            return formatDate(date, App.view.locale);
         }
 
         if (groupType === 'month') {

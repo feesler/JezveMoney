@@ -2,6 +2,7 @@ import { setBlock, TestStory } from 'jezve-test';
 import * as ImportTests from '../../../run/import/index.js';
 import { App } from '../../../Application.js';
 import { api } from '../../../model/api.js';
+import { testLocales } from '../../../run/locale.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {
@@ -45,6 +46,7 @@ export class ImportListStory extends TestStory {
         await this.submit();
         await this.formOrigDataCollapsible();
         await this.stateLoop();
+        await this.locales();
         await this.currencyPrecision();
 
         await this.submitError();
@@ -588,6 +590,33 @@ export class ImportListStory extends TestStory {
         });
 
         await ImportTests.deleteAllItems();
+    }
+
+    async locales() {
+        setBlock('Import view locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        const { cardFile, ACC_RUB } = App.scenario;
+
+        setBlock('Create transaction', 2);
+        await ImportTests.createItemAndSave([
+            { action: 'inputDestAmount', data: '100' },
+            { action: 'inputDate', data: App.datesFmt.weekAgo },
+        ]);
+        await ImportTests.submit();
+
+        setBlock('Upload file', 2);
+        await ImportTests.uploadFile(cardFile);
+        await ImportTests.submitUploaded({
+            ...cardFile,
+            account: ACC_RUB,
+        });
+        await ImportTests.submit();
     }
 
     async submitError() {

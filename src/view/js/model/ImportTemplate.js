@@ -7,6 +7,8 @@ import {
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 
+export const IMPORT_DATE_LOCALE = 'ru';
+
 /**
  * Import template class
  * @param {object} props - properties of instance
@@ -132,7 +134,7 @@ export class ImportTemplate extends ListItem {
         }
 
         const value = this.getColumnData(data, this.columns.date);
-        return timestampFromString(value);
+        return timestampFromString(value, IMPORT_DATE_LOCALE);
     }
 
     /** Extract comment value from data */

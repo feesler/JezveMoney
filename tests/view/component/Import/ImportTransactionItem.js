@@ -329,7 +329,7 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_amount = res.src_amount;
         }
 
-        res.date = dateStringToSeconds(model.date);
+        res.date = dateStringToSeconds(model.date, App.view.locale);
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -455,7 +455,7 @@ export class ImportTransactionItem extends TestComponent {
                 visible: isDebt,
             },
             dateField: {
-                value: secondsToDateString(item.date),
+                value: secondsToDateString(item.date, App.view.locale, App.dateFormatOptions),
                 visible: true,
             },
             categoryField: {

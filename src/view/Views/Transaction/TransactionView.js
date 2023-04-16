@@ -4,9 +4,9 @@ import {
     insertAfter,
     show,
     enable,
-    checkDate,
     setEvents,
     addChilds,
+    isValidDateString,
 } from 'jezvejs';
 import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
@@ -919,7 +919,7 @@ class TransactionView extends View {
             }
         }
 
-        if (!checkDate(state.form.date)) {
+        if (!isValidDateString(state.form.date, window.app.locale)) {
             this.store.dispatch(actions.invalidateDate());
         }
 

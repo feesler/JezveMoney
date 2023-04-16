@@ -74,7 +74,9 @@ export const changeLocale = async (locale) => {
 
         return App.view.checkState(expected);
     });
+};
 
+export const checkLocale = async (locale) => {
     await test('Main view', async () => {
         const expected = MainView.render(App.state);
 
@@ -168,14 +170,18 @@ export const changeLocale = async (locale) => {
     });
 };
 
-export const changeLocaleTest = async () => {
+export const testLocales = async (action) => {
     const locales = Object.keys(tokensMap);
     const initialLocale = App.view.locale;
     const remainLocales = locales.filter((locale) => locale !== initialLocale);
 
     for (const locale of remainLocales) {
         await changeLocale(locale);
+        await action(locale);
     }
 
     await changeLocale(initialLocale);
+    await action(initialLocale);
 };
+
+export const changeLocaleTest = () => testLocales(checkLocale);

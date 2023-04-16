@@ -2,6 +2,7 @@ import {
     fixFloat,
     isDate,
     isObject,
+    parseDateString,
     shiftDate,
 } from 'jezvejs';
 
@@ -58,13 +59,13 @@ export const leadZero = (val) => {
     return v.toString();
 };
 
-/** Convert DD.MM.YYYY string to timestamp */
-export const fixDate = (str) => {
+/** Convert date string to timestamp */
+export const fixDate = (str, locales = []) => {
     if (typeof str !== 'string') {
         return null;
     }
-
-    const res = Date.parse(str.split('.').reverse().join('-'));
+    const locale = (locales.length === 0) ? window.app.locale : locales;
+    const res = parseDateString(str, locale);
     if (Number.isNaN(res)) {
         return null;
     }
@@ -73,7 +74,7 @@ export const fixDate = (str) => {
 };
 
 /** Convert date string to timestamp */
-export const timestampFromString = (str) => {
+export const timestampFromString = (str, locales = []) => {
     if (typeof str === 'number') {
         return str;
     }
@@ -90,7 +91,7 @@ export const timestampFromString = (str) => {
         tmpDate = tmpDate.substring(0, pos);
     }
 
-    return fixDate(tmpDate);
+    return fixDate(tmpDate, locales);
 };
 
 /** Convert date string to Unix timestamp in seconds */

@@ -108,11 +108,11 @@ export class PersonDetails extends TestComponent {
             },
             transactionsLink: { visible: true },
             createDateField: {
-                value: secondsToDateString(item.createdate),
+                value: secondsToDateString(item.createdate, App.view.locale, App.dateFormatOptions),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate),
+                value: secondsToDateString(item.updatedate, App.view.locale, App.dateFormatOptions),
                 visible: true,
             },
         };

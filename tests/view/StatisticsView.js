@@ -106,8 +106,8 @@ export class StatisticsView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const startDate = new Date(fixDate(dateRange.startDate));
-            const endDate = new Date(fixDate(dateRange.endDate));
+            const startDate = new Date(fixDate(dateRange.startDate, res.locale));
+            const endDate = new Date(fixDate(dateRange.endDate, res.locale));
 
             res.filter.startDate = dateToSeconds(startDate);
             res.filter.endDate = dateToSeconds(endDate);
@@ -168,7 +168,12 @@ export class StatisticsView extends AppView {
 
     getExpectedState(model = this.model) {
         const { filtersVisible } = model;
-        const { report, group } = model.filter;
+        const {
+            report,
+            group,
+            startDate,
+            endDate,
+        } = model.filter;
 
         const res = {
             typeMenu: {
@@ -186,11 +191,11 @@ export class StatisticsView extends AppView {
             dateFilter: {
                 visible: filtersVisible,
                 value: {
-                    startDate: (model.filter.startDate)
-                        ? secondsToDateString(model.filter.startDate)
+                    startDate: (startDate)
+                        ? secondsToDateString(startDate, model.locale, App.dateFormatOptions)
                         : null,
-                    endDate: (model.filter.endDate)
-                        ? secondsToDateString(model.filter.endDate)
+                    endDate: (endDate)
+                        ? secondsToDateString(endDate, model.locale, App.dateFormatOptions)
                         : null,
                 },
             },
@@ -505,8 +510,8 @@ export class StatisticsView extends AppView {
     async selectDateRange(start, end) {
         await this.openFilters();
 
-        const startDate = new Date(fixDate(start));
-        const endDate = new Date(fixDate(end));
+        const startDate = new Date(fixDate(start, this.locale));
+        const endDate = new Date(fixDate(end, this.locale));
 
         this.model.filter.startDate = dateToSeconds(startDate);
         this.model.filter.endDate = dateToSeconds(endDate);

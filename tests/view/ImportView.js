@@ -12,6 +12,7 @@ import {
     asyncMap,
     evaluate,
     formatDate,
+    isValidDateString,
 } from 'jezve-test';
 import { DropDown, Checkbox, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -23,7 +24,7 @@ import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { Counter } from './component/Counter.js';
-import { checkDate, fixFloat } from '../common.js';
+import { fixFloat } from '../common.js';
 import { __ } from '../model/locale.js';
 
 const defaultPagination = {
@@ -98,7 +99,6 @@ export class ImportView extends AppView {
         res.listMenu = { elem: await query(listMenuSelector) };
         if (res.listMenu.elem) {
             await this.parseMenuItems(res, menuItems);
-            res.deleteAllBtn.content.disabled = await hasAttr(res.deleteAllBtn.elem, 'disabled');
 
             res.rulesCheck = await Checkbox.create(this, await query('#rulesCheck'));
             res.similarCheck = await Checkbox.create(this, await query('#similarCheck'));
@@ -148,8 +148,8 @@ export class ImportView extends AppView {
             uploadDialogVisible,
             rulesDialogVisible,
         ] = await evaluate((uploadDialog, rulesDialog) => ([
-            uploadDialog && !uploadDialog.hasAttribute('hidden'),
-            rulesDialog && !rulesDialog.hasAttribute('hidden'),
+            uploadDialog && !uploadDialog.hidden,
+            rulesDialog && !rulesDialog.hidden,
         ]), uploadDialogPopup, rulesDialogPopup);
 
         if (uploadDialogVisible) {
@@ -177,6 +177,8 @@ export class ImportView extends AppView {
         await asyncMap(itemIds, async (id) => {
             res[id] = await Button.create(this, await query(`#${id}`));
             assert(res[id], `Menu item '${id}' not found`);
+            res[id].content.disabled = await hasAttr(res[id].elem, 'disabled');
+
             return res[id];
         });
 
@@ -448,10 +450,11 @@ export class ImportView extends AppView {
         this.model.contextItemIndex = pos.rangeIndex;
         const expected = this.getExpectedState();
 
-        const item = this.itemsList.getItem(pos.rangeIndex);
         await this.performAction(async () => {
+            const item = this.itemsList.getItem(pos.rangeIndex);
             await item.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            await wait('#contextMenu', { visible: true });
+            await this.parse();
         });
 
         return this.checkState(expected);
@@ -505,7 +508,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.rulesCheck.toggle());
+        await this.waitForList(() => this.content.rulesCheck.toggle());
 
         return this.checkState(expected);
     }
@@ -1107,7 +1110,7 @@ export class ImportView extends AppView {
         const destAmount = (isExpense || isDiff)
             ? this.isValidAmount(formModel.destAmount)
             : true;
-        const date = checkDate(formModel.date);
+        const date = isValidDateString(formModel.date, this.locale);
         assert(!(srcAmount && destAmount && date), 'Invalid state');
 
         formModel.validation = {
@@ -1143,7 +1146,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: formatDate(new Date()),
+            date: formatDate(new Date(), App.view.locale, App.dateFormatOptions),
             comment: '',
         });
         this.formIndex = this.items.length;
@@ -1501,6 +1504,8 @@ export class ImportView extends AppView {
 
         await this.openListMenu();
 
+        assert(!this.content.deleteSelectedBtn.content.disabled, '\'Delete all\' menu item is disabled');
+
         const selectedIndexes = [];
         this.items.forEach((item, ind) => {
             if (item.selected) {
@@ -1523,7 +1528,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.deleteSelectedBtn.click());
+        await this.waitForList(() => this.content.deleteSelectedBtn.click());
 
         return this.checkState();
     }
@@ -1531,6 +1536,8 @@ export class ImportView extends AppView {
     async deleteAllItems() {
         this.checkMainState();
         await this.openListMenu();
+
+        assert(!this.content.deleteAllBtn.content.disabled, '\'Delete all\' menu item is disabled');
 
         this.items = [];
         this.formIndex = -1;
@@ -1540,7 +1547,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.deleteAllBtn.click());
+        await this.waitForList(() => this.content.deleteAllBtn.click());
 
         return this.checkState();
     }

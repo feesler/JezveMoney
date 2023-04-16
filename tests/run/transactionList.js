@@ -4,11 +4,10 @@ import {
     baseUrl,
     goTo,
     copyObject,
-    formatDate,
     asArray,
 } from 'jezve-test';
 import { App } from '../Application.js';
-import { fixDate } from '../common.js';
+import { reformatDate } from '../common.js';
 import { TransactionListView } from '../view/TransactionListView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
 import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
@@ -319,8 +318,8 @@ export const filterByDate = async ({ start, end, directNavigate = false }) => {
         await checkNavigation();
     }
 
-    const startDateFmt = formatDate(new Date(fixDate(start)));
-    const endDateFmt = formatDate(new Date(fixDate(end)));
+    const startDateFmt = reformatDate(start, App.view.locale);
+    const endDateFmt = reformatDate(end, App.view.locale);
 
     await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
         await App.view.selectDateRange(start, end, directNavigate);

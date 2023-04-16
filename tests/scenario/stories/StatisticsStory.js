@@ -9,6 +9,7 @@ import {
     Transaction,
 } from '../../model/Transaction.js';
 import * as StatisticsTests from '../../run/statistics.js';
+import { testLocales } from '../../run/locale.js';
 
 export class StatisticsStory extends TestStory {
     async beforeRun() {
@@ -90,6 +91,8 @@ export class StatisticsStory extends TestStory {
         });
         await StatisticsTests.clearDateRange();
 
+        await this.locales();
+
         await this.availability();
     }
 
@@ -120,5 +123,25 @@ export class StatisticsStory extends TestStory {
         await App.view.navigateToStatistics();
 
         await StatisticsTests.checkInitialState();
+    }
+
+    async locales() {
+        setBlock('Statistics view locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        await StatisticsTests.selectDateRange({
+            start: App.datesFmt.yearAgo,
+            end: App.datesFmt.monthAgo,
+        });
+        await StatisticsTests.selectDateRange({
+            start: App.datesFmt.weekAgo,
+            end: App.datesFmt.now,
+        });
+        await StatisticsTests.clearDateRange();
     }
 }

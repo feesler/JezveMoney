@@ -7,6 +7,7 @@ import {
 import { App } from '../Application.js';
 import { convDate, fixFloat } from '../common.js';
 import { __ } from './locale.js';
+import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -412,7 +413,7 @@ export class ImportCondition {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = !!convDate(this.value);
+            res.date = !!convDate(this.value, IMPORT_DATE_LOCALE);
         }
 
         // Check empty condition value is used only for string field
@@ -475,7 +476,7 @@ export class ImportCondition {
             return parseFloat(this.value);
         }
         if (this.isDateField()) {
-            return convDate(this.value);
+            return convDate(this.value, App.goToMainView.locale);
         }
 
         return this.value;

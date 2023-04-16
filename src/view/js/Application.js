@@ -29,7 +29,12 @@ export class Application {
         }
 
         this.config = {
-            dateFormatLocale: 'ru',
+            dateFormatLocale: this.locale,
+            dateFormatOptions: {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            },
         };
 
         // Setup models
@@ -85,12 +90,12 @@ export class Application {
         return this.config.dateFormatLocale;
     }
 
-    formatDate(date) {
+    formatDate(date, locales = this.dateFormatLocale) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }
 
-        return formatDate(date, this.config.dateFormatLocale);
+        return formatDate(date, locales, this.config.dateFormatOptions);
     }
 
     getThemeCookie() {

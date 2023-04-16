@@ -7,6 +7,7 @@ import {
     copyObject,
     asyncMap,
     evaluate,
+    isValidDateString,
 } from 'jezve-test';
 import { Collapsible, DropDown } from 'jezvejs-test';
 import {
@@ -22,7 +23,6 @@ import {
     fixFloat,
     dateStringToSeconds,
     secondsToDateString,
-    convDate,
     trimToDigitsLimit,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
@@ -453,8 +453,8 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_amount = Math.abs(this.getAmountValue(model.destAmount, model.destCurrency));
         }
 
-        const isValidDate = convDate(model.date) !== null;
-        res.date = (isValidDate) ? dateStringToSeconds(model.date) : null;
+        const isValidDate = isValidDateString(model.date, App.view.locale);
+        res.date = (isValidDate) ? dateStringToSeconds(model.date, App.view.locale) : null;
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -895,7 +895,9 @@ export class ImportTransactionForm extends TestComponent {
             },
             dateField: {
                 value: (
-                    (typeof item.date === 'string') ? item.date : secondsToDateString(item.date)
+                    (typeof item.date === 'string')
+                        ? item.date
+                        : secondsToDateString(item.date, App.view.locale, App.dateFormatOptions)
                 ),
                 disabled: false,
                 invFeedback: {

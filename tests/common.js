@@ -1,9 +1,9 @@
 import {
     isDate,
-    isNum,
     isObject,
     assert,
     formatDate,
+    parseDateString,
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
@@ -36,18 +36,10 @@ export const isEmpty = (obj) => {
     return true;
 };
 
-/** Convert date string from DD.MM.YYYY to timestamp */
-export const convDate = (dateStr) => {
-    if (typeof dateStr !== 'string') {
-        return null;
-    }
-
-    const res = Date.parse(dateStr.split('.').reverse().join('-'));
-    if (Number.isNaN(res)) {
-        return null;
-    }
-
-    return res;
+/** Converts date string to timestamp */
+export const convDate = (dateStr, locales = []) => {
+    const date = parseDateString(dateStr, locales);
+    return (isDate(date)) ? date.getTime() : null;
 };
 
 /** Return timestamp for the start of the day */
@@ -59,8 +51,8 @@ export const cutDate = (date) => {
     return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
-// Convert Date object, timestamp or DD.MM.YYYY string to the timestamp of the start of day
-export const fixDate = (date) => {
+/** Convert Date object, timestamp or date string to the timestamp of the start of day */
+export const fixDate = (date, locales = []) => {
     if (isDate(date)) {
         return cutDate(date);
     }
@@ -69,8 +61,13 @@ export const fixDate = (date) => {
         return cutDate(new Date(date));
     }
 
-    return convDate(date);
+    return convDate(date, locales);
 };
+
+/** Parses date from string and format it back */
+export const reformatDate = (str, locales = []) => (
+    formatDate(new Date(fixDate(str, locales)), locales)
+);
 
 /** Converts Date instance to seconds */
 export const dateToSeconds = (date) => {
@@ -80,7 +77,9 @@ export const dateToSeconds = (date) => {
 };
 
 /** Converts date string to seconds */
-export const dateStringToSeconds = (date) => dateToSeconds(new Date(convDate(date)));
+export const dateStringToSeconds = (date, locales = []) => (
+    dateToSeconds(new Date(convDate(date, locales)))
+);
 
 /** Converts seconds to Date instance */
 export const secondsToDate = (seconds) => {
@@ -89,37 +88,9 @@ export const secondsToDate = (seconds) => {
 };
 
 /** Converts seconds to date string */
-export const secondsToDateString = (seconds) => {
+export const secondsToDateString = (seconds, locales = [], options = {}) => {
     assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
-    return formatDate(secondsToDate(seconds));
-};
-
-/** Check string is correct date in dd.mm.yyyy format */
-export const checkDate = (str) => {
-    if (typeof str !== 'string' || !str.length) {
-        return false;
-    }
-
-    const sparr = str.split('.');
-    if (sparr.length !== 3) {
-        return false;
-    }
-
-    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2])) {
-        return false;
-    }
-
-    if (
-        sparr[0] < 1
-        || sparr[0] > 31
-        || sparr[1] < 1
-        || sparr[1] > 12
-        || sparr[2] < 1970
-    ) {
-        return false;
-    }
-
-    return true;
+    return formatDate(secondsToDate(seconds), locales, options);
 };
 
 // Returns the ISO week of the date.

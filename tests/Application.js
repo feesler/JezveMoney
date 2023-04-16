@@ -37,10 +37,41 @@ class Application extends TestApplication {
             yearAgo: new Date(year - 1, month, day),
         };
 
-        this.datesFmt = {};
+        const self = this;
+        this.dateFormatOptions = {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        };
+
+        this.datesFmt = {
+            get now() {
+                return formatDate(self.dates.now, self.view.locale, self.dateFormatOptions);
+            },
+
+            get monthAgo() {
+                return formatDate(self.dates.monthAgo, self.view.locale, self.dateFormatOptions);
+            },
+
+            get weekAgo() {
+                return formatDate(self.dates.weekAgo, self.view.locale, self.dateFormatOptions);
+            },
+
+            get weekAfter() {
+                return formatDate(self.dates.weekAfter, self.view.locale, self.dateFormatOptions);
+            },
+
+            get yesterday() {
+                return formatDate(self.dates.yesterday, self.view.locale, self.dateFormatOptions);
+            },
+
+            get yearAgo() {
+                return formatDate(self.dates.yearAgo, self.view.locale, self.dateFormatOptions);
+            },
+        };
+
         this.datesSec = {};
         Object.keys(this.dates).forEach((key) => {
-            this.datesFmt[key] = formatDate(this.dates[key]);
             this.datesSec[key] = dateToSeconds(this.dates[key]);
         });
 

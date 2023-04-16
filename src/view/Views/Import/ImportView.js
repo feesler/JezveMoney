@@ -14,7 +14,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { createStore } from 'jezvejs/Store';
 
-import { MS_IN_SECOND, timestampFromString, __ } from '../../js/utils.js';
+import { MS_IN_SECOND, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
@@ -397,7 +397,7 @@ class ImportView extends View {
                 return;
             }
 
-            const time = timestampFromString(item.date);
+            const time = item.originalData.date.getTime();
             if (res.start === 0) {
                 res.start = time;
                 res.end = time;
@@ -490,6 +490,7 @@ class ImportView extends View {
         }
 
         this.store.dispatch(actions.deleteSelectedItems());
+        this.setRenderTime();
     }
 
     setListMode(listMode) {
@@ -516,6 +517,7 @@ class ImportView extends View {
     /** Remove all transaction rows */
     removeAllItems() {
         this.store.dispatch(actions.deleteAllItems());
+        this.setRenderTime();
     }
 
     toggleCollapseItem(index) {
@@ -735,6 +737,7 @@ class ImportView extends View {
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
         this.store.dispatch(actions.toggleEnableRules());
+        this.setRenderTime();
     }
 
     /** Check similar transactions checkbox 'change' event handler */

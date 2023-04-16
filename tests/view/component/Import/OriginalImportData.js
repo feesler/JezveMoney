@@ -5,7 +5,7 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { ImportTemplate } from '../../../model/ImportTemplate.js';
+import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
 
 export class OriginalImportData extends TestComponent {
@@ -57,6 +57,8 @@ export class OriginalImportData extends TestComponent {
             transactionAmount: ImportTemplate.amountFix(cont.transactionAmount),
             date: formatDate(
                 ImportTemplate.dateFromString(cont.date),
+                IMPORT_DATE_LOCALE,
+                App.dateFormatOptions,
             ),
         };
 

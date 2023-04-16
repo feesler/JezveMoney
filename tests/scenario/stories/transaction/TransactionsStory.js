@@ -16,6 +16,7 @@ import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
 import * as creditLimitTests from './creditLimit.js';
 import * as AccountTests from '../../../run/account.js';
+import { testLocales } from '../../../run/locale.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
@@ -40,6 +41,7 @@ export class TransactionsStory extends TestStory {
         await this.update();
         await this.updateFromMainView();
         await this.setCategoryFromMainView();
+        await this.locales();
         await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
@@ -929,6 +931,30 @@ export class TransactionsStory extends TestStory {
         setBlock('Handling URL parameters', 1);
 
         await TransactionTests.checkDebtNoAccountURL();
+    }
+
+    async locales() {
+        setBlock('Transaction view locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        const { CARD_RUB } = App.scenario;
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'inputDestAmount', data: '0.01' },
+            { action: 'inputDate', data: App.datesFmt.yesterday },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeDestAccount', data: CARD_RUB },
+            { action: 'inputSrcAmount', data: '99.99' },
+            { action: 'selectDate', data: App.dates.monthAgo },
+        ]);
     }
 
     async availability(directNavigate) {

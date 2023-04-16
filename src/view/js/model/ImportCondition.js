@@ -2,11 +2,12 @@ import {
     copyObject,
     isObject,
     hasFlag,
-    checkDate,
     fixFloat,
+    isValidDateString,
 } from 'jezvejs';
 import { timestampFromString, __ } from '../utils.js';
 import { ListItem } from './ListItem.js';
+import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -391,7 +392,7 @@ export class ImportCondition extends ListItem {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = checkDate(this.value);
+            res.date = isValidDateString(this.value, window.app.locale);
         }
 
         // Check empty condition value is used only for string field
@@ -454,7 +455,7 @@ export class ImportCondition extends ListItem {
             return parseFloat(this.value);
         }
         if (this.isDateField()) {
-            return timestampFromString(this.value);
+            return timestampFromString(this.value, IMPORT_DATE_LOCALE);
         }
 
         return this.value;

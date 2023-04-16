@@ -114,7 +114,7 @@ export class TransactionDetails extends TestComponent {
             },
             dateField: {
                 visible: true,
-                value: secondsToDateString(item.date),
+                value: secondsToDateString(item.date, App.view.local, App.dateFormatOptionse),
             },
             categoryField: {
                 visible: true,
@@ -125,11 +125,11 @@ export class TransactionDetails extends TestComponent {
                 value: item.comment,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate),
+                value: secondsToDateString(item.createdate, App.view.locale, App.dateFormatOptions),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate),
+                value: secondsToDateString(item.updatedate, App.view.locale, App.dateFormatOptions),
                 visible: true,
             },
         };

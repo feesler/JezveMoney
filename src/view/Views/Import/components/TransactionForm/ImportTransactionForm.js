@@ -3,10 +3,10 @@ import {
     enable,
     isFunction,
     insertAfter,
-    checkDate,
     Component,
     getClassName,
     fixFloat,
+    isValidDateString,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -549,7 +549,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = checkDate(transaction.date);
+        const date = isValidDateString(transaction.date, window.app.locale);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {

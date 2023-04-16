@@ -13,6 +13,8 @@ export const tplColumns = [
     'comment',
 ];
 
+export const IMPORT_DATE_LOCALE = 'ru';
+
 /** Import template model */
 export class ImportTemplate {
     constructor(data) {
@@ -40,7 +42,7 @@ export class ImportTemplate {
             tmpDate = tmpDate.substring(0, pos);
         }
 
-        const timestamp = fixDate(tmpDate);
+        const timestamp = fixDate(tmpDate, IMPORT_DATE_LOCALE);
         return (timestamp) ? (new Date(timestamp)) : null;
     }
 
@@ -63,7 +65,7 @@ export class ImportTemplate {
             if (['accountAmount', 'transactionAmount'].includes(column)) {
                 value = ImportTemplate.amountFix(value);
             } else if (column === 'date') {
-                value = formatDate(ImportTemplate.dateFromString(value));
+                value = formatDate(ImportTemplate.dateFromString(value), IMPORT_DATE_LOCALE);
             }
 
             res[column] = value;

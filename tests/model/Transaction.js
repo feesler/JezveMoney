@@ -49,7 +49,7 @@ export class Transaction {
 
     /** Converts transaction date in seconds to date string */
     static formatDate(date) {
-        return secondsToDateString(date);
+        return secondsToDateString(date, App.view.locale, App.dateFormatOptions);
     }
 
     // Try to convert specified short declaration of transaction to full object
