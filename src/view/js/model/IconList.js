@@ -6,11 +6,6 @@ import { Icon } from './Icon.js';
  * @param {object[]} props - array of icons
  */
 export class IconList extends List {
-    /** Static alias for IconList constructor */
-    static create(props) {
-        return new IconList(props);
-    }
-
     /**
      * Create list item from specified object
      * @param {Object} obj

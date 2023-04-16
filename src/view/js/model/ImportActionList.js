@@ -10,10 +10,6 @@ import {
  * @param {object[]} props - array of import action
  */
 export class ImportActionList extends List {
-    static create(props) {
-        return new ImportActionList(props);
-    }
-
     /** Check list has specified action type */
     static findAction(actions, action) {
         const actionType = parseInt(action, 10);
