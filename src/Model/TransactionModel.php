@@ -1969,26 +1969,12 @@ class TransactionModel extends SortableModel
      * Returns label for specified timestamp and group type
      *
      * @param int $time timestamp
-     * @param int $groupType group type
      *
      * @return string|null
      */
-    protected function getLabel(mixed $dateInfo, int $groupType)
+    protected function getLabel(mixed $dateInfo)
     {
-        $time = $dateInfo["time"];
-        if ($groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
-            return date("d.m.Y", $time);
-        }
-
-        if ($groupType == GROUP_BY_MONTH) {
-            return date("m.Y", $time);
-        }
-
-        if ($groupType == GROUP_BY_YEAR) {
-            return date("Y", $time);
-        }
-
-        return null;
+        return $dateInfo["time"];
     }
 
     /**

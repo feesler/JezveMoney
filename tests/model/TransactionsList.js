@@ -8,6 +8,7 @@ import {
     createCSV,
     cutDate,
     getWeek,
+    dateToSeconds,
     MS_IN_SECOND,
 } from '../common.js';
 import { App } from '../Application.js';
@@ -717,28 +718,8 @@ export class TransactionsList extends SortableList {
         return new Date(timestamp);
     }
 
-    getStatisticsLabel(date, groupType) {
-        if (!date) {
-            return null;
-        }
-
-        if (groupType === 'day' || groupType === 'week') {
-            return formatDate(date, App.view.locale);
-        }
-
-        if (groupType === 'month') {
-            const month = date.getMonth() + 1;
-            const monthStr = (month < 10) ? `0${month}` : month;
-            const yearStr = date.getFullYear();
-
-            return `${monthStr}.${yearStr}`;
-        }
-
-        if (groupType === 'year') {
-            return date.getFullYear().toString();
-        }
-
-        return null;
+    getStatisticsLabel(date) {
+        return dateToSeconds(date);
     }
 
     getStatistics(params) {

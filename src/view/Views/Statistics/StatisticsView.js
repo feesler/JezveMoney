@@ -13,7 +13,12 @@ import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
 import { createStore } from 'jezvejs/Store';
 
-import { formatValueShort, normalize, __ } from '../../js/utils.js';
+import {
+    formatValueShort,
+    normalize,
+    __,
+    timeToDate,
+} from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
@@ -239,6 +244,7 @@ class StatisticsView extends View {
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
+            renderXAxisLabel: (value) => this.renderDateLabel(value),
             onItemClick: (target) => this.onSelectDataColumn(target),
         });
         this.chart.append(this.histogram.elem);
@@ -509,8 +515,9 @@ class StatisticsView extends View {
         const header = createElement('div', {
             props: { className: POPUP_HEADER_CLASS, textContent: headerTitle },
         });
+        const seriesTitle = this.renderDateLabel(target.series);
         const series = createElement('div', {
-            props: { className: POPUP_SERIES_CLASS, textContent: target.series },
+            props: { className: POPUP_SERIES_CLASS, textContent: seriesTitle },
         });
 
         return createElement('div', {
@@ -572,6 +579,34 @@ class StatisticsView extends View {
                 }),
             })),
         });
+    }
+
+    renderDateLabel(value) {
+        const state = this.store.getState();
+        const { group } = state.form;
+        const date = timeToDate(value);
+
+        if (group === 'day' || group === 'week') {
+            return window.app.formatDate(date);
+        }
+
+        if (group === 'month') {
+            return window.app.formatDate(
+                date,
+                window.app.dateFormatLocale,
+                { year: 'numeric', month: '2-digit' },
+            );
+        }
+
+        if (group === 'year') {
+            return window.app.formatDate(
+                date,
+                window.app.dateFormatLocale,
+                { year: 'numeric' },
+            );
+        }
+
+        return null;
     }
 
     renderAccountsFilter(state) {
@@ -680,7 +715,7 @@ class StatisticsView extends View {
 
         const { groupName, series, total } = state.selectedColumn;
         this.pieChartHeaderType.textContent = Transaction.getTypeTitle(groupName);
-        this.pieChartHeaderDate.textContent = series;
+        this.pieChartHeaderDate.textContent = this.renderDateLabel(series);
 
         this.pieChartTotalValue.textContent = this.formatValue(total);
         show(this.pieChartTotal, true);

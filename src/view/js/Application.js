@@ -90,12 +90,12 @@ export class Application {
         return this.config.dateFormatLocale;
     }
 
-    formatDate(date, locales = this.dateFormatLocale) {
+    formatDate(date, locales = this.dateFormatLocale, options = this.config.dateFormatOptions) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }
 
-        return formatDate(date, locales, this.config.dateFormatOptions);
+        return formatDate(date, locales, options);
     }
 
     getThemeCookie() {
