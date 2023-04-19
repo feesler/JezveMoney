@@ -23,12 +23,13 @@ const AVAIL_SORT_TYPES = [
 
 const AVAIL_SORT_SETTINGS = ["sort_accounts", "sort_persons", "sort_categories"];
 
-const AVAILABLE_SETTINGS = [...AVAIL_SORT_SETTINGS];
+const AVAILABLE_SETTINGS = [...AVAIL_SORT_SETTINGS, "date_locale"];
 
 const DEFAULT_SETTINGS = [
     "sort_accounts" => SORT_BY_CREATEDATE_ASC,
     "sort_persons" => SORT_BY_CREATEDATE_ASC,
     "sort_categories" => SORT_BY_CREATEDATE_ASC,
+    "date_locale" => DEFAULT_LOCALE,
 ];
 
 /**
@@ -124,9 +125,15 @@ class UserSettingsModel extends CachedTable
             checkFields($params, $avFields, true);
         }
 
-        foreach (AVAIL_SORT_SETTINGS as $settingsName) {
-            if (array_key_exists($settingsName, $params)) {
+        foreach (AVAILABLE_SETTINGS as $settingsName) {
+            if (!array_key_exists($settingsName, $params)) {
+                continue;
+            }
+
+            if (in_array($settingsName, AVAIL_SORT_SETTINGS)) {
                 $res[$settingsName] = $this->validateSortType($params[$settingsName]);
+            } else {
+                $res[$settingsName] = $params[$settingsName];
             }
         }
 

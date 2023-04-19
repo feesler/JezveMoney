@@ -397,7 +397,11 @@ export class ImportCondition extends ListItem {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = isValidDateString(this.value, window.app.locale);
+            res.date = isValidDateString(
+                this.value,
+                window.app.dateFormatLocale,
+                window.app.dateFormatOptions,
+            );
         }
 
         // Check empty condition value is used only for string field

@@ -39,34 +39,38 @@ class Application extends TestApplication {
 
         const self = this;
         this.dateFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
+            dateStyle: 'short',
         };
 
         this.datesFmt = {
             get now() {
-                return formatDate(self.dates.now, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.now, dateLocale, self.dateFormatOptions);
             },
 
             get monthAgo() {
-                return formatDate(self.dates.monthAgo, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.monthAgo, dateLocale, self.dateFormatOptions);
             },
 
             get weekAgo() {
-                return formatDate(self.dates.weekAgo, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.weekAgo, dateLocale, self.dateFormatOptions);
             },
 
             get weekAfter() {
-                return formatDate(self.dates.weekAfter, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.weekAfter, dateLocale, self.dateFormatOptions);
             },
 
             get yesterday() {
-                return formatDate(self.dates.yesterday, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.yesterday, dateLocale, self.dateFormatOptions);
             },
 
             get yearAgo() {
-                return formatDate(self.dates.yearAgo, self.view.locale, self.dateFormatOptions);
+                const dateLocale = self.state.getDateFormatLocale();
+                return formatDate(self.dates.yearAgo, dateLocale, self.dateFormatOptions);
             },
         };
 

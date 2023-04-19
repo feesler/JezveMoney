@@ -323,9 +323,10 @@ export class ImportRulesDialog extends TestComponent {
             };
 
             if (ImportCondition.isDateField(item.field_id)) {
+                const dateLocale = App.state.getDateFormatLocale();
                 condition.value = secondsToDateString(
                     parseInt(condition.value, 10),
-                    App.view.locale,
+                    dateLocale,
                     App.dateFormatOptions,
                 );
             }

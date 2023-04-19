@@ -1110,7 +1110,9 @@ export class ImportView extends AppView {
         const destAmount = (isExpense || isDiff)
             ? this.isValidAmount(formModel.destAmount)
             : true;
-        const date = isValidDateString(formModel.date, this.locale);
+
+        const dateLocale = App.state.getDateFormatLocale();
+        const date = isValidDateString(formModel.date, dateLocale, App.dateFormatOptions);
         assert(!(srcAmount && destAmount && date), 'Invalid state');
 
         formModel.validation = {
@@ -1133,6 +1135,7 @@ export class ImportView extends AppView {
         this.checkMainState();
         await this.openListMenu();
 
+        const dateLocale = App.state.getDateFormatLocale();
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
         const form = new ImportTransaction({
             enabled: true,
@@ -1146,7 +1149,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: formatDate(new Date(), App.view.locale, App.dateFormatOptions),
+            date: formatDate(new Date(), dateLocale, App.dateFormatOptions),
             comment: '',
         });
         this.formIndex = this.items.length;

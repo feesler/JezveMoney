@@ -87,6 +87,7 @@ export class TransactionDetails extends TestComponent {
         const categoryTitle = (category)
             ? category.name
             : __('NO_CATEGORY', App.view.locale);
+        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -114,7 +115,7 @@ export class TransactionDetails extends TestComponent {
             },
             dateField: {
                 visible: true,
-                value: secondsToDateString(item.date, App.view.local, App.dateFormatOptionse),
+                value: secondsToDateString(item.date, dateLocale, App.dateFormatOptions),
             },
             categoryField: {
                 visible: true,
@@ -125,11 +126,11 @@ export class TransactionDetails extends TestComponent {
                 value: item.comment,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
         };

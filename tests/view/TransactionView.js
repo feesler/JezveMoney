@@ -9,11 +9,11 @@ import {
     isObject,
     copyObject,
     formatDate,
+    isValidDateString,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import {
-    convDate,
     correct,
     correctExch,
     normalize,
@@ -22,6 +22,7 @@ import {
     trimToDigitsLimit,
     EXCHANGE_PRECISION,
     dateStringToSeconds,
+    reformatDate,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
@@ -460,8 +461,8 @@ export class TransactionView extends AppView {
     }
 
     isValidDate(value) {
-        const timestamp = convDate(value, this.locale);
-        return timestamp > 0;
+        const dateLocale = this.appState().getDateFormatLocale();
+        return isValidDateString(value, dateLocale, App.dateFormatOptions);
     }
 
     isValid() {
@@ -501,6 +502,7 @@ export class TransactionView extends AppView {
 
     getExpectedTransaction() {
         const res = {};
+        const dateLocale = this.appState().getDateFormatLocale();
 
         if (this.model.isUpdate) {
             res.id = this.model.id;
@@ -524,7 +526,7 @@ export class TransactionView extends AppView {
         res.dest_amount = this.getExpectedDestAmount();
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
-        res.date = dateStringToSeconds(this.model.date, this.locale);
+        res.date = dateStringToSeconds(this.model.date, dateLocale, App.dateFormatOptions);
         res.category_id = this.model.categoryId;
         res.comment = this.model.comment;
 
@@ -617,9 +619,10 @@ export class TransactionView extends AppView {
                 res.exchangeInfo.value = this.model.fmtExch;
             }
 
+            const dateLocale = this.appState().getDateFormatLocale();
             res.datePicker = {
                 visible: true,
-                value: this.model.date,
+                value: reformatDate(this.model.date, dateLocale, App.dateFormatOptions),
                 isInvalid: this.model.dateInvalidated,
             };
 
@@ -2579,7 +2582,8 @@ export class TransactionView extends AppView {
     async selectDate(val) {
         assert.isDate(val, 'Invalid date');
 
-        this.model.date = formatDate(val, this.locale, App.dateFormatOptions);
+        const dateLocale = this.appState().getDateFormatLocale();
+        this.model.date = formatDate(val, dateLocale, App.dateFormatOptions);
         this.model.dateInvalidated = false;
         this.expectedState = this.getExpectedState();
 

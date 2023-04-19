@@ -79,6 +79,7 @@ export class AccountDetails extends TestComponent {
         });
 
         const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
+        const dateLocale = state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -115,11 +116,11 @@ export class AccountDetails extends TestComponent {
                 visible: true,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
         };

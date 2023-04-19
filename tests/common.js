@@ -4,6 +4,7 @@ import {
     assert,
     formatDate,
     parseDateString,
+    getLocaleDateFormat,
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
@@ -37,8 +38,8 @@ export const isEmpty = (obj) => {
 };
 
 /** Converts date string to timestamp */
-export const convDate = (dateStr, locales = []) => {
-    const date = parseDateString(dateStr, locales);
+export const convDate = (dateStr, locales = [], options = {}) => {
+    const date = parseDateString(dateStr, locales, options);
     return (isDate(date)) ? date.getTime() : null;
 };
 
@@ -52,7 +53,7 @@ export const cutDate = (date) => {
 };
 
 /** Convert Date object, timestamp or date string to the timestamp of the start of day */
-export const fixDate = (date, locales = []) => {
+export const fixDate = (date, locales = [], options = {}) => {
     if (isDate(date)) {
         return cutDate(date);
     }
@@ -61,13 +62,32 @@ export const fixDate = (date, locales = []) => {
         return cutDate(new Date(date));
     }
 
-    return convDate(date, locales);
+    return convDate(date, locales, options);
 };
 
 /** Parses date from string and format it back */
-export const reformatDate = (str, locales = []) => (
-    formatDate(new Date(fixDate(str, locales)), locales)
-);
+export const reformatDate = (str, locales = [], options = {}) => {
+    const format = getLocaleDateFormat(locales, options);
+    const inputFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: (format.yearLength === 2) ? '2-digit' : 'numeric',
+    };
+
+    const fixedDate = fixDate(str, locales, options);
+    if (!fixedDate) {
+        return str;
+    }
+
+    let res = formatDate(new Date(fixedDate), locales, inputFormatOptions);
+
+    if (res.endsWith(format.separator)) {
+        const length = res.lastIndexOf(format.separator);
+        res = res.substring(0, length);
+    }
+
+    return res;
+};
 
 /** Converts Date instance to seconds */
 export const dateToSeconds = (date) => {
@@ -77,8 +97,8 @@ export const dateToSeconds = (date) => {
 };
 
 /** Converts date string to seconds */
-export const dateStringToSeconds = (dateStr, locales = []) => {
-    const date = parseDateString(dateStr, locales);
+export const dateStringToSeconds = (dateStr, locales = [], options = {}) => {
+    const date = parseDateString(dateStr, locales, options);
     return (isDate(date)) ? dateToSeconds(date) : null;
 };
 

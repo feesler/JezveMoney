@@ -31,6 +31,7 @@ import * as ImportTests from '../../../run/import/index.js';
 import * as ImportRuleApiTests from '../../../run/api/importrule.js';
 import { testLocales } from '../../../run/locale.js';
 import { App } from '../../../Application.js';
+import { testDateLocales } from '../../../run/settings.js';
 
 export class ImportRulesStory extends TestStory {
     async beforeRun() {
@@ -554,6 +555,7 @@ export class ImportRulesStory extends TestStory {
         setBlock('Import rules locales', 1);
 
         await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

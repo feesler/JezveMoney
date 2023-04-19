@@ -9,6 +9,7 @@
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
+        "test-implst": "node ./tests/index.js importList",
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
@@ -66,8 +67,8 @@
         "image-minimizer-webpack-plugin": "^3.8.2",
         "imagemin": "^8.0.1",
         "imagemin-svgo": "^10.0.1",
-        "jezve-test": "^1.6.2",
-        "jezvejs-test": "^1.7.6",
+        "jezve-test": "^1.6.3",
+        "jezvejs-test": "^1.7.7",
         "mini-css-extract-plugin": "^2.7.5",
         "node-fetch": "^3.3.1",
         "npm-run-all": "^4.1.5",
@@ -89,7 +90,7 @@
     "dependencies": {
         "@babel/runtime": "^7.21.0",
         "core-js": "^3.30.1",
-        "jezvejs": "^1.92.0",
+        "jezvejs": "^1.92.2",
         "whatwg-fetch": "^3.6.2"
     }
 }

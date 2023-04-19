@@ -103,8 +103,9 @@ export const groupByYear = async () => {
 };
 
 export const selectDateRange = async ({ start, end }) => {
-    const startDateFmt = reformatDate(start, App.view.locale);
-    const endDateFmt = reformatDate(end, App.view.locale);
+    const dateLocale = App.state.getDateFormatLocale();
+    const startDateFmt = reformatDate(start, dateLocale, App.dateFormatOptions);
+    const endDateFmt = reformatDate(end, dateLocale, App.dateFormatOptions);
 
     await checkNavigation();
     await test(

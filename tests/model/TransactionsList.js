@@ -24,6 +24,7 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
+import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
 const WEEKS_IN_YEAR = 52;
 const MONTHS_IN_YEAR = 12;
@@ -562,7 +563,7 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            Transaction.formatDate(transaction.date),
+            Transaction.formatDate(transaction.date, IMPORT_DATE_LOCALE),
             transaction.comment,
         ]);
 

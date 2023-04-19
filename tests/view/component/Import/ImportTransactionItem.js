@@ -329,7 +329,8 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_amount = res.src_amount;
         }
 
-        res.date = dateStringToSeconds(model.date, App.view.locale);
+        const dateLocale = App.state.getDateFormatLocale();
+        res.date = dateStringToSeconds(model.date, dateLocale, App.dateFormatOptions);
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -434,6 +435,7 @@ export class ImportTransactionItem extends TestComponent {
 
         const category = state.categories.getItem(item.category_id);
         const categoryName = (item.category_id === 0) ? '' : category.name;
+        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             enabled: item.enabled,
@@ -455,7 +457,7 @@ export class ImportTransactionItem extends TestComponent {
                 visible: isDebt,
             },
             dateField: {
-                value: secondsToDateString(item.date, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.date, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
             categoryField: {

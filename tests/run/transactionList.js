@@ -318,8 +318,9 @@ export const filterByDate = async ({ start, end, directNavigate = false }) => {
         await checkNavigation();
     }
 
-    const startDateFmt = reformatDate(start, App.view.locale);
-    const endDateFmt = reformatDate(end, App.view.locale);
+    const dateLocale = App.state.getDateFormatLocale();
+    const startDateFmt = reformatDate(start, dateLocale, App.dateFormatOptions);
+    const endDateFmt = reformatDate(end, dateLocale, App.dateFormatOptions);
 
     await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
         await App.view.selectDateRange(start, end, directNavigate);

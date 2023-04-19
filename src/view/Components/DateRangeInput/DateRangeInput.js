@@ -142,8 +142,12 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const stdate = (data.stdate) ? window.app.formatDate(timeToDate(data.stdate)) : null;
-        const enddate = (data.enddate) ? window.app.formatDate(timeToDate(data.enddate)) : null;
+        const stdate = (data.stdate)
+            ? window.app.formatInputDate(timeToDate(data.stdate))
+            : null;
+        const enddate = (data.enddate)
+            ? window.app.formatInputDate(timeToDate(data.enddate))
+            : null;
 
         this.setState({
             form: { stdate, enddate },
@@ -172,8 +176,8 @@ export class DateRangeInput extends Component {
             return;
         }
 
-        const stdate = window.app.formatDate(range.start);
-        const enddate = window.app.formatDate(range.end);
+        const stdate = window.app.formatInputDate(range.start);
+        const enddate = window.app.formatInputDate(range.end);
         if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
             return;
         }
@@ -307,7 +311,7 @@ export class DateRangeInput extends Component {
         const { stdate, enddate } = state.filter;
         const isDateFilter = !!(stdate && enddate);
         if (isDateFilter) {
-            this.datePicker.setSelection(stdate, enddate);
+            this.datePicker.setSelection(fixDate(stdate), fixDate(enddate));
         } else {
             this.datePicker.clearSelection();
         }

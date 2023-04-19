@@ -5,6 +5,7 @@ import {
     isDate,
     formatDate,
     isFunction,
+    getLocaleDateFormat,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 import { parseCookies, setCookie, __ } from './utils.js';
@@ -31,9 +32,7 @@ export class Application {
         this.config = {
             dateFormatLocale: this.locale,
             dateFormatOptions: {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
+                dateStyle: 'short',
             },
         };
 
@@ -43,6 +42,9 @@ export class Application {
 
         if (this.props.profile) {
             this.model.profile = { ...this.props.profile };
+
+            const { settings } = this.model.profile;
+            this.config.dateFormatLocale = settings.date_locale;
         }
 
         this.notification = null;
@@ -90,12 +92,35 @@ export class Application {
         return this.config.dateFormatLocale;
     }
 
-    formatDate(date, locales = this.dateFormatLocale, options = this.config.dateFormatOptions) {
+    get dateFormatOptions() {
+        return this.config.dateFormatOptions;
+    }
+
+    formatDate(date, locales = this.dateFormatLocale, options = this.dateFormatOptions) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }
 
         return formatDate(date, locales, options);
+    }
+
+    formatInputDate(date, locales = this.dateFormatLocale, options = this.dateFormatOptions) {
+        const format = getLocaleDateFormat(locales, options);
+        const inputFormatOptions = {
+            day: '2-digit',
+            month: '2-digit',
+            year: (format.yearLength === 2) ? '2-digit' : 'numeric',
+        };
+
+        let res = this.formatDate(date, locales, inputFormatOptions);
+        res = res.trim();
+
+        if (res.endsWith(format.separator)) {
+            const length = res.lastIndexOf(format.separator);
+            res = res.substring(0, length);
+        }
+
+        return res;
     }
 
     getThemeCookie() {

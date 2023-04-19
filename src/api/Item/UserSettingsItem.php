@@ -9,6 +9,7 @@ class UserSettingsItem
     public $sort_accounts = 0;
     public $sort_persons = 0;
     public $sort_categories = 0;
+    public $date_locale = "en";
 
     /**
      * Converts table row from database to UserSettingsItem object
@@ -29,6 +30,7 @@ class UserSettingsItem
         $res->sort_accounts = intval($row["sort_accounts"]);
         $res->sort_persons = intval($row["sort_persons"]);
         $res->sort_categories = intval($row["sort_categories"]);
+        $res->date_locale = $row["date_locale"];
 
         return $res;
     }
@@ -44,6 +46,7 @@ class UserSettingsItem
         $res->sort_accounts = $this->sort_accounts;
         $res->sort_persons = $this->sort_persons;
         $res->sort_categories = $this->sort_categories;
+        $res->date_locale = $this->date_locale;
 
         return $res;
     }

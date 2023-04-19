@@ -8,6 +8,7 @@ import {
 import * as Actions from '../../run/transactionList.js';
 import { testLocales } from '../../run/locale.js';
 import { App } from '../../Application.js';
+import { testDateLocales } from '../../run/settings.js';
 
 export class TransactionListStory extends TestStory {
     async beforeRun() {
@@ -152,6 +153,7 @@ export class TransactionListStory extends TestStory {
         setBlock('Transaction list view locales', 1);
 
         await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

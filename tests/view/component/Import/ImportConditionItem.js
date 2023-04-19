@@ -74,7 +74,8 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = currency.id;
             } else if (ImportCondition.isDateField(field.id)) {
-                res.value = dateStringToSeconds(value, App.view.locale);
+                const dateLocale = App.state.getDateFormatLocale();
+                res.value = dateStringToSeconds(value, dateLocale, App.dateFormatOptions);
             } else {
                 res.value = value;
             }
@@ -125,7 +126,8 @@ export class ImportConditionItem extends TestComponent {
             value = currency.code;
         } else if (ImportCondition.isDateField(model.fieldType)) {
             const time = parseInt(model.value, 10);
-            value = secondsToDateString(time, App.view.locale, App.dateFormatOptions);
+            const dateLocale = App.state.getDateFormatLocale();
+            value = secondsToDateString(time, dateLocale, App.dateFormatOptions);
         } else {
             value = model.value;
         }

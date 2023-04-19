@@ -39,6 +39,15 @@
                             <div id="userCurrenciesContainer">
                             </div>
                         </section>
+
+                        <section class="settings-block">
+                            <header id="dateFormatHeading" class="heading">
+                                <h2><?= __("SETTINGS_DATE_FORMAT") ?></h2>
+                                <div class="heading-actions"></div>
+                            </header>
+                            <div id="dateFormatContainer">
+                            </div>
+                        </section>
                     </main>
                 </div>
             </div>

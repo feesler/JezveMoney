@@ -48,8 +48,9 @@ export class Transaction {
     }
 
     /** Converts transaction date in seconds to date string */
-    static formatDate(date) {
-        return secondsToDateString(date, App.view.locale, App.dateFormatOptions);
+    static formatDate(date, locales = []) {
+        const dateLocale = (locales.length === 0) ? App.state.getDateFormatLocale() : locales;
+        return secondsToDateString(date, dateLocale, App.dateFormatOptions);
     }
 
     // Try to convert specified short declaration of transaction to full object

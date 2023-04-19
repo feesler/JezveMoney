@@ -69,6 +69,15 @@ export class SettingsView extends AppView {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
+        // Date format
+        res.dateRenderTime = await evaluate(() => {
+            const el = document.getElementById('dateFormatContainer');
+            return el?.dataset?.time;
+        });
+
+        const dateLocaleDropDownEl = await query('#dateFormatContainer .dd__container');
+        res.dateLocaleDropDown = await DropDown.create(this, dateLocaleDropDownEl);
+
         res.loadingIndicator = { elem: await query('#userCurrenciesContainer .loading-indicator') };
 
         return res;
@@ -102,6 +111,8 @@ export class SettingsView extends AppView {
                 mode: cont.currenciesList.mode,
                 renderTime: cont.currenciesList.renderTime,
             },
+            dateLocale: cont.dateLocaleDropDown.value,
+            dateRenderTime: cont.dateRenderTime,
         };
 
         return res;
@@ -136,6 +147,10 @@ export class SettingsView extends AppView {
 
                     return expectedItem;
                 }),
+            },
+            dateLocaleDropDown: {
+                visible: true,
+                value: model.dateLocale,
             },
         };
 
@@ -206,6 +221,24 @@ export class SettingsView extends AppView {
             return (
                 !this.model.loading
                 && prevTime !== this.model.currenciesList.renderTime
+            );
+        });
+
+        await this.parse();
+    }
+
+    async waitForDateFormat(action) {
+        await this.parse();
+
+        const prevTime = this.model.dateRenderTime;
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.dateRenderTime
             );
         });
 
@@ -384,6 +417,15 @@ export class SettingsView extends AppView {
         const expected = this.getExpectedState();
 
         await this.waitForList(() => this.content.deleteBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async selectDateLocale(locale) {
+        this.model.dateLocale = locale;
+        const expected = this.getExpectedState();
+
+        await this.waitForDateFormat(() => this.content.dateLocaleDropDown.setSelection(locale));
 
         return this.checkState(expected);
     }

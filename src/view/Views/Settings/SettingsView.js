@@ -43,6 +43,8 @@ class SettingsView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
 
+        const { settings } = window.app.model.profile;
+
         const initialState = {
             ...this.props,
             userCurrencies: createItemsFromModel(),
@@ -52,6 +54,8 @@ class SettingsView extends View {
             showMenu: false,
             showContextMenu: false,
             contextItem: null,
+            dateLocale: settings.date_locale,
+            dateRenderTime: Date.now(),
         };
 
         this.store = createStore(reducer, { initialState });
@@ -64,6 +68,7 @@ class SettingsView extends View {
             'themeSwitch',
             'userCurrenciesHeading',
             'userCurrenciesContainer',
+            'dateFormatContainer',
         ]);
 
         // Locale select
@@ -135,6 +140,35 @@ class SettingsView extends View {
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
+
+        // Date format
+        this.dateFormatSelect = DropDown.create({
+            onItemSelect: (sel) => this.onDateFormatSelect(sel),
+            data: [
+                { id: 'ru', title: 'dd.MM.YYYY' },
+                { id: 'lt', title: 'YYYY-MM-dd' },
+                { id: 'fr', title: 'dd/MM/YYYY' },
+                { id: 'ar', title: 'dYYYY/M/' },
+                { id: 'es', title: 'd/M/YY' },
+                { id: 'zh', title: 'YYYY/M/d' },
+                { id: 'hr', title: 'dd. MM. YYYY.' },
+                { id: 'uk', title: 'dd.MM.YY' },
+                { id: 'nl', title: 'dd-MM-YYYY' },
+                { id: 'en', title: 'M/d/YY' },
+                { id: 'fi', title: 'd.M.YYYY' },
+                { id: 'hu', title: 'YYYY. MM. dd.' },
+                { id: 'it', title: 'dd/MM/YY' },
+                { id: 'ja', title: 'YYYY/MM/dd' },
+                { id: 'ko', title: 'YY. MM. dd.' },
+                { id: 'ms', title: 'd/MM/YY' },
+                { id: 'pl', title: 'd.MM.YYYY' },
+                { id: 'sr', title: 'd.MM.YY.' },
+                { id: 'sk', title: 'd. MM. YYYY.' },
+                { id: 'sl', title: 'd. MM. YY' },
+                { id: 'te', title: 'dd-MM-YY' },
+            ],
+        });
+        this.dateFormatContainer.append(this.dateFormatSelect.elem);
 
         this.subscribeToStore(this.store);
     }
@@ -250,6 +284,10 @@ class SettingsView extends View {
 
     stopLoading() {
         this.store.dispatch(actions.stopLoading());
+    }
+
+    setDateRenderTime() {
+        this.store.dispatch(actions.setDateRenderTime());
     }
 
     setListMode(listMode) {
@@ -412,6 +450,33 @@ class SettingsView extends View {
         this.stopLoading();
     }
 
+    onDateFormatSelect(format) {
+        this.requestDateLocale(format.id);
+    }
+
+    async requestDateLocale(locale) {
+        const { settings } = window.app.model.profile;
+        if (settings.date_locale === locale) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.profile.updateSettings({
+                date_locale: locale,
+            });
+            settings.date_locale = locale;
+
+            this.store.dispatch(actions.changeDateLocale(locale));
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setDateRenderTime();
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
@@ -511,6 +576,11 @@ class SettingsView extends View {
         }));
     }
 
+    renderDateFormat(state) {
+        this.dateFormatSelect.selectItem(state.dateLocale);
+        this.dateFormatContainer.dataset.time = state.dateRenderTime;
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -524,6 +594,7 @@ class SettingsView extends View {
         this.renderUserCurrenciesList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);
+        this.renderDateFormat(state);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

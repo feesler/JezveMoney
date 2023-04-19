@@ -1,6 +1,7 @@
 import {
     fixFloat,
     isDate,
+    isEmpty,
     isObject,
     parseDateString,
     shiftDate,
@@ -60,12 +61,13 @@ export const leadZero = (val) => {
 };
 
 /** Convert date string to timestamp */
-export const fixDate = (str, locales = []) => {
+export const fixDate = (str, locales = [], options = {}) => {
     if (typeof str !== 'string') {
         return null;
     }
-    const locale = (locales.length === 0) ? window.app.locale : locales;
-    const res = parseDateString(str, locale);
+    const locale = (locales.length === 0) ? window.app.dateFormatLocale : locales;
+    const formatOptions = (isEmpty(options)) ? window.app.dateFormatOptions : options;
+    const res = parseDateString(str, locale, formatOptions);
     if (Number.isNaN(res)) {
         return null;
     }
@@ -74,7 +76,7 @@ export const fixDate = (str, locales = []) => {
 };
 
 /** Convert date string to timestamp */
-export const timestampFromString = (str, locales = []) => {
+export const timestampFromString = (str, locales = [], options = {}) => {
     if (typeof str === 'number') {
         return str;
     }
@@ -91,7 +93,7 @@ export const timestampFromString = (str, locales = []) => {
         tmpDate = tmpDate.substring(0, pos);
     }
 
-    return fixDate(tmpDate, locales);
+    return fixDate(tmpDate, locales, options);
 };
 
 /** Returns Unix timestamp in seconds for specified date */
@@ -104,8 +106,8 @@ export const getSeconds = (date) => {
 };
 
 /** Convert date string to Unix timestamp in seconds */
-export const dateStringToTime = (value) => {
-    const res = fixDate(value);
+export const dateStringToTime = (value, locales = [], options = {}) => {
+    const res = fixDate(value, locales, options);
     return (res) ? getSeconds(res) : null;
 };
 

@@ -420,7 +420,8 @@ export class ImportCondition {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = isValidDateString(this.value, App.view.locale);
+            const dateLocale = App.state.getDateFormatLocale();
+            res.date = isValidDateString(this.value, dateLocale, App.dateFormatOptions);
         }
 
         // Check empty condition value is used only for string field

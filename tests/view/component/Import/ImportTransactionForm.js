@@ -24,6 +24,7 @@ import {
     dateStringToSeconds,
     secondsToDateString,
     trimToDigitsLimit,
+    reformatDate,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
@@ -290,6 +291,8 @@ export class ImportTransactionForm extends TestComponent {
             .getCategoriesForType(realType)
             .map((item) => ({ id: item.id.toString() }));
 
+        const dateLocale = App.state.getDateFormatLocale();
+
         const res = {
             typeField: {
                 disabled: false,
@@ -325,7 +328,7 @@ export class ImportTransactionForm extends TestComponent {
                 disabled: !isDebt,
             },
             dateField: {
-                value: model.date.toString(),
+                value: reformatDate(model.date, dateLocale, App.dateFormatOptions),
                 disabled: false,
                 visible: true,
                 button: {
@@ -453,8 +456,11 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_amount = Math.abs(this.getAmountValue(model.destAmount, model.destCurrency));
         }
 
-        const isValidDate = isValidDateString(model.date, App.view.locale);
-        res.date = (isValidDate) ? dateStringToSeconds(model.date, App.view.locale) : null;
+        const dateLocale = App.state.getDateFormatLocale();
+        const isValidDate = isValidDateString(model.date, dateLocale, App.dateFormatOptions);
+        res.date = (isValidDate)
+            ? dateStringToSeconds(model.date, dateLocale, App.dateFormatOptions)
+            : null;
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -859,9 +865,12 @@ export class ImportTransactionForm extends TestComponent {
         const isDebt = (item.type === 'debt_out' || item.type === 'debt_in');
         const isLimit = (item.type === 'limit');
         const isDiff = (item.src_curr !== item.dest_curr);
-
         const showSrcAmount = (!isExpense && !isLimit) || isDiff;
         const showDestAmount = isExpense || isLimit || isDiff;
+        const dateLocale = App.state.getDateFormatLocale();
+        const dateStr = (typeof item.date === 'string')
+            ? item.date
+            : secondsToDateString(item.date, dateLocale, App.dateFormatOptions);
 
         const res = {
             typeField: { disabled: false },
@@ -894,11 +903,7 @@ export class ImportTransactionForm extends TestComponent {
                 disabled: !isDebt,
             },
             dateField: {
-                value: (
-                    (typeof item.date === 'string')
-                        ? item.date
-                        : secondsToDateString(item.date, App.view.locale, App.dateFormatOptions)
-                ),
+                value: reformatDate(dateStr, dateLocale, App.dateFormatOptions),
                 disabled: false,
                 invFeedback: {
                     visible: false,

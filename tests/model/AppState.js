@@ -38,7 +38,7 @@ import { ImportCondition } from './ImportCondition.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = sortSettings;
+const availSettings = [...sortSettings, 'date_locale'];
 
 /** Accounts */
 const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
@@ -330,6 +330,10 @@ export class AppState {
     deleteProfile() {
         this.resetAll();
         delete this.profile;
+    }
+
+    getDateFormatLocale() {
+        return this.profile.settings.date_locale;
     }
 
     getCurrencies() {
@@ -2014,7 +2018,8 @@ export class AppState {
             };
 
             if (ImportCondition.isDateField(item.field_id)) {
-                const time = dateStringToSeconds(item.value, App.view.locale);
+                const dateLocale = this.getDateFormatLocale();
+                const time = dateStringToSeconds(item.value, dateLocale, App.dateFormatOptions);
                 condition.value = time?.toString() ?? null;
             }
 

@@ -3,6 +3,7 @@ import * as ImportTests from '../../../run/import/index.js';
 import { App } from '../../../Application.js';
 import { api } from '../../../model/api.js';
 import { testLocales } from '../../../run/locale.js';
+import { testDateLocales } from '../../../run/settings.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {
@@ -596,6 +597,7 @@ export class ImportListStory extends TestStory {
         setBlock('Import view locales', 1);
 
         await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

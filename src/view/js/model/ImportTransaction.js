@@ -826,6 +826,14 @@ export class ImportTransaction {
             valid = (startFromDest) ? this.validateSourceAmount() : this.validateDestAmount();
         }
 
-        return (valid && isValidDateString(this.date, window.app.locale));
+        if (valid) {
+            valid = isValidDateString(
+                this.date,
+                window.app.dateFormatLocale,
+                window.app.dateFormatOptions,
+            );
+        }
+
+        return valid;
     }
 }

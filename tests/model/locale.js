@@ -7,6 +7,30 @@ export const tokensMap = {
     ru: ruTokens,
 };
 
+export const dateFormatLocales = {
+    ru: 'dd.MM.YYYY',
+    lt: 'YYYY-MM-dd',
+    fr: 'dd/MM/YYYY',
+    ar: 'dYYYY/M/',
+    es: 'd/M/YY',
+    zh: 'YYYY/M/d',
+    hr: 'dd. MM. YYYY.',
+    uk: 'dd.MM.YY',
+    nl: 'dd-MM-YYYY',
+    en: 'M/d/YY',
+    fi: 'd.M.YYYY',
+    hu: 'YYYY. MM. dd.',
+    it: 'dd/MM/YY',
+    ja: 'YYYY/MM/dd',
+    ko: 'YY. MM. dd.',
+    ms: 'd/MM/YY',
+    pl: 'd.MM.YYYY',
+    sr: 'd.MM.YY.',
+    sk: 'd. MM. YYYY.',
+    sl: 'd. MM. YY',
+    te: 'dd-MM-YY',
+};
+
 /** Returns true if specified token is exists */
 export const hasToken = (token, locale = 'en') => (
     (typeof token === 'string')

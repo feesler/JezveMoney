@@ -17,6 +17,7 @@ import * as debtTests from './debt.js';
 import * as creditLimitTests from './creditLimit.js';
 import * as AccountTests from '../../../run/account.js';
 import { testLocales } from '../../../run/locale.js';
+import { testDateLocales } from '../../../run/settings.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
@@ -174,7 +175,7 @@ export class TransactionsStory extends TestStory {
         // Try to submit expense with invalid date
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: '01.01.69' },
+            { action: 'inputDate', data: '' },
         ]);
     }
 
@@ -937,6 +938,7 @@ export class TransactionsStory extends TestStory {
         setBlock('Transaction view locales', 1);
 
         await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

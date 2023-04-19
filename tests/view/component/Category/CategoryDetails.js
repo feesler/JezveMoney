@@ -79,6 +79,7 @@ export class CategoryDetails extends TestComponent {
         const itemTransactions = state.transactions.applyFilter({
             categories: item.id,
         });
+        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -107,11 +108,11 @@ export class CategoryDetails extends TestComponent {
             },
             transactionsLink: { visible: true },
             createDateField: {
-                value: secondsToDateString(item.createdate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, App.view.locale, App.dateFormatOptions),
+                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
                 visible: true,
             },
         };
