@@ -241,6 +241,10 @@ class AccountModel extends SortableModel
             unset($res["initlimit"]);
         }
 
+        if (isset($res["type"]) && $res["type"] != $item->type) {
+            $this->limitUpdated = true;
+        }
+
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

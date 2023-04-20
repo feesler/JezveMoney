@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { assert, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import {
     ACCOUNT_HIDDEN,
@@ -35,11 +35,15 @@ const create = async () => {
         icon_id: 5,
     }];
 
+    const res = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    // Double check all accounts are created
+    res.forEach((item) => assert(item, 'Failed to create account'));
+
     [
         App.scenario.ACC_RUB,
         App.scenario.CASH_RUB,
         App.scenario.ACC_USD,
-    ] = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    ] = res;
 };
 
 const createWithChainedRequest = async () => {
@@ -67,10 +71,14 @@ const createWithChainedRequest = async () => {
         },
     }];
 
+    const res = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    // Double check all accounts are created
+    res.forEach((item) => assert(item, 'Failed to create account'));
+
     [
         App.scenario.ACC_CHAINED_RUB,
         App.scenario.ACC_CHAINED_USD,
-    ] = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    ] = res;
 };
 
 const createInvalid = async () => {
@@ -137,7 +145,7 @@ const createInvalid = async () => {
 const createMultiple = async () => {
     setBlock('Create multiple accounts', 2);
 
-    const { RUB, USD } = App.scenario;
+    const { RUB, USD, BTC } = App.scenario;
 
     const data = [{
         type: ACCOUNT_TYPE_CASH,
@@ -157,13 +165,25 @@ const createMultiple = async () => {
         initbalance: 100,
         initlimit: 100,
         icon_id: 5,
+    }, {
+        type: ACCOUNT_TYPE_CREDIT_CARD,
+        name: 'BTC_CREDIT',
+        curr_id: BTC,
+        initbalance: 0.123456,
+        initlimit: 0.125,
+        icon_id: 3,
     }];
+
+    const res = await AccountApiTests.createMultiple(data);
+    // Double check all accounts are created
+    res.forEach((item) => assert(item, 'Failed to create account'));
 
     [
         App.scenario.ACCOUNT_1,
         App.scenario.ACCOUNT_2,
         App.scenario.ACCOUNT_3,
-    ] = await AccountApiTests.createMultiple(data);
+        App.scenario.BTC_CREDIT,
+    ] = res;
 };
 
 const createMultipleInvalid = async () => {
@@ -243,7 +263,9 @@ const update = async () => {
         type: ACCOUNT_TYPE_CREDIT,
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    const res = await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    // Double check all accounts are updated
+    res.forEach((item) => assert(item, 'Failed to update account'));
 };
 
 const updateWithChainedRequest = async () => {
@@ -263,7 +285,9 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    const res = await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    // Double check all accounts are created
+    res.forEach((item) => assert(item, 'Failed to create account'));
 };
 
 const updateInvalid = async () => {

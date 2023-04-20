@@ -17,10 +17,12 @@ const create = async () => {
         RUB,
         USD,
         EUR,
+        BTC,
         ACC_RUB,
         ACC_USD,
         CASH_RUB,
         ACCOUNT_3,
+        BTC_CREDIT,
         PERSON_X,
         PERSON_Y,
         FOOD_CATEGORY,
@@ -138,6 +140,14 @@ const create = async () => {
         src_curr: USD,
         dest_curr: USD,
     }, {
+        type: LIMIT_CHANGE,
+        src_id: BTC_CREDIT,
+        dest_id: 0,
+        src_amount: 0.01,
+        dest_amount: 0.01,
+        src_curr: BTC,
+        dest_curr: BTC,
+    }, {
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 123,
@@ -169,6 +179,7 @@ const create = async () => {
         App.scenario.TR_DEBT_6,
         App.scenario.TR_DEBT_7,
         App.scenario.TR_LIMIT_1,
+        App.scenario.TR_LIMIT_2,
     ] = res;
 };
 

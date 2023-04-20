@@ -788,7 +788,7 @@ export class AppState {
             return false;
         }
 
-        const currency = App.currency.getItem(params.curr_id);
+        const currency = App.currency.getItem(expAccount.curr_id);
         if (!currency) {
             return false;
         }
