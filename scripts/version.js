@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { isFunction } from 'jezvejs';
 
 /* eslint-disable no-console */
 
@@ -9,18 +8,28 @@ const getPackageVersion = (fileName) => {
     return json.version;
 };
 
-const updateFile = (fileName, ver) => {
-    if (!Array.isArray(ver)) {
+const updateFile = (fileName, version) => {
+    if (typeof version !== 'string' || version.length === 0) {
         throw new Error('Invalid version argument');
     }
 
     const content = readFileSync(fileName);
     const strContent = content.toString();
+    const expr = /"version"\s*:\s*"(.*?)"/;
 
-    const updatedContent = strContent.replace(
-        /"version"\s*:\s*"(.*?)"/,
-        `"version": "${ver.join('.')}"`,
-    );
+    const matches = strContent.match(expr);
+    if (matches === null) {
+        throw new Error('Version not found');
+    }
+
+    const [, currentVersion] = matches;
+    if (currentVersion === version) {
+        return;
+    }
+
+    const updatedContent = strContent.replace(expr, `"version": "${version}"`);
+
+    console.log('Version updated: ', currentVersion, ' -> ', version);
 
     if (strContent === updatedContent) {
         throw new Error('Version not found');
@@ -29,31 +38,11 @@ const updateFile = (fileName, ver) => {
     writeFileSync(fileName, updatedContent);
 };
 
-const optionsMap = {
-    major: ([mjr]) => ([mjr + 1, 0, 0]),
-    minor: ([mjr, mnr]) => ([mjr, mnr + 1, 0]),
-    patch: ([mjr, mnr, ptc]) => ([mjr, mnr, ptc + 1]),
-};
-
 let res = 1;
 
 try {
-    const opt = (process.argv.length > 2) ? process.argv[2] : null;
-    const option = opt?.toLowerCase();
-
-    if (!option || !isFunction(optionsMap[option])) {
-        throw new Error('Invalid argument. Available values: \'major\', \'minor\' and \'patch\'');
-    }
-
-    const ver = getPackageVersion('./package.json');
-    const versionParts = ver.split('.').map((part) => parseInt(part, 10));
-    const updateFunc = optionsMap[option];
-    const updatedParts = updateFunc(versionParts);
-
-    updateFile('package.json', updatedParts);
-    updateFile('composer.json', updatedParts);
-
-    console.log('Version updated: ', ver, ' -> ', updatedParts.join('.'));
+    const version = getPackageVersion('./package.json');
+    updateFile('composer.json', version);
 
     res = 0;
 } catch (e) {
