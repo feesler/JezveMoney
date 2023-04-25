@@ -263,6 +263,7 @@ const slice = createSlice({
             mainAccount: state.mainAccount,
             sourceAmount: '',
             destAmount: '',
+            date: window.app.formatInputDate(new Date()),
         });
 
         return {

@@ -168,7 +168,7 @@ class ImportConditionModel extends CachedTable
             "rule" => $params["rule_id"],
             "field" => $params["field_id"],
             "operator" => $params["operator"],
-            "value" => $params["value"]
+            "value" => $params["value"] ?? null,
         ]);
         $foundItem = (is_array($items) && count($items) > 0) ? $items[0] : null;
         return ($foundItem && $foundItem->id != $item_id);

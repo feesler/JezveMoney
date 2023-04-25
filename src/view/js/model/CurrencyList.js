@@ -6,11 +6,6 @@ import { Currency } from './Currency.js';
  * @param {object[]} props - array of currencies
  */
 export class CurrencyList extends List {
-    /** Static alias for CurrencyList constructor */
-    static create(props) {
-        return new CurrencyList(props);
-    }
-
     /**
      * Create list item from specified object
      * @param {Object} obj

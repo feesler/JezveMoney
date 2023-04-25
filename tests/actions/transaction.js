@@ -178,7 +178,7 @@ export const runAction = async ({ action, data }) => {
     }
 
     if (action === 'selectDate') {
-        testDescr = `Select date '${formatDate(data)}'`;
+        testDescr = `Select date '${formatDate(data, { locales: App.view.locale })}'`;
     }
 
     if (action === 'inputComment') {

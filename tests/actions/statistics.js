@@ -1,15 +1,24 @@
 import {
     test,
-    formatDate,
     asArray,
     assert,
 } from 'jezve-test';
 import { App } from '../Application.js';
-import { fixDate } from '../common.js';
 import { Transaction } from '../model/Transaction.js';
+import { StatisticsView } from '../view/StatisticsView.js';
+
+/** Navigate to statistics page */
+const checkNavigation = async () => {
+    if (App.view instanceof StatisticsView) {
+        return;
+    }
+
+    await App.view.navigateToStatistics();
+};
 
 export const checkInitialState = async () => {
     await test('Initial state of transaction statistics view', async () => {
+        await checkNavigation();
         await App.view.waitForLoad();
         const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
@@ -21,18 +30,22 @@ export const filterByType = async (type) => {
     assert(types.length > 0, 'Invalid transaction type filter');
     const typeNames = types.map((item) => Transaction.typeToString(item));
 
+    await checkNavigation();
     await test(`Filter by transaction types: [${typeNames}]`, () => App.view.filterByType(type));
 };
 
 export const byCategories = async () => {
+    await checkNavigation();
     await test('Show report by categories', () => App.view.byCategories());
 };
 
 export const byAccounts = async () => {
+    await checkNavigation();
     await test('Show report by accounts', () => App.view.byAccounts());
 };
 
 export const byCurrencies = async () => {
+    await checkNavigation();
     await test('Show report by currencies', () => App.view.byCurrencies());
 };
 
@@ -46,6 +59,7 @@ export const filterByCategories = async (ids) => {
         return (item) ? item.name : `(${id})`;
     });
 
+    await checkNavigation();
     await test(`Filter by categories [${names.join()}]`, () => App.view.filterByCategories(ids));
 };
 
@@ -55,6 +69,7 @@ export const filterByAccounts = async (ids) => {
         return (item) ? item.name : `(${accountId})`;
     });
 
+    await checkNavigation();
     await test(`Filter by accounts [${names.join()}]`, () => App.view.filterByAccounts(ids));
 };
 
@@ -62,29 +77,35 @@ export const selectCurrency = async (id) => {
     const currency = App.currency.getItem(id);
     const code = (currency) ? currency.code : `(${id})`;
 
+    await checkNavigation();
     await test(`Select currency [${code}]`, () => App.view.selectCurrency(id));
 };
 
 export const groupByDay = async () => {
+    await checkNavigation();
     await test('Group statistics by day', () => App.view.groupByDay());
 };
 
 export const groupByWeek = async () => {
+    await checkNavigation();
     await test('Group statistics by week', () => App.view.groupByWeek());
 };
 
 export const groupByMonth = async () => {
+    await checkNavigation();
     await test('Group statistics by month', () => App.view.groupByMonth());
 };
 
 export const groupByYear = async () => {
+    await checkNavigation();
     await test('Group statistics by year', () => App.view.groupByYear());
 };
 
 export const selectDateRange = async ({ start, end }) => {
-    const startDateFmt = formatDate(new Date(fixDate(start)));
-    const endDateFmt = formatDate(new Date(fixDate(end)));
+    const startDateFmt = App.reformatDate(start);
+    const endDateFmt = App.reformatDate(end);
 
+    await checkNavigation();
     await test(
         `Select date range (${startDateFmt} - ${endDateFmt})`,
         () => App.view.selectDateRange(start, end),
@@ -92,5 +113,6 @@ export const selectDateRange = async ({ start, end }) => {
 };
 
 export const clearDateRange = async () => {
+    await checkNavigation();
     await test('Clear date range', () => App.view.clearDateRange());
 };

@@ -3,6 +3,7 @@
   --header-color: #dddddd;
   --header-bg-color: #404040;
   --header-hover-btn-bg-color: #606060;
+  --header-active-btn-bg-color: #202020;
 }
 
 /* header */
@@ -30,6 +31,10 @@
   width: 200px;
   height: var(--header-size);
   flex-shrink: 0;
+}
+
+.header-logo:active {
+  background-color: var(--header-active-btn-bg-color);
 }
 
 .header-logo__icon,
@@ -94,6 +99,7 @@
   --btn-hover-title-color: var(--header-color);
   --btn-hover-icon-color: var(--header-color);
   --btn-hover-background: var(--header-hover-btn-bg-color);
+  --btn-active-background: var(--header-active-btn-bg-color);
 
   .btn__content {
     display: none;
@@ -279,18 +285,15 @@ a.nav-item__link:visited {
   color: var(--text-color-2);
 }
 
-.nav-item__icon-btn {
+.btn.nav-item__icon-btn {
+  --btn-icon-size: 13px;
+  --btn-hover-background: var(--icon-btn-hover-bg);
+  --btn-active-background: var(--icon-btn-active-bg);
+  --btn-icon-color: var(--main-text-color);
+
   margin-left: auto;
   padding: 0.6rem;
   border-radius: 50%;
-}
-
-.nav-item__icon {
-  --nav-item-icon-size: 13px;
-
-  fill: var(--main-text-color);
-  width: var(--nav-item-icon-size);
-  height: var(--nav-item-icon-size);
 }
 
 .nav-bottom {
@@ -357,6 +360,10 @@ a.nav-item__link:visited {
     background-color: var(--header-hover-btn-bg-color);
   }
 
+  .header-logo:active:hover {
+    background-color: var(--header-active-btn-bg-color);
+  }
+
   .nav-toggle-btn:hover {
     background-color: #323232;
   }
@@ -364,9 +371,5 @@ a.nav-item__link:visited {
   a.nav-item__link:hover {
     text-decoration: underline;
     color: var(--hl-text-color);
-  }
-
-  .nav-item__icon-btn:hover {
-    background: var(--icon-btn-hover-bg);
   }
 }

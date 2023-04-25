@@ -4,67 +4,52 @@ import {
     click,
     assert,
     evaluate,
-    prop,
-    asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
 
-const fieldSelectors = [
-    '.source-field',
-    '.destination-field',
-    '.src-amount-field',
-    '.dest-amount-field',
-    '.src-result-field',
-    '.dest-result-field',
-    '.date-field',
-    '.category-field',
-    '.comment-field',
-    '.create-date-field',
-    '.update-date-field',
-];
+const fieldSelectors = {
+    sourceField: '.source-field',
+    destinationField: '.destination-field',
+    srcAmountField: '.src-amount-field',
+    destAmountField: '.dest-amount-field',
+    srcResultField: '.src-result-field',
+    destResultField: '.dest-result-field',
+    dateField: '.date-field',
+    categoryField: '.category-field',
+    commentField: '.comment-field',
+    createDateField: '.create-date-field',
+    updateDateField: '.update-date-field',
+};
 
 export class TransactionDetails extends TestComponent {
     async parseContent() {
-        const res = {
-            closeBtn: { elem: await query(this.elem, '.close-btn') },
-            title: { elem: await query(this.elem, '.heading h1') },
-        };
-        res.title.value = await prop(res.title.elem, 'textContent');
+        const res = await evaluate((el, selectors) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
 
-        [
-            res.sourceField,
-            res.destinationField,
-            res.srcAmountField,
-            res.destAmountField,
-            res.srcResultField,
-            res.destResultField,
-            res.dateField,
-            res.categoryField,
-            res.commentField,
-            res.createDateField,
-            res.updateDateField,
-        ] = await asyncMap(fieldSelectors, async (selector) => (
-            this.parseField(await query(this.elem, selector))
-        ));
+            const state = {
+                title: textElemState(el.querySelector('.heading h1')),
+            };
 
-        return res;
-    }
+            Object.entries(selectors).forEach(([field, selector]) => {
+                const elem = el.querySelector(selector);
+                const titleEl = elem?.querySelector('.field__title');
+                const contentEl = elem?.querySelector('.field__content');
+                state[field] = {
+                    title: titleEl?.textContent,
+                    value: contentEl?.textContent,
+                    visible: !!elem && !elem.hidden,
+                };
+            });
 
-    async parseField(elem) {
-        assert(elem, 'Invalid field element');
+            return state;
+        }, this.elem, fieldSelectors);
 
-        const titleElem = await query(elem, '.field__title');
-        const contentElem = await query(elem, '.field__content');
-        assert(titleElem && contentElem, 'Invalid structure of field');
-
-        const res = await evaluate((titleEl, contEl) => ({
-            title: titleEl.textContent,
-            value: contEl.textContent,
-        }), titleElem, contentElem);
-        res.elem = elem;
+        res.closeBtn = { elem: await query(this.elem, '.close-btn') };
 
         return res;
     }
@@ -128,7 +113,7 @@ export class TransactionDetails extends TestComponent {
             },
             dateField: {
                 visible: true,
-                value: secondsToDateString(item.date),
+                value: App.secondsToDateString(item.date),
             },
             categoryField: {
                 visible: true,
@@ -139,11 +124,11 @@ export class TransactionDetails extends TestComponent {
                 value: item.comment,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

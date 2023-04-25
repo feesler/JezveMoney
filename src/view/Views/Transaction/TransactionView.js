@@ -4,7 +4,6 @@ import {
     insertAfter,
     show,
     enable,
-    checkDate,
     setEvents,
     addChilds,
 } from 'jezvejs';
@@ -119,7 +118,7 @@ class TransactionView extends View {
                 fExchange: 1,
                 backExchange: 1,
                 fBackExchange: 1,
-                date: window.app.formatDate(timeToDate(transaction.date)),
+                date: window.app.formatInputDate(timeToDate(transaction.date)),
                 comment: transaction.comment,
                 useBackExchange: false,
             },
@@ -603,7 +602,7 @@ class TransactionView extends View {
      * @param {Date} date - selected date object
      */
     onSelectDate(date) {
-        this.store.dispatch(actions.dateChange(window.app.formatDate(date)));
+        this.store.dispatch(actions.dateChange(window.app.formatInputDate(date)));
 
         this.datePicker.hide();
     }
@@ -847,6 +846,13 @@ class TransactionView extends View {
         }
     }
 
+    validateDate(state) {
+        const valid = window.app.isValidDateString(state.form.date);
+        if (!valid) {
+            this.store.dispatch(actions.invalidateDate());
+        }
+    }
+
     onSourceAmountInput(e) {
         this.store.dispatch(actions.sourceAmountChange(e.target.value));
     }
@@ -919,9 +925,7 @@ class TransactionView extends View {
             }
         }
 
-        if (!checkDate(state.form.date)) {
-            this.store.dispatch(actions.invalidateDate());
-        }
+        this.validateDate(state);
 
         const { validation } = this.store.getState();
         const valid = validation.destAmount && validation.sourceAmount && validation.date;
@@ -945,7 +949,7 @@ class TransactionView extends View {
             dest_amount: transaction.dest_amount,
             src_curr: transaction.src_curr,
             dest_curr: transaction.dest_curr,
-            date: state.transaction.date,
+            date: transaction.date,
             category_id: transaction.category_id,
             comment: transaction.comment,
         };

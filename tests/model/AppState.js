@@ -5,7 +5,12 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { isValidValue, availSortTypes, normalize } from '../common.js';
+import {
+    isValidValue,
+    availSortTypes,
+    normalize,
+    dateStringToSeconds,
+} from '../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -29,10 +34,11 @@ import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
+import { ImportCondition } from './ImportCondition.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = sortSettings;
+const availSettings = [...sortSettings, 'date_locale'];
 
 /** Accounts */
 const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
@@ -324,6 +330,10 @@ export class AppState {
     deleteProfile() {
         this.resetAll();
         delete this.profile;
+    }
+
+    getDateFormatLocale() {
+        return this.profile.settings.date_locale;
     }
 
     getCurrencies() {
@@ -778,7 +788,7 @@ export class AppState {
             return false;
         }
 
-        const currency = App.currency.getItem(params.curr_id);
+        const currency = App.currency.getItem(expAccount.curr_id);
         if (!currency) {
             return false;
         }
@@ -2001,10 +2011,22 @@ export class AppState {
     prepareConditions(conditions) {
         assert.isArray(conditions, 'Invalid conditions parameter');
 
-        return conditions.map((condition) => ({
-            ...condition,
-            value: condition.value?.toString(),
-        }));
+        return conditions.map((item) => {
+            const condition = {
+                ...item,
+                value: item.value?.toString(),
+            };
+
+            if (ImportCondition.isDateField(item.field_id)) {
+                const time = dateStringToSeconds(item.value, {
+                    locales: this.getDateFormatLocale(),
+                    options: App.dateFormatOptions,
+                });
+                condition.value = time?.toString() ?? null;
+            }
+
+            return condition;
+        });
     }
 
     prepareActions(actions) {

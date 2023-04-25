@@ -138,7 +138,7 @@
 
 @media (hover: hover) {
   .upload-form__file:hover .browse-btn {
-    background-color: #1e82cc;
+    background-color: var(--accent-hover-color);
   }
 
   .back-btn:hover {

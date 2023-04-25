@@ -1,6 +1,6 @@
 import { setBlock, TestStory } from 'jezve-test';
 import { App } from '../../Application.js';
-import { translationTest, changeLocaleTest } from '../../run/locale.js';
+import { translationTest, changeLocaleTest } from '../../actions/locale.js';
 
 export class LocalesStory extends TestStory {
     async beforeRun() {

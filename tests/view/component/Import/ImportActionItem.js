@@ -1,9 +1,4 @@
-import {
-    TestComponent,
-    assert,
-    query,
-    evaluate,
-} from 'jezve-test';
+import { TestComponent, assert, evaluate } from 'jezve-test';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';
@@ -13,23 +8,21 @@ export class ImportActionItem extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import action item');
 
-        const res = {
-            typeTitle: { elem: await query(this.elem, '.action-item__type') },
-            valueTitle: { elem: await query(this.elem, '.action-item__value') },
-        };
-        assert(
-            res.typeTitle.elem
-            && res.valueTitle.elem,
-            'Invalid structure of action item',
-        );
+        const res = await evaluate((el) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
 
-        [
-            res.typeTitle.value,
-            res.valueTitle.value,
-        ] = await evaluate(
-            (...elems) => elems.map((el) => el?.textContent),
-            res.typeTitle.elem,
-            res.valueTitle.elem,
+            return {
+                typeTitle: textElemState(el.querySelector('.action-item__type')),
+                valueTitle: textElemState(el.querySelector('.action-item__value')),
+            };
+        }, this.elem);
+
+        assert(
+            res.typeTitle.visible && res.valueTitle.visible,
+            'Invalid structure of import action item',
         );
 
         return res;

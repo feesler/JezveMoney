@@ -27,9 +27,11 @@ import {
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../model/ImportAction.js';
 import { api } from '../../../model/api.js';
-import * as ImportTests from '../../../run/import/index.js';
-import * as ImportRuleApiTests from '../../../run/api/importrule.js';
+import * as ImportTests from '../../../actions/import/index.js';
+import * as ImportRuleApiTests from '../../../actions/api/importrule.js';
+import { testLocales } from '../../../actions/locale.js';
 import { App } from '../../../Application.js';
+import { testDateLocales } from '../../../actions/settings.js';
 
 export class ImportRulesStory extends TestStory {
     async beforeRun() {
@@ -68,6 +70,7 @@ export class ImportRulesStory extends TestStory {
         await this.search();
         await this.pagination();
         await this.createTemplateRule(0);
+        await this.locales();
         await this.noPersonTests();
     }
 
@@ -408,6 +411,24 @@ export class ImportRulesStory extends TestStory {
             { action: 'changeTransactionType', data: 'limit' },
         ]);
         await ImportTests.submitRule();
+
+        setBlock('Create import rule #5', 2);
+        await ImportTests.createRule();
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
+            { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+            { action: 'inputValue', data: App.datesFmt.now },
+        ]);
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'BAR' },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Bar date' },
+        ]);
+        await ImportTests.submitRule();
     }
 
     // Update import rule tests
@@ -528,6 +549,29 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.submitRule();
 
         await ImportTests.closeRulesDialog();
+    }
+
+    async locales() {
+        setBlock('Import rules locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        const date = (locale === 'en')
+            ? App.datesFmt.weekAgo
+            : App.datesFmt.now;
+
+        setBlock('Update conditions and actions', 2);
+        await ImportTests.updateRule(3);
+        await ImportTests.updateRuleCondition({
+            pos: 0,
+            action: { action: 'inputValue', data: date },
+        });
+        await ImportTests.submitRule();
     }
 
     // Import rule action form test for no persons

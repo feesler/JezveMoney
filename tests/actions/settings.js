@@ -50,3 +50,30 @@ export const del = async (index) => {
         return App.state.fetchAndTest();
     });
 };
+
+export const selectDateLocale = async (locale) => {
+    await test(`Select date locale ${locale}`, async () => {
+        await checkNavigation();
+
+        App.state.updateSettings({
+            date_locale: locale,
+        });
+
+        await App.view.selectDateLocale(locale);
+
+        return App.state.fetchAndTest();
+    });
+};
+
+export const testDateLocales = async (locales, action) => {
+    const initialLocale = App.state.getDateFormatLocale();
+    const remainLocales = locales.filter((locale) => locale !== initialLocale);
+
+    for (const locale of remainLocales) {
+        await selectDateLocale(locale);
+        await action(locale);
+    }
+
+    await selectDateLocale(initialLocale);
+    await action(initialLocale);
+};

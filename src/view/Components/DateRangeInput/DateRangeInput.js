@@ -12,7 +12,7 @@ import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import {
     dateStringToTime,
-    fixDate,
+    parseDate,
     timeToDate,
     __,
 } from '../../js/utils.js';
@@ -142,8 +142,12 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const stdate = (data.stdate) ? window.app.formatDate(timeToDate(data.stdate)) : null;
-        const enddate = (data.enddate) ? window.app.formatDate(timeToDate(data.enddate)) : null;
+        const stdate = (data.stdate)
+            ? window.app.formatInputDate(timeToDate(data.stdate))
+            : null;
+        const enddate = (data.enddate)
+            ? window.app.formatInputDate(timeToDate(data.enddate))
+            : null;
 
         this.setState({
             form: { stdate, enddate },
@@ -172,8 +176,8 @@ export class DateRangeInput extends Component {
             return;
         }
 
-        const stdate = window.app.formatDate(range.start);
-        const enddate = window.app.formatDate(range.end);
+        const stdate = window.app.formatInputDate(range.start);
+        const enddate = window.app.formatInputDate(range.end);
         if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
             return;
         }
@@ -237,8 +241,8 @@ export class DateRangeInput extends Component {
 
     validateDateRange(state = this.state) {
         const validation = { ...defaultValidation };
-        const startDate = fixDate(state.form.stdate);
-        const endDate = fixDate(state.form.enddate);
+        const startDate = parseDate(state.form.stdate);
+        const endDate = parseDate(state.form.enddate);
         if (!startDate) {
             validation.stdate = false;
         }
@@ -307,7 +311,7 @@ export class DateRangeInput extends Component {
         const { stdate, enddate } = state.filter;
         const isDateFilter = !!(stdate && enddate);
         if (isDateFilter) {
-            this.datePicker.setSelection(stdate, enddate);
+            this.datePicker.setSelection(parseDate(stdate), parseDate(enddate));
         } else {
             this.datePicker.clearSelection();
         }

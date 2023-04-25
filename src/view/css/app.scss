@@ -93,6 +93,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --btn-bg: #3c3c3c;
   --btn-hover-bg: #4a4a4a;
   --icon-btn-hover-bg: #323232;
+  --icon-btn-active-bg: var(--bg-color-4);
 
   /* Inputs */
   --input-bg-color: #181818;
@@ -161,6 +162,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --btn-bg: #e8e8e8;
   --btn-hover-bg: #c9c9c9;
   --icon-btn-hover-bg: #dddddd;
+  --icon-btn-active-bg: var(--bg-color-4);
 
   /* Inputs */
   --input-bg-color: #f2f2f2;
@@ -279,6 +281,9 @@ svg * {
   --ig-input-disabled-color: var(--input-disabled-color);
   --ig-input-disabled-bg: var(--input-disabled-bg);
   --ig-input-disabled-border: var(--input-border-color);
+  --ig-button-disabled-border: var(--input-border-color);
+  --ig-button-disabled-color: var(--input-disabled-color);
+  --ig-button-disabled-bg: var(--input-disabled-bg);
   --ig-inner-button-color: var(--neutral-color);
   --ig-inner-button-active-color: var(--hl-text-color);
   --ig-text-bg: var(--bg-color-3);
@@ -501,7 +506,7 @@ svg * {
 .btn.circle-btn {
   --btn-border-radius: 100vh;
   --btn-hover-background: var(--icon-btn-hover-bg);
-  --btn-active-background: var(--icon-btn-hover-bg);
+  --btn-active-background: var(--icon-btn-active-bg);
   --btn-icon-size: calc(1.275rem + 0.3vw);
 
   width: var(--btn-size);

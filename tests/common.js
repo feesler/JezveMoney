@@ -1,9 +1,10 @@
 import {
     isDate,
-    isNum,
     isObject,
     assert,
     formatDate,
+    parseDateString,
+    getLocaleDateFormat,
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
@@ -36,20 +37,6 @@ export const isEmpty = (obj) => {
     return true;
 };
 
-/** Convert date string from DD.MM.YYYY to timestamp */
-export const convDate = (dateStr) => {
-    if (typeof dateStr !== 'string') {
-        return null;
-    }
-
-    const res = Date.parse(dateStr.split('.').reverse().join('-'));
-    if (Number.isNaN(res)) {
-        return null;
-    }
-
-    return res;
-};
-
 /** Return timestamp for the start of the day */
 export const cutDate = (date) => {
     if (!isDate(date)) {
@@ -57,19 +44,6 @@ export const cutDate = (date) => {
     }
 
     return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
-// Convert Date object, timestamp or DD.MM.YYYY string to the timestamp of the start of day
-export const fixDate = (date) => {
-    if (isDate(date)) {
-        return cutDate(date);
-    }
-
-    if (typeof date === 'number') {
-        return cutDate(new Date(date));
-    }
-
-    return convDate(date);
 };
 
 /** Converts Date instance to seconds */
@@ -80,7 +54,10 @@ export const dateToSeconds = (date) => {
 };
 
 /** Converts date string to seconds */
-export const dateStringToSeconds = (date) => dateToSeconds(new Date(convDate(date)));
+export const dateStringToSeconds = (dateStr, params = {}) => {
+    const date = parseDateString(dateStr, params);
+    return (isDate(date)) ? dateToSeconds(date) : null;
+};
 
 /** Converts seconds to Date instance */
 export const secondsToDate = (seconds) => {
@@ -89,37 +66,50 @@ export const secondsToDate = (seconds) => {
 };
 
 /** Converts seconds to date string */
-export const secondsToDateString = (seconds) => {
+export const secondsToDateString = (seconds, params = {}) => {
     assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
-    return formatDate(secondsToDate(seconds));
+    return formatDate(secondsToDate(seconds), params);
 };
 
-/** Check string is correct date in dd.mm.yyyy format */
-export const checkDate = (str) => {
-    if (typeof str !== 'string' || !str.length) {
-        return false;
+/** Convert Date object, timestamp or date string to the timestamp of the start of day */
+export const fixDate = (date, params = {}) => {
+    if (isDate(date)) {
+        return cutDate(date);
     }
 
-    const sparr = str.split('.');
-    if (sparr.length !== 3) {
-        return false;
+    if (typeof date === 'number') {
+        return cutDate(new Date(date));
     }
 
-    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2])) {
-        return false;
+    const res = dateStringToSeconds(date, params);
+    return (res === null) ? null : (res * MS_IN_SECOND);
+};
+
+/** Parses date from string and format it back */
+export const reformatDate = (str, params = {}) => {
+    const format = getLocaleDateFormat(params);
+    const inputFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: (format.yearLength === 2) ? '2-digit' : 'numeric',
+    };
+
+    const fixedDate = fixDate(str, params);
+    if (!fixedDate) {
+        return str;
     }
 
-    if (
-        sparr[0] < 1
-        || sparr[0] > 31
-        || sparr[1] < 1
-        || sparr[1] > 12
-        || sparr[2] < 1970
-    ) {
-        return false;
+    let res = formatDate(new Date(fixedDate), {
+        locales: params?.locales ?? [],
+        options: inputFormatOptions,
+    });
+
+    if (res.endsWith(format.separator)) {
+        const length = res.lastIndexOf(format.separator);
+        res = res.substring(0, length);
     }
 
-    return true;
+    return res;
 };
 
 // Returns the ISO week of the date.

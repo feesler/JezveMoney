@@ -33,17 +33,8 @@
 
                                     <hr class="filters-separator">
 
-                                    <section class="filter-item group-type-filter">
+                                    <section id="groupTypeFilter" class="filter-item group-type-filter">
                                         <header class="filter-item__title"><?= __("STAT_GROUP_BY") ?></header>
-                                        <select id="groupsel">
-                                            <?php foreach ($groupTypes as $val => $grtype) {    ?>
-                                                <?php if ($val == $groupType_id) {        ?>
-                                                    <option value="<?= e($val) ?>" selected><?= e($grtype) ?></option>
-                                                <?php        } else { ?>
-                                                    <option value="<?= e($val) ?>"><?= e($grtype) ?></option>
-                                                <?php        } ?>
-                                            <?php    }    ?>
-                                        </select>
                                     </section>
                                 </div>
 

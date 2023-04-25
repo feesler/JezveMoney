@@ -5,6 +5,8 @@ import {
     isDate,
     formatDate,
     isFunction,
+    getLocaleDateFormat,
+    isValidDateString,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 import { parseCookies, setCookie, __ } from './utils.js';
@@ -29,7 +31,10 @@ export class Application {
         }
 
         this.config = {
-            dateFormatLocale: 'ru',
+            dateFormatLocale: this.locale,
+            dateFormatOptions: {
+                dateStyle: 'short',
+            },
         };
 
         // Setup models
@@ -38,6 +43,9 @@ export class Application {
 
         if (this.props.profile) {
             this.model.profile = { ...this.props.profile };
+
+            const { settings } = this.model.profile;
+            this.config.dateFormatLocale = settings.date_locale;
         }
 
         this.notification = null;
@@ -85,12 +93,49 @@ export class Application {
         return this.config.dateFormatLocale;
     }
 
-    formatDate(date) {
+    get dateFormatOptions() {
+        return this.config.dateFormatOptions;
+    }
+
+    isValidDateString(value) {
+        return isValidDateString(value, {
+            locales: this.dateFormatLocale,
+            options: this.dateFormatOptions,
+        });
+    }
+
+    formatDate(date, params = {}) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }
 
-        return formatDate(date, this.config.dateFormatLocale);
+        return formatDate(date, {
+            locales: params?.locales ?? this.dateFormatLocale,
+            options: params?.options ?? this.dateFormatOptions,
+        });
+    }
+
+    formatInputDate(date, params = {}) {
+        const locales = params?.locales ?? this.dateFormatLocale;
+        const options = params?.options ?? this.dateFormatOptions;
+        const format = getLocaleDateFormat({ locales, options });
+
+        let res = this.formatDate(date, {
+            locales,
+            options: {
+                day: '2-digit',
+                month: '2-digit',
+                year: (format.yearLength === 2) ? '2-digit' : 'numeric',
+            },
+        });
+        res = res.trim();
+
+        if (res.endsWith(format.separator)) {
+            const length = res.lastIndexOf(format.separator);
+            res = res.substring(0, length);
+        }
+
+        return res;
     }
 
     getThemeCookie() {

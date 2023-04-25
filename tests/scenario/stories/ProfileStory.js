@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as ProfileTests from '../../run/profile.js';
+import * as ProfileTests from '../../actions/profile.js';
 import { App } from '../../Application.js';
 
 const resetAllOptions = {

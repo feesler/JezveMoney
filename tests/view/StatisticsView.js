@@ -15,7 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { dateToSeconds, fixDate, secondsToDateString } from '../common.js';
+import { dateToSeconds } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -58,7 +58,7 @@ export class StatisticsView extends AppView {
             res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
 
-        res.groupDropDown = await DropDown.createFromChild(this, await query('#groupsel'));
+        res.groupTypeMenu = await LinkMenu.create(this, await query('#groupTypeMenu'));
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
@@ -106,8 +106,8 @@ export class StatisticsView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const startDate = new Date(fixDate(dateRange.startDate));
-            const endDate = new Date(fixDate(dateRange.endDate));
+            const startDate = new Date(App.parseDate(dateRange.startDate));
+            const endDate = new Date(App.parseDate(dateRange.endDate));
 
             res.filter.startDate = dateToSeconds(startDate);
             res.filter.endDate = dateToSeconds(endDate);
@@ -125,9 +125,9 @@ export class StatisticsView extends AppView {
             res.filter.categories = this.getDropDownFilter(cont.categoryDropDown);
         }
 
-        const [selectedGroup] = cont.groupDropDown.getSelectedValues();
-        const groupType = parseInt(selectedGroup, 10);
-        assert(!Number.isNaN(groupType) && availGroupTypes.includes(groupType), 'Invalid group type');
+        const selectedGroup = cont.groupTypeMenu.value;
+        const groupType = this.getGroupTypeByName(selectedGroup);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
         res.filter.group = groupType;
 
         res.chart = {
@@ -140,7 +140,7 @@ export class StatisticsView extends AppView {
         return res;
     }
 
-    getGroupTypeString(groupType) {
+    getGroupTypeName(groupType) {
         const groupTypesMap = {
             [GROUP_BY_DAY]: 'day',
             [GROUP_BY_WEEK]: 'week',
@@ -153,9 +153,39 @@ export class StatisticsView extends AppView {
         return groupTypesMap[groupType];
     }
 
+    getGroupTypeByName(groupName) {
+        const groupTypesMap = {
+            day: GROUP_BY_DAY,
+            week: GROUP_BY_WEEK,
+            month: GROUP_BY_MONTH,
+            year: GROUP_BY_YEAR,
+        };
+
+        assert(groupName in groupTypesMap, 'Invalid group type');
+
+        return groupTypesMap[groupName];
+    }
+
     getExpectedState(model = this.model) {
         const { filtersVisible } = model;
-        const { report } = model.filter;
+        const {
+            report,
+            group,
+            startDate,
+            endDate,
+        } = model.filter;
+
+        let startDateFmt = null;
+        if (startDate) {
+            const dateFmt = App.secondsToDateString(startDate);
+            startDateFmt = App.reformatDate(dateFmt);
+        }
+
+        let endDateFmt = null;
+        if (endDate) {
+            const dateFmt = App.secondsToDateString(endDate);
+            endDateFmt = App.reformatDate(dateFmt);
+        }
 
         const res = {
             typeMenu: {
@@ -166,15 +196,15 @@ export class StatisticsView extends AppView {
                 visible: filtersVisible,
                 value: report,
             },
+            groupTypeMenu: {
+                visible: filtersVisible,
+                value: this.getGroupTypeName(group),
+            },
             dateFilter: {
                 visible: filtersVisible,
                 value: {
-                    startDate: (model.filter.startDate)
-                        ? secondsToDateString(model.filter.startDate)
-                        : null,
-                    endDate: (model.filter.endDate)
-                        ? secondsToDateString(model.filter.endDate)
-                        : null,
+                    startDate: startDateFmt,
+                    endDate: endDateFmt,
                 },
             },
             noDataMessage: {},
@@ -205,7 +235,7 @@ export class StatisticsView extends AppView {
         const params = {
             type: model.filter.type,
             report,
-            group: this.getGroupTypeString(model.filter.group),
+            group: this.getGroupTypeName(model.filter.group),
         };
         if (report === 'currency') {
             params.curr_id = model.filter.curr_id;
@@ -459,10 +489,12 @@ export class StatisticsView extends AppView {
     async groupBy(group) {
         await this.openFilters();
 
+        const groupName = this.getGroupTypeName(group);
+
         this.model.filter.group = group;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.groupDropDown.setSelection(group));
+        await this.waitForData(() => this.content.groupTypeMenu.selectItemByValue(groupName));
 
         return App.view.checkState(expected);
     }
@@ -486,8 +518,8 @@ export class StatisticsView extends AppView {
     async selectDateRange(start, end) {
         await this.openFilters();
 
-        const startDate = new Date(fixDate(start));
-        const endDate = new Date(fixDate(end));
+        const startDate = new Date(App.parseDate(start));
+        const endDate = new Date(App.parseDate(end));
 
         this.model.filter.startDate = dateToSeconds(startDate);
         this.model.filter.endDate = dateToSeconds(endDate);

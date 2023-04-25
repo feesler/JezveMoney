@@ -2,10 +2,10 @@ import {
     copyObject,
     isObject,
     hasFlag,
-    checkDate,
     fixFloat,
+    isDate,
 } from 'jezvejs';
-import { timestampFromString, __ } from '../utils.js';
+import { __, getSeconds } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */
@@ -163,7 +163,12 @@ export class ImportCondition extends ListItem {
 
         const dataProp = this.fieldsMap[field];
 
-        return data[dataProp];
+        const res = data[dataProp];
+        if (this.isDateField(fieldId) && isDate(res)) {
+            return getSeconds(res);
+        }
+
+        return res;
     }
 
     /** Check value for specified field type is account, template or currency */
@@ -391,7 +396,7 @@ export class ImportCondition extends ListItem {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = checkDate(this.value);
+            res.date = window.app.isValidDateString(this.value);
         }
 
         // Check empty condition value is used only for string field
@@ -447,14 +452,11 @@ export class ImportCondition extends ListItem {
         if (this.isPropertyValue()) {
             return ImportCondition.getFieldValue(this.value, data);
         }
-        if (this.isItemField()) {
+        if (this.isItemField() || this.isDateField()) {
             return parseInt(this.value, 10);
         }
         if (this.isAmountField()) {
             return parseFloat(this.value);
-        }
-        if (this.isDateField()) {
-            return timestampFromString(this.value);
         }
 
         return this.value;

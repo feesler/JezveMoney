@@ -10,11 +10,6 @@ import {
  * @param {object[]} props - array of import conditions
  */
 export class ImportConditionList extends List {
-    /** Static alias for ImportConditionList constructor */
-    static create(props) {
-        return new ImportConditionList(props);
-    }
-
     /**
      * Search for condition for specified property with `is` (equal) operator
      * @param {Number} field

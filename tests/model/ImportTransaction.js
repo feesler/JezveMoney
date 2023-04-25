@@ -1,7 +1,6 @@
-import { assert } from 'jezve-test';
+import { assert, isValidDateString } from 'jezve-test';
 import { App } from '../Application.js';
 import {
-    convDate,
     dateStringToSeconds,
     fixFloat,
     normalize,
@@ -15,6 +14,7 @@ import {
     DEBT,
     LIMIT_CHANGE,
 } from './Transaction.js';
+import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
 export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -62,8 +62,9 @@ export class ImportTransaction {
             original: data,
         });
 
-        const isValidDate = convDate(data.date) !== null;
-        res.date = (isValidDate) ? dateStringToSeconds(data.date) : null;
+        res.date = (isValidDateString(data.date, { locales: IMPORT_DATE_LOCALE }))
+            ? dateStringToSeconds(data.date, { locales: IMPORT_DATE_LOCALE })
+            : null;
 
         if (res.type === 'expense') {
             res.src_id = mainAccount.id;
@@ -494,8 +495,9 @@ export class ImportTransaction {
             }
         }
 
-        const isValidDate = convDate(this.original.date) !== null;
-        this.date = (isValidDate) ? dateStringToSeconds(this.original.date) : null;
+        this.date = (isValidDateString(this.original.date, { locales: IMPORT_DATE_LOCALE }))
+            ? dateStringToSeconds(this.original.date, { locales: IMPORT_DATE_LOCALE })
+            : null;
 
         this.category_id = 0;
         this.comment = this.original.comment;

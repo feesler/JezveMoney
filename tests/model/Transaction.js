@@ -1,6 +1,5 @@
 import { assert } from 'jezve-test';
 import { App } from '../Application.js';
-import { secondsToDateString } from '../common.js';
 import { __ } from './locale.js';
 
 /** Types of transactions */
@@ -49,7 +48,7 @@ export class Transaction {
 
     /** Converts transaction date in seconds to date string */
     static formatDate(date) {
-        return secondsToDateString(date);
+        return App.secondsToDateString(date);
     }
 
     // Try to convert specified short declaration of transaction to full object

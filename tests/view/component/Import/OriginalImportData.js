@@ -1,15 +1,12 @@
 import {
     TestComponent,
-    query,
-    queryAll,
     assert,
-    formatDate,
     evaluate,
-    asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
+import { formatCsvDate } from '../../../model/import.js';
 
 export class OriginalImportData extends TestComponent {
     getLabelsMap() {
@@ -26,36 +23,29 @@ export class OriginalImportData extends TestComponent {
     }
 
     async parseContent() {
-        const res = {};
-
-        const dataValues = await queryAll(this.elem, '.column');
-        const dataColumns = await asyncMap(dataValues, (elem) => this.parseDataColumn(elem));
-        dataColumns.forEach(({ value, property }) => {
-            res[property] = value;
-        });
-
         const labelsMap = this.getLabelsMap();
-        const valid = Object.keys(labelsMap).every((key) => key in res);
+
+        const res = await evaluate((el, labels) => {
+            const columns = {};
+            const columnKeys = Object.keys(labels);
+
+            const columnElems = el.querySelectorAll('.column');
+            columnElems.forEach((columnEl) => {
+                const labelEl = columnEl.querySelector('.column__header');
+                const valueEl = columnEl.querySelector('.column__data');
+                const label = labelEl?.textContent;
+
+                const property = columnKeys.find((key) => label === labels[key]);
+                if (property) {
+                    columns[property] = valueEl?.textContent;
+                }
+            });
+
+            return columns;
+        }, this.elem, labelsMap);
+
+        const valid = Object.keys(labelsMap).every((key) => (key in res));
         assert(valid, 'Invalid structure of import item');
-
-        return res;
-    }
-
-    async parseDataColumn(elem) {
-        assert(elem, 'Invalid element');
-
-        const labelElem = await query(elem, '.column__header');
-        const valueElem = await query(elem, '.column__data');
-        assert(labelElem && valueElem, 'Invalid structure of import item');
-
-        const res = await evaluate((labelEl, valueEl) => ({
-            label: labelEl.textContent,
-            value: valueEl.textContent,
-        }), labelElem, valueElem);
-
-        const labelsMap = this.getLabelsMap();
-        res.property = Object.keys(labelsMap).find((key) => res.label === labelsMap[key]);
-        assert(res.property, `Invalid label: '${res.label}'`);
 
         return res;
     }
@@ -65,9 +55,7 @@ export class OriginalImportData extends TestComponent {
             ...cont,
             accountAmount: ImportTemplate.amountFix(cont.accountAmount),
             transactionAmount: ImportTemplate.amountFix(cont.transactionAmount),
-            date: formatDate(
-                ImportTemplate.dateFromString(cont.date),
-            ),
+            date: formatCsvDate(ImportTemplate.dateFromString(cont.date)),
         };
 
         const template = App.state.templates.find((item) => item.name === cont.template);

@@ -71,11 +71,21 @@ const slice = createSlice({
             : state
     ),
 
+    setDateRenderTime: (state) => ({
+        ...state,
+        dateRenderTime: Date.now(),
+    }),
+
     listRequestLoaded: (state, keepState) => ({
         ...state,
         userCurrencies: createItemsFromModel(),
         listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
+    }),
+
+    changeDateLocale: (state, dateLocale) => ({
+        ...state,
+        dateLocale,
     }),
 });
 

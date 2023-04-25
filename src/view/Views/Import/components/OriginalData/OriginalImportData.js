@@ -1,5 +1,6 @@
 import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../../js/utils.js';
+import { IMPORT_DATE_LOCALE } from '../../../../js/model/ImportTemplate.js';
 import './OriginalImportData.scss';
 
 /** CSS classes */
@@ -68,7 +69,13 @@ export class OriginalImportData extends Component {
                 [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
             ],
             [
-                [__('COLUMN_DATE'), window.app.formatDate(new Date(this.props.date))],
+                [
+                    __('COLUMN_DATE'),
+                    window.app.formatDate(
+                        new Date(this.props.date),
+                        { locales: IMPORT_DATE_LOCALE },
+                    ),
+                ],
             ],
             [
                 [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],

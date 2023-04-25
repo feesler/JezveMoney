@@ -8,7 +8,9 @@ import {
     createCSV,
     cutDate,
     getWeek,
+    dateToSeconds,
     MS_IN_SECOND,
+    secondsToDate,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -23,6 +25,7 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
+import { formatCsvDate } from './import.js';
 
 const WEEKS_IN_YEAR = 52;
 const MONTHS_IN_YEAR = 12;
@@ -561,7 +564,7 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            Transaction.formatDate(transaction.date),
+            formatCsvDate(secondsToDate(transaction.date)),
             transaction.comment,
         ]);
 
@@ -588,7 +591,7 @@ export class TransactionsList extends SortableList {
         const res = { time, date };
 
         if (groupType === 'day') {
-            res.id = formatDate(date);
+            res.id = formatDate(date, { locales: App.view.locale });
         } else if (groupType === 'week') {
             const week = getWeek(time);
             const fixedYear = this.getFixedWeekYear(date);
@@ -636,6 +639,33 @@ export class TransactionsList extends SortableList {
         throw new Error('Invalid group type');
     }
 
+    getGroupStart(date, groupType) {
+        assert.isDate(date);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
+
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthDay = date.getDate();
+        let timestamp = 0;
+
+        if (groupType === 'day') {
+            timestamp = Date.UTC(year, month, monthDay);
+        }
+        if (groupType === 'week') {
+            let weekday = date.getDay();
+            weekday = (weekday === 0) ? 6 : (weekday - 1);
+            timestamp = Date.UTC(year, month, monthDay - weekday);
+        }
+        if (groupType === 'month') {
+            timestamp = Date.UTC(year, month, 1);
+        }
+        if (groupType === 'year') {
+            timestamp = Date.UTC(year, 0, 1);
+        }
+
+        return new Date(timestamp);
+    }
+
     getNextDate(date, groupType) {
         assert.isDate(date);
         assert(availGroupTypes.includes(groupType), 'Invalid group type');
@@ -661,28 +691,37 @@ export class TransactionsList extends SortableList {
         return new Date(timestamp);
     }
 
-    getStatisticsLabel(date, groupType) {
-        if (!date) {
-            return null;
-        }
+    getLimitStartDate(endDate, limit, groupType) {
+        assert.isDate(endDate);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
 
-        if (groupType === 'day' || groupType === 'week') {
-            return formatDate(date);
+        let timestamp = 0;
+        if (groupType === 'day') {
+            timestamp = Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate() - limit,
+            );
         }
-
+        if (groupType === 'week') {
+            timestamp = Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate() - (DAYS_IN_WEEK * limit),
+            );
+        }
         if (groupType === 'month') {
-            const month = date.getMonth() + 1;
-            const monthStr = (month < 10) ? `0${month}` : month;
-            const yearStr = date.getFullYear();
-
-            return `${monthStr}.${yearStr}`;
+            timestamp = Date.UTC(endDate.getFullYear(), endDate.getMonth() - limit, 1);
         }
-
         if (groupType === 'year') {
-            return date.getFullYear().toString();
+            timestamp = Date.UTC(endDate.getFullYear() - limit, 0, 1);
         }
 
-        return null;
+        return new Date(timestamp);
+    }
+
+    getStatisticsLabel(date) {
+        return dateToSeconds(date);
     }
 
     getStatistics(params) {
@@ -691,6 +730,7 @@ export class TransactionsList extends SortableList {
         let groupArr = [];
         let sumDate = null;
         let curDate = null;
+        let groupStart = null;
         const curSum = {};
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
@@ -766,6 +806,10 @@ export class TransactionsList extends SortableList {
         if (params.startDate && params.endDate) {
             itemsFilter.startDate = params.startDate;
             itemsFilter.endDate = params.endDate;
+        } else if (limit > 0) {
+            const now = new Date();
+            itemsFilter.startDate = this.getLimitStartDate(now, limit, groupType);
+            itemsFilter.endDate = now;
         }
 
         const list = this.applyFilter(itemsFilter);
@@ -807,6 +851,7 @@ export class TransactionsList extends SortableList {
 
             if (!sumDate) {
                 sumDate = curDate;
+                groupStart = this.getGroupStart(sumDate.date, groupType);
             } else if (sumDate && sumDate.id !== curDate.id) {
                 const dateDiff = this.getDateDiff(sumDate, curDate, groupType);
                 for (const type of transTypes) {
@@ -820,10 +865,10 @@ export class TransactionsList extends SortableList {
                     }
                 }
 
-                let label = this.getStatisticsLabel(sumDate.date, groupType);
+                let label = this.getStatisticsLabel(groupStart, groupType);
                 groupArr.push([label, 1]);
                 // Append series for empty values
-                let groupDate = sumDate.date;
+                let groupDate = groupStart;
                 for (let i = 1; i < dateDiff; i += 1) {
                     groupDate = this.getNextDate(groupDate, groupType);
                     label = this.getStatisticsLabel(groupDate, groupType);
@@ -831,6 +876,7 @@ export class TransactionsList extends SortableList {
                 }
 
                 sumDate = curDate;
+                groupStart = this.getGroupStart(sumDate.date, groupType);
             }
 
             curSum[item.type][category] += amount;
@@ -848,7 +894,7 @@ export class TransactionsList extends SortableList {
                 }
             }
 
-            const label = this.getStatisticsLabel(sumDate.date, groupType);
+            const label = this.getStatisticsLabel(groupStart, groupType);
             groupArr.push([label, 1]);
         }
 

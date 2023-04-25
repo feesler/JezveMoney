@@ -7,7 +7,8 @@
   max-width: 450px;
 }
 
-.report-type-filter {
+.report-type-filter,
+.group-type-filter {
   max-width: 300px;
 
   .link-menu {
@@ -19,8 +20,7 @@
   flex-shrink: 0;
 }
 
-.currency-filter,
-.group-type-filter {
+.currency-filter {
   width: 100px;
   flex-grow: 0;
 }

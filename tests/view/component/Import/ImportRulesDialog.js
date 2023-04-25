@@ -13,7 +13,7 @@ import {
     asyncMap,
 } from 'jezve-test';
 import { Button, Paginator } from 'jezvejs-test';
-import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
+import { IMPORT_COND_OP_FIELD_FLAG, ImportCondition } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -313,12 +313,20 @@ export class ImportRulesDialog extends TestComponent {
 
         this.model.state = 'update';
         const ruleItem = App.state.rules.getItemByIndex(ind);
-        const ruleConditions = ruleItem.conditions.map((item) => ({
-            fieldType: item.field_id,
-            operator: item.operator,
-            value: item.value,
-            isFieldValue: hasFlag(item.flags, IMPORT_COND_OP_FIELD_FLAG),
-        }));
+        const ruleConditions = ruleItem.conditions.map((item) => {
+            const condition = {
+                fieldType: item.field_id,
+                operator: item.operator,
+                value: item.value,
+                isFieldValue: hasFlag(item.flags, IMPORT_COND_OP_FIELD_FLAG),
+            };
+
+            if (ImportCondition.isDateField(item.field_id)) {
+                condition.value = App.secondsToDateString(parseInt(condition.value, 10));
+            }
+
+            return condition;
+        });
         const ruleActions = ruleItem.actions.map((item) => ({
             actionType: item.action_id,
             value: item.value,

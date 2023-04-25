@@ -1,6 +1,5 @@
 import {
     copyObject,
-    checkDate,
     trimDecimalPlaces,
     fixFloat,
 } from 'jezvejs';
@@ -826,6 +825,10 @@ export class ImportTransaction {
             valid = (startFromDest) ? this.validateSourceAmount() : this.validateDestAmount();
         }
 
-        return (valid && checkDate(this.date));
+        if (valid) {
+            valid = window.app.isValidDateString(this.date);
+        }
+
+        return valid;
     }
 }

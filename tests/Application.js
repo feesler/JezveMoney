@@ -2,6 +2,7 @@ import {
     TestApplication,
     assert,
     formatDate,
+    isValidDateString,
 } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
@@ -9,7 +10,12 @@ import { AppState } from './model/AppState.js';
 import { Scenario } from './scenario/index.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
-import { dateToSeconds } from './common.js';
+import {
+    dateToSeconds,
+    fixDate,
+    reformatDate,
+    secondsToDateString,
+} from './common.js';
 
 class Application extends TestApplication {
     constructor() {
@@ -37,14 +43,78 @@ class Application extends TestApplication {
             yearAgo: new Date(year - 1, month, day),
         };
 
-        this.datesFmt = {};
+        const self = this;
+        this.dateFormatOptions = {
+            dateStyle: 'short',
+        };
+
+        this.datesFmt = {
+            get now() {
+                return self.formatDate(self.dates.now);
+            },
+
+            get monthAgo() {
+                return self.formatDate(self.dates.monthAgo);
+            },
+
+            get weekAgo() {
+                return self.formatDate(self.dates.weekAgo);
+            },
+
+            get weekAfter() {
+                return self.formatDate(self.dates.weekAfter);
+            },
+
+            get yesterday() {
+                return self.formatDate(self.dates.yesterday);
+            },
+
+            get yearAgo() {
+                return self.formatDate(self.dates.yearAgo);
+            },
+        };
+
         this.datesSec = {};
         Object.keys(this.dates).forEach((key) => {
-            this.datesFmt[key] = formatDate(this.dates[key]);
             this.datesSec[key] = dateToSeconds(this.dates[key]);
         });
 
         this.dateSecList = Object.values(this.datesSec);
+    }
+
+    isValidDateString(value) {
+        return isValidDateString(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    formatDate(date) {
+        return formatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    reformatDate(date) {
+        return reformatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    secondsToDateString(value) {
+        return secondsToDateString(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    parseDate(date) {
+        return fixDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
     }
 
     async setupUser() {

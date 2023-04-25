@@ -38,26 +38,26 @@
         <?php if ($this->user_id != 0) {        ?>
             <li class="nav-item">
                 <a class="nav-item__link" href="<?= BASEURL ?>accounts/"><?= __("ACCOUNTS") ?></a>
-                <a class="nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
-                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
+                    <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-item__link" href="<?= BASEURL ?>persons/"><?= __("PERSONS") ?></a>
-                <a class="nav-item__icon-btn" href="<?= BASEURL ?>persons/create/">
-                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>persons/create/">
+                    <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-item__link" href="<?= BASEURL ?>categories/"><?= __("CATEGORIES") ?></a>
-                <a class="nav-item__icon-btn" href="<?= BASEURL ?>categories/create/">
-                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>categories/create/">
+                    <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-item__link" href="<?= BASEURL ?>transactions/"><?= __("TRANSACTIONS") ?></a>
-                <a class="nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
-                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
+                    <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/"><?= __("STATISTICS") ?></a></li>

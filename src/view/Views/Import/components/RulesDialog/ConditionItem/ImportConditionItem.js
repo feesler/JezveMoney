@@ -7,6 +7,7 @@ import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
 } from '../../../../../js/model/ImportCondition.js';
+import { timeToDate } from '../../../../../js/utils.js';
 import './ImportConditionItem.scss';
 
 /**
@@ -119,6 +120,10 @@ export class ImportConditionItem extends Component {
             }
 
             return valueItem.name;
+        }
+
+        if (ImportCondition.isDateField(state.fieldType)) {
+            return window.app.formatDate(timeToDate(state.value));
         }
 
         return state.value;

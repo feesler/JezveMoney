@@ -57,6 +57,13 @@ class TransactionModel extends SortableModel
         GROUP_BY_YEAR => "year",
     ];
 
+    private static $durationMap = [
+        GROUP_BY_DAY => "D",
+        GROUP_BY_WEEK => "W",
+        GROUP_BY_MONTH => "M",
+        GROUP_BY_YEAR => "Y",
+    ];
+
     protected $tbl_name = "transactions";
     protected $accModel = null;
     protected $currMod = null;
@@ -1961,26 +1968,13 @@ class TransactionModel extends SortableModel
     /**
      * Returns label for specified timestamp and group type
      *
-     * @param int $time timestamp
-     * @param int $groupType group type
+     * @param mixed $dateInfo date info object
      *
      * @return string|null
      */
-    protected function getLabel(int $time, int $groupType)
+    protected function getLabel(mixed $dateInfo)
     {
-        if ($groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
-            return date("d.m.Y", $time);
-        }
-
-        if ($groupType == GROUP_BY_MONTH) {
-            return date("m.Y", $time);
-        }
-
-        if ($groupType == GROUP_BY_YEAR) {
-            return date("Y", $time);
-        }
-
-        return null;
+        return $dateInfo["time"];
     }
 
     /**
@@ -2014,6 +2008,7 @@ class TransactionModel extends SortableModel
     {
         $info = getdate($time);
         $info["week"] = intval(date("W", $time));
+        $info["wday"] = ($info["wday"] === 0) ? 6 : ($info["wday"] - 1);
         $res = [
             "time" => $time,
             "info" => $info,
@@ -2084,36 +2079,86 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns next date timestamp for specified group type
+     * Returns date info object for group start in specified group type
      *
-     * @param int $time timestamp
+     * @param mixed $dateInfo date info object
+     * @param int $groupType group type
+     *
+     * @return array
+     */
+    protected function getGroupStart(mixed $dateInfo, int $groupType)
+    {
+        if (!isset(self::$durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $date = new DateTime("@" . $dateInfo["time"], new DateTimeZone('UTC'));
+        $info = $dateInfo["info"];
+        $date->setTime(0, 0);
+
+        if ($groupType === GROUP_BY_WEEK) {
+            $date->sub(new DateInterval("P" . $info["wday"] . "D"));
+        }
+
+        if ($groupType === GROUP_BY_MONTH) {
+            $date->setDate($info["year"], $info["mon"], 1);
+        }
+
+        if ($groupType === GROUP_BY_YEAR) {
+            $date->setDate($info["year"], 1, 1);
+        }
+
+        $timestamp = $date->getTimestamp();
+        return $this->getDateInfo($timestamp, $groupType);
+    }
+
+    /**
+     * Returns date info object for next date in specified group type
+     *
+     * @param mixed $dateInfo date info object
+     * @param int $groupType group type
+     *
+     * @return array
+     */
+    protected function getNextDate(mixed $dateInfo, int $groupType)
+    {
+        if (!isset(self::$durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $groupStart = $this->getGroupStart($dateInfo, $groupType);
+        $date = new DateTime("@" . $groupStart["time"], new DateTimeZone('UTC'));
+        $duration = "P1" . self::$durationMap[$groupType];
+
+        $timestamp = $date->add(new DateInterval($duration))->getTimestamp();
+        return $this->getDateInfo($timestamp, $groupType);
+    }
+
+    /**
+     * Returns timestamp start date of range for specified group type
+     *
+     * @param int $endTime timestamp
+     * @param int $limit limit
      * @param int $groupType group type
      *
      * @return int
      */
-    protected function getNextDate(int $time, int $groupType)
+    protected function getLimitStartDate(int $endTime, int $limit, int $groupType)
     {
-        $durationMap = [
-            GROUP_BY_DAY => "P1D",
-            GROUP_BY_WEEK => "P1W",
-            GROUP_BY_MONTH => "P1M",
-            GROUP_BY_YEAR => "P1Y",
-        ];
-
-        if (!isset($durationMap[$groupType])) {
+        if (!isset(self::$durationMap[$groupType])) {
             throw new \Error("Invalid group type");
         }
 
-        $date = new DateTime("@" . $time, new DateTimeZone('UTC'));
-        $duration = $durationMap[$groupType];
+        $date = new DateTime("@" . $endTime, new DateTimeZone('UTC'));
+        $duration = "P" . $limit . self::$durationMap[$groupType];
 
         if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
-            $dateInfo = $this->getDateInfo($time, $groupType);
+            $dateInfo = $this->getDateInfo($endTime, $groupType);
             $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
             $date->setDate($dateInfo["info"]["year"], $month, 1);
         }
 
-        return $date->add(new DateInterval($duration))->getTimestamp();
+        return $date->sub(new DateInterval($duration))->getTimestamp();
     }
 
     /**
@@ -2276,6 +2321,7 @@ class TransactionModel extends SortableModel
         $groupArr = [];
         $sumDate = null;
         $curDate = null;
+        $groupStart = null;
         $curSum = [];
 
         $typesReq = (isset($params["type"])) ? $params["type"] : DEFAULT_TRANSACTION_TYPE;
@@ -2320,6 +2366,10 @@ class TransactionModel extends SortableModel
         ) {
             $dataParams["startDate"] = $params["startDate"];
             $dataParams["endDate"] = $params["endDate"];
+        } elseif ($limit > 0) {
+            $now = time();
+            $dataParams["startDate"] = $this->getLimitStartDate($now, $limit, $group_type);
+            $dataParams["endDate"] = $now;
         }
 
         $items = $this->getData($dataParams);
@@ -2361,6 +2411,7 @@ class TransactionModel extends SortableModel
             $curDate = $dateInfo;
 
             if (is_null($sumDate)) {        // first iteration
+                $groupStart = $this->getGroupStart($curDate, $group_type);
                 $sumDate = $curDate;
             } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
                 $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
@@ -2376,17 +2427,18 @@ class TransactionModel extends SortableModel
                     }
                 }
 
-                $label = $this->getLabel($sumDate["time"], $group_type);
+                $label = $this->getLabel($groupStart);
                 $groupArr[] = [$label, 1];
                 // Append series for empty values
-                $groupTime = $sumDate["time"];
+                $groupDate = $groupStart;
                 for ($i = 1; $i < $dateDiff; $i++) {
-                    $groupTime = $this->getNextDate($groupTime, $group_type);
-                    $label = $this->getLabel($groupTime, $group_type);
+                    $groupDate = $this->getNextDate($groupDate, $group_type);
+                    $label = $this->getLabel($groupDate);
                     $groupArr[] = [$label, 1];
                 }
 
                 $sumDate = $curDate;
+                $groupStart = $this->getGroupStart($sumDate, $group_type);
             }
 
             $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);
@@ -2397,14 +2449,14 @@ class TransactionModel extends SortableModel
         foreach ($transTypes as $type) {
             $remainSum += array_sum($curSum[$type]);
         }
-        if ($remainSum != 0.0 && is_array($sumDate)) {
+        if ($remainSum != 0.0 && is_array($groupStart)) {
             foreach ($transTypes as $type) {
                 foreach ($dataCategories as $cat) {
                     $amountArr[$type][$cat][] = $curSum[$type][$cat];
                 }
             }
 
-            $label = $this->getLabel($sumDate["time"], $group_type);
+            $label = $this->getLabel($groupStart);
             $groupArr[] = [$label, 1];
         }
 
@@ -2549,17 +2601,29 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns array of histogram group names
+     * Returns array of histogram group types
      *
      * @return array
      */
-    public static function getHistogramGroupNames()
+    public static function getHistogramGroupTypes()
     {
         return [
-            GROUP_BY_DAY => __("STAT_GROUP_BY_DAY"),
-            GROUP_BY_WEEK => __("STAT_GROUP_BY_WEEK"),
-            GROUP_BY_MONTH => __("STAT_GROUP_BY_MONTH"),
-            GROUP_BY_YEAR => __("STAT_GROUP_BY_YEAR"),
+            GROUP_BY_DAY => [
+                "name" => self::getHistogramGroupName(GROUP_BY_DAY),
+                "title" => __("STAT_GROUP_BY_DAY"),
+            ],
+            GROUP_BY_WEEK => [
+                "name" => self::getHistogramGroupName(GROUP_BY_WEEK),
+                "title" => __("STAT_GROUP_BY_WEEK"),
+            ],
+            GROUP_BY_MONTH => [
+                "name" => self::getHistogramGroupName(GROUP_BY_MONTH),
+                "title" => __("STAT_GROUP_BY_MONTH"),
+            ],
+            GROUP_BY_YEAR => [
+                "name" => self::getHistogramGroupName(GROUP_BY_YEAR),
+                "title" => __("STAT_GROUP_BY_YEAR"),
+            ],
         ];
     }
 

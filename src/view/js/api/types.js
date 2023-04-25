@@ -3,7 +3,6 @@ import {
     isFunction,
     isInt,
     isNum,
-    checkDate,
 } from 'jezvejs';
 
 /* eslint-disable no-console */
@@ -99,9 +98,6 @@ export const isIntArray = isArrayOf(isInt);
 export const isNumArray = isArrayOf(isNum);
 /** Verify object is array of strings */
 export const isStringArray = isArrayOf(isString);
-
-/** Verify object is date string in DD.MM.YYYY format */
-export const isDateString = (obj) => checkDate(obj);
 
 /** Verify object is account */
 export const isAccount = (obj) => verifyObject(obj, {

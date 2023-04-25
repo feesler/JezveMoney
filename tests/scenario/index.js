@@ -16,9 +16,9 @@ import { getAccountCSV, getCardCSV, getLargeCSV } from './data/importfiles.js';
 import { createImportRules } from './data/rules.js';
 import { createImportTemplates } from './data/templates.js';
 
-import * as ApiTests from '../run/api/index.js';
-import * as ProfileTests from '../run/profile.js';
-import { putFile, removeFile } from '../run/import/index.js';
+import * as ApiTests from '../actions/api/index.js';
+import * as ProfileTests from '../actions/profile.js';
+import { putFile, removeFile } from '../actions/import/index.js';
 
 import { UnitTestsStory } from './stories/UnitTestsStory.js';
 import { SecurityStory } from './stories/SecurityStory.js';

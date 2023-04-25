@@ -11,9 +11,10 @@ import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../../js/utils.js';
+import { __, timeToDate } from '../../../../../js/utils.js';
 import { API } from '../../../../../js/api/index.js';
 import { ImportRule } from '../../../../../js/model/ImportRule.js';
+import { ImportCondition } from '../../../../../js/model/ImportCondition.js';
 import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { SearchInput } from '../../../../../Components/SearchInput/SearchInput.js';
@@ -246,7 +247,23 @@ export class ImportRulesDialog extends Component {
         }
 
         this.state.id = this.UPDATE_STATE;
-        this.state.rule = new ImportRule(item);
+
+        const rule = {
+            ...item,
+            conditions: item.conditions.map((condition) => {
+                const res = {
+                    ...condition,
+                };
+
+                if (ImportCondition.isDateField(condition.field_id)) {
+                    res.value = window.app.formatDate(timeToDate(condition.value));
+                }
+
+                return res;
+            }),
+        };
+
+        this.state.rule = new ImportRule(rule);
 
         this.render(this.state);
     }

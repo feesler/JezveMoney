@@ -2,19 +2,12 @@ import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 import { normalize } from '../../js/utils.js';
 
-const groupTypes = [null, 'day', 'week', 'month', 'year'];
-
 const SECTOR_OFFSET = 10;
 
 // Utils
 export const isSameSelection = (a, b) => (
     a.length === b.length && a.every((id) => b.includes(id))
 );
-
-export const getGroupTypeByName = (name) => {
-    const groupName = (name) ? name.toLowerCase() : null;
-    return groupTypes.indexOf(groupName);
-};
 
 const pieChartInfoFromSector = (sector) => ({
     category: sector.category,
@@ -110,22 +103,14 @@ const slice = createSlice({
         },
     }),
 
-    changeGroupType: (state, value) => {
-        if (state.form.group === value) {
-            return state;
-        }
-
-        const form = { ...state.form };
-        const groupId = parseInt(value, 10);
-        const group = (groupId < groupTypes.length) ? groupTypes[groupId] : null;
-        if (group) {
-            form.group = group;
-        } else if ('group' in form) {
-            delete form.group;
-        }
-
-        return { ...state, form };
-    },
+    changeGroupType: (state, group) => (
+        (state.form.group === group)
+            ? state
+            : {
+                ...state,
+                form: { ...state.form, group },
+            }
+    ),
 
     selectDataColumn: (state, target) => {
         const selectedColumn = {

@@ -9,13 +9,15 @@ import {
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
-import * as TransactionTests from '../../../run/transaction.js';
+import * as TransactionTests from '../../../actions/transaction.js';
 import * as expenseTests from './expense.js';
 import * as incomeTests from './income.js';
 import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
 import * as creditLimitTests from './creditLimit.js';
-import * as AccountTests from '../../../run/account.js';
+import * as AccountTests from '../../../actions/account.js';
+import { testLocales } from '../../../actions/locale.js';
+import { testDateLocales } from '../../../actions/settings.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
@@ -40,6 +42,7 @@ export class TransactionsStory extends TestStory {
         await this.update();
         await this.updateFromMainView();
         await this.setCategoryFromMainView();
+        await this.locales();
         await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
@@ -172,7 +175,7 @@ export class TransactionsStory extends TestStory {
         // Try to submit expense with invalid date
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: '01.01.69' },
+            { action: 'inputDate', data: '' },
         ]);
     }
 
@@ -929,6 +932,31 @@ export class TransactionsStory extends TestStory {
         setBlock('Handling URL parameters', 1);
 
         await TransactionTests.checkDebtNoAccountURL();
+    }
+
+    async locales() {
+        setBlock('Transaction view locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        const { CARD_RUB } = App.scenario;
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'inputDestAmount', data: '0.01' },
+            { action: 'inputDate', data: App.datesFmt.yesterday },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeDestAccount', data: CARD_RUB },
+            { action: 'inputSrcAmount', data: '99.99' },
+            { action: 'selectDate', data: App.dates.monthAgo },
+        ]);
     }
 
     async availability(directNavigate) {

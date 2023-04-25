@@ -17,7 +17,6 @@ import {
     normalize,
     fixFloat,
     dateStringToSeconds,
-    secondsToDateString,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
@@ -329,7 +328,10 @@ export class ImportTransactionItem extends TestComponent {
             res.dest_amount = res.src_amount;
         }
 
-        res.date = dateStringToSeconds(model.date);
+        res.date = dateStringToSeconds(model.date, {
+            locales: App.state.getDateFormatLocale(),
+            options: App.dateFormatOptions,
+        });
         res.category_id = model.categoryId;
         res.comment = model.comment;
 
@@ -455,7 +457,7 @@ export class ImportTransactionItem extends TestComponent {
                 visible: isDebt,
             },
             dateField: {
-                value: secondsToDateString(item.date),
+                value: App.secondsToDateString(item.date),
                 visible: true,
             },
             categoryField: {

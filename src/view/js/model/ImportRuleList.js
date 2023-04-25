@@ -6,11 +6,6 @@ import { ImportRule } from './ImportRule.js';
  * @param {object[]} props - array of import rules
  */
 export class ImportRuleList extends List {
-    /** Static alias for ImportRuleList constructor */
-    static create(props) {
-        return new ImportRuleList(props);
-    }
-
     /**
      * Create list item from specified object
      * @param {Object} obj

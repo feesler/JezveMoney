@@ -1,41 +1,31 @@
-import {
-    TestComponent,
-    query,
-    assert,
-    evaluate,
-} from 'jezve-test';
+import { TestComponent, assert, evaluate } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
+import { dateStringToSeconds } from '../../../common.js';
 
 export class ImportConditionItem extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import condition item');
 
-        const res = {
-            propertyTitle: { elem: await query(this.elem, '.cond-item__property') },
-            operatorTitle: { elem: await query(this.elem, '.cond-item__operator') },
-            valueTitle: { elem: await query(this.elem, '.cond-item__value') },
-            valuePropTitle: { elem: await query(this.elem, '.cond-item__value-property') },
-        };
+        const res = await evaluate((el) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
+
+            return {
+                propertyTitle: textElemState(el.querySelector('.cond-item__property')),
+                operatorTitle: textElemState(el.querySelector('.cond-item__operator')),
+                valueTitle: textElemState(el.querySelector('.cond-item__value')),
+                valuePropTitle: textElemState(el.querySelector('.cond-item__value-property')),
+            };
+        }, this.elem);
 
         assert(
-            res.propertyTitle.elem
-            && res.operatorTitle.elem
-            && (res.valueTitle.elem || res.valuePropTitle.elem),
+            res.propertyTitle.visible
+            && res.operatorTitle.visible
+            && (res.valueTitle.visible || res.valuePropTitle.visible),
             'Invalid structure of condition item',
-        );
-
-        [
-            res.propertyTitle.value,
-            res.operatorTitle.value,
-            res.valueTitle.value,
-            res.valuePropTitle.value,
-        ] = await evaluate(
-            (...elems) => elems.map((el) => el?.textContent),
-            res.propertyTitle.elem,
-            res.operatorTitle.elem,
-            res.valueTitle.elem,
-            res.valuePropTitle.elem,
         );
 
         return res;
@@ -83,6 +73,11 @@ export class ImportConditionItem extends TestComponent {
                 assert(currency, `Currency not found: '${value}'`);
 
                 res.value = currency.id;
+            } else if (ImportCondition.isDateField(field.id)) {
+                res.value = dateStringToSeconds(value, {
+                    locales: App.state.getDateFormatLocale(),
+                    options: App.dateFormatOptions,
+                });
             } else {
                 res.value = value;
             }
@@ -131,6 +126,9 @@ export class ImportConditionItem extends TestComponent {
             assert(currency, `Currency not found: '${model.value}'`);
 
             value = currency.code;
+        } else if (ImportCondition.isDateField(model.fieldType)) {
+            const time = parseInt(model.value, 10);
+            value = App.secondsToDateString(time);
         } else {
             value = model.value;
         }

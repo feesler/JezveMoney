@@ -5,8 +5,10 @@ import {
     DEBT,
     availTransTypes,
 } from '../../model/Transaction.js';
-import * as Actions from '../../run/transactionList.js';
+import * as Actions from '../../actions/transactionList.js';
+import { testLocales } from '../../actions/locale.js';
 import { App } from '../../Application.js';
+import { testDateLocales } from '../../actions/settings.js';
 
 export class TransactionListStory extends TestStory {
     async beforeRun() {
@@ -25,6 +27,7 @@ export class TransactionListStory extends TestStory {
     async run() {
         await this.runTests(false);
         await this.runTests(true);
+        await this.locales();
     }
 
     async runTests(directNavigate = false) {
@@ -144,5 +147,21 @@ export class TransactionListStory extends TestStory {
         });
         // Show all types
         await Actions.filterByType({ type: 0, iteratePages: false });
+    }
+
+    async locales() {
+        setBlock('Transaction list view locales', 1);
+
+        await testLocales((locale) => this.checkLocale(locale));
+        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
+    }
+
+    async checkLocale(locale) {
+        setBlock(`Locale: '${locale}'`, 1);
+
+        await Actions.filterByDate({
+            start: App.datesFmt.weekAgo, end: App.datesFmt.now,
+        });
+        await Actions.clearDateRange();
     }
 }

@@ -2,6 +2,7 @@ import {
     fixFloat,
     isDate,
     isObject,
+    parseDateString,
     shiftDate,
 } from 'jezvejs';
 
@@ -58,22 +59,22 @@ export const leadZero = (val) => {
     return v.toString();
 };
 
-/** Convert DD.MM.YYYY string to timestamp */
-export const fixDate = (str) => {
+/** Convert date string to timestamp */
+export const parseDate = (str, params = {}) => {
     if (typeof str !== 'string') {
         return null;
     }
 
-    const res = Date.parse(str.split('.').reverse().join('-'));
-    if (Number.isNaN(res)) {
-        return null;
-    }
+    const res = parseDateString(str, {
+        locales: params?.locales ?? window.app.dateFormatLocale,
+        options: params?.options ?? window.app.dateFormatOptions,
+    });
 
-    return res;
+    return isDate(res) ? res : null;
 };
 
 /** Convert date string to timestamp */
-export const timestampFromString = (str) => {
+export const timestampFromString = (str, params = {}) => {
     if (typeof str === 'number') {
         return str;
     }
@@ -90,13 +91,22 @@ export const timestampFromString = (str) => {
         tmpDate = tmpDate.substring(0, pos);
     }
 
-    return fixDate(tmpDate);
+    return parseDate(tmpDate, params);
+};
+
+/** Returns Unix timestamp in seconds for specified date */
+export const getSeconds = (date) => {
+    if (!isDate(date)) {
+        throw new Error('Invalid date');
+    }
+
+    return date.getTime() / MS_IN_SECOND;
 };
 
 /** Convert date string to Unix timestamp in seconds */
-export const dateStringToTime = (value) => {
-    const res = fixDate(value);
-    return (res) ? (res / MS_IN_SECOND) : null;
+export const dateStringToTime = (value, locales = [], options = {}) => {
+    const res = parseDate(value, locales, options);
+    return (res) ? getSeconds(res) : null;
 };
 
 /** Convert Unix timestamp in seconds to date string */
@@ -112,7 +122,7 @@ export const timeToDate = (value) => {
 /** Returns time for start of the day */
 export const cutTime = (value) => {
     const fixedDate = shiftDate(timeToDate(value), 0);
-    return fixedDate.getTime() / MS_IN_SECOND;
+    return getSeconds(fixedDate);
 };
 
 /** Convert string to amount value */

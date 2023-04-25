@@ -4,19 +4,17 @@ import {
     click,
     assert,
     evaluate,
-    asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { __ } from '../../../model/locale.js';
 
-const fieldSelectors = [
-    '.debts-field',
-    '.visibility-field',
-    '.trans-count-field',
-    '.create-date-field',
-    '.update-date-field',
-];
+const fieldSelectors = {
+    debtField: '.debts-field',
+    visibilityField: '.visibility-field',
+    transactionsField: '.trans-count-field',
+    createDateField: '.create-date-field',
+    updateDateField: '.update-date-field',
+};
 
 export class PersonDetails extends TestComponent {
     get loading() {
@@ -24,45 +22,37 @@ export class PersonDetails extends TestComponent {
     }
 
     async parseContent() {
-        const res = {
-            closeBtn: { elem: await query(this.elem, '.close-btn') },
-            title: { elem: await query(this.elem, '.heading h1') },
-            transactionsLink: { elem: await query(this.elem, '.transactions-link') },
-        };
+        const res = await evaluate((el, selectors) => {
+            const textElemState = (elem) => ({
+                value: elem?.textContent,
+                visible: !!elem && !elem.hidden,
+            });
 
-        [
-            res.title.value,
-            res.loading,
-        ] = await evaluate((titleEl, linkEl) => ([
-            titleEl.textContent,
-            linkEl.classList.contains('vhidden'),
-        ]), res.title.elem, res.transactionsLink.elem);
+            const trLinkEl = el.querySelector('.transactions-link');
 
-        [
-            res.debtField,
-            res.visibilityField,
-            res.transactionsField,
-            res.createDateField,
-            res.updateDateField,
-        ] = await asyncMap(fieldSelectors, async (selector) => (
-            this.parseField(await query(this.elem, selector))
-        ));
+            const state = {
+                title: textElemState(el.querySelector('.heading h1')),
+                loading: trLinkEl?.classList.contains('vhidden'),
+                transactionsLink: {
+                    visible: !!trLinkEl && !trLinkEl.hidden,
+                },
+            };
 
-        return res;
-    }
+            Object.entries(selectors).forEach(([field, selector]) => {
+                const elem = el.querySelector(selector);
+                const titleEl = elem?.querySelector('.field__title');
+                const contentEl = elem?.querySelector('.field__content');
+                state[field] = {
+                    title: titleEl?.textContent,
+                    value: contentEl?.textContent,
+                    visible: !!elem && !elem.hidden,
+                };
+            });
 
-    async parseField(elem) {
-        assert(elem, 'Invalid field element');
+            return state;
+        }, this.elem, fieldSelectors);
 
-        const titleElem = await query(elem, '.field__title');
-        const contentElem = await query(elem, '.field__content');
-        assert(titleElem && contentElem, 'Invalid structure of field');
-
-        const res = await evaluate((titleEl, contEl) => ({
-            title: titleEl.textContent,
-            value: contEl.textContent,
-        }), titleElem, contentElem);
-        res.elem = elem;
+        res.closeBtn = { elem: await query(this.elem, '.close-btn') };
 
         return res;
     }
@@ -117,11 +107,11 @@ export class PersonDetails extends TestComponent {
             },
             transactionsLink: { visible: true },
             createDateField: {
-                value: secondsToDateString(item.createdate),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

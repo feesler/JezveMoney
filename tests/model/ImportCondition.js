@@ -5,8 +5,9 @@ import {
     assert,
 } from 'jezve-test';
 import { App } from '../Application.js';
-import { convDate, fixFloat } from '../common.js';
+import { dateToSeconds, fixFloat } from '../common.js';
 import { __ } from './locale.js';
+import { ImportTemplate } from './ImportTemplate.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -217,7 +218,13 @@ export class ImportCondition {
             return mapper(data);
         }
 
-        return data[mapper];
+        const res = data[mapper];
+        if (this.isDateField(fieldId) && typeof res === 'string') {
+            const date = ImportTemplate.dateFromString(res);
+            return dateToSeconds(date);
+        }
+
+        return res;
     }
 
     /** Check value for specified field type is account */
@@ -412,7 +419,7 @@ export class ImportCondition {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = !!convDate(this.value);
+            res.date = App.isValidDateString(this.value);
         }
 
         // Check empty condition value is used only for string field
@@ -468,14 +475,11 @@ export class ImportCondition {
         if (this.isPropertyValue()) {
             return ImportCondition.getFieldValue(this.value, data);
         }
-        if (this.isItemField()) {
+        if (this.isItemField() || this.isDateField()) {
             return parseInt(this.value, 10);
         }
         if (this.isAmountField()) {
             return parseFloat(this.value);
-        }
-        if (this.isDateField()) {
-            return convDate(this.value);
         }
 
         return this.value;

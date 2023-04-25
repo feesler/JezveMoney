@@ -3,7 +3,6 @@ import {
     enable,
     isFunction,
     insertAfter,
-    checkDate,
     Component,
     getClassName,
     fixFloat,
@@ -22,8 +21,9 @@ import {
     __,
     dateStringToTime,
     timeToDate,
+    parseDate,
 } from '../../../../js/utils.js';
-import { transTypeMap, typeNames } from '../../../../js/model/ImportTransaction.js';
+import { transTypeMap, typeNames, ImportTransaction } from '../../../../js/model/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';
@@ -497,7 +497,7 @@ export class ImportTransactionForm extends Component {
 
     /** DatePicker select event handler */
     onDateSelect(date) {
-        const dateFmt = window.app.formatDate(date);
+        const dateFmt = window.app.formatInputDate(date);
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -549,7 +549,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = checkDate(transaction.date);
+        const date = window.app.isValidDateString(transaction.date);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {
@@ -567,6 +567,14 @@ export class ImportTransactionForm extends Component {
         return valid;
     }
 
+    getData() {
+        const { transaction } = this.state;
+        return new ImportTransaction({
+            ...transaction,
+            date: window.app.formatDate(parseDate(transaction.date)),
+        });
+    }
+
     onSubmit(e) {
         e?.preventDefault();
 
@@ -575,9 +583,12 @@ export class ImportTransactionForm extends Component {
         }
 
         this.reset();
-        if (isFunction(this.props.onSave)) {
-            this.props.onSave(this.state.transaction);
+        if (!isFunction(this.props.onSave)) {
+            return;
         }
+
+        const transaction = this.getData();
+        this.props.onSave(transaction);
     }
 
     cancel() {
