@@ -62,8 +62,8 @@ export class ImportTransaction {
             original: data,
         });
 
-        res.date = (isValidDateString(data.date, IMPORT_DATE_LOCALE))
-            ? dateStringToSeconds(data.date, IMPORT_DATE_LOCALE)
+        res.date = (isValidDateString(data.date, { locales: IMPORT_DATE_LOCALE }))
+            ? dateStringToSeconds(data.date, { locales: IMPORT_DATE_LOCALE })
             : null;
 
         if (res.type === 'expense') {
@@ -495,8 +495,8 @@ export class ImportTransaction {
             }
         }
 
-        this.date = (isValidDateString(this.original.date, IMPORT_DATE_LOCALE))
-            ? dateStringToSeconds(this.original.date, IMPORT_DATE_LOCALE)
+        this.date = (isValidDateString(this.original.date, { locales: IMPORT_DATE_LOCALE }))
+            ? dateStringToSeconds(this.original.date, { locales: IMPORT_DATE_LOCALE })
             : null;
 
         this.category_id = 0;

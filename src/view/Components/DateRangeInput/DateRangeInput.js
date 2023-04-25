@@ -12,7 +12,7 @@ import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import {
     dateStringToTime,
-    fixDate,
+    parseDate,
     timeToDate,
     __,
 } from '../../js/utils.js';
@@ -241,8 +241,8 @@ export class DateRangeInput extends Component {
 
     validateDateRange(state = this.state) {
         const validation = { ...defaultValidation };
-        const startDate = fixDate(state.form.stdate);
-        const endDate = fixDate(state.form.enddate);
+        const startDate = parseDate(state.form.stdate);
+        const endDate = parseDate(state.form.enddate);
         if (!startDate) {
             validation.stdate = false;
         }
@@ -311,7 +311,7 @@ export class DateRangeInput extends Component {
         const { stdate, enddate } = state.filter;
         const isDateFilter = !!(stdate && enddate);
         if (isDateFilter) {
-            this.datePicker.setSelection(fixDate(stdate), fixDate(enddate));
+            this.datePicker.setSelection(parseDate(stdate), parseDate(enddate));
         } else {
             this.datePicker.clearSelection();
         }

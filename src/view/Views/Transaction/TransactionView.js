@@ -6,7 +6,6 @@ import {
     enable,
     setEvents,
     addChilds,
-    isValidDateString,
 } from 'jezvejs';
 import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
@@ -848,11 +847,7 @@ class TransactionView extends View {
     }
 
     validateDate(state) {
-        const valid = isValidDateString(
-            state.form.date,
-            window.app.dateFormatLocale,
-            window.app.dateFormatOptions,
-        );
+        const valid = window.app.isValidDateString(state.form.date);
         if (!valid) {
             this.store.dispatch(actions.invalidateDate());
         }

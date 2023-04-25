@@ -2,6 +2,7 @@ import {
     TestApplication,
     assert,
     formatDate,
+    isValidDateString,
 } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
@@ -9,7 +10,12 @@ import { AppState } from './model/AppState.js';
 import { Scenario } from './scenario/index.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
-import { dateToSeconds } from './common.js';
+import {
+    dateToSeconds,
+    fixDate,
+    reformatDate,
+    secondsToDateString,
+} from './common.js';
 
 class Application extends TestApplication {
     constructor() {
@@ -44,33 +50,27 @@ class Application extends TestApplication {
 
         this.datesFmt = {
             get now() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.now, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.now);
             },
 
             get monthAgo() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.monthAgo, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.monthAgo);
             },
 
             get weekAgo() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.weekAgo, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.weekAgo);
             },
 
             get weekAfter() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.weekAfter, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.weekAfter);
             },
 
             get yesterday() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.yesterday, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.yesterday);
             },
 
             get yearAgo() {
-                const dateLocale = self.state.getDateFormatLocale();
-                return formatDate(self.dates.yearAgo, dateLocale, self.dateFormatOptions);
+                return self.formatDate(self.dates.yearAgo);
             },
         };
 
@@ -80,6 +80,41 @@ class Application extends TestApplication {
         });
 
         this.dateSecList = Object.values(this.datesSec);
+    }
+
+    isValidDateString(value) {
+        return isValidDateString(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    formatDate(date) {
+        return formatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    reformatDate(date) {
+        return reformatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    secondsToDateString(value) {
+        return secondsToDateString(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    parseDate(date) {
+        return fixDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
     }
 
     async setupUser() {

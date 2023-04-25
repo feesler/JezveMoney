@@ -10,6 +10,7 @@ import {
     getWeek,
     dateToSeconds,
     MS_IN_SECOND,
+    secondsToDate,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -24,7 +25,7 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
-import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
+import { formatCsvDate } from './import.js';
 
 const WEEKS_IN_YEAR = 52;
 const MONTHS_IN_YEAR = 12;
@@ -563,7 +564,7 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            Transaction.formatDate(transaction.date, IMPORT_DATE_LOCALE),
+            formatCsvDate(secondsToDate(transaction.date)),
             transaction.comment,
         ]);
 
@@ -590,7 +591,7 @@ export class TransactionsList extends SortableList {
         const res = { time, date };
 
         if (groupType === 'day') {
-            res.id = formatDate(date, App.view.locale);
+            res.id = formatDate(date, { locales: App.view.locale });
         } else if (groupType === 'week') {
             const week = getWeek(time);
             const fixedYear = this.getFixedWeekYear(date);

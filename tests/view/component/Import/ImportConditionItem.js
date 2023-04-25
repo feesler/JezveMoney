@@ -1,7 +1,7 @@
 import { TestComponent, assert, evaluate } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
-import { secondsToDateString, dateStringToSeconds } from '../../../common.js';
+import { dateStringToSeconds } from '../../../common.js';
 
 export class ImportConditionItem extends TestComponent {
     async parseContent() {
@@ -74,8 +74,10 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = currency.id;
             } else if (ImportCondition.isDateField(field.id)) {
-                const dateLocale = App.state.getDateFormatLocale();
-                res.value = dateStringToSeconds(value, dateLocale, App.dateFormatOptions);
+                res.value = dateStringToSeconds(value, {
+                    locales: App.state.getDateFormatLocale(),
+                    options: App.dateFormatOptions,
+                });
             } else {
                 res.value = value;
             }
@@ -126,8 +128,7 @@ export class ImportConditionItem extends TestComponent {
             value = currency.code;
         } else if (ImportCondition.isDateField(model.fieldType)) {
             const time = parseInt(model.value, 10);
-            const dateLocale = App.state.getDateFormatLocale();
-            value = secondsToDateString(time, dateLocale, App.dateFormatOptions);
+            value = App.secondsToDateString(time);
         } else {
             value = model.value;
         }

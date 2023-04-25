@@ -6,7 +6,6 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../../../model/AccountsList.js';
 import { __ } from '../../../model/locale.js';
 
@@ -79,7 +78,6 @@ export class AccountDetails extends TestComponent {
         });
 
         const isCreditCard = item.type === ACCOUNT_TYPE_CREDIT_CARD;
-        const dateLocale = state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -116,11 +114,11 @@ export class AccountDetails extends TestComponent {
                 visible: true,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

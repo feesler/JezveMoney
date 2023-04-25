@@ -6,7 +6,6 @@ import {
     Component,
     getClassName,
     fixFloat,
-    isValidDateString,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -22,7 +21,7 @@ import {
     __,
     dateStringToTime,
     timeToDate,
-    fixDate,
+    parseDate,
 } from '../../../../js/utils.js';
 import { transTypeMap, typeNames, ImportTransaction } from '../../../../js/model/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
@@ -550,11 +549,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = isValidDateString(
-            transaction.date,
-            window.app.dateFormatLocale,
-            window.app.dateFormatOptions,
-        );
+        const date = window.app.isValidDateString(transaction.date);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {
@@ -576,7 +571,7 @@ export class ImportTransactionForm extends Component {
         const { transaction } = this.state;
         return new ImportTransaction({
             ...transaction,
-            date: window.app.formatDate(fixDate(transaction.date)),
+            date: window.app.formatDate(parseDate(transaction.date)),
         });
     }
 

@@ -15,12 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import {
-    dateToSeconds,
-    fixDate,
-    reformatDate,
-    secondsToDateString,
-} from '../common.js';
+import { dateToSeconds } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -111,13 +106,8 @@ export class StatisticsView extends AppView {
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const dateLocale = App.state.getDateFormatLocale();
-            const startDate = new Date(
-                fixDate(dateRange.startDate, dateLocale, App.dateFormatOptions),
-            );
-            const endDate = new Date(
-                fixDate(dateRange.endDate, dateLocale, App.dateFormatOptions),
-            );
+            const startDate = new Date(App.parseDate(dateRange.startDate));
+            const endDate = new Date(App.parseDate(dateRange.endDate));
 
             res.filter.startDate = dateToSeconds(startDate);
             res.filter.endDate = dateToSeconds(endDate);
@@ -184,18 +174,17 @@ export class StatisticsView extends AppView {
             startDate,
             endDate,
         } = model.filter;
-        const dateLocale = App.state.getDateFormatLocale();
 
         let startDateFmt = null;
         if (startDate) {
-            const dateFmt = secondsToDateString(startDate, dateLocale, App.dateFormatOptions);
-            startDateFmt = reformatDate(dateFmt, dateLocale, App.dateFormatOptions);
+            const dateFmt = App.secondsToDateString(startDate);
+            startDateFmt = App.reformatDate(dateFmt);
         }
 
         let endDateFmt = null;
         if (endDate) {
-            const dateFmt = secondsToDateString(endDate, dateLocale, App.dateFormatOptions);
-            endDateFmt = reformatDate(dateFmt, dateLocale, App.dateFormatOptions);
+            const dateFmt = App.secondsToDateString(endDate);
+            endDateFmt = App.reformatDate(dateFmt);
         }
 
         const res = {
@@ -529,9 +518,8 @@ export class StatisticsView extends AppView {
     async selectDateRange(start, end) {
         await this.openFilters();
 
-        const dateLocale = App.state.getDateFormatLocale();
-        const startDate = new Date(fixDate(start, dateLocale, App.dateFormatOptions));
-        const endDate = new Date(fixDate(end, dateLocale, App.dateFormatOptions));
+        const startDate = new Date(App.parseDate(start));
+        const endDate = new Date(App.parseDate(end));
 
         this.model.filter.startDate = dateToSeconds(startDate);
         this.model.filter.endDate = dateToSeconds(endDate);

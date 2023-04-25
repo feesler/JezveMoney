@@ -3,7 +3,6 @@ import {
     isObject,
     hasFlag,
     assert,
-    isValidDateString,
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { dateToSeconds, fixFloat } from '../common.js';
@@ -420,8 +419,7 @@ export class ImportCondition {
 
         // Check date condition
         if (this.isDateField()) {
-            const dateLocale = App.state.getDateFormatLocale();
-            res.date = isValidDateString(this.value, dateLocale, App.dateFormatOptions);
+            res.date = App.isValidDateString(this.value);
         }
 
         // Check empty condition value is used only for string field

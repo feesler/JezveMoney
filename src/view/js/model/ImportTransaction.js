@@ -1,7 +1,6 @@
 import {
     copyObject,
     trimDecimalPlaces,
-    isValidDateString,
     fixFloat,
 } from 'jezvejs';
 import {
@@ -827,11 +826,7 @@ export class ImportTransaction {
         }
 
         if (valid) {
-            valid = isValidDateString(
-                this.date,
-                window.app.dateFormatLocale,
-                window.app.dateFormatOptions,
-            );
+            valid = window.app.isValidDateString(this.date);
         }
 
         return valid;

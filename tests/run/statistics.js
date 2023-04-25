@@ -4,7 +4,6 @@ import {
     assert,
 } from 'jezve-test';
 import { App } from '../Application.js';
-import { reformatDate } from '../common.js';
 import { Transaction } from '../model/Transaction.js';
 import { StatisticsView } from '../view/StatisticsView.js';
 
@@ -103,9 +102,8 @@ export const groupByYear = async () => {
 };
 
 export const selectDateRange = async ({ start, end }) => {
-    const dateLocale = App.state.getDateFormatLocale();
-    const startDateFmt = reformatDate(start, dateLocale, App.dateFormatOptions);
-    const endDateFmt = reformatDate(end, dateLocale, App.dateFormatOptions);
+    const startDateFmt = App.reformatDate(start);
+    const endDateFmt = App.reformatDate(end);
 
     await checkNavigation();
     await test(

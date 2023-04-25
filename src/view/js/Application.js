@@ -6,6 +6,7 @@ import {
     formatDate,
     isFunction,
     getLocaleDateFormat,
+    isValidDateString,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 import { parseCookies, setCookie, __ } from './utils.js';
@@ -96,23 +97,37 @@ export class Application {
         return this.config.dateFormatOptions;
     }
 
-    formatDate(date, locales = this.dateFormatLocale, options = this.dateFormatOptions) {
+    isValidDateString(value) {
+        return isValidDateString(value, {
+            locales: this.dateFormatLocale,
+            options: this.dateFormatOptions,
+        });
+    }
+
+    formatDate(date, params = {}) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }
 
-        return formatDate(date, locales, options);
+        return formatDate(date, {
+            locales: params?.locales ?? this.dateFormatLocale,
+            options: params?.options ?? this.dateFormatOptions,
+        });
     }
 
-    formatInputDate(date, locales = this.dateFormatLocale, options = this.dateFormatOptions) {
-        const format = getLocaleDateFormat(locales, options);
-        const inputFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: (format.yearLength === 2) ? '2-digit' : 'numeric',
-        };
+    formatInputDate(date, params = {}) {
+        const locales = params?.locales ?? this.dateFormatLocale;
+        const options = params?.options ?? this.dateFormatOptions;
+        const format = getLocaleDateFormat({ locales, options });
 
-        let res = this.formatDate(date, locales, inputFormatOptions);
+        let res = this.formatDate(date, {
+            locales,
+            options: {
+                day: '2-digit',
+                month: '2-digit',
+                year: (format.yearLength === 2) ? '2-digit' : 'numeric',
+            },
+        });
         res = res.trim();
 
         if (res.endsWith(format.separator)) {

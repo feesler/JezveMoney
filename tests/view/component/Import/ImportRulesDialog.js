@@ -20,7 +20,6 @@ import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
 import { SearchInput } from '../SearchInput.js';
 import { __ } from '../../../model/locale.js';
-import { secondsToDateString } from '../../../common.js';
 
 const ITEMS_ON_PAGE = 20;
 
@@ -323,12 +322,7 @@ export class ImportRulesDialog extends TestComponent {
             };
 
             if (ImportCondition.isDateField(item.field_id)) {
-                const dateLocale = App.state.getDateFormatLocale();
-                condition.value = secondsToDateString(
-                    parseInt(condition.value, 10),
-                    dateLocale,
-                    App.dateFormatOptions,
-                );
+                condition.value = App.secondsToDateString(parseInt(condition.value, 10));
             }
 
             return condition;

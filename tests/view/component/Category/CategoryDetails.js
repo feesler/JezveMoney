@@ -8,7 +8,6 @@ import {
     prop,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { Category } from '../../../model/Category.js';
 import { __ } from '../../../model/locale.js';
 
@@ -73,13 +72,10 @@ export class CategoryDetails extends TestComponent {
     static render(item, state) {
         const parent = state.categories.getItem(item.parent_id);
         const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT', App.view.locale);
-
         const subcategories = state.categories.findByParent(item.id);
-
         const itemTransactions = state.transactions.applyFilter({
             categories: item.id,
         });
-        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -108,11 +104,11 @@ export class CategoryDetails extends TestComponent {
             },
             transactionsLink: { visible: true },
             createDateField: {
-                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

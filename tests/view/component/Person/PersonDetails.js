@@ -6,7 +6,6 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { __ } from '../../../model/locale.js';
 
 const fieldSelectors = {
@@ -88,7 +87,6 @@ export class PersonDetails extends TestComponent {
         const itemTransactions = state.transactions.applyFilter({
             persons: item.id,
         });
-        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -109,11 +107,11 @@ export class PersonDetails extends TestComponent {
             },
             transactionsLink: { visible: true },
             createDateField: {
-                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

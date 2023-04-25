@@ -11,8 +11,6 @@ import {
     asArray,
     asyncMap,
     evaluate,
-    formatDate,
-    isValidDateString,
 } from 'jezve-test';
 import { DropDown, Checkbox, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -1111,8 +1109,7 @@ export class ImportView extends AppView {
             ? this.isValidAmount(formModel.destAmount)
             : true;
 
-        const dateLocale = App.state.getDateFormatLocale();
-        const date = isValidDateString(formModel.date, dateLocale, App.dateFormatOptions);
+        const date = App.isValidDateString(formModel.date);
         assert(!(srcAmount && destAmount && date), 'Invalid state');
 
         formModel.validation = {
@@ -1135,7 +1132,6 @@ export class ImportView extends AppView {
         this.checkMainState();
         await this.openListMenu();
 
-        const dateLocale = App.state.getDateFormatLocale();
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
         const form = new ImportTransaction({
             enabled: true,
@@ -1149,7 +1145,7 @@ export class ImportView extends AppView {
             dest_curr: mainAccount.curr_id,
             src_amount: '',
             dest_amount: '',
-            date: formatDate(new Date(), dateLocale, App.dateFormatOptions),
+            date: App.formatDate(new Date()),
             comment: '',
         });
         this.formIndex = this.items.length;

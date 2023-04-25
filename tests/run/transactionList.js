@@ -7,7 +7,6 @@ import {
     asArray,
 } from 'jezve-test';
 import { App } from '../Application.js';
-import { reformatDate } from '../common.js';
 import { TransactionListView } from '../view/TransactionListView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
 import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
@@ -318,9 +317,8 @@ export const filterByDate = async ({ start, end, directNavigate = false }) => {
         await checkNavigation();
     }
 
-    const dateLocale = App.state.getDateFormatLocale();
-    const startDateFmt = reformatDate(start, dateLocale, App.dateFormatOptions);
-    const endDateFmt = reformatDate(end, dateLocale, App.dateFormatOptions);
+    const startDateFmt = App.reformatDate(start);
+    const endDateFmt = App.reformatDate(end);
 
     await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
         await App.view.selectDateRange(start, end, directNavigate);

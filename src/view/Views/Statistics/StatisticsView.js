@@ -591,19 +591,17 @@ class StatisticsView extends View {
         }
 
         if (group === 'month') {
-            return window.app.formatDate(
-                date,
-                window.app.dateFormatLocale,
-                { year: 'numeric', month: '2-digit' },
-            );
+            return window.app.formatDate(date, {
+                locales: window.app.dateFormatLocale,
+                options: { year: 'numeric', month: '2-digit' },
+            });
         }
 
         if (group === 'year') {
-            return window.app.formatDate(
-                date,
-                window.app.dateFormatLocale,
-                { year: 'numeric' },
-            );
+            return window.app.formatDate(date, {
+                locales: window.app.dateFormatLocale,
+                options: { year: 'numeric' },
+            });
         }
 
         return null;

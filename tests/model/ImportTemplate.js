@@ -1,8 +1,9 @@
-import { assert, copyObject, formatDate } from 'jezve-test';
+import { assert, copyObject } from 'jezve-test';
 import { fixFloat, fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';
+import { formatCsvDate } from './import.js';
 
 export const tplColumns = [
     'accountAmount',
@@ -42,7 +43,7 @@ export class ImportTemplate {
             tmpDate = tmpDate.substring(0, pos);
         }
 
-        const timestamp = fixDate(tmpDate, IMPORT_DATE_LOCALE);
+        const timestamp = fixDate(tmpDate, { locales: IMPORT_DATE_LOCALE });
         return (timestamp) ? (new Date(timestamp)) : null;
     }
 
@@ -65,7 +66,7 @@ export class ImportTemplate {
             if (['accountAmount', 'transactionAmount'].includes(column)) {
                 value = ImportTemplate.amountFix(value);
             } else if (column === 'date') {
-                value = formatDate(ImportTemplate.dateFromString(value), IMPORT_DATE_LOCALE);
+                value = formatCsvDate(ImportTemplate.dateFromString(value));
             }
 
             res[column] = value;

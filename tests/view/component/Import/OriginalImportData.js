@@ -1,12 +1,12 @@
 import {
     TestComponent,
     assert,
-    formatDate,
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../model/ImportTemplate.js';
+import { ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
+import { formatCsvDate } from '../../../model/import.js';
 
 export class OriginalImportData extends TestComponent {
     getLabelsMap() {
@@ -55,11 +55,7 @@ export class OriginalImportData extends TestComponent {
             ...cont,
             accountAmount: ImportTemplate.amountFix(cont.accountAmount),
             transactionAmount: ImportTemplate.amountFix(cont.transactionAmount),
-            date: formatDate(
-                ImportTemplate.dateFromString(cont.date),
-                IMPORT_DATE_LOCALE,
-                App.dateFormatOptions,
-            ),
+            date: formatCsvDate(ImportTemplate.dateFromString(cont.date)),
         };
 
         const template = App.state.templates.find((item) => item.name === cont.template);

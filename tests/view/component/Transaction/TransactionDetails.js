@@ -6,7 +6,6 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { secondsToDateString } from '../../../common.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
 
@@ -87,7 +86,6 @@ export class TransactionDetails extends TestComponent {
         const categoryTitle = (category)
             ? category.name
             : __('NO_CATEGORY', App.view.locale);
-        const dateLocale = App.state.getDateFormatLocale();
 
         const res = {
             title: {
@@ -115,7 +113,7 @@ export class TransactionDetails extends TestComponent {
             },
             dateField: {
                 visible: true,
-                value: secondsToDateString(item.date, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.date),
             },
             categoryField: {
                 visible: true,
@@ -126,11 +124,11 @@ export class TransactionDetails extends TestComponent {
                 value: item.comment,
             },
             createDateField: {
-                value: secondsToDateString(item.createdate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.createdate),
                 visible: true,
             },
             updateDateField: {
-                value: secondsToDateString(item.updatedate, dateLocale, App.dateFormatOptions),
+                value: App.secondsToDateString(item.updatedate),
                 visible: true,
             },
         };

@@ -134,7 +134,7 @@ export class ImportTemplate extends ListItem {
         }
 
         const value = this.getColumnData(data, this.columns.date);
-        return timestampFromString(value, IMPORT_DATE_LOCALE);
+        return timestampFromString(value, { locales: IMPORT_DATE_LOCALE });
     }
 
     /** Extract comment value from data */

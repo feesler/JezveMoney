@@ -3,6 +3,14 @@ import { createCSV } from '../common.js';
 import { App } from '../Application.js';
 import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
+/** Returns formatted date string according to CSV locale */
+export const formatCsvDate = (date) => (
+    formatDate(date, {
+        locales: IMPORT_DATE_LOCALE,
+        options: App.dateFormatOptions,
+    })
+);
+
 /** Convert data array to import statement row */
 function createCardTransaction(data) {
     const [
@@ -21,8 +29,8 @@ function createCardTransaction(data) {
     const confirmDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3);
 
     return [
-        `${formatDate(date, IMPORT_DATE_LOCALE)} 00:00`,
-        `${formatDate(confirmDate, IMPORT_DATE_LOCALE)} 00:00`,
+        `${formatCsvDate(date)} 00:00`,
+        `${formatCsvDate(confirmDate)} 00:00`,
         '*7777',
         `${comment} ${city} ${country}`,
         comment,
@@ -71,7 +79,7 @@ function createAccountTransaction(data) {
     assert.isDate(date, 'Invalid date object');
 
     return [
-        `${formatDate(date, IMPORT_DATE_LOCALE)} 00:00`,
+        `${formatCsvDate(date)} 00:00`,
         comment,
         trCurr,
         trAmount,

@@ -3,7 +3,6 @@ import {
     isObject,
     hasFlag,
     fixFloat,
-    isValidDateString,
     isDate,
 } from 'jezvejs';
 import { __, getSeconds } from '../utils.js';
@@ -397,11 +396,7 @@ export class ImportCondition extends ListItem {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = isValidDateString(
-                this.value,
-                window.app.dateFormatLocale,
-                window.app.dateFormatOptions,
-            );
+            res.date = window.app.isValidDateString(this.value);
         }
 
         // Check empty condition value is used only for string field

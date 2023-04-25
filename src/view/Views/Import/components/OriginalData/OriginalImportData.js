@@ -71,7 +71,10 @@ export class OriginalImportData extends Component {
             [
                 [
                     __('COLUMN_DATE'),
-                    window.app.formatDate(new Date(this.props.date), IMPORT_DATE_LOCALE),
+                    window.app.formatDate(
+                        new Date(this.props.date),
+                        { locales: IMPORT_DATE_LOCALE },
+                    ),
                 ],
             ],
             [

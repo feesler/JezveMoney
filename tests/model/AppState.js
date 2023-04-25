@@ -2018,8 +2018,10 @@ export class AppState {
             };
 
             if (ImportCondition.isDateField(item.field_id)) {
-                const dateLocale = this.getDateFormatLocale();
-                const time = dateStringToSeconds(item.value, dateLocale, App.dateFormatOptions);
+                const time = dateStringToSeconds(item.value, {
+                    locales: this.getDateFormatLocale(),
+                    options: App.dateFormatOptions,
+                });
                 condition.value = time?.toString() ?? null;
             }
 
