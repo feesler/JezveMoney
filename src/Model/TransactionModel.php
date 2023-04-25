@@ -1968,7 +1968,7 @@ class TransactionModel extends SortableModel
     /**
      * Returns label for specified timestamp and group type
      *
-     * @param int $time timestamp
+     * @param mixed $dateInfo date info object
      *
      * @return string|null
      */
@@ -2084,7 +2084,7 @@ class TransactionModel extends SortableModel
      * @param mixed $dateInfo date info object
      * @param int $groupType group type
      *
-     * @return mixed
+     * @return array
      */
     protected function getGroupStart(mixed $dateInfo, int $groupType)
     {
@@ -2118,7 +2118,7 @@ class TransactionModel extends SortableModel
      * @param mixed $dateInfo date info object
      * @param int $groupType group type
      *
-     * @return int
+     * @return array
      */
     protected function getNextDate(mixed $dateInfo, int $groupType)
     {
@@ -2137,8 +2137,8 @@ class TransactionModel extends SortableModel
     /**
      * Returns timestamp start date of range for specified group type
      *
-     * @param int $time timestamp
-     * @param int $time limit
+     * @param int $endTime timestamp
+     * @param int $limit limit
      * @param int $groupType group type
      *
      * @return int
@@ -2427,13 +2427,13 @@ class TransactionModel extends SortableModel
                     }
                 }
 
-                $label = $this->getLabel($groupStart, $group_type);
+                $label = $this->getLabel($groupStart);
                 $groupArr[] = [$label, 1];
                 // Append series for empty values
                 $groupDate = $groupStart;
                 for ($i = 1; $i < $dateDiff; $i++) {
                     $groupDate = $this->getNextDate($groupDate, $group_type);
-                    $label = $this->getLabel($groupDate, $group_type);
+                    $label = $this->getLabel($groupDate);
                     $groupArr[] = [$label, 1];
                 }
 
@@ -2456,7 +2456,7 @@ class TransactionModel extends SortableModel
                 }
             }
 
-            $label = $this->getLabel($groupStart, $group_type);
+            $label = $this->getLabel($groupStart);
             $groupArr[] = [$label, 1];
         }
 
