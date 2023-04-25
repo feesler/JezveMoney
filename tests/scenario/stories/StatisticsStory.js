@@ -10,7 +10,7 @@ import {
 } from '../../model/Transaction.js';
 import * as StatisticsTests from '../../actions/statistics.js';
 import { testLocales } from '../../actions/locale.js';
-import { testDateLocales } from '../../actions/settings.js';
+import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
 
 export class StatisticsStory extends TestStory {
     async beforeRun() {
@@ -131,6 +131,7 @@ export class StatisticsStory extends TestStory {
 
         await testLocales((locale) => this.checkLocale(locale));
         await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
+        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

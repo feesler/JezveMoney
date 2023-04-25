@@ -70,13 +70,23 @@ export class SettingsView extends AppView {
         }
 
         // Date format
-        res.dateRenderTime = await evaluate(() => {
-            const el = document.getElementById('dateFormatContainer');
-            return el?.dataset?.time;
+        [
+            res.dateRenderTime,
+            res.decimalRenderTime,
+        ] = await evaluate(() => {
+            const dateEl = document.getElementById('dateFormatContainer');
+            const decimalEl = document.getElementById('decimalFormatContainer');
+            return [
+                dateEl?.dataset?.time,
+                decimalEl?.dataset?.time,
+            ];
         });
 
         const dateLocaleDropDownEl = await query('#dateFormatContainer .dd__container');
         res.dateLocaleDropDown = await DropDown.create(this, dateLocaleDropDownEl);
+
+        const decimalLocaleDropDownEl = await query('#decimalFormatContainer .dd__container');
+        res.decimalLocaleDropDown = await DropDown.create(this, decimalLocaleDropDownEl);
 
         res.loadingIndicator = { elem: await query('#userCurrenciesContainer .loading-indicator') };
 
@@ -113,6 +123,8 @@ export class SettingsView extends AppView {
             },
             dateLocale: cont.dateLocaleDropDown.value,
             dateRenderTime: cont.dateRenderTime,
+            decimalLocale: cont.decimalLocaleDropDown.value,
+            decimalRenderTime: cont.decimalRenderTime,
         };
 
         return res;
@@ -151,6 +163,10 @@ export class SettingsView extends AppView {
             dateLocaleDropDown: {
                 visible: true,
                 value: model.dateLocale,
+            },
+            decimalLocaleDropDown: {
+                visible: true,
+                value: model.decimalLocale,
             },
         };
 
@@ -239,6 +255,24 @@ export class SettingsView extends AppView {
             return (
                 !this.model.loading
                 && prevTime !== this.model.dateRenderTime
+            );
+        });
+
+        await this.parse();
+    }
+
+    async waitForDecimalFormat(action) {
+        await this.parse();
+
+        const prevTime = this.model.decimalRenderTime;
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.decimalRenderTime
             );
         });
 
@@ -425,7 +459,20 @@ export class SettingsView extends AppView {
         this.model.dateLocale = locale;
         const expected = this.getExpectedState();
 
-        await this.waitForDateFormat(() => this.content.dateLocaleDropDown.setSelection(locale));
+        await this.waitForDateFormat(() => (
+            this.content.dateLocaleDropDown.setSelection(locale)
+        ));
+
+        return this.checkState(expected);
+    }
+
+    async selectDecimalLocale(locale) {
+        this.model.decimalLocale = locale;
+        const expected = this.getExpectedState();
+
+        await this.waitForDateFormat(() => (
+            this.content.decimalLocaleDropDown.setSelection(locale)
+        ));
 
         return this.checkState(expected);
     }

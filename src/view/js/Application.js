@@ -35,6 +35,10 @@ export class Application {
             dateFormatOptions: {
                 dateStyle: 'short',
             },
+            decimalFormatLocale: this.locale,
+            decimalFormatOptions: {
+                style: 'decimal',
+            },
         };
 
         // Setup models
@@ -46,6 +50,7 @@ export class Application {
 
             const { settings } = this.model.profile;
             this.config.dateFormatLocale = settings.date_locale;
+            this.config.decimalFormatLocale = settings.decimal_locale;
         }
 
         this.notification = null;
@@ -97,6 +102,14 @@ export class Application {
         return this.config.dateFormatOptions;
     }
 
+    get decimalFormatLocale() {
+        return this.config.decimalFormatLocale;
+    }
+
+    get decimalFormatOptions() {
+        return this.config.decimalFormatOptions;
+    }
+
     isValidDateString(value) {
         return isValidDateString(value, {
             locales: this.dateFormatLocale,
@@ -136,6 +149,14 @@ export class Application {
         }
 
         return res;
+    }
+
+    formatNumber(value, params = {}) {
+        const locales = params?.locales ?? this.decimalFormatLocale;
+        const options = params?.options ?? this.decimalFormatOptions;
+
+        const formatter = new Intl.NumberFormat(locales, options);
+        return formatter.format(value);
     }
 
     getThemeCookie() {

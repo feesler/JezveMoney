@@ -48,6 +48,15 @@
                             <div id="dateFormatContainer">
                             </div>
                         </section>
+
+                        <section class="settings-block">
+                            <header id="decimalFormatHeading" class="heading">
+                                <h2><?= __("SETTINGS_DECIMAL_FORMAT") ?></h2>
+                                <div class="heading-actions"></div>
+                            </header>
+                            <div id="decimalFormatContainer">
+                            </div>
+                        </section>
                     </main>
                 </div>
             </div>

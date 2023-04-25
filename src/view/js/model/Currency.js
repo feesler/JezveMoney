@@ -1,6 +1,5 @@
 import { hasFlag } from 'jezvejs';
 import {
-    formatValue,
     normalize,
     hasToken,
     __,
@@ -39,12 +38,17 @@ export class Currency extends ListItem {
      * @param {*} value - float value to format
      */
     formatValue(value) {
-        let nval = normalize(value, this.precision);
+        const options = {
+            ...window.app.decimalFormatOptions,
+        };
+
+        const nval = normalize(value, this.precision);
         if (Math.floor(nval) !== nval && hasFlag(this.flags, CURRENCY_FORMAT_TRAILING_ZEROS)) {
-            nval = nval.toFixed(this.precision);
+            options.minimumFractionDigits = this.precision;
+            options.maximumFractionDigits = this.precision;
         }
 
-        const fmtVal = formatValue(nval);
+        const fmtVal = window.app.formatNumber(nval, { options });
         return (hasFlag(this.flags, CURRENCY_SIGN_BEFORE_VALUE))
             ? `${this.sign} ${fmtVal}`
             : `${fmtVal} ${this.sign}`;

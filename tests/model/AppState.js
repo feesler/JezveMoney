@@ -38,7 +38,7 @@ import { ImportCondition } from './ImportCondition.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = [...sortSettings, 'date_locale'];
+const availSettings = [...sortSettings, 'date_locale', 'decimal_locale'];
 
 /** Accounts */
 const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
@@ -334,6 +334,10 @@ export class AppState {
 
     getDateFormatLocale() {
         return this.profile.settings.date_locale;
+    }
+
+    getDecimalFormatLocale() {
+        return this.profile.settings.decimal_locale;
     }
 
     getCurrencies() {

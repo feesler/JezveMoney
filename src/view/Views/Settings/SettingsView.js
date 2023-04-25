@@ -55,6 +55,7 @@ class SettingsView extends View {
             showContextMenu: false,
             contextItem: null,
             dateLocale: settings.date_locale,
+            decimalLocale: settings.decimal_locale,
             dateRenderTime: Date.now(),
         };
 
@@ -69,6 +70,7 @@ class SettingsView extends View {
             'userCurrenciesHeading',
             'userCurrenciesContainer',
             'dateFormatContainer',
+            'decimalFormatContainer',
         ]);
 
         // Locale select
@@ -169,6 +171,19 @@ class SettingsView extends View {
             ],
         });
         this.dateFormatContainer.append(this.dateFormatSelect.elem);
+
+        // Decimal format
+        this.decimalFormatSelect = DropDown.create({
+            onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
+            data: [
+                { id: 'ru', title: '1 234 567,89' },
+                { id: 'es', title: '1.234.567,89' },
+                { id: 'en', title: '1,234,567.89' },
+                { id: 'de-ch', title: '1’234’567.89' },
+                { id: 'hi', title: '12,34,567.345' },
+            ],
+        });
+        this.decimalFormatContainer.append(this.decimalFormatSelect.elem);
 
         this.subscribeToStore(this.store);
     }
@@ -477,6 +492,33 @@ class SettingsView extends View {
         this.setDateRenderTime();
     }
 
+    onDecimalFormatSelect(format) {
+        this.requestDecimalLocale(format.id);
+    }
+
+    async requestDecimalLocale(locale) {
+        const { settings } = window.app.model.profile;
+        if (settings.decimal_locale === locale) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.profile.updateSettings({
+                decimal_locale: locale,
+            });
+            settings.decimal_locale = locale;
+
+            this.store.dispatch(actions.changeDecimalLocale(locale));
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setDateRenderTime();
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
@@ -581,6 +623,11 @@ class SettingsView extends View {
         this.dateFormatContainer.dataset.time = state.dateRenderTime;
     }
 
+    renderDecimalFormat(state) {
+        this.decimalFormatSelect.selectItem(state.decimalLocale);
+        this.decimalFormatContainer.dataset.time = state.dateRenderTime;
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -595,6 +642,7 @@ class SettingsView extends View {
         this.renderContextMenu(state);
         this.renderMenu(state);
         this.renderDateFormat(state);
+        this.renderDecimalFormat(state);
 
         if (!state.loading) {
             this.loadingIndicator.hide();
