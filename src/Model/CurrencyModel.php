@@ -240,9 +240,15 @@ class CurrencyModel extends CachedTable
         $signBeforeValue = ($currObj->flags & $signFlag) === $signFlag;
 
         $zerosFlag = self::CURRENCY_FORMAT_TRAILING_ZEROS;
-        $trailingZeros = ($currObj->flags & $zerosFlag) === $zerosFlag;
 
-        $valueFmt = valFormat($value, $currObj->precision, $trailingZeros);
+        $settingsModel = UserSettingsModel::getInstance();
+
+        $valueFmt = valFormat($value, [
+            "precision" => $currObj->precision,
+            "trailingZeros" => ($currObj->flags & $zerosFlag) === $zerosFlag,
+            "decimalSeparator" => $settingsModel->getDecimalSeparator(),
+            "thousandsSeparator" => $settingsModel->getThousandsSeparator(),
+        ]);
 
         return ($signBeforeValue)
             ? ($currObj->sign . " " . $valueFmt)

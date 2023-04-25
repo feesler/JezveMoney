@@ -155,12 +155,11 @@ function e(?string $str, bool $lineEnd = false)
  * Returns formatted value
  *
  * @param mixed $val
- * @param int $precision
- * @param bool $trailingZeros
+ * @param array $options array of number format options
  *
  * @return string
  */
-function valFormat(mixed $val, int $precision, bool $trailingZeros = false)
+function valFormat(mixed $val, array $options = [])
 {
     if (!is_numeric($val)) {
         return "";
@@ -168,10 +167,15 @@ function valFormat(mixed $val, int $precision, bool $trailingZeros = false)
 
     $val = floatval($val);
 
+    $precision = $options["precision"] ?? 0;
+    $trailingZeros = $options["trailingZeros"] ?? false;
+    $decimalSeparator = $options["decimalSeparator"] ?? ".";
+    $thousandsSeparator = $options["thousandsSeparator"] ?? " ";
+
     if (strval(round($val)) !== strval($val) && $trailingZeros) {
-        $nf = number_format($val, $precision, ".", " ");
+        $nf = number_format($val, $precision, $decimalSeparator, $thousandsSeparator);
     } else {
-        $nf = number_format($val, 0, "", " ");
+        $nf = number_format($val, 0, "", $thousandsSeparator);
     }
 
     return $nf;

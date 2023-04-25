@@ -47,6 +47,9 @@ class Application extends TestApplication {
         this.dateFormatOptions = {
             dateStyle: 'short',
         };
+        this.decimalFormatOptions = {
+            style: 'decimal',
+        };
 
         this.datesFmt = {
             get now() {
@@ -115,6 +118,14 @@ class Application extends TestApplication {
             locales: this.state.getDateFormatLocale(),
             options: this.dateFormatOptions,
         });
+    }
+
+    formatNumber(value, params = {}) {
+        const locales = params?.locales ?? this.state.getDecimalFormatLocale();
+        const options = params?.options ?? this.decimalFormatOptions;
+
+        const formatter = new Intl.NumberFormat(locales, options);
+        return formatter.format(value);
     }
 
     async setupUser() {

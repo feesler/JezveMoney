@@ -17,7 +17,7 @@ import * as debtTests from './debt.js';
 import * as creditLimitTests from './creditLimit.js';
 import * as AccountTests from '../../../actions/account.js';
 import { testLocales } from '../../../actions/locale.js';
-import { testDateLocales } from '../../../actions/settings.js';
+import { testDateLocales, testDecimalLocales } from '../../../actions/settings.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
@@ -939,6 +939,7 @@ export class TransactionsStory extends TestStory {
 
         await testLocales((locale) => this.checkLocale(locale));
         await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
+        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
     }
 
     async checkLocale(locale) {

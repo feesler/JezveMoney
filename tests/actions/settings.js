@@ -65,6 +65,20 @@ export const selectDateLocale = async (locale) => {
     });
 };
 
+export const selectDecimalLocale = async (locale) => {
+    await test(`Select decimal locale ${locale}`, async () => {
+        await checkNavigation();
+
+        App.state.updateSettings({
+            decimal_locale: locale,
+        });
+
+        await App.view.selectDecimalLocale(locale);
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const testDateLocales = async (locales, action) => {
     const initialLocale = App.state.getDateFormatLocale();
     const remainLocales = locales.filter((locale) => locale !== initialLocale);
@@ -75,5 +89,18 @@ export const testDateLocales = async (locales, action) => {
     }
 
     await selectDateLocale(initialLocale);
+    await action(initialLocale);
+};
+
+export const testDecimalLocales = async (locales, action) => {
+    const initialLocale = App.state.getDecimalFormatLocale();
+    const remainLocales = locales.filter((locale) => locale !== initialLocale);
+
+    for (const locale of remainLocales) {
+        await selectDecimalLocale(locale);
+        await action(locale);
+    }
+
+    await selectDecimalLocale(initialLocale);
     await action(initialLocale);
 };

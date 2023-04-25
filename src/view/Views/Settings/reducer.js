@@ -87,6 +87,11 @@ const slice = createSlice({
         ...state,
         dateLocale,
     }),
+
+    changeDecimalLocale: (state, decimalLocale) => ({
+        ...state,
+        decimalLocale,
+    }),
 });
 
 export const { actions, reducer } = slice;

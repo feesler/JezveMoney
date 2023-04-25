@@ -338,6 +338,7 @@
     "SETTINGS_MAIN": "Common",
     "SETTINGS_CURRENCIES": "Currencies",
     "SETTINGS_DATE_FORMAT": "Date format",
+    "SETTINGS_DECIMAL_FORMAT": "Decimal format",
     "USER_CURRENCIES_NO_DATA": "No currencies selected",
     "OTHER_CURRENCIES": "Other currencies",
     "STATISTICS": "Statistics",
