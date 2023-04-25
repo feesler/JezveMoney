@@ -8,9 +8,9 @@ import {
     DEBT,
     Transaction,
 } from '../../model/Transaction.js';
-import * as StatisticsTests from '../../run/statistics.js';
-import { testLocales } from '../../run/locale.js';
-import { testDateLocales } from '../../run/settings.js';
+import * as StatisticsTests from '../../actions/statistics.js';
+import { testLocales } from '../../actions/locale.js';
+import { testDateLocales } from '../../actions/settings.js';
 
 export class StatisticsStory extends TestStory {
     async beforeRun() {

@@ -7,10 +7,10 @@ import {
     TRANSFER,
     DEBT,
 } from '../../../model/Transaction.js';
-import * as AccountApiTests from '../../../run/api/account.js';
-import * as PersonApiTests from '../../../run/api/person.js';
-import * as CategoryApiTests from '../../../run/api/category.js';
-import * as TransactionApiTests from '../../../run/api/transaction.js';
+import * as AccountApiTests from '../../../actions/api/account.js';
+import * as PersonApiTests from '../../../actions/api/person.js';
+import * as CategoryApiTests from '../../../actions/api/category.js';
+import * as TransactionApiTests from '../../../actions/api/transaction.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);

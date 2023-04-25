@@ -27,11 +27,11 @@ import {
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../model/ImportAction.js';
 import { api } from '../../../model/api.js';
-import * as ImportTests from '../../../run/import/index.js';
-import * as ImportRuleApiTests from '../../../run/api/importrule.js';
-import { testLocales } from '../../../run/locale.js';
+import * as ImportTests from '../../../actions/import/index.js';
+import * as ImportRuleApiTests from '../../../actions/api/importrule.js';
+import { testLocales } from '../../../actions/locale.js';
 import { App } from '../../../Application.js';
-import { testDateLocales } from '../../../run/settings.js';
+import { testDateLocales } from '../../../actions/settings.js';
 
 export class ImportRulesStory extends TestStory {
     async beforeRun() {

@@ -9,15 +9,15 @@ import {
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
-import * as TransactionTests from '../../../run/transaction.js';
+import * as TransactionTests from '../../../actions/transaction.js';
 import * as expenseTests from './expense.js';
 import * as incomeTests from './income.js';
 import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
 import * as creditLimitTests from './creditLimit.js';
-import * as AccountTests from '../../../run/account.js';
-import { testLocales } from '../../../run/locale.js';
-import { testDateLocales } from '../../../run/settings.js';
+import * as AccountTests from '../../../actions/account.js';
+import { testLocales } from '../../../actions/locale.js';
+import { testDateLocales } from '../../../actions/settings.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {

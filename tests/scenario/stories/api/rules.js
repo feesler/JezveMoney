@@ -6,7 +6,7 @@ import {
 } from '../../../model/ImportCondition.js';
 import { actions, ImportActionTypes } from '../../../model/ImportAction.js';
 import { App } from '../../../Application.js';
-import * as ImportRuleApiTests from '../../../run/api/importrule.js';
+import * as ImportRuleApiTests from '../../../actions/api/importrule.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);

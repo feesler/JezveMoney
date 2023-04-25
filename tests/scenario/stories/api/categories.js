@@ -1,7 +1,7 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { EXPENSE, INCOME } from '../../../model/Transaction.js';
-import * as CategoryApiTests from '../../../run/api/category.js';
+import * as CategoryApiTests from '../../../actions/api/category.js';
 
 const create = async () => {
     setBlock('Create categories', 2);

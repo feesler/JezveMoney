@@ -7,7 +7,7 @@ import {
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
-import * as TransactionApiTests from '../../../run/api/transaction.js';
+import * as TransactionApiTests from '../../../actions/api/transaction.js';
 import { dateToSeconds, formatProps } from '../../../common.js';
 
 const create = async () => {

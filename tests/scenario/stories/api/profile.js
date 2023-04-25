@@ -1,7 +1,7 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { SORT_BY_CREATEDATE_ASC, SORT_BY_CREATEDATE_DESC, SORT_BY_NAME_ASC } from '../../../common.js';
-import * as ApiTests from '../../../run/api/index.js';
+import * as ApiTests from '../../../actions/api/index.js';
 
 const runTests = async () => {
     setBlock('Profile', 2);

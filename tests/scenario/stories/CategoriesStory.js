@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as CategoryTests from '../../run/category.js';
+import * as CategoryTests from '../../actions/category.js';
 import { App } from '../../Application.js';
 import { EXPENSE, INCOME } from '../../model/Transaction.js';
 

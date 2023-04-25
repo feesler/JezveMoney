@@ -6,7 +6,7 @@ import {
     normalizeTest,
     normalizePrecTest,
     isValidValueTest,
-} from '../../run/unit.js';
+} from '../../actions/unit.js';
 import { App } from '../../Application.js';
 
 const zeroStrings = [

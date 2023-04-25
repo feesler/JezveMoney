@@ -5,10 +5,10 @@ import {
     DEBT,
     availTransTypes,
 } from '../../model/Transaction.js';
-import * as Actions from '../../run/transactionList.js';
-import { testLocales } from '../../run/locale.js';
+import * as Actions from '../../actions/transactionList.js';
+import { testLocales } from '../../actions/locale.js';
 import { App } from '../../Application.js';
-import { testDateLocales } from '../../run/settings.js';
+import { testDateLocales } from '../../actions/settings.js';
 
 export class TransactionListStory extends TestStory {
     async beforeRun() {

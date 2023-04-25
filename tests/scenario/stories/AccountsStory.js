@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as AccountTests from '../../run/account.js';
+import * as AccountTests from '../../actions/account.js';
 import { App } from '../../Application.js';
 
 export class AccountsStory extends TestStory {

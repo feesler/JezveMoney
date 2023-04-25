@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as SecurityTests from '../../run/security.js';
+import * as SecurityTests from '../../actions/security.js';
 import { App } from '../../Application.js';
 
 export class SecurityStory extends TestStory {
