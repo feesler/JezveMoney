@@ -1701,6 +1701,17 @@ class TransactionModel extends SortableModel
             }
         }
 
+        // Limit
+        if (isset($request["onPage"])) {
+            $onPage = intval($request["onPage"]);
+            if ($onPage < 0) {
+                throw new \Error("Invalid page limit");
+            }
+            if ($onPage > 0) {
+                $res["onPage"] = $onPage;
+            }
+        }
+
         // Pages range
         if (isset($request["range"])) {
             $range = intval($request["range"]);
