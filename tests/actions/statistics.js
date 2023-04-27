@@ -101,6 +101,27 @@ export const groupByYear = async () => {
     await test('Group statistics by year', () => App.view.groupByYear());
 };
 
+export const selectWeekRangeFilter = async () => {
+    await checkNavigation();
+    await test('Show week date range', () => (
+        App.view.selectWeekRangeFilter()
+    ));
+};
+
+export const selectMonthRangeFilter = async () => {
+    await checkNavigation();
+    await test('Show month date range', () => (
+        App.view.selectMonthRangeFilter()
+    ));
+};
+
+export const selectHalfYearRangeFilter = async () => {
+    await checkNavigation();
+    await test('Show half a year date range', () => (
+        App.view.selectHalfYearRangeFilter()
+    ));
+};
+
 export const selectStartDateFilter = async (date) => {
     const dateFmt = App.reformatDate(date);
 

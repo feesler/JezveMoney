@@ -15,7 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { dateToSeconds } from '../common.js';
+import { dateToSeconds, shiftDate, shiftMonth } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -62,6 +62,10 @@ export class StatisticsView extends AppView {
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
+
+        res.weekRangeBtn = { elem: await query('.range-selector-btn[data-range="week"]') };
+        res.monthRangeBtn = { elem: await query('.range-selector-btn[data-range="month"]') };
+        res.halfYearRangeBtn = { elem: await query('.range-selector-btn[data-range="halfyear"]') };
 
         res.chart = {
             elem: await query('.histogram'),
@@ -176,6 +180,7 @@ export class StatisticsView extends AppView {
             startDate,
             endDate,
         } = model.filter;
+        const showRangeSelectors = (group === GROUP_BY_DAY || group === GROUP_BY_WEEK);
 
         let startDateFmt = '';
         if (startDate) {
@@ -209,6 +214,9 @@ export class StatisticsView extends AppView {
                     endDate: endDateFmt,
                 },
             },
+            weekRangeBtn: { visible: filtersVisible && showRangeSelectors },
+            monthRangeBtn: { visible: filtersVisible && showRangeSelectors },
+            halfYearRangeBtn: { visible: filtersVisible && showRangeSelectors },
             noDataMessage: {},
             chartContainer: {},
         };
@@ -517,6 +525,80 @@ export class StatisticsView extends AppView {
 
     groupByYear() {
         return this.groupBy(GROUP_BY_YEAR);
+    }
+
+    checkRangeSelectorsAvailable() {
+        const { group } = this.model.filter;
+        assert(group === GROUP_BY_DAY || group === GROUP_BY_WEEK, `Invalid group type: ${group}`);
+    }
+
+    async selectWeekRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
+        await this.openFilters();
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftDate(now, -7));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        assert(this.content.weekRangeBtn.visible, 'Week range button not visible');
+        await this.waitForData(() => click(this.content.weekRangeBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectMonthRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
+        await this.openFilters();
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -1));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        assert(this.content.monthRangeBtn.visible, 'Month range button not visible');
+        await this.waitForData(() => click(this.content.monthRangeBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectHalfYearRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
+        await this.openFilters();
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -6));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        assert(this.content.halfYearRangeBtn.visible, 'Half a year range button not visible');
+        await this.waitForData(() => click(this.content.halfYearRangeBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async selectStartDateFilter(value) {

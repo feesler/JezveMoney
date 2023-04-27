@@ -93,6 +93,11 @@ export class StatisticsStory extends TestStory {
         await Actions.clearStartDateFilter();
         await Actions.clearEndDateFilter();
 
+        await Actions.groupByDay();
+        await Actions.selectWeekRangeFilter();
+        await Actions.selectMonthRangeFilter();
+        await Actions.selectHalfYearRangeFilter();
+
         await this.locales();
 
         await this.availability();

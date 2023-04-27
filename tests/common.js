@@ -126,6 +126,24 @@ export const getWeek = (timestamp) => {
     return 1 + Math.round((diff / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
 };
 
+/** Returns a new date shifted by the specified number of months */
+export const shiftMonth = (date, shift) => (
+    new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth() + shift,
+        date.getDate(),
+    ))
+);
+
+/** Returns a new date shifted by the specified number of days */
+export const shiftDate = (date, shift) => (
+    new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + shift,
+    ))
+);
+
 /** Format specified value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 

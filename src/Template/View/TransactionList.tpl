@@ -44,9 +44,7 @@
                                     <hr class="filters-separator">
 
                                     <div class="filters-row">
-                                        <section id="dateFilter" class="filter-item date-range-filter validation-block">
-                                            <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
-                                        </section>
+                                        <section id="dateFilter" class="filter-item date-range-filter validation-block"></section>
 
                                         <hr class="filters-separator">
 

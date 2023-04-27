@@ -312,6 +312,39 @@ export const filterByCategories = async ({ categories, directNavigate = false })
     });
 };
 
+export const selectWeekRangeFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Show week date range', async () => {
+        await App.view.selectWeekRangeFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const selectMonthRangeFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Show month date range', async () => {
+        await App.view.selectMonthRangeFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const selectHalfYearRangeFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Show half a year date range', async () => {
+        await App.view.selectHalfYearRangeFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
 export const selectStartDateFilter = async ({ date, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();

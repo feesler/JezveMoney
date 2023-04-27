@@ -1,9 +1,11 @@
 import {
+    DAYS_IN_WEEK,
     fixFloat,
     isDate,
     isObject,
     parseDateString,
     shiftDate,
+    shiftMonth,
 } from 'jezvejs';
 
 export const MS_IN_SECOND = 1000;
@@ -100,7 +102,7 @@ export const getSeconds = (date) => {
         throw new Error('Invalid date');
     }
 
-    return date.getTime() / MS_IN_SECOND;
+    return Math.round(date.getTime() / MS_IN_SECOND);
 };
 
 /** Convert date string to Unix timestamp in seconds */
@@ -123,6 +125,33 @@ export const timeToDate = (value) => {
 export const cutTime = (value) => {
     const fixedDate = shiftDate(timeToDate(value), 0);
     return getSeconds(fixedDate);
+};
+
+/** Returns date range object for a last week */
+export const getWeekRange = () => {
+    const now = new Date();
+    return {
+        stdate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
+        enddate: getSeconds(now),
+    };
+};
+
+/** Returns date range object for a last month */
+export const getMonthRange = () => {
+    const now = new Date();
+    return {
+        stdate: getSeconds(shiftMonth(now, -1)),
+        enddate: getSeconds(now),
+    };
+};
+
+/** Returns date range object for half a year */
+export const getHalfYearRange = () => {
+    const now = new Date();
+    return {
+        stdate: getSeconds(shiftMonth(now, -6)),
+        enddate: getSeconds(now),
+    };
 };
 
 /** Convert string to amount value */

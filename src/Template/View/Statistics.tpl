@@ -58,9 +58,7 @@
 
                                     <hr class="filters-separator">
 
-                                    <section id="dateFilter" class="filter-item date-range-filter">
-                                        <header class="filter-item__title"><?= __("FILTER_DATE_RANGE") ?></header>
-                                    </section>
+                                    <section id="dateFilter" class="filter-item date-range-filter"></section>
                                 </div>
                             </div>
 

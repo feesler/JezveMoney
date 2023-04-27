@@ -84,6 +84,10 @@ export class TransactionListStory extends TestStory {
         await Actions.selectStartDateFilter({ date: App.dates.yearAgo, directNavigate });
         await Actions.selectEndDateFilter({ date: App.dates.monthAgo, directNavigate });
 
+        await Actions.selectWeekRangeFilter(directNavigate);
+        await Actions.selectMonthRangeFilter(directNavigate);
+        await Actions.selectHalfYearRangeFilter(directNavigate);
+
         await Actions.search({ text: '1', directNavigate });
         await Actions.search({ text: 'la', directNavigate });
         await Actions.search({ text: 'кк', directNavigate });
