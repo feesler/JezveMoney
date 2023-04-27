@@ -104,12 +104,14 @@ export class StatisticsView extends AppView {
             startDate: null,
             endDate: null,
         };
-        const dateRange = cont.dateFilter.getSelectedRange();
-        if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const startDate = new Date(App.parseDate(dateRange.startDate));
-            const endDate = new Date(App.parseDate(dateRange.endDate));
 
+        const dateRange = cont.dateFilter.getSelectedRange();
+        if (dateRange?.startDate) {
+            const startDate = new Date(App.parseDate(dateRange.startDate));
             res.filter.startDate = dateToSeconds(startDate);
+        }
+        if (dateRange?.endDate) {
+            const endDate = new Date(App.parseDate(dateRange.endDate));
             res.filter.endDate = dateToSeconds(endDate);
         }
 
@@ -175,13 +177,13 @@ export class StatisticsView extends AppView {
             endDate,
         } = model.filter;
 
-        let startDateFmt = null;
+        let startDateFmt = '';
         if (startDate) {
             const dateFmt = App.secondsToDateString(startDate);
             startDateFmt = App.reformatDate(dateFmt);
         }
 
-        let endDateFmt = null;
+        let endDateFmt = '';
         if (endDate) {
             const dateFmt = App.secondsToDateString(endDate);
             endDateFmt = App.reformatDate(dateFmt);
@@ -245,8 +247,10 @@ export class StatisticsView extends AppView {
             params.category_id = model.filter.categories;
         }
 
-        if (model.filter.startDate && model.filter.endDate) {
+        if (model.filter.startDate) {
             params.startDate = model.filter.startDate;
+        }
+        if (model.filter.endDate) {
             params.endDate = model.filter.endDate;
         }
 
@@ -515,29 +519,58 @@ export class StatisticsView extends AppView {
         return this.groupBy(GROUP_BY_YEAR);
     }
 
-    async selectDateRange(start, end) {
+    async selectStartDateFilter(value) {
         await this.openFilters();
 
-        const startDate = new Date(App.parseDate(start));
-        const endDate = new Date(App.parseDate(end));
+        const date = new Date(App.parseDate(value));
+        const startDate = dateToSeconds(date);
+        if (this.model.filter.startDate === startDate) {
+            return true;
+        }
 
-        this.model.filter.startDate = dateToSeconds(startDate);
-        this.model.filter.endDate = dateToSeconds(endDate);
+        this.model.filter.startDate = startDate;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.dateFilter.selectRange(startDate, endDate));
+        await this.waitForData(() => this.content.dateFilter.selectStart(date));
 
         return App.view.checkState(expected);
     }
 
-    async clearDateRange() {
+    async selectEndDateFilter(value) {
+        await this.openFilters();
+
+        const date = new Date(App.parseDate(value));
+        const endDate = dateToSeconds(date);
+        if (this.model.filter.endDate === endDate) {
+            return true;
+        }
+
+        this.model.filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.dateFilter.selectEnd(date));
+
+        return App.view.checkState(expected);
+    }
+
+    async clearStartDateFilter() {
         await this.openFilters();
 
         this.model.filter.startDate = null;
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.dateFilter.clearStart());
+
+        return App.view.checkState(expected);
+    }
+
+    async clearEndDateFilter() {
+        await this.openFilters();
+
         this.model.filter.endDate = null;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.dateFilter.clear());
+        await this.waitForData(() => this.content.dateFilter.clearEnd());
 
         return App.view.checkState(expected);
     }

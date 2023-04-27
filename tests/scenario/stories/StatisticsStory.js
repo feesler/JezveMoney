@@ -82,15 +82,16 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.filterByCategories([FOOD_CATEGORY, BIKE_CATEGORY]);
         await StatisticsTests.filterByCategories(0);
 
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.yearAgo,
-            end: App.datesFmt.monthAgo,
-        });
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.weekAgo,
-            end: App.datesFmt.now,
-        });
-        await StatisticsTests.clearDateRange();
+        await StatisticsTests.selectStartDateFilter(App.dates.yearAgo);
+        await StatisticsTests.clearStartDateFilter();
+        await StatisticsTests.selectEndDateFilter(App.dates.monthAgo);
+        await StatisticsTests.selectStartDateFilter(App.dates.yearAgo);
+
+        await StatisticsTests.selectEndDateFilter(App.dates.now);
+        await StatisticsTests.selectStartDateFilter(App.dates.weekAgo);
+
+        await StatisticsTests.clearStartDateFilter();
+        await StatisticsTests.clearEndDateFilter();
 
         await this.locales();
 
@@ -137,14 +138,7 @@ export class StatisticsStory extends TestStory {
     async checkLocale(locale) {
         setBlock(`Locale: '${locale}'`, 1);
 
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.yearAgo,
-            end: App.datesFmt.monthAgo,
-        });
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.weekAgo,
-            end: App.datesFmt.now,
-        });
-        await StatisticsTests.clearDateRange();
+        await StatisticsTests.selectStartDateFilter(App.datesFmt.monthAgo);
+        await StatisticsTests.clearStartDateFilter();
     }
 }

@@ -312,27 +312,50 @@ export const filterByCategories = async ({ categories, directNavigate = false })
     });
 };
 
-export const filterByDate = async ({ start, end, directNavigate = false }) => {
+export const selectStartDateFilter = async ({ date, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    const startDateFmt = App.reformatDate(start);
-    const endDateFmt = App.reformatDate(end);
+    const dateFmt = App.reformatDate(date);
 
-    await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
-        await App.view.selectDateRange(start, end, directNavigate);
+    await test(`Select start date (${dateFmt})`, async () => {
+        await App.view.selectStartDateFilter(date, directNavigate);
         return App.view.iteratePages();
     });
 };
 
-export const clearDateRange = async (directNavigate = false) => {
+export const selectEndDateFilter = async ({ date, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    await test('Clear date range', async () => {
-        await App.view.clearDateRange(directNavigate);
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select end date (${dateFmt})`, async () => {
+        await App.view.selectEndDateFilter(date, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const clearStartDateFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear start date', async () => {
+        await App.view.clearStartDateFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const clearEndDateFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear end date', async () => {
+        await App.view.clearEndDateFilter(directNavigate);
         return App.view.iteratePages();
     });
 };

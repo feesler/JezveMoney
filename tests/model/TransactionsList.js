@@ -223,12 +223,9 @@ export class TransactionsList extends SortableList {
             return list;
         }
 
-        assert.isInteger(start, `Invalid start date timestamp: ${start}`);
-        assert.isInteger(end, `Invalid start date timestamp: ${end}`);
-
-        let fStart = start;
-        let fEnd = end;
-        if (fStart > fEnd) {
+        let fStart = start ?? null;
+        let fEnd = end ?? null;
+        if (fStart && fEnd && fStart > fEnd) {
             const tmp = fEnd;
             fEnd = fStart;
             fStart = tmp;
@@ -328,7 +325,7 @@ export class TransactionsList extends SortableList {
 
             res = this.getItemsByAccounts(res, filterAccounts);
         }
-        if ('startDate' in params && 'endDate' in params) {
+        if ('startDate' in params || 'endDate' in params) {
             res = this.getItemsByDate(res, params.startDate, params.endDate);
         }
         if ('search' in params) {
@@ -803,13 +800,18 @@ export class TransactionsList extends SortableList {
         if (categoryId.length > 0) {
             itemsFilter.categories = categoryId;
         }
-        if (params.startDate && params.endDate) {
+
+        if (params.startDate) {
             itemsFilter.startDate = params.startDate;
+        }
+        if (params.endDate) {
             itemsFilter.endDate = params.endDate;
-        } else if (limit > 0) {
-            const now = new Date();
-            itemsFilter.startDate = this.getLimitStartDate(now, limit, groupType);
-            itemsFilter.endDate = now;
+        }
+
+        if (limit > 0) {
+            const endTime = itemsFilter.endDate ?? new Date();
+            itemsFilter.startDate = this.getLimitStartDate(endTime, limit, groupType);
+            itemsFilter.endDate = endTime;
         }
 
         const list = this.applyFilter(itemsFilter);

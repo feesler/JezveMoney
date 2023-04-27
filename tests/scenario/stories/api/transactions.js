@@ -838,6 +838,10 @@ const filter = async () => {
         onPage: 10,
         page: 2,
     }, {
+        startDate: App.datesSec.monthAgo,
+    }, {
+        endDate: App.datesSec.yesterday,
+    }, {
         startDate: App.datesSec.now,
         endDate: App.datesSec.weekAfter,
     }, {
@@ -870,6 +874,18 @@ const statistics = async () => {
         { report: 'currency', curr_id: RUB },
         { report: 'currency', curr_id: RUB, group: 'day' },
         { report: 'currency', curr_id: RUB, group: 'week' },
+        {
+            report: 'currency',
+            curr_id: RUB,
+            group: 'week',
+            stdate: App.datesSec.monthAgo,
+        },
+        {
+            report: 'currency',
+            curr_id: RUB,
+            group: 'week',
+            enddate: App.datesSec.now,
+        },
         {
             report: 'currency',
             curr_id: RUB,

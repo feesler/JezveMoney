@@ -171,8 +171,10 @@ class Transaction extends ApiSortableListController
             }
         }
 
-        if (isset($filterObj->stdate) && isset($filterObj->enddate)) {
+        if (isset($filterObj->stdate)) {
             $params["startDate"] = $filterObj->stdate;
+        }
+        if (isset($filterObj->enddate)) {
             $params["endDate"] = $filterObj->enddate;
         }
 

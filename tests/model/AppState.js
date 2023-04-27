@@ -1625,8 +1625,10 @@ export class AppState {
         if ('categories' in params) {
             res.category_id = params.categories;
         }
-        if ('startDate' in params && 'endDate' in params) {
+        if ('startDate' in params) {
             res.stdate = params.startDate;
+        }
+        if ('endDate' in params) {
             res.enddate = params.endDate;
         }
         if ('search' in params) {
