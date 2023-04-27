@@ -266,7 +266,7 @@ export class TransactionsList extends SortableList {
         return TransactionsList.create(items);
     }
 
-    getItemsPage(list, num, limit, range) {
+    getItemsPage(list, num, limit, range, desc = false) {
         const onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
         const pagesRange = (typeof range !== 'undefined') ? range : 1;
 
@@ -275,15 +275,13 @@ export class TransactionsList extends SortableList {
 
         const offset = (num - 1) * onPage;
 
-        const res = copyObject(list);
-
-        res.sort((a, b) => a.pos - b.pos);
+        const res = this.sortItems(list, desc);
 
         return res.slice(offset, Math.min(offset + onPage * pagesRange, res.length));
     }
 
-    getPage(num, limit, range) {
-        const items = this.getItemsPage(this.data, num, limit, range);
+    getPage(num, limit, range, desc = false) {
+        const items = this.getItemsPage(this.data, num, limit, range, desc);
         if (items === this.data) {
             return this;
         }

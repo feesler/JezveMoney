@@ -358,6 +358,8 @@ export const updateFromMainViewAndSubmit = async (pos, actions) => {
 };
 
 export const deleteFromContextMenu = async (index) => {
+    const onPage = App.config.transactionsOnPage;
+
     await test(`Delete transaction from context menu [${index}]`, async () => {
         await App.view.navigateToTransactions();
 
@@ -368,7 +370,7 @@ export const deleteFromContextMenu = async (index) => {
 
         App.view.model.data = App.state.transactions.clone();
 
-        const expectedItems = App.state.transactions.getPage(1);
+        const expectedItems = App.view.model.data.getPage(1, onPage, 1, true);
         const expected = {
             transList: TransactionList.render(expectedItems.data, App.state),
         };

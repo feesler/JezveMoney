@@ -468,14 +468,14 @@ export class AppState {
         const filtered = this.transactions.applyFilter(request);
         let items = filtered.clone();
         const { onPage } = request;
+        const isDesc = request.order?.toLowerCase() === 'desc';
 
         if ('page' in request || 'range' in request || 'onPage' in request) {
             const targetPage = request.page ?? 1;
             const targetRange = request.range ?? 1;
-            items = items.getPage(targetPage, request.onPage, targetRange);
+            items = items.getPage(targetPage, request.onPage, targetRange, isDesc);
         }
 
-        const isDesc = request.order?.toLowerCase() === 'desc';
         if (!isDesc) {
             items.data = items.sortAsc();
         }
