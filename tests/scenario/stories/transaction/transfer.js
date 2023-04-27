@@ -1,7 +1,7 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { TRANSFER } from '../../../model/Transaction.js';
-import * as TransactionTests from '../../../actions/transaction.js';
+import * as Actions from '../../../actions/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();
@@ -28,9 +28,9 @@ export const stateLoop = async () => {
     });
 
     // Input source amount
-    await TransactionTests.runGroup('inputSrcAmount', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputSrcAmount', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 7: Change destination account to another one with same currency
         //  as source (RUB)
         { action: 'changeDestAccount', data: ACC_3 },
@@ -42,9 +42,9 @@ export const stateLoop = async () => {
     ]);
 
     // Input source result balance
-    await TransactionTests.runGroup('inputResBalance', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputResBalance', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 11: Change source account to another one with same currency as destination
         //  and stay on State 1
         { action: 'changeSrcAccount', data: CARD_RUB },
@@ -56,9 +56,9 @@ export const stateLoop = async () => {
     ]);
 
     // Input destination result balance
-    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputDestResBalance', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 15: Change source account to another one with same currency and stay
         //  on State 2
         { action: 'changeSrcAccount', data: CARD_RUB },
@@ -145,16 +145,16 @@ export const stateLoop = async () => {
     ]);
 
     // Input exchange rate
-    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
 
     // Toggle direction of exchange rate and stay on State 8
-    await TransactionTests.runAction({ action: 'toggleExchange' });
+    await Actions.runAction({ action: 'toggleExchange' });
     // Input back exchange rate
-    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
     // Toggle direction of exchange rate and stay on State 8
-    await TransactionTests.runAction({ action: 'toggleExchange' });
+    await Actions.runAction({ action: 'toggleExchange' });
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 51: Change source account to another one with different currency than
         //  destination (USD) and stay on State 6
         { action: 'changeSrcAccount', data: ACC_USD },

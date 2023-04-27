@@ -1,7 +1,7 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { INCOME } from '../../../model/Transaction.js';
-import * as TransactionTests from '../../../actions/transaction.js';
+import * as Actions from '../../../actions/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();
@@ -32,9 +32,9 @@ export const stateLoop = async () => {
     });
 
     // Input source amount
-    await TransactionTests.runGroup('inputSrcAmount', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputSrcAmount', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 2: Click on destination result balance block and move from State 0 to State 1
         { action: 'clickDestResultBalance' },
         // Transition 23: Change account to another one with different currency and stay on State 1
@@ -43,9 +43,9 @@ export const stateLoop = async () => {
     ]);
 
     // Input result balance
-    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputDestResBalance', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 4: Click on source amount block and move from State 1 to State 0
         { action: 'clickSrcAmount' },
         // Transition 3: Change source currency to different than currency of account and move
@@ -58,9 +58,9 @@ export const stateLoop = async () => {
     ]);
 
     // Input destination amount
-    await TransactionTests.runGroup('inputDestAmount', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputDestAmount', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 7: Click on result balance block and move from State 2 to State 4
         { action: 'clickDestResultBalance' },
         // Transition 17: Change account to another one with currency different than current
@@ -82,16 +82,16 @@ export const stateLoop = async () => {
     ]);
 
     // Input exchange rate
-    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
 
     // Toggle direction of exchange rate and stay on State 3
-    await TransactionTests.runAction({ action: 'toggleExchange' });
+    await Actions.runAction({ action: 'toggleExchange' });
     // Input back exchange rate
-    await TransactionTests.runGroup('inputExchRate', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
     // Toggle direction of exchange rate and stay on State 3
-    await TransactionTests.runAction({ action: 'toggleExchange' });
+    await Actions.runAction({ action: 'toggleExchange' });
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 13: Click on destination amount block and move from State 3 to State 2
         { action: 'clickDestAmount' },
         // Transition 9: change source currency to different than currency of account and
@@ -139,7 +139,7 @@ export const stateLoop = async () => {
     ]);
 
     // Test input values for precise currency
-    await TransactionTests.runActions([
+    await Actions.runActions([
         { action: 'changeSourceCurrency', data: BTC },
         { action: 'inputSrcAmount', data: '0.12345678' },
         { action: 'changeDestAccount', data: ACC_BTC },

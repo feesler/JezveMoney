@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as PersonApiTests from '../../../actions/api/person.js';
+import * as Actions from '../../../actions/api/person.js';
 
 const create = async () => {
     setBlock('Create persons', 2);
@@ -14,7 +14,7 @@ const create = async () => {
     [
         App.scenario.PERSON_X,
         App.scenario.PERSON_Y,
-    ] = await App.scenario.runner.runGroup(PersonApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -36,7 +36,7 @@ const createWithChainedRequest = async () => {
     [
         App.scenario.PERSON_CHAINED_Z,
         App.scenario.PERSON_CHAINED_AA,
-    ] = await App.scenario.runner.runGroup(PersonApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -56,7 +56,7 @@ const createInvalid = async () => {
         flags: 1,
     }];
 
-    await App.scenario.runner.runGroup(PersonApiTests.create, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createMultiple = async () => {
@@ -70,7 +70,7 @@ const createMultiple = async () => {
         name: 'Person 3',
     }];
 
-    await PersonApiTests.createMultiple(data);
+    await Actions.createMultiple(data);
 };
 
 const createMultipleInvalid = async () => {
@@ -90,7 +90,7 @@ const createMultipleInvalid = async () => {
         }, null],
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.createMultiple, data);
 };
 
 const read = async () => {
@@ -101,7 +101,7 @@ const read = async () => {
         [App.scenario.PERSON_X, App.scenario.PERSON_Y],
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.read, data);
+    await App.scenario.runner.runGroup(Actions.read, data);
 };
 
 const list = async () => {
@@ -114,7 +114,7 @@ const list = async () => {
         { visibility: 'all' },
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.list, data);
+    await App.scenario.runner.runGroup(Actions.list, data);
 };
 
 const update = async () => {
@@ -124,7 +124,7 @@ const update = async () => {
         { id: App.scenario.PERSON_X, name: 'XX!' },
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -140,7 +140,7 @@ const updateWithChainedRequest = async () => {
         },
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateInvalid = async () => {
@@ -152,7 +152,7 @@ const updateInvalid = async () => {
         { id: App.scenario.PERSON_X, name: '' },
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const setPos = async () => {
@@ -166,7 +166,7 @@ const setPos = async () => {
         { id: PERSON_X, pos: 1 },
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosWithChainedRequest = async () => {
@@ -184,7 +184,7 @@ const setPosWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosInvalid = async () => {
@@ -201,7 +201,7 @@ const setPosInvalid = async () => {
         null,
     ];
 
-    await App.scenario.runner.runGroup(PersonApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const del = async () => {
@@ -211,7 +211,7 @@ const del = async () => {
         { id: App.scenario.PERSON_Y },
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.del, data);
+    return App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delWithChainedRequest = async () => {
@@ -229,7 +229,7 @@ const delWithChainedRequest = async () => {
         },
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.del, data);
+    return App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delInvalid = async () => {
@@ -241,7 +241,7 @@ const delInvalid = async () => {
         [null, null],
     ];
 
-    return App.scenario.runner.runGroup(PersonApiTests.del, data);
+    return App.scenario.runner.runGroup(Actions.del, data);
 };
 
 export const apiPersonsTests = {

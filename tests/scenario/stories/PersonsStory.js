@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as PersonTests from '../../actions/person.js';
+import * as Actions from '../../actions/person.js';
 import { App } from '../../Application.js';
 
 export class PersonsStory extends TestStory {
@@ -26,7 +26,7 @@ export class PersonsStory extends TestStory {
     async run() {
         setBlock('Persons', 1);
 
-        await PersonTests.securityTests();
+        await Actions.securityTests();
 
         await this.create();
         await this.hide();
@@ -47,64 +47,64 @@ export class PersonsStory extends TestStory {
     async create() {
         setBlock('Create persons', 2);
 
-        await PersonTests.create();
-        await PersonTests.inputName('&&<div>');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('&&<div>');
+        await Actions.submit();
 
-        await PersonTests.create();
-        await PersonTests.inputName('Alex');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('Alex');
+        await Actions.submit();
 
-        await PersonTests.create();
-        await PersonTests.inputName('Maria');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('Maria');
+        await Actions.submit();
 
-        await PersonTests.create();
-        await PersonTests.inputName('Johnny');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('Johnny');
+        await Actions.submit();
 
-        await PersonTests.create();
-        await PersonTests.inputName('Иван');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('Иван');
+        await Actions.submit();
 
         // Try to submit person with empty name
-        await PersonTests.create();
-        await PersonTests.inputName('');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('');
+        await Actions.submit();
 
         // Try to submit person with existing name
-        await PersonTests.create();
-        await PersonTests.inputName('Alex');
-        await PersonTests.submit();
+        await Actions.create();
+        await Actions.inputName('Alex');
+        await Actions.submit();
     }
 
     async update() {
         setBlock('Update persons', 2);
 
-        await PersonTests.update(4);
-        await PersonTests.inputName('Ivan<');
-        await PersonTests.submit();
+        await Actions.update(4);
+        await Actions.inputName('Ivan<');
+        await Actions.submit();
 
         // Try to submit person with empty name
-        await PersonTests.update(0);
-        await PersonTests.inputName('');
-        await PersonTests.submit();
+        await Actions.update(0);
+        await Actions.inputName('');
+        await Actions.submit();
 
         // Try to submit person with existing name
-        await PersonTests.update(0);
-        await PersonTests.inputName('Alex');
-        await PersonTests.submit();
+        await Actions.update(0);
+        await Actions.inputName('Alex');
+        await Actions.submit();
 
         // Update case in person name
-        await PersonTests.update(2);
-        await PersonTests.inputName('MARIA');
-        await PersonTests.submit();
+        await Actions.update(2);
+        await Actions.inputName('MARIA');
+        await Actions.submit();
     }
 
     async deleteFromContextMenu() {
         setBlock('Delete person from context menu', 1);
 
-        await PersonTests.deleteFromContextMenu(0);
+        await Actions.deleteFromContextMenu(0);
     }
 
     async del() {
@@ -115,7 +115,7 @@ export class PersonsStory extends TestStory {
             [0, 2],
         ];
 
-        await App.scenario.runner.runGroup(PersonTests.del, data);
+        await App.scenario.runner.runGroup(Actions.del, data);
     }
 
     async deleteFromUpdate() {
@@ -125,7 +125,7 @@ export class PersonsStory extends TestStory {
             0,
         ];
 
-        await App.scenario.runner.runGroup(PersonTests.delFromUpdate, data);
+        await App.scenario.runner.runGroup(Actions.delFromUpdate, data);
     }
 
     async hide() {
@@ -136,7 +136,7 @@ export class PersonsStory extends TestStory {
             [0, 1],
         ];
 
-        await App.scenario.runner.runGroup(PersonTests.hide, data);
+        await App.scenario.runner.runGroup(Actions.hide, data);
     }
 
     async show() {
@@ -147,7 +147,7 @@ export class PersonsStory extends TestStory {
             [0, 4],
         ];
 
-        await App.scenario.runner.runGroup(PersonTests.show, data);
+        await App.scenario.runner.runGroup(Actions.show, data);
     }
 
     async exportCSV() {
@@ -158,7 +158,7 @@ export class PersonsStory extends TestStory {
             [0, 1],
         ];
 
-        await App.scenario.runner.runGroup(PersonTests.exportTest, data);
+        await App.scenario.runner.runGroup(Actions.exportTest, data);
     }
 
     async select() {
@@ -170,39 +170,39 @@ export class PersonsStory extends TestStory {
         ];
 
         setBlock('Toggle select persons', 2);
-        await App.scenario.runner.runGroup(PersonTests.toggleSelect, data);
+        await App.scenario.runner.runGroup(Actions.toggleSelect, data);
 
         setBlock('Select/deselect all persons', 2);
-        await PersonTests.selectAll();
-        await PersonTests.deselectAll();
+        await Actions.selectAll();
+        await Actions.deselectAll();
     }
 
     async sort() {
         setBlock('Sort persons', 1);
 
         setBlock('Sort by name', 2);
-        await PersonTests.toggleSortByName();
-        await PersonTests.toggleSortByName();
+        await Actions.toggleSortByName();
+        await Actions.toggleSortByName();
 
         setBlock('Sort by date', 2);
-        await PersonTests.toggleSortByDate();
-        await PersonTests.toggleSortByDate();
+        await Actions.toggleSortByDate();
+        await Actions.toggleSortByDate();
 
         setBlock('Sort manually', 2);
-        await PersonTests.sortManually();
+        await Actions.sortManually();
     }
 
     async details() {
         setBlock('Person details', 1);
 
-        await PersonTests.showDetails({ index: 0 });
-        await PersonTests.closeDetails();
-        await PersonTests.showDetails({ index: 1 });
-        await PersonTests.showDetails({ index: 2 });
-        await PersonTests.showDetails({ index: 2 });
-        await PersonTests.closeDetails();
-        await PersonTests.showDetails({ index: 0, directNavigate: true });
-        await PersonTests.showDetails({ index: 1, directNavigate: true });
-        await PersonTests.closeDetails();
+        await Actions.showDetails({ index: 0 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 1 });
+        await Actions.showDetails({ index: 2 });
+        await Actions.showDetails({ index: 2 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 0, directNavigate: true });
+        await Actions.showDetails({ index: 1, directNavigate: true });
+        await Actions.closeDetails();
     }
 }

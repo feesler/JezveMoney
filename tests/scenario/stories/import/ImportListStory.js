@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as ImportTests from '../../../actions/import/index.js';
+import * as Actions from '../../../actions/import/index.js';
 import { App } from '../../../Application.js';
 import { api } from '../../../model/api.js';
 import { testLocales } from '../../../actions/locale.js';
@@ -34,7 +34,7 @@ export class ImportListStory extends TestStory {
     async run() {
         setBlock('Import list', 1);
 
-        await ImportTests.checkInitialState();
+        await Actions.checkInitialState();
 
         await this.create();
         await this.uploadAccount();
@@ -59,20 +59,20 @@ export class ImportListStory extends TestStory {
 
         const { TRANSPORT_CATEGORY } = App.scenario;
 
-        await ImportTests.addItem([
+        await Actions.addItem([
             { action: 'inputDestAmount', data: '1' },
             { action: 'changeCategory', data: TRANSPORT_CATEGORY },
         ]);
 
         setBlock('Save item', 2);
-        await ImportTests.saveItem();
+        await Actions.saveItem();
 
         setBlock('Cancel item edit', 2);
-        await ImportTests.updateItem({
+        await Actions.updateItem({
             pos: 0,
             action: { action: 'inputDestAmount', data: '2' },
         });
-        await ImportTests.cancelItem();
+        await Actions.cancelItem();
     }
 
     async uploadAccount() {
@@ -80,14 +80,14 @@ export class ImportListStory extends TestStory {
 
         const { cardFile, ACC_USD, ACC_RUB } = App.scenario;
 
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_USD,
         });
 
         setBlock('Check main account is updated after select it at upload dialog', 2);
-        await ImportTests.selectUploadAccount(ACC_RUB);
+        await Actions.selectUploadAccount(ACC_RUB);
     }
 
     async convert() {
@@ -95,20 +95,20 @@ export class ImportListStory extends TestStory {
 
         const { cardFile, ACC_3 } = App.scenario;
 
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_3,
         });
 
         setBlock('Cancel changes', 2);
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 8,
             action: { action: 'inputDestAmount', data: '100' },
         });
-        await ImportTests.restoreItems(8);
+        await Actions.restoreItems(8);
 
-        await ImportTests.deleteAllItems();
+        await Actions.deleteAllItems();
     }
 
     async pagination() {
@@ -117,68 +117,68 @@ export class ImportListStory extends TestStory {
         const { largeFile, ACC_RUB } = App.scenario;
         const itemsOnPage = App.config.importTransactionsOnPage;
 
-        await ImportTests.changeMainAccount(ACC_RUB);
+        await Actions.changeMainAccount(ACC_RUB);
 
-        await ImportTests.uploadFile(largeFile);
-        await ImportTests.submitUploaded(largeFile);
-        await ImportTests.createItemAndSave([
+        await Actions.uploadFile(largeFile);
+        await Actions.submitUploaded(largeFile);
+        await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '1' },
         ]);
-        await ImportTests.goToPrevPage(); // page 2
+        await Actions.goToPrevPage(); // page 2
 
         setBlock('Update item on 2nd page', 2);
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: itemsOnPage + 1,
             action: { action: 'inputComment', data: `Item ${itemsOnPage + 1}` },
         });
-        await ImportTests.showMore(); // pages 2-3
+        await Actions.showMore(); // pages 2-3
 
         setBlock('Update item on 3rd page while showing pages 2-3', 2);
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: (itemsOnPage * 2) + 1,
             action: { action: 'inputComment', data: `Item ${(itemsOnPage * 2) + 1}` },
         });
 
-        await ImportTests.goToPrevPage(); // page 2
-        await ImportTests.goToFirstPage(); // page 1
-        await ImportTests.showMore(); // pages 1-2
-        await ImportTests.showMore(); // pages 1-3
-        await ImportTests.goToFirstPage(); // page 1
-        await ImportTests.goToNextPage(); // page 2
+        await Actions.goToPrevPage(); // page 2
+        await Actions.goToFirstPage(); // page 1
+        await Actions.showMore(); // pages 1-2
+        await Actions.showMore(); // pages 1-3
+        await Actions.goToFirstPage(); // page 1
+        await Actions.goToNextPage(); // page 2
 
-        await ImportTests.toggleSelectItems([21, 22]);
-        await ImportTests.goToPrevPage(); // page 1
-        await ImportTests.toggleSelectItems([11, 12]);
-        await ImportTests.deleteSelectedItems();
+        await Actions.toggleSelectItems([21, 22]);
+        await Actions.goToPrevPage(); // page 1
+        await Actions.toggleSelectItems([11, 12]);
+        await Actions.deleteSelectedItems();
 
-        await ImportTests.deleteAllItems();
+        await Actions.deleteAllItems();
     }
 
     async listModes() {
         setBlock('List modes', 1);
 
         const { cardFile } = App.scenario;
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded(cardFile);
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded(cardFile);
 
         setBlock('Check selection is cleared on change list mode', 2);
-        await ImportTests.toggleSelectItems([0, 1]);
-        await ImportTests.setListMode();
+        await Actions.toggleSelectItems([0, 1]);
+        await Actions.setListMode();
 
         setBlock('List items select', 2);
-        await ImportTests.toggleSelectItems([0, 1]);
-        await ImportTests.toggleSelectItems([0, 1]);
-        await ImportTests.selectAllItems();
-        await ImportTests.deselectAllItems();
-        await ImportTests.toggleSelectItems([0, 1, 2]);
-        await ImportTests.enableSelectedItems(false);
-        await ImportTests.enableSelectedItems(true);
-        await ImportTests.deleteSelectedItems();
-        await ImportTests.setListMode();
-        await ImportTests.setSortMode();
-        await ImportTests.setListMode();
+        await Actions.toggleSelectItems([0, 1]);
+        await Actions.toggleSelectItems([0, 1]);
+        await Actions.selectAllItems();
+        await Actions.deselectAllItems();
+        await Actions.toggleSelectItems([0, 1, 2]);
+        await Actions.enableSelectedItems(false);
+        await Actions.enableSelectedItems(true);
+        await Actions.deleteSelectedItems();
+        await Actions.setListMode();
+        await Actions.setSortMode();
+        await Actions.setListMode();
 
-        await ImportTests.deleteAllItems();
+        await Actions.deleteAllItems();
     }
 
     async checkSimilar() {
@@ -187,23 +187,23 @@ export class ImportListStory extends TestStory {
         const { cardFile, ACC_RUB } = App.scenario;
 
         // Check option change is correctly update already uploaded transactions
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_RUB,
         });
-        await ImportTests.enableCheckSimilar(false);
-        await ImportTests.enableCheckSimilar(true);
-        await ImportTests.enableCheckSimilar(false);
+        await Actions.enableCheckSimilar(false);
+        await Actions.enableCheckSimilar(true);
+        await Actions.enableCheckSimilar(false);
         // Check option change is correctly affect on new uploaded transactions
-        await ImportTests.deleteAllItems();
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.deleteAllItems();
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_RUB,
         });
-        await ImportTests.enableCheckSimilar(true);
-        await ImportTests.deleteAllItems();
+        await Actions.enableCheckSimilar(true);
+        await Actions.deleteAllItems();
     }
 
     async enableDisableRules() {
@@ -211,20 +211,20 @@ export class ImportListStory extends TestStory {
 
         const { cardFile, ACC_RUB } = App.scenario;
 
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_RUB,
         });
 
-        await ImportTests.enableRules(false);
-        await ImportTests.enableRules(true);
+        await Actions.enableRules(false);
+        await Actions.enableRules(true);
     }
 
     async del() {
         setBlock('Delete import items', 2);
 
-        await ImportTests.deleteItems([3, 5]);
+        await Actions.deleteItems([3, 5]);
     }
 
     async submit() {
@@ -234,79 +234,79 @@ export class ImportListStory extends TestStory {
 
         // Disable all items except 0 and 1 and submit
         // As result two first transactions will be found as similar
-        await ImportTests.selectAllItems();
-        await ImportTests.toggleSelectItems([0, 1]);
-        await ImportTests.enableSelectedItems(false);
-        await ImportTests.submit();
+        await Actions.selectAllItems();
+        await Actions.toggleSelectItems([0, 1]);
+        await Actions.enableSelectedItems(false);
+        await Actions.submit();
         // Verify submit is disabled for empty list
         setBlock('Verify submit is disabled for empty list', 2);
-        await ImportTests.submit();
+        await Actions.submit();
 
         setBlock('Verify validation is resetted after close dialog', 2);
-        await ImportTests.createItemAndSave([
+        await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '' },
             { action: 'inputDate', data: '' },
         ]);
-        await ImportTests.cancelItem();
-        await ImportTests.addItem();
-        await ImportTests.cancelItem();
+        await Actions.cancelItem();
+        await Actions.addItem();
+        await Actions.cancelItem();
 
         setBlock('Verify invalid items are not submitted', 2);
         // Empty amount
-        await ImportTests.createItemAndSave();
+        await Actions.createItemAndSave();
 
         // Zero amount
-        await ImportTests.runFormActions(
+        await Actions.runFormActions(
             { action: 'inputDestAmount', data: '0' },
         );
-        await ImportTests.saveItem();
+        await Actions.saveItem();
 
         // Valid amount, different currencies and empty source amount
-        await ImportTests.runFormActions([
+        await Actions.runFormActions([
             { action: 'inputDestAmount', data: '1' },
             { action: 'changeDestCurrency', data: USD },
             { action: 'inputSourceAmount', data: '' },
         ]);
-        await ImportTests.saveItem();
+        await Actions.saveItem();
 
         // Empty date
-        await ImportTests.runFormActions([
+        await Actions.runFormActions([
             { action: 'inputSourceAmount', data: '2' },
             { action: 'inputDate', data: '' },
         ]);
-        await ImportTests.saveItem();
+        await Actions.saveItem();
 
         // Correct date
-        await ImportTests.runFormActions(
+        await Actions.runFormActions(
             { action: 'inputDate', data: App.datesFmt.now },
         );
-        await ImportTests.saveItem();
-        await ImportTests.submit();
+        await Actions.saveItem();
+        await Actions.submit();
 
         // Verify submit is disabled for list with no enabled items
         setBlock('Verify submit is disabled for list with no enabled items', 2);
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             template: 0,
         });
-        await ImportTests.selectAllItems();
-        await ImportTests.enableSelectedItems(false);
-        await ImportTests.submit();
+        await Actions.selectAllItems();
+        await Actions.enableSelectedItems(false);
+        await Actions.submit();
     }
 
     async formOrigDataCollapsible() {
         setBlock('Form original data collapsible', 2);
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 2,
             action: [
                 { action: 'toggleOriginalData' },
                 { action: 'toggleOriginalData' },
             ],
         });
-        await ImportTests.updateItemAndSave({ pos: 0 });
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({ pos: 0 });
+        await Actions.updateItemAndSave({
             pos: 2,
             action: [
                 { action: 'toggleOriginalData' },
@@ -332,9 +332,9 @@ export class ImportListStory extends TestStory {
 
         setBlock('Import item state loop', 1);
 
-        await ImportTests.changeMainAccount(ACC_3);
+        await Actions.changeMainAccount(ACC_3);
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 0,
             action: [
                 { action: 'changeType', data: 'expense' }, // 3-1
@@ -405,7 +405,7 @@ export class ImportListStory extends TestStory {
         });
 
         /** Prepare items of all states */
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 1,
             action: [
                 { action: 'changeDestCurrency', data: USD }, // 1-2
@@ -414,12 +414,12 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 2,
             action: { action: 'changeType', data: 'income' }, // 1-3
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 3,
             action: [
                 { action: 'changeDestCurrency', data: USD }, // 1-2
@@ -429,12 +429,12 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 4,
             action: { action: 'changeType', data: 'transfer_out' }, // 1-5
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 5,
             action: [
                 { action: 'changeType', data: 'transfer_out' }, // 1-5
@@ -444,12 +444,12 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 6,
             action: { action: 'changeType', data: 'transfer_in' }, // 1-7
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 7,
             action: [
                 { action: 'changeType', data: 'debt_out' }, // 1-9
@@ -457,23 +457,23 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 8,
             action: { action: 'changeType', data: 'debt_in' }, // 1-10
         });
 
-        await ImportTests.changeMainAccount(ACC_EUR);
+        await Actions.changeMainAccount(ACC_EUR);
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 0,
             action: [
                 { action: 'changeTransferAccount', data: ACC_3 }, // 8-8
             ],
         });
 
-        await ImportTests.changeMainAccount(ACC_3); // for item 0: 8-8
+        await Actions.changeMainAccount(ACC_3); // for item 0: 8-8
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 0,
             action: [
                 { action: 'changeTransferAccount', data: ACC_USD }, // 7-8
@@ -505,7 +505,7 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 7,
             action: [
                 { action: 'changeType', data: 'debt_in' },
@@ -513,9 +513,9 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.changeMainAccount(CREDIT_CARD);
+        await Actions.changeMainAccount(CREDIT_CARD);
 
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 0,
             action: [
                 { action: 'changeType', data: 'limit' }, // 10-11
@@ -545,7 +545,7 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.submit();
+        await Actions.submit();
     }
 
     async currencyPrecision() {
@@ -561,8 +561,8 @@ export class ImportListStory extends TestStory {
         } = App.scenario;
 
         setBlock('Update on change currency', 2);
-        await ImportTests.changeMainAccount(ACC_3);
-        await ImportTests.createItemAndSave([
+        await Actions.changeMainAccount(ACC_3);
+        await Actions.createItemAndSave([
             { action: 'changeDestCurrency', data: BTC },
             { action: 'inputDestAmount', data: '0.12345678' },
             { action: 'inputSourceAmount', data: '100' },
@@ -574,12 +574,12 @@ export class ImportListStory extends TestStory {
         ]);
 
         setBlock('Update on change main account', 2);
-        await ImportTests.changeMainAccount(ACC_USD);
-        await ImportTests.changeMainAccount(ACC_BTC);
-        await ImportTests.changeMainAccount(ACC_3);
+        await Actions.changeMainAccount(ACC_USD);
+        await Actions.changeMainAccount(ACC_BTC);
+        await Actions.changeMainAccount(ACC_3);
 
         setBlock('Update on change transfer account', 2);
-        await ImportTests.updateItemAndSave({
+        await Actions.updateItemAndSave({
             pos: 0,
             action: [
                 { action: 'changeType', data: 'transfer_in' },
@@ -590,7 +590,7 @@ export class ImportListStory extends TestStory {
             ],
         });
 
-        await ImportTests.deleteAllItems();
+        await Actions.deleteAllItems();
     }
 
     async locales() {
@@ -607,19 +607,19 @@ export class ImportListStory extends TestStory {
         const { cardFile, ACC_RUB } = App.scenario;
 
         setBlock('Create transaction', 2);
-        await ImportTests.createItemAndSave([
+        await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
         ]);
-        await ImportTests.submit();
+        await Actions.submit();
 
         setBlock('Upload file', 2);
-        await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded({
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
             ...cardFile,
             account: ACC_RUB,
         });
-        await ImportTests.submit();
+        await Actions.submit();
     }
 
     async submitError() {
@@ -627,14 +627,14 @@ export class ImportListStory extends TestStory {
 
         const { ACC_3 } = App.scenario;
 
-        await ImportTests.changeMainAccount(ACC_3);
-        await ImportTests.createItemAndSave([
+        await Actions.changeMainAccount(ACC_3);
+        await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '1' },
         ]);
         // Remove selected account
         await api.account.del({ id: ACC_3 });
 
-        await ImportTests.submit();
+        await Actions.submit();
     }
 
     async noAccounts() {
@@ -645,6 +645,6 @@ export class ImportListStory extends TestStory {
         });
 
         await App.goToMainView();
-        await ImportTests.checkInitialState();
+        await Actions.checkInitialState();
     }
 }

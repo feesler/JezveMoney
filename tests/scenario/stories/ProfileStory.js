@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as ProfileTests from '../../actions/profile.js';
+import * as Actions from '../../actions/profile.js';
 import { App } from '../../Application.js';
 
 const resetAllOptions = {
@@ -31,10 +31,10 @@ export class ProfileStory extends TestStory {
     async registration() {
         setBlock('User registration', 2);
 
-        await ProfileTests.register(App.config.newUser);
-        await ProfileTests.deleteProfile();
+        await Actions.register(App.config.newUser);
+        await Actions.deleteProfile();
 
-        await App.scenario.runner.runGroup(ProfileTests.register, [{
+        await App.scenario.runner.runGroup(Actions.register, [{
             login: '',
             name: '',
             password: '',
@@ -56,7 +56,7 @@ export class ProfileStory extends TestStory {
     async login() {
         setBlock('User login', 2);
 
-        await App.scenario.runner.runGroup(ProfileTests.relogin, [{
+        await App.scenario.runner.runGroup(Actions.relogin, [{
             login: App.config.testUser.login,
             password: '',
         }, {
@@ -75,7 +75,7 @@ export class ProfileStory extends TestStory {
 
         const origUserName = App.state.profile.name;
 
-        await App.scenario.runner.runGroup(ProfileTests.changeName, [
+        await App.scenario.runner.runGroup(Actions.changeName, [
             '',
             origUserName,
             '^^&&>>',
@@ -88,7 +88,7 @@ export class ProfileStory extends TestStory {
 
         const tmpPassword = 'test123';
 
-        await App.scenario.runner.runGroup(ProfileTests.changePass, [{
+        await App.scenario.runner.runGroup(Actions.changePass, [{
             oldPassword: '',
             newPassword: '',
         }, {
@@ -109,7 +109,7 @@ export class ProfileStory extends TestStory {
     async reset() {
         setBlock('Reset data', 2);
 
-        await ProfileTests.resetData(resetAllOptions);
+        await Actions.resetData(resetAllOptions);
     }
 
     async resetWithData() {
@@ -123,7 +123,7 @@ export class ProfileStory extends TestStory {
         });
         await App.scenario.createTestData();
 
-        await App.scenario.runner.runGroup(ProfileTests.resetData, [
+        await App.scenario.runner.runGroup(Actions.resetData, [
             { accounts: true },
             resetAllOptions,
         ]);
@@ -132,6 +132,6 @@ export class ProfileStory extends TestStory {
     async about() {
         setBlock('About view', 2);
 
-        await ProfileTests.openAbout();
+        await Actions.openAbout();
     }
 }
