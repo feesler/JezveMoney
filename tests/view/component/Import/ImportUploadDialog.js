@@ -324,7 +324,7 @@ export class ImportUploadDialog extends TestComponent {
         assert(this.isTemplateFormState(model), `Invalid state: ${model.state}`);
     }
 
-    getColumn(data, index) {
+    getColumn(data, index, firstRowInd = 1) {
         const rowsToShow = 2;
         const headerRow = data.slice(0, 1)[0];
         const ind = parseInt(index, 10);
@@ -334,7 +334,7 @@ export class ImportUploadDialog extends TestComponent {
             title: headerRow[ind],
         };
 
-        const cellsData = data.slice(1, rowsToShow + 1);
+        const cellsData = data.slice(firstRowInd, firstRowInd + rowsToShow);
         res.cells = cellsData.map((row) => {
             const val = row[ind];
             if (isNum(val)) {
@@ -424,19 +424,19 @@ export class ImportUploadDialog extends TestComponent {
         res.submitBtn = { visible: isConvertState && model.isValid };
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE].includes(model.state)) {
+            const firstRowInd = (Number.isNaN(model.template.first_row))
+                ? 1
+                : model.template.first_row;
+            const firstRowIndex = Math.max(firstRowInd, 2);
+
             const [rawDataHeader] = this.parent.fileData.slice(0, 1);
             res.columns = rawDataHeader.map(
-                (_, ind) => this.getColumn(this.parent.fileData, ind),
+                (_, ind) => this.getColumn(this.parent.fileData, ind, firstRowIndex - 1),
             );
             res.rowNumbers = {
                 cells: ['1'],
             };
 
-            const firstRowInd = (Number.isNaN(model.template.first_row))
-                ? 1
-                : model.template.first_row;
-
-            const firstRowIndex = Math.max(firstRowInd, 2);
             for (let i = 0; i < 3; i += 1) {
                 const rowNumber = firstRowIndex + i;
                 res.rowNumbers.cells.push(rowNumber.toString());
