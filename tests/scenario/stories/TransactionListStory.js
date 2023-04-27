@@ -77,23 +77,28 @@ export class TransactionListStory extends TestStory {
             directNavigate,
         });
 
-        await Actions.filterByDate({
-            start: App.datesFmt.weekAgo, end: App.datesFmt.now, directNavigate,
-        });
-        await Actions.filterByDate({
-            start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate,
-        });
+        await Actions.selectEndDateFilter({ date: App.dates.yesterday, directNavigate });
+        await Actions.selectStartDateFilter({ date: App.dates.weekAgo, directNavigate });
+        await Actions.clearEndDateFilter();
+        await Actions.clearStartDateFilter();
+        await Actions.selectStartDateFilter({ date: App.dates.yearAgo, directNavigate });
+        await Actions.selectEndDateFilter({ date: App.dates.monthAgo, directNavigate });
+
+        await Actions.selectWeekRangeFilter(directNavigate);
+        await Actions.selectMonthRangeFilter(directNavigate);
+        await Actions.selectHalfYearRangeFilter(directNavigate);
 
         await Actions.search({ text: '1', directNavigate });
         await Actions.search({ text: 'la', directNavigate });
         await Actions.search({ text: 'кк', directNavigate });
         await Actions.clearSearchForm(directNavigate);
-        await Actions.clearDateRange(directNavigate);
+        await Actions.clearStartDateFilter(directNavigate);
+        await Actions.clearEndDateFilter(directNavigate);
         await Actions.search({ text: '1', directNavigate });
 
-        await Actions.filterByDate({
-            start: App.datesFmt.yearAgo, end: App.datesFmt.monthAgo, directNavigate,
-        });
+        await Actions.selectStartDateFilter({ date: App.dates.yearAgo, directNavigate });
+        await Actions.selectEndDateFilter({ date: App.dates.monthAgo, directNavigate });
+
         await Actions.clearAllFilters(directNavigate);
     }
 
@@ -160,9 +165,7 @@ export class TransactionListStory extends TestStory {
     async checkLocale(locale) {
         setBlock(`Locale: '${locale}'`, 1);
 
-        await Actions.filterByDate({
-            start: App.datesFmt.weekAgo, end: App.datesFmt.now,
-        });
-        await Actions.clearDateRange();
+        await Actions.selectStartDateFilter({ date: App.dates.weekAgo });
+        await Actions.clearStartDateFilter();
     }
 }

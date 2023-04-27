@@ -101,18 +101,51 @@ export const groupByYear = async () => {
     await test('Group statistics by year', () => App.view.groupByYear());
 };
 
-export const selectDateRange = async ({ start, end }) => {
-    const startDateFmt = App.reformatDate(start);
-    const endDateFmt = App.reformatDate(end);
-
+export const selectWeekRangeFilter = async () => {
     await checkNavigation();
-    await test(
-        `Select date range (${startDateFmt} - ${endDateFmt})`,
-        () => App.view.selectDateRange(start, end),
-    );
+    await test('Show week date range', () => (
+        App.view.selectWeekRangeFilter()
+    ));
 };
 
-export const clearDateRange = async () => {
+export const selectMonthRangeFilter = async () => {
     await checkNavigation();
-    await test('Clear date range', () => App.view.clearDateRange());
+    await test('Show month date range', () => (
+        App.view.selectMonthRangeFilter()
+    ));
+};
+
+export const selectHalfYearRangeFilter = async () => {
+    await checkNavigation();
+    await test('Show half a year date range', () => (
+        App.view.selectHalfYearRangeFilter()
+    ));
+};
+
+export const selectStartDateFilter = async (date) => {
+    const dateFmt = App.reformatDate(date);
+
+    await checkNavigation();
+    await test(`Select start date (${dateFmt})`, () => (
+        App.view.selectStartDateFilter(date)
+    ));
+};
+
+export const selectEndDateFilter = async (date) => {
+    const dateFmt = App.reformatDate(date);
+
+    await checkNavigation();
+    await test(`Select end date (${dateFmt})`, () => (
+        App.view.selectEndDateFilter(date)
+    ));
+};
+
+export const clearStartDateFilter = async () => {
+    await checkNavigation();
+    await test('Clear start date', () => App.view.clearStartDateFilter());
+};
+
+export const clearEndDateFilter = async () => {
+    await checkNavigation();
+    await test('Clear end date', () => App.view.clearEndDateFilter());
 };

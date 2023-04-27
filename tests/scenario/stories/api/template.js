@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as ImportTemplateApiTests from '../../../actions/api/importtemplate.js';
+import * as Actions from '../../../actions/api/importtemplate.js';
 
 const create = async () => {
     setBlock('Create import template', 2);
@@ -44,7 +44,7 @@ const create = async () => {
         App.scenario.TEMPLATE_1,
         App.scenario.TEMPLATE_2,
         App.scenario.TEMPLATE_3,
-    ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -68,7 +68,7 @@ const createWithChainedRequest = async () => {
 
     [
         App.scenario.TEMPLATE_CHAINED,
-    ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -102,7 +102,7 @@ const createInvalid = async () => {
         comment_col: 6,
     }];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.create, invData);
+    await App.scenario.runner.runGroup(Actions.create, invData);
 };
 
 const createMultiple = async () => {
@@ -143,7 +143,7 @@ const createMultiple = async () => {
         comment_col: 6,
     }];
 
-    await ImportTemplateApiTests.createMultiple(data);
+    await Actions.createMultiple(data);
 };
 
 const createMultipleInvalid = async () => {
@@ -176,7 +176,7 @@ const createMultipleInvalid = async () => {
             comment_col: 2,
         }, null],
     ];
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.createMultiple, invData);
+    await App.scenario.runner.runGroup(Actions.createMultiple, invData);
 };
 
 const update = async () => {
@@ -190,7 +190,7 @@ const update = async () => {
         comment_col: 8,
     }];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -206,7 +206,7 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateInvalid = async () => {
@@ -227,7 +227,7 @@ const updateInvalid = async () => {
         account_id: App.scenario.API_USER_ACC_RUB,
     }];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const del = async () => {
@@ -238,7 +238,7 @@ const del = async () => {
         { id: [App.scenario.TEMPLATE_1, App.scenario.TEMPLATE_2] },
     ];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delWithChainedRequest = async () => {
@@ -254,7 +254,7 @@ const delWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(ImportTemplateApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 export const apiImportTemplateTests = {

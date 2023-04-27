@@ -160,7 +160,7 @@ export default {
                         || (entry.runtimeChunk || {}).name;
 
                     const entryFiles = [].concat(
-                        ...(entry.chunks || []).map((chunk) => chunk.files),
+                        ...(entry.chunks || []).map((chunk) => ([...chunk.files])),
                     ).filter(Boolean);
 
                     return name ? { ...acc, [name]: entryFiles } : acc;

@@ -1,7 +1,7 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { LIMIT_CHANGE } from '../../../model/Transaction.js';
-import * as TransactionTests from '../../../actions/transaction.js';
+import * as Actions from '../../../actions/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();
@@ -25,17 +25,17 @@ export const stateLoop = async () => {
     });
 
     // Input destination amount
-    await TransactionTests.runGroup('inputDestAmount', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputDestAmount', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 2: Click on destination result balance block and move from State 1 to State 0
         { action: 'clickDestResultBalance' },
     ]);
 
     // Input result balance
-    await TransactionTests.runGroup('inputDestResBalance', TransactionTests.decimalInputTestStrings);
+    await Actions.runGroup('inputDestResBalance', Actions.decimalInputTestStrings);
 
-    await TransactionTests.runActions([
+    await Actions.runActions([
         // Transition 1: Click on destination amount block and move from State 0 to State 1
         { action: 'clickDestAmount' },
         // Test input values for precise currency

@@ -15,7 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { dateToSeconds } from '../common.js';
+import { dateToSeconds, shiftDate, shiftMonth } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -63,6 +63,10 @@ export class StatisticsView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
+        res.weekRangeBtn = { elem: await query('.range-selector-btn[data-range="week"]') };
+        res.monthRangeBtn = { elem: await query('.range-selector-btn[data-range="month"]') };
+        res.halfYearRangeBtn = { elem: await query('.range-selector-btn[data-range="halfyear"]') };
+
         res.chart = {
             elem: await query('.histogram'),
             bars: [],
@@ -104,12 +108,14 @@ export class StatisticsView extends AppView {
             startDate: null,
             endDate: null,
         };
-        const dateRange = cont.dateFilter.getSelectedRange();
-        if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const startDate = new Date(App.parseDate(dateRange.startDate));
-            const endDate = new Date(App.parseDate(dateRange.endDate));
 
+        const dateRange = cont.dateFilter.getSelectedRange();
+        if (dateRange?.startDate) {
+            const startDate = new Date(App.parseDate(dateRange.startDate));
             res.filter.startDate = dateToSeconds(startDate);
+        }
+        if (dateRange?.endDate) {
+            const endDate = new Date(App.parseDate(dateRange.endDate));
             res.filter.endDate = dateToSeconds(endDate);
         }
 
@@ -174,14 +180,15 @@ export class StatisticsView extends AppView {
             startDate,
             endDate,
         } = model.filter;
+        const showRangeSelectors = (group === GROUP_BY_DAY || group === GROUP_BY_WEEK);
 
-        let startDateFmt = null;
+        let startDateFmt = '';
         if (startDate) {
             const dateFmt = App.secondsToDateString(startDate);
             startDateFmt = App.reformatDate(dateFmt);
         }
 
-        let endDateFmt = null;
+        let endDateFmt = '';
         if (endDate) {
             const dateFmt = App.secondsToDateString(endDate);
             endDateFmt = App.reformatDate(dateFmt);
@@ -207,6 +214,9 @@ export class StatisticsView extends AppView {
                     endDate: endDateFmt,
                 },
             },
+            weekRangeBtn: { visible: filtersVisible && showRangeSelectors },
+            monthRangeBtn: { visible: filtersVisible && showRangeSelectors },
+            halfYearRangeBtn: { visible: filtersVisible && showRangeSelectors },
             noDataMessage: {},
             chartContainer: {},
         };
@@ -245,8 +255,10 @@ export class StatisticsView extends AppView {
             params.category_id = model.filter.categories;
         }
 
-        if (model.filter.startDate && model.filter.endDate) {
+        if (model.filter.startDate) {
             params.startDate = model.filter.startDate;
+        }
+        if (model.filter.endDate) {
             params.endDate = model.filter.endDate;
         }
 
@@ -515,29 +527,132 @@ export class StatisticsView extends AppView {
         return this.groupBy(GROUP_BY_YEAR);
     }
 
-    async selectDateRange(start, end) {
+    checkRangeSelectorsAvailable() {
+        const { group } = this.model.filter;
+        assert(group === GROUP_BY_DAY || group === GROUP_BY_WEEK, `Invalid group type: ${group}`);
+    }
+
+    async selectWeekRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
         await this.openFilters();
 
-        const startDate = new Date(App.parseDate(start));
-        const endDate = new Date(App.parseDate(end));
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftDate(now, -7));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
 
-        this.model.filter.startDate = dateToSeconds(startDate);
-        this.model.filter.endDate = dateToSeconds(endDate);
+        filter.startDate = startDate;
+        filter.endDate = endDate;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.dateFilter.selectRange(startDate, endDate));
+        assert(this.content.weekRangeBtn.visible, 'Week range button not visible');
+        await this.waitForData(() => click(this.content.weekRangeBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectMonthRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
+        await this.openFilters();
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -1));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        assert(this.content.monthRangeBtn.visible, 'Month range button not visible');
+        await this.waitForData(() => click(this.content.monthRangeBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectHalfYearRangeFilter() {
+        this.checkRangeSelectorsAvailable();
+
+        await this.openFilters();
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -6));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        assert(this.content.halfYearRangeBtn.visible, 'Half a year range button not visible');
+        await this.waitForData(() => click(this.content.halfYearRangeBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectStartDateFilter(value) {
+        await this.openFilters();
+
+        const date = new Date(App.parseDate(value));
+        const startDate = dateToSeconds(date);
+        if (this.model.filter.startDate === startDate) {
+            return true;
+        }
+
+        this.model.filter.startDate = startDate;
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.dateFilter.selectStart(date));
 
         return App.view.checkState(expected);
     }
 
-    async clearDateRange() {
+    async selectEndDateFilter(value) {
+        await this.openFilters();
+
+        const date = new Date(App.parseDate(value));
+        const endDate = dateToSeconds(date);
+        if (this.model.filter.endDate === endDate) {
+            return true;
+        }
+
+        this.model.filter.endDate = endDate;
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.dateFilter.selectEnd(date));
+
+        return App.view.checkState(expected);
+    }
+
+    async clearStartDateFilter() {
         await this.openFilters();
 
         this.model.filter.startDate = null;
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.dateFilter.clearStart());
+
+        return App.view.checkState(expected);
+    }
+
+    async clearEndDateFilter() {
+        await this.openFilters();
+
         this.model.filter.endDate = null;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.dateFilter.clear());
+        await this.waitForData(() => this.content.dateFilter.clearEnd());
 
         return App.view.checkState(expected);
     }

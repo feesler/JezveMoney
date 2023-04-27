@@ -8,7 +8,7 @@ import {
     ACCOUNT_TYPE_CREDIT_CARD,
     ACCOUNT_TYPE_CREDIT,
 } from '../../../model/AccountsList.js';
-import * as AccountApiTests from '../../../actions/api/account.js';
+import * as Actions from '../../../actions/api/account.js';
 
 const create = async () => {
     setBlock('Create accounts', 2);
@@ -35,7 +35,7 @@ const create = async () => {
         icon_id: 5,
     }];
 
-    const res = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    const res = await App.scenario.runner.runGroup(Actions.create, data);
     // Double check all accounts are created
     res.forEach((item) => assert(item, 'Failed to create account'));
 
@@ -71,7 +71,7 @@ const createWithChainedRequest = async () => {
         },
     }];
 
-    const res = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    const res = await App.scenario.runner.runGroup(Actions.create, data);
     // Double check all accounts are created
     res.forEach((item) => assert(item, 'Failed to create account'));
 
@@ -139,7 +139,7 @@ const createInvalid = async () => {
         icon_id: 5,
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createMultiple = async () => {
@@ -174,7 +174,7 @@ const createMultiple = async () => {
         icon_id: 3,
     }];
 
-    const res = await AccountApiTests.createMultiple(data);
+    const res = await Actions.createMultiple(data);
     // Double check all accounts are created
     res.forEach((item) => assert(item, 'Failed to create account'));
 
@@ -220,7 +220,7 @@ const createMultipleInvalid = async () => {
         }, null],
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.createMultiple, data);
 };
 
 const read = async () => {
@@ -231,7 +231,7 @@ const read = async () => {
         [App.scenario.CASH_RUB, App.scenario.ACC_USD],
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.read, data);
+    await App.scenario.runner.runGroup(Actions.read, data);
 };
 
 const list = async () => {
@@ -244,7 +244,7 @@ const list = async () => {
         { visibility: 'all' },
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.list, data);
+    await App.scenario.runner.runGroup(Actions.list, data);
 };
 
 const update = async () => {
@@ -263,7 +263,7 @@ const update = async () => {
         type: ACCOUNT_TYPE_CREDIT,
     }];
 
-    const res = await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    const res = await App.scenario.runner.runGroup(Actions.update, data);
     // Double check all accounts are updated
     res.forEach((item) => assert(item, 'Failed to update account'));
 };
@@ -285,7 +285,7 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    const res = await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    const res = await App.scenario.runner.runGroup(Actions.update, data);
     // Double check all accounts are created
     res.forEach((item) => assert(item, 'Failed to create account'));
 };
@@ -299,7 +299,7 @@ const updateInvalid = async () => {
         name: 'acc rub',
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const setPos = async () => {
@@ -313,7 +313,7 @@ const setPos = async () => {
         { id: ACC_RUB, pos: 1 },
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosWithChainedRequest = async () => {
@@ -331,7 +331,7 @@ const setPosWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosInvalid = async () => {
@@ -348,7 +348,7 @@ const setPosInvalid = async () => {
         null,
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const del = async () => {
@@ -358,7 +358,7 @@ const del = async () => {
         id: [App.scenario.ACC_USD, App.scenario.CASH_RUB],
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delWithChainedRequest = async () => {
@@ -372,7 +372,7 @@ const delWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(AccountApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delInvalid = async () => {
@@ -384,7 +384,7 @@ const delInvalid = async () => {
         [null, null],
     ];
 
-    await App.scenario.runner.runGroup(AccountApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 export const apiAccountsTests = {

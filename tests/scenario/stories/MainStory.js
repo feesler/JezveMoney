@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as MainTests from '../../actions/main.js';
+import * as Actions from '../../actions/main.js';
 import { App } from '../../Application.js';
 
 export class MainStory extends TestStory {
@@ -26,19 +26,19 @@ export class MainStory extends TestStory {
     async toggleHiddenAccounts() {
         setBlock('Toggle show/hide hidden accounts', 1);
 
-        await MainTests.toggleHiddenAccounts();
-        await MainTests.toggleHiddenAccounts();
-        await MainTests.toggleHiddenAccounts();
-        await MainTests.toggleHiddenPersons();
-        await MainTests.toggleHiddenPersons();
-        await MainTests.toggleHiddenPersons();
+        await Actions.toggleHiddenAccounts();
+        await Actions.toggleHiddenAccounts();
+        await Actions.toggleHiddenAccounts();
+        await Actions.toggleHiddenPersons();
+        await Actions.toggleHiddenPersons();
+        await Actions.toggleHiddenPersons();
     }
 
     async toggleHiddenPersons() {
         setBlock('Toggle show/hide hidden persons', 1);
 
-        await MainTests.toggleHiddenPersons();
-        await MainTests.toggleHiddenPersons();
-        await MainTests.toggleHiddenPersons();
+        await Actions.toggleHiddenPersons();
+        await Actions.toggleHiddenPersons();
+        await Actions.toggleHiddenPersons();
     }
 }

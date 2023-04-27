@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as CategoryTests from '../../actions/category.js';
+import * as Actions from '../../actions/category.js';
 import { App } from '../../Application.js';
 import { EXPENSE, INCOME } from '../../model/Transaction.js';
 
@@ -28,7 +28,7 @@ export class CategoriesStory extends TestStory {
     async run() {
         setBlock('Categories', 1);
 
-        await CategoryTests.securityTests();
+        await Actions.securityTests();
 
         await this.create();
         await this.select();
@@ -47,41 +47,41 @@ export class CategoriesStory extends TestStory {
         setBlock('Create categories', 1);
 
         setBlock('Create category with empty name', 2);
-        await CategoryTests.create();
-        await CategoryTests.submit();
-        await CategoryTests.inputName('Food');
-        await CategoryTests.inputName('');
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.submit();
+        await Actions.inputName('Food');
+        await Actions.inputName('');
+        await Actions.submit();
 
         setBlock('Create valid categories', 2);
-        await CategoryTests.create();
-        await CategoryTests.inputName('Food');
-        await CategoryTests.selectType(EXPENSE);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Food');
+        await Actions.selectType(EXPENSE);
+        await Actions.submit();
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Investments');
-        await CategoryTests.selectType(INCOME);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Investments');
+        await Actions.selectType(INCOME);
+        await Actions.submit();
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Taxes');
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Taxes');
+        await Actions.submit();
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Transpost');
-        await CategoryTests.selectType(EXPENSE);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Transpost');
+        await Actions.selectType(EXPENSE);
+        await Actions.submit();
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Shop');
-        await CategoryTests.selectType(EXPENSE);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Shop');
+        await Actions.selectType(EXPENSE);
+        await Actions.submit();
 
         setBlock('Create category with existing name', 2);
-        await CategoryTests.create();
-        await CategoryTests.inputName('Transpost');
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Transpost');
+        await Actions.submit();
 
         [
             App.scenario.FOOD_CATEGORY,
@@ -94,15 +94,15 @@ export class CategoriesStory extends TestStory {
             true,
         );
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Cafe');
-        await CategoryTests.selectParentCategory(App.scenario.FOOD_CATEGORY);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Cafe');
+        await Actions.selectParentCategory(App.scenario.FOOD_CATEGORY);
+        await Actions.submit();
 
-        await CategoryTests.create();
-        await CategoryTests.inputName('Bike rent');
-        await CategoryTests.selectParentCategory(App.scenario.TRANSPORT_CATEGORY);
-        await CategoryTests.submit();
+        await Actions.create();
+        await Actions.inputName('Bike rent');
+        await Actions.selectParentCategory(App.scenario.TRANSPORT_CATEGORY);
+        await Actions.submit();
     }
 
     async update() {
@@ -115,45 +115,45 @@ export class CategoriesStory extends TestStory {
             SHOP_CATEGORY,
         } = App.scenario;
 
-        await CategoryTests.updateById(FOOD_CATEGORY);
-        await CategoryTests.inputName('Meal');
-        await CategoryTests.submit();
+        await Actions.updateById(FOOD_CATEGORY);
+        await Actions.inputName('Meal');
+        await Actions.submit();
 
-        await CategoryTests.updateById(TAXES_CATEGORY);
-        await CategoryTests.selectParentCategory(INVEST_CATEGORY);
-        await CategoryTests.submit();
+        await Actions.updateById(TAXES_CATEGORY);
+        await Actions.selectParentCategory(INVEST_CATEGORY);
+        await Actions.submit();
 
-        await CategoryTests.updateById(INVEST_CATEGORY);
-        await CategoryTests.selectType(EXPENSE);
-        await CategoryTests.submit();
+        await Actions.updateById(INVEST_CATEGORY);
+        await Actions.selectType(EXPENSE);
+        await Actions.submit();
 
-        await CategoryTests.updateById(FOOD_CATEGORY);
-        await CategoryTests.selectParentCategory(SHOP_CATEGORY);
-        await CategoryTests.submit();
+        await Actions.updateById(FOOD_CATEGORY);
+        await Actions.selectParentCategory(SHOP_CATEGORY);
+        await Actions.submit();
 
         setBlock('Update category with empty name', 2);
-        await CategoryTests.updateById(FOOD_CATEGORY);
-        await CategoryTests.inputName('');
-        await CategoryTests.submit();
+        await Actions.updateById(FOOD_CATEGORY);
+        await Actions.inputName('');
+        await Actions.submit();
 
         setBlock('Update category with existing name', 2);
-        await CategoryTests.updateById(FOOD_CATEGORY);
-        await CategoryTests.inputName('Transpost');
-        await CategoryTests.submit();
+        await Actions.updateById(FOOD_CATEGORY);
+        await Actions.inputName('Transpost');
+        await Actions.submit();
     }
 
     async deleteFromContextMenu() {
         setBlock('Delete category from context menu', 1);
 
-        await CategoryTests.deleteFromContextMenu(0);
+        await Actions.deleteFromContextMenu(0);
     }
 
     async del() {
         setBlock('Delete categories', 1);
 
-        await CategoryTests.del(0);
-        await CategoryTests.del(2, false);
-        await CategoryTests.del([0, 1]);
+        await Actions.del(0);
+        await Actions.del(2, false);
+        await Actions.del([0, 1]);
     }
 
     async deleteFromUpdate() {
@@ -163,7 +163,7 @@ export class CategoriesStory extends TestStory {
             0,
         ];
 
-        await App.scenario.runner.runGroup(CategoryTests.delFromUpdate, data);
+        await App.scenario.runner.runGroup(Actions.delFromUpdate, data);
     }
 
     async select() {
@@ -175,39 +175,39 @@ export class CategoriesStory extends TestStory {
         ];
 
         setBlock('Toggle select categories', 2);
-        await App.scenario.runner.runGroup(CategoryTests.toggleSelect, data);
+        await App.scenario.runner.runGroup(Actions.toggleSelect, data);
 
         setBlock('Select/deselect all categories', 2);
-        await CategoryTests.selectAll();
-        await CategoryTests.deselectAll();
+        await Actions.selectAll();
+        await Actions.deselectAll();
     }
 
     async sort() {
         setBlock('Sort categories', 1);
 
         setBlock('Sort by name', 2);
-        await CategoryTests.toggleSortByName();
-        await CategoryTests.toggleSortByName();
+        await Actions.toggleSortByName();
+        await Actions.toggleSortByName();
 
         setBlock('Sort by date', 2);
-        await CategoryTests.toggleSortByDate();
-        await CategoryTests.toggleSortByDate();
+        await Actions.toggleSortByDate();
+        await Actions.toggleSortByDate();
 
         setBlock('Sort manually', 2);
-        await CategoryTests.sortManually();
+        await Actions.sortManually();
     }
 
     async details() {
         setBlock('Category details', 1);
 
-        await CategoryTests.showDetails({ index: 0 });
-        await CategoryTests.closeDetails();
-        await CategoryTests.showDetails({ index: 1 });
-        await CategoryTests.showDetails({ index: 2 });
-        await CategoryTests.showDetails({ index: 2 });
-        await CategoryTests.closeDetails();
-        await CategoryTests.showDetails({ index: 0, directNavigate: true });
-        await CategoryTests.showDetails({ index: 1, directNavigate: true });
-        await CategoryTests.closeDetails();
+        await Actions.showDetails({ index: 0 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 1 });
+        await Actions.showDetails({ index: 2 });
+        await Actions.showDetails({ index: 2 });
+        await Actions.closeDetails();
+        await Actions.showDetails({ index: 0, directNavigate: true });
+        await Actions.showDetails({ index: 1, directNavigate: true });
+        await Actions.closeDetails();
     }
 }

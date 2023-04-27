@@ -7,10 +7,10 @@ import {
     TRANSFER,
     DEBT,
 } from '../../../model/Transaction.js';
-import * as AccountApiTests from '../../../actions/api/account.js';
-import * as PersonApiTests from '../../../actions/api/person.js';
-import * as CategoryApiTests from '../../../actions/api/category.js';
-import * as TransactionApiTests from '../../../actions/api/transaction.js';
+import * as accountActions from '../../../actions/api/account.js';
+import * as personActions from '../../../actions/api/person.js';
+import * as categoryActions from '../../../actions/api/category.js';
+import * as transactionActions from '../../../actions/api/transaction.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);
@@ -20,7 +20,7 @@ const prepareTests = async () => {
     [
         App.scenario.API_USER_ACC_RUB,
         App.scenario.API_USER_ACC_USD,
-    ] = await App.scenario.runner.runGroup(AccountApiTests.create, [{
+    ] = await App.scenario.runner.runGroup(accountActions.create, [{
         type: ACCOUNT_TYPE_OTHER,
         name: 'RUB',
         curr_id: RUB,
@@ -41,14 +41,14 @@ const prepareTests = async () => {
 
     [
         App.scenario.API_USER_PERSON,
-    ] = await App.scenario.runner.runGroup(PersonApiTests.create, [{
+    ] = await App.scenario.runner.runGroup(personActions.create, [{
         name: 'API user Person',
     }]);
     assert(App.scenario.API_USER_PERSON, 'Failed to create person');
 
     [
         App.scenario.API_USER_CATEGORY,
-    ] = await App.scenario.runner.runGroup(CategoryApiTests.create, [{
+    ] = await App.scenario.runner.runGroup(categoryActions.create, [{
         name: 'API user Category',
         type: EXPENSE,
     }]);
@@ -56,7 +56,7 @@ const prepareTests = async () => {
 
     [
         App.scenario.API_USER_TRANSACTION,
-    ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, [{
+    ] = await App.scenario.runner.runGroup(transactionActions.extractAndCreate, [{
         type: EXPENSE,
         src_id: App.scenario.API_USER_ACC_RUB,
         src_amount: 100,
@@ -69,15 +69,15 @@ const accountsTests = async () => {
 
     const { EUR, API_USER_ACC_RUB } = App.scenario;
 
-    await AccountApiTests.update({
+    await accountActions.update({
         id: API_USER_ACC_RUB,
         name: 'EUR',
         curr_id: EUR,
         initbalance: 10,
         icon_id: 2,
     });
-    await AccountApiTests.del(API_USER_ACC_RUB);
-    await AccountApiTests.setPos({ id: API_USER_ACC_RUB, pos: 1 });
+    await accountActions.del(API_USER_ACC_RUB);
+    await accountActions.setPos({ id: API_USER_ACC_RUB, pos: 1 });
 };
 
 const personsTests = async () => {
@@ -85,12 +85,12 @@ const personsTests = async () => {
 
     const { API_USER_PERSON } = App.scenario;
 
-    await PersonApiTests.update({
+    await personActions.update({
         id: API_USER_PERSON,
         name: 'API Person',
     });
-    await PersonApiTests.del(API_USER_PERSON);
-    await PersonApiTests.setPos({ id: API_USER_PERSON, pos: 1 });
+    await personActions.del(API_USER_PERSON);
+    await personActions.setPos({ id: API_USER_PERSON, pos: 1 });
 };
 
 const categoriesTests = async () => {
@@ -98,13 +98,13 @@ const categoriesTests = async () => {
 
     const { API_USER_CATEGORY } = App.scenario;
 
-    await CategoryApiTests.update({
+    await categoryActions.update({
         id: API_USER_CATEGORY,
         name: 'API Category',
         type: EXPENSE,
     });
-    await CategoryApiTests.del(API_USER_CATEGORY);
-    await CategoryApiTests.setPos({ id: API_USER_CATEGORY, pos: 1, parent_id: 0 });
+    await categoryActions.del(API_USER_CATEGORY);
+    await categoryActions.setPos({ id: API_USER_CATEGORY, pos: 1, parent_id: 0 });
 };
 
 const createTransaction = async () => {
@@ -163,7 +163,7 @@ const createTransaction = async () => {
         dest_amount: 100,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.create, data);
+    await App.scenario.runner.runGroup(transactionActions.create, data);
 };
 
 const updateTransaction = async () => {
@@ -223,7 +223,7 @@ const updateTransaction = async () => {
         acc_id: API_USER_ACC_RUB,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+    await App.scenario.runner.runGroup(transactionActions.update, data);
 };
 
 const deleteTransaction = async () => {
@@ -233,7 +233,7 @@ const deleteTransaction = async () => {
         [App.scenario.API_USER_TRANSACTION],
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+    await App.scenario.runner.runGroup(transactionActions.del, data);
 };
 
 const transactionsTests = async () => {

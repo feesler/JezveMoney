@@ -1686,11 +1686,11 @@ class TransactionModel extends SortableModel
         }
 
         // Date range filter
-        $stDate = (isset($request["stdate"]) ? intval($request["stdate"]) : null);
-        $endDate = (isset($request["enddate"]) ? intval($request["enddate"]) : null);
-        if (!is_null($stDate) && !is_null($endDate)) {
-            $res["startDate"] = $stDate;
-            $res["endDate"] = $endDate;
+        if (isset($request["stdate"]) && !is_null($request["stdate"])) {
+            $res["startDate"] = intval($request["stdate"]);
+        }
+        if (isset($request["enddate"]) && !is_null($request["enddate"])) {
+            $res["endDate"] = intval($request["enddate"]);
         }
 
         // Page
@@ -1698,6 +1698,17 @@ class TransactionModel extends SortableModel
             $page = intval($request["page"]);
             if ($page > 1) {
                 $res["page"] = $page - 1;
+            }
+        }
+
+        // Limit
+        if (isset($request["onPage"])) {
+            $onPage = intval($request["onPage"]);
+            if ($onPage < 0) {
+                throw new \Error("Invalid page limit");
+            }
+            if ($onPage > 0) {
+                $res["onPage"] = $onPage;
             }
         }
 
@@ -1760,8 +1771,10 @@ class TransactionModel extends SortableModel
         }
 
         // Date range
-        if (isset($params["startDate"]) && $params["endDate"]) {
+        if (isset($params["startDate"])) {
             $res["stdate"] = $params["startDate"];
+        }
+        if (isset($params["endDate"])) {
             $res["enddate"] = $params["endDate"];
         }
 
@@ -1843,14 +1856,13 @@ class TransactionModel extends SortableModel
         }
 
         // Date range condition
-        if (
-            isset($params["startDate"]) && !is_null($params["startDate"]) &&
-            isset($params["endDate"]) && !is_null($params["endDate"])
-        ) {
+        if (isset($params["startDate"]) && !is_null($params["startDate"])) {
             $startDate = date("Y-m-d H:i:s", $params["startDate"]);
-            $endDate = date("Y-m-d H:i:s", $params["endDate"]);
-
             $res[] = "date >= " . qnull($startDate);
+        }
+
+        if (isset($params["endDate"]) && !is_null($params["endDate"])) {
+            $endDate = date("Y-m-d H:i:s", $params["endDate"]);
             $res[] = "date <= " . qnull($endDate);
         }
 
@@ -2253,11 +2265,12 @@ class TransactionModel extends SortableModel
             $res->group = self::getHistogramGroupName(DEFAULT_GROUP_TYPE);
         }
 
-        $stDate = isset($request["stdate"]) ? $request["stdate"] : null;
-        $endDate = isset($request["enddate"]) ? $request["enddate"] : null;
-        if (!is_null($stDate) && !is_null($endDate)) {
-            $res->stdate = $stDate;
-            $res->enddate = $endDate;
+        // Date range
+        if (isset($request["stdate"])) {
+            $res->stdate = $request["stdate"];
+        }
+        if (isset($request["enddate"])) {
+            $res->enddate = $request["enddate"];
         }
 
         return $res;
@@ -2360,16 +2373,18 @@ class TransactionModel extends SortableModel
         if (count($categories) > 0) {
             $dataParams["categories"] = $categories;
         }
-        if (
-            isset($params["startDate"]) && !is_null($params["startDate"]) &&
-            isset($params["endDate"]) && !is_null($params["endDate"])
-        ) {
+
+        if (isset($params["startDate"]) && !is_null($params["startDate"])) {
             $dataParams["startDate"] = $params["startDate"];
+        }
+        if (isset($params["endDate"]) && !is_null($params["endDate"])) {
             $dataParams["endDate"] = $params["endDate"];
-        } elseif ($limit > 0) {
-            $now = time();
-            $dataParams["startDate"] = $this->getLimitStartDate($now, $limit, $group_type);
-            $dataParams["endDate"] = $now;
+        }
+
+        if ($limit > 0) {
+            $endTime = $dataParams["endDate"] ?? time();
+            $dataParams["startDate"] = $this->getLimitStartDate($endTime, $limit, $group_type);
+            $dataParams["endDate"] = $endTime;
         }
 
         $items = $this->getData($dataParams);

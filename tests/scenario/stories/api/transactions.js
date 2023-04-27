@@ -7,7 +7,7 @@ import {
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
-import * as TransactionApiTests from '../../../actions/api/transaction.js';
+import * as Actions from '../../../actions/api/transaction.js';
 import { dateToSeconds, formatProps } from '../../../common.js';
 
 const create = async () => {
@@ -159,7 +159,7 @@ const create = async () => {
         date: dateToSeconds(weekDate2),
     }];
 
-    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
     // Double check all transactions created
     res.forEach((item) => assert(item, 'Failed to create transaction'));
 
@@ -210,7 +210,7 @@ const createWithChainedRequest = async () => {
         },
     }];
 
-    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
     // Double check all transactions created
     res.forEach((item) => assert(item, 'Failed to create transaction'));
 
@@ -382,7 +382,7 @@ const createInvalid = async () => {
         dest_curr: EUR,
     }];
 
-    const res = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
     // Double check all transactions not created
     res.forEach((item, index) => {
         assert(!item, `Created transaction with invalid data: { ${formatProps(data[index])} }`);
@@ -446,7 +446,7 @@ const createMultiple = async () => {
         date: yearAfter,
     });
 
-    await TransactionApiTests.extractAndCreateMultiple(data);
+    await Actions.extractAndCreateMultiple(data);
 };
 
 const createMultipleInvalid = async () => {
@@ -472,7 +472,7 @@ const createMultipleInvalid = async () => {
         }, null],
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreateMultiple, data);
+    await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
 };
 
 const update = async () => {
@@ -540,7 +540,7 @@ const update = async () => {
         dest_amount: 150,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -568,7 +568,7 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateInvalid = async () => {
@@ -654,7 +654,7 @@ const updateInvalid = async () => {
         src_curr: EUR,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const del = async () => {
@@ -674,7 +674,7 @@ const del = async () => {
         { id: [TR_TRANSFER_1, TR_DEBT_3, TR_LIMIT_1] },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delWithChainedRequest = async () => {
@@ -691,7 +691,7 @@ const delWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delInvalid = async () => {
@@ -704,7 +704,7 @@ const delInvalid = async () => {
         [-1],
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const setCategory = async () => {
@@ -724,7 +724,7 @@ const setCategory = async () => {
         { id: [TR_EXPENSE_2], category_id: 0 },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
+    await App.scenario.runner.runGroup(Actions.setCategory, data);
 };
 
 const setCategoryWithChainedRequest = async () => {
@@ -746,7 +746,7 @@ const setCategoryWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
+    await App.scenario.runner.runGroup(Actions.setCategory, data);
 };
 
 const setCategoryInvalid = async () => {
@@ -765,7 +765,7 @@ const setCategoryInvalid = async () => {
         { id: [TR_EXPENSE_1], category_id: -1 },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setCategory, data);
+    await App.scenario.runner.runGroup(Actions.setCategory, data);
 };
 
 const setPos = async () => {
@@ -777,7 +777,7 @@ const setPos = async () => {
         { id: App.scenario.TR_TRANSFER_1, pos: 100 },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosWithChainedRequest = async () => {
@@ -793,7 +793,7 @@ const setPosWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const filter = async () => {
@@ -838,6 +838,10 @@ const filter = async () => {
         onPage: 10,
         page: 2,
     }, {
+        startDate: App.datesSec.monthAgo,
+    }, {
+        endDate: App.datesSec.yesterday,
+    }, {
         startDate: App.datesSec.now,
         endDate: App.datesSec.weekAfter,
     }, {
@@ -850,7 +854,7 @@ const filter = async () => {
         search: 'кк',
     }];
 
-    return App.scenario.runner.runGroup(TransactionApiTests.filter, data);
+    return App.scenario.runner.runGroup(Actions.filter, data);
 };
 
 const statistics = async () => {
@@ -870,6 +874,18 @@ const statistics = async () => {
         { report: 'currency', curr_id: RUB },
         { report: 'currency', curr_id: RUB, group: 'day' },
         { report: 'currency', curr_id: RUB, group: 'week' },
+        {
+            report: 'currency',
+            curr_id: RUB,
+            group: 'week',
+            stdate: App.datesSec.monthAgo,
+        },
+        {
+            report: 'currency',
+            curr_id: RUB,
+            group: 'week',
+            enddate: App.datesSec.now,
+        },
         {
             report: 'currency',
             curr_id: RUB,
@@ -920,7 +936,7 @@ const statistics = async () => {
         },
     ];
 
-    return App.scenario.runner.runGroup(TransactionApiTests.statistics, data);
+    return App.scenario.runner.runGroup(Actions.statistics, data);
 };
 
 export const apiTransactionsTests = {

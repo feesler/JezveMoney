@@ -6,7 +6,7 @@ import {
 } from '../../../model/ImportCondition.js';
 import { actions, ImportActionTypes } from '../../../model/ImportAction.js';
 import { App } from '../../../Application.js';
-import * as ImportRuleApiTests from '../../../actions/api/importrule.js';
+import * as Actions from '../../../actions/api/importrule.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);
@@ -149,7 +149,7 @@ const create = async () => {
         App.scenario.RULE_1,
         App.scenario.RULE_2,
         App.scenario.RULE_3,
-    ] = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -169,7 +169,7 @@ const createWithChainedRequest = async () => {
 
     [
         App.scenario.RULE_CHAINED,
-    ] = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const update = async () => {
@@ -218,7 +218,7 @@ const update = async () => {
         actions: [null],
     }];
 
-    await App.scenario.runner.runGroup(ImportRuleApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -238,7 +238,7 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(ImportRuleApiTests.update, data);
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const del = async () => {
@@ -249,7 +249,7 @@ const del = async () => {
         { id: [App.scenario.RULE_1, App.scenario.RULE_2] },
     ];
 
-    await App.scenario.runner.runGroup(ImportRuleApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 const delWithChainedRequest = async () => {
@@ -264,7 +264,7 @@ const delWithChainedRequest = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(ImportRuleApiTests.del, data);
+    await App.scenario.runner.runGroup(Actions.del, data);
 };
 
 export const apiImportRulesTests = {

@@ -312,27 +312,83 @@ export const filterByCategories = async ({ categories, directNavigate = false })
     });
 };
 
-export const filterByDate = async ({ start, end, directNavigate = false }) => {
+export const selectWeekRangeFilter = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    const startDateFmt = App.reformatDate(start);
-    const endDateFmt = App.reformatDate(end);
-
-    await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
-        await App.view.selectDateRange(start, end, directNavigate);
+    await test('Show week date range', async () => {
+        await App.view.selectWeekRangeFilter(directNavigate);
         return App.view.iteratePages();
     });
 };
 
-export const clearDateRange = async (directNavigate = false) => {
+export const selectMonthRangeFilter = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
-    await test('Clear date range', async () => {
-        await App.view.clearDateRange(directNavigate);
+    await test('Show month date range', async () => {
+        await App.view.selectMonthRangeFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const selectHalfYearRangeFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Show half a year date range', async () => {
+        await App.view.selectHalfYearRangeFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const selectStartDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select start date (${dateFmt})`, async () => {
+        await App.view.selectStartDateFilter(date, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const selectEndDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select end date (${dateFmt})`, async () => {
+        await App.view.selectEndDateFilter(date, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const clearStartDateFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear start date', async () => {
+        await App.view.clearStartDateFilter(directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const clearEndDateFilter = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear end date', async () => {
+        await App.view.clearEndDateFilter(directNavigate);
         return App.view.iteratePages();
     });
 };

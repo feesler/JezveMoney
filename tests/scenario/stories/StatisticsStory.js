@@ -8,7 +8,7 @@ import {
     DEBT,
     Transaction,
 } from '../../model/Transaction.js';
-import * as StatisticsTests from '../../actions/statistics.js';
+import * as Actions from '../../actions/statistics.js';
 import { testLocales } from '../../actions/locale.js';
 import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
 
@@ -43,54 +43,60 @@ export class StatisticsStory extends TestStory {
 
         await App.view.navigateToStatistics();
 
-        await StatisticsTests.checkInitialState();
+        await Actions.checkInitialState();
 
-        await StatisticsTests.byAccounts();
+        await Actions.byAccounts();
         // Income transactions filter
-        await StatisticsTests.filterByType(INCOME);
-        await StatisticsTests.filterByType(TRANSFER);
-        await StatisticsTests.filterByType(DEBT);
+        await Actions.filterByType(INCOME);
+        await Actions.filterByType(TRANSFER);
+        await Actions.filterByType(DEBT);
         // Filter by accounts
-        await StatisticsTests.filterByType(EXPENSE);
-        await StatisticsTests.filterByAccounts(ACC_EUR);
-        await StatisticsTests.filterByAccounts([ACC_3, ACC_RUB]);
-        await StatisticsTests.filterByAccounts(ACC_3);
+        await Actions.filterByType(EXPENSE);
+        await Actions.filterByAccounts(ACC_EUR);
+        await Actions.filterByAccounts([ACC_3, ACC_RUB]);
+        await Actions.filterByAccounts(ACC_3);
         // Test grouping
-        await StatisticsTests.filterByType(DEBT);
-        await StatisticsTests.groupByDay();
-        await StatisticsTests.groupByWeek();
-        await StatisticsTests.groupByMonth();
-        await StatisticsTests.groupByYear();
-        await StatisticsTests.filterByAccounts(ACC_USD);
-        await StatisticsTests.filterByType([EXPENSE, DEBT]);
-        await StatisticsTests.groupByDay();
-        await StatisticsTests.groupByWeek();
-        await StatisticsTests.groupByMonth();
-        await StatisticsTests.groupByYear();
+        await Actions.filterByType(DEBT);
+        await Actions.groupByDay();
+        await Actions.groupByWeek();
+        await Actions.groupByMonth();
+        await Actions.groupByYear();
+        await Actions.filterByAccounts(ACC_USD);
+        await Actions.filterByType([EXPENSE, DEBT]);
+        await Actions.groupByDay();
+        await Actions.groupByWeek();
+        await Actions.groupByMonth();
+        await Actions.groupByYear();
         // Show report by currencies
-        await StatisticsTests.byCurrencies();
+        await Actions.byCurrencies();
         // Change transaction type when currencies filter is selected
-        await StatisticsTests.filterByType(EXPENSE);
+        await Actions.filterByType(EXPENSE);
 
-        await StatisticsTests.selectCurrency(USD);
-        await StatisticsTests.selectCurrency(EUR);
-        await StatisticsTests.selectCurrency(RUB);
+        await Actions.selectCurrency(USD);
+        await Actions.selectCurrency(EUR);
+        await Actions.selectCurrency(RUB);
 
         // Show report by categories
-        await StatisticsTests.byCategories();
-        await StatisticsTests.filterByCategories(FOOD_CATEGORY);
-        await StatisticsTests.filterByCategories([FOOD_CATEGORY, BIKE_CATEGORY]);
-        await StatisticsTests.filterByCategories(0);
+        await Actions.byCategories();
+        await Actions.filterByCategories(FOOD_CATEGORY);
+        await Actions.filterByCategories([FOOD_CATEGORY, BIKE_CATEGORY]);
+        await Actions.filterByCategories(0);
 
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.yearAgo,
-            end: App.datesFmt.monthAgo,
-        });
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.weekAgo,
-            end: App.datesFmt.now,
-        });
-        await StatisticsTests.clearDateRange();
+        await Actions.selectStartDateFilter(App.dates.yearAgo);
+        await Actions.clearStartDateFilter();
+        await Actions.selectEndDateFilter(App.dates.monthAgo);
+        await Actions.selectStartDateFilter(App.dates.yearAgo);
+
+        await Actions.selectEndDateFilter(App.dates.now);
+        await Actions.selectStartDateFilter(App.dates.weekAgo);
+
+        await Actions.clearStartDateFilter();
+        await Actions.clearEndDateFilter();
+
+        await Actions.groupByDay();
+        await Actions.selectWeekRangeFilter();
+        await Actions.selectMonthRangeFilter();
+        await Actions.selectHalfYearRangeFilter();
 
         await this.locales();
 
@@ -123,7 +129,7 @@ export class StatisticsStory extends TestStory {
         await App.goToMainView();
         await App.view.navigateToStatistics();
 
-        await StatisticsTests.checkInitialState();
+        await Actions.checkInitialState();
     }
 
     async locales() {
@@ -137,14 +143,7 @@ export class StatisticsStory extends TestStory {
     async checkLocale(locale) {
         setBlock(`Locale: '${locale}'`, 1);
 
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.yearAgo,
-            end: App.datesFmt.monthAgo,
-        });
-        await StatisticsTests.selectDateRange({
-            start: App.datesFmt.weekAgo,
-            end: App.datesFmt.now,
-        });
-        await StatisticsTests.clearDateRange();
+        await Actions.selectStartDateFilter(App.datesFmt.monthAgo);
+        await Actions.clearStartDateFilter();
     }
 }

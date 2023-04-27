@@ -6,6 +6,10 @@
     --btn-active-icon-color: var(--ig-inner-button-active-color);
   }
 
+  .btn.calendar-btn {
+    --btn-icon-size: 24px;
+  }
+
   .date-range-part {
     min-width: 120px;
   }

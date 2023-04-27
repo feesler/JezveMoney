@@ -6,6 +6,7 @@ import {
     setEvents,
     debounce,
     isFunction,
+    createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
@@ -15,8 +16,14 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
-import { __ } from '../../js/utils.js';
+import {
+    __,
+    getHalfYearRange,
+    getMonthRange,
+    getWeekRange,
+} from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -37,6 +44,9 @@ import { TransactionDetails } from './components/TransactionDetails/TransactionD
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './TransactionListView.scss';
+
+/* CSS classes */
+const FILTER_HEADER_CLASS = 'filter-item__title';
 
 const SEARCH_DELAY = 500;
 
@@ -193,13 +203,45 @@ class TransactionListView extends View {
         }
 
         // Date range filter
+        this.dateRangeFilterTitle = createElement('span', {
+            props: { textContent: __('FILTER_DATE_RANGE') },
+        });
+
+        this.weekRangeBtn = DateRangeSelector.create({
+            rangeType: 'week',
+            title: __('DATE_RANGE_FOR_WEEK'),
+            onClick: (e) => this.showWeekRange(e),
+        });
+
+        this.monthRangeBtn = DateRangeSelector.create({
+            rangeType: 'month',
+            title: __('DATE_RANGE_FOR_MONTH'),
+            onClick: (e) => this.showMonthRange(e),
+        });
+
+        this.halfYearRangeBtn = DateRangeSelector.create({
+            rangeType: 'halfyear',
+            title: __('DATE_RANGE_FOR_HALF_YEAR'),
+            onClick: (e) => this.showHalfYearRange(e),
+        });
+
+        this.dateRangeHeader = createElement('header', {
+            props: { className: FILTER_HEADER_CLASS },
+            children: [
+                this.dateRangeFilterTitle,
+                this.weekRangeBtn.elem,
+                this.monthRangeBtn.elem,
+                this.halfYearRangeBtn.elem,
+            ],
+        });
+
         this.dateRangeFilter = DateRangeInput.create({
             id: 'dateFrm',
             startPlaceholder: __('DATE_RANGE_FROM'),
             endPlaceholder: __('DATE_RANGE_TO'),
-            onChange: (data) => this.onChangeDateFilter(data),
+            onChange: (data) => this.changeDateFilter(data),
         });
-        this.dateFilter.append(this.dateRangeFilter.elem);
+        this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
 
         // Search input
         this.searchInput = SearchInput.create({
@@ -748,7 +790,7 @@ class TransactionListView extends View {
     }
 
     /** Date range filter change handler */
-    onChangeDateFilter(data) {
+    changeDateFilter(data) {
         const { filter } = this.store.getState();
         const stdate = filter.stdate ?? null;
         const enddate = filter.enddate ?? null;
@@ -760,6 +802,21 @@ class TransactionListView extends View {
         this.store.dispatch(actions.changeDateFilter(data));
         const state = this.store.getState();
         this.requestTransactions(state.form);
+    }
+
+    showWeekRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getWeekRange());
+    }
+
+    showMonthRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getMonthRange());
+    }
+
+    showHalfYearRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getHalfYearRange());
     }
 
     showMore() {
@@ -1036,12 +1093,26 @@ class TransactionListView extends View {
         this.renderAccountsFilter(state);
         this.renderCategoriesFilter(state);
 
-        // Render date
+        // Date range filter
         const dateFilter = {
             stdate: (state.form.stdate ?? null),
             enddate: (state.form.enddate ?? null),
         };
         this.dateRangeFilter.setData(dateFilter);
+
+        const dateFilterURL = this.getFilterURL(state, false);
+        const weekRange = getWeekRange();
+        dateFilterURL.searchParams.set('stdate', weekRange.stdate);
+        dateFilterURL.searchParams.set('enddate', weekRange.enddate);
+        this.weekRangeBtn.setURL(dateFilterURL.toString());
+
+        const monthRange = getMonthRange();
+        dateFilterURL.searchParams.set('stdate', monthRange.stdate);
+        this.monthRangeBtn.setURL(dateFilterURL.toString());
+
+        const halfYearRange = getHalfYearRange();
+        dateFilterURL.searchParams.set('stdate', halfYearRange.stdate);
+        this.halfYearRangeBtn.setURL(dateFilterURL.toString());
 
         // Search form
         this.searchInput.value = state.form.search ?? '';

@@ -31,6 +31,8 @@ import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 import {
     dateToSeconds,
     isEmpty,
+    shiftDate,
+    shiftMonth,
     urlJoin,
 } from '../common.js';
 import { __ } from '../model/locale.js';
@@ -126,6 +128,10 @@ export class TransactionListView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
+        res.weekRangeBtn = { elem: await query('.range-selector-btn[data-range="week"]') };
+        res.monthRangeBtn = { elem: await query('.range-selector-btn[data-range="month"]') };
+        res.halfYearRangeBtn = { elem: await query('.range-selector-btn[data-range="halfyear"]') };
+
         res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');
 
@@ -210,12 +216,14 @@ export class TransactionListView extends AppView {
             startDate: null,
             endDate: null,
         };
-        const dateRange = cont.dateFilter.getSelectedRange();
-        if (dateRange && dateRange.startDate && dateRange.endDate) {
-            const startDate = new Date(App.parseDate(dateRange.startDate));
-            const endDate = new Date(App.parseDate(dateRange.endDate));
 
+        const dateRange = cont.dateFilter.getSelectedRange();
+        if (dateRange?.startDate) {
+            const startDate = new Date(App.parseDate(dateRange.startDate));
             res.filter.startDate = dateToSeconds(startDate);
+        }
+        if (dateRange?.endDate) {
+            const endDate = new Date(App.parseDate(dateRange.endDate));
             res.filter.endDate = dateToSeconds(endDate);
         }
 
@@ -365,8 +373,10 @@ export class TransactionListView extends AppView {
             params.search = model.filter.search;
         }
 
-        if (model.filter.startDate && model.filter.endDate) {
+        if (model.filter.startDate) {
             params.stdate = model.filter.startDate;
+        }
+        if (model.filter.endDate) {
             params.enddate = model.filter.endDate;
         }
 
@@ -477,13 +487,13 @@ export class TransactionListView extends AppView {
         const pageNum = this.currentPage(model);
         const { startDate, endDate } = model.filter;
 
-        let startDateFmt = null;
+        let startDateFmt = '';
         if (startDate) {
             const dateFmt = App.secondsToDateString(startDate);
             startDateFmt = App.reformatDate(dateFmt);
         }
 
-        let endDateFmt = null;
+        let endDateFmt = '';
         if (endDate) {
             const dateFmt = App.secondsToDateString(endDate);
             endDateFmt = App.reformatDate(dateFmt);
@@ -507,6 +517,9 @@ export class TransactionListView extends AppView {
                     endDate: endDateFmt,
                 },
             },
+            weekRangeBtn: { visible: filtersVisible },
+            monthRangeBtn: { visible: filtersVisible },
+            halfYearRangeBtn: { visible: filtersVisible },
             searchForm: {
                 value: model.filter.search,
                 visible: filtersVisible,
@@ -871,30 +884,144 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async selectDateRange(start, end, directNavigate = false) {
+    async selectWeekRangeFilter(directNavigate = false) {
         if (directNavigate) {
             this.model.filtersVisible = false;
         } else {
             await this.openFilters();
         }
 
-        const startDate = new Date(App.parseDate(start));
-        const endDate = new Date(App.parseDate(end));
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftDate(now, -7));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
 
-        this.model.filter.startDate = dateToSeconds(startDate);
-        this.model.filter.endDate = dateToSeconds(endDate);
+        filter.startDate = startDate;
+        filter.endDate = endDate;
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.dateFilter.selectRange(startDate, endDate));
+            assert(this.content.weekRangeBtn.visible, 'Week range button not visible');
+            await this.waitForList(() => click(this.content.weekRangeBtn.elem));
         }
 
         return App.view.checkState(expected);
     }
 
-    async clearDateRange(directNavigate = false) {
+    async selectMonthRangeFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -1));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            assert(this.content.monthRangeBtn.visible, 'Month range button not visible');
+            await this.waitForList(() => click(this.content.monthRangeBtn.elem));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async selectHalfYearRangeFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const { filter } = this.model;
+        const now = new Date();
+        const startDate = dateToSeconds(shiftMonth(now, -6));
+        const endDate = dateToSeconds(now);
+        if (filter.startDate === startDate && filter.endDate === endDate) {
+            return true;
+        }
+
+        filter.startDate = startDate;
+        filter.endDate = endDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            assert(this.content.halfYearRangeBtn.visible, 'Half a year range button not visible');
+            await this.waitForList(() => click(this.content.halfYearRangeBtn.elem));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async selectStartDateFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const date = new Date(App.parseDate(value));
+        const startDate = dateToSeconds(date);
+        if (this.model.filter.startDate === startDate) {
+            return true;
+        }
+
+        this.model.filter.startDate = startDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.selectStart(date));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async selectEndDateFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const date = new Date(App.parseDate(value));
+        const endDate = dateToSeconds(date);
+        if (this.model.filter.endDate === endDate) {
+            return true;
+        }
+
+        this.model.filter.endDate = endDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.selectEnd(date));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearStartDateFilter(directNavigate = false) {
         if (directNavigate) {
             this.model.filtersVisible = false;
         } else {
@@ -902,13 +1029,31 @@ export class TransactionListView extends AppView {
         }
 
         this.model.filter.startDate = null;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.clearStart());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearEndDateFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.endDate = null;
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.dateFilter.clear());
+            await this.waitForList(() => this.content.dateFilter.clearEnd());
         }
 
         return App.view.checkState(expected);

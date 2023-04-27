@@ -1,7 +1,7 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { EXPENSE, INCOME } from '../../../model/Transaction.js';
-import * as CategoryApiTests from '../../../actions/api/category.js';
+import * as Actions from '../../../actions/api/category.js';
 
 const create = async () => {
     setBlock('Create categories', 2);
@@ -34,7 +34,7 @@ const create = async () => {
         App.scenario.TAXES_CATEGORY,
         App.scenario.TRANSPORT_CATEGORY,
         App.scenario.SHOP_CATEGORY,
-    ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -60,7 +60,7 @@ const createWithChainedRequest = async () => {
     [
         App.scenario.SCV_CHAINED_CATEGORY,
         App.scenario.BEAUTY_CHAINED_CATEGORY,
-    ] = await App.scenario.runner.runGroup(CategoryApiTests.create, data);
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -88,7 +88,7 @@ const createInvalid = async () => {
         type: EXPENSE,
     }];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.create, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const createMultiple = async () => {
@@ -117,7 +117,7 @@ const createMultiple = async () => {
         App.scenario.BIKE_CATEGORY,
         App.scenario.LEARN_CATEGORY,
         App.scenario.OTHER_CATEGORY,
-    ] = await CategoryApiTests.createMultiple(data);
+    ] = await Actions.createMultiple(data);
 };
 
 const createMultipleInvalid = async () => {
@@ -141,7 +141,7 @@ const createMultipleInvalid = async () => {
         }, null],
     ];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.createMultiple, data);
 };
 
 const read = async () => {
@@ -152,7 +152,7 @@ const read = async () => {
         [App.scenario.BIKE_CATEGORY, App.scenario.LEARN_CATEGORY],
     ];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.read, data);
+    await App.scenario.runner.runGroup(Actions.read, data);
 };
 
 const list = async () => {
@@ -164,7 +164,7 @@ const list = async () => {
         { parent_id: App.scenario.TRANSPORT_CATEGORY },
     ];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.list, data);
+    await App.scenario.runner.runGroup(Actions.list, data);
 };
 
 const update = async () => {
@@ -184,7 +184,7 @@ const update = async () => {
         { id: FOOD_CATEGORY, parent_id: SHOP_CATEGORY },
     ];
 
-    return App.scenario.runner.runGroup(CategoryApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -209,7 +209,7 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    return App.scenario.runner.runGroup(CategoryApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const updateInvalid = async () => {
@@ -232,7 +232,7 @@ const updateInvalid = async () => {
         { id: CAFE_CATEGORY, type: INCOME },
     ];
 
-    return App.scenario.runner.runGroup(CategoryApiTests.update, data);
+    return App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const setPos = async () => {
@@ -247,7 +247,7 @@ const setPos = async () => {
         { id: SHOP_CATEGORY, pos: 4, parent_id: 0 },
     ];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosWithChainedRequest = async () => {
@@ -264,7 +264,7 @@ const setPosWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const setPosInvalid = async () => {
@@ -289,7 +289,7 @@ const setPosInvalid = async () => {
         null,
     ];
 
-    await App.scenario.runner.runGroup(CategoryApiTests.setPos, data);
+    await App.scenario.runner.runGroup(Actions.setPos, data);
 };
 
 const del = async () => {
@@ -302,9 +302,9 @@ const del = async () => {
         LEARN_CATEGORY,
     } = App.scenario;
 
-    await CategoryApiTests.del(INVEST_CATEGORY);
-    await CategoryApiTests.del(SHOP_CATEGORY, false);
-    await CategoryApiTests.del([BIKE_CATEGORY, LEARN_CATEGORY]);
+    await Actions.del(INVEST_CATEGORY);
+    await Actions.del(SHOP_CATEGORY, false);
+    await Actions.del([BIKE_CATEGORY, LEARN_CATEGORY]);
 };
 
 const delWithChainedRequest = async () => {
@@ -315,7 +315,7 @@ const delWithChainedRequest = async () => {
         BEAUTY_CHAINED_CATEGORY,
     } = App.scenario;
 
-    await CategoryApiTests.del({
+    await Actions.del({
         id: [SCV_CHAINED_CATEGORY, BEAUTY_CHAINED_CATEGORY],
         returnState: {
             categories: {},
@@ -332,7 +332,7 @@ const delInvalid = async () => {
         [null, null],
     ];
 
-    return App.scenario.runner.runGroup(CategoryApiTests.del, data);
+    return App.scenario.runner.runGroup(Actions.del, data);
 };
 
 export const apiCategoriesTests = {

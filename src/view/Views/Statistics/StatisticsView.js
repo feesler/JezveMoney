@@ -18,6 +18,9 @@ import {
     normalize,
     __,
     timeToDate,
+    getWeekRange,
+    getMonthRange,
+    getHalfYearRange,
 } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
@@ -31,6 +34,7 @@ import { Transaction } from '../../js/model/Transaction.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -40,7 +44,8 @@ import { isSameSelection, actions, reducer } from './reducer.js';
 import '../../css/app.scss';
 import './StatisticsView.scss';
 
-/** CSS classes */
+/* CSS classes */
+const FILTER_HEADER_CLASS = 'filter-item__title';
 /* Chart popup */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';
 const POPUP_HEADER_CLASS = 'chart-popup__header';
@@ -218,13 +223,46 @@ class StatisticsView extends View {
         this.groupTypeFilter.append(this.groupTypeMenu.elem);
 
         // Date range filter
+        this.dateRangeFilterTitle = createElement('span', {
+            props: { textContent: __('FILTER_DATE_RANGE') },
+        });
+
+        this.weekRangeBtn = DateRangeSelector.create({
+            rangeType: 'week',
+            title: __('DATE_RANGE_FOR_WEEK'),
+            onClick: (e) => this.showWeekRange(e),
+        });
+
+        this.monthRangeBtn = DateRangeSelector.create({
+            rangeType: 'month',
+            title: __('DATE_RANGE_FOR_MONTH'),
+            onClick: (e) => this.showMonthRange(e),
+        });
+
+        this.halfYearRangeBtn = DateRangeSelector.create({
+            rangeType: 'halfyear',
+            title: __('DATE_RANGE_FOR_HALF_YEAR'),
+            onClick: (e) => this.showHalfYearRange(e),
+        });
+
+        this.dateRangeHeader = createElement('header', {
+            props: { className: FILTER_HEADER_CLASS },
+            children: [
+                this.dateRangeFilterTitle,
+                this.weekRangeBtn.elem,
+                this.monthRangeBtn.elem,
+                this.halfYearRangeBtn.elem,
+            ],
+        });
+
         this.dateRangeFilter = DateRangeInput.create({
             id: 'dateFrm',
             startPlaceholder: __('DATE_RANGE_FROM'),
             endPlaceholder: __('DATE_RANGE_TO'),
-            onChange: (data) => this.onChangeDateFilter(data),
+            onChange: (data) => this.changeDateFilter(data),
         });
-        this.dateFilter.append(this.dateRangeFilter.elem);
+
+        this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
 
         // Chart
         this.noDataMessage = this.chart.querySelector('.nodata-message');
@@ -324,7 +362,7 @@ class StatisticsView extends View {
     }
 
     /** Date range filter change handler */
-    onChangeDateFilter(data) {
+    changeDateFilter(data) {
         const { filter } = this.store.getState();
         const stdate = filter.stdate ?? null;
         const enddate = filter.enddate ?? null;
@@ -336,6 +374,21 @@ class StatisticsView extends View {
         this.store.dispatch(actions.changeDateFilter(data));
         const state = this.store.getState();
         this.requestData(state.form);
+    }
+
+    showWeekRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getWeekRange());
+    }
+
+    showMonthRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getMonthRange());
+    }
+
+    showHalfYearRange(e) {
+        e.preventDefault();
+        this.changeDateFilter(getHalfYearRange());
     }
 
     /**
@@ -646,7 +699,7 @@ class StatisticsView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.form.type);
 
-        const { report } = state.form;
+        const { report, group } = state.form;
         this.reportMenu.setActive(report);
 
         show(this.accountsFilter, (report === 'account'));
@@ -660,14 +713,32 @@ class StatisticsView extends View {
             this.currencyDropDown.setSelection(state.form.curr_id);
         }
 
-        this.groupTypeMenu.setActive(state.form.group);
+        this.groupTypeMenu.setActive(group);
 
-        // Render date
+        // Date range filter
         const dateFilter = {
             stdate: (state.form.stdate ?? null),
             enddate: (state.form.enddate ?? null),
         };
         this.dateRangeFilter.setData(dateFilter);
+
+        const showRangeSelectors = (group === 'day' || group === 'week');
+        const dateFilterURL = this.getFilterURL(state, false);
+        const weekRange = getWeekRange();
+        dateFilterURL.searchParams.set('stdate', weekRange.stdate);
+        dateFilterURL.searchParams.set('enddate', weekRange.enddate);
+        this.weekRangeBtn.show(showRangeSelectors);
+        this.weekRangeBtn.setURL(dateFilterURL.toString());
+
+        const monthRange = getMonthRange();
+        dateFilterURL.searchParams.set('stdate', monthRange.stdate);
+        this.monthRangeBtn.show(showRangeSelectors);
+        this.monthRangeBtn.setURL(dateFilterURL.toString());
+
+        const halfYearRange = getHalfYearRange();
+        dateFilterURL.searchParams.set('stdate', halfYearRange.stdate);
+        this.halfYearRangeBtn.show(showRangeSelectors);
+        this.halfYearRangeBtn.setURL(dateFilterURL.toString());
     }
 
     renderHistogram(state, prevState = {}) {

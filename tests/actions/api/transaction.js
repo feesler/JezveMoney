@@ -264,8 +264,10 @@ export const filter = async (params) => {
 export const statistics = async (params) => {
     await test(`Statistics (${formatProps(params)})`, async () => {
         const stateParams = { ...params };
-        if (params.stdate && params.enddate) {
+        if (params.stdate) {
             stateParams.startDate = params.stdate;
+        }
+        if (params.enddate) {
             stateParams.endDate = params.enddate;
         }
         const histogram = App.state.transactions.getStatistics(stateParams);

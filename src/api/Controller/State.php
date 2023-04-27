@@ -337,7 +337,7 @@ class State extends ApiController
         $res = $this->getData([
             "accounts" => [],
             "persons" => [],
-            "transactions" => ["desc" => true, "onPage" => 5],
+            "transactions" => ["order" => "desc", "onPage" => 5],
         ]);
 
         // Statistics

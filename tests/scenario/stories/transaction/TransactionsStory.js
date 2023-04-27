@@ -9,13 +9,13 @@ import {
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
-import * as TransactionTests from '../../../actions/transaction.js';
-import * as expenseTests from './expense.js';
-import * as incomeTests from './income.js';
-import * as transferTests from './transfer.js';
-import * as debtTests from './debt.js';
-import * as creditLimitTests from './creditLimit.js';
-import * as AccountTests from '../../../actions/account.js';
+import * as Actions from '../../../actions/transaction.js';
+import * as expenseActions from './expense.js';
+import * as incomeActions from './income.js';
+import * as transferActions from './transfer.js';
+import * as debtActions from './debt.js';
+import * as creditLimitActions from './creditLimit.js';
+import * as accountActions from '../../../actions/account.js';
 import { testLocales } from '../../../actions/locale.js';
 import { testDateLocales, testDecimalLocales } from '../../../actions/settings.js';
 
@@ -36,7 +36,7 @@ export class TransactionsStory extends TestStory {
     async run() {
         setBlock('Transactions', 1);
 
-        await TransactionTests.securityTests();
+        await Actions.securityTests();
         await this.stateLoops();
         await this.create();
         await this.update();
@@ -56,11 +56,11 @@ export class TransactionsStory extends TestStory {
     async stateLoops() {
         setBlock('Transaction view state loops', 1);
 
-        await expenseTests.stateLoop();
-        await incomeTests.stateLoop();
-        await transferTests.stateLoop();
-        await debtTests.stateLoop();
-        await creditLimitTests.stateLoop();
+        await expenseActions.stateLoop();
+        await incomeActions.stateLoop();
+        await transferActions.stateLoop();
+        await debtActions.stateLoop();
+        await creditLimitActions.stateLoop();
 
         await this.typeChangeLoop();
     }
@@ -106,66 +106,66 @@ export class TransactionsStory extends TestStory {
             HIDDEN_ACC,
         } = App.scenario;
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '123.7801' },
             { action: 'changeCategory', data: FOOD_CATEGORY },
             { action: 'inputComment', data: 'buy' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(3, [
+        await Actions.createFromAccountAndSubmit(3, [
             { action: 'changeDestCurrency', data: RUB },
             { action: 'inputDestAmount', data: '7013.21' },
             { action: 'inputSrcAmount', data: '100' },
             { action: 'changeCategory', data: TRANSPORT_CATEGORY },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'inputDestAmount', data: '0.01' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeSrcAccount', data: CARD_RUB },
             { action: 'inputDestAmount', data: '99.99' },
             { action: 'selectDate', data: App.dates.monthAgo },
         ]);
 
         // Check create transaction with hidden account
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '0.01' },
         ]);
 
         // Try to submit expense with invalid destination amount
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '' },
             { action: 'clickSrcResultBalance' },
         ]);
 
         // Try to submit expense with invalid source amount
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeDestCurrency', data: KRW },
             { action: 'inputDestAmount', data: '1' },
             { action: 'inputSrcAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeDestCurrency', data: KRW },
             { action: 'inputDestAmount', data: '1' },
             { action: 'inputSrcAmount', data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeDestCurrency', data: KRW },
             { action: 'inputDestAmount', data: '1' },
             { action: 'inputSrcAmount', data: '' },
@@ -173,7 +173,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Try to submit expense with invalid date
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputDate', data: '' },
         ]);
@@ -190,14 +190,14 @@ export class TransactionsStory extends TestStory {
             INVEST_CATEGORY,
         } = App.scenario;
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '10023.7801' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
             { action: 'inputComment', data: 'some income' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(3, [
+        await Actions.createFromAccountAndSubmit(3, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeSourceCurrency', data: USD },
             { action: 'inputSrcAmount', data: '7013.21' },
@@ -205,14 +205,14 @@ export class TransactionsStory extends TestStory {
             { action: 'changeCategory', data: INVEST_CATEGORY },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '0.01' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
             { action: 'changeCategory', data: INVEST_CATEGORY },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeDestAccount', data: CARD_RUB },
             { action: 'inputSrcAmount', data: '99.99' },
@@ -220,39 +220,39 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Check create transaction with hidden account
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeDestAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '0.01' },
         ]);
 
         // Try to submit income with invalid source amount
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '' },
             { action: 'clickDestResultBalance' },
         ]);
 
         // Try to submit income with invalid destination amount
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeSourceCurrency', data: KRW },
             { action: 'inputSrcAmount', data: '1' },
             { action: 'inputDestAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeSourceCurrency', data: KRW },
             { action: 'inputSrcAmount', data: '1' },
@@ -260,7 +260,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Check invalidated destination amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeSourceCurrency', data: KRW },
             { action: 'inputSrcAmount', data: '1' },
@@ -269,7 +269,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Try to submit income with invalid date
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '100' },
             { action: 'inputDate', data: '' },
@@ -286,20 +286,20 @@ export class TransactionsStory extends TestStory {
             HIDDEN_ACC,
         } = App.scenario;
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '1000' },
             { action: 'inputComment', data: 'xxxx 1234 ц' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '10' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeSrcAccount', data: ACC_RUB },
             { action: 'changeDestAccount', data: ACC_EUR },
@@ -307,14 +307,14 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '4.7614' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeSrcAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '10' },
             { action: 'inputDestAmount', data: '9.75' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '10' },
@@ -322,7 +322,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Check create transaction with hidden account
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeSrcAccount', data: ACC_USD },
             { action: 'changeDestAccount', data: HIDDEN_ACC },
@@ -331,32 +331,32 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Try to submit transfer with invalid source amount
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '' },
             { action: 'clickDestResultBalance' },
         ]);
 
         // Try to submit transfer with invalid destination amount
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
@@ -364,7 +364,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Check invalidated destination amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
@@ -373,7 +373,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Try to submit transfer with invalid date
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '100' },
@@ -393,38 +393,38 @@ export class TransactionsStory extends TestStory {
             HIDDEN_PERSON,
         } = App.scenario;
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'inputSrcAmount', data: '100' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '100.0101' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(1, [
+        await Actions.createFromPersonAndSubmit(1, [
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '10' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'toggleAccount' },
             { action: 'inputDestAmount', data: '105' },
             { action: 'selectDate', data: App.dates.yesterday },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(1, [
+        await Actions.createFromPersonAndSubmit(1, [
             { action: 'toggleAccount' },
             { action: 'swapSourceAndDest' },
             { action: 'changeAccount', data: ACC_EUR },
@@ -432,26 +432,26 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'changeSourceCurrency', data: USD },
             { action: 'inputSrcAmount', data: '10' },
             { action: 'inputDestAmount', data: '650' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(1, [
+        await Actions.createFromPersonAndSubmit(1, [
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: EUR },
             { action: 'inputSrcAmount', data: '11.5' },
             { action: 'inputDestAmount', data: '714' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'toggleAccount' },
             { action: 'changeSourceCurrency', data: USD },
             { action: 'inputSrcAmount', data: '20' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'toggleAccount' },
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: EUR },
@@ -459,52 +459,52 @@ export class TransactionsStory extends TestStory {
         ]);
 
         // Check create transaction with hidden person
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'changePerson', data: HIDDEN_PERSON },
             { action: 'inputSrcAmount', data: '0.01' },
         ]);
 
         // Check create transaction with hidden account
-        await TransactionTests.createFromPersonAndSubmit(1, [
+        await Actions.createFromPersonAndSubmit(1, [
             { action: 'changeAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
         // Try to submit debt with invalid destination amount
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
-        await TransactionTests.createFromAccountAndSubmit(0, [
+        await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
             { action: 'inputDestAmount', data: '' },
             { action: 'clickDestResultBalance' },
         ]);
 
         // Try to submit debt with invalid source amount
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'inputSrcAmount', data: '' },
         ]);
 
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'inputSrcAmount', data: '-200' },
         ]);
 
         // Check invalidated source amount field is shown on submit
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'inputSrcAmount', data: '' },
             { action: 'clickSrcResultBalance' },
         ]);
 
         // Try to submit debt with invalid date
-        await TransactionTests.createFromPersonAndSubmit(0, [
+        await Actions.createFromPersonAndSubmit(0, [
             { action: 'inputSrcAmount', data: '100' },
             { action: 'inputDate', data: '' },
         ]);
@@ -521,12 +521,12 @@ export class TransactionsStory extends TestStory {
         const index = accounts.getIndexById(CREDIT_CARD);
         assert(index !== -1, 'Account not found');
 
-        await TransactionTests.createFromAccountAndSubmit(index, [
+        await Actions.createFromAccountAndSubmit(index, [
             { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'inputDestAmount', data: '10000' },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(index, [
+        await Actions.createFromAccountAndSubmit(index, [
             { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'inputDestAmount', data: '-5000' },
         ]);
@@ -542,30 +542,30 @@ export class TransactionsStory extends TestStory {
             CAFE_CATEGORY,
         } = App.scenario;
 
-        await TransactionTests.updateAndSubmit(EXPENSE, 3, [
+        await Actions.updateAndSubmit(EXPENSE, 3, [
             { action: 'inputDestAmount', data: '124.7701' },
             { action: 'changeCategory', data: CAFE_CATEGORY },
         ]);
 
-        await TransactionTests.updateAndSubmit(EXPENSE, 0, [
+        await Actions.updateAndSubmit(EXPENSE, 0, [
             { action: 'changeDestCurrency', data: USD },
             { action: 'inputDestAmount', data: '7065.30' },
             { action: 'inputSrcAmount', data: '101' },
         ]);
 
-        await TransactionTests.updateAndSubmit(EXPENSE, 2, [
+        await Actions.updateAndSubmit(EXPENSE, 2, [
             { action: 'inputDestAmount', data: '0.02' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
         ]);
 
-        await TransactionTests.updateAndSubmit(EXPENSE, 3, [
+        await Actions.updateAndSubmit(EXPENSE, 3, [
             { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '99.9' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
 
         // Check update transaction with hidden account
-        await TransactionTests.updateAndSubmit(EXPENSE, 4, [
+        await Actions.updateAndSubmit(EXPENSE, 4, [
             { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '99.9' },
         ]);
@@ -581,29 +581,29 @@ export class TransactionsStory extends TestStory {
             TAXES_CATEGORY,
         } = App.scenario;
 
-        await TransactionTests.updateAndSubmit(INCOME, 1, [
+        await Actions.updateAndSubmit(INCOME, 1, [
             { action: 'inputSrcAmount', data: '100.001' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
             { action: 'changeCategory', data: TAXES_CATEGORY },
         ]);
 
-        await TransactionTests.updateAndSubmit(INCOME, 2, [
+        await Actions.updateAndSubmit(INCOME, 2, [
             { action: 'inputSrcAmount', data: '0.02' },
         ]);
 
-        await TransactionTests.updateAndSubmit(INCOME, 0, [
+        await Actions.updateAndSubmit(INCOME, 0, [
             { action: 'changeSourceCurrency', data: USD },
             { action: 'inputSrcAmount', data: '7065.30' },
             { action: 'inputDestAmount', data: '101' },
         ]);
 
-        await TransactionTests.updateAndSubmit(INCOME, 3, [
+        await Actions.updateAndSubmit(INCOME, 3, [
             { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '99.9' },
         ]);
 
         // Check update transaction with hidden account
-        await TransactionTests.updateAndSubmit(INCOME, 4, [
+        await Actions.updateAndSubmit(INCOME, 4, [
             { action: 'changeDestAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '99.9' },
         ]);
@@ -619,34 +619,34 @@ export class TransactionsStory extends TestStory {
             HIDDEN_ACC,
         } = App.scenario;
 
-        await TransactionTests.updateAndSubmit(TRANSFER, 0, [
+        await Actions.updateAndSubmit(TRANSFER, 0, [
             { action: 'changeDestAccount', data: ACC_3 },
             { action: 'inputSrcAmount', data: '11' },
         ]);
 
-        await TransactionTests.updateAndSubmit(TRANSFER, 1, [
+        await Actions.updateAndSubmit(TRANSFER, 1, [
             { action: 'changeSrcAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '100' },
             { action: 'inputDestAmount', data: '97.55' },
         ]);
 
-        await TransactionTests.updateAndSubmit(TRANSFER, 2, [
+        await Actions.updateAndSubmit(TRANSFER, 2, [
             { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '5.0301' },
         ]);
 
-        await TransactionTests.updateAndSubmit(TRANSFER, 3, [
+        await Actions.updateAndSubmit(TRANSFER, 3, [
             { action: 'changeSrcAccount', data: ACC_3 },
             { action: 'inputSrcAmount', data: '50' },
             { action: 'inputDestAmount', data: '0.82' },
         ]);
 
-        await TransactionTests.updateAndSubmit(TRANSFER, 4, [
+        await Actions.updateAndSubmit(TRANSFER, 4, [
             { action: 'inputSrcAmount', data: '1050.01' },
         ]);
 
         // Check update transaction with hidden account
-        await TransactionTests.updateAndSubmit(TRANSFER, 5, [
+        await Actions.updateAndSubmit(TRANSFER, 5, [
             { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '1000' },
         ]);
@@ -664,24 +664,24 @@ export class TransactionsStory extends TestStory {
             HIDDEN_PERSON,
         } = App.scenario;
 
-        await TransactionTests.updateAndSubmit(DEBT, 0, [
+        await Actions.updateAndSubmit(DEBT, 0, [
             { action: 'changePerson', data: MARIA },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
-        await TransactionTests.updateAndSubmit(DEBT, 3, [
+        await Actions.updateAndSubmit(DEBT, 3, [
             { action: 'changeAccount', data: ACC_RUB },
             { action: 'inputSrcAmount', data: '105' },
             { action: 'inputDate', data: App.datesFmt.now },
         ]);
 
-        await TransactionTests.updateAndSubmit(DEBT, 4, [
+        await Actions.updateAndSubmit(DEBT, 4, [
             { action: 'swapSourceAndDest' },
             { action: 'changeSourceCurrency', data: USD },
             { action: 'inputSrcAmount', data: '10' },
         ]);
 
-        await TransactionTests.updateAndSubmit(DEBT, 1, [
+        await Actions.updateAndSubmit(DEBT, 1, [
             { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: USD },
@@ -689,24 +689,24 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDate', data: App.datesFmt.monthAgo },
         ]);
 
-        await TransactionTests.updateAndSubmit(DEBT, 6, [
+        await Actions.updateAndSubmit(DEBT, 6, [
             { action: 'toggleAccount' },
             { action: 'inputSrcAmount', data: '200' },
         ]);
 
-        await TransactionTests.updateAndSubmit(DEBT, 2, [
+        await Actions.updateAndSubmit(DEBT, 2, [
             { action: 'inputSrcAmount', data: '1001' },
             { action: 'inputDate', data: App.datesFmt.weekAgo },
         ]);
 
         // Check update transaction with hidden person
-        await TransactionTests.updateAndSubmit(DEBT, 0, [
+        await Actions.updateAndSubmit(DEBT, 0, [
             { action: 'changePerson', data: HIDDEN_PERSON },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
         // Check update transaction with hidden account
-        await TransactionTests.updateAndSubmit(DEBT, 1, [
+        await Actions.updateAndSubmit(DEBT, 1, [
             { action: 'changeAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '105' },
         ]);
@@ -715,11 +715,11 @@ export class TransactionsStory extends TestStory {
     async updateLimitChange() {
         setBlock('Update credit limit transactions', 2);
 
-        await TransactionTests.updateAndSubmit(LIMIT_CHANGE, 0, [
+        await Actions.updateAndSubmit(LIMIT_CHANGE, 0, [
             { action: 'clickDestAmount' },
             { action: 'inputDestAmount', data: '100000' },
         ]);
-        await TransactionTests.updateAndSubmit(LIMIT_CHANGE, 1, [
+        await Actions.updateAndSubmit(LIMIT_CHANGE, 1, [
             { action: 'clickDestAmount' },
             { action: 'inputDestAmount', data: '5000' },
             { action: 'changeDestAccount', data: App.scenario.BTC_CREDIT },
@@ -731,12 +731,12 @@ export class TransactionsStory extends TestStory {
 
         const { MARIA } = App.scenario;
 
-        await TransactionTests.updateFromMainViewAndSubmit(2, [
+        await Actions.updateFromMainViewAndSubmit(2, [
             { action: 'changePerson', data: MARIA },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
-        await TransactionTests.updateFromMainViewAndSubmit(4, [
+        await Actions.updateFromMainViewAndSubmit(4, [
             { action: 'inputSrcAmount', data: '555' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
@@ -752,13 +752,13 @@ export class TransactionsStory extends TestStory {
             { index: 2, category: 0 },
         ];
 
-        return App.scenario.runner.runGroup(TransactionTests.setTransactionCategory, data);
+        return App.scenario.runner.runGroup(Actions.setTransactionCategory, data);
     }
 
     async deleteFromContextMenu() {
         setBlock('Delete transaction from context menu', 1);
 
-        await TransactionTests.deleteFromContextMenu(1);
+        await Actions.deleteFromContextMenu(1);
     }
 
     async deleteExpense() {
@@ -769,7 +769,7 @@ export class TransactionsStory extends TestStory {
             [0, 1],
         ];
 
-        await App.scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
+        await App.scenario.runner.runGroup((items) => Actions.del(EXPENSE, items), data);
     }
 
     async deleteIncome() {
@@ -780,7 +780,7 @@ export class TransactionsStory extends TestStory {
             [0, 1],
         ];
 
-        await App.scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
+        await App.scenario.runner.runGroup((items) => Actions.del(INCOME, items), data);
     }
 
     async deleteTransfer() {
@@ -791,7 +791,7 @@ export class TransactionsStory extends TestStory {
             [0, 2],
         ];
 
-        await App.scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
+        await App.scenario.runner.runGroup((items) => Actions.del(TRANSFER, items), data);
     }
 
     async deleteDebt() {
@@ -802,13 +802,13 @@ export class TransactionsStory extends TestStory {
             [0, 1],
         ];
 
-        await App.scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
+        await App.scenario.runner.runGroup((items) => Actions.del(DEBT, items), data);
     }
 
     async deleteLimitChange() {
         setBlock('Delete credit limit transactions', 2);
 
-        await TransactionTests.del(LIMIT_CHANGE, [0]);
+        await Actions.del(LIMIT_CHANGE, [0]);
     }
 
     async deleteFromMainView() {
@@ -819,7 +819,7 @@ export class TransactionsStory extends TestStory {
             1,
         ];
 
-        await App.scenario.runner.runGroup(TransactionTests.deleteFromMainView, data);
+        await App.scenario.runner.runGroup(Actions.deleteFromMainView, data);
     }
 
     async typeChangeLoop() {
@@ -828,7 +828,7 @@ export class TransactionsStory extends TestStory {
         // Hide first account
         let userVisibleAccounts = App.state.accounts.getUserVisible();
         const account = userVisibleAccounts.getItemByIndex(0);
-        await AccountTests.hide(0);
+        await accountActions.hide(0);
 
         await App.goToMainView();
         await App.view.goToNewTransactionByAccount(0);
@@ -836,7 +836,7 @@ export class TransactionsStory extends TestStory {
         const { CREDIT_CARD, CAFE_CATEGORY } = App.scenario;
 
         // Start from Expense type
-        await TransactionTests.runActions([
+        await Actions.runActions([
             // Select Expense category to check state on change type of transaction
             { action: 'changeCategory', data: CAFE_CATEGORY },
             { action: 'changeTransactionType', data: INCOME },
@@ -868,7 +868,7 @@ export class TransactionsStory extends TestStory {
         userVisibleAccounts = App.state.accounts.getUserVisible();
         const userHiddenAccounts = App.state.accounts.getUserHidden();
         const index = userHiddenAccounts.getIndexById(account.id);
-        await AccountTests.show(userVisibleAccounts.length + index);
+        await accountActions.show(userVisibleAccounts.length + index);
     }
 
     async deleteFromUpdate() {
@@ -879,7 +879,7 @@ export class TransactionsStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(
-            (pos) => TransactionTests.delFromUpdate(DEBT, pos),
+            (pos) => Actions.delFromUpdate(DEBT, pos),
             data,
         );
     }
@@ -925,13 +925,13 @@ export class TransactionsStory extends TestStory {
             { type: TRANSFER, accountId: personAccount.id },
             { type: DEBT, accountId: personAccount.id },
         ];
-        await App.scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
+        await App.scenario.runner.runGroup(Actions.createFromPersonAccount, data);
     }
 
     async noAccountURL() {
         setBlock('Handling URL parameters', 1);
 
-        await TransactionTests.checkDebtNoAccountURL();
+        await Actions.checkDebtNoAccountURL();
     }
 
     async locales() {
@@ -947,12 +947,12 @@ export class TransactionsStory extends TestStory {
 
         const { CARD_RUB } = App.scenario;
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'inputDestAmount', data: '0.01' },
             { action: 'inputDate', data: App.datesFmt.yesterday },
         ]);
 
-        await TransactionTests.createFromAccountAndSubmit(1, [
+        await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'changeDestAccount', data: CARD_RUB },
             { action: 'inputSrcAmount', data: '99.99' },
@@ -964,7 +964,7 @@ export class TransactionsStory extends TestStory {
         const { RUB } = App.scenario;
 
         const checkAvailable = (type) => (
-            TransactionTests.checkTransactionAvailable(type, directNavigate)
+            Actions.checkTransactionAvailable(type, directNavigate)
         );
 
         const navType = (directNavigate) ? 'direct' : 'manual';
@@ -1009,7 +1009,7 @@ export class TransactionsStory extends TestStory {
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Transfer
-            await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+            await Actions.checkTransactionAvailable(TRANSFER, directNavigate);
         }
 
         // Create person
@@ -1063,7 +1063,7 @@ export class TransactionsStory extends TestStory {
         // Only Debt must be available
         await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
         // Check state of Debt transaction after swap source and destination
-        await TransactionTests.runAction({ action: 'swapSourceAndDest' });
+        await Actions.runAction({ action: 'swapSourceAndDest' });
 
         // Remove person
         await api.person.del({ id: person1 });
