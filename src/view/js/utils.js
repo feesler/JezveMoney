@@ -122,17 +122,22 @@ export const timeToDate = (value) => {
 };
 
 /** Returns time for start of the day */
-export const cutTime = (value) => {
-    const fixedDate = shiftDate(timeToDate(value), 0);
+export const cutDate = (date) => {
+    const fixedDate = shiftDate(date, 0);
     return getSeconds(fixedDate);
 };
+
+/** Returns time for start of the day */
+export const cutTime = (value) => (
+    cutDate(timeToDate(value))
+);
 
 /** Returns date range object for a last week */
 export const getWeekRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 
@@ -141,7 +146,7 @@ export const getMonthRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftMonth(now, -1)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 
@@ -150,7 +155,7 @@ export const getHalfYearRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftMonth(now, -6)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 
@@ -213,28 +218,6 @@ export const isValidValue = (val) => (
 /** Format decimal value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 
-/** Format decimal value with size postfix */
-export const formatValueShort = (value) => {
-    let val = value;
-    let size = '';
-    if (value >= 1e12) {
-        val = correct(value / 1e12, 2);
-        size = 'T';
-    } else if (value >= 1e9) {
-        val = correct(value / 1e9, 2);
-        size = 'B';
-    } else if (value >= 1e6) {
-        val = correct(value / 1e6, 2);
-        size = 'M';
-    } else if (value >= 1e3) {
-        val = correct(value / 1e3, 2);
-        size = 'k';
-    }
-
-    const fmtValue = formatValue(val);
-    return `${fmtValue}${size}`;
-};
-
 /** Formats token string with specified arguments */
 export const formatTokenString = (value, ...args) => (
     value.replace(/\$\{(\d+)\}/g, (_, num) => {
@@ -274,6 +257,28 @@ export const __ = (token, ...args) => {
     return formatTokenString(localeTokens[token], args);
 };
 /* eslint-enable no-underscore-dangle */
+
+/** Format decimal value with size postfix */
+export const formatNumberShort = (value) => {
+    let val = value;
+    let size = '';
+    if (value >= 1e12) {
+        val = correct(value / 1e12, 2);
+        size = __('NUMBER_SIZE_T');
+    } else if (value >= 1e9) {
+        val = correct(value / 1e9, 2);
+        size = __('NUMBER_SIZE_B');
+    } else if (value >= 1e6) {
+        val = correct(value / 1e6, 2);
+        size = __('NUMBER_SIZE_M');
+    } else if (value >= 1e3) {
+        val = correct(value / 1e3, 2);
+        size = __('NUMBER_SIZE_K');
+    }
+
+    const fmtValue = formatValue(val);
+    return `${fmtValue}${size}`;
+};
 
 /** Returns array of formatted debts of person or 'No debts' string */
 export const formatPersonDebts = (person) => {

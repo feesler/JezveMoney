@@ -14,7 +14,7 @@ import { PieChart } from 'jezvejs/PieChart';
 import { createStore } from 'jezvejs/Store';
 
 import {
-    formatValueShort,
+    formatNumberShort,
     normalize,
     __,
     timeToDate,
@@ -281,7 +281,7 @@ class StatisticsView extends View {
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
-            renderYAxisLabel: (value) => formatValueShort(value),
+            renderYAxisLabel: (value) => formatNumberShort(value),
             renderXAxisLabel: (value) => this.renderDateLabel(value),
             onItemClick: (target) => this.onSelectDataColumn(target),
         });

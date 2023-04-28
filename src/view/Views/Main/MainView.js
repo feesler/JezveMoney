@@ -16,7 +16,7 @@ import { TabList } from 'jezvejs/TabList';
 import { API } from '../../js/api/index.js';
 import {
     formatPersonDebts,
-    formatValueShort,
+    formatNumberShort,
     getCurrencyPrecision,
     listData,
     normalize,
@@ -219,7 +219,7 @@ class MainView extends View {
                 renderXAxisLabel: (value) => (
                     window.app.formatDate(timeToDate(value))
                 ),
-                renderYAxisLabel: (value) => formatValueShort(value),
+                renderYAxisLabel: (value) => formatNumberShort(value),
             });
             chart.append(this.histogram.elem);
         }

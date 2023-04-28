@@ -9,7 +9,7 @@ import {
     asArray,
     navigation,
 } from 'jezve-test';
-import { Button, DropDown } from 'jezvejs-test';
+import { Button, DropDown, TabList } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { CurrenciesList } from './component/Currency/CurrenciesList.js';
@@ -35,8 +35,13 @@ const contextMenuItems = [
 
 /** Settings view class */
 export class SettingsView extends AppView {
+    get tabs() {
+        return this.content.tabs;
+    }
+
     async parseContent() {
         const res = {
+            tabs: await TabList.create(this, await query('.tab-list')),
             localeSelect: await DropDown.createFromChild(this, await query('#localeSelect')),
             createBtn: { elem: await query('#createBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
@@ -112,6 +117,7 @@ export class SettingsView extends AppView {
     buildModel(cont) {
         const res = {
             locale: cont.locale,
+            selectedTab: cont.tabs.selectedId,
             loading: cont.loadingIndicator.visible,
             contextItem: cont.contextMenu.itemId,
             listMenuVisible: cont.listMenu.visible,
@@ -131,18 +137,30 @@ export class SettingsView extends AppView {
     }
 
     getExpectedState(model = this.model) {
+        const isMainTab = model.selectedTab === 'main';
+        const isCurrenciesTab = model.selectedTab === 'currencies';
+        const isRegionalTab = model.selectedTab === 'regional';
+
         const currenciesCount = model.currenciesList.items.length;
         const selectedCurrencies = this.getSelectedCurrencies(model);
         const selectedCurrenciesCount = selectedCurrencies.length;
         const isListMode = model.currenciesList.mode === 'list';
-        const showSelectItems = model.listMenuVisible && model.currenciesList.mode === 'select';
-        const showSortItems = model.listMenuVisible && isListMode && currenciesCount > 1;
+        const showSelectItems = (
+            isCurrenciesTab && model.listMenuVisible && model.currenciesList.mode === 'select'
+        );
+        const showSortItems = (
+            isCurrenciesTab && model.listMenuVisible && isListMode && currenciesCount > 1
+        );
 
         const res = {
-            createBtn: { visible: isListMode },
-            listModeBtn: { visible: !isListMode },
+            localeSelect: {
+                visible: isMainTab,
+                value: model.locale,
+            },
+            createBtn: { visible: isCurrenciesTab && isListMode },
+            listModeBtn: { visible: isCurrenciesTab && !isListMode },
             currenciesList: {
-                visible: true,
+                visible: isCurrenciesTab,
                 mode: model.currenciesList.mode,
                 items: model.currenciesList.items.map((item) => {
                     const expectedItem = { ...item };
@@ -161,18 +179,20 @@ export class SettingsView extends AppView {
                 }),
             },
             dateLocaleDropDown: {
-                visible: true,
+                visible: isRegionalTab,
                 value: model.dateLocale,
             },
             decimalLocaleDropDown: {
-                visible: true,
+                visible: isRegionalTab,
                 value: model.decimalLocale,
             },
         };
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = { visible: model.listMenuVisible && isListMode };
-            res.sortModeBtn = { visible: showSortItems };
+            res.selectModeBtn = {
+                visible: isCurrenciesTab && model.listMenuVisible && isListMode,
+            };
+            res.sortModeBtn = { visible: isCurrenciesTab && showSortItems };
             res.selectAllBtn = {
                 visible: showSelectItems && selectedCurrenciesCount < currenciesCount,
             };
@@ -192,7 +212,7 @@ export class SettingsView extends AppView {
 
             res.contextMenu.itemId = model.contextItem;
 
-            res.ctxDeleteBtn = { visible: true };
+            res.ctxDeleteBtn = { visible: isCurrenciesTab };
         }
 
         return res;
@@ -279,11 +299,40 @@ export class SettingsView extends AppView {
         await this.parse();
     }
 
+    async showTabById(tabId) {
+        if (this.model.selectedTab === tabId) {
+            return true;
+        }
+
+        this.model.selectedTab = tabId;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.tabs.selectTabById(tabId));
+
+        return this.checkState(expected);
+    }
+
+    async showMainTab() {
+        return this.showTabById('main');
+    }
+
+    async showUserCurrenciesTab() {
+        return this.showTabById('currencies');
+    }
+
+    async showRegionalTab() {
+        return this.showTabById('regional');
+    }
+
     async changeLocale(value) {
+        await this.showMainTab();
+
         await navigation(() => this.content.localeSelect.setSelection(value));
     }
 
     async openCurrencyContextMenu(index) {
+        await this.showUserCurrenciesTab();
+
         assert.arrayIndex(this.model.currenciesList.items, index, 'Invalid currency index');
 
         await this.setCurrenciesListMode();
@@ -303,6 +352,8 @@ export class SettingsView extends AppView {
     }
 
     async openCurrenciesListMenu() {
+        await this.showUserCurrenciesTab();
+
         assert(!this.content.listMenu.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
@@ -317,6 +368,8 @@ export class SettingsView extends AppView {
     }
 
     async changeCurrenciesListMode(mode) {
+        await this.showUserCurrenciesTab();
+
         if (this.model.currenciesList.mode === mode) {
             return true;
         }
@@ -358,6 +411,8 @@ export class SettingsView extends AppView {
     }
 
     async addCurrencyById(id) {
+        await this.showUserCurrenciesTab();
+
         const currencyId = parseInt(id, 10);
         const currency = App.currency.getItem(currencyId);
         assert(currency, `Invalid currency id: ${id}`);
@@ -374,6 +429,8 @@ export class SettingsView extends AppView {
     }
 
     async selectCurrencies(data) {
+        await this.showUserCurrenciesTab();
+
         assert.isDefined(data, 'No currencies specified');
 
         await this.setCurrenciesSelectMode();
@@ -401,6 +458,8 @@ export class SettingsView extends AppView {
     }
 
     async selectAllCurrencies() {
+        await this.showUserCurrenciesTab();
+
         await this.setCurrenciesSelectMode();
         await this.openCurrenciesListMenu();
 
@@ -414,6 +473,8 @@ export class SettingsView extends AppView {
     }
 
     async deselectAllCurrencies() {
+        await this.showUserCurrenciesTab();
+
         assert(this.model.currenciesList.mode === 'select', 'Invalid state');
 
         await this.openCurrenciesListMenu();
@@ -429,6 +490,8 @@ export class SettingsView extends AppView {
 
     /** Delete secified currency from context menu */
     async deleteCurrencyFromContextMenu(index) {
+        await this.showUserCurrenciesTab();
+
         await this.openCurrencyContextMenu(index);
 
         this.model.contextMenuVisible = false;
@@ -442,6 +505,8 @@ export class SettingsView extends AppView {
     }
 
     async deleteCurrencies(currencies) {
+        await this.showUserCurrenciesTab();
+
         await this.selectCurrencies(currencies);
 
         await this.openCurrenciesListMenu();
@@ -456,6 +521,8 @@ export class SettingsView extends AppView {
     }
 
     async selectDateLocale(locale) {
+        await this.showRegionalTab();
+
         this.model.dateLocale = locale;
         const expected = this.getExpectedState();
 
@@ -467,6 +534,8 @@ export class SettingsView extends AppView {
     }
 
     async selectDecimalLocale(locale) {
+        await this.showRegionalTab();
+
         this.model.decimalLocale = locale;
         const expected = this.getExpectedState();
 

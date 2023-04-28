@@ -1,5 +1,9 @@
 {
     "APP_NAME": "Jezve Money",
+    "NUMBER_SIZE_T": " трлн.",
+    "NUMBER_SIZE_B": " млрд.",
+    "NUMBER_SIZE_M": " млн.",
+    "NUMBER_SIZE_K": " тыс.",
     "LANGUAGE": "Язык",
     "DARK_THEME": "Тёмная тема",
     "LOGOUT": "Выйти",
@@ -340,6 +344,7 @@
     "SETTINGS": "Настройки",
     "SETTINGS_MAIN": "Основное",
     "SETTINGS_CURRENCIES": "Валюты",
+    "SETTINGS_REGIONAL": "Региональные настройки",
     "SETTINGS_DATE_FORMAT": "Формат даты",
     "SETTINGS_DECIMAL_FORMAT": "Формат чисел",
     "USER_CURRENCIES_NO_DATA": "Валюты не выбраны",

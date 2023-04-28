@@ -1,4 +1,12 @@
 /* Settings view */
+.tab-list {
+  --tab-padding: 0;
+  --tab-gap: 24px;
+  --tab-border-width: 0;
+  --tab-content-background: none;
+  --tab-content-padding: 0;
+}
+
 .settings-block {
   display: flex;
   flex-flow: column nowrap;

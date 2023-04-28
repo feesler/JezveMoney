@@ -190,6 +190,24 @@ export class DateRangeInput extends Component {
         });
     }
 
+    isDisabledDate(date, state) {
+        const rangePart = state?.rangePart;
+        if (rangePart !== 'start' && rangePart !== 'end') {
+            return false;
+        }
+
+        const { filter } = this.state;
+
+        const limitValue = (rangePart === 'start') ? filter.enddate : filter.stdate;
+        const limitDate = parseDate(limitValue);
+        if (!limitDate) {
+            return false;
+        }
+
+        const diff = limitDate - date;
+        return (rangePart === 'start') ? (diff < 0) : (diff > 0);
+    }
+
     /**
      * Date select callback
      * @param {Date} date - selected date
@@ -307,6 +325,7 @@ export class DateRangeInput extends Component {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
                 locales: window.app.getCurrrentLocale(),
+                disabledDateFilter: (...args) => this.isDisabledDate(...args),
                 onDateSelect: (date) => this.onDateSelect(date),
                 onHide: () => this.onDatePickerHide(),
             });
@@ -319,6 +338,7 @@ export class DateRangeInput extends Component {
         if (selectPart === this.state.selectPart) {
             this.datePicker.show(!this.datePicker.visible());
         } else {
+            this.datePicker.setRangePart(selectPart);
             this.datePicker.show();
         }
 
@@ -399,7 +419,7 @@ export class DateRangeInput extends Component {
         }
     }
 
-    render(state) {
+    render(state, prevState = {}) {
         this.startDateInput.value = state.form.stdate ?? '';
         this.endDateInput.value = state.form.enddate ?? '';
 
@@ -409,5 +429,8 @@ export class DateRangeInput extends Component {
         window.app.setValidation(this.elem, state.validation.valid);
 
         this.setDatePickerSelection(state);
+        if (this.datePicker && state.selectPart !== prevState?.selectPart) {
+            this.datePicker.setRangePart(state.selectPart);
+        }
     }
 }

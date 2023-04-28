@@ -10,6 +10,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
+import { TabList } from 'jezvejs/TabList';
 
 import { __ } from '../../js/utils.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -71,6 +72,10 @@ class SettingsView extends View {
             'userCurrenciesContainer',
             'dateFormatContainer',
             'decimalFormatContainer',
+            'tabsContainer',
+            'mainTab',
+            'userCurrenciesTab',
+            'regionalTab',
         ]);
 
         // Locale select
@@ -81,6 +86,7 @@ class SettingsView extends View {
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
+            showInHeaderOnScroll: false,
             title: __('SETTINGS_CURRENCIES'),
         });
 
@@ -184,6 +190,27 @@ class SettingsView extends View {
             ],
         });
         this.decimalFormatContainer.append(this.decimalFormatSelect.elem);
+
+        // Tabs
+        this.tabs = TabList.create({
+            items: [{
+                id: 'main',
+                value: 'main',
+                title: __('SETTINGS_MAIN'),
+                content: this.mainTab,
+            }, {
+                id: 'currencies',
+                value: 'currencies',
+                title: __('SETTINGS_CURRENCIES'),
+                content: this.userCurrenciesTab,
+            }, {
+                id: 'regional',
+                value: 'regional',
+                title: __('SETTINGS_REGIONAL'),
+                content: this.regionalTab,
+            }],
+        });
+        this.tabsContainer.append(this.tabs.elem);
 
         this.subscribeToStore(this.store);
     }

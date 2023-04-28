@@ -31,7 +31,6 @@ import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 import {
     dateToSeconds,
     isEmpty,
-    shiftDate,
     shiftMonth,
     urlJoin,
 } from '../common.js';
@@ -892,9 +891,8 @@ export class TransactionListView extends AppView {
         }
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftDate(now, -7));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(App.dates.weekAgo);
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }
@@ -921,9 +919,8 @@ export class TransactionListView extends AppView {
         }
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftMonth(now, -1));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(App.dates.monthAgo);
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }
@@ -950,9 +947,8 @@ export class TransactionListView extends AppView {
         }
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftMonth(now, -6));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(shiftMonth(App.dates.now, -6));
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }
