@@ -1,5 +1,9 @@
 {
     "APP_NAME": "Jezve Money",
+    "NUMBER_SIZE_T": "T",
+    "NUMBER_SIZE_B": "B",
+    "NUMBER_SIZE_M": "M",
+    "NUMBER_SIZE_K": "k",
     "LANGUAGE": "Language",
     "DARK_THEME": "Dark theme",
     "LOGOUT": "Logout",

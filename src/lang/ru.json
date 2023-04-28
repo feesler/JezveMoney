@@ -1,5 +1,9 @@
 {
     "APP_NAME": "Jezve Money",
+    "NUMBER_SIZE_T": " трлн.",
+    "NUMBER_SIZE_B": " млрд.",
+    "NUMBER_SIZE_M": " млн.",
+    "NUMBER_SIZE_K": " тыс.",
     "LANGUAGE": "Язык",
     "DARK_THEME": "Тёмная тема",
     "LOGOUT": "Выйти",
