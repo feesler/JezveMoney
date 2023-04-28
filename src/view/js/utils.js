@@ -122,17 +122,22 @@ export const timeToDate = (value) => {
 };
 
 /** Returns time for start of the day */
-export const cutTime = (value) => {
-    const fixedDate = shiftDate(timeToDate(value), 0);
+export const cutDate = (date) => {
+    const fixedDate = shiftDate(date, 0);
     return getSeconds(fixedDate);
 };
+
+/** Returns time for start of the day */
+export const cutTime = (value) => (
+    cutDate(timeToDate(value))
+);
 
 /** Returns date range object for a last week */
 export const getWeekRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 
@@ -141,7 +146,7 @@ export const getMonthRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftMonth(now, -1)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 
@@ -150,7 +155,7 @@ export const getHalfYearRange = () => {
     const now = new Date();
     return {
         stdate: getSeconds(shiftMonth(now, -6)),
-        enddate: getSeconds(now),
+        enddate: cutDate(now),
     };
 };
 

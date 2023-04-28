@@ -15,7 +15,7 @@ import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { dateToSeconds, shiftDate, shiftMonth } from '../common.js';
+import { dateToSeconds, shiftMonth } from '../common.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
@@ -538,9 +538,8 @@ export class StatisticsView extends AppView {
         await this.openFilters();
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftDate(now, -7));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(App.dates.weekAgo);
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }
@@ -561,9 +560,8 @@ export class StatisticsView extends AppView {
         await this.openFilters();
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftMonth(now, -1));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(App.dates.monthAgo);
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }
@@ -584,9 +582,8 @@ export class StatisticsView extends AppView {
         await this.openFilters();
 
         const { filter } = this.model;
-        const now = new Date();
-        const startDate = dateToSeconds(shiftMonth(now, -6));
-        const endDate = dateToSeconds(now);
+        const startDate = dateToSeconds(shiftMonth(App.dates.now, -6));
+        const endDate = dateToSeconds(App.dates.now);
         if (filter.startDate === startDate && filter.endDate === endDate) {
             return true;
         }

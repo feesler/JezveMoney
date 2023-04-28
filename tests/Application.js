@@ -36,11 +36,11 @@ class Application extends TestApplication {
         const day = now.getDate();
         this.dates = {
             now,
-            monthAgo: new Date(year, month - 1, day),
-            weekAgo: new Date(year, month, day - 7),
-            weekAfter: new Date(year, month, day + 7),
-            yesterday: new Date(year, month, day - 1),
-            yearAgo: new Date(year - 1, month, day),
+            monthAgo: new Date(Date.UTC(year, month - 1, day)),
+            weekAgo: new Date(Date.UTC(year, month, day - 7)),
+            weekAfter: new Date(Date.UTC(year, month, day + 7)),
+            yesterday: new Date(Date.UTC(year, month, day - 1)),
+            yearAgo: new Date(Date.UTC(year - 1, month, day)),
         };
 
         const self = this;
