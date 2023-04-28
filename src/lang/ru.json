@@ -340,6 +340,7 @@
     "SETTINGS": "Настройки",
     "SETTINGS_MAIN": "Основное",
     "SETTINGS_CURRENCIES": "Валюты",
+    "SETTINGS_REGIONAL": "Региональные настройки",
     "SETTINGS_DATE_FORMAT": "Формат даты",
     "SETTINGS_DECIMAL_FORMAT": "Формат чисел",
     "USER_CURRENCIES_NO_DATA": "Валюты не выбраны",

@@ -10,8 +10,8 @@
                         <h1><?= __("SETTINGS") ?></h1>
                     </header>
 
-                    <main>
-                        <section class="settings-block">
+                    <main id="tabsContainer">
+                        <section id="mainTab" class="settings-block">
                             <header id="mainHeading" class="heading">
                                 <h2><?= __("SETTINGS_MAIN") ?></h2>
                             </header>
@@ -31,7 +31,7 @@
                             </div>
                         </section>
 
-                        <section class="settings-block">
+                        <section id="userCurrenciesTab" class="settings-block">
                             <header id="userCurrenciesHeading" class="heading">
                                 <h2><?= __("SETTINGS_CURRENCIES") ?></h2>
                                 <div class="heading-actions"></div>
@@ -40,22 +40,17 @@
                             </div>
                         </section>
 
-                        <section class="settings-block">
+                        <section id="regionalTab" class="settings-block">
                             <header id="dateFormatHeading" class="heading">
                                 <h2><?= __("SETTINGS_DATE_FORMAT") ?></h2>
                                 <div class="heading-actions"></div>
                             </header>
-                            <div id="dateFormatContainer">
-                            </div>
-                        </section>
-
-                        <section class="settings-block">
+                            <div id="dateFormatContainer"></div>
                             <header id="decimalFormatHeading" class="heading">
                                 <h2><?= __("SETTINGS_DECIMAL_FORMAT") ?></h2>
                                 <div class="heading-actions"></div>
                             </header>
-                            <div id="decimalFormatContainer">
-                            </div>
+                            <div id="decimalFormatContainer"></div>
                         </section>
                     </main>
                 </div>
