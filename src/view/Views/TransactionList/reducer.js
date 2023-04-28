@@ -6,6 +6,10 @@ export const isSameSelection = (a, b) => (
     a.length === b.length && a.every((id) => b.includes(id))
 );
 
+export const getSelectedItems = (list) => (
+    list.filter((item) => item?.selected)
+);
+
 // Reducers
 const reduceDeselectAllItems = (state) => ({
     ...state,
@@ -154,6 +158,11 @@ const slice = createSlice({
             ...state.form,
             ...data,
         },
+    }),
+
+    toggleGroupByDate: (state) => ({
+        ...state,
+        groupByDate: !state.groupByDate,
     }),
 
     toggleMode: (state) => ({

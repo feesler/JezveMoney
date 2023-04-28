@@ -540,6 +540,31 @@ export class TransactionsList extends SortableList {
         return TransactionsList.create(res);
     }
 
+    getDateGroups(list) {
+        let prevDate = null;
+        const groups = [];
+        let group = null;
+
+        list.forEach((item) => {
+            const currentDate = dateToSeconds(secondsToDate(item.date));
+            if (currentDate !== prevDate) {
+                group = {
+                    id: currentDate,
+                    date: currentDate,
+                    items: [],
+                };
+                groups.push(group);
+                prevDate = currentDate;
+            }
+
+            if (currentDate === prevDate) {
+                group.items.push(item);
+            }
+        });
+
+        return groups;
+    }
+
     exportToCSV() {
         const header = [
             'ID',

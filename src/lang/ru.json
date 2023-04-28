@@ -171,6 +171,7 @@
     "TR_DEBT_NO_PERSONS": "Нет персон",
     "TR_LIST_SHOW_MAIN": "Основное",
     "TR_LIST_SHOW_DETAILS": "Детали",
+    "TR_LIST_GROUP_BY_DATE": "Группировать по дате",
     "TR_EXPORT_CSV": "Экспортировать в CSV",
     "PERSONS": "Персоны",
     "PERSONS_NO_DATA": "Нет персон",

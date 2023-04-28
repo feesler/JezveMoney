@@ -18,9 +18,11 @@ import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 import {
     __,
+    cutDate,
     getHalfYearRange,
     getMonthRange,
     getWeekRange,
+    timeToDate,
 } from '../../js/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
@@ -41,8 +43,15 @@ import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
+import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
+import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import { reducer, actions, isSameSelection } from './reducer.js';
+import {
+    reducer,
+    actions,
+    isSameSelection,
+    getSelectedItems,
+} from './reducer.js';
 import './TransactionListView.scss';
 
 /* CSS classes */
@@ -63,6 +72,7 @@ class TransactionListView extends View {
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
+            groupByDate: this.getGroupByDate() === 1,
             showMenu: false,
             showContextMenu: false,
             contextItem: null,
@@ -269,6 +279,7 @@ class TransactionListView extends View {
         // Transactions list
         const listContainer = document.querySelector('.list-container');
         this.list = TransactionList.create({
+            ItemComponent: () => this.getListItemComponent(),
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
@@ -360,6 +371,13 @@ class TransactionListView extends View {
                 icon: 'del',
                 title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
+            }, {
+                id: 'separator3',
+                type: 'separator',
+            }, {
+                id: 'groupByDateBtn',
+                title: __('TR_LIST_GROUP_BY_DATE'),
+                onClick: () => this.onMenuClick('groupByDateBtn'),
             }],
         });
 
@@ -370,6 +388,7 @@ class TransactionListView extends View {
             deselectAllBtn: () => this.deselectAll(),
             setCategoryBtn: () => this.showCategoryDialog(),
             deleteBtn: () => this.confirmDelete(),
+            groupByDateBtn: () => this.toggleGroupByDate(),
         };
     }
 
@@ -408,6 +427,11 @@ class TransactionListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    getListItemComponent() {
+        const state = this.store.getState();
+        return (state.groupByDate) ? TransactionListGroup : TransactionListItem;
     }
 
     showMenu() {
@@ -503,7 +527,7 @@ class TransactionListView extends View {
             return asArray(state.contextItem);
         }
 
-        const selected = this.list.getSelectedItems();
+        const selected = getSelectedItems(state.items);
         return selected.map((item) => item.id);
     }
 
@@ -906,6 +930,39 @@ class TransactionListView extends View {
         }
     }
 
+    getGroupByDate() {
+        return window.app.model.profile.settings.tr_group_by_date;
+    }
+
+    toggleGroupByDate() {
+        const { settings } = window.app.model.profile;
+        const groupByDate = (settings.tr_group_by_date === 0) ? 1 : 0;
+        this.requestGroupByDate(groupByDate);
+    }
+
+    async requestGroupByDate(groupByDate) {
+        const { settings } = window.app.model.profile;
+        if (settings.tr_group_by_date === groupByDate) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.profile.updateSettings({
+                tr_group_by_date: groupByDate,
+            });
+            settings.tr_group_by_date = groupByDate;
+
+            this.store.dispatch(actions.toggleGroupByDate());
+        } catch (e) {
+            window.app.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setRenderTime();
+    }
+
     renderContextMenu(state) {
         if (state.listMode !== 'list' || !state.showContextMenu) {
             this.contextMenu?.detach();
@@ -916,8 +973,9 @@ class TransactionListView extends View {
             this.contextMenu?.detach();
             return;
         }
-        const listItem = this.list.getListItemById(itemId);
-        const menuButton = listItem?.elem?.querySelector('.menu-btn');
+
+        const selector = `.trans-item[data-id="${itemId}"] .menu-btn`;
+        const menuButton = this.listContainer.querySelector(selector);
         if (!menuButton) {
             this.contextMenu?.detach();
             return;
@@ -940,8 +998,9 @@ class TransactionListView extends View {
         const isListMode = state.listMode === 'list';
         const isSelectMode = state.listMode === 'select';
         const isSortMode = state.listMode === 'sort';
-        const selectedItems = this.list.getSelectedItems();
+        const selectedItems = getSelectedItems(state.items);
         const selCount = selectedItems.length;
+        const groupByDate = this.getGroupByDate() === 1;
 
         this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
@@ -974,6 +1033,10 @@ class TransactionListView extends View {
 
         items.setCategoryBtn.show(isSelectMode && selCount > 0);
         items.deleteBtn.show(isSelectMode && selCount > 0);
+
+        show(items.separator3, isListMode);
+        items.groupByDateBtn.setIcon((groupByDate) ? 'check' : null);
+        items.groupByDateBtn.show(isListMode);
 
         if (showFirstTime) {
             this.menu.showMenu();
@@ -1118,18 +1181,48 @@ class TransactionListView extends View {
         this.searchInput.value = state.form.search ?? '';
 
         // Render list
+        const groupByDate = this.getGroupByDate() === 1;
+        let listItems = null;
+        if (groupByDate) {
+            let prevDate = null;
+            const groups = [];
+            let group = null;
+
+            state.items.forEach((item) => {
+                const currentDate = cutDate(timeToDate(item.date));
+                if (currentDate !== prevDate) {
+                    group = {
+                        id: currentDate,
+                        date: currentDate,
+                        items: [],
+                    };
+                    groups.push(group);
+                    prevDate = currentDate;
+                }
+
+                if (currentDate === prevDate) {
+                    group.items.push(item);
+                }
+            });
+
+            listItems = groups;
+        } else {
+            listItems = state.items;
+        }
+
         this.list.setState((listState) => ({
             ...listState,
             mode: state.mode,
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
-            items: state.items,
+            showDate: !groupByDate,
+            items: listItems,
             renderTime: state.renderTime,
         }));
 
         // Counters
         const isSelectMode = (state.listMode === 'select');
-        const selected = (isSelectMode) ? this.list.getSelectedItems() : [];
+        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
         this.itemsCount.textContent = state.pagination.total;
         show(this.selectedCounter, isSelectMode);
         this.selItemsCount.textContent = selected.length;

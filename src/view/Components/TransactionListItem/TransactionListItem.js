@@ -49,6 +49,7 @@ const defaultProps = {
     selected: false,
     listMode: 'list',
     showControls: false,
+    showDate: true,
 };
 
 /**
@@ -398,6 +399,7 @@ export class TransactionListItem extends Component {
         this.amountElem.textContent = this.formatAmount(item);
 
         this.dateElem.textContent = this.renderDate(item.date);
+        show(this.dateElem, state.showDate);
 
         const categoryTitle = this.getCategoryTitle(state);
         show(this.categoryElem, !!categoryTitle);
@@ -462,6 +464,7 @@ export class TransactionListItem extends Component {
 
         // Date
         this.dateField.setContent(this.renderDate(item.date));
+        this.dateField.show(state.showDate);
 
         // Category field
         const categoryTitle = this.getCategoryTitle(state);

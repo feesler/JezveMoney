@@ -115,6 +115,9 @@ export class TransactionListStory extends TestStory {
     async manualTests() {
         const { FOOD_CATEGORY, TAXES_CATEGORY } = App.scenario;
 
+        await Actions.toggleGroupByDate();
+        await Actions.toggleGroupByDate();
+
         await Actions.toggleSelect(0);
         await Actions.toggleSelect([1, 2]);
 

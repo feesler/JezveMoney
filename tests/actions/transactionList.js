@@ -453,6 +453,14 @@ export const clearSearchForm = async ({
     });
 };
 
+export const toggleGroupByDate = async () => {
+    await checkNavigation();
+
+    await test('Toggle enable group transactions by date', () => (
+        App.view.toggleGroupByDate()
+    ));
+};
+
 export const exportTest = async () => {
     await test('Export transactions', async () => {
         await checkNavigation();

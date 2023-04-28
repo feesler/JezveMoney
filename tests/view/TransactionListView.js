@@ -31,6 +31,7 @@ import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 import {
     dateToSeconds,
     isEmpty,
+    secondsToDate,
     shiftMonth,
     urlJoin,
 } from '../common.js';
@@ -52,6 +53,7 @@ const listMenuItems = [
     'exportBtn',
     'setCategoryBtn',
     'deleteBtn',
+    'groupByDateBtn',
 ];
 
 const contextMenuItems = [
@@ -202,6 +204,7 @@ export class TransactionListView extends AppView {
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible: cont.contextMenu.visible,
             filtersVisible: cont.filtersContainer.visible,
+            groupByDate: App.state.getGroupByDate(),
             data: App.state.transactions.clone(),
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
@@ -291,24 +294,26 @@ export class TransactionListView extends AppView {
 
     updateModelFilter(model) {
         const res = this.cloneModel(model);
+        const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
         if (res.filtered.length > 0) {
-            const pageItems = res.filtered.getPage(1);
+            const onPage = App.config.transactionsOnPage;
+            const pageItems = res.filtered.getPage(1, onPage, range, true);
             const { items } = TransactionList.render(pageItems.data, App.state);
 
             res.list = {
                 page: 1,
                 pages: res.filtered.expectedPages(),
                 items,
-                range: 1,
+                range,
             };
         } else {
             res.list = {
                 page: 0,
                 pages: 0,
                 items: [],
-                range: 1,
+                range,
             };
         }
 
@@ -415,11 +420,13 @@ export class TransactionListView extends AppView {
         assert(page >= 1 && page <= model.list.pages, `Invalid page number ${page}`);
 
         const res = this.cloneModel(model);
+        const onPage = App.config.transactionsOnPage;
+        const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
-        res.list.range = 1;
-        const pageItems = res.filtered.getPage(page);
+        res.list.range = range;
+        const pageItems = res.filtered.getPage(page, onPage, range, true);
         const { items } = TransactionList.render(pageItems.data, App.state);
         res.list.items = items;
 
@@ -443,7 +450,7 @@ export class TransactionListView extends AppView {
 
         res.filtered = res.data.applyFilter(res.filter);
         res.list.range = range;
-        const pageItems = res.filtered.getPage(model.list.page, onPage, range);
+        const pageItems = res.filtered.getPage(model.list.page, onPage, range, true);
         const { items } = TransactionList.render(pageItems.data, App.state);
         res.list.items = items;
 
@@ -559,6 +566,7 @@ export class TransactionListView extends AppView {
             res.exportBtn = { visible: isItemsAvailable };
             res.setCategoryBtn = { visible: showSelectItems && selected.length > 0 };
             res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
+            res.groupByDateBtn = { visible: model.listMenuVisible && listMode };
         }
 
         res.contextMenu = {
@@ -588,6 +596,17 @@ export class TransactionListView extends AppView {
         }
 
         if (isItemsAvailable) {
+            if (model.groupByDate) {
+                const { page, range } = model.list;
+                const onPage = App.config.transactionsOnPage;
+                const pageItems = model.filtered.getPage(page, onPage, range, true);
+                const dateGroups = model.filtered.getDateGroups(pageItems);
+                res.transList.groups = dateGroups.map((item) => ({
+                    id: item.id,
+                    title: App.formatDate(secondsToDate(item.date)),
+                }));
+            }
+
             res.paginator = {
                 ...res.paginator,
                 pages: model.list.pages,
@@ -1560,5 +1579,24 @@ export class TransactionListView extends AppView {
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
 
         await this.waitForList(() => this.content.delete_warning.clickOk());
+    }
+
+    /** Toggle enables/disables group transactions by date */
+    async toggleGroupByDate() {
+        await this.openListMenu();
+
+        this.model.groupByDate = !this.model.groupByDate;
+        this.model.listMenuVisible = false;
+
+        App.state.updateSettings({
+            tr_group_by_date: (this.model.groupByDate) ? 1 : 0,
+        });
+
+        const expected = this.getExpectedState();
+
+        await this.waitForList(() => this.content.groupByDateBtn.click());
+        this.checkState(expected);
+
+        return App.state.fetchAndTest();
     }
 }

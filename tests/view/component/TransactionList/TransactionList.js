@@ -9,6 +9,7 @@ import {
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { TransactionListItem } from './TransactionListItem.js';
+import { TransactionListGroup } from './TransactionListGroup.js';
 
 export class TransactionList extends TestComponent {
     async parseContent() {
@@ -34,6 +35,13 @@ export class TransactionList extends TestComponent {
             res.listMode = 'list';
         }
 
+        const groupElems = await queryAll(this.elem, '.trans-group');
+
+        res.groups = await asyncMap(
+            groupElems,
+            (item) => TransactionListGroup.create(this.parent, item),
+        );
+
         const listItems = await queryAll(this.elem, '.trans-item');
         if (listItems.length === 0) {
             return res;
@@ -49,6 +57,10 @@ export class TransactionList extends TestComponent {
 
     get items() {
         return this.content.items;
+    }
+
+    get groups() {
+        return this.content.groups;
     }
 
     get listMode() {

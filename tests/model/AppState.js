@@ -38,7 +38,7 @@ import { ImportCondition } from './ImportCondition.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = [...sortSettings, 'date_locale', 'decimal_locale'];
+const availSettings = [...sortSettings, 'date_locale', 'decimal_locale', 'tr_group_by_date'];
 
 /** Accounts */
 const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
@@ -1452,6 +1452,10 @@ export class AppState {
     /**
      * Transactions
      */
+
+    getGroupByDate() {
+        return this.profile.settings.tr_group_by_date === 1;
+    }
 
     checkTransactionCorrectness(params) {
         if (!isObject(params)) {

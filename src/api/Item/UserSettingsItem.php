@@ -11,6 +11,7 @@ class UserSettingsItem
     public $sort_categories = 0;
     public $date_locale = "en";
     public $decimal_locale = "en";
+    public $tr_group_by_date = 0;
 
     /**
      * Converts table row from database to UserSettingsItem object
@@ -33,6 +34,7 @@ class UserSettingsItem
         $res->sort_categories = intval($row["sort_categories"]);
         $res->date_locale = $row["date_locale"];
         $res->decimal_locale = $row["decimal_locale"];
+        $res->tr_group_by_date = intval($row["tr_group_by_date"]);
 
         return $res;
     }
@@ -50,6 +52,7 @@ class UserSettingsItem
         $res->sort_categories = $this->sort_categories;
         $res->date_locale = $this->date_locale;
         $res->decimal_locale = $this->decimal_locale;
+        $res->tr_group_by_date = $this->tr_group_by_date;
 
         return $res;
     }
