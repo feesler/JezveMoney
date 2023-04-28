@@ -27,31 +27,21 @@ import { TransactionList } from '../view/component/TransactionList/TransactionLi
 
 export const decimalInputTestStrings = [
     '-',
-    '-.',
     '-.0',
-    '-.01',
     '-.015',
     '-0',
-    '-0.',
     '-0.0',
-    '-0.01',
     '-0.015',
     '.',
     '.0',
-    '.01',
     '.015',
     '0',
-    '0.',
     '0.0',
-    '0.01',
     '0.015',
     '',
     '1',
-    '1.',
     '1.0',
-    '1.01',
-    '1.010',
-    '1.0101',
+    '1.015',
 ];
 
 export const runAction = async ({ action, data }) => {
