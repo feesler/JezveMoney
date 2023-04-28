@@ -21,8 +21,10 @@ const defaultProps = {
     noItemsMessage: __('TRANSACTIONS_NO_DATA'),
     mode: 'classic',
     showControls: true,
+    showDate: true,
     ascending: false,
     onSort: null,
+    onItemClick: null,
 };
 
 /**
@@ -170,6 +172,10 @@ export class TransactionList extends SortableListContainer {
             selected: item.selected,
             listMode: state.listMode,
             showControls: state.showControls,
+            showDate: state.showDate,
+            renderTime: state.renderTime,
+            onItemClick: state.onItemClick,
+            onSort: state.onSort,
             item,
         };
     }
@@ -180,6 +186,7 @@ export class TransactionList extends SortableListContainer {
             || state.mode !== prevState.mode
             || state.listMode !== prevState.listMode
             || state.showControls !== prevState.showControls
+            || state.showDate !== prevState.showDate
         );
     }
 

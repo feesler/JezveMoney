@@ -23,7 +23,12 @@ const AVAIL_SORT_TYPES = [
 
 const AVAIL_SORT_SETTINGS = ["sort_accounts", "sort_persons", "sort_categories"];
 
-const AVAILABLE_SETTINGS = [...AVAIL_SORT_SETTINGS, "date_locale", "decimal_locale"];
+const AVAILABLE_SETTINGS = [
+    ...AVAIL_SORT_SETTINGS,
+    "date_locale",
+    "decimal_locale",
+    "tr_group_by_date",
+];
 
 const DEFAULT_SETTINGS = [
     "sort_accounts" => SORT_BY_CREATEDATE_ASC,
@@ -31,6 +36,7 @@ const DEFAULT_SETTINGS = [
     "sort_categories" => SORT_BY_CREATEDATE_ASC,
     "date_locale" => DEFAULT_LOCALE,
     "decimal_locale" => DEFAULT_LOCALE,
+    "tr_group_by_date" => 0,
 ];
 
 /**

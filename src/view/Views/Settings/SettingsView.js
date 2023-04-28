@@ -86,7 +86,6 @@ class SettingsView extends View {
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
-            showInHeaderOnScroll: false,
             title: __('SETTINGS_CURRENCIES'),
         });
 

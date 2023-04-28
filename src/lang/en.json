@@ -171,6 +171,7 @@
     "TR_DEBT_NO_PERSONS": "You have no persons. Please create one for debts.",
     "TR_LIST_SHOW_MAIN": "Show main",
     "TR_LIST_SHOW_DETAILS": "Show details",
+    "TR_LIST_GROUP_BY_DATE": "Group by date",
     "TR_EXPORT_CSV": "Export to CSV",
     "PERSONS": "Persons",
     "PERSONS_NO_DATA": "No persons",
