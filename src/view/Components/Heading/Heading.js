@@ -112,6 +112,17 @@ export class Heading extends Component {
                 return;
             }
 
+            const rect = entry.boundingClientRect;
+            if (
+                rect
+                && rect.left === 0
+                && rect.right === 0
+                && rect.top === 0
+                && rect.bottom === 0
+            ) {
+                return;
+            }
+
             this.onIntersectionChanged(entry.isIntersecting);
         }, options);
 
