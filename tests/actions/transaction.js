@@ -405,10 +405,6 @@ export const del = async (type, transactions) => {
             await App.state.fetch();
             await App.view.updateModel();
 
-            // After delete transactions navigation occurs to page without filters,
-            // so we need to restore it
-            await App.view.filterByType(type);
-
             // Exclude previously removed transactions
             tr = tr.filter((ind) => !absTrOnCurrentPage.includes(ind));
             if (!tr.length) {

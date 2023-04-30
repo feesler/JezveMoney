@@ -73,8 +73,6 @@ export const updateById = (id) => {
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {
-    await App.state.fetch();
-
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of category not specified');
 
@@ -152,8 +150,6 @@ export const deleteFromContextMenu = async (index, removeChildren = true) => {
     const options = (removeChildren) ? 'remove children' : 'keep children';
     await test(`Delete category from context menu [${index}] ${options}`, async () => {
         await checkNavigation();
-
-        await App.state.fetch();
 
         const item = App.view.getItemByIndex(index);
         const { id } = item.model;

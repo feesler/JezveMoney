@@ -119,8 +119,6 @@ export const toggleSelect = async (transactions) => {
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {
-    await App.state.fetch();
-
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of transaction not specified');
 
@@ -467,7 +465,6 @@ export const exportTest = async () => {
     await test('Export transactions', async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const transactions = App.state.transactions.applyFilter(App.view.model.filter);
         const expectedContent = transactions.exportToCSV();
 

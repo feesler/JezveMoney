@@ -136,8 +136,7 @@ export class AppState {
         }
         this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
-        this.userAccountsCache = null;
-        this.sortedAccountsCache = null;
+        this.resetUserAccountsCache();
         this.sortAccounts();
 
         if (!this.persons) {
@@ -145,8 +144,7 @@ export class AppState {
         }
         this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
-        this.personsCache = null;
-        this.sortedPersonsCache = null;
+        this.resetPersonsCache();
         this.sortPersons();
 
         if (!this.transactions) {
@@ -311,12 +309,10 @@ export class AppState {
 
     resetAll() {
         this.accounts?.reset();
-        this.userAccountsCache = null;
-        this.sortedAccountsCache = null;
+        this.resetUserAccountsCache();
         this.persons?.reset();
         this.categories?.reset();
-        this.personsCache = null;
-        this.sortedPersonsCache = null;
+        this.resetPersonsCache();
         this.transactions?.reset();
         this.templates?.reset();
         this.rules?.reset();
@@ -771,6 +767,7 @@ export class AppState {
         const ind = this.accounts.create(data);
         const item = this.accounts.getItemByIndex(ind);
         this.updatePersonAccounts();
+        this.resetUserAccountsCache();
 
         return this.returnState(params.returnState, { id: item.id });
     }
@@ -816,6 +813,7 @@ export class AppState {
 
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetUserAccountsCache();
 
         return this.returnState(params.returnState);
     }
@@ -838,6 +836,7 @@ export class AppState {
 
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetUserAccountsCache();
 
         return this.returnState(params.returnState);
     }
@@ -861,6 +860,8 @@ export class AppState {
             this.accounts.update(account);
         }
 
+        this.resetUserAccountsCache();
+
         return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
@@ -879,7 +880,14 @@ export class AppState {
             return false;
         }
 
+        this.resetUserAccountsCache();
+
         return this.returnState(params.returnState);
+    }
+
+    resetUserAccountsCache() {
+        this.userAccountsCache = null;
+        this.sortedAccountsCache = null;
     }
 
     cacheUserAccounts() {
@@ -1018,6 +1026,8 @@ export class AppState {
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
 
+        this.resetPersonsCache();
+
         return this.returnState(params.returnState, { id: item.id });
     }
 
@@ -1037,6 +1047,7 @@ export class AppState {
         }
 
         this.persons.update(expPerson);
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
     }
@@ -1055,6 +1066,7 @@ export class AppState {
 
         this.rules.deletePersons(ids);
         this.persons.deleteItems(ids);
+        this.resetPersonsCache();
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, accountsToDelete);
@@ -1082,6 +1094,8 @@ export class AppState {
             this.persons.update(person);
         }
 
+        this.resetPersonsCache();
+
         return this.returnState(params.returnState);
     }
     /* eslint-enable no-bitwise */
@@ -1099,6 +1113,8 @@ export class AppState {
         if (!this.persons.setPos(id, pos)) {
             return false;
         }
+
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
     }
@@ -1155,6 +1171,11 @@ export class AppState {
 
         const ind = this.accounts.create(accObj);
         return this.accounts.getItemByIndex(ind);
+    }
+
+    resetPersonsCache() {
+        this.personsCache = null;
+        this.sortedPersonsCache = null;
     }
 
     cachePersons() {
