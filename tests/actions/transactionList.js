@@ -194,6 +194,7 @@ export const setTransactionCategory = async ({ index, category }) => {
             transList: TransactionList.render(expectedItems, App.state),
         };
         App.view.checkState(expected);
+        App.view.updateTransactions();
 
         return App.state.fetchAndTest();
     });
@@ -224,6 +225,7 @@ export const setCategory = async ({ items, category }) => {
             transList: TransactionList.render(expectedItems, App.state),
         };
         App.view.checkState(expected);
+        App.view.updateTransactions();
 
         return App.state.fetchAndTest();
     });

@@ -233,7 +233,10 @@ export class TransactionListView extends AppView {
 
         if (cont.paginator && cont.transList) {
             const items = cont.transList.getItems();
-            const range = Math.ceil(items.length / App.config.transactionsOnPage);
+            const range = (items.length > 0)
+                ? Math.ceil(items.length / App.config.transactionsOnPage)
+                : 1;
+
             res.list = {
                 page: cont.paginator.active - range + 1,
                 pages: cont.paginator.pages,
@@ -290,6 +293,11 @@ export class TransactionListView extends AppView {
 
     getSelectedItems(model = this.model) {
         return model.list.items.filter((item) => item.selected);
+    }
+
+    updateTransactions() {
+        this.model.data = App.state.transactions.clone();
+        this.model = this.updateModelFilter(this.model);
     }
 
     updateModelFilter(model) {
@@ -477,6 +485,19 @@ export class TransactionListView extends AppView {
         ];
     }
 
+    getExpectedList(model = this.model) {
+        const onPage = App.config.transactionsOnPage;
+        const { page, range } = model.list;
+
+        let items = [];
+        if (page !== 0) {
+            const pageItems = model.filtered.getPage(page, onPage, range, true);
+            items = pageItems.data;
+        }
+
+        return TransactionList.render(items, App.state);
+    }
+
     getExpectedState(model = this.model) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
@@ -504,6 +525,8 @@ export class TransactionListView extends AppView {
             const dateFmt = App.secondsToDateString(endDate);
             endDateFmt = App.reformatDate(dateFmt);
         }
+
+        const list = this.getExpectedList(model);
 
         const res = {
             typeMenu: {
@@ -538,7 +561,10 @@ export class TransactionListView extends AppView {
             },
             showMoreSpinner: { visible: model.isLoadingMore },
             paginator: { visible: isItemsAvailable },
-            transList: { visible: true },
+            transList: {
+                ...list,
+                visible: true,
+            },
             createBtn: { visible: listMode },
             listModeBtn: { visible: !listMode },
             menuBtn: { visible: isItemsAvailable && !sortMode },
