@@ -13,6 +13,7 @@ import { IconsList } from './model/IconsList.js';
 import {
     dateToSeconds,
     fixDate,
+    formatInputDate,
     reformatDate,
     secondsToDateString,
 } from './common.js';
@@ -94,6 +95,13 @@ class Application extends TestApplication {
 
     formatDate(date) {
         return formatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    formatInputDate(date) {
+        return formatInputDate(date, {
             locales: this.state.getDateFormatLocale(),
             options: this.dateFormatOptions,
         });
