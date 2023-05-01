@@ -8,12 +8,12 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
-import { __ } from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
-import { PersonList } from '../../js/model/PersonList.js';
+import { __ } from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
+import { PersonList } from '../../Models/PersonList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { actions, reducer } from './reducer.js';

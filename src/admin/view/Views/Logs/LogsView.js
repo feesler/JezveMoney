@@ -1,6 +1,6 @@
 import 'jezvejs/style';
-import { Application } from '../../../../view/js/Application.js';
-import '../../../../view/css/app.scss';
+import { Application } from '../../../../view/Application/Application.js';
+import '../../../../view/Application/Application.scss';
 import { AdminView } from '../../js/AdminView.js';
 import '../../css/admin.scss';
 

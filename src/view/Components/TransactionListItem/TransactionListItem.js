@@ -6,14 +6,14 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { timeToDate, __ } from '../../js/utils.js';
+import { timeToDate, __ } from '../../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
     LIMIT_CHANGE,
-} from '../../js/model/Transaction.js';
+} from '../../Models/Transaction.js';
 import { Field } from '../Field/Field.js';
 import './TransactionListItem.scss';
 

@@ -1,13 +1,13 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
+import { Application } from '../../Application/Application.js';
+import { View } from '../../utils/View.js';
 import { Field } from '../../Components/Field/Field.js';
 import { actions, reducer } from './reducer.js';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './RegisterView.scss';
-import { __ } from '../../js/utils.js';
+import { __ } from '../../utils/utils.js';
 import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
 import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 

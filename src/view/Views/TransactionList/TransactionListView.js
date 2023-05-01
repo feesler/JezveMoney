@@ -23,18 +23,18 @@ import {
     getMonthRange,
     getWeekRange,
     timeToDate,
-} from '../../js/utils.js';
+} from '../../utils/utils.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { API } from '../../js/api/index.js';
-import { View } from '../../js/View.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { API } from '../../API/index.js';
+import { View } from '../../utils/View.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { PersonList } from '../../Models/PersonList.js';
+import { CategoryList } from '../../Models/CategoryList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';

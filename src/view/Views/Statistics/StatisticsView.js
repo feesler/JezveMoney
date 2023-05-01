@@ -21,16 +21,16 @@ import {
     getWeekRange,
     getMonthRange,
     getHalfYearRange,
-} from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import { API } from '../../js/api/index.js';
-import { View } from '../../js/View.js';
+} from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import { API } from '../../API/index.js';
+import { View } from '../../utils/View.js';
 
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { Transaction } from '../../js/model/Transaction.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { CategoryList } from '../../Models/CategoryList.js';
+import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
@@ -41,7 +41,7 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 
 import { isSameSelection, actions, reducer } from './reducer.js';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './StatisticsView.scss';
 
 /* CSS classes */

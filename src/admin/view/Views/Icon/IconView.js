@@ -1,7 +1,7 @@
 import 'jezvejs/style';
 import { ge, createElement, selectByValue } from 'jezvejs';
-import { Application } from '../../../../view/js/Application.js';
-import '../../../../view/css/app.scss';
+import { Application } from '../../../../view/Application/Application.js';
+import '../../../../view/Application/Application.scss';
 import { AdminListView } from '../../js/AdminListView.js';
 import '../../css/admin.scss';
 

@@ -6,8 +6,8 @@ import {
     setEvents,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { __ } from '../../../../../js/utils.js';
-import { API } from '../../../../../js/api/index.js';
+import { __ } from '../../../../../utils/utils.js';
+import { API } from '../../../../../API/index.js';
 
 /** CSS classes */
 const FILE_NAME_CLASS = 'upload-form__filename';

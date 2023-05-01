@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 /** Prepare data from currencies list model for list component */
 export const createItemsFromModel = () => {

@@ -1,7 +1,7 @@
 import { createSlice } from 'jezvejs/Store';
-import { Person } from '../../js/model/Person.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
+import { Person } from '../../Models/Person.js';
+import { PersonList } from '../../Models/PersonList.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 export const createList = (items, sortMode) => {
     const res = PersonList.create(items);

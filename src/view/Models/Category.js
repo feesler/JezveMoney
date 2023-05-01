@@ -1,4 +1,4 @@
-import { __ } from '../utils.js';
+import { __ } from '../utils/utils.js';
 import { CategoryList } from './CategoryList.js';
 import { ListItem } from './ListItem.js';
 import { availTransTypes, Transaction } from './Transaction.js';

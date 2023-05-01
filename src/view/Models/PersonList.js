@@ -1,32 +1,39 @@
 import { List } from './List.js';
-import { Category } from './Category.js';
+import { Person } from './Person.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
-} from '../utils.js';
+} from '../utils/utils.js';
 
 /**
- * @constructor CategoryList class
- * @param {object[]} props - array of categories
+ * @constructor PersonList class
+ * @param {object[]} props - array of persons
  */
-export class CategoryList extends List {
+export class PersonList extends List {
     /**
      * Create list item from specified object
      * @param {Object} obj
      */
     createItem(obj) {
-        return new Category(obj);
+        return new Person(obj);
     }
 
-    /** Returns array of ids of child categories */
-    findByParent(id) {
-        return this.filter((item) => item.parent_id === id);
+    /**
+     * Return list of visible Persons
+     */
+    getVisible() {
+        return this.filter((item) => item && item.isVisible());
     }
 
-    /** Search category with specified name */
+    /** Return list of hidden Persons */
+    getHidden() {
+        return this.filter((item) => item && !item.isVisible());
+    }
+
+    /** Search person with specified name */
     findByName(name, caseSens = false) {
         if (typeof name !== 'string' || name.length === 0) {
             return null;

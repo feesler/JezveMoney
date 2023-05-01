@@ -5,7 +5,7 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
-import { __ } from '../../../../js/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import './AccountContainer.scss';
 
 /** CSS classes */

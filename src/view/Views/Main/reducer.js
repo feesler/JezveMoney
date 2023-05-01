@@ -1,6 +1,6 @@
 import { createSlice } from 'jezvejs/Store';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { PersonList } from '../../Models/PersonList.js';
 
 // Reducers
 const slice = createSlice({

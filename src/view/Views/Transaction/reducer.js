@@ -5,16 +5,16 @@ import {
     normalizeExch,
     isValidValue,
     dateStringToTime,
-} from '../../js/utils.js';
+} from '../../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
     DEBT,
     TRANSFER,
     LIMIT_CHANGE,
-} from '../../js/model/Transaction.js';
+} from '../../Models/Transaction.js';
 import * as STATE from './stateId.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
 
 // Tools
 

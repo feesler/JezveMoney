@@ -20,13 +20,13 @@ import {
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
-} from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { PersonList } from '../../js/model/PersonList.js';
+} from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { PersonList } from '../../Models/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';

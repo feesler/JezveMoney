@@ -5,7 +5,7 @@ import {
 import { CategorySelect } from '../CategorySelect/CategorySelect.js';
 import { Field } from '../Field/Field.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
-import { __ } from '../../js/utils.js';
+import { __ } from '../../utils/utils.js';
 import './SetCategoryDialog.scss';
 
 const defaultProps = {

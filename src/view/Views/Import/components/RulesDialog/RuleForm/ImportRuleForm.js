@@ -7,17 +7,17 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { ListContainer } from 'jezvejs/ListContainer';
-import { ImportRule } from '../../../../../js/model/ImportRule.js';
+import { ImportRule } from '../../../../../Models/ImportRule.js';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_TR_TYPE,
     ImportAction,
-} from '../../../../../js/model/ImportAction.js';
-import { ImportCondition } from '../../../../../js/model/ImportCondition.js';
-import { ImportConditionList } from '../../../../../js/model/ImportConditionList.js';
-import { ImportActionList } from '../../../../../js/model/ImportActionList.js';
-import { listData, __, dateStringToTime } from '../../../../../js/utils.js';
+} from '../../../../../Models/ImportAction.js';
+import { ImportCondition } from '../../../../../Models/ImportCondition.js';
+import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
+import { ImportActionList } from '../../../../../Models/ImportActionList.js';
+import { listData, __, dateStringToTime } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';

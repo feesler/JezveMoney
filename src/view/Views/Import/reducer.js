@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { ImportTransaction } from '../../js/model/ImportTransaction.js';
+import { ImportTransaction } from '../../Models/ImportTransaction.js';
 
 /** Returns page number and relative index of specified absolute index */
 export const getPageIndex = (index, state) => {

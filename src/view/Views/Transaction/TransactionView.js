@@ -22,7 +22,7 @@ import {
     normalizeExch,
     timeToDate,
     __,
-} from '../../js/utils.js';
+} from '../../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -30,16 +30,16 @@ import {
     TRANSFER,
     Transaction,
     LIMIT_CHANGE,
-} from '../../js/model/Transaction.js';
-import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { IconList } from '../../js/model/IconList.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
+} from '../../Models/Transaction.js';
+import { Application } from '../../Application/Application.js';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { CategoryList } from '../../Models/CategoryList.js';
+import { IconList } from '../../Models/IconList.js';
+import { PersonList } from '../../Models/PersonList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
@@ -57,9 +57,9 @@ import {
 } from './reducer.js';
 import * as STATE from './stateId.js';
 import '../../Components/Field/Field.scss';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './TransactionView.scss';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../js/model/Account.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;

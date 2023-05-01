@@ -14,18 +14,18 @@ import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { createStore } from 'jezvejs/Store';
 
-import { MS_IN_SECOND, __ } from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import { API } from '../../js/api/index.js';
-import { View } from '../../js/View.js';
+import { MS_IN_SECOND, __ } from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import { API } from '../../API/index.js';
+import { View } from '../../utils/View.js';
 
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { ImportRuleList } from '../../js/model/ImportRuleList.js';
-import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { PersonList } from '../../Models/PersonList.js';
+import { CategoryList } from '../../Models/CategoryList.js';
+import { ImportRuleList } from '../../Models/ImportRuleList.js';
+import { ImportTemplateList } from '../../Models/ImportTemplateList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -35,7 +35,7 @@ import { ImportTransactionList } from './components/List/ImportTransactionList.j
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 
 import { actions, reducer, getPageIndex } from './reducer.js';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './ImportView.scss';
 
 const SUBMIT_LIMIT = 100;

@@ -1,4 +1,4 @@
-import { View } from '../../../view/js/View.js';
+import { View } from '../../../view/utils/View.js';
 import { Header } from '../../../view/Components/Header/Header.js';
 
 /**

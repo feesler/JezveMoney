@@ -22,9 +22,9 @@ import {
     dateStringToTime,
     timeToDate,
     parseDate,
-} from '../../../../js/utils.js';
-import { transTypeMap, typeNames, ImportTransaction } from '../../../../js/model/ImportTransaction.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
+} from '../../../../utils/utils.js';
+import { transTypeMap, typeNames, ImportTransaction } from '../../../../Models/ImportTransaction.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';

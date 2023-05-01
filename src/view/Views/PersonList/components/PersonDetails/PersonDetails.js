@@ -1,5 +1,5 @@
 import { createElement } from 'jezvejs';
-import { __, formatPersonDebts } from '../../../../js/utils.js';
+import { __, formatPersonDebts } from '../../../../utils/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 

@@ -1,6 +1,6 @@
 import { createElement, getClassName, Component } from 'jezvejs';
-import { __ } from '../../../../js/utils.js';
-import { IMPORT_DATE_LOCALE } from '../../../../js/model/ImportTemplate.js';
+import { __ } from '../../../../utils/utils.js';
+import { IMPORT_DATE_LOCALE } from '../../../../Models/ImportTemplate.js';
 import './OriginalImportData.scss';
 
 /** CSS classes */

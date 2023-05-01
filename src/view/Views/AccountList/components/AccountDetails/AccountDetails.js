@@ -1,8 +1,8 @@
 import { createElement } from 'jezvejs';
-import { __ } from '../../../../js/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
-import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../js/model/Account.js';
+import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 
 /** CSS classes */
 const TYPE_FIELD_CLASS = 'type-field';

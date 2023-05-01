@@ -1,5 +1,5 @@
 import { fixFloat } from 'jezvejs';
-import { __ } from '../utils.js';
+import { __ } from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 import {
     IMPORT_COND_OP_EQUAL,
@@ -9,8 +9,8 @@ import {
 } from './ImportCondition.js';
 import { ImportConditionList } from './ImportConditionList.js';
 import { ImportActionList } from './ImportActionList.js';
-import { ImportConditionValidationError } from '../error/ImportConditionValidationError.js';
-import { ImportActionValidationError } from '../error/ImportActionValidationError.js';
+import { ImportConditionValidationError } from './Error/ImportConditionValidationError.js';
+import { ImportActionValidationError } from './Error/ImportActionValidationError.js';
 
 /**
  * Import rule class

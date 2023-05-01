@@ -1,5 +1,5 @@
 import { hasFlag } from 'jezvejs';
-import { __ } from '../utils.js';
+import { __ } from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Account flags */

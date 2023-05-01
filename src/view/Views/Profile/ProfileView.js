@@ -1,10 +1,10 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
-import { __ } from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
+import { __ } from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ChangeNameDialog } from './components/ChangeNameDialog/ChangeNameDialog.js';
@@ -13,7 +13,7 @@ import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js
 import { actions, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
 import '../../Components/Field/Field.scss';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './ProfileView.scss';
 
 const titleMap = {

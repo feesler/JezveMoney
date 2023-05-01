@@ -1,5 +1,5 @@
-import { Transaction } from '../../../../js/model/Transaction.js';
-import { __ } from '../../../../js/utils.js';
+import { Transaction } from '../../../../Models/Transaction.js';
+import { __ } from '../../../../utils/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 

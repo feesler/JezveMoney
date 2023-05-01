@@ -1,6 +1,6 @@
 import { Component, createElement, isFunction } from 'jezvejs';
 import { TransactionList } from '../TransactionList/TransactionList.js';
-import { timeToDate } from '../../js/utils.js';
+import { timeToDate } from '../../utils/utils.js';
 import './TransactionListGroup.scss';
 
 /* CSS classes */
