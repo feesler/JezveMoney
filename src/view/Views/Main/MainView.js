@@ -13,7 +13,7 @@ import { ListContainer } from 'jezvejs/ListContainer';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
-import { API } from '../../js/api/index.js';
+import { API } from '../../API/index.js';
 import {
     formatPersonDebts,
     formatNumberShort,
@@ -22,16 +22,16 @@ import {
     normalize,
     __,
     timeToDate,
-} from '../../js/utils.js';
+} from '../../utils/utils.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { View } from '../../js/View.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { IconList } from '../../js/model/IconList.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { View } from '../../utils/View.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { PersonList } from '../../Models/PersonList.js';
+import { CategoryList } from '../../Models/CategoryList.js';
+import { IconList } from '../../Models/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Tile } from '../../Components/Tile/Tile.js';

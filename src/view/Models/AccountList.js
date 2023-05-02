@@ -6,7 +6,7 @@ import {
     SORT_BY_NAME_ASC,
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
-} from '../utils.js';
+} from '../utils/utils.js';
 
 /**
  * Accounts list class

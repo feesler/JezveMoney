@@ -32,8 +32,8 @@ export class TransactionListItem extends TestComponent {
                 ] = Array.from(elem.querySelectorAll('.trans-item__account-field .field__content'));
                 const sourceContent = srcAccEl.textContent;
                 const destContent = dAccEl.textContent;
-                const sourceVisible = !srcAccEl.hidden;
-                if (sourceVisible && !dAccEl.hidden) {
+                const sourceVisible = sourceContent.length > 0;
+                if (sourceVisible && destContent.length > 0) {
                     item.accountTitle = `${sourceContent} → ${destContent}`;
                 } else {
                     item.accountTitle = (sourceVisible) ? sourceContent : destContent;
@@ -51,7 +51,7 @@ export class TransactionListItem extends TestComponent {
                     dAmount,
                 ] = Array.from(elem.querySelectorAll('.trans-item__amount-field .field__content'));
                 const srcAmount = sAmount.textContent;
-                if (!sAmount.hidden && !dAmount.hidden) {
+                if (srcAmount.length > 0 && dAmount?.textContent.length > 0) {
                     item.amountText = `${sign}${srcAmount} (${sign}${dAmount.textContent})`;
                 } else {
                     item.amountText = srcAmount;

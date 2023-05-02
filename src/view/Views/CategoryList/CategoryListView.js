@@ -11,9 +11,9 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { View } from '../../js/View.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { View } from '../../utils/View.js';
 import {
     listData,
     getSortByDateIcon,
@@ -24,11 +24,11 @@ import {
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
-} from '../../js/utils.js';
-import { API } from '../../js/api/index.js';
-import { Category } from '../../js/model/Category.js';
-import { CategoryList } from '../../js/model/CategoryList.js';
-import { availTransTypes, Transaction } from '../../js/model/Transaction.js';
+} from '../../utils/utils.js';
+import { API } from '../../API/index.js';
+import { Category } from '../../Models/Category.js';
+import { CategoryList } from '../../Models/CategoryList.js';
+import { availTransTypes, Transaction } from '../../Models/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';

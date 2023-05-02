@@ -5,7 +5,7 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_CATEGORY,
-} from '../../../../../js/model/ImportAction.js';
+} from '../../../../../Models/ImportAction.js';
 import './ImportActionItem.scss';
 
 /**

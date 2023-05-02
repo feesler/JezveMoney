@@ -13,16 +13,16 @@ import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
-import { getCurrencyPrecision, normalize, __ } from '../../js/utils.js';
-import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
+import { getCurrencyPrecision, normalize, __ } from '../../utils/utils.js';
+import { Application } from '../../Application/Application.js';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
 
-import { IconList } from '../../js/model/IconList.js';
-import { accountTypes, Account } from '../../js/model/Account.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { IconList } from '../../Models/IconList.js';
+import { accountTypes, Account } from '../../Models/Account.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
@@ -31,7 +31,7 @@ import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
 
 import { actions, reducer } from './reducer.js';
 import '../../Components/Field/Field.scss';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './AccountView.scss';
 
 /**

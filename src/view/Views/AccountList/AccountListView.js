@@ -10,9 +10,9 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../js/Application.js';
-import '../../css/app.scss';
-import { View } from '../../js/View.js';
+import { Application } from '../../Application/Application.js';
+import '../../Application/Application.scss';
+import { View } from '../../utils/View.js';
 import {
     listData,
     getSortByDateIcon,
@@ -23,11 +23,11 @@ import {
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
-} from '../../js/utils.js';
-import { API } from '../../js/api/index.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { IconList } from '../../js/model/IconList.js';
+} from '../../utils/utils.js';
+import { API } from '../../API/index.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { IconList } from '../../Models/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';

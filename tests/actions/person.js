@@ -55,8 +55,6 @@ export const update = async (pos) => {
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {
-    await App.state.fetch();
-
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of person not specified');
 
@@ -110,8 +108,6 @@ export const submit = async () => {
 export const deleteFromContextMenu = async (index) => {
     await test(`Delete person from context menu [${index}]`, async () => {
         await checkNavigation();
-
-        await App.state.fetch();
 
         await App.view.deleteFromContextMenu(index);
 
@@ -172,7 +168,6 @@ export const show = async (persons, val = true) => {
     await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const id = App.state.getSortedPersonsByIndexes(itemIds, true);
         App.state.showPersons({ id }, val);
 
@@ -193,7 +188,6 @@ export const exportTest = async (persons) => {
     await test(`Export persons [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const ids = App.state.getSortedPersonsByIndexes(itemIds, true);
         const transactions = App.state.transactions.applyFilter({ persons: ids });
         const expectedContent = transactions.exportToCSV();

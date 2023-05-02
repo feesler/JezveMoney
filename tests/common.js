@@ -85,21 +85,19 @@ export const fixDate = (date, params = {}) => {
     return (res === null) ? null : (res * MS_IN_SECOND);
 };
 
-/** Parses date from string and format it back */
-export const reformatDate = (str, params = {}) => {
+/** Returns date string with days and month in 2-digit format */
+export const formatInputDate = (date, params = {}) => {
+    assert.isDate(date);
+
     const format = getLocaleDateFormat(params);
+
     const inputFormatOptions = {
         day: '2-digit',
         month: '2-digit',
         year: (format.yearLength === 2) ? '2-digit' : 'numeric',
     };
 
-    const fixedDate = fixDate(str, params);
-    if (!fixedDate) {
-        return str;
-    }
-
-    let res = formatDate(new Date(fixedDate), {
+    let res = formatDate(date, {
         locales: params?.locales ?? [],
         options: inputFormatOptions,
     });
@@ -110,6 +108,16 @@ export const reformatDate = (str, params = {}) => {
     }
 
     return res;
+};
+
+/** Parses date from string and format it back */
+export const reformatDate = (str, params = {}) => {
+    const fixedDate = fixDate(str, params);
+    if (!fixedDate) {
+        return str;
+    }
+
+    return formatInputDate(new Date(fixedDate), params);
 };
 
 // Returns the ISO week of the date.

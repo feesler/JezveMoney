@@ -9,7 +9,7 @@ import {
     isValidDateString,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
-import { parseCookies, setCookie, __ } from './utils.js';
+import { parseCookies, setCookie, __ } from '../utils/utils.js';
 
 /** CSS classes */
 const INVALID_BLOCK_CLASS = 'invalid-block';

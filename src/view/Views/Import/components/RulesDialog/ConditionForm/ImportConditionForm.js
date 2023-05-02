@@ -12,8 +12,8 @@ import { Icon } from 'jezvejs/Icon';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
-} from '../../../../../js/model/ImportCondition.js';
-import { MAX_PRECISION, __ } from '../../../../../js/utils.js';
+} from '../../../../../Models/ImportCondition.js';
+import { MAX_PRECISION, __ } from '../../../../../utils/utils.js';
 import './ImportConditionForm.scss';
 
 /** CSS classes */

@@ -8,10 +8,10 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { ImportRule } from '../../../../../js/model/ImportRule.js';
-import { ImportConditionList } from '../../../../../js/model/ImportConditionList.js';
-import { ImportActionList } from '../../../../../js/model/ImportActionList.js';
-import { __ } from '../../../../../js/utils.js';
+import { ImportRule } from '../../../../../Models/ImportRule.js';
+import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
+import { ImportActionList } from '../../../../../Models/ImportActionList.js';
+import { __ } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';

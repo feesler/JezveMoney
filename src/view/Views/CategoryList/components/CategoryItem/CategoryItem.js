@@ -7,7 +7,7 @@ import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { ListContainer } from 'jezvejs/ListContainer';
-import { listData } from '../../../../js/utils.js';
+import { listData } from '../../../../utils/utils.js';
 import './CategoryItem.scss';
 
 /** CSS classes */

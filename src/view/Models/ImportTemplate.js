@@ -3,8 +3,8 @@ import {
     amountFix,
     timestampFromString,
     __,
-} from '../utils.js';
-import { ImportTemplateError } from '../error/ImportTemplateError.js';
+} from '../utils/utils.js';
+import { ImportTemplateError } from './Error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 
 export const IMPORT_DATE_LOCALE = 'ru';

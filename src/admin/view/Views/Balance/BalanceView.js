@@ -1,9 +1,9 @@
 import 'jezvejs/style';
 import { urlJoin, isEmpty, asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { Application } from '../../../../view/js/Application.js';
-import '../../../../view/css/app.scss';
-import { View } from '../../../../view/js/View.js';
+import { Application } from '../../../../view/Application/Application.js';
+import '../../../../view/Application/Application.scss';
+import { View } from '../../../../view/utils/View.js';
 import '../../css/admin.scss';
 import './BalanceView.scss';
 

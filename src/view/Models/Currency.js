@@ -3,7 +3,7 @@ import {
     normalize,
     hasToken,
     __,
-} from '../utils.js';
+} from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 
 export const CURRENCY_SIGN_BEFORE_VALUE = 0x01;

@@ -7,7 +7,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../../js/utils.js';
+import { __ } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import './TemplateSelect.scss';
 

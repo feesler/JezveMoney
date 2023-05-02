@@ -1,5 +1,5 @@
 import { DropDown } from 'jezvejs/DropDown';
-import { __ } from '../../js/utils.js';
+import { __ } from '../../utils/utils.js';
 import { IconListItem } from './IconListItem.js';
 import './IconSelect.scss';
 

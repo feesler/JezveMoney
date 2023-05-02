@@ -614,10 +614,8 @@ export class AccountListView extends AppView {
     }
 
     static render(state) {
-        const sortMode = state.profile.settings.sort_accounts;
-        const userAccounts = state.accounts.getUserAccounts();
-        const visibleAccounts = userAccounts.getVisible(true);
-        const hiddenAccounts = userAccounts.getHidden(true);
+        const sortMode = state.getAccountsSortMode();
+        const userAccounts = state.getUserAccounts();
 
         const res = {
             tiles: TilesList.renderAccounts(userAccounts, sortMode),
@@ -625,9 +623,9 @@ export class AccountListView extends AppView {
         };
         res.tiles.visible = true;
         res.tiles.noDataMsg = {
-            visible: visibleAccounts.length === 0,
+            visible: res.tiles.items.length === 0,
         };
-        res.hiddenTiles.visible = hiddenAccounts.length > 0;
+        res.hiddenTiles.visible = res.hiddenTiles.items.length > 0;
 
         return res;
     }

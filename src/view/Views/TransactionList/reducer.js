@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 // Utils
 export const isSameSelection = (a, b) => (

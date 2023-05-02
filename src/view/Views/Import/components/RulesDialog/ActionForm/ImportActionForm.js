@@ -8,14 +8,14 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
-import { MAX_PRECISION, __ } from '../../../../../js/utils.js';
+import { MAX_PRECISION, __ } from '../../../../../utils/utils.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_CATEGORY,
-} from '../../../../../js/model/ImportAction.js';
+} from '../../../../../Models/ImportAction.js';
 import { CategorySelect } from '../../../../../Components/CategorySelect/CategorySelect.js';
 import './ImportActionForm.scss';
 

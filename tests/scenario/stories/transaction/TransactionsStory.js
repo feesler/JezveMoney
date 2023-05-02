@@ -121,7 +121,7 @@ export class TransactionsStory extends TestStory {
 
         await Actions.createFromAccountAndSubmit(1, [
             { action: 'inputDestAmount', data: '0.01' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
@@ -193,7 +193,7 @@ export class TransactionsStory extends TestStory {
         await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '10023.7801' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
             { action: 'inputComment', data: 'some income' },
         ]);
 
@@ -208,7 +208,7 @@ export class TransactionsStory extends TestStory {
         await Actions.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
             { action: 'inputSrcAmount', data: '0.01' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
             { action: 'changeCategory', data: INVEST_CATEGORY },
         ]);
 
@@ -401,7 +401,7 @@ export class TransactionsStory extends TestStory {
             { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
@@ -414,7 +414,7 @@ export class TransactionsStory extends TestStory {
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '10' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
@@ -429,7 +429,7 @@ export class TransactionsStory extends TestStory {
             { action: 'swapSourceAndDest' },
             { action: 'changeAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '105' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
@@ -555,13 +555,13 @@ export class TransactionsStory extends TestStory {
 
         await Actions.updateAndSubmit(EXPENSE, 2, [
             { action: 'inputDestAmount', data: '0.02' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         await Actions.updateAndSubmit(EXPENSE, 3, [
             { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '99.9' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         // Check update transaction with hidden account
@@ -583,7 +583,7 @@ export class TransactionsStory extends TestStory {
 
         await Actions.updateAndSubmit(INCOME, 1, [
             { action: 'inputSrcAmount', data: '100.001' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
             { action: 'changeCategory', data: TAXES_CATEGORY },
         ]);
 
@@ -672,7 +672,7 @@ export class TransactionsStory extends TestStory {
         await Actions.updateAndSubmit(DEBT, 3, [
             { action: 'changeAccount', data: ACC_RUB },
             { action: 'inputSrcAmount', data: '105' },
-            { action: 'inputDate', data: App.datesFmt.now },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.now) },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 4, [
@@ -686,7 +686,7 @@ export class TransactionsStory extends TestStory {
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: USD },
             { action: 'inputDestAmount', data: '200.0202' },
-            { action: 'inputDate', data: App.datesFmt.monthAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.monthAgo) },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 6, [
@@ -696,7 +696,7 @@ export class TransactionsStory extends TestStory {
 
         await Actions.updateAndSubmit(DEBT, 2, [
             { action: 'inputSrcAmount', data: '1001' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         // Check update transaction with hidden person
@@ -738,7 +738,7 @@ export class TransactionsStory extends TestStory {
 
         await Actions.updateFromMainViewAndSubmit(4, [
             { action: 'inputSrcAmount', data: '555' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
     }
 
@@ -949,7 +949,7 @@ export class TransactionsStory extends TestStory {
 
         await Actions.createFromAccountAndSubmit(1, [
             { action: 'inputDestAmount', data: '0.01' },
-            { action: 'inputDate', data: App.datesFmt.yesterday },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [

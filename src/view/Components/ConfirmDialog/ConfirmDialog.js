@@ -1,7 +1,7 @@
 import { isFunction, Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Popup } from 'jezvejs/Popup';
-import { __ } from '../../js/utils.js';
+import { __ } from '../../utils/utils.js';
 
 const defaultProps = {
     destroyOnResult: true,

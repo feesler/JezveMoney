@@ -1,4 +1,4 @@
-import { __ } from '../utils.js';
+import { __ } from '../utils/utils.js';
 
 /** Types of transactions */
 export const EXPENSE = 1;

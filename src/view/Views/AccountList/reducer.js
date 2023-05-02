@@ -1,7 +1,7 @@
 import { createSlice } from 'jezvejs/Store';
-import { Account } from '../../js/model/Account.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../js/utils.js';
+import { Account } from '../../Models/Account.js';
+import { AccountList } from '../../Models/AccountList.js';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 export const createList = (items, sortMode) => {
     const res = AccountList.create(items);

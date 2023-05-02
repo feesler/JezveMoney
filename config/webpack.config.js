@@ -13,17 +13,17 @@ export default {
     context: resolve(currentDir, '..'),
     entry: {
         polyfills: {
-            import: './src/view/js/polyfill/index.js',
+            import: './src/view/utils/polyfill/index.js',
             filename: 'view/js/polyfill/index.js',
         },
 
         locale_en: {
-            import: './src/view/js/locale/en.js',
+            import: './src/view/Locales/en.js',
             filename: 'view/js/locale/en.js',
         },
 
         locale_ru: {
-            import: './src/view/js/locale/ru.js',
+            import: './src/view/Locales/ru.js',
             filename: 'view/js/locale/ru.js',
         },
 

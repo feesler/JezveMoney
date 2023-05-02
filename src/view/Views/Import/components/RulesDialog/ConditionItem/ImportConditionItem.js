@@ -6,8 +6,8 @@ import {
     IMPORT_COND_FIELD_ACC_CURRENCY,
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
-} from '../../../../../js/model/ImportCondition.js';
-import { timeToDate } from '../../../../../js/utils.js';
+} from '../../../../../Models/ImportCondition.js';
+import { timeToDate } from '../../../../../utils/utils.js';
 import './ImportConditionItem.scss';
 
 /**

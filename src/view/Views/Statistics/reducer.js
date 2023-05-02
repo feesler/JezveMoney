@@ -1,6 +1,6 @@
 import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
-import { normalize } from '../../js/utils.js';
+import { normalize } from '../../utils/utils.js';
 
 const SECTOR_OFFSET = 10;
 

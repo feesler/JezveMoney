@@ -8,7 +8,7 @@ import {
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
-import { __ } from '../../../../../js/utils.js';
+import { __ } from '../../../../../utils/utils.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import {
     ImportTemplateManager,

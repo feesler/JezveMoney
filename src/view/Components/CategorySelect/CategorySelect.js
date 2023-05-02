@@ -1,6 +1,6 @@
 import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { __ } from '../../js/utils.js';
+import { __ } from '../../utils/utils.js';
 
 const defaultProps = {
     transactionType: null, // filter categories by type, null - show all

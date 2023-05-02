@@ -1,7 +1,7 @@
 import { createElement } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { Category } from '../../../../js/model/Category.js';
-import { __ } from '../../../../js/utils.js';
+import { Category } from '../../../../Models/Category.js';
+import { __ } from '../../../../utils/utils.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 

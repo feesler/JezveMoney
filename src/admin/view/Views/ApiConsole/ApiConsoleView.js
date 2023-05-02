@@ -10,9 +10,9 @@ import {
     removeChilds,
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import * as apiTypes from '../../../../view/js/api/types.js';
-import { Application } from '../../../../view/js/Application.js';
-import '../../../../view/css/app.scss';
+import * as apiTypes from '../../../../view/API/types.js';
+import { Application } from '../../../../view/Application/Application.js';
+import '../../../../view/Application/Application.scss';
 import '../../css/admin.scss';
 import { AdminView } from '../../js/AdminView.js';
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';

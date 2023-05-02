@@ -278,7 +278,7 @@ export class ImportListStory extends TestStory {
 
         // Correct date
         await Actions.runFormActions(
-            { action: 'inputDate', data: App.datesFmt.now },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.now) },
         );
         await Actions.saveItem();
         await Actions.submit();
@@ -609,7 +609,7 @@ export class ImportListStory extends TestStory {
         setBlock('Create transaction', 2);
         await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: App.datesFmt.weekAgo },
+            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
         ]);
         await Actions.submit();
 

@@ -12,12 +12,12 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
-import { __ } from '../../js/utils.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { UserCurrencyList } from '../../js/model/UserCurrencyList.js';
-import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
-import { API } from '../../js/api/index.js';
+import { __ } from '../../utils/utils.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { Application } from '../../Application/Application.js';
+import { View } from '../../utils/View.js';
+import { API } from '../../API/index.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
@@ -28,7 +28,7 @@ import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
 import '../../Components/Field/Field.scss';
-import '../../css/app.scss';
+import '../../Application/Application.scss';
 import './SettingsView.scss';
 
 /* CSS classes */

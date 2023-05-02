@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { getCurrencyPrecision, normalize } from '../../js/utils.js';
+import { getCurrencyPrecision, normalize } from '../../utils/utils.js';
 
 // Reducers
 const slice = createSlice({

@@ -15,7 +15,7 @@ import {
     parseDate,
     timeToDate,
     __,
-} from '../../js/utils.js';
+} from '../../utils/utils.js';
 import './DateRangeInput.scss';
 
 const CALENDAR_BUTTON_CLASS = 'btn input-group__inner-btn calendar-btn';

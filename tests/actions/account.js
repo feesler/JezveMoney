@@ -27,7 +27,6 @@ export const create = async () => {
         await checkNavigation();
         await App.view.goToCreateAccount();
 
-        await App.state.fetch();
         const expAccount = {
             type: 0,
             name: '',
@@ -45,8 +44,6 @@ export const create = async () => {
 };
 
 export const update = async (pos) => {
-    await App.state.fetch();
-
     const index = parseInt(pos, 10);
     assert(!Number.isNaN(index), 'Position of account not specified');
 
@@ -63,8 +60,6 @@ export const update = async (pos) => {
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {
-    await App.state.fetch();
-
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of account not specified');
 
@@ -142,8 +137,6 @@ export const deleteFromContextMenu = async (index) => {
     await test(`Delete account from context menu [${index}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
-
         await App.view.deleteFromContextMenu(index);
 
         const id = App.state.getSortedAccountsByIndexes(index, true);
@@ -162,7 +155,6 @@ export const del = async (accounts) => {
     await test(`Delete account(s) [${indexes.join()}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const id = App.state.getSortedAccountsByIndexes(indexes, true);
         App.state.deleteAccounts({ id });
 
@@ -182,7 +174,6 @@ export const delFromUpdate = async (pos) => {
     await test(`Delete account from update view [${ind}]`, async () => {
         await checkNavigation();
         await App.view.goToUpdateAccount(ind);
-        await App.state.fetch();
 
         await App.view.deleteSelfItem();
 
@@ -207,7 +198,6 @@ export const show = async (accounts, val = true) => {
     await test(`${actVerb} account(s) [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const id = App.state.getSortedAccountsByIndexes(itemIds, true);
         App.state.showAccounts({ id }, val);
 
@@ -232,7 +222,6 @@ export const exportTest = async (accounts) => {
     await test(`Export accounts [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        await App.state.fetch();
         const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
         const transactions = App.state.transactions.applyFilter({ accounts: ids });
         const expectedContent = transactions.exportToCSV();

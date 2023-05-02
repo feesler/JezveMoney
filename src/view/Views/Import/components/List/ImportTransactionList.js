@@ -1,7 +1,7 @@
 import { isFunction } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
-import { __ } from '../../../../js/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
 import './ImportTransactionList.scss';
 

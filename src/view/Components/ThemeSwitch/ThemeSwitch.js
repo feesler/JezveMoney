@@ -1,5 +1,5 @@
 import { Switch } from 'jezvejs/Switch';
-import { DARK_THEME } from '../../js/Application.js';
+import { DARK_THEME } from '../../Application/Application.js';
 
 /** Dark theme toggler Switch component */
 export class ThemeSwitch extends Switch {

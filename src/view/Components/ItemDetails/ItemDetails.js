@@ -5,7 +5,7 @@ import {
     asArray,
 } from 'jezvejs';
 import { CloseButton } from 'jezvejs/CloseButton';
-import { timeToDate, __ } from '../../js/utils.js';
+import { timeToDate, __ } from '../../utils/utils.js';
 import { Field } from '../Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
 import './ItemDetails.scss';

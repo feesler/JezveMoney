@@ -7,7 +7,7 @@ import {
     dateStringToTime,
     getCurrencyPrecision,
     __,
-} from '../utils.js';
+} from '../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
