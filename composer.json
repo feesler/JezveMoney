@@ -1,6 +1,6 @@
 {
     "name": "henryfeesler/jezvemoney",
-    "version": "1.60.1",
+    "version": "1.60.2",
     "description": "",
 	"config": {
 		"vendor-dir": "vendor",
