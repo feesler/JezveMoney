@@ -5,6 +5,7 @@ namespace JezveMoney\App\Admin\Controller;
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 
 /**
@@ -24,6 +25,7 @@ class Balance extends AdminController
         ];
 
         $trModel = TransactionModel::getInstance();
+        $currModel = CurrencyModel::getInstance();
 
         $srcAvailTypes = [EXPENSE, TRANSFER, DEBT];
         $destAvailTypes = [INCOME, TRANSFER, DEBT];
@@ -73,7 +75,12 @@ class Balance extends AdminController
                     $results[$tr->src_id] = $accObj->initbalance;
                 }
 
-                $results[$tr->src_id] = normalize($results[$tr->src_id] - $tr->src_amount);
+                $srcCurr = $currModel->getItem($tr->src_curr);
+
+                $results[$tr->src_id] = normalize(
+                    $results[$tr->src_id] - $tr->src_amount,
+                    $srcCurr->precision,
+                );
                 $tr->exp_src_result = $results[$tr->src_id];
             } else {
                 $tr->exp_src_result = 0;
@@ -88,7 +95,12 @@ class Balance extends AdminController
                     $results[$tr->dest_id] = $accObj->initbalance;
                 }
 
-                $results[$tr->dest_id] = normalize($results[$tr->dest_id] + $tr->dest_amount);
+                $destCurr = $currModel->getItem($tr->dest_curr);
+
+                $results[$tr->dest_id] = normalize(
+                    $results[$tr->dest_id] + $tr->dest_amount,
+                    $destCurr->precision,
+                );
                 $tr->exp_dest_result = $results[$tr->dest_id];
             } else {
                 $tr->exp_dest_result = 0;
