@@ -207,50 +207,6 @@ function sessionStart()
 }
 
 /**
- * Builds URL from base and array of parameters
- *
- * @param string $base
- * @param array|null $params
- * @param bool $raw
- *
- * @return string
- */
-function urlJoin(string $base, array $params = null, bool $raw = false)
-{
-    if (is_empty($base)) {
-        return "";
-    }
-
-    if (!is_array($params)) {
-        return $base;
-    }
-
-    $pairs = [];
-    $encode = ($raw) ? "rawurlencode" : "urlencode";
-    foreach ($params as $pkey => $pval) {
-        if (is_array($pval)) {
-            foreach ($pval as $akey => $avalue) {
-                if (is_string($akey)) {
-                    $pairs[] = $encode($pkey) . "[" . $encode($akey) . "]=" . $encode($avalue);
-                } elseif (is_numeric($akey)) {
-                    $pairs[] = $encode($pkey) . "[]=" . $encode($avalue);
-                }
-            }
-        } elseif (!is_null($pval) && !is_object($pval)) {
-            $pairs[] = $encode($pkey) . "=" . $encode($pval);
-        }
-    }
-
-    $resStr = $base;
-    if (count($pairs)) {
-        $resStr .= "?";
-    }
-    $resStr .= implode("&", $pairs);
-
-    return $resStr;
-}
-
-/**
  * Returns file modification timestamp
  *
  * @param string $file file name
