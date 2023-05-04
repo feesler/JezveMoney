@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { urlJoin, isEmpty, asArray } from 'jezvejs';
+import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
@@ -69,22 +69,20 @@ class AdminBalanceView extends View {
      * Build new location address from current filter
      */
     buildAddress(state) {
-        const { baseURL } = window.app;
-        let newLocation = `${baseURL}admin/balance/`;
-        const locFilter = { ...state.filter };
+        const res = new URL('admin/balance/', window.app.baseURL);
+        const { filter } = state;
 
-        if ('accounts' in locFilter) {
-            locFilter.accounts = asArray(locFilter.accounts);
-            if (!locFilter.accounts.length) {
-                delete locFilter.accounts;
+        Object.keys(filter).forEach((prop) => {
+            const value = filter[prop];
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => res.searchParams.append(arrProp, item));
+            } else {
+                res.searchParams.set(prop, value);
             }
-        }
+        });
 
-        if (!isEmpty(locFilter)) {
-            newLocation += `?${urlJoin(locFilter)}`;
-        }
-
-        return newLocation;
+        return res.toString();
     }
 
     requestTransactions(state) {
