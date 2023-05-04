@@ -265,38 +265,6 @@ export function createCSV({
     return `${res}${newLine}`;
 }
 
-/** Join parameters and values of object to URL */
-export const urlJoin = (obj) => {
-    if (!isObject(obj)) {
-        return '';
-    }
-
-    const arr = [];
-    Object.keys(obj).forEach((par) => {
-        const val = obj[par];
-
-        if (typeof val === 'undefined') {
-            return;
-        }
-
-        if (Array.isArray(val)) {
-            val.forEach((arrItem) => {
-                if (!isObject(arrItem)) {
-                    const parName = encodeURIComponent(par);
-                    const parValue = encodeURIComponent(arrItem.toString());
-                    arr.push(`${parName}[]=${parValue}`);
-                }
-            });
-        } else if (!isObject(val)) {
-            const parName = encodeURIComponent(par);
-            const parValue = encodeURIComponent(val.toString());
-            arr.push(`${parName}=${parValue}`);
-        }
-    });
-
-    return arr.join('&');
-};
-
 export const formatProps = (params) => {
     if (typeof params === 'undefined') {
         return 'undefined';
