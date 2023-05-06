@@ -25,12 +25,13 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
-import { formatCsvDate } from './import.js';
 
 const WEEKS_IN_YEAR = 52;
 const MONTHS_IN_YEAR = 12;
 const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
+
+const defaultExportDateLocale = 'ru';
 
 const availFilters = ['type', 'accounts', 'persons', 'categories', 'startDate', 'endDate', 'search'];
 const arrayFilters = ['type', 'accounts', 'persons', 'categories'];
@@ -584,7 +585,7 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            formatCsvDate(secondsToDate(transaction.date)),
+            App.formatDate(secondsToDate(transaction.date), { locales: defaultExportDateLocale }),
             transaction.comment,
         ]);
 

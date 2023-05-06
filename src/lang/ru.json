@@ -268,6 +268,7 @@
     "TEMPLATE_SET_DEFAULT_ACCOUNT": "Задать основной счёт",
     "TEMPLATE_DEFAULT_ACCOUNT": "Счёт",
     "TEMPLATE_COLUMN": "Столбец",
+    "TEMPLATE_DATE_FORMAT": "Формат даты",
     "TEMPLATE_COLUMN_MAP": "Загруженный файл",
     "TEMPLATE_VALID": "Корректный шаблон",
     "MSG_TPL_ACCOUNT_AMOUNT": "Выберите столбец с суммой счёта",

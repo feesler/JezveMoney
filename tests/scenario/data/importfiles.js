@@ -1,4 +1,4 @@
-import { generateCardCSV, generateAccountCSV } from '../../model/import.js';
+import { generateCardCSV, generateAccountCSV, generateEnLocaleCSV } from '../../model/import.js';
 
 const getCardData = (date) => ([
     [date, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
@@ -52,5 +52,18 @@ export const getAccountCSV = () => {
         [now, 'INTEREST', 'RUB', '23.16'],
         [now, 'RBA R-BANK', 'RUB', '-5 000.00'],
         [now, 'C2C R-BANK', 'RUB', '-10 000.00'],
+    ]);
+};
+
+export const getEnLocaleCSV = () => {
+    const now = new Date();
+    return generateEnLocaleCSV([
+        [now, 'MARKET', 'USD', '-536.75'],
+        [now, 'BAR', 'USD', '-150.00'],
+        [now, 'CAFE', 'USD', '-200.00'],
+        [now, 'RENT BIKE', 'USD', '-200.00'],
+        [now, 'CASHBACK', 'USD', '136.50'],
+        [now, 'CASH M-BANK', 'USD', '-5 000.00'],
+        [now, 'TRANSFER M-BANK', 'USD', '-10 000.00'],
     ]);
 };

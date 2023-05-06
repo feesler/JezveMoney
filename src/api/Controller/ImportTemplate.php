@@ -21,6 +21,7 @@ class ImportTemplate extends ApiListController
         "trans_amount_col",
         "account_curr_col",
         "account_amount_col",
+        "date_locale",
     ];
     protected $defaultValues = [
         "type_id" => 0,

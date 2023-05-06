@@ -73,14 +73,20 @@
                 <label class="field__title"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></label>
             </div>
 
-            <div id="columnField" class="field form-row validation-block">
-                <label for="columnSel" class="field__title"><?= __("TEMPLATE_COLUMN") ?></label>
-                <select id="columnSel">
-                    <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
-                        <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
-                    <?php   }   ?>
-                </select>
-                <div id="columnFeedback" class="feedback invalid-feedback"></div>
+            <div class="form-fields-row">
+                <div id="columnField" class="field form-row validation-block">
+                    <label for="columnSel" class="field__title"><?= __("TEMPLATE_COLUMN") ?></label>
+                    <select id="columnSel">
+                        <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
+                            <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
+                        <?php   }   ?>
+                    </select>
+                    <div id="columnFeedback" class="feedback invalid-feedback"></div>
+                </div>
+
+                <div id="dateFormatField" class="field form-row tpl-date-format-field" hidden>
+                    <label class="field__title"><?= __("TEMPLATE_DATE_FORMAT") ?></label>
+                </div>
             </div>
 
             <div id="rawDataTable" class="field form-row raw-data-field">

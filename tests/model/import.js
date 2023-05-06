@@ -1,12 +1,19 @@
 import { assert, formatDate } from 'jezve-test';
 import { createCSV } from '../common.js';
 import { App } from '../Application.js';
-import { IMPORT_DATE_LOCALE } from './ImportTemplate.js';
 
-/** Returns formatted date string according to CSV locale */
-export const formatCsvDate = (date) => (
+/** Returns data formatted in 'ru' locale */
+const formatRuCsvDate = (date) => (
     formatDate(date, {
-        locales: IMPORT_DATE_LOCALE,
+        locales: 'ru',
+        options: App.dateFormatOptions,
+    })
+);
+
+/** Returns data formatted in 'en' locale */
+const formatEnCsvDate = (date) => (
+    formatDate(date, {
+        locales: 'en',
         options: App.dateFormatOptions,
     })
 );
@@ -29,8 +36,8 @@ function createCardTransaction(data) {
     const confirmDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3);
 
     return [
-        `${formatCsvDate(date)} 00:00`,
-        `${formatCsvDate(confirmDate)} 00:00`,
+        `${formatRuCsvDate(date)} 00:00`,
+        `${formatRuCsvDate(confirmDate)} 00:00`,
         '*7777',
         `${comment} ${city} ${country}`,
         comment,
@@ -79,7 +86,7 @@ function createAccountTransaction(data) {
     assert.isDate(date, 'Invalid date object');
 
     return [
-        `${formatCsvDate(date)} 00:00`,
+        `${formatRuCsvDate(date)} 00:00`,
         comment,
         trCurr,
         trAmount,
@@ -102,6 +109,47 @@ export function generateAccountCSV(data) {
     assert.isArray(data, 'Invalid data');
 
     const rows = data.map((item) => createAccountTransaction(item));
+
+    return createCSV({ header, data: rows });
+}
+
+/** Convert data array to import statement row */
+function createEnLocaleTransaction(data) {
+    const [
+        date,
+        comment,
+        trCurr,
+        trAmount,
+        accCurr = trCurr,
+        accAmount = trAmount,
+    ] = data;
+
+    assert.isDate(date, 'Invalid date object');
+
+    return [
+        `${formatEnCsvDate(date)} 00:00`,
+        comment,
+        trCurr,
+        trAmount,
+        accCurr,
+        accAmount,
+    ];
+}
+
+/** Convert transactions data array to CSV */
+export function generateEnLocaleCSV(data) {
+    const header = [
+        'Transaction date',
+        'Description',
+        'Transaction currency',
+        'Amount in transaction currency',
+        'Account currency',
+        'Amount in account currency',
+    ];
+
+    assert.isArray(data, 'Invalid data');
+
+    const rows = data.map((item) => createEnLocaleTransaction(item));
 
     return createCSV({ header, data: rows });
 }

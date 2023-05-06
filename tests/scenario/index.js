@@ -12,7 +12,12 @@ import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createCategories } from './data/categories.js';
 import { createTransactions } from './data/transactions.js';
-import { getAccountCSV, getCardCSV, getLargeCSV } from './data/importfiles.js';
+import {
+    getAccountCSV,
+    getCardCSV,
+    getEnLocaleCSV,
+    getLargeCSV,
+} from './data/importfiles.js';
 import { createImportRules } from './data/rules.js';
 import { createImportTemplates } from './data/templates.js';
 
@@ -254,6 +259,7 @@ export class Scenario {
         this.cardFile = await putFile(getCardCSV());
         this.accountFile = await putFile(getAccountCSV());
         this.largeFile = await putFile(getLargeCSV());
+        this.enLocaleFile = await putFile(getEnLocaleCSV());
 
         await ApiTests.loginTest(App.config.testUser);
     }
@@ -268,6 +274,8 @@ export class Scenario {
         this.accountFile = null;
         await removeFile(this.largeFile?.filename);
         this.largeFile = null;
+        await removeFile(this.enLocaleFile?.filename);
+        this.enLocaleFile = null;
 
         await ApiTests.loginTest(App.config.testUser);
     }

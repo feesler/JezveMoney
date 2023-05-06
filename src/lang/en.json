@@ -268,6 +268,7 @@
     "TEMPLATE_SET_DEFAULT_ACCOUNT": "Select main account",
     "TEMPLATE_DEFAULT_ACCOUNT": "Account",
     "TEMPLATE_COLUMN": "Column",
+    "TEMPLATE_DATE_FORMAT": "Date format",
     "TEMPLATE_COLUMN_MAP": "Uploaded file",
     "TEMPLATE_VALID": "Valid template",
     "MSG_TPL_ACCOUNT_AMOUNT": "Select decimal column for account amount",

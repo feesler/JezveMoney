@@ -31,6 +31,13 @@ export const selectTemplateColumn = async ({ column, index }) => {
     ));
 };
 
+/** Select date format of import template */
+export const selectTemplateDateFormat = async (locale) => {
+    await test(`Select template date format '${locale}'`, () => (
+        App.view.selectTemplateDateFormat(locale)
+    ));
+};
+
 /** Input import template first row */
 export const inputTemplateFirstRow = async (value) => {
     await test(`Input template first row (${value})`, () => (
@@ -68,7 +75,7 @@ export const selectTemplateAccountById = async (value) => {
 
 /** Select template account */
 export const selectTemplateAccountByIndex = async (index) => {
-    await test(`Select upload template by index [${index}]`, () => (
+    await test(`Select template account by index [${index}]`, () => (
         App.view.selectTemplateAccountByIndex(index)
     ));
 };
@@ -151,6 +158,11 @@ export const addTemplate = async (props) => {
     if (props.account_id) {
         await toggleTemplateAccount();
         await selectTemplateAccountById(props.account_id);
+    }
+
+    if (props.date_locale) {
+        await selectTemplateColumn({ column: 'date', index: props.date });
+        await selectTemplateDateFormat(props.date_locale);
     }
 
     await submitTemplate();
