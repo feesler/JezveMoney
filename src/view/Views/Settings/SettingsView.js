@@ -21,6 +21,7 @@ import { API } from '../../API/index.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
+import { DateFormatSelect } from '../../Components/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
 import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
@@ -149,31 +150,8 @@ class SettingsView extends View {
         });
 
         // Date format
-        this.dateFormatSelect = DropDown.create({
+        this.dateFormatSelect = DateFormatSelect.create({
             onItemSelect: (sel) => this.onDateFormatSelect(sel),
-            data: [
-                { id: 'ru', title: 'dd.MM.YYYY' },
-                { id: 'lt', title: 'YYYY-MM-dd' },
-                { id: 'fr', title: 'dd/MM/YYYY' },
-                { id: 'ar', title: 'dYYYY/M/' },
-                { id: 'es', title: 'd/M/YY' },
-                { id: 'zh', title: 'YYYY/M/d' },
-                { id: 'hr', title: 'dd. MM. YYYY.' },
-                { id: 'uk', title: 'dd.MM.YY' },
-                { id: 'nl', title: 'dd-MM-YYYY' },
-                { id: 'en', title: 'M/d/YY' },
-                { id: 'fi', title: 'd.M.YYYY' },
-                { id: 'hu', title: 'YYYY. MM. dd.' },
-                { id: 'it', title: 'dd/MM/YY' },
-                { id: 'ja', title: 'YYYY/MM/dd' },
-                { id: 'ko', title: 'YY. MM. dd.' },
-                { id: 'ms', title: 'd/MM/YY' },
-                { id: 'pl', title: 'd.MM.YYYY' },
-                { id: 'sr', title: 'd.MM.YY.' },
-                { id: 'sk', title: 'd. MM. YYYY.' },
-                { id: 'sl', title: 'd. MM. YY' },
-                { id: 'te', title: 'dd-MM-YY' },
-            ],
         });
         this.dateFormatContainer.append(this.dateFormatSelect.elem);
 
