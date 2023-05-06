@@ -10,6 +10,15 @@ import { ListItem } from './ListItem.js';
 export const IMPORT_DATE_LOCALE = 'ru';
 const availFields = ['id', 'name', 'account_id', 'type_id', 'first_row', 'columns', 'date_locale'];
 
+export const templateColumns = [
+    'accountAmount',
+    'transactionAmount',
+    'accountCurrency',
+    'transactionCurrency',
+    'date',
+    'comment',
+];
+
 /**
  * Import template class
  * @param {object} props - properties of instance

@@ -112,13 +112,26 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         res.uploadProgress = { elem: await query(this.elem, ':scope > .loading-indicator') };
-        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
+        res.loadingIndicator = { elem: await query(this.elem, '.upload-form__converter > .loading-indicator') };
 
         res.useServerAddress = res.useServerCheck.checked;
         res.encode = res.isEncodeCheck.checked;
-        res.templateBlock.visible = await isVisible(res.templateBlock.elem, true);
-        res.uploadProgress.visible = await isVisible(res.uploadProgress.elem, true);
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
+
+        [
+            res.templateBlock.visible,
+            res.templateForm.visible,
+            res.uploadProgress.visible,
+            res.loadingIndicator.visible,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => el && !el.hidden),
+            res.templateBlock.elem,
+            res.templateForm.elem,
+            res.uploadProgress.elem,
+            res.loadingIndicator.elem,
+        );
+
+        const formVisible = res.templateForm.visible;
+
         res.isLoading = (
             res.uploadProgress.visible
             || (res.templateBlock.visible && res.loadingIndicator.visible)
@@ -174,7 +187,7 @@ export class ImportUploadDialog extends TestComponent {
         res.isTplLoading = res.templateDropDown.disabled;
 
         res.columns = null;
-        if (res.templateBlock.visible && !res.isLoading) {
+        if (formVisible && !res.isLoading) {
             res.columns = await asyncMap(
                 await queryAll(res.rawDataTable.elem, '.raw-data-table__data .raw-data-column'),
                 async (elem) => this.parseRawDataTableColumn(elem),
@@ -191,9 +204,12 @@ export class ImportUploadDialog extends TestComponent {
         if (res.isLoading) {
             res.state = LOADING_STATE;
         } else if (res.templateBlock.visible) {
-            if (res.tplFormTitle.title === __('TEMPLATE_CREATE', App.view.locale)) {
+            const createTplTitle = __('TEMPLATE_CREATE', App.view.locale);
+            const updateTplTitle = __('TEMPLATE_UPDATE', App.view.locale);
+
+            if (formVisible && res.tplFormTitle.title === createTplTitle) {
                 res.state = CREATE_TPL_STATE;
-            } else if (res.tplFormTitle.title === __('TEMPLATE_UPDATE', App.view.locale)) {
+            } else if (formVisible && res.tplFormTitle.title === updateTplTitle) {
                 res.state = UPDATE_TPL_STATE;
             } else {
                 res.state = CONVERT_STATE;
@@ -521,7 +537,7 @@ export class ImportUploadDialog extends TestComponent {
             await click(this.content.serverUploadBtn.elem);
 
             await wait('#templateBlock', { visible: true });
-            await wait('.tpl-form > .loading-indicator', { hidden: true });
+            await wait('.upload-form__converter > .loading-indicator', { hidden: true });
         });
 
         return this.checkState();

@@ -5,22 +5,18 @@ import {
     show,
     enable,
     Component,
-    re,
     setEvents,
     insertAfter,
 } from 'jezvejs';
-import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
-import { Switch } from 'jezvejs/Switch';
+import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 import { ImportTemplateError } from '../../../../../Models/Error/ImportTemplateError.js';
 import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../../../Models/ImportTemplate.js';
 import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
-import { DateFormatSelect } from '../../../../../Components/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
-import { RawDataTable } from '../RawDataTable/RawDataTable.js';
+import { ImportTemplateForm } from '../TemplateForm/ImportTemplateForm.js';
 import { TemplateSelect } from '../TemplateSelect/TemplateSelect.js';
 import './ImportTemplateManager.scss';
 
@@ -53,48 +49,29 @@ export class ImportTemplateManager extends Component {
         }
 
         this.state = {
+            visible: false,
             mainAccount: this.props.mainAccount,
             templates: window.app.model.templates.data,
+            listLoading: false,
+            formRequest: null,
             template: null,
             selectedTemplateId: 0,
-            selectedColumn: null,
             validation: {
                 ...defaultValidation,
             },
         };
 
-        this.columnFeedback = {
-            accountAmount: { msg: __('MSG_TPL_ACCOUNT_AMOUNT') },
-            accountCurrency: { msg: __('MSG_TPL_ACCOUNT_CURRENCY') },
-            transactionAmount: { msg: __('MSG_TPL_TR_AMOUNT') },
-            transactionCurrency: { msg: __('MSG_TPL_TR_CURRENCY') },
-            date: { msg: __('MSG_TPL_DATE') },
-            comment: { msg: __('MSG_TPL_COMMENT') },
-        };
+        this.init();
+    }
 
+    init() {
         const elemIds = [
             'tplSelectGroup',
-            'templateForm',
             'tplFilename',
             'tplField',
             'tplFieldHeader',
             'tplFeedback',
-            'nameField',
-            'tplNameInp',
-            'firstRowField',
-            'firstRowInp',
-            'decFirstRowBtn',
-            'incFirstRowBtn',
-            'tplAccountSwitchField',
-            'tplAccountSwitch',
-            'tplAccountField',
             'columnField',
-            'dateFormatField',
-            'tplControls',
-            'submitTplBtn',
-            'cancelTplBtn',
-            'rawDataTable',
-            'tplFormFeedback',
             'initialAccField',
             'uploadControls',
             'submitUploadedBtn',
@@ -122,16 +99,15 @@ export class ImportTemplateManager extends Component {
         });
         this.tplFieldHeader.append(this.createTplBtn.elem);
 
-        this.columnDropDown = DropDown.create({
-            elem: 'columnSel',
-            onChange: (column) => this.onColumnChange(column),
+        // Template form
+        this.templateForm = ImportTemplateForm.create({
+            mainAccount: this.state.mainAccount,
+            rawData: this.state.rawData,
+            template: this.state.template,
+            listLoading: this.state.listLoading,
+            onSubmit: (request) => this.onSubmitTemplate(request),
+            onCancel: () => this.onCancelTemplate(),
         });
-
-        // Date format field
-        this.dateFormatSelect = DateFormatSelect.create({
-            onItemSelect: (sel) => this.onDateFormatSelect(sel),
-        });
-        this.dateFormatField.append(this.dateFormatSelect.elem);
 
         // Main account
         this.accountDropDown = DropDown.create({
@@ -143,39 +119,20 @@ export class ImportTemplateManager extends Component {
         window.app.initAccountsList(this.accountDropDown);
         this.accountDropDown.setSelection(this.state.mainAccount.id);
 
-        // Template default account
-        this.tplAccountSwitch = Switch.fromElement(this.tplAccountSwitch, {
-            onChange: () => this.onTemplateAccountToggle(),
-        });
-
-        this.tplAccountDropDown = DropDown.create({
-            className: 'dd_fullwidth',
-            enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
-            onChange: (account) => this.onTemplateAccountChange(account),
-        });
-        window.app.initAccountsList(this.tplAccountDropDown);
-        this.tplAccountField.append(this.tplAccountDropDown.elem);
-
         setEvents(this.submitUploadedBtn, { click: () => this.onSubmit() });
-
-        setEvents(this.tplNameInp, { input: () => this.onTemplateNameInput() });
-        setEvents(this.firstRowInp, { input: () => this.onFirstRowInput() });
-        DecimalInput.create({
-            elem: this.firstRowInp,
-            digits: 0,
-            allowNegative: false,
-        });
-        setEvents(this.decFirstRowBtn, { click: () => this.onFirstRowDecrease() });
-        setEvents(this.incFirstRowBtn, { click: () => this.onFirstRowIncrease() });
-
-        setEvents(this.submitTplBtn, { click: () => this.onSubmitTemplateClick() });
-        setEvents(this.cancelTplBtn, { click: () => this.onCancelTemplateClick() });
 
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
+    }
+
+    show(visible = true) {
+        this.setState({ ...this.state, visible });
+    }
+
+    hide() {
+        this.show(false);
     }
 
     onSubmit() {
@@ -213,15 +170,15 @@ export class ImportTemplateManager extends Component {
         this.setState({
             ...this.state,
             id: LOADING_STATE,
+            visible: false,
             rawData: null,
             filename: null,
             rowsToShow: 3,
             listLoading: false,
+            formRequest: null,
             template: null,
             selectedTemplateId: 0,
         });
-
-        this.hide();
     }
 
     /** Show/hide loading indication */
@@ -318,9 +275,6 @@ export class ImportTemplateManager extends Component {
      */
     setTemplate(value) {
         const template = window.app.model.templates.getItem(value) ?? null;
-        if (this.state.template?.id === template?.id) {
-            return;
-        }
 
         if (template?.account_id) {
             this.changeMainAccount(template.account_id);
@@ -329,123 +283,6 @@ export class ImportTemplateManager extends Component {
         this.validateTemplateAndSetState({
             ...this.state,
             template,
-        });
-    }
-
-    /** Template name field 'input' event handler */
-    onTemplateNameInput() {
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...this.state.template,
-                name: this.tplNameInp.value,
-            }),
-            validation: {
-                ...this.state.validation,
-                name: true,
-            },
-        });
-    }
-
-    /** Template first row 'input' event handler */
-    onFirstRowInput() {
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...this.state.template,
-                first_row: parseInt(this.firstRowInp.value, 10),
-            }),
-            validation: {
-                ...this.state.validation,
-                firstRow: true,
-            },
-        });
-    }
-
-    /** Template first row decrease button 'click' event handler */
-    onFirstRowDecrease() {
-        const { template } = this.state;
-        if (Number.isNaN(template.first_row) || template.first_row === 1) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                first_row: template.first_row - 1,
-            }),
-            validation: {
-                ...this.state.validation,
-                firstRow: true,
-            },
-        });
-    }
-
-    /** Template first row increase button 'click' event handler */
-    onFirstRowIncrease() {
-        const { template } = this.state;
-
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                first_row: (
-                    Number.isNaN(template.first_row) ? 1 : template.first_row + 1
-                ),
-            }),
-            validation: {
-                ...this.state.validation,
-                firstRow: true,
-            },
-        });
-    }
-
-    /** Template default account 'change' event handler */
-    onTemplateAccountToggle() {
-        const { template } = this.state;
-        const { userAccounts } = window.app.model;
-
-        let id = 0;
-        if (!template.account_id) {
-            const account = userAccounts.getItemByIndex(0);
-            id = account.id;
-        }
-
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                account_id: id,
-            }),
-        });
-    }
-
-    /** Template default account 'change' event handler */
-    onTemplateAccountChange(account) {
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...this.state.template,
-                account_id: account?.id,
-            }),
-        });
-    }
-
-    onColumnChange(column) {
-        this.setState({
-            ...this.state,
-            selectedColumn: column?.id,
-        });
-    }
-
-    onDateFormatSelect(selected) {
-        this.validateTemplateAndSetState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...this.state.template,
-                date_locale: selected?.id,
-            }),
         });
     }
 
@@ -468,7 +305,6 @@ export class ImportTemplateManager extends Component {
         this.setState({
             ...this.state,
             id: TPL_CREATE_STATE,
-            selectedColumn: 'accountAmount',
             template: new ImportTemplate({
                 name: '',
                 type_id: 0,
@@ -481,6 +317,8 @@ export class ImportTemplateManager extends Component {
                 ...defaultValidation,
             },
         });
+
+        this.templateForm.validateTemplateAndSetState();
         this.notifyStateChanged();
     }
 
@@ -489,8 +327,8 @@ export class ImportTemplateManager extends Component {
         this.setState({
             ...this.state,
             id: TPL_UPDATE_STATE,
-            selectedColumn: 'accountAmount',
         });
+        this.templateForm.validateTemplateAndSetState();
         this.notifyStateChanged();
     }
 
@@ -514,63 +352,24 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Save template button 'click' event handler */
-    onSubmitTemplateClick() {
-        const { template } = this.state;
-
-        const requestObj = {
-            name: template.name,
-            type_id: template.type_id,
-            account_id: template.account_id,
-            first_row: template.first_row,
-            date_locale: template.date_locale,
-            date_col: template.columns.date,
-            comment_col: template.columns.comment,
-            trans_curr_col: template.columns.transactionCurrency,
-            trans_amount_col: template.columns.transactionAmount,
-            account_curr_col: template.columns.accountCurrency,
-            account_amount_col: template.columns.accountAmount,
-        };
-
-        if (!template.name.length) {
-            this.setState({
-                ...this.state,
-                validation: {
-                    ...this.state.validation,
-                    name: false,
-                    valid: false,
-                },
-            });
-
-            return;
-        }
-
-        const firstRow = parseInt(template.first_row, 10);
-        if (Number.isNaN(firstRow) || firstRow < 1) {
-            this.setState({
-                ...this.state,
-                validation: {
-                    ...this.state.validation,
-                    firstRow: false,
-                    valid: false,
-                },
-            });
-
-            return;
-        }
-
-        if (template.id) {
-            requestObj.id = template.id;
-        }
-
-        this.requestSubmitTemplate(requestObj);
+    onSubmitTemplate(request) {
+        this.requestSubmitTemplate(request);
     }
 
-    startListLoading() {
-        this.setState({ ...this.state, listLoading: true });
+    startListLoading(formRequest = null) {
+        this.setState({
+            ...this.state,
+            listLoading: true,
+            formRequest,
+        });
     }
 
     stopListLoading() {
-        this.setState({ ...this.state, listLoading: false });
+        this.setState({
+            ...this.state,
+            listLoading: false,
+            formRequest: null,
+        });
     }
 
     prepareRequest(data) {
@@ -602,8 +401,10 @@ export class ImportTemplateManager extends Component {
         if (window.app.model.templates.length > 0) {
             // Find template with same name as currently selected
             let template = null;
-            if (this.state.template) {
-                template = templates.find((item) => item.name === this.state.template.name);
+            if (this.state.formRequest) {
+                template = templates.find((item) => item.name === this.state.formRequest.name);
+            } else if (this.state.selectedTemplateId) {
+                template = templates.getItem(this.state.selectedTemplateId);
             }
             if (!template) {
                 template = templates.getItemByIndex(0);
@@ -631,7 +432,7 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to create/update template */
     async requestSubmitTemplate(data) {
-        this.startListLoading();
+        this.startListLoading(data);
 
         try {
             const request = this.prepareRequest(data);
@@ -661,19 +462,8 @@ export class ImportTemplateManager extends Component {
         }
     }
 
-    /** Send API request to obain list of import templates */
-    async requestTemplatesList() {
-        try {
-            const result = await API.importTemplate.list();
-            this.setListData(result.data);
-        } catch (e) {
-            window.app.createErrorNotification(e.message);
-            this.stopListLoading();
-        }
-    }
-
     /** Cancel template button 'click' event handler */
-    onCancelTemplateClick() {
+    onCancelTemplate() {
         if (this.state.id !== TPL_CREATE_STATE && this.state.id !== TPL_UPDATE_STATE) {
             return;
         }
@@ -700,30 +490,6 @@ export class ImportTemplateManager extends Component {
         this.setState(newState);
     }
 
-    /** Raw data table column 'click' event handler */
-    onDataColumnClick(index) {
-        if (this.state.id !== TPL_CREATE_STATE && this.state.id !== TPL_UPDATE_STATE) {
-            return;
-        }
-
-        const { selectedColumn } = this.state;
-        if (!selectedColumn) {
-            throw new Error('Invalid column selection');
-        }
-
-        const { template } = this.state;
-        this.validateTemplateAndSetState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                columns: {
-                    ...template.columns,
-                    [selectedColumn]: index + 1,
-                },
-            }),
-        });
-    }
-
     /** Set feedback for specified element */
     setFeedback(feedbackElem, message = null, isValid = false) {
         const elem = feedbackElem;
@@ -748,40 +514,13 @@ export class ImportTemplateManager extends Component {
     /** Renders selected template feedback */
     setTemplateFeedback(message = null, isValid = false) {
         this.setFeedback(this.tplFeedback, message, isValid);
-        this.setFeedback(this.tplFormFeedback);
-        this.setFeedback(this.convertFeedback);
-    }
-
-    /** Renders template form feedback */
-    setTemplateFormFeedback(message = null, isValid = false) {
-        this.setFeedback(this.tplFeedback);
-        this.setFeedback(this.tplFormFeedback, message, isValid);
         this.setFeedback(this.convertFeedback);
     }
 
     /** Validate current template on raw data */
     setConvertFeedback(message = null, isValid = false) {
         this.setFeedback(this.tplFeedback);
-        this.setFeedback(this.tplFormFeedback);
         this.setFeedback(this.convertFeedback, message, isValid);
-    }
-
-    /** Validate current template on raw data */
-    onInvalidPropertyValue(state, propName) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
-        if (
-            (state.id !== TPL_CREATE_STATE && state.id !== TPL_UPDATE_STATE)
-            || (typeof propName !== 'string')
-            || !propName.length
-            || !this.columnFeedback[propName]
-        ) {
-            return;
-        }
-
-        this.setTemplateFormFeedback(this.columnFeedback[propName].msg, false);
     }
 
     /** Validate current template on raw data */
@@ -857,110 +596,56 @@ export class ImportTemplateManager extends Component {
 
     /** Render component */
     render(state, prevState = {}) {
+        const templateAvail = (window.app.model.templates.length > 0);
+        const isLoadingState = (state.id === LOADING_STATE);
+        const isSelectState = (state.id === TPL_SELECT_STATE);
+        const isFormState = (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE);
+
+        show(this.elem, state.visible);
+
         this.renderTemplateSelect(state, prevState);
 
-        const templateAvail = (window.app.model.templates.length > 0);
-        if (state.id === LOADING_STATE) {
-            this.loadingIndicator.show();
+        if (isLoadingState) {
             show(this.convertFeedback, false);
-        } else if (state.id === TPL_SELECT_STATE) {
-            show(this.tplField, templateAvail);
-            show(this.noTplLabel, !templateAvail);
-
-            this.loadingIndicator.hide();
-            window.app.setValidation(this.nameField, true);
-            this.createTplBtn.show(templateAvail);
-        } else if (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE) {
-            show(this.noTplLabel, false);
-            this.loadingIndicator.hide();
-            show(this.tplField, false);
-            this.createTplBtn.show(false);
-            show(this.cancelTplBtn, templateAvail);
         }
 
-        const isRawData = (state.id === TPL_SELECT_STATE);
-        const isForm = (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE);
-        show(this.tplSelectGroup, isRawData);
-        show(this.templateForm, isForm);
+        show(this.tplField, isSelectState && templateAvail);
+        this.createTplBtn.show(isSelectState && templateAvail);
+
+        this.loadingIndicator.show(state.visible && isLoadingState);
+
+        show(this.tplSelectGroup, isSelectState);
+        this.templateForm.show(isFormState);
 
         this.templateSelect.enable(!state.listLoading);
-        this.columnDropDown.enable(!state.listLoading);
-        this.dateFormatSelect.enable(!state.listLoading);
         enable(this.tplNameInp, !state.listLoading);
         this.createTplBtn.enable(!state.listLoading);
-        enable(this.submitTplBtn, !state.listLoading);
-        enable(this.cancelTplBtn, !state.listLoading);
 
         this.tplFilename.textContent = state.filename ?? '';
 
-        this.tplNameInp.value = (state.template) ? state.template.name : '';
+        if (isFormState) {
+            this.templateForm.setState((formState) => ({
+                ...formState,
+                template: state.template,
+                rawData: state.rawData,
+                mainAccount: state.mainAccount,
+                listLoading: state.listLoading,
+            }));
+        }
 
-        // Raw data table
         if (!Array.isArray(state.rawData) || !state.rawData.length) {
             return;
         }
 
-        const scrollLeft = (isForm && this.dataTable)
-            ? this.dataTable.scrollLeft
-            : 0;
-
-        if (isForm) {
-            const dataTable = RawDataTable.create({
-                data: state.rawData,
-                rowsToShow: state.rowsToShow,
-                template: state.template,
-                scrollLeft,
-                onSelectColumn: (index) => this.onDataColumnClick(index),
-            });
-
-            this.rawDataTable.append(dataTable.elem);
-            dataTable.scrollLeft = scrollLeft;
-
-            re(this.dataTable?.elem);
-            this.dataTable = dataTable;
-
-            window.app.setValidation(this.nameField, state.validation.name);
-
-            this.firstRowInp.value = state.template.first_row;
-            enable(this.decFirstRowBtn, state.template.first_row > 1);
-            window.app.setValidation(this.firstRowField, state.validation.firstRow);
-
-            const useTplAccount = state.template.account_id !== 0;
-            this.tplAccountSwitch.check(useTplAccount);
-            show(this.tplAccountField, useTplAccount);
-            if (state.template.account_id !== 0) {
-                this.tplAccountDropDown.setSelection(state.template.account_id);
-            }
-
-            const { selectedColumn } = state;
-            show(this.dateFormatField, selectedColumn === 'date');
-            this.dateFormatSelect.setSelection(state.template.date_locale);
-        } else {
-            re(this.dataTable?.elem);
-        }
-
-        let isValid = false;
+        const { validation } = state;
         if (state.id === LOADING_STATE) {
             this.setTemplateFeedback();
-        } else {
-            isValid = state.validation.valid;
-            if (isValid) {
-                if (state.id === TPL_SELECT_STATE) {
-                    this.setTemplateFeedback(__('TEMPLATE_VALID'), true);
-                } else {
-                    this.setTemplateFormFeedback(__('TEMPLATE_VALID'), true);
-                }
-            } else {
-                this.onInvalidPropertyValue(state, state.validation.column);
-                if (state.id === TPL_SELECT_STATE) {
-                    this.setTemplateFeedback(__('MSG_TPL_NOT_MATCH'), false);
-                }
-            }
-
-            this.columnDropDown.setSelection(state.selectedColumn);
+        } else if (state.id === TPL_SELECT_STATE) {
+            const message = (validation.valid) ? __('TEMPLATE_VALID') : __('MSG_TPL_NOT_MATCH');
+            this.setTemplateFeedback(message, validation.valid);
         }
 
-        const uploadEnabled = state.id === TPL_SELECT_STATE && isValid;
+        const uploadEnabled = state.id === TPL_SELECT_STATE && validation.valid;
         this.accountDropDown.enable(uploadEnabled);
         this.accountDropDown.setSelection(state.mainAccount.id);
         show(this.initialAccField, uploadEnabled);

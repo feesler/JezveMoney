@@ -1,0 +1,31 @@
+/* Template first row field */
+.field.first-row-field {
+  max-width: 150px;
+}
+
+/* Default account switch */
+.field.tpl-form-switch-field {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--input-height);
+
+  .switch {
+    margin: 0;
+  }
+}
+
+.tpl-form-switch__label {
+  font-size: 1.15rem;
+  font-weight: 300;
+  padding: 0.5rem 0;
+  white-space: nowrap;
+}
+
+/* Raw data table field */
+.field.raw-data-field {
+  align-items: normal;
+  max-width: none;
+}
