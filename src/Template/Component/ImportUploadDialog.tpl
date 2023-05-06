@@ -61,8 +61,8 @@
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
             </div>
 
-            <div id="tplAccountSwitchField" class="field form-row tpl-form-switch-field">
-                <span class="tpl-form-switch__label"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
+            <div id="tplAccountSwitchField" class="field form-row horizontal-field">
+                <span class="field__title"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
                 <label id="tplAccountSwitch" class="switch">
                     <input type="checkbox">
                     <div class="switch-slider"></div>

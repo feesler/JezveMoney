@@ -869,12 +869,15 @@ svg * {
   column-gap: 2rem;
 
   .field__title {
-    white-space: nowrap;
     padding: 0.5rem 0;
   }
 
   .dd__container {
     align-self: center;
+  }
+
+  .switch {
+    flex-shrink: 0;
   }
 }
 
