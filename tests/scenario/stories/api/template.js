@@ -1,6 +1,7 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import * as Actions from '../../../actions/api/importtemplate.js';
+import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
 
 const create = async () => {
     setBlock('Create import template', 2);
@@ -9,6 +10,7 @@ const create = async () => {
         name: 'Template 1',
         type_id: 0,
         first_row: 2,
+        date_locale: IMPORT_DATE_LOCALE,
         account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -20,6 +22,7 @@ const create = async () => {
         name: 'Template 2',
         type_id: 1,
         first_row: 2,
+        date_locale: IMPORT_DATE_LOCALE,
         account_id: App.scenario.ACC_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -32,6 +35,7 @@ const create = async () => {
         type_id: 0,
         first_row: 3,
         account_id: 0,
+        date_locale: IMPORT_DATE_LOCALE,
         account_amount_col: 10,
         account_curr_col: 20,
         trans_amount_col: 30,
@@ -54,6 +58,7 @@ const createWithChainedRequest = async () => {
         name: 'Template chained',
         type_id: 0,
         first_row: 2,
+        date_locale: 'en',
         account_id: App.scenario.CASH_RUB,
         account_amount_col: 10,
         account_curr_col: 20,
@@ -112,6 +117,7 @@ const createMultiple = async () => {
         name: 'Template 10',
         type_id: 0,
         first_row: 2,
+        date_locale: IMPORT_DATE_LOCALE,
         account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -123,6 +129,7 @@ const createMultiple = async () => {
         name: 'Template 11',
         type_id: 1,
         first_row: 2,
+        date_locale: IMPORT_DATE_LOCALE,
         account_id: 0,
         account_amount_col: 7,
         account_curr_col: 6,
@@ -134,6 +141,7 @@ const createMultiple = async () => {
         name: 'Template 12',
         type_id: 1,
         first_row: 2,
+        date_locale: 'en',
         account_id: App.scenario.ACCOUNT_1,
         account_amount_col: 1,
         account_curr_col: 2,

@@ -32,10 +32,10 @@
         </div>
     </section>
 
-    <section id="templateBlock" class="tpl-form" hidden>
-        <div id="tplFilename" class="tpl-form__file"></div>
+    <section id="templateBlock" class="upload-form__converter" hidden>
+        <div id="tplFilename" class="converter__file"></div>
 
-        <section id="tplSelectGroup" class="tpl-form__select-group">
+        <section id="tplSelectGroup" class="converter__select-group">
             <div id="tplField" class="field template-field">
                 <header id="tplFieldHeader" class="template-field__header">
                     <label><?= __("TEMPLATE") ?></label>
@@ -44,7 +44,7 @@
             </div>
         </section>
 
-        <section id="templateForm" hidden>
+        <section id="templateForm" class="template-form" hidden>
             <div id="nameField" class="field form-row validation-block">
                 <label for="tplNameInp" class="field__title"><?= __("TEMPLATE_NAME") ?></label>
                 <input id="tplNameInp" class="input stretch-input" type="text" autocomplete="off">
@@ -61,8 +61,8 @@
                 <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_FIRST_ROW") ?></div>
             </div>
 
-            <div id="tplAccountSwitchField" class="field form-row tpl-form-switch-field">
-                <span class="tpl-form-field__label"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
+            <div id="tplAccountSwitchField" class="field form-row horizontal-field">
+                <span class="field__title"><?= __("TEMPLATE_SET_DEFAULT_ACCOUNT") ?></span>
                 <label id="tplAccountSwitch" class="switch">
                     <input type="checkbox">
                     <div class="switch-slider"></div>
@@ -73,14 +73,20 @@
                 <label class="field__title"><?= __("TEMPLATE_DEFAULT_ACCOUNT") ?></label>
             </div>
 
-            <div id="columnField" class="field form-row validation-block">
-                <label for="columnSel" class="field__title"><?= __("TEMPLATE_COLUMN") ?></label>
-                <select id="columnSel">
-                    <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
-                        <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
-                    <?php   }   ?>
-                </select>
-                <div id="columnFeedback" class="feedback invalid-feedback"></div>
+            <div class="form-fields-row">
+                <div id="columnField" class="field form-row validation-block">
+                    <label for="columnSel" class="field__title"><?= __("TEMPLATE_COLUMN") ?></label>
+                    <select id="columnSel">
+                        <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
+                            <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
+                        <?php   }   ?>
+                    </select>
+                    <div id="columnFeedback" class="feedback invalid-feedback"></div>
+                </div>
+
+                <div id="dateFormatField" class="field form-row tpl-date-format-field" hidden>
+                    <label class="field__title"><?= __("TEMPLATE_DATE_FORMAT") ?></label>
+                </div>
             </div>
 
             <div id="rawDataTable" class="field form-row raw-data-field">

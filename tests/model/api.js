@@ -4,17 +4,28 @@ import {
     httpReq,
     assert,
     asArray,
+    isObject,
 } from 'jezve-test';
-import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
 
 /* eslint-disable no-console */
-async function apiRequest(method, url, data = null) {
+async function apiRequest(method, request, data = null) {
     assert(method, 'Method not specified');
-    assert(url, 'API method not specified');
+    assert(request, 'API method not specified');
 
-    const reqUrl = `${baseUrl()}api/${url}`;
-    const response = await httpReq(method, reqUrl, data);
+    const url = new URL(`${baseUrl()}api/${request}`);
+    if (method.toLowerCase() === 'get' && isObject(data)) {
+        Object.entries(data).forEach(([prop, value]) => {
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => url.searchParams.append(arrProp, item));
+            } else {
+                url.searchParams.set(prop, value);
+            }
+        });
+    }
+
+    const response = await httpReq(method, url.toString(), data);
     if (response.status !== 200) {
         throw new Error(`Invalid status code: ${response.status}`);
     }
@@ -37,17 +48,25 @@ const idsRequest = (base, val) => {
         throw new ApiRequestError('Invalid request');
     }
 
+    const res = {
+        request: base,
+    };
+
     const ids = asArray(val);
-    return (ids.length === 1)
-        ? `${base}${ids[0]}`
-        : `${base}?${urlJoin({ id: ids })}`;
+    if (ids.length === 1) {
+        res.request += ids[0].toString();
+    } else {
+        res.options = { id: ids };
+    }
+
+    return res;
 };
 
 export const api = {
     currency: {
         async read(ids) {
-            const apiReq = idsRequest('currency/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('currency/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -79,8 +98,8 @@ export const api = {
 
     icon: {
         async read(ids) {
-            const apiReq = idsRequest('icon/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('icon/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -195,8 +214,8 @@ export const api = {
 
     usercurrency: {
         async read(ids) {
-            const apiReq = idsRequest('usercurrency/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('usercurrency/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -226,8 +245,7 @@ export const api = {
         },
 
         async list(options = {}) {
-            const apiReq = `usercurrency/list?${urlJoin(options)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('usercurrency/list', options);
             return data;
         },
     },
@@ -241,8 +259,8 @@ export const api = {
 
     account: {
         async read(ids) {
-            const apiReq = idsRequest('account/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('account/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -282,16 +300,15 @@ export const api = {
         },
 
         async list(options = {}) {
-            const apiReq = `account/list?${urlJoin(options)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('account/list', options);
             return data;
         },
     },
 
     person: {
         async read(ids) {
-            const apiReq = idsRequest('person/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('person/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -331,16 +348,15 @@ export const api = {
         },
 
         async list(options = {}) {
-            const apiReq = `person/list?${urlJoin(options)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('person/list', options);
             return data;
         },
     },
 
     category: {
         async read(ids) {
-            const apiReq = idsRequest('category/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('category/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -370,16 +386,15 @@ export const api = {
         },
 
         async list(options = {}) {
-            const apiReq = `category/list?${urlJoin(options)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('category/list', options);
             return data;
         },
     },
 
     transaction: {
         async read(ids) {
-            const apiReq = idsRequest('transaction/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('transaction/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -409,8 +424,7 @@ export const api = {
                 reqParams.count = 0;
             }
 
-            const apiReq = `transaction/list?${urlJoin(reqParams)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('transaction/list', reqParams);
             return data;
         },
 
@@ -425,16 +439,15 @@ export const api = {
         },
 
         async statistics(options = {}) {
-            const apiReq = `transaction/statistics?${urlJoin(options)}`;
-            const { data } = await apiGet(apiReq);
+            const { data } = await apiGet('transaction/statistics', options);
             return data;
         },
     },
 
     importrule: {
         async read(ids) {
-            const apiReq = idsRequest('importrule/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('importrule/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -453,17 +466,16 @@ export const api = {
             return response.data ?? {};
         },
 
-        async list(params = {}) {
-            const reqUrl = `importrule/list?${urlJoin(params)}`;
-            const { data } = await apiGet(reqUrl);
+        async list(options = {}) {
+            const { data } = await apiGet('importrule/list', options);
             return data;
         },
     },
 
     importcondition: {
         async read(ids) {
-            const apiReq = idsRequest('importcond/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('importcond/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -496,8 +508,8 @@ export const api = {
 
     importaction: {
         async read(ids) {
-            const apiReq = idsRequest('importaction/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('importaction/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 
@@ -530,8 +542,8 @@ export const api = {
 
     importtemplate: {
         async read(ids) {
-            const apiReq = idsRequest('importtpl/', ids);
-            const { data } = await apiGet(apiReq);
+            const { request, options } = idsRequest('importtpl/', ids);
+            const { data } = await apiGet(request, options);
             return data;
         },
 

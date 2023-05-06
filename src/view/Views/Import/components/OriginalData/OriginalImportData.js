@@ -1,6 +1,5 @@
 import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
-import { IMPORT_DATE_LOCALE } from '../../../../Models/ImportTemplate.js';
 import './OriginalImportData.scss';
 
 /** CSS classes */
@@ -54,6 +53,10 @@ export class OriginalImportData extends Component {
     render() {
         const template = window.app.model.templates.getItem(this.props.template);
         const templateName = (template) ? template.name : '';
+        const dateString = window.app.formatDate(
+            new Date(this.props.date),
+            { locales: template?.date_locale },
+        );
 
         const dataTable = [
             [
@@ -69,13 +72,7 @@ export class OriginalImportData extends Component {
                 [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
             ],
             [
-                [
-                    __('COLUMN_DATE'),
-                    window.app.formatDate(
-                        new Date(this.props.date),
-                        { locales: IMPORT_DATE_LOCALE },
-                    ),
-                ],
+                [__('COLUMN_DATE'), dateString],
             ],
             [
                 [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],

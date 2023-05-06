@@ -432,6 +432,14 @@ svg * {
   margin: var(--form-field-margin);
 }
 
+/* Horizontal group of fields */
+.form-fields-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  column-gap: 1.5rem;
+}
+
 /* Horizontal form separator */
 .form-separator {
   border: 0;
@@ -861,12 +869,15 @@ svg * {
   column-gap: 2rem;
 
   .field__title {
-    white-space: nowrap;
     padding: 0.5rem 0;
   }
 
   .dd__container {
     align-self: center;
+  }
+
+  .switch {
+    flex-shrink: 0;
   }
 }
 

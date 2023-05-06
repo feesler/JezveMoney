@@ -11,6 +11,7 @@ class ImportTemplateItem
     public $account_id = 0;
     public $first_row = 0;
     public $columns = [];
+    public $date_locale = "";
     public $createdate = 0;
     public $updatedate = 0;
 
@@ -42,6 +43,7 @@ class ImportTemplateItem
             "accountCurrency" => intval($row["account_curr_col"]),
             "accountAmount" => intval($row["account_amount_col"]),
         ];
+        $res->date_locale = $row["date_locale"];
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
 

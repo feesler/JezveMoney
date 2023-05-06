@@ -30,10 +30,8 @@ import { Counter } from './component/Counter.js';
 import { SetCategoryDialog } from './component/SetCategoryDialog.js';
 import {
     dateToSeconds,
-    isEmpty,
     secondsToDate,
     shiftMonth,
-    urlJoin,
 } from '../common.js';
 import { __ } from '../model/locale.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
@@ -361,8 +359,7 @@ export class TransactionListView extends AppView {
     }
 
     getExpectedURL(model = this.model) {
-        let res = `${baseUrl()}transactions/`;
-
+        const res = new URL(`${baseUrl()}transactions/`);
         const params = {};
 
         if (model.filter.type.length > 0) {
@@ -400,11 +397,16 @@ export class TransactionListView extends AppView {
             params.mode = 'details';
         }
 
-        if (!isEmpty(params)) {
-            res += `?${urlJoin(params)}`;
-        }
+        Object.entries(params).forEach(([prop, value]) => {
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => res.searchParams.append(arrProp, item));
+            } else {
+                res.searchParams.set(prop, value);
+            }
+        });
 
-        return res;
+        return res.toString();
     }
 
     getExpectedCategory(index, model = this.model) {

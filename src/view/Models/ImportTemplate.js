@@ -8,6 +8,16 @@ import { ImportTemplateError } from './Error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 
 export const IMPORT_DATE_LOCALE = 'ru';
+const availFields = ['id', 'name', 'account_id', 'type_id', 'first_row', 'columns', 'date_locale'];
+
+export const templateColumns = [
+    'accountAmount',
+    'transactionAmount',
+    'accountCurrency',
+    'transactionCurrency',
+    'date',
+    'comment',
+];
 
 /**
  * Import template class
@@ -19,8 +29,6 @@ export class ImportTemplate extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = ['id', 'name', 'account_id', 'type_id', 'first_row', 'columns'];
-
         return typeof field === 'string' && availFields.includes(field);
     }
 
@@ -134,7 +142,7 @@ export class ImportTemplate extends ListItem {
         }
 
         const value = this.getColumnData(data, this.columns.date);
-        return timestampFromString(value, { locales: IMPORT_DATE_LOCALE });
+        return timestampFromString(value, { locales: this.date_locale });
     }
 
     /** Extract comment value from data */

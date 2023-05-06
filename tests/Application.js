@@ -93,10 +93,11 @@ class Application extends TestApplication {
         });
     }
 
-    formatDate(date) {
+    formatDate(date, params = {}) {
         return formatDate(date, {
             locales: this.state.getDateFormatLocale(),
             options: this.dateFormatOptions,
+            ...params,
         });
     }
 

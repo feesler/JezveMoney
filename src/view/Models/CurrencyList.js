@@ -41,11 +41,11 @@ export class CurrencyList extends List {
      * @param {string} code - currency code
      */
     findByCode(code) {
-        const uCode = code?.toUpperCase() ?? null;
-        if (uCode === null) {
+        if (typeof code !== 'string' || code.length === 0) {
             return null;
         }
 
+        const uCode = code.toUpperCase();
         return this.find((item) => item.code.toUpperCase() === uCode);
     }
 }

@@ -3,11 +3,11 @@ import {
     isObject,
     hasFlag,
     assert,
+    isDate,
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { dateToSeconds, fixFloat } from '../common.js';
 import { __ } from './locale.js';
-import { ImportTemplate } from './ImportTemplate.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -219,9 +219,8 @@ export class ImportCondition {
         }
 
         const res = data[mapper];
-        if (this.isDateField(fieldId) && typeof res === 'string') {
-            const date = ImportTemplate.dateFromString(res);
-            return dateToSeconds(date);
+        if (this.isDateField(fieldId) && isDate(res)) {
+            return dateToSeconds(res);
         }
 
         return res;

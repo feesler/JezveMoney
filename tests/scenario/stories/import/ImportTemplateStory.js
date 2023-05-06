@@ -1,6 +1,7 @@
 import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../../../actions/import/index.js';
 import { api } from '../../../model/api.js';
+import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
 import { App } from '../../../Application.js';
 
 export class ImportTemplateStory extends TestStory {
@@ -41,6 +42,7 @@ export class ImportTemplateStory extends TestStory {
 
         await this.autoSelect();
         await this.firstRow();
+        await this.dateLocale();
 
         await this.resetAccounts();
     }
@@ -139,6 +141,7 @@ export class ImportTemplateStory extends TestStory {
         await api.importtemplate.create({
             name: 'Template_Account',
             first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
             account_id: App.scenario.ACC_RUB,
             account_amount_col: 6,
             account_curr_col: 5,
@@ -179,6 +182,29 @@ export class ImportTemplateStory extends TestStory {
         await Actions.deleteAllItems();
     }
 
+    // Template date locale option test
+    async dateLocale() {
+        setBlock('Template date locale option', 2);
+
+        const { enLocaleFile, ACC_USD } = App.scenario;
+
+        await Actions.uploadFile(enLocaleFile);
+        await Actions.addTemplate({
+            name: 'Template_EN',
+            accountAmount: 6,
+            transactionAmount: 4,
+            accountCurrency: 5,
+            transactionCurrency: 3,
+            date: 1,
+            comment: 2,
+            date_locale: 'en',
+        });
+
+        await Actions.selectUploadAccount(ACC_USD);
+        await Actions.submitUploaded(enLocaleFile);
+        await Actions.deleteAllItems();
+    }
+
     // Template first row option test
     async resetAccounts() {
         setBlock('Check templates after delete and reset accounts', 2);
@@ -208,6 +234,7 @@ export class ImportTemplateStory extends TestStory {
         await api.importtemplate.create({
             name: 'Template_Acc_1',
             first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
             account_id: account1,
             account_amount_col: 11,
             account_curr_col: 10,
@@ -220,6 +247,7 @@ export class ImportTemplateStory extends TestStory {
         await api.importtemplate.create({
             name: 'Template_Acc_2',
             first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
             account_id: account2,
             account_amount_col: 11,
             account_curr_col: 10,

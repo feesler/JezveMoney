@@ -6,7 +6,6 @@ import {
 import { App } from '../../../Application.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
-import { formatCsvDate } from '../../../model/import.js';
 
 export class OriginalImportData extends TestComponent {
     getLabelsMap() {
@@ -55,7 +54,6 @@ export class OriginalImportData extends TestComponent {
             ...cont,
             accountAmount: ImportTemplate.amountFix(cont.accountAmount),
             transactionAmount: ImportTemplate.amountFix(cont.transactionAmount),
-            date: formatCsvDate(ImportTemplate.dateFromString(cont.date)),
         };
 
         const template = App.state.templates.find((item) => item.name === cont.template);
@@ -64,6 +62,8 @@ export class OriginalImportData extends TestComponent {
 
         res.origAccount = App.state.accounts.findByName(res.mainAccount);
         assert(res.origAccount, `Account ${res.mainAccount} not found`);
+
+        res.date = ImportTemplate.dateFromString(cont.date, template.date_locale);
 
         return res;
     }

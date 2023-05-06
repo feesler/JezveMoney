@@ -6,7 +6,6 @@ import {
     prop,
     click,
     input,
-    select,
     isVisible,
     wait,
     waitForFunction,
@@ -22,9 +21,8 @@ import {
     Switch,
 } from 'jezvejs-test';
 import { App } from '../../../Application.js';
-import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
-import { ImportTemplate } from '../../../model/ImportTemplate.js';
+import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
 
 export const BROWSE_FILE_STATE = 1;
@@ -81,7 +79,10 @@ export class ImportUploadDialog extends TestComponent {
             tplAccountSel: await DropDown.create(this, await query('#tplAccountField .dd__container')),
             // Template column field
             columnField: { elem: await query('#columnField') },
-            columnSel: { elem: await query('#columnSel') },
+            columnSel: await DropDown.create(this, await query('#columnField .dd__container')),
+            // Template date format field
+            dateFormatField: { elem: await query('#dateFormatField') },
+            dateFormatSel: await DropDown.create(this, await query('#dateFormatField .dd__container')),
             // Template form
             rawDataTable: { elem: await query('#rawDataTable') },
             createTplBtn: { elem: await query('#createTplBtn') },
@@ -111,13 +112,26 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         res.uploadProgress = { elem: await query(this.elem, ':scope > .loading-indicator') };
-        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
+        res.loadingIndicator = { elem: await query(this.elem, '.upload-form__converter > .loading-indicator') };
 
         res.useServerAddress = res.useServerCheck.checked;
         res.encode = res.isEncodeCheck.checked;
-        res.templateBlock.visible = await isVisible(res.templateBlock.elem, true);
-        res.uploadProgress.visible = await isVisible(res.uploadProgress.elem, true);
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
+
+        [
+            res.templateBlock.visible,
+            res.templateForm.visible,
+            res.uploadProgress.visible,
+            res.loadingIndicator.visible,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => el && !el.hidden),
+            res.templateBlock.elem,
+            res.templateForm.elem,
+            res.uploadProgress.elem,
+            res.loadingIndicator.elem,
+        );
+
+        const formVisible = res.templateForm.visible;
+
         res.isLoading = (
             res.uploadProgress.visible
             || (res.templateBlock.visible && res.loadingIndicator.visible)
@@ -173,7 +187,7 @@ export class ImportUploadDialog extends TestComponent {
         res.isTplLoading = res.templateDropDown.disabled;
 
         res.columns = null;
-        if (res.templateBlock.visible && !res.isLoading) {
+        if (formVisible && !res.isLoading) {
             res.columns = await asyncMap(
                 await queryAll(res.rawDataTable.elem, '.raw-data-table__data .raw-data-column'),
                 async (elem) => this.parseRawDataTableColumn(elem),
@@ -190,9 +204,12 @@ export class ImportUploadDialog extends TestComponent {
         if (res.isLoading) {
             res.state = LOADING_STATE;
         } else if (res.templateBlock.visible) {
-            if (res.tplFormTitle.title === __('TEMPLATE_CREATE', App.view.locale)) {
+            const createTplTitle = __('TEMPLATE_CREATE', App.view.locale);
+            const updateTplTitle = __('TEMPLATE_UPDATE', App.view.locale);
+
+            if (formVisible && res.tplFormTitle.title === createTplTitle) {
                 res.state = CREATE_TPL_STATE;
-            } else if (res.tplFormTitle.title === __('TEMPLATE_UPDATE', App.view.locale)) {
+            } else if (formVisible && res.tplFormTitle.title === updateTplTitle) {
                 res.state = UPDATE_TPL_STATE;
             } else {
                 res.state = CONVERT_STATE;
@@ -249,18 +266,22 @@ export class ImportUploadDialog extends TestComponent {
         res.selectedTemplateId = cont.templateDropDown?.value ?? 0;
 
         res.template = (cont.state === CREATE_TPL_STATE)
-            ? {}
+            ? new ImportTemplate({})
             : App.state.templates.getItem(res.selectedTemplateId);
 
         if (
             (cont.state === CREATE_TPL_STATE || cont.state === UPDATE_TPL_STATE)
             && res.template
         ) {
+            res.selectedColumn = cont.columnSel.value;
+
             res.template.name = cont.tplNameInp.value;
             res.template.first_row = parseInt(cont.firstRowInp.value, 10);
             res.template.account_id = (cont.tplAccountSwitch.checked)
                 ? parseInt(cont.tplAccountSel.value, 10)
                 : 0;
+
+            res.template.date_locale = cont.dateFormatSel.value;
 
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
@@ -352,6 +373,8 @@ export class ImportUploadDialog extends TestComponent {
         const isLoadingState = model.state === LOADING_STATE;
         const isConvertState = model.state === CONVERT_STATE;
         const isFormState = this.isTemplateFormState(model);
+        const isDateFormatColumn = model.selectedColumn === 'date';
+
         const res = {
             uploadFormBrowser: { visible: isBrowseState },
             isEncodeCheck: { visible: isBrowseState },
@@ -371,6 +394,7 @@ export class ImportUploadDialog extends TestComponent {
         res.nameField = { visible: isFormState };
         res.firstRowField = { visible: isFormState };
         res.columnField = { visible: isFormState };
+        res.dateFormatField = { visible: isFormState && isDateFormatColumn };
         res.tplFormFeedback = { visible: isFormState };
         res.submitTplBtn = { visible: isFormState };
 
@@ -415,6 +439,11 @@ export class ImportUploadDialog extends TestComponent {
             if (useAccount) {
                 res.tplAccountSel.value = model.template.account_id.toString();
             }
+
+            res.dateFormatSel = {
+                visible: isDateFormatColumn,
+                value: model.template.date_locale,
+            };
         }
 
         if (isBrowseState) {
@@ -447,48 +476,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     isValidTemplate(template = this.model.template) {
-        if (!template || !template.columns) {
-            return false;
-        }
-
-        if (template.name.length === 0) {
-            return false;
-        }
-        if (Number.isNaN(template.first_row) || template.first_row < 1) {
-            return false;
-        }
-
-        const tplProp = [
-            'accountAmount',
-            'transactionAmount',
-            'accountCurrency',
-            'transactionCurrency',
-            'date',
-            'comment',
-        ];
-
-        const [dataRow] = this.parent.fileData.slice(template.first_row, template.first_row + 1);
-        const fileColumns = dataRow?.length ?? 0;
-
-        return tplProp.every((property) => {
-            if (!(property in template.columns)) {
-                return false;
-            }
-
-            const propValue = template.columns[property];
-            if (propValue < 1 || propValue > fileColumns) {
-                return false;
-            }
-
-            if (property === 'accountAmount' || property === 'transactionAmount') {
-                const val = dataRow[propValue - 1];
-                if (!parseFloat(fixFloat(val))) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
+        return template?.isValid(this.parent.fileData);
     }
 
     async close() {
@@ -534,12 +522,14 @@ export class ImportUploadDialog extends TestComponent {
             this.model.isValid = !!template;
         } else {
             this.model.state = CREATE_TPL_STATE;
-            this.model.template = {
+            this.model.selectedColumn = 'accountAmount';
+            this.model.template = new ImportTemplate({
                 name: '',
                 account_id: 0,
                 first_row: 2,
+                date_locale: IMPORT_DATE_LOCALE,
                 columns: {},
-            };
+            });
         }
         this.expectedState = this.getExpectedState(this.model);
 
@@ -547,7 +537,7 @@ export class ImportUploadDialog extends TestComponent {
             await click(this.content.serverUploadBtn.elem);
 
             await wait('#templateBlock', { visible: true });
-            await wait('.tpl-form > .loading-indicator', { hidden: true });
+            await wait('.upload-form__converter > .loading-indicator', { hidden: true });
         });
 
         return this.checkState();
@@ -578,11 +568,13 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = CREATE_TPL_STATE;
-        this.model.template = {
+        this.model.selectedColumn = 'accountAmount';
+        this.model.template = new ImportTemplate({
             name: '',
             first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
             columns: {},
-        };
+        });
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => click(this.content.createTplBtn.elem));
@@ -602,6 +594,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = UPDATE_TPL_STATE;
+        this.model.selectedColumn = 'accountAmount';
         this.model.template = App.state.templates.getItem(this.content.templateDropDown.value);
         this.expectedState = this.getExpectedState(this.model);
 
@@ -616,11 +609,13 @@ export class ImportUploadDialog extends TestComponent {
 
         if (this.content.templateDropDown.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
-            this.model.template = {
+            this.model.selectedColumn = 'accountAmount';
+            this.model.template = new ImportTemplate({
                 name: '',
                 first_row: 2,
+                date_locale: IMPORT_DATE_LOCALE,
                 columns: {},
-            };
+            });
         } else {
             this.model.state = CONVERT_STATE;
             const currentInd = this.content.templateDropDown.items.findIndex(
@@ -666,14 +661,29 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.columns[name] = index;
+        const invalidColumn = this.model.template.getFirstInvalidColumn(this.parent.fileData);
+        if (invalidColumn !== null) {
+            this.model.selectedColumn = invalidColumn;
+        }
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => select(this.content.columnSel.elem, name.toString()));
+        await this.performAction(() => this.content.columnSel.selectItem(name));
 
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.columns, ind - 1);
 
         await this.performAction(() => click(this.content.columns[ind - 1].elem));
+
+        return this.checkState();
+    }
+
+    async selectTemplateDateFormat(locale) {
+        this.checkTplFormState();
+
+        this.model.template.date_locale = locale;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => this.content.dateFormatSel.selectItem(locale));
 
         return this.checkState();
     }
@@ -754,10 +764,13 @@ export class ImportUploadDialog extends TestComponent {
 
     async submitTemplate() {
         const disabled = await prop(this.content.submitTplBtn.elem, 'disabled');
-        assert(!disabled, 'Submit template button is disabled');
 
         const { template } = this.model;
         this.model.isValid = this.isValidTemplate(template);
+        if (!this.model.isValid && disabled) {
+            return true;
+        }
+
         if (this.model.isValid) {
             this.model.state = CONVERT_STATE;
 
@@ -766,15 +779,16 @@ export class ImportUploadDialog extends TestComponent {
             }
         }
 
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState(this.model);
 
+        assert(!disabled, 'Submit template button is disabled');
         await click(this.content.submitTplBtn.elem);
         await waitForFunction(async () => {
             await this.parse();
             return !this.model.isTplLoading;
         });
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     getCurrentState() {

@@ -648,6 +648,14 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    async selectTemplateDateFormat(locale) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.selectTemplateDateFormat(locale));
+
+        return this.checkState();
+    }
+
     async inputTemplateFirstRow(val) {
         this.checkUploadState();
 

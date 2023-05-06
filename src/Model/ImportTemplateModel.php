@@ -78,6 +78,7 @@ class ImportTemplateModel extends CachedTable
             "name",
             "type_id",
             "account_id",
+            "date_locale",
         ]);
         $res = [];
 
@@ -90,6 +91,13 @@ class ImportTemplateModel extends CachedTable
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
                 throw new \Error("Invalid name specified");
+            }
+        }
+
+        if (isset($params["date_locale"]) || is_null($params["date_locale"])) {
+            $res["date_locale"] = $this->dbObj->escape($params["date_locale"]);
+            if (is_empty($res["date_locale"])) {
+                throw new \Error("Invalid date locale specified");
             }
         }
 

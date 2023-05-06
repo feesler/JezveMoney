@@ -1,11 +1,11 @@
 /* Import template section */
-.tpl-form {
+.upload-form__converter {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
 
   /* Uploaded file name */
-  .tpl-form__file {
+  .converter__file {
     font-size: 0.9rem;
     color: #7b7b7b;
     margin: var(--form-field-margin);
@@ -50,40 +50,8 @@
   }
 }
 
-/* Template first row field */
-.field.first-row-field {
-  max-width: 150px;
-}
-
-/* Default account switch */
-.field.tpl-form-switch-field {
-  align-items: center;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-  width: 100%;
-  min-height: var(--input-height);
-
-  .switch {
-    margin: 0;
-  }
-}
-
-.tpl-form-switch__label {
-  font-size: 1.15rem;
-  font-weight: 300;
-  padding: 0.5rem 0.75rem;
-  white-space: nowrap;
-}
-
-/* Raw data table field */
-.field.raw-data-field {
-  align-items: normal;
-  max-width: none;
-}
-
 /* Template select */
-.tpl-form__select-group {
+.converter__select-group {
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;

@@ -1,20 +1,22 @@
-import { assert, copyObject } from 'jezve-test';
+import { assert, copyObject, isDate } from 'jezve-test';
 import { fixFloat, fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';
-import { formatCsvDate } from './import.js';
 
 export const tplColumns = [
     'accountAmount',
-    'accountCurrency',
     'transactionAmount',
+    'accountCurrency',
     'transactionCurrency',
     'date',
     'comment',
 ];
 
 export const IMPORT_DATE_LOCALE = 'ru';
+
+const amountColumns = ['accountAmount', 'transactionAmount'];
+const currencyColumns = ['accountCurrency', 'transactionCurrency'];
 
 /** Import template model */
 export class ImportTemplate {
@@ -26,6 +28,7 @@ export class ImportTemplate {
         this.type_id = data.type_id;
         this.account_id = data.account_id;
         this.first_row = data.first_row;
+        this.date_locale = data.date_locale;
         this.columns = copyObject(data.columns);
     }
 
@@ -36,23 +39,44 @@ export class ImportTemplate {
     }
 
     /** Obtain date value from raw data */
-    static dateFromString(str) {
+    static dateFromString(str, locales = []) {
         let tmpDate = str;
         const pos = str.indexOf(' ');
         if (pos !== -1) {
             tmpDate = tmpDate.substring(0, pos);
         }
 
-        const timestamp = fixDate(tmpDate, { locales: IMPORT_DATE_LOCALE });
+        const timestamp = fixDate(tmpDate, { locales });
         return (timestamp) ? (new Date(timestamp)) : null;
     }
 
-    /** Extract specified column data from raw data row */
-    static getColumn(row, colInd) {
-        const col = parseInt(colInd, 10);
-        assert.arrayIndex(row, col - 1, `Invalid column ${colInd}. Total columns: ${row.length}`);
+    static isValidAmount(value) {
+        const amount = this.amountFix(value);
+        return !Number.isNaN(amount) && amount !== 0;
+    }
 
-        return row[col - 1];
+    static isValidCurrency(value) {
+        return App.currency.findByCode(value);
+    }
+
+    static isValidDate(value, locale) {
+        const date = this.dateFromString(value, locale);
+        return isDate(date);
+    }
+
+    /** Extract specified column data from raw data row */
+    static getColumn(row, colInd, safe = false) {
+        try {
+            const col = parseInt(colInd, 10);
+            assert.arrayIndex(row, col - 1, `Invalid column ${colInd}. Total columns: ${row.length}`);
+            return row[col - 1];
+        } catch (e) {
+            if (safe) {
+                return null;
+            }
+
+            throw e;
+        }
     }
 
     getRowData(row) {
@@ -63,10 +87,10 @@ export class ImportTemplate {
 
             let value = ImportTemplate.getColumn(row, this.columns[column]);
 
-            if (['accountAmount', 'transactionAmount'].includes(column)) {
+            if (amountColumns.includes(column)) {
                 value = ImportTemplate.amountFix(value);
             } else if (column === 'date') {
-                value = formatCsvDate(ImportTemplate.dateFromString(value));
+                value = ImportTemplate.dateFromString(value, this.date_locale);
             }
 
             res[column] = value;
@@ -75,36 +99,39 @@ export class ImportTemplate {
         return res;
     }
 
-    isValid(data) {
+    getFirstInvalidColumn(data) {
         assert.isArray(data, 'Invalid data');
 
-        try {
-            const start = this.first_row - 1;
-            const [row] = data.slice(start, start + 1);
-            const rowData = this.getRowData(row);
+        const start = this.first_row - 1;
+        const [row] = data.slice(start, start + 1);
 
-            const accCurrency = App.currency.findByCode(rowData.accountCurrency);
-            if (!accCurrency) {
-                return false;
-            }
-            const trCurrency = App.currency.findByCode(rowData.transactionCurrency);
-            if (!trCurrency) {
-                return false;
-            }
-            if (
-                Number.isNaN(rowData.accountAmount)
-                || rowData.accountAmount === 0
-                || Number.isNaN(rowData.transactionAmount)
-                || rowData.transactionAmount === 0
-                || rowData.date == null
-            ) {
-                return false;
-            }
-        } catch (e) {
+        const res = tplColumns.find((column) => {
+            const value = ImportTemplate.getColumn(row, this.columns[column], true);
+            return (
+                (value === null)
+                || (amountColumns.includes(column) && !ImportTemplate.isValidAmount(value))
+                || (currencyColumns.includes(column) && !ImportTemplate.isValidCurrency(value))
+                || (column === 'date' && !ImportTemplate.isValidDate(value, this.date_locale))
+            );
+        });
+
+        return res ?? null;
+    }
+
+    isValid(data) {
+        if (!this.columns) {
             return false;
         }
 
-        return true;
+        if (typeof this.name !== 'string' || this.name.length === 0) {
+            return false;
+        }
+
+        if (Number.isNaN(this.first_row) || this.first_row < 1) {
+            return false;
+        }
+
+        return (this.getFirstInvalidColumn(data) === null);
     }
 
     /**

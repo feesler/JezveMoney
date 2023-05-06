@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 25);
+define("DB_VERSION", 26);
 
 /**
  * Database version manager class
@@ -865,6 +865,37 @@ class DBVersion
     }
 
     /**
+     * Creates database version 26
+     *
+     * @return int
+     */
+    private function version26()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $defaultDateLocale = "ru";
+        $tableName = "import_tpl";
+        $res = $this->dbClient->addColumns(
+            $tableName,
+            ["date_locale" => "VARCHAR(64) NOT NULL"],
+        );
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        $res = $this->dbClient->updateQ($tableName, [
+            "date_locale=" . qnull($defaultDateLocale),
+        ]);
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        return 26;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1225,6 +1256,7 @@ class DBVersion
                 "trans_amount_col" => "INT(11) NOT NULL DEFAULT '0'",
                 "account_curr_col" => "INT(11) NOT NULL DEFAULT '0'",
                 "account_amount_col" => "INT(11) NOT NULL DEFAULT '0'",
+                "date_locale" => "VARCHAR(64) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
