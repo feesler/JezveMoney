@@ -98,6 +98,16 @@
   flex-basis: 350px;
 }
 
+/* Statistics widget */
+.statistics-widget {
+  flex-basis: 350px;
+}
+
+.widget_charts {
+  display: flex;
+  width: 100%;
+}
+
 @media (hover: hover) {
   .widget_title-link:hover {
     color: var(--main-text-color);
