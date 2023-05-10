@@ -631,7 +631,7 @@ export class AppState {
      * User currencies
      */
 
-    checkUserCurrencyCorrectness(params) {
+    validateUserCurrency(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -653,7 +653,7 @@ export class AppState {
     }
 
     createUserCurrency(params) {
-        const resExpected = this.checkUserCurrencyCorrectness(params);
+        const resExpected = this.validateUserCurrency(params);
         if (!resExpected) {
             return false;
         }
@@ -677,7 +677,7 @@ export class AppState {
         const data = copyFields(params, uCurrReqFields);
         Object.assign(expectedItem, data);
 
-        const resExpected = this.checkUserCurrencyCorrectness(expectedItem);
+        const resExpected = this.validateUserCurrency(expectedItem);
         if (!resExpected) {
             return false;
         }
@@ -731,7 +731,7 @@ export class AppState {
      * Accounts
      */
 
-    checkAccountCorrectness(params) {
+    validateAccount(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -782,7 +782,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkAccountCorrectness(itemData);
+        const resExpected = this.validateAccount(itemData);
         if (!resExpected) {
             return false;
         }
@@ -812,7 +812,7 @@ export class AppState {
         data.owner_id = this.profile.owner_id;
         Object.assign(expAccount, data);
 
-        const resExpected = this.checkAccountCorrectness(expAccount);
+        const resExpected = this.validateAccount(expAccount);
         if (!resExpected) {
             return false;
         }
@@ -1023,7 +1023,7 @@ export class AppState {
      * Persons
      */
 
-    checkPersonCorrectness(params) {
+    validatePerson(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -1054,7 +1054,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkPersonCorrectness(itemData);
+        const resExpected = this.validatePerson(itemData);
         if (!resExpected) {
             return false;
         }
@@ -1079,7 +1079,7 @@ export class AppState {
         const data = copyFields(params, pReqFields);
         Object.assign(expPerson, data);
 
-        const resExpected = this.checkPersonCorrectness(expPerson);
+        const resExpected = this.validatePerson(expPerson);
         if (!resExpected) {
             return false;
         }
@@ -1279,7 +1279,7 @@ export class AppState {
      * Categories
      */
 
-    checkCategoryCorrectness(params) {
+    validateCategory(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -1331,7 +1331,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkCategoryCorrectness(itemData);
+        const resExpected = this.validateCategory(itemData);
         if (!resExpected) {
             return false;
         }
@@ -1354,7 +1354,7 @@ export class AppState {
         const data = copyFields(params, catReqFields);
         Object.assign(expItem, data);
 
-        const resExpected = this.checkCategoryCorrectness(expItem);
+        const resExpected = this.validateCategory(expItem);
         if (!resExpected) {
             return false;
         }
@@ -1517,7 +1517,7 @@ export class AppState {
         return this.profile.settings.tr_group_by_date === 1;
     }
 
-    checkTransactionCorrectness(params) {
+    validateTransaction(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -1764,7 +1764,7 @@ export class AppState {
             ...params,
         };
 
-        let resExpected = this.checkTransactionCorrectness(itemData);
+        let resExpected = this.validateTransaction(itemData);
         if (!resExpected) {
             return false;
         }
@@ -1805,7 +1805,7 @@ export class AppState {
         const updTrans = this.transactionToRequest(origTrans);
         Object.assign(updTrans, params);
 
-        const correct = this.checkTransactionCorrectness(updTrans);
+        const correct = this.validateTransaction(updTrans);
         if (!correct) {
             return false;
         }
@@ -1907,7 +1907,7 @@ export class AppState {
      * Scheduled transactions
      */
 
-    checkScheduledTransactionCorrectness(params) {
+    validateScheduledTransaction(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -2057,7 +2057,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkScheduledTransactionCorrectness(itemData);
+        const resExpected = this.validateScheduledTransaction(itemData);
         if (!resExpected) {
             return false;
         }
@@ -2079,7 +2079,7 @@ export class AppState {
         const data = copyFields(params, scheduledTrReqFields);
         Object.assign(expItem, data);
 
-        const resExpected = this.checkScheduledTransactionCorrectness(expItem);
+        const resExpected = this.validateScheduledTransaction(expItem);
         if (!resExpected) {
             return false;
         }
@@ -2108,7 +2108,7 @@ export class AppState {
     /**
      * Import templates
      */
-    checkTemplateCorrectness(params) {
+    validateTemplate(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -2177,7 +2177,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkTemplateCorrectness(itemData);
+        const resExpected = this.validateTemplate(itemData);
         if (!resExpected) {
             return false;
         }
@@ -2236,7 +2236,7 @@ export class AppState {
             });
         }
 
-        const resExpected = this.checkTemplateCorrectness(expTemplate);
+        const resExpected = this.validateTemplate(expTemplate);
         if (!resExpected) {
             return false;
         }
@@ -2266,7 +2266,7 @@ export class AppState {
     /**
      * Import rules
      */
-    checkRuleCorrectness(params) {
+    validateRule(params) {
         if (!checkFields(params, ruleReqFields)) {
             return false;
         }
@@ -2319,7 +2319,7 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkRuleCorrectness(itemData);
+        const resExpected = this.validateRule(itemData);
         if (!resExpected) {
             return false;
         }
@@ -2344,7 +2344,7 @@ export class AppState {
         const data = copyFields(params, ruleReqFields);
         Object.assign(expRule, data);
 
-        const resExpected = this.checkRuleCorrectness(expRule);
+        const resExpected = this.validateRule(expRule);
         if (!resExpected) {
             return false;
         }

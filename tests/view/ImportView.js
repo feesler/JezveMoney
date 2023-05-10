@@ -1097,7 +1097,7 @@ export class ImportView extends AppView {
         }
 
         const expectedTransaction = this.transactionForm.getExpectedTransaction();
-        const isValid = App.state.checkTransactionCorrectness(expectedTransaction);
+        const isValid = App.state.validateTransaction(expectedTransaction);
         if (isValid) {
             return true;
         }
