@@ -10,6 +10,7 @@ use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
@@ -221,6 +222,23 @@ class Profile extends ApiController
     }
 
     /**
+     * Removes all scheduled transactions of user
+     */
+    private function resetScheduledTransactions()
+    {
+        $model = ScheduledTransactionModel::getInstance();
+        $result = false;
+        try {
+            $result = $model->reset();
+        } catch (\Error $e) {
+            wlog("Reset scheduled transactions error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(__("ERR_PROFILE_RESET"));
+        }
+    }
+
+    /**
      * Removes all import templates of user
      */
     private function resetImportTemplates()
@@ -269,6 +287,7 @@ class Profile extends ApiController
             "persons",
             "categories",
             "transactions",
+            "scheduledTransactions",
             "keepbalance",
             "importtpl",
             "importrules"
@@ -294,6 +313,9 @@ class Profile extends ApiController
         }
         if ($request["transactions"]) {
             $this->resetTransactions($request["keepbalance"]);
+        }
+        if ($request["scheduledTransactions"]) {
+            $this->resetScheduledTransactions();
         }
         if ($request["importtpl"]) {
             $this->resetImportTemplates();

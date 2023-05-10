@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 26);
+define("DB_VERSION", 27);
 
 /**
  * Database version manager class
@@ -61,6 +61,7 @@ class DBVersion
             $this->createAccountsTable();
             $this->createPersonsTable();
             $this->createTransactionsTable();
+            $this->createScheduledTransactionsTable();
             $this->createCategoriesTable();
             $this->createUsersTable();
             $this->createUserSettingsTable();
@@ -896,6 +897,18 @@ class DBVersion
     }
 
     /**
+     * Creates database version 27
+     *
+     * @return int
+     */
+    private function version27()
+    {
+        $this->createScheduledTransactionsTable();
+
+        return 27;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1031,12 +1044,57 @@ class DBVersion
                 "src_curr" => "INT(11) NOT NULL",
                 "dest_curr" => "INT(11) NOT NULL",
                 "date" => "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
+                "category_id" => "INT(11) NOT NULL",
                 "comment" => "text NOT NULL",
                 "pos" => "INT(11) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "src_result" => DECIMAL_TYPE . " NOT NULL",
                 "dest_result" => DECIMAL_TYPE . " NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates transactions table
+     */
+    private function createScheduledTransactionsTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "scheduled_transactions";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "src_id" => "INT(11) NOT NULL",
+                "dest_id" => "INT(11) NOT NULL",
+                "type" => "INT(11) NOT NULL",
+                "src_amount" => DECIMAL_TYPE . " NOT NULL",
+                "dest_amount" => DECIMAL_TYPE . " NOT NULL",
+                "src_curr" => "INT(11) NOT NULL",
+                "dest_curr" => "INT(11) NOT NULL",
+                "category_id" => "INT(11) NOT NULL",
+                "comment" => "text NOT NULL",
+                "interval_type" => "INT(11) NOT NULL",
+                "interval_step" => "INT(11) NOT NULL",
+                "interval_offset" => "INT(11) NOT NULL",
+                "start_date" => "DATETIME NOT NULL",
+                "end_date" => "DATETIME NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,

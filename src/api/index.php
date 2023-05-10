@@ -19,6 +19,7 @@ $router->setRoutes([
     "account" => "Account",
     "person" => "Person",
     "transaction" => "Transaction",
+    "scheduledtransaction" => "ScheduledTransaction",
     "category" => "Category",
     "user" => "User",
     "profile" => "Profile",

@@ -41,12 +41,12 @@ class TransactionModel extends SortableModel
 {
     use Singleton;
 
-    private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $srcMandatoryTypes = [EXPENSE, TRANSFER];
+    public static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $srcMandatoryTypes = [EXPENSE, TRANSFER];
 
-    private static $destAvailTypes = [INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $destMandatoryTypes = [INCOME, TRANSFER];
+    public static $destAvailTypes = [INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $destMandatoryTypes = [INCOME, TRANSFER];
 
     private static $availReports = ["account", "currency", "category"];
 
@@ -260,6 +260,16 @@ class TransactionModel extends SortableModel
 
         if ($srcCurrId === $destCurrId && $srcAmount != $destAmount) {
             throw new \Error("src_amount and dest_amount must be equal when src_curr and dest_curr are same");
+        }
+
+        if (
+            $res["type"] === DEBT
+            && $srcAcc
+            && $srcAcc->owner_id !== self::$owner_id
+            && $destAcc
+            && $destAcc->owner_id !== self::$owner_id
+        ) {
+            throw new \Error("Both source and destination accounts are owned by persons");
         }
 
         if (isset($params["date"])) {

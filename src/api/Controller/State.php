@@ -9,6 +9,7 @@ use JezveMoney\Core\DBVersion;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\CategoryModel;
@@ -140,6 +141,18 @@ class State extends ApiController
     protected function getCategories(array $options = [])
     {
         return $this->getList(CategoryModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns planed transactions data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getScheduledTransactions(array $options = [])
+    {
+        return $this->getList(ScheduledTransactionModel::getInstance(), $options);
     }
 
     /**
@@ -318,6 +331,7 @@ class State extends ApiController
             "accounts" => ["autoIncrement" => true],
             "persons" => ["autoIncrement" => true],
             "transactions" => ["count" => 0, "autoIncrement" => true],
+            "scheduledtransactions" => ["autoIncrement" => true],
             "categories" => ["autoIncrement" => true],
             "importtemplates" => ["autoIncrement" => true],
             "importrules" => ["autoIncrement" => true],
@@ -388,6 +402,10 @@ class State extends ApiController
         // Categories
         if (isset($request["categories"])) {
             $res->categories = $this->getCategories($request["categories"]);
+        }
+        // Scheduled transactions
+        if (isset($request["scheduledtransactions"])) {
+            $res->scheduledtransactions = $this->getScheduledTransactions($request["scheduledtransactions"]);
         }
         // Import templates
         if (isset($request["importtemplates"])) {

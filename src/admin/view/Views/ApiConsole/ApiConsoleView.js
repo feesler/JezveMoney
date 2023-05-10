@@ -72,6 +72,7 @@ class AdminApiConsoleView extends AdminView {
         this.initPersonForms();
         this.initCategoryForms();
         this.initTransactionForms();
+        this.initScheduledTransactionForms();
         this.initTemplateForms();
         this.initRuleForms();
         this.initConditionForms();
@@ -212,6 +213,32 @@ class AdminApiConsoleView extends AdminView {
                 enable('statistics_cat', (value === 'account'));
             },
         });
+    }
+
+    /** Initialization of forms for Scheduled Transaction API controller */
+    initScheduledTransactionForms() {
+        this.initForm(
+            '#listScheduledTrForm > form',
+            this.getVerifyHandler(apiTypes.isScheduledTransactionsArray),
+        );
+
+        // Read scheduled transactions by ids form
+        const readtransbtn = ge('readScheduledTransBtn');
+        if (!readtransbtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readtransbtn, {
+            click: (e) => this.onReadItemsSubmit(
+                e,
+                'read_scheduled_trans_id',
+                'scheduledtransaction/',
+                apiTypes.isScheduledTransactionsArray,
+            ),
+        });
+
+        this.initForm('#createScheduledTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateScheduledTrForm > form');
+        this.initIdsForm('#delScheduledTrForm > form');
     }
 
     /** Initialization of forms for Import template API controller */

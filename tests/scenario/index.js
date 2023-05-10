@@ -12,6 +12,7 @@ import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createCategories } from './data/categories.js';
 import { createTransactions } from './data/transactions.js';
+import { createScheduledTransactions } from './data/scheduledTransactions.js';
 import {
     getAccountCSV,
     getCardCSV,
@@ -233,6 +234,11 @@ export class Scenario {
         await createTransactions();
     }
 
+    /** Creates common test scheduled transactions */
+    async createScheduledTransactions() {
+        await createScheduledTransactions();
+    }
+
     /** Creates import templates */
     async createImportTemplates() {
         await createImportTemplates();
@@ -250,6 +256,7 @@ export class Scenario {
         await createPersons();
         await createCategories();
         await createTransactions();
+        await createScheduledTransactions();
     }
 
     /** Upload CSV files to server */

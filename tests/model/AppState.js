@@ -35,6 +35,8 @@ import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
 import { ImportCondition } from './ImportCondition.js';
+import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
+import { ScheduledTransaction } from './ScheduledTransaction.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
@@ -57,6 +59,9 @@ const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TY
 /** Transactions */
 const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
 const trAvailFields = [...trReqFields, 'id', 'person_id', 'acc_id', 'op'];
+
+/** Scheduled transactions */
+const scheduledTrReqFields = [...ScheduledTransaction.availProps];
 
 /** Import templates */
 const tplReqFields = [
@@ -117,6 +122,7 @@ export class AppState {
         this.personsCache = null;
         this.sortedPersonsCache = null;
         this.transactions = null;
+        this.scheduledTransactions = null;
         this.templates = null;
         this.rules = null;
         this.userCurrencies = null;
@@ -153,6 +159,13 @@ export class AppState {
         const transactions = state.transactions?.items ?? state.transactions.data;
         this.transactions.setData(transactions);
         this.transactions.autoincrement = state.transactions.autoincrement;
+
+        if (!this.scheduledTransactions) {
+            this.scheduledTransactions = ScheduledTransactionsList.create();
+        }
+        const scheduledTransactions = state.scheduledtransactions ?? state.scheduledTransactions;
+        this.scheduledTransactions.setData(scheduledTransactions.data);
+        this.scheduledTransactions.autoincrement = scheduledTransactions.autoincrement;
 
         if (!this.categories) {
             this.categories = CategoryList.create();
@@ -201,6 +214,7 @@ export class AppState {
         res.persons = this.persons.clone();
         res.categories = this.categories.clone();
         res.transactions = this.transactions.clone();
+        res.scheduledTransactions = this.scheduledTransactions.clone();
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
         res.userCurrencies = this.userCurrencies.clone();
@@ -298,6 +312,10 @@ export class AppState {
             this.accounts?.setData(accountsData);
         }
 
+        if ('scheduledTransactions' in options) {
+            this.scheduledTransactions?.reset();
+        }
+
         if ('importtpl' in options) {
             this.templates?.reset();
         }
@@ -314,6 +332,7 @@ export class AppState {
         this.categories?.reset();
         this.resetPersonsCache();
         this.transactions?.reset();
+        this.scheduledTransactions?.reset();
         this.templates?.reset();
         this.rules?.reset();
         this.userCurrencies?.reset();
@@ -512,6 +531,12 @@ export class AppState {
         return res;
     }
 
+    getScheduledTransactions() {
+        return {
+            data: copyObject(this.scheduledTransactions.data),
+        };
+    }
+
     getState(request) {
         const res = {};
 
@@ -529,6 +554,9 @@ export class AppState {
         }
         if (request.transactions) {
             res.transactions = this.getTransactions(request.transactions);
+        }
+        if (request.scheduledTransactions) {
+            res.transactions = this.getScheduledTransactions(request.scheduledTransactions);
         }
         if (request.statistics) {
             res.statistics = this.getStatistics(request.statistics);
@@ -808,6 +836,12 @@ export class AppState {
         // Prepare expected updates of transactions list
         this.transactions = this.transactions.updateAccount(this.accounts.data, expAccount);
 
+        // Prepare expected updates of scheduled transactions list
+        this.scheduledTransactions = this.scheduledTransactions.updateAccount(
+            this.accounts.data,
+            expAccount,
+        );
+
         // Prepare expected updates of accounts list
         this.accounts.update(expAccount);
 
@@ -830,6 +864,10 @@ export class AppState {
         this.rules.deleteAccounts(ids);
         this.templates.deleteAccounts(ids);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
+        this.scheduledTransactions = this.scheduledTransactions.deleteAccounts(
+            this.accounts.data,
+            ids,
+        );
 
         // Prepare expected updates of accounts list
         this.accounts.deleteItems(ids);
@@ -1354,14 +1392,14 @@ export class AppState {
             return false;
         }
 
-        const categoriesToDelete = [...ids];
+        const itemsToDelete = [...ids];
         const childrenCategories = ids.flatMap((id) => (
             this.categories.findByParent(id).map((item) => item.id)
         ));
 
         const removeChildren = params.removeChildren ?? true;
         if (removeChildren) {
-            categoriesToDelete.push(...childrenCategories);
+            itemsToDelete.push(...childrenCategories);
         } else {
             childrenCategories.forEach((id) => {
                 const item = this.categories.getItem(id);
@@ -1374,10 +1412,11 @@ export class AppState {
         }
 
         // Prepare expected updates of transactions
-        this.transactions = this.transactions.deleteCategories(categoriesToDelete);
-        this.rules.deleteCategories(...categoriesToDelete);
+        this.transactions = this.transactions.deleteCategories(itemsToDelete);
+        this.scheduledTransactions = this.scheduledTransactions.deleteCategories(itemsToDelete);
+        this.rules.deleteCategories(...itemsToDelete);
 
-        this.categories.deleteItems(categoriesToDelete);
+        this.categories.deleteItems(itemsToDelete);
 
         this.sortCategories();
 
@@ -1862,6 +1901,208 @@ export class AppState {
 
         // LIMIT_CHANGE
         return this.userAccountsCache.some((item) => item.type === ACCOUNT_TYPE_CREDIT_CARD);
+    }
+
+    /**
+     * Scheduled transactions
+     */
+
+    checkScheduledTransactionCorrectness(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (!availTransTypes.includes(params.type)) {
+            return false;
+        }
+        // Amount must be greather than zero
+        if (params.src_amount <= 0 || params.dest_amount <= 0) {
+            return false;
+        }
+        // Source and destination amounts must be equal if currencies are same
+        if (params.src_curr === params.dest_curr && params.src_amount !== params.dest_amount) {
+            return false;
+        }
+
+        const srcCurr = App.currency.getItem(params.src_curr);
+        if (!srcCurr) {
+            return false;
+        }
+        const destCurr = App.currency.getItem(params.dest_curr);
+        if (!destCurr) {
+            return false;
+        }
+
+        let srcAccount = null;
+        if (params.src_id) {
+            if (params.type === INCOME) {
+                return false;
+            }
+
+            srcAccount = this.accounts.getItem(params.src_id);
+            if (
+                !srcAccount
+                || (srcCurr.id !== srcAccount.curr_id)
+                || (params.type !== DEBT && srcAccount.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && srcAccount.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === EXPENSE || params.type === TRANSFER) {
+            return false;
+        }
+
+        let destAccount = null;
+        if (params.dest_id) {
+            if (params.type === EXPENSE) {
+                return false;
+            }
+
+            destAccount = this.accounts.getItem(params.dest_id);
+            if (
+                !destAccount
+                || (destCurr.id !== destAccount.curr_id)
+                || (params.type !== DEBT && destAccount.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && destAccount.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === INCOME || params.type === TRANSFER) {
+            return false;
+        }
+
+        if (params.src_id === params.dest_id) {
+            return false;
+        }
+
+        if (params.type === DEBT) {
+            // Both source and destination are accounts of person
+            if (
+                srcAccount
+                && srcAccount.owner_id !== this.profile.owner_id
+                && destAccount
+                && destAccount.owner_id !== this.profile.owner_id
+            ) {
+                return false;
+            }
+
+            // Neither source nor destination are accounts of person
+            if (
+                (!srcAccount || srcAccount.owner_id === this.profile.owner_id)
+                && (!destAccount || destAccount.owner_id === this.profile.owner_id)
+            ) {
+                return false;
+            }
+        }
+
+        if (params.category_id !== 0) {
+            const category = this.categories.getItem(params.category_id);
+            if (!category) {
+                return false;
+            }
+        }
+
+        if ('start_date' in params && !isInt(params.start_date)) {
+            return false;
+        }
+
+        if ('end_date' in params && !isInt(params.end_date) && params.end_date !== null) {
+            return false;
+        }
+
+        // End date must be greater than start date
+        if (
+            isInt(params.start_date)
+            && isInt(params.end_date)
+            && params.start_date >= params.end_date
+        ) {
+            return false;
+        }
+
+        if (!ScheduledTransaction.isValidIntervalType(params.interval_type)) {
+            return false;
+        }
+
+        if (!ScheduledTransaction.isValidIntervalStep(params.interval_step)) {
+            return false;
+        }
+
+        if (
+            !ScheduledTransaction.isValidIntervalOffset(
+                params.interval_offset,
+                params.interval_type,
+            )
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    createScheduledTransaction(params) {
+        const itemData = {
+            ...ScheduledTransaction.defaultProps,
+            ...params,
+        };
+
+        const resExpected = this.checkScheduledTransactionCorrectness(itemData);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(itemData, scheduledTrReqFields);
+        const ind = this.scheduledTransactions.create(data);
+        const item = this.scheduledTransactions.getItemByIndex(ind);
+
+        return this.returnState(params.returnState, { id: item.id });
+    }
+
+    updateScheduledTransaction(params) {
+        const origItem = this.scheduledTransactions.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expItem = copyObject(origItem);
+        const data = copyFields(params, scheduledTrReqFields);
+        Object.assign(expItem, data);
+
+        const resExpected = this.checkScheduledTransactionCorrectness(expItem);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.scheduledTransactions.update(expItem);
+
+        return this.returnState(params.returnState);
+    }
+
+    deleteScheduledTransaction(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        const itemsToDelete = ids.map((id) => this.scheduledTransactions.getItem(id));
+        if (!itemsToDelete.every((item) => !!item)) {
+            return false;
+        }
+
+        this.scheduledTransactions.deleteItems(ids);
+
+        return this.returnState(params.returnState);
     }
 
     /**

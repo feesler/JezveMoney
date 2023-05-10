@@ -79,7 +79,7 @@ class Transaction extends ApiSortableListController
      */
     protected function getExpectedFields(array $request)
     {
-        $trans_type = intval($request["type"]);
+        $trans_type = isset($request["type"]) ? intval($request["type"]) : 0;
 
         return ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
     }
@@ -93,7 +93,7 @@ class Transaction extends ApiSortableListController
      */
     protected function preCreate(array $request)
     {
-        $trans_type = intval($request["type"]);
+        $trans_type = isset($request["type"]) ? intval($request["type"]) : 0;
         if ($trans_type == DEBT) {
             return $this->model->prepareDebt($request);
         } else {

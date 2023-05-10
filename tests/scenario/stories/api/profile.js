@@ -10,6 +10,7 @@ const runTests = async () => {
         accounts: true,
         persons: true,
         transactions: true,
+        scheduledTransactions: true,
         importtpl: true,
         importrules: true,
     };
