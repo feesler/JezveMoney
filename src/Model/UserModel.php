@@ -950,6 +950,7 @@ class UserModel extends CachedTable
             "accounts",
             "persons",
             "transactions",
+            "scheduled_transactions",
             "categories",
             "import_tpl",
             "import_rule",
