@@ -46,11 +46,6 @@ export class Transaction {
         return (key in strToType) ? strToType[key] : null;
     }
 
-    /** Converts transaction date in seconds to date string */
-    static formatDate(date) {
-        return App.secondsToDateString(date);
-    }
-
     // Try to convert specified short declaration of transaction to full object
     static extract(params, state) {
         const extractMap = {
