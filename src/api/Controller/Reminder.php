@@ -110,7 +110,7 @@ class Reminder extends ApiListController
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || count($ids) !== 1) {
+        if (!is_array($ids) || count($ids) !== 1) {
             throw new \Error(__("ERR_NO_IDS"));
         }
 

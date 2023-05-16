@@ -35,7 +35,7 @@ class ApiListController extends ApiController
     public function index()
     {
         $ids = $this->getRequestedIds();
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
+        if (!is_array($ids) || !count($ids)) {
             throw new \Error(__("ERR_NO_IDS"));
         }
 
@@ -382,7 +382,7 @@ class ApiListController extends ApiController
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
+        if (!is_array($ids) || !count($ids)) {
             throw new \Error(__("ERR_NO_IDS"));
         }
 
