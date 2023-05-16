@@ -1916,15 +1916,6 @@ class TransactionModel extends SortableModel
             return $res;
         }
 
-        if (!$this->accModel->getCount(["full" => true])) {
-            return $res;
-        }
-
-        // Skip if no transactions at all
-        if (!$this->dbObj->countQ($this->tbl_name, "user_id=" . self::$user_id)) {
-            return $res;
-        }
-
         $condArr = $this->getDBCondition($params);
 
         // Sort order condition
