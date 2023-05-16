@@ -211,7 +211,7 @@ class AdminApiConsoleView extends AdminView {
                 const { value } = statisticsFilter;
                 enable('statistics_curr', (value === 'currency'));
                 enable('statistics_acc', (value === 'account'));
-                enable('statistics_cat', (value === 'account'));
+                enable('statistics_cat', (value === 'category'));
             },
         });
     }
