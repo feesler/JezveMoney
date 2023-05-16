@@ -14,7 +14,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Import rule id</span>
             </label>
-            <input id="list_act_rule" class="input stretch-input" name="rule" type="text" value="0" disabled hidden>
+            <input id="list_act_rule" class="input stretch-input" name="rule" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="0" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -26,7 +26,7 @@
     <h3>Read import actions by ids</h3>
     <div class="std_margin">
         <label for="readactid">Id</label>
-        <input id="readactid" class="input stretch-input" type="text">
+        <input id="readactid" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="form-controls">
         <input id="readactbtn" class="btn submit-btn" type="button" value="Submit">
@@ -38,17 +38,17 @@
     <form action="<?= BASEURL ?>api/importaction/create" method="post">
         <div class="std_margin">
             <label for="create_act_rule">Parent rule id</label>
-            <input id="create_act_rule" class="input stretch-input" name="rule_id" type="text">
+            <input id="create_act_rule" class="input stretch-input" name="rule_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_act_type">Action type (1-6)</label>
-            <input id="create_act_type" class="input stretch-input" name="action_id" type="text">
+            <input id="create_act_type" class="input stretch-input" name="action_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_act_value">Value</label>
-            <input id="create_act_value" class="input stretch-input" name="value" type="text">
+            <input id="create_act_value" class="input stretch-input" name="value" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -57,7 +57,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -71,22 +71,22 @@
     <form action="<?= BASEURL ?>api/importaction/update" method="post">
         <div class="std_margin">
             <label for="update_act_id">Id</label>
-            <input id="update_act_id" class="input stretch-input" name="id" type="text">
+            <input id="update_act_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_act_rule">Parent rule id</label>
-            <input id="update_act_rule" class="input stretch-input" name="rule_id" type="text">
+            <input id="update_act_rule" class="input stretch-input" name="rule_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_act_type">Action type (1-6)</label>
-            <input id="update_act_type" class="input stretch-input" name="action_id" type="text">
+            <input id="update_act_type" class="input stretch-input" name="action_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_act_value">Value</label>
-            <input id="update_act_value" class="input stretch-input" name="value" type="text">
+            <input id="update_act_value" class="input stretch-input" name="value" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -95,7 +95,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -109,7 +109,7 @@
     <form action="<?= BASEURL ?>api/importaction/delete" method="post">
         <div class="std_margin">
             <label for="delactions">Actions (comma separated ids)</label>
-            <input id="delactions" class="input stretch-input" name="id" type="text">
+            <input id="delactions" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -118,7 +118,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">

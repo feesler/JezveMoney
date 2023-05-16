@@ -7,7 +7,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Schedule id</span>
             </label>
-            <input class="input stretch-input" name="schedule_id" type="text" value="" disabled hidden>
+            <input class="input stretch-input" name="schedule_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
 
         <div class="std_margin">
@@ -16,7 +16,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Date</span>
             </label>
-            <input class="input stretch-input" name="date" type="text" value="" disabled hidden>
+            <input class="input stretch-input" name="date" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
 
         <div class="std_margin">
@@ -25,7 +25,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Transaction id</span>
             </label>
-            <input class="input stretch-input" name="transaction_id" type="text" value="" disabled hidden>
+            <input class="input stretch-input" name="transaction_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -38,7 +38,7 @@
     <h3>Read by ids</h3>
     <div class="std_margin">
         <label for="read_reminder_id">Id</label>
-        <input id="read_reminder_id" class="input stretch-input" type="text">
+        <input id="read_reminder_id" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="form-controls">
         <input id="readRemindersBtn" class="btn submit-btn" type="button" value="Submit">
@@ -50,7 +50,7 @@
     <form action="<?= BASEURL ?>api/reminder/confirm" method="post">
         <div class="std_margin">
             <label for="confirm_reminder_id">Reminder id</label>
-            <input id="confirm_reminder_id" class="input stretch-input" name="id" type="text">
+            <input id="confirm_reminder_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -59,7 +59,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Transaction id</span>
             </label>
-            <input class="input stretch-input" name="transaction_id" type="text" value="" disabled hidden>
+            <input class="input stretch-input" name="transaction_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
 
         <div class="std_margin">
@@ -68,7 +68,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -82,7 +82,7 @@
     <form action="<?= BASEURL ?>api/reminder/cancel" method="post">
         <div class="std_margin">
             <label for="cancel_reminder_id">Reminder id</label>
-            <input id="cancel_reminder_id" class="input stretch-input" name="id" type="text">
+            <input id="cancel_reminder_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -91,7 +91,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">

@@ -14,7 +14,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Import rule id</span>
             </label>
-            <input id="list_cond_rule" class="input stretch-input" name="rule" type="text" value="0" disabled hidden>
+            <input id="list_cond_rule" class="input stretch-input" name="rule" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="0" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -26,7 +26,7 @@
     <h3>Read import conditions by ids</h3>
     <div class="std_margin">
         <label for="readcondid">Id</label>
-        <input id="readcondid" class="input stretch-input" type="text">
+        <input id="readcondid" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="form-controls">
         <input id="readcondbtn" class="btn submit-btn" type="button" value="Submit">
@@ -38,27 +38,27 @@
     <form action="<?= BASEURL ?>api/importcond/create" method="post">
         <div class="std_margin">
             <label for="create_cond_rule">Parent rule id</label>
-            <input id="create_cond_rule" class="input stretch-input" name="rule_id" type="text">
+            <input id="create_cond_rule" class="input stretch-input" name="rule_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_cond_field">Field type (1-8)</label>
-            <input id="create_cond_field" class="input stretch-input" name="field_id" type="text">
+            <input id="create_cond_field" class="input stretch-input" name="field_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_cond_op">Operator (1-5)</label>
-            <input id="create_cond_op" class="input stretch-input" name="operator" type="text">
+            <input id="create_cond_op" class="input stretch-input" name="operator" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_cond_value">Value</label>
-            <input id="create_cond_value" class="input stretch-input" name="value" type="text">
+            <input id="create_cond_value" class="input stretch-input" name="value" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_cond_flags">Flags</label>
-            <input id="create_cond_flags" class="input stretch-input" name="flags" type="text">
+            <input id="create_cond_flags" class="input stretch-input" name="flags" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -67,7 +67,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -81,32 +81,32 @@
     <form action="<?= BASEURL ?>api/importcond/update" method="post">
         <div class="std_margin">
             <label for="update_cond_id">Id</label>
-            <input id="update_cond_id" class="input stretch-input" name="id" type="text">
+            <input id="update_cond_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_cond_rule">Parent rule id</label>
-            <input id="update_cond_rule" class="input stretch-input" name="rule_id" type="text">
+            <input id="update_cond_rule" class="input stretch-input" name="rule_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_cond_field">Field type (1-8)</label>
-            <input id="update_cond_field" class="input stretch-input" name="field_id" type="text">
+            <input id="update_cond_field" class="input stretch-input" name="field_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_cond_op">Operator (1-5)</label>
-            <input id="update_cond_op" class="input stretch-input" name="operator" type="text">
+            <input id="update_cond_op" class="input stretch-input" name="operator" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_cond_value">Value</label>
-            <input id="update_cond_value" class="input stretch-input" name="value" type="text">
+            <input id="update_cond_value" class="input stretch-input" name="value" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_cond_flags">Flags</label>
-            <input id="update_cond_flags" class="input stretch-input" name="flags" type="text">
+            <input id="update_cond_flags" class="input stretch-input" name="flags" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -115,7 +115,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -129,7 +129,7 @@
     <form action="<?= BASEURL ?>api/importcond/delete" method="post">
         <div class="std_margin">
             <label for="delconds">Conditions (comma separated ids)</label>
-            <input id="delconds" class="input stretch-input" name="id" type="text">
+            <input id="delconds" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -138,7 +138,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">

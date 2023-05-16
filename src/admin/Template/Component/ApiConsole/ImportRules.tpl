@@ -25,7 +25,7 @@
     <h3>Read import rules by ids</h3>
     <div class="std_margin">
         <label for="readruleid">Id</label>
-        <input id="readruleid" class="input stretch-input" type="text">
+        <input id="readruleid" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="form-controls">
         <input id="readrulebtn" class="btn submit-btn" type="button" value="Submit">
@@ -37,17 +37,17 @@
     <form action="<?= BASEURL ?>api/importrule/create" method="post">
         <div class="std_margin">
             <label for="create_rule_flags">Flags</label>
-            <input id="create_rule_flags" class="input stretch-input" name="flags" type="text">
+            <input id="create_rule_flags" class="input stretch-input" name="flags" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_rule_conditions">Conditions</label>
-            <input id="create_rule_conditions" class="input stretch-input" name="conditions" type="text">
+            <input id="create_rule_conditions" class="input stretch-input" name="conditions" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_rule_actions">Actions</label>
-            <input id="create_rule_actions" class="input stretch-input" name="actions" type="text">
+            <input id="create_rule_actions" class="input stretch-input" name="actions" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -56,7 +56,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -70,22 +70,22 @@
     <form action="<?= BASEURL ?>api/importrule/update" method="post">
         <div class="std_margin">
             <label for="update_rule_id">Id</label>
-            <input id="update_rule_id" class="input stretch-input" name="id" type="text">
+            <input id="update_rule_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_rule_conditions">Conditions</label>
-            <input id="create_rule_conditions" class="input stretch-input" name="conditions" type="text">
+            <input id="create_rule_conditions" class="input stretch-input" name="conditions" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="create_rule_actions">Actions</label>
-            <input id="create_rule_actions" class="input stretch-input" name="actions" type="text">
+            <input id="create_rule_actions" class="input stretch-input" name="actions" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
             <label for="update_rule_flags">Flags</label>
-            <input id="update_rule_flags" class="input stretch-input" name="flags" type="text">
+            <input id="update_rule_flags" class="input stretch-input" name="flags" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -94,7 +94,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -108,7 +108,7 @@
     <form action="<?= BASEURL ?>api/importrule/delete" method="post">
         <div class="std_margin">
             <label for="delrules">Rules (comma separated ids)</label>
-            <input id="delrules" class="input stretch-input" name="id" type="text">
+            <input id="delrules" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="std_margin">
@@ -117,7 +117,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
+            <input class="input stretch-input" name="returnState" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" disabled hidden>
         </div>
 
         <div class="form-controls">
