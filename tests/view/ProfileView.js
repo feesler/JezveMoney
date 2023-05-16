@@ -74,6 +74,7 @@ export class ProfileView extends AppView {
             personsCheck: await Checkbox.create(this, await query('#personsCheck')),
             transactionsCheck: await Checkbox.create(this, await query('#transactionsCheck')),
             keepBalanceCheck: await Checkbox.create(this, await query('#keepBalanceCheck')),
+            scheduleCheck: await Checkbox.create(this, await query('#scheduleCheck')),
             importTplCheck: await Checkbox.create(this, await query('#importTplCheck')),
             importRulesCheck: await Checkbox.create(this, await query('#importRulesCheck')),
         };
@@ -169,6 +170,11 @@ export class ProfileView extends AppView {
         if (('keepbalance' in options) && !keepBalanceCheck.checked) {
             assert(!keepBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
             await this.performAction(() => keepBalanceCheck.toggle());
+        }
+
+        const { scheduleCheck } = this.content.resetDataPopup;
+        if (('scheduledTransactions' in options) && !scheduleCheck.checked) {
+            await this.performAction(() => scheduleCheck.toggle());
         }
 
         const { importTplCheck } = this.content.resetDataPopup;

@@ -341,6 +341,7 @@
     "RESET_CATEGORIES": "Категории",
     "RESET_TRANSACTIONS": "Транзакции",
     "RESET_KEEP_BALANCE": "Сохранить текущий баланс счетов",
+    "RESET_SCHEDULE": "Запланированные транзакции",
     "RESET_IMPORT_TEMPLATES": "Шаблоны импорта",
     "RESET_IMPORT_RULES": "Правила импорта",
     "SETTINGS": "Настройки",

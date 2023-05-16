@@ -341,6 +341,7 @@
     "RESET_CATEGORIES": "Categories",
     "RESET_TRANSACTIONS": "Transactions",
     "RESET_KEEP_BALANCE": "Keep current balance of accounts",
+    "RESET_SCHEDULE": "Scheduled transactions",
     "RESET_IMPORT_TEMPLATES": "Import templates",
     "RESET_IMPORT_RULES": "Import rules",
     "SETTINGS": "Settings",
