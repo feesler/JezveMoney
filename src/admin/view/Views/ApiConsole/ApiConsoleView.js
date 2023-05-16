@@ -14,8 +14,8 @@ import { Offcanvas } from 'jezvejs/Offcanvas';
 import * as apiTypes from '../../../../view/API/types.js';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
-import '../../css/admin.scss';
-import { AdminView } from '../../js/AdminView.js';
+import '../../utils/AdminView/AdminView.scss';
+import { AdminView } from '../../utils/AdminView/AdminView.js';
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
 import './ApiConsoleView.scss';
 

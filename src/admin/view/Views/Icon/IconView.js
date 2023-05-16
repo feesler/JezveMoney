@@ -2,8 +2,8 @@ import 'jezvejs/style';
 import { ge, createElement, selectByValue } from 'jezvejs';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
-import { AdminListView } from '../../js/AdminListView.js';
-import '../../css/admin.scss';
+import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
+import '../../utils/AdminView/AdminView.scss';
 
 /**
  * Admin icon list view

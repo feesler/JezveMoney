@@ -1,8 +1,8 @@
 import 'jezvejs/style';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
-import { AdminView } from '../../js/AdminView.js';
-import '../../css/admin.scss';
+import { AdminView } from '../../utils/AdminView/AdminView.js';
+import '../../utils/AdminView/AdminView.scss';
 
 export class AdminLogsView extends AdminView {
 }
