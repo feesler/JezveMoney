@@ -16,9 +16,9 @@ import {
     EXPENSE,
     INCOME,
     DEBT,
-    availTransTypes,
     TRANSFER,
     LIMIT_CHANGE,
+    Transaction,
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { ImportRule } from './ImportRule.js';
@@ -45,50 +45,19 @@ import {
     REMINDER_SCHEDULED,
     Reminder,
 } from './Reminder.js';
+import { Account } from './Account.js';
+import { Person } from './Person.js';
+import { Category } from './Category.js';
+import { UserCurrency } from './UserCurrency.js';
+import { ImportTemplate } from './ImportTemplate.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
 const availSettings = [...sortSettings, 'date_locale', 'decimal_locale', 'tr_group_by_date'];
 
-/** Accounts */
-const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
-
-/** Persons */
-const pReqFields = ['name', 'flags'];
-
-/** User currencies */
-const uCurrReqFields = ['curr_id', 'flags'];
-
 /** Categories */
-const catReqFields = ['name', 'parent_id', 'type'];
 const ANY_TYPE = 0;
-const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
-
-/** Transactions */
-const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
-const trAvailFields = [...trReqFields, 'id', 'person_id', 'acc_id', 'op'];
-
-/** Scheduled transactions */
-const scheduledTrReqFields = [...ScheduledTransaction.availProps];
-
-/** Import templates */
-const tplReqFields = [
-    'name',
-    'type_id',
-    'account_id',
-    'first_row',
-];
-const tplReqColumns = {
-    account_amount_col: 'accountAmount',
-    account_curr_col: 'accountCurrency',
-    trans_amount_col: 'transactionAmount',
-    trans_curr_col: 'transactionCurrency',
-    date_col: 'date',
-    comment_col: 'comment',
-};
-
-/** Import rules */
-const ruleReqFields = ['flags', 'conditions', 'actions'];
+const transTypes = [...Transaction.availTypes, ANY_TYPE];
 
 /**
  * Check all properties of expected object are presents in specified object
@@ -686,7 +655,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(params, uCurrReqFields);
+        const data = copyFields(params, UserCurrency.availProps);
 
         const ind = this.userCurrencies.create(data);
         const item = this.userCurrencies.getItemByIndex(ind);
@@ -702,7 +671,7 @@ export class AppState {
 
         // Prepare expected item object
         const expectedItem = copyObject(original);
-        const data = copyFields(params, uCurrReqFields);
+        const data = copyFields(params, UserCurrency.availProps);
         Object.assign(expectedItem, data);
 
         const resExpected = this.validateUserCurrency(expectedItem);
@@ -799,14 +768,8 @@ export class AppState {
     }
 
     createAccount(params) {
-        const defaults = {
-            type: 0,
-            initlimit: 0,
-            icon_id: 0,
-            flags: 0,
-        };
         const itemData = {
-            ...defaults,
+            ...Account.defaultProps,
             ...params,
         };
 
@@ -815,7 +778,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, accReqFields);
+        const data = copyFields(itemData, Account.availProps);
         data.owner_id = this.profile.owner_id;
         data.balance = data.initbalance;
         data.limit = data.initlimit;
@@ -836,7 +799,7 @@ export class AppState {
 
         // Prepare expected account object
         const expAccount = copyObject(origAcc);
-        const data = copyFields(params, accReqFields);
+        const data = copyFields(params, Account.availProps);
         data.owner_id = this.profile.owner_id;
         Object.assign(expAccount, data);
 
@@ -1074,11 +1037,8 @@ export class AppState {
     }
 
     createPerson(params) {
-        const defaults = {
-            flags: 0,
-        };
         const itemData = {
-            ...defaults,
+            ...Person.defaultProps,
             ...params,
         };
 
@@ -1087,7 +1047,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, pReqFields);
+        const data = copyFields(itemData, Person.availProps);
         const ind = this.persons.create(data);
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
@@ -1104,7 +1064,7 @@ export class AppState {
         }
 
         const expPerson = copyObject(origPerson);
-        const data = copyFields(params, pReqFields);
+        const data = copyFields(params, Person.availProps);
         Object.assign(expPerson, data);
 
         const resExpected = this.validatePerson(expPerson);
@@ -1343,7 +1303,7 @@ export class AppState {
             }
         }
 
-        if (params.type !== 0 && !availTransTypes.includes(params.type)) {
+        if (params.type !== 0 && !Transaction.availTypes.includes(params.type)) {
             return false;
         }
 
@@ -1369,7 +1329,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, catReqFields);
+        const data = copyFields(itemData, Category.availProps);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
         this.sortCategories();
@@ -1384,7 +1344,7 @@ export class AppState {
         }
 
         const expItem = copyObject(origItem);
-        const data = copyFields(params, catReqFields);
+        const data = copyFields(params, Category.availProps);
         Object.assign(expItem, data);
 
         const resExpected = this.validateCategory(expItem);
@@ -1555,7 +1515,7 @@ export class AppState {
             return false;
         }
 
-        if (!availTransTypes.includes(params.type)) {
+        if (!Transaction.availTypes.includes(params.type)) {
             return false;
         }
         // Amount must be greather than zero
@@ -1745,16 +1705,17 @@ export class AppState {
     }
 
     getExpectedTransaction(params) {
-        const res = copyFields(params, trAvailFields);
-        if (!res.date) {
-            res.date = App.datesSec.now;
+        const fields = (params.type === DEBT) ? Transaction.debtProps : Transaction.availProps;
+        const itemData = {
+            ...Transaction.defaultProps,
+            ...params,
+        };
+
+        const res = copyFields(itemData, fields);
+        if (itemData.id) {
+            res.id = itemData.id;
         }
-        if (typeof res.category_id !== 'number') {
-            res.category_id = 0;
-        }
-        if (!res.comment) {
-            res.comment = '';
-        }
+
         if (res.type !== DEBT) {
             return res;
         }
@@ -1788,12 +1749,8 @@ export class AppState {
     }
 
     createTransaction(params) {
-        const defaults = {
-            category_id: 0,
-            comment: '',
-        };
         const itemData = {
-            ...defaults,
+            ...Transaction.defaultProps,
             ...params,
         };
 
@@ -1809,7 +1766,7 @@ export class AppState {
         }
         expTrans.pos = 0;
 
-        resExpected = checkFields(expTrans, trReqFields);
+        resExpected = checkFields(expTrans, Transaction.availProps);
         if (!resExpected) {
             return false;
         }
@@ -1918,7 +1875,7 @@ export class AppState {
     }
 
     isAvailableTransactionType(type) {
-        assert(availTransTypes.includes(type), 'Invalid transaction type');
+        assert(Transaction.availTypes.includes(type), 'Invalid transaction type');
 
         this.cacheUserAccounts();
 
@@ -1945,7 +1902,7 @@ export class AppState {
             return false;
         }
 
-        if (!availTransTypes.includes(params.type)) {
+        if (!Transaction.availTypes.includes(params.type)) {
             return false;
         }
         // Amount must be greather than zero
@@ -2095,7 +2052,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, scheduledTrReqFields);
+        const data = copyFields(itemData, ScheduledTransaction.availProps);
         const ind = this.scheduledTransactions.create(data);
         const item = this.scheduledTransactions.getItemByIndex(ind);
 
@@ -2113,7 +2070,7 @@ export class AppState {
         }
 
         const expItem = copyObject(origItem);
-        const data = copyFields(params, scheduledTrReqFields);
+        const data = copyFields(params, ScheduledTransaction.availProps);
         Object.assign(expItem, data);
 
         const resExpected = this.validateScheduledTransaction(expItem);
@@ -2341,7 +2298,7 @@ export class AppState {
             return false;
         }
 
-        if (!checkFields(params, tplReqFields)) {
+        if (!checkFields(params, ImportTemplate.availProps)) {
             return false;
         }
 
@@ -2368,7 +2325,7 @@ export class AppState {
             return false;
         }
         // Check every column value is present and have correct value
-        return Object.values(tplReqColumns).every((columnName) => (
+        return Object.values(ImportTemplate.columnsMap).every((columnName) => (
             (columnName in params.columns)
             && isInt(params.columns[columnName])
             && params.columns[columnName] > 0
@@ -2382,11 +2339,11 @@ export class AppState {
 
         const origItem = this.templates.getItem(request.id) ?? { columns: {} };
         const res = copyObject(origItem);
-        const data = copyFields(request, tplReqFields);
+        const data = copyFields(request, ImportTemplate.availProps);
         Object.assign(res, data);
 
-        Object.keys(tplReqColumns).forEach((columnName) => {
-            const targetProp = tplReqColumns[columnName];
+        Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+            const targetProp = ImportTemplate.columnsMap[columnName];
             if (request[columnName]) {
                 res.columns[targetProp] = request[columnName];
             }
@@ -2410,9 +2367,9 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, tplReqFields);
+        const data = copyFields(itemData, ImportTemplate.availProps);
         data.columns = {};
-        Object.values(tplReqColumns).forEach((columnName) => {
+        Object.values(ImportTemplate.columnsMap).forEach((columnName) => {
             data.columns[columnName] = itemData.columns[columnName];
         });
 
@@ -2426,14 +2383,14 @@ export class AppState {
         const origItem = this.templates.getItem(params.id) ?? { columns: {} };
 
         const expTemplate = copyObject(origItem);
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
         const res = copyObject(expTemplate);
         delete res.columns;
 
-        Object.keys(tplReqColumns).forEach((columnName) => {
-            const targetProp = tplReqColumns[columnName];
+        Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+            const targetProp = ImportTemplate.columnsMap[columnName];
 
             if (params[columnName]) {
                 expTemplate.columns[targetProp] = params[columnName];
@@ -2452,12 +2409,12 @@ export class AppState {
         }
 
         const expTemplate = copyObject(origItem);
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
         if (params.columns) {
-            Object.keys(tplReqColumns).forEach((columnName) => {
-                const targetProp = tplReqColumns[columnName];
+            Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+                const targetProp = ImportTemplate.columnsMap[columnName];
                 if (params.columns && params.columns[targetProp]) {
                     expTemplate.columns[targetProp] = params.columns[targetProp];
                 }
@@ -2495,7 +2452,7 @@ export class AppState {
      * Import rules
      */
     validateRule(params) {
-        if (!checkFields(params, ruleReqFields)) {
+        if (!checkFields(params, ImportRule.availProps)) {
             return false;
         }
 
@@ -2552,7 +2509,7 @@ export class AppState {
             return false;
         }
 
-        const data = copyFields(itemData, ruleReqFields);
+        const data = copyFields(itemData, ImportRule.availProps);
         data.conditions = this.prepareConditions(data.conditions);
         data.actions = this.prepareActions(data.actions);
 
@@ -2569,7 +2526,7 @@ export class AppState {
         }
 
         const expRule = origItem.toPlain();
-        const data = copyFields(params, ruleReqFields);
+        const data = copyFields(params, ImportRule.availProps);
         Object.assign(expRule, data);
 
         const resExpected = this.validateRule(expRule);

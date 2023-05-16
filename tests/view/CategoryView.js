@@ -10,7 +10,7 @@ import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
-import { availTransTypes } from '../model/Transaction.js';
+import { Transaction } from '../model/Transaction.js';
 
 /** Create or update category test view */
 export class CategoryView extends AppView {
@@ -186,7 +186,7 @@ export class CategoryView extends AppView {
 
     async selectType(val) {
         const type = parseInt(val, 10);
-        assert(availTransTypes.includes(type), `Invalid type: ${val}`);
+        assert(Transaction.availTypes.includes(type), `Invalid type: ${val}`);
 
         this.model.type = type;
         const expected = this.getExpectedState();

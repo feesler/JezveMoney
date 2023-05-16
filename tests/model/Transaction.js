@@ -9,10 +9,46 @@ export const TRANSFER = 3;
 export const DEBT = 4;
 export const LIMIT_CHANGE = 5;
 
-export const basicTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
-export const availTransTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
-
 export class Transaction {
+    static availProps = [
+        'type',
+        'src_id',
+        'dest_id',
+        'src_amount',
+        'dest_amount',
+        'src_curr',
+        'dest_curr',
+        'date',
+        'category_id',
+        'comment',
+    ];
+
+    static debtProps = [
+        'type',
+        'person_id',
+        'acc_id',
+        'op',
+        'src_amount',
+        'dest_amount',
+        'src_curr',
+        'dest_curr',
+        'date',
+        'category_id',
+        'comment',
+    ];
+
+    static get defaultProps() {
+        return {
+            date: App.datesSec.now,
+            category_id: 0,
+            comment: '',
+        };
+    }
+
+    static availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+
+    static basicTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
+
     /** Return string for specified type of transaction */
     static typeToString(type, locale = 'en') {
         const typesMap = {

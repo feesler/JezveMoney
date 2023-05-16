@@ -34,8 +34,8 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    availTransTypes,
     LIMIT_CHANGE,
+    Transaction,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { AccountsList } from '../model/AccountsList.js';
@@ -180,7 +180,7 @@ export class TransactionView extends AppView {
         res.locale = cont.locale;
 
         res.type = cont.typeMenu.value;
-        assert(availTransTypes.includes(res.type), 'Invalid type selected');
+        assert(Transaction.availTypes.includes(res.type), 'Invalid type selected');
 
         res.isAvailable = !cont.notAvailMsg.visible;
 

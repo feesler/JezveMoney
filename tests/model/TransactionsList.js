@@ -19,7 +19,6 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    availTransTypes,
     Transaction,
     LIMIT_CHANGE,
 } from './Transaction.js';
@@ -281,7 +280,7 @@ export class TransactionsList extends SortableList {
     // Empty array, zero or undefined assumed filter is set as ALL
     getItemsByType(list, type) {
         let types = asArray(type);
-        types = types.filter((item) => availTransTypes.includes(item));
+        types = types.filter((item) => Transaction.availTypes.includes(item));
         if (!types.length) {
             return list;
         }

@@ -4,8 +4,8 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    basicTransTypes,
     LIMIT_CHANGE,
+    Transaction,
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
@@ -984,7 +984,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 account and no person', 2);
         // Only Expense and Income must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Expense
@@ -1005,7 +1005,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 accounts and no person', 2);
         // Expense, Income and Transfer must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Transfer
@@ -1020,7 +1020,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 accounts and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         // Hide first account
         await api.account.hide({ id: account1 });
@@ -1028,7 +1028,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 visible, 1 hidden account and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         // Hide second account
         await api.account.hide({ id: account2 });
@@ -1036,7 +1036,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('2 hidden accounts and 1 person', 2);
         // All transaction types must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         // Remove account
         await api.account.show({ id: account1 });
@@ -1045,7 +1045,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('1 account and 1 person', 2);
         // Expense, Income and Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         // Remove account
         await api.account.del({ id: account1 });
@@ -1053,7 +1053,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and 1 person', 2);
         // Only Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
 
         // Hide person
         await api.person.hide({ id: person1 });
@@ -1061,7 +1061,7 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and 1 hidden person', 2);
         // Only Debt must be available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
         // Check state of Debt transaction after swap source and destination
         await Actions.runAction({ action: 'swapSourceAndDest' });
 
@@ -1071,6 +1071,6 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and no persons', 2);
         // Expected no transaction available
-        await App.scenario.runner.runGroup(checkAvailable, basicTransTypes);
+        await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
     }
 }

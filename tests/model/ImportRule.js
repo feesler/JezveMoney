@@ -14,6 +14,12 @@ import { fixFloat } from '../common.js';
 
 /** Import rule model */
 export class ImportRule {
+    static availProps = [
+        'flags',
+        'conditions',
+        'actions',
+    ];
+
     constructor(data) {
         assert(data?.conditions && data?.actions, 'Invalid properties');
 

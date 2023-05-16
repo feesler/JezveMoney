@@ -166,8 +166,13 @@ export class ScheduledTransaction {
         return Transaction.limitChange(params, state);
     }
 
-    constructor(props) {
-        assert.isObject(props, 'Invalid props');
+    constructor(data) {
+        assert.isObject(data, 'Invalid props');
+
+        const props = {
+            ...this.defaultProps,
+            ...data,
+        };
 
         if (props.id) {
             this.id = props.id;
