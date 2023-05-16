@@ -7,6 +7,7 @@ import { apiPersonsTests } from './persons.js';
 import { apiCategoriesTests } from './categories.js';
 import { apiTransactionsTests } from './transactions.js';
 import { apiScheduledTransactionsTests } from './scheduledTransactions.js';
+import { apiRemindersTests } from './reminders.js';
 import { apiImportTemplateTests } from './template.js';
 import { apiImportRulesTests } from './rules.js';
 import { apiSecurityTests } from './security.js';
@@ -43,6 +44,8 @@ export class ApiStory extends TestStory {
         await apiCategoriesTests.createTests();
         await apiTransactionsTests.createTests();
         await apiScheduledTransactionsTests.createTests();
+
+        await apiRemindersTests.run();
 
         await apiSecurityTests.run();
 

@@ -483,6 +483,29 @@ export const api = {
         },
     },
 
+    reminder: {
+        async read(ids) {
+            const { request, options } = idsRequest('reminder/', ids);
+            const { data } = await apiGet(request, options);
+            return data;
+        },
+
+        async confirm(options) {
+            const response = await apiPost('reminder/confirm', options);
+            return response.data ?? {};
+        },
+
+        async cancel(options) {
+            const response = await apiPost('reminder/cancel', options);
+            return response.data ?? {};
+        },
+
+        async list() {
+            const { data } = await apiGet('reminder/list');
+            return data;
+        },
+    },
+
     importrule: {
         async read(ids) {
             const { request, options } = idsRequest('importrule/', ids);

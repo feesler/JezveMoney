@@ -80,6 +80,16 @@
                     </li>
 
                     <li>
+                        <button>Reminders</button>
+                        <ul class="sub-menu-list">
+                            <li data-target="listReminderForm">List</li>
+                            <li data-target="readReminderForm">Read</li>
+                            <li data-target="confirmReminderForm">Confirm</li>
+                            <li data-target="cancelReminderForm">Cancel</li>
+                        </ul>
+                    </li>
+
+                    <li>
                         <button>Categories</button>
                         <ul class="sub-menu-list">
                             <li data-target="listCategoriesForm">List</li>
@@ -214,6 +224,8 @@
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Transactions.tpl");    ?>
 
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/ScheduledTransactions.tpl");    ?>
+
+                            <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Reminders.tpl");    ?>
 
                             <?php include(ADMIN_TPL_PATH . "Component/ApiConsole/Categories.tpl");    ?>
 

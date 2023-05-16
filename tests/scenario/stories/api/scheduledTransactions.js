@@ -173,6 +173,24 @@ const create = async () => {
         App.scenario.SCHEDULED_TR_LIMIT_1,
         App.scenario.SCHEDULED_TR_LIMIT_2,
     ] = res;
+
+    [
+        App.scenario.REMINDER_EXPENSE_1_1,
+        App.scenario.REMINDER_EXPENSE_1_2,
+    ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_EXPENSE_1, true);
+    [
+        App.scenario.REMINDER_INCOME_2_1,
+        App.scenario.REMINDER_INCOME_2_2,
+    ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_INCOME_2, true);
+    [
+        App.scenario.REMINDER_TRANSFER_1_1,
+    ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_TRANSFER_1, true);
+    [
+        App.scenario.REMINDER_DEBT_1_1,
+    ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_DEBT_1, true);
+    [
+        App.scenario.REMINDER_LIMIT_1_1,
+    ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_LIMIT_1, true);
 };
 
 const createWithChainedRequest = async () => {

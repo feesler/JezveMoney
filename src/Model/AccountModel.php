@@ -531,14 +531,21 @@ class AccountModel extends SortableModel
         $tplModel = ImportTemplateModel::getInstance();
         $tplModel->onAccountDelete($accountsToDelete);
 
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+
         // if delete person accounts, then delete all transactions
         if ($deletePersons) {
             if (!$this->dbObj->deleteQ("transactions", $condArr)) {
                 return false;
             }
+            $scheduleModel->reset();
         } else {
             $transMod = TransactionModel::getInstance();
             $res = $transMod->onAccountDelete($userAccounts);
+            if (!$res) {
+                return false;
+            }
+            $res = $scheduleModel->onAccountDelete($userAccounts);
             if (!$res) {
                 return false;
             }

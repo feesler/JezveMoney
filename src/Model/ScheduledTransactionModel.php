@@ -42,7 +42,9 @@ class ScheduledTransactionModel extends CachedTable
     protected $accModel = null;
     protected $currMod = null;
     protected $catModel = null;
+    protected $reminderModel = null;
     protected $affectedItems = null;
+    protected $remindersChanged = false;
 
     /**
      * Model initialization
@@ -58,6 +60,7 @@ class ScheduledTransactionModel extends CachedTable
         $this->accModel = AccountModel::getInstance();
         $this->currMod = CurrencyModel::getInstance();
         $this->catModel = CategoryModel::getInstance();
+        $this->reminderModel = ReminderModel::getInstance();
     }
 
     /**
@@ -466,6 +469,26 @@ class ScheduledTransactionModel extends CachedTable
     }
 
     /**
+     * Performs final steps after new item was successfully created
+     *
+     * @param int|int[]|null $items id or array of created item ids
+     *
+     * @return bool
+     */
+    protected function postCreate(mixed $items)
+    {
+        parent::postCreate($items);
+
+        $items = asArray($items);
+
+        foreach ($items as $item_id) {
+            $this->createReminders($item_id);
+        }
+
+        return true;
+    }
+
+    /**
      * Checks update conditions and returns array of expressions
      *
      * @param int $item_id item id
@@ -485,6 +508,14 @@ class ScheduledTransactionModel extends CachedTable
 
         $res = $this->validateParams($params, $item_id);
 
+        $this->remindersChanged = (
+            ($res["start_date"] !== $item->start_date)
+            || (isset($res["end_date"]) && $res["end_date"] !== $item->end_date)
+            || (isset($res["interval_type"]) && $res["interval_type"] !== $item->interval_type)
+            || (isset($res["interval_step"]) && $res["interval_step"] !== $item->interval_step)
+            || (isset($res["interval_offset"]) && $res["interval_offset"] !== $item->interval_offset)
+        );
+
         $res["start_date"] = date("Y-m-d H:i:s", $res["start_date"]);
         if (isset($res["end_date"])) {
             $res["end_date"] = date("Y-m-d H:i:s", $res["end_date"]);
@@ -492,6 +523,22 @@ class ScheduledTransactionModel extends CachedTable
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
+    }
+
+    /**
+     * Performs model-specific actions after update successfully completed
+     *
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function postUpdate(int $item_id)
+    {
+        if ($this->remindersChanged) {
+            $this->updateReminders($item_id);
+        }
+
+        return true;
     }
 
     /**
@@ -509,6 +556,8 @@ class ScheduledTransactionModel extends CachedTable
             if (!$itemObj) {
                 return false;
             }
+
+            $this->deleteReminders($item_id);
         }
 
         return true;
@@ -521,9 +570,11 @@ class ScheduledTransactionModel extends CachedTable
      */
     public function reset()
     {
-        if (!self::$user_id || !self::$owner_id) {
+        if (!self::$user_id) {
             return false;
         }
+
+        $this->reminderModel->reset();
 
         $condArr = ["user_id=" . self::$user_id];
         if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
@@ -774,5 +825,64 @@ class ScheduledTransactionModel extends CachedTable
         $this->cleanCache();
 
         return true;
+    }
+
+    /**
+     * Creates reminders for specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     *
+     * @return bool
+     */
+    protected function createReminders(int $item_id)
+    {
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+
+        $reminderDates = $item->getReminders();
+        if (count($reminderDates) === 0) {
+            return true;
+        }
+
+        $reminders = [];
+        foreach ($reminderDates as $date) {
+            $reminders[] = [
+                "schedule_id" => $item_id,
+                "state" => REMINDER_SCHEDULED,
+                "date" => $date,
+                "transaction_id" => 0,
+            ];
+        }
+
+        $this->reminderModel->createMultiple($reminders);
+
+        return true;
+    }
+
+    /**
+     * Updates reminders of specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     *
+     * @return bool
+     */
+    protected function updateReminders(int $item_id)
+    {
+        $this->deleteReminders($item_id);
+        return $this->createReminders($item_id);
+    }
+
+    /**
+     * Removes reminders of specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     *
+     * @return bool
+     */
+    protected function deleteReminders(int $item_id)
+    {
+        return $this->reminderModel->deleteRemindersBySchedule($item_id);
     }
 }

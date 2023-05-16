@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 27);
+define("DB_VERSION", 28);
 
 /**
  * Database version manager class
@@ -31,6 +31,8 @@ class DBVersion
         "import_tpl",
         "persons",
         "transactions",
+        "scheduled_transactions",
+        "reminders",
         "categories",
         "user_settings",
         "user_currency",
@@ -62,6 +64,7 @@ class DBVersion
             $this->createPersonsTable();
             $this->createTransactionsTable();
             $this->createScheduledTransactionsTable();
+            $this->createRemindersTable();
             $this->createCategoriesTable();
             $this->createUsersTable();
             $this->createUserSettingsTable();
@@ -909,6 +912,18 @@ class DBVersion
     }
 
     /**
+     * Creates database version 28
+     *
+     * @return int
+     */
+    private function version28()
+    {
+        $this->createRemindersTable();
+
+        return 28;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1061,7 +1076,7 @@ class DBVersion
     }
 
     /**
-     * Creates transactions table
+     * Creates scheduled transactions table
      */
     private function createScheduledTransactionsTable()
     {
@@ -1093,6 +1108,40 @@ class DBVersion
                 "interval_offset" => "INT(11) NOT NULL",
                 "start_date" => "DATETIME NOT NULL",
                 "end_date" => "DATETIME NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates scheduled transactions reminders table
+     */
+    private function createRemindersTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "reminders";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "schedule_id" => "INT(11) NOT NULL",
+                "state" => "INT(11) NOT NULL",
+                "date" => "DATETIME NOT NULL",
+                "transaction_id" => "INT(11) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",

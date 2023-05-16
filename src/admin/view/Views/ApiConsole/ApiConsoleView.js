@@ -73,6 +73,7 @@ class AdminApiConsoleView extends AdminView {
         this.initCategoryForms();
         this.initTransactionForms();
         this.initScheduledTransactionForms();
+        this.initRemindersForms();
         this.initTemplateForms();
         this.initRuleForms();
         this.initConditionForms();
@@ -239,6 +240,31 @@ class AdminApiConsoleView extends AdminView {
         this.initForm('#createScheduledTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
         this.initForm('#updateScheduledTrForm > form');
         this.initIdsForm('#delScheduledTrForm > form');
+    }
+
+    /** Initialization of forms for Reminder API controller */
+    initRemindersForms() {
+        this.initForm(
+            '#listReminderForm > form',
+            this.getVerifyHandler(apiTypes.isRemindersArray),
+        );
+
+        // Read reminders by ids form
+        const readRemindersBtn = ge('readRemindersBtn');
+        if (!readRemindersBtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readRemindersBtn, {
+            click: (e) => this.onReadItemsSubmit(
+                e,
+                'read_reminder_id',
+                'reminder/',
+                apiTypes.isRemindersArray,
+            ),
+        });
+
+        this.initForm('#confirmReminderForm > form');
+        this.initForm('#cancelReminderForm > form');
     }
 
     /** Initialization of forms for Import template API controller */

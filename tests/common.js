@@ -46,11 +46,16 @@ export const cutDate = (date) => {
     return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
+/** Converts timestamp to seconds */
+export const timeToSeconds = (timestamp) => {
+    assert(timestamp, 'Invalid timestamp');
+    return timestamp / MS_IN_SECOND;
+};
+
 /** Converts Date instance to seconds */
 export const dateToSeconds = (date) => {
     const ms = cutDate(date);
-    assert(ms, 'Invalid date');
-    return ms / MS_IN_SECOND;
+    return timeToSeconds(ms);
 };
 
 /** Converts date string to seconds */
@@ -59,11 +64,16 @@ export const dateStringToSeconds = (dateStr, params = {}) => {
     return (isDate(date)) ? dateToSeconds(date) : null;
 };
 
-/** Converts seconds to Date instance */
-export const secondsToDate = (seconds) => {
+/** Converts seconds to timestamp */
+export const secondsToTime = (seconds) => {
     assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
-    return new Date(seconds * MS_IN_SECOND);
+    return seconds * MS_IN_SECOND;
 };
+
+/** Converts seconds to Date instance */
+export const secondsToDate = (seconds) => (
+    new Date(secondsToTime(seconds))
+);
 
 /** Converts seconds to date string */
 export const secondsToDateString = (seconds, params = {}) => {
@@ -149,6 +159,15 @@ export const shiftDate = (date, shift) => (
         date.getFullYear(),
         date.getMonth(),
         date.getDate() + shift,
+    ))
+);
+
+/** Returns last date of month */
+export const getLastDayOfMonth = (date) => (
+    new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0,
     ))
 );
 

@@ -17,6 +17,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
@@ -153,6 +154,18 @@ class State extends ApiController
     protected function getScheduledTransactions(array $options = [])
     {
         return $this->getList(ScheduledTransactionModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns scheduled transactions reminders data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getReminders(array $options = [])
+    {
+        return $this->getList(ReminderModel::getInstance(), $options);
     }
 
     /**
@@ -332,6 +345,7 @@ class State extends ApiController
             "persons" => ["autoIncrement" => true],
             "transactions" => ["count" => 0, "autoIncrement" => true],
             "scheduledtransactions" => ["autoIncrement" => true],
+            "reminders" => ["autoIncrement" => true],
             "categories" => ["autoIncrement" => true],
             "importtemplates" => ["autoIncrement" => true],
             "importrules" => ["autoIncrement" => true],
@@ -406,6 +420,10 @@ class State extends ApiController
         // Scheduled transactions
         if (isset($request["scheduledtransactions"])) {
             $res->scheduledtransactions = $this->getScheduledTransactions($request["scheduledtransactions"]);
+        }
+        // Scheduled transaction reminders
+        if (isset($request["reminders"])) {
+            $res->reminders = $this->getReminders($request["reminders"]);
         }
         // Import templates
         if (isset($request["importtemplates"])) {

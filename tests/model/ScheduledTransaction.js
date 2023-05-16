@@ -7,6 +7,12 @@ import {
     TRANSFER,
     Transaction,
 } from './Transaction.js';
+import {
+    cutDate,
+    getLastDayOfMonth,
+    secondsToTime,
+    shiftDate,
+} from '../common.js';
 
 /** Types of transactions */
 export const INTERVAL_NONE = 0;
@@ -172,5 +178,90 @@ export class ScheduledTransaction {
 
             this[propName] = props[propName];
         });
+    }
+
+    getFirstInterval() {
+        return secondsToTime(this.start_date);
+    }
+
+    getNextInterval(timestamp) {
+        const endDate = this.end_date ? secondsToTime(this.end_date) : null;
+
+        if (
+            (this.interval_type === INTERVAL_NONE)
+            || (this.interval_step === 0)
+            || (endDate && endDate < timestamp)
+        ) {
+            return null;
+        }
+
+        const date = new Date(timestamp);
+        let res;
+
+        if (this.interval_type === INTERVAL_DAY) {
+            const targetDate = shiftDate(date, this.interval_step);
+            res = targetDate.getTime();
+        } else if (this.interval_type === INTERVAL_WEEK) {
+            const targetWeek = shiftDate(date, this.interval_step * DAYS_IN_WEEK);
+            res = targetWeek.getTime();
+        } else if (this.interval_type === INTERVAL_MONTH) {
+            const startDate = new Date(this.getFirstInterval());
+            const targetMonth = new Date(Date.UTC(
+                date.getFullYear(),
+                date.getMonth() + this.interval_step,
+                1,
+            ));
+            const maxDate = getLastDayOfMonth(targetMonth);
+
+            res = Date.UTC(
+                date.getFullYear(),
+                date.getMonth() + this.interval_step,
+                Math.min(startDate.getDate(), maxDate.getDate()),
+            );
+        } else if (this.interval_type === INTERVAL_YEAR) {
+            res = Date.UTC(
+                date.getFullYear() + this.interval_step,
+                date.getMonth(),
+                date.getDate(),
+            );
+        } else {
+            throw new Error('Invalid type of interval');
+        }
+
+        return (endDate && endDate < res) ? null : res;
+    }
+
+    getReminderDate(timestamp) {
+        let res = new Date(cutDate(new Date(timestamp)));
+
+        if (
+            this.interval_type !== INTERVAL_NONE
+            && this.interval_offset > 0
+        ) {
+            res = shiftDate(res, this.interval_offset);
+        }
+
+        return res.getTime();
+    }
+
+    getReminders(options = {}) {
+        const {
+            limit = 100,
+            endDate = Date.now(),
+        } = options;
+
+        const res = [];
+        let interval = this.getFirstInterval();
+        while (interval && (limit === 0 || res.length < limit) && interval < endDate) {
+            const date = this.getReminderDate(interval);
+            if (date > endDate) {
+                break;
+            }
+
+            res.push(date);
+            interval = this.getNextInterval(interval);
+        }
+
+        return res;
     }
 }

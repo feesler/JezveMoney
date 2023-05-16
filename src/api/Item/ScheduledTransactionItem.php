@@ -2,6 +2,10 @@
 
 namespace JezveMoney\App\Item;
 
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+
 class ScheduledTransactionItem
 {
     public $id = 0;
@@ -22,6 +26,13 @@ class ScheduledTransactionItem
     public $interval_offset = 0;
     public $createdate = 0;
     public $updatedate = 0;
+
+    private static $durationMap = [
+        INTERVAL_DAY => "D",
+        INTERVAL_WEEK => "W",
+        INTERVAL_MONTH => "M",
+        INTERVAL_YEAR => "Y",
+    ];
 
     /**
      * Converts table row from database to ScheduledTransactionItem object
@@ -55,6 +66,109 @@ class ScheduledTransactionItem
         $res->interval_offset = intval($row["interval_offset"]);
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
+
+        return $res;
+    }
+
+    /**
+     * Returns timestamp for first interval of specified scheduled transaction
+     *
+     * @return int|null
+     */
+    public function getFirstInterval()
+    {
+        return $this->start_date;
+    }
+
+    /**
+     * Returns timestamp for next interval of specified scheduled transaction
+     *  or null in case no more intervals available
+     *
+     * @param int $timestamp
+     *
+     * @return int|null
+     */
+    public function getNextInterval(int $timestamp)
+    {
+        if (
+            ($this->interval_type === INTERVAL_NONE)
+            || ($this->interval_step === 0)
+            || ($this->end_date && $this->end_date < $timestamp)
+        ) {
+            return null;
+        }
+
+        $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+        $date->setTime(0, 0);
+
+        if ($this->interval_type === INTERVAL_MONTH) {
+            $startDate = new DateTime("@" . $this->start_date, new DateTimeZone('UTC'));
+            $startDate->setTime(0, 0);
+            $startDateInfo = getdate($startDate->getTimestamp());
+            $monthDay = $startDateInfo["mday"];
+
+            $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+            $maxDate->setTime(0, 0);
+            $maxDate->modify("last day of next month");
+
+            $dateInfo = getdate($date->getTimestamp());
+            $res = mktime(0, 0, 0, $dateInfo["mon"] + $this->interval_step, $monthDay, $dateInfo["year"]);
+            $res = min($res, $maxDate->getTimestamp());
+        } else {
+            $duration = "P" . $this->interval_step . self::$durationMap[$this->interval_type];
+            $date->add(new DateInterval($duration));
+            $res = $date->getTimestamp();
+        }
+
+        return ($this->end_date && $this->end_date < $res) ? null : $res;
+    }
+
+    /**
+     * Returns reminder timestamp for for specified interval of scheduled transaction
+     *
+     * @param int $timestamp interval timestamp
+     *
+     * @return int|null
+     */
+    public function getReminderDate(int $timestamp)
+    {
+        $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+
+        if (
+            $this->interval_type !== INTERVAL_NONE
+            && $this->interval_offset > 0
+        ) {
+            $duration = "P" . $this->interval_offset . "D";
+            $date->add(new DateInterval($duration));
+        }
+
+        return $date->getTimestamp();
+    }
+
+    /**
+     * Returns array of reminder timestamps
+     *
+     * @param array $params options
+     *
+     * @return int[]
+     */
+    public function getReminders(array $params = [])
+    {
+        $limit = isset($params["limit"]) ? intval($params["limit"]) : 100;
+        $endDate = isset($params["endDate"]) ? intval($params["endDate"]) : time();
+
+        $res = [];
+        $interval = $this->getFirstInterval();
+        while ($interval && ($limit === 0 || count($res) < $limit) && $interval <= $endDate) {
+            $date = $this->getReminderDate($interval);
+            if ($date > $endDate) {
+                break;
+            }
+
+            $res[] = $date;
+
+            $interval = $this->getNextInterval($interval);
+        }
 
         return $res;
     }
