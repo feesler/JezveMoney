@@ -64,17 +64,13 @@ class Profile extends ApiController
     public function changename()
     {
         $requiredFields = ["name"];
-        $defMsg = __("ERR_PROFILE_NAME");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 
@@ -85,7 +81,7 @@ class Profile extends ApiController
             wlog("Change name error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_NAME"));
         }
 
         $this->commit();
@@ -100,23 +96,19 @@ class Profile extends ApiController
     public function changepass()
     {
         $requiredFields = ["current", "new"];
-        $defMsg = __("ERR_PROFILE_PASSWORD");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_PASSWORD"));
         }
 
         $result = false;
@@ -126,7 +118,7 @@ class Profile extends ApiController
             wlog("Change password error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_PASSWORD"));
         }
 
         $this->commit();

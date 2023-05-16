@@ -221,10 +221,7 @@ class ApiListController extends ApiController
         $expectedFields = $this->getExpectedFields($request);
         $default = $this->getDefaultValues($request);
         $itemData = array_merge($default, $request);
-        $checkResult = checkFields($itemData, $expectedFields);
-        if ($checkResult === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        checkFields($itemData, $expectedFields, true);
 
         $this->begin();
 
@@ -272,10 +269,7 @@ class ApiListController extends ApiController
             $expectedFields = $this->getExpectedFields($item);
             $default = $this->getDefaultValues($item);
             $itemData = array_merge($default, $item);
-            $checkResult = checkFields($itemData, $expectedFields);
-            if ($checkResult === false) {
-                throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-            }
+            checkFields($itemData, $expectedFields, true);
 
             $items[] = $this->preCreate($itemData);
         }

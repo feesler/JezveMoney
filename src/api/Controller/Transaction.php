@@ -118,15 +118,14 @@ class Transaction extends ApiSortableListController
      */
     public function setCategory()
     {
+        $requiredFields = ["id", "category_id"];
+
         if (!$this->isPOST()) {
             throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, ["id", "category_id"]);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 

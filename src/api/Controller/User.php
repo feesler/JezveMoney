@@ -37,7 +37,7 @@ class User extends ApiListController
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
+        $reqData = checkFields($request, $requiredFields, true);
         if (!$this->uMod->login($reqData)) {
             throw new \Error(__("ERR_LOGIN_FAIL"));
         }
@@ -74,10 +74,7 @@ class User extends ApiListController
 
         $request = $this->getRequestData();
         $request["access"] = 0;
-        $reqData = checkFields($request, $this->createRequiredFields);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        $reqData = checkFields($request, $this->createRequiredFields, true);
 
         $this->begin();
 
@@ -150,10 +147,7 @@ class User extends ApiListController
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 

@@ -31,10 +31,7 @@ class ApiSortableListController extends ApiListController
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $this->changePosFields);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        $reqData = checkFields($request, $this->changePosFields, true);
 
         $this->begin();
 
