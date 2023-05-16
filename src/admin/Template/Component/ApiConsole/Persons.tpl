@@ -7,7 +7,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Visibility</span>
             </label>
-            <select class="input stretch-input" name="visibility" disabled>
+            <select class="input stretch-input" name="visibility" disabled hidden>
                 <option value="all">All</option>
                 <option value="visible" selected>Visible</option>
                 <option value="hidden">Hidden</option>
@@ -47,7 +47,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -76,7 +76,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -97,7 +97,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -118,7 +118,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -139,7 +139,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -164,7 +164,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">

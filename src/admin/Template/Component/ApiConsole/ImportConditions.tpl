@@ -14,7 +14,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Import rule id</span>
             </label>
-            <input id="list_cond_rule" class="input stretch-input" name="rule" type="text" value="0" disabled>
+            <input id="list_cond_rule" class="input stretch-input" name="rule" type="text" value="0" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -67,7 +67,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -115,7 +115,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -138,7 +138,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">

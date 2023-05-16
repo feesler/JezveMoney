@@ -55,7 +55,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -105,7 +105,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -128,7 +128,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">

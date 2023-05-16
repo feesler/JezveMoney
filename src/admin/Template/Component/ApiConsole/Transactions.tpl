@@ -8,12 +8,12 @@
                 <span class="checkbox__label">Order</span>
             </label>
 
-            <label id="list_trans_isasc" class="radio">
+            <label id="list_trans_isasc" class="radio" hidden>
                 <input name="order" type="radio" value="asc" checked disabled>
                 <span class="radio__check"></span>
                 <span class="radio__label">Ascending</span>
             </label>
-            <label id="list_trans_isdesc" class="radio">
+            <label id="list_trans_isdesc" class="radio" hidden>
                 <input name="order" type="radio" value="desc" checked disabled>
                 <span class="radio__check"></span>
                 <span class="radio__label">Descending</span>
@@ -25,7 +25,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Types</span>
             </label>
-            <input class="input stretch-input" name="type" type="text" value="0" disabled>
+            <input class="input stretch-input" name="type" type="text" value="0" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -33,7 +33,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Max. count</span>
             </label>
-            <input class="input stretch-input" name="count" type="text" value="10" disabled>
+            <input class="input stretch-input" name="count" type="text" value="10" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -41,7 +41,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Page number</span>
             </label>
-            <input class="input stretch-input" name="page" type="text" value="0" disabled>
+            <input class="input stretch-input" name="page" type="text" value="0" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -49,7 +49,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Pages range</span>
             </label>
-            <input class="input stretch-input" name="range" type="text" value="1" disabled>
+            <input class="input stretch-input" name="range" type="text" value="1" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -57,7 +57,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Account ids</span>
             </label>
-            <input class="input stretch-input" name="acc_id" type="text" value="" disabled>
+            <input class="input stretch-input" name="acc_id" type="text" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -65,7 +65,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Person ids</span>
             </label>
-            <input class="input stretch-input" name="person_id" type="text" value="" disabled>
+            <input class="input stretch-input" name="person_id" type="text" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -73,7 +73,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Category ids</span>
             </label>
-            <input class="input stretch-input" name="category_id" type="text" value="" disabled>
+            <input class="input stretch-input" name="category_id" type="text" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -81,7 +81,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Start date</span>
             </label>
-            <input class="input stretch-input" name="stdate" type="text" value="" disabled>
+            <input class="input stretch-input" name="stdate" type="text" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -89,7 +89,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">End date</span>
             </label>
-            <input class="input stretch-input" name="enddate" type="text" value="" disabled>
+            <input class="input stretch-input" name="enddate" type="text" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -97,7 +97,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Search request</span>
             </label>
-            <input class="input stretch-input" name="search" type="text" value="" disabled>
+            <input class="input stretch-input" name="search" type="text" value="" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
@@ -170,7 +170,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -235,7 +235,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -304,7 +304,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -375,7 +375,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -398,7 +398,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -426,7 +426,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -454,7 +454,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -481,11 +481,11 @@
             </div>
             <div class="std_margin">
                 <label for="statistics_curr">Currency</label>
-                <input id="statistics_curr" class="input stretch-input" name="curr_id" type="text" disabled>
+                <input id="statistics_curr" class="input stretch-input" name="curr_id" type="text" disabled hidden>
             </div>
             <div class="std_margin">
                 <label for="statistics_acc">Account ids</label>
-                <input id="statistics_acc" class="input stretch-input" name="acc_id" type="text" disabled>
+                <input id="statistics_acc" class="input stretch-input" name="acc_id" type="text" disabled hidden>
             </div>
             <div class="std_margin">
                 <label for="statistics_cat">Category ids</label>
@@ -508,7 +508,7 @@
                     <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                     <span class="checkbox__label">Start date</span>
                 </label>
-                <input class="input stretch-input" name="stdate" type="text" value="" disabled>
+                <input class="input stretch-input" name="stdate" type="text" value="" disabled hidden>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -516,7 +516,7 @@
                     <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                     <span class="checkbox__label">End date</span>
                 </label>
-                <input class="input stretch-input" name="enddate" type="text" value="" disabled>
+                <input class="input stretch-input" name="enddate" type="text" value="" disabled hidden>
             </div>
         </div>
 

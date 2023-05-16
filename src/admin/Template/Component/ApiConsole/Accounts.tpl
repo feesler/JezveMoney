@@ -7,7 +7,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Owner</span>
             </label>
-            <input class="input stretch-input" name="owner" type="text" disabled>
+            <input class="input stretch-input" name="owner" type="text" disabled hidden>
         </div>
 
         <div class="std_margin">
@@ -16,7 +16,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Visibility</span>
             </label>
-            <select name="visibility" class="input stretch-input" disabled>
+            <select name="visibility" class="input stretch-input" disabled hidden>
                 <option value="all">All</option>
                 <option value="visible" selected>Visible</option>
                 <option value="hidden">Hidden</option>
@@ -29,7 +29,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Sort by</span>
             </label>
-            <select name="sort" class="input stretch-input" disabled>
+            <select name="sort" class="input stretch-input" disabled hidden>
                 <option value="visibility">Visibility</option>
             </select>
         </div>
@@ -95,7 +95,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -152,7 +152,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -175,7 +175,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -198,7 +198,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -221,7 +221,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
 
         <div class="form-controls">
@@ -247,7 +247,7 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
             </label>
-            <input class="input stretch-input" name="returnState" type="text" disabled>
+            <input class="input stretch-input" name="returnState" type="text" disabled hidden>
         </div>
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">

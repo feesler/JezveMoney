@@ -8,6 +8,7 @@ import {
     isObject,
     isFunction,
     removeChilds,
+    show,
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import * as apiTypes from '../../../../view/API/types.js';
@@ -610,11 +611,36 @@ class AdminApiConsoleView extends AdminView {
             if (el instanceof NodeList) {
                 for (let i = 0; i < el.length; i += 1) {
                     el[i].disabled = disableElements;
+                    this.showFormField(el[i], !disableElements);
                 }
             } else {
                 el.disabled = disableElements;
+                this.showFormField(el, !disableElements);
             }
         }
+    }
+
+    /**
+     * Shows/hides specified form field
+     * @param {Element} elem
+     * @param {boolean} value
+     * @returns
+     */
+    showFormField(elem, value) {
+        if (!elem) {
+            return;
+        }
+
+        let el = elem;
+
+        const inputType = elem.type?.toLowerCase();
+        if (inputType === 'radio') {
+            el = elem.closest('.radio');
+        } else if (inputType === 'checkbox') {
+            el = elem.closest('.checkbox');
+        }
+
+        show(el, value);
     }
 
     /**
