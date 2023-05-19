@@ -191,6 +191,18 @@ const create = async () => {
     [
         App.scenario.REMINDER_LIMIT_1_1,
     ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_LIMIT_1, true);
+
+    const reminderIds = [
+        'REMINDER_EXPENSE_1_1',
+        'REMINDER_EXPENSE_1_2',
+        'REMINDER_INCOME_2_1',
+        'REMINDER_INCOME_2_2',
+        'REMINDER_TRANSFER_1_1',
+        'REMINDER_DEBT_1_1',
+        'REMINDER_LIMIT_1_1',
+    ];
+
+    reminderIds.forEach((id) => assert(App.scenario[id], `Reminder '${id}' not found`));
 };
 
 const createWithChainedRequest = async () => {
