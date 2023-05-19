@@ -90,8 +90,8 @@
             <span class="checkbox__label">Transactions</span>
         </label>
 
-        <label class="checkbox std_margin suboption">
-            <input type="checkbox" name="keepbalance" disabled hidden>
+        <label class="checkbox std_margin suboption" hidden>
+            <input type="checkbox" name="keepbalance" disabled>
             <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
             <span class="checkbox__label">Keep current balance of accounts</span>
         </label>
