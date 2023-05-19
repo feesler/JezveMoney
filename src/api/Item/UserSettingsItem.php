@@ -12,6 +12,7 @@ class UserSettingsItem
     public $date_locale = "en";
     public $decimal_locale = "en";
     public $tr_group_by_date = 0;
+    public $tz_offset = 0;
 
     /**
      * Converts table row from database to UserSettingsItem object
@@ -35,6 +36,7 @@ class UserSettingsItem
         $res->date_locale = $row["date_locale"];
         $res->decimal_locale = $row["decimal_locale"];
         $res->tr_group_by_date = intval($row["tr_group_by_date"]);
+        $res->tz_offset = intval($row["tz_offset"]);
 
         return $res;
     }
@@ -53,6 +55,7 @@ class UserSettingsItem
         $res->date_locale = $this->date_locale;
         $res->decimal_locale = $this->decimal_locale;
         $res->tr_group_by_date = $this->tr_group_by_date;
+        $res->tz_offset = $this->tz_offset;
 
         return $res;
     }

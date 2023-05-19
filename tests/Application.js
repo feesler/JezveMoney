@@ -137,6 +137,11 @@ class Application extends TestApplication {
         return formatter.format(value);
     }
 
+    getTimezoneOffset() {
+        const date = new Date();
+        return date.getTimezoneOffset();
+    }
+
     async setupUser() {
         const userProfile = await api.profile.read();
         assert(userProfile?.user_id, 'Fail to read user profile');
@@ -146,8 +151,24 @@ class Application extends TestApplication {
 
         this.state = new AppState();
         await this.state.fetch();
+
+        await this.updateTimezone();
+
         this.currency = await CurrencyList.create();
         this.icons = await IconsList.create();
+    }
+
+    async updateTimezone() {
+        const tzOffset = this.state.getTimezoneOffset();
+        const currentTzOffset = this.getTimezoneOffset();
+        if (tzOffset === currentTzOffset) {
+            return;
+        }
+
+        await api.profile.updateSettings({
+            tz_offset: currentTzOffset,
+        });
+        await this.state.fetch();
     }
 
     async startTests() {

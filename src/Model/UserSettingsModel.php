@@ -28,6 +28,7 @@ const AVAILABLE_SETTINGS = [
     "date_locale",
     "decimal_locale",
     "tr_group_by_date",
+    "tz_offset",
 ];
 
 const DEFAULT_SETTINGS = [
@@ -37,6 +38,7 @@ const DEFAULT_SETTINGS = [
     "date_locale" => DEFAULT_LOCALE,
     "decimal_locale" => DEFAULT_LOCALE,
     "tr_group_by_date" => 0,
+    "tz_offset" => 0,
 ];
 
 /**

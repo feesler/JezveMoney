@@ -53,7 +53,13 @@ import { ImportTemplate } from './ImportTemplate.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = [...sortSettings, 'date_locale', 'decimal_locale', 'tr_group_by_date'];
+const availSettings = [
+    ...sortSettings,
+    'date_locale',
+    'decimal_locale',
+    'tr_group_by_date',
+    'tz_offset',
+];
 
 /** Categories */
 const ANY_TYPE = 0;
@@ -342,6 +348,10 @@ export class AppState {
 
     getDecimalFormatLocale() {
         return this.profile.settings.decimal_locale;
+    }
+
+    getTimezoneOffset() {
+        return this.profile.settings.tz_offset;
     }
 
     getCurrencies() {
