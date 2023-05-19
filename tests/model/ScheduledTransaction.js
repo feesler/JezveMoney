@@ -257,7 +257,7 @@ export class ScheduledTransaction {
 
         const res = [];
         let interval = this.getFirstInterval();
-        while (interval && (limit === 0 || res.length < limit) && interval < endDate) {
+        while (interval && (limit === 0 || res.length < limit) && interval <= endDate) {
             const date = this.getReminderDate(interval);
             if (date > endDate) {
                 break;

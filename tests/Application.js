@@ -11,6 +11,7 @@ import { Scenario } from './scenario/index.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
 import {
+    cutDate,
     dateToSeconds,
     fixDate,
     formatInputDate,
@@ -31,7 +32,7 @@ class Application extends TestApplication {
 
         this.scenario = await Scenario.create(this.environment);
 
-        const now = new Date();
+        const now = new Date(cutDate(new Date()));
         const year = now.getFullYear();
         const month = now.getMonth();
         const day = now.getDate();

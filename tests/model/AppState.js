@@ -2131,7 +2131,9 @@ export class AppState {
             return false;
         }
 
-        const reminderDates = item.getReminders();
+        const reminderDates = item.getReminders({
+            endDate: App.dates.now.getTime(),
+        });
         return reminderDates.every((timestamp) => (
             this.createReminder({
                 schedule_id: scheduleId,

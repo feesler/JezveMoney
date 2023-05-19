@@ -841,7 +841,11 @@ class ScheduledTransactionModel extends CachedTable
             throw new \Error("Item not found");
         }
 
-        $reminderDates = $item->getReminders();
+        $settingsModel = UserSettingsModel::getInstance();
+
+        $reminderDates = $item->getReminders([
+            "endDate" => $settingsModel->getClientTime(),
+        ]);
         if (count($reminderDates) === 0) {
             return true;
         }

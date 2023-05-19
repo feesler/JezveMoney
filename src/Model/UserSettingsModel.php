@@ -41,6 +41,8 @@ const DEFAULT_SETTINGS = [
     "tz_offset" => 0,
 ];
 
+const SECONDS_IN_MINUTE = 60;
+
 /**
  * User settings model
  */
@@ -350,5 +352,21 @@ class UserSettingsModel extends CachedTable
         }
 
         throw new \Error("Invalid decimal format locale");
+    }
+
+    /**
+     * Returns timestamp for current time with client timezone correction
+     *
+     * @return int
+     */
+    public function getClientTime()
+    {
+        $settings = $this->getSettings();
+        if (is_null($settings)) {
+            throw new \Error("Settings not available");
+        }
+
+        $res = time() - ($settings->tz_offset * SECONDS_IN_MINUTE);
+        return $res;
     }
 }
