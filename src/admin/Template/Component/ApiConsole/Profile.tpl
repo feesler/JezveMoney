@@ -97,6 +97,12 @@
         </label>
 
         <label class="checkbox std_margin">
+            <input type="checkbox" name="scheduledTransactions">
+            <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+            <span class="checkbox__label">Scheduled transactions</span>
+        </label>
+
+        <label class="checkbox std_margin">
             <input type="checkbox" name="importtpl">
             <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
             <span class="checkbox__label">Import templates</span>
