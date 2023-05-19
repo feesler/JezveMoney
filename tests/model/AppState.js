@@ -342,12 +342,28 @@ export class AppState {
         delete this.profile;
     }
 
+    getAccountsSortMode() {
+        return this.profile.settings.sort_accounts;
+    }
+
+    getPersonsSortMode() {
+        return this.profile.settings.sort_persons;
+    }
+
+    getCategoriesSortMode() {
+        return this.profile.settings.sort_categories;
+    }
+
     getDateFormatLocale() {
         return this.profile.settings.date_locale;
     }
 
     getDecimalFormatLocale() {
         return this.profile.settings.decimal_locale;
+    }
+
+    getGroupByDate() {
+        return this.profile.settings.tr_group_by_date === 1;
     }
 
     getTimezoneOffset() {
@@ -943,10 +959,6 @@ export class AppState {
         return this.userAccountsCache;
     }
 
-    getAccountsSortMode() {
-        return this.profile.settings.sort_accounts;
-    }
-
     sortAccounts() {
         const sortMode = this.getAccountsSortMode();
         this.accounts.sortBy(sortMode);
@@ -1228,10 +1240,6 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
-    getPersonsSortMode() {
-        return this.profile.settings.sort_persons;
-    }
-
     sortPersons() {
         const sortMode = this.getPersonsSortMode();
         this.persons.sortBy(sortMode);
@@ -1445,10 +1453,6 @@ export class AppState {
         return this.returnState(params.returnState);
     }
 
-    getCategoriesSortMode() {
-        return this.profile.settings.sort_categories;
-    }
-
     sortCategories() {
         const sortMode = this.getCategoriesSortMode();
         this.categories.sortBy(sortMode);
@@ -1515,10 +1519,6 @@ export class AppState {
     /**
      * Transactions
      */
-
-    getGroupByDate() {
-        return this.profile.settings.tr_group_by_date === 1;
-    }
 
     validateTransaction(params) {
         if (!isObject(params)) {
