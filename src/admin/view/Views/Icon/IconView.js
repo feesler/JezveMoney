@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import { ge, createElement, selectByValue } from 'jezvejs';
 import { Application } from '../../../../view/Application/Application.js';
+import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';
 import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
 import '../../utils/AdminView/AdminView.scss';
@@ -14,7 +15,7 @@ class AdminIconListView extends AdminListView {
 
         this.apiController = 'icon';
         this.statePath = 'icons';
-        this.deleteConfirmMessage = 'Are you sure want to delete selected icon?';
+        this.deleteConfirmMessage = __('MSG_ICON_DELETE');
     }
 
     /**
