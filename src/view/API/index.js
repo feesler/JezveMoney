@@ -4,7 +4,7 @@ import { asArray } from 'jezvejs';
 const MSG_REQUEST_FAIL = 'API request failed';
 
 /** Send API request */
-const apiRequest = async (method, path, data = null, options = {}) => {
+export const apiRequest = async (method, path, data = null, options = {}) => {
     const { baseURL } = window.app;
     const isPOST = method.toLowerCase() === 'post';
     const url = new URL(`${baseURL}api/${path}`);
@@ -43,12 +43,12 @@ const apiRequest = async (method, path, data = null, options = {}) => {
 };
 
 /** Send GET API request */
-const apiGet = (...args) => apiRequest('GET', ...args);
+export const apiGet = (...args) => apiRequest('GET', ...args);
 /** Send GET API request */
-const apiPost = (...args) => apiRequest('POST', ...args);
+export const apiPost = (...args) => apiRequest('POST', ...args);
 
 /** Send GET request for items by ids */
-const idsRequest = (path, val) => {
+export const idsRequest = (path, val) => {
     if (!path) {
         throw new Error('Invalid request path');
     }

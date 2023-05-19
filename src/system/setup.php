@@ -3,8 +3,6 @@
 use JezveMoney\Core\Locale;
 use JezveMoney\Core\MySqlDB;
 
-$noLogs = true;
-
 defineHostConstants();
 
 require_once(APP_ROOT . "system/common.php");
