@@ -402,6 +402,7 @@
     "MSG_PROFILE_DELETED": "Your profile is successfully deleted",
     "ERR_PROFILE_DELETE": "Fail to delete profile",
     "ERR_SETTINGS_UPDATE": "Fail to update settings",
+    "ERR_SETTING_DELETE": "Fail to delete setting",
     "ERR_USER_CREATE": "Fail to create user",
     "ERR_USER_UPDATE": "Fail to update user",
     "ERR_USER_DELETE": "Fail to delete user",

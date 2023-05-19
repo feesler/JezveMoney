@@ -143,5 +143,6 @@ function defineHostConstants()
     define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "Template"));
     define("ADMIN_VIEW_TPL_PATH", pathJoin(APP_ROOT, "admin", "Template", "View"));
     define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads"));
+    define("SETTINGS_PATH", pathJoin(APP_ROOT, "system"));
     define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs"));
 }
