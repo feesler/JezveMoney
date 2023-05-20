@@ -65,7 +65,7 @@ export class TransactionView extends AppView {
         res.isUpdate = (await url()).includes('/update/');
 
         if (res.isUpdate) {
-            const hiddenEl = await query('input[name="id"]');
+            const hiddenEl = await query('#idInp');
             assert(hiddenEl, 'Transaction id field not found');
 
             res.id = parseInt(await prop(hiddenEl, 'value'), 10);
@@ -91,6 +91,12 @@ export class TransactionView extends AppView {
             const personIdInp = await query('#personIdInp');
             res.personContainer.content.id = parseInt(await prop(personIdInp, 'value'), 10);
         }
+
+        const srcCurrInp = await query('#srcCurrInp');
+        res.srcCurrId = parseInt(await prop(srcCurrInp, 'value'), 10);
+
+        const destCurrInp = await query('#destCurrInp');
+        res.destCurrId = parseInt(await prop(destCurrInp, 'value'), 10);
 
         const debtOperationInp = await query('#debtOperationInp');
         res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
@@ -198,12 +204,8 @@ export class TransactionView extends AppView {
             ? appState.accounts.getItem(cont.destContainer.content.id)
             : null;
 
-        res.src_curr_id = (cont.srcAmountRow)
-            ? parseInt(cont.srcAmountRow.content.hiddenValue, 10)
-            : 0;
-        res.dest_curr_id = (cont.destAmountRow)
-            ? parseInt(cont.destAmountRow.content.hiddenValue, 10)
-            : 0;
+        res.src_curr_id = cont.srcCurrId;
+        res.dest_curr_id = cont.destCurrId;
 
         res.srcCurr = App.currency.getItem(res.src_curr_id);
         res.destCurr = App.currency.getItem(res.dest_curr_id);

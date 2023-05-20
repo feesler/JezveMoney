@@ -4,15 +4,18 @@ import {
     insertAfter,
     show,
     enable,
-    setEvents,
     addChilds,
+    createElement,
+    setProps,
 } from 'jezvejs';
 import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Input } from 'jezvejs/Input';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import { InputGroup } from 'jezvejs/InputGroup';
 import { createStore } from 'jezvejs/Store';
 import 'jezvejs/style/Input';
 import 'jezvejs/style/InputGroup';
@@ -60,6 +63,14 @@ import '../../Components/Field/Field.scss';
 import '../../Application/Application.scss';
 import './TransactionView.scss';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
+import { Field } from '../../Components/Field/Field.js';
+
+const inputProps = {
+    autocomplete: 'off',
+    autocapitalize: 'none',
+    autocorrect: 'off',
+    spellcheck: false,
+};
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
@@ -217,37 +228,7 @@ class TransactionView extends View {
     onStart() {
         const isUpdate = this.props.transaction.id;
 
-        this.loadElementsByIds([
-            'heading',
-            'form',
-            'notAvailMsg',
-            'accountsSection',
-            'srcAmountRow',
-            'srcAmountInput',
-            'srcCurrBtn',
-            'srcAmountSign',
-            'destAmountRow',
-            'destAmountInput',
-            'destCurrBtn',
-            'destAmountSign',
-            'srcResBalanceRow',
-            'srcResBalanceInput',
-            'srcResBalanceSign',
-            'destResBalanceRow',
-            'destResBalanceInput',
-            'destResBalanceSign',
-            'exchangeRow',
-            'exchangeInput',
-            'exchangeSign',
-            'dateRow',
-            'dateInput',
-            'dateInputBtn',
-            'datePickerWrapper',
-            'categoryRow',
-            'categorySelect',
-            'commentRow',
-            'commentInput',
-            // Hidden inputs
+        const hiddenInputIds = [
             'typeInp',
             'srcIdInp',
             'destIdInp',
@@ -256,15 +237,24 @@ class TransactionView extends View {
             'debtOperationInp',
             'personIdInp',
             'debtAccountInp',
-            // Submit controls
-            'submitControls',
-            'submitBtn',
-            'cancelBtn',
+        ];
+
+        this.loadElementsByIds([
+            'heading',
+            'transactionContainer',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: (isUpdate) ? __('TR_UPDATE') : __('TR_CREATE'),
             showInHeaderOnScroll: false,
+        });
+
+        // Not available message
+        this.notAvailMsg = createElement('span', {
+            props: {
+                id: 'notAvailMsg',
+                className: 'nodata-message',
+            },
         });
 
         // Update mode
@@ -279,9 +269,6 @@ class TransactionView extends View {
             this.heading.actionsContainer.append(this.deleteBtn.elem);
         }
 
-        // Init form submit event handler
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
-
         this.typeMenu = TransactionTypeMenu.create({
             id: 'typeMenu',
             multiple: false,
@@ -289,7 +276,14 @@ class TransactionView extends View {
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
-        this.form.prepend(this.typeMenu.elem);
+
+        // Accounts section
+        this.accountsSection = createElement('div', {
+            props: {
+                id: 'accountsSection',
+                className: 'accounts-section',
+            },
+        });
 
         this.swapBtn = Button.create({
             id: 'swapBtn',
@@ -376,64 +370,337 @@ class TransactionView extends View {
         });
         this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
 
-        this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
-        if (this.srcAmountInput) {
-            this.srcAmountInput = DecimalInput.create({
-                elem: this.srcAmountInput,
-                onInput: (e) => this.onSourceAmountInput(e),
-            });
-        }
+        // Source amount field
+        this.srcAmountInput = DecimalInput.create({
+            id: 'srcAmountInput',
+            className: 'input input-group__input right-align-text',
+            onInput: (e) => this.onSourceAmountInput(e),
+        });
 
-        this.destAmountRowLabel = this.destAmountRow.querySelector('label');
-        if (this.destAmountInput) {
-            this.destAmountInput = DecimalInput.create({
-                elem: this.destAmountInput,
-                onInput: (e) => this.onDestAmountInput(e),
-            });
-        }
+        this.srcAmountSign = createElement('div', {
+            props: {
+                id: 'srcAmountSign',
+                className: 'input-group__btn-title',
+            },
+        });
 
-        this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
+        this.srcCurrBtn = Button.create({
+            id: 'srcCurrBtn',
+            className: 'input-group__btn',
+            tabIndex: -1,
+            title: this.srcAmountSign,
+        });
+
+        const srcAmountFeedback = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('TR_INVALID_AMOUNT'),
+            },
+        });
+
+        this.srcAmountRow = Field.create({
+            id: 'srcAmountRow',
+            htmlFor: 'srcAmountInput',
+            title: __('TR_SRC_AMOUNT'),
+            className: 'form-row validation-block',
+            content: [
+                InputGroup.create({
+                    children: [
+                        this.srcAmountInput.elem,
+                        this.srcCurrBtn.elem,
+                    ],
+                }).elem,
+                srcAmountFeedback,
+            ],
+        });
+
+        // Destination amount field
+        this.destAmountInput = DecimalInput.create({
+            id: 'destAmountInput',
+            className: 'input input-group__input right-align-text',
+            onInput: (e) => this.onDestAmountInput(e),
+        });
+
+        this.destAmountSign = createElement('div', {
+            props: {
+                id: 'destAmountSign',
+                className: 'input-group__btn-title',
+            },
+        });
+
+        this.destCurrBtn = Button.create({
+            id: 'destCurrBtn',
+            className: 'input-group__btn',
+            tabIndex: -1,
+            title: this.destAmountSign,
+        });
+
+        const destAmountFeedback = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('TR_INVALID_AMOUNT'),
+            },
+        });
+
+        this.destAmountRow = Field.create({
+            id: 'destAmountRow',
+            htmlFor: 'destAmountInput',
+            title: __('TR_DEST_AMOUNT'),
+            className: 'form-row validation-block',
+            content: [
+                InputGroup.create({
+                    children: [
+                        this.destAmountInput.elem,
+                        this.destCurrBtn.elem,
+                    ],
+                }).elem,
+                destAmountFeedback,
+            ],
+        });
+
+        // Source result field
+        this.srcResBalanceSign = Button.create({
+            id: 'srcResBalanceSign',
+            className: 'input-group__text',
+            type: 'static',
+        });
+
         this.srcResBalanceInput = DecimalInput.create({
-            elem: this.srcResBalanceInput,
+            id: 'srcResBalanceInput',
+            className: 'input input-group__input right-align-text',
             onInput: (e) => this.onSourceResultInput(e),
         });
 
-        this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
+        this.srcResBalanceRow = Field.create({
+            id: 'srcResBalanceRow',
+            htmlFor: 'srcResBalanceInput',
+            title: __('TR_RESULT'),
+            className: 'form-row',
+            content: [
+                InputGroup.create({
+                    children: [
+                        this.srcResBalanceInput.elem,
+                        this.srcResBalanceSign.elem,
+                    ],
+                }).elem,
+            ],
+        });
+        this.srcResBalanceRow.hide();
+
+        // Destination result field
         this.destResBalanceInput = DecimalInput.create({
-            elem: this.destResBalanceInput,
+            id: 'destResBalanceInput',
+            className: 'input input-group__input right-align-text',
             onInput: (e) => this.onDestResultInput(e),
         });
 
-        this.exchangeRowLabel = this.exchangeRow.querySelector('label');
+        this.destResBalanceSign = Button.create({
+            id: 'destResBalanceSign',
+            className: 'input-group__text',
+            type: 'static',
+        });
+
+        this.destResBalanceRow = Field.create({
+            id: 'destResBalanceRow',
+            htmlFor: 'destResBalanceInput',
+            title: __('TR_RESULT'),
+            className: 'form-row',
+            content: [
+                InputGroup.create({
+                    children: [
+                        this.destResBalanceInput.elem,
+                        this.destResBalanceSign.elem,
+                    ],
+                }).elem,
+            ],
+        });
+        this.destResBalanceRow.hide();
+
+        // Exchange rate field
         this.exchangeInput = DecimalInput.create({
-            elem: this.exchangeInput,
+            id: 'exchangeInput',
+            className: 'input input-group__input right-align-text',
             digits: EXCHANGE_PRECISION,
             allowNegative: false,
             onInput: (e) => this.onExchangeInput(e),
         });
-        setEvents(this.exchangeSign, { click: () => this.onToggleExchange() });
 
-        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
+        this.exchangeSign = Button.create({
+            id: 'exchangeSign',
+            className: 'input-group__btn',
+            tabIndex: -1,
+            onClick: () => this.onToggleExchange(),
+        });
+
+        this.exchangeRow = Field.create({
+            id: 'exchangeRow',
+            htmlFor: 'destAmountInput',
+            title: __('TR_EXCHANGE_RATE'),
+            className: 'form-row',
+            content: [
+                InputGroup.create({
+                    children: [
+                        this.exchangeInput.elem,
+                        this.exchangeSign.elem,
+                    ],
+                }).elem,
+            ],
+        });
+        this.exchangeRow.hide();
+
+        // Date field
+        this.dateInputBtn = Button.create({
+            id: 'dateInputBtn',
+            className: 'input-group__btn',
+            icon: 'calendar-icon',
+            onClick: () => this.showCalendar(),
+        });
 
         this.dateInput = DateInput.create({
-            elem: this.dateInput,
+            id: 'dateInput',
+            className: 'input input-group__input',
             locales: window.app.dateFormatLocale,
             onInput: (e) => this.onDateInput(e),
         });
 
+        this.datePickerWrapper = createElement('div', {
+            props: {
+                id: 'datePickerWrapper',
+                className: 'calendar',
+            },
+        });
+
+        const dateFeedback = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('TR_INVALID_DATE'),
+            },
+        });
+
+        const dateFieldContainer = createElement('div', {
+            props: {
+                className: 'column-container',
+            },
+            children: [
+                InputGroup.create({
+                    children: [
+                        this.dateInput.elem,
+                        this.dateInputBtn.elem,
+                    ],
+                }).elem,
+                this.datePickerWrapper,
+            ],
+        });
+
+        this.dateRow = Field.create({
+            id: 'dateRow',
+            htmlFor: 'dateInput',
+            title: __('TR_DATE'),
+            className: 'form-row validation-block',
+            content: [
+                dateFieldContainer,
+                dateFeedback,
+            ],
+        });
+
+        // Category field
         this.categorySelect = CategorySelect.create({
-            elem: this.categorySelect,
+            id: 'categorySelect',
+            name: 'category_id',
             className: 'dd_fullwidth',
             enableFilter: true,
             noResultsMessage: __('NOT_FOUND'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 
-        setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
+        this.categoryRow = Field.create({
+            id: 'categoryRow',
+            htmlFor: 'categorySelect',
+            title: __('TR_CATEGORY'),
+            className: 'form-row',
+            content: this.categorySelect.elem,
+        });
+
+        // Comment field
+        this.commentInput = Input.create({
+            id: 'commentInput',
+            name: 'comment',
+            className: 'stretch-input',
+            onInput: (e) => this.onCommentInput(e),
+        });
+        setProps(this.commentInput.elem, inputProps);
+
+        this.commentRow = Field.create({
+            id: 'commentRow',
+            htmlFor: 'commentInput',
+            title: __('TR_COMMENT'),
+            className: 'form-row',
+            content: this.commentInput.elem,
+        });
+
+        // Controls
+        this.submitBtn = Button.create({
+            id: 'submitBtn',
+            type: 'submit',
+            className: 'submit-btn',
+            title: __('SUBMIT'),
+        });
+
+        this.cancelBtn = Button.create({
+            id: 'cancelBtn',
+            type: 'link',
+            url: window.app.props.nextAddress,
+            className: 'cancel-btn',
+            title: __('CANCEL'),
+        });
 
         this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
-        insertAfter(this.spinner.elem, this.cancelBtn);
+
+        this.submitControls = createElement('div', {
+            props: {
+                id: 'submitControls',
+                className: 'form-controls',
+            },
+            children: [
+                this.submitBtn.elem,
+                this.cancelBtn.elem,
+                this.spinner.elem,
+            ],
+        });
+
+        // Hidden inputs
+        if (isUpdate) {
+            hiddenInputIds.push('idInp');
+        }
+        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+
+        this.form = createElement('form', {
+            props: {
+                id: 'form',
+                method: 'post',
+            },
+            events: {
+                submit: (e) => this.onSubmit(e),
+            },
+            children: [
+                this.typeMenu.elem,
+                this.accountsSection,
+                this.srcAmountRow.elem,
+                this.destAmountRow.elem,
+                this.exchangeRow.elem,
+                this.srcResBalanceRow.elem,
+                this.destResBalanceRow.elem,
+                this.dateRow.elem,
+                this.categoryRow.elem,
+                this.commentRow.elem,
+                this.submitControls,
+                this.notAvailMsg,
+                ...hiddenInputs,
+            ],
+        });
+
+        this.transactionContainer.append(this.form);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
@@ -446,6 +713,16 @@ class TransactionView extends View {
         if (state.isUpdate && state.transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
         }
+    }
+
+    /** Returns hidden input element */
+    createHiddenInput(id) {
+        const input = createElement('input', {
+            props: { id, type: 'hidden' },
+        });
+
+        this[id] = input;
+        return input;
     }
 
     /** Initialize DropDown for source account tile */
@@ -654,7 +931,12 @@ class TransactionView extends View {
      * @param {Number} options - show/hide options
      */
     srcAmountSwitch(options) {
-        this.commonSwitch(this.srcAmountRow, this.srcAmountInfo, this.srcAmountInput, options);
+        this.commonSwitch(
+            this.srcAmountRow.elem,
+            this.srcAmountInfo,
+            this.srcAmountInput.elem,
+            options,
+        );
     }
 
     /**
@@ -662,7 +944,12 @@ class TransactionView extends View {
      * @param {Number} options - show/hide options
      */
     destAmountSwitch(options) {
-        this.commonSwitch(this.destAmountRow, this.destAmountInfo, this.destAmountInput, options);
+        this.commonSwitch(
+            this.destAmountRow.elem,
+            this.destAmountInfo,
+            this.destAmountInput.elem,
+            options,
+        );
     }
 
     /**
@@ -671,9 +958,9 @@ class TransactionView extends View {
      */
     resBalanceSwitch(options) {
         this.commonSwitch(
-            this.srcResBalanceRow,
+            this.srcResBalanceRow.elem,
             this.srcResBalanceInfo,
-            this.srcResBalanceInput,
+            this.srcResBalanceInput.elem,
             options,
         );
     }
@@ -684,9 +971,9 @@ class TransactionView extends View {
      */
     resBalanceDestSwitch(options) {
         this.commonSwitch(
-            this.destResBalanceRow,
+            this.destResBalanceRow.elem,
             this.destResBalanceInfo,
-            this.destResBalanceInput,
+            this.destResBalanceInput.elem,
             options,
         );
     }
@@ -696,7 +983,12 @@ class TransactionView extends View {
      * @param {Number} options - show/hide options
      */
     exchRateSwitch(options) {
-        this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, options);
+        this.commonSwitch(
+            this.exchangeRow.elem,
+            this.exchangeInfo,
+            this.exchangeInput.elem,
+            options,
+        );
     }
 
     onChangeType(value) {
@@ -805,7 +1097,7 @@ class TransactionView extends View {
     /** Enable/disable source currency button */
     enableSourceCurrencySelect(value) {
         this.enableCurrencySelect(
-            this.srcCurrBtn,
+            this.srcCurrBtn.elem,
             this.srcAmountSign,
             this.srcCurrDDList,
             value,
@@ -815,7 +1107,7 @@ class TransactionView extends View {
     /** Enable/disable destination currency button */
     enableDestCurrencySelect(value) {
         this.enableCurrencySelect(
-            this.destCurrBtn,
+            this.destCurrBtn.elem,
             this.destAmountSign,
             this.destCurrDDList,
             value,
@@ -1056,7 +1348,7 @@ class TransactionView extends View {
         const exchSigns = (useBackExchange)
             ? `${srcCurr.sign}/${destCurr.sign}`
             : `${destCurr.sign}/${srcCurr.sign}`;
-        this.exchangeSign.textContent = exchSigns;
+        this.exchangeSign.setTitle(exchSigns);
 
         const exchangeValue = (useBackExchange)
             ? state.form.backExchange
@@ -1106,8 +1398,8 @@ class TransactionView extends View {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = __('TR_RESULT');
-        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
+        this.srcResBalanceRow.setTitle(__('TR_RESULT'));
+        this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
         this.enableSourceCurrencySelect(false);
         this.enableDestCurrencySelect(true);
@@ -1153,8 +1445,8 @@ class TransactionView extends View {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = __('TR_RESULT');
-        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
+        this.srcResBalanceRow.setTitle(__('TR_RESULT'));
+        this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
         this.enableSourceCurrencySelect(true);
         this.enableDestCurrencySelect(false);
@@ -1229,8 +1521,8 @@ class TransactionView extends View {
             this.destResBalanceInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${__('TR_SOURCE')})`;
-        this.destResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${__('TR_DESTINATION')})`;
+        this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_SOURCE')})`);
+        this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_DESTINATION')})`);
 
         this.enableSourceCurrencySelect(false);
         this.enableDestCurrencySelect(false);
@@ -1402,8 +1694,8 @@ class TransactionView extends View {
 
         const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
         const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
-        this.srcResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${srcResultTarget})`;
-        this.destResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${destResultTarget})`;
+        this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${srcResultTarget})`);
+        this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${destResultTarget})`);
 
         this.enableSourceCurrencySelect(debtType);
         this.enableDestCurrencySelect(!debtType);
@@ -1456,7 +1748,7 @@ class TransactionView extends View {
             this.destResBalanceInfo.elem,
         ]);
 
-        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
+        this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
         this.enableSourceCurrencySelect(false);
         this.enableDestCurrencySelect(false);
@@ -1484,6 +1776,10 @@ class TransactionView extends View {
             this.notAvailMsg.textContent = message;
         }
         show(this.notAvailMsg, !state.isAvailable);
+
+        if (state.isUpdate) {
+            this.idInp.value = transaction.id;
+        }
 
         const scrTypes = [EXPENSE, TRANSFER];
         const destTypes = [INCOME, TRANSFER, LIMIT_CHANGE];
@@ -1526,18 +1822,18 @@ class TransactionView extends View {
                 this.renderLimitChange(state);
             }
         } else {
-            show(this.srcAmountRow, false);
-            show(this.destAmountRow, false);
-            show(this.srcResBalanceRow, false);
-            show(this.destResBalanceRow, false);
-            show(this.exchangeRow, false);
+            this.srcAmountRow.hide();
+            this.destAmountRow.hide();
+            this.srcResBalanceRow.hide();
+            this.destResBalanceRow.hide();
+            this.exchangeRow.hide();
         }
 
-        show(this.dateRow, state.isAvailable);
+        this.dateRow.show(state.isAvailable);
         this.dateInput.value = state.form.date;
 
-        show(this.categoryRow, state.isAvailable);
-        show(this.commentRow, state.isAvailable);
+        this.categoryRow.show(state.isAvailable);
+        this.commentRow.show(state.isAvailable);
         show(this.submitControls, state.isAvailable);
 
         if (!state.isAvailable) {
@@ -1608,16 +1904,14 @@ class TransactionView extends View {
         }
 
         // Source amount field
-        if (this.srcAmountRowLabel) {
-            this.srcAmountRowLabel.textContent = sourceAmountLbl;
-        }
+        this.srcAmountRow.setTitle(sourceAmountLbl);
         this.srcAmountInput.setState((inpState) => ({
             ...inpState,
             digits: srcCurrency.precision,
         }));
         this.srcAmountInput.value = state.form.sourceAmount;
         enable(this.srcAmountInput.elem, !state.submitStarted);
-        window.app.setValidation(this.srcAmountRow, state.validation.sourceAmount);
+        window.app.setValidation(this.srcAmountRow.elem, state.validation.sourceAmount);
 
         // Source currency
         this.srcCurrInp.value = transaction.src_curr;
@@ -1628,19 +1922,17 @@ class TransactionView extends View {
         ) {
             this.initSrcCurrList(state);
         }
-        enable(this.srcCurrBtn, !state.submitStarted);
+        this.srcCurrBtn.enable(!state.submitStarted);
 
         // Destination amount field
-        if (this.destAmountRowLabel) {
-            this.destAmountRowLabel.textContent = destAmountLbl;
-        }
+        this.destAmountRow.setTitle(destAmountLbl);
         this.destAmountInput.setState((inpState) => ({
             ...inpState,
             digits: destCurrency.precision,
         }));
         this.destAmountInput.value = state.form.destAmount;
         enable(this.destAmountInput.elem, !state.submitStarted);
-        window.app.setValidation(this.destAmountRow, state.validation.destAmount);
+        window.app.setValidation(this.destAmountRow.elem, state.validation.destAmount);
 
         // Destination currency
         this.destCurrInp.value = transaction.dest_curr;
@@ -1651,13 +1943,13 @@ class TransactionView extends View {
         ) {
             this.initDestCurrList(state);
         }
-        enable(this.destCurrBtn, !state.submitStarted);
+        this.destCurrBtn.enable(!state.submitStarted);
 
         // Exchange rate field
         this.exchangeInput.value = (state.form.useBackExchange)
             ? state.form.backExchange
             : state.form.exchange;
-        enable(this.exchangeInput.elem, !state.submitStarted);
+        this.exchangeInput.enable(!state.submitStarted);
         this.renderExchangeRate(state);
 
         // Source result field
@@ -1667,7 +1959,7 @@ class TransactionView extends View {
         }));
         this.srcResBalanceInput.value = state.form.sourceResult;
         enable(this.srcResBalanceInput.elem, !state.submitStarted);
-        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
+        this.setSign(this.srcResBalanceSign.elem, null, transaction.src_curr);
 
         // Destination result field
         this.destResBalanceInput.setState((inpState) => ({
@@ -1675,13 +1967,13 @@ class TransactionView extends View {
             digits: destCurrency.precision,
         }));
         this.destResBalanceInput.value = state.form.destResult;
-        enable(this.destResBalanceInput.elem, !state.submitStarted);
-        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
+        this.destResBalanceInput.enable(!state.submitStarted);
+        this.setSign(this.destResBalanceSign.elem, null, transaction.dest_curr);
 
         // Date field
         this.dateInput.enable(!state.submitStarted);
-        enable(this.dateInputBtn, !state.submitStarted);
-        window.app.setValidation(this.dateRow, state.validation.date);
+        this.dateInputBtn.enable(!state.submitStarted);
+        window.app.setValidation(this.dateRow.elem, state.validation.date);
 
         // Category field
         this.categorySelect.setType(transaction.type);
@@ -1690,11 +1982,12 @@ class TransactionView extends View {
 
         // Comment field
         this.commentInput.value = state.form.comment;
-        enable(this.commentInput, !state.submitStarted);
+        this.commentInput.enable(!state.submitStarted);
 
         // Controls
-        enable(this.submitBtn, !state.submitStarted);
-        show(this.cancelBtn, !state.submitStarted);
+        this.submitBtn.enable(!state.submitStarted);
+        this.cancelBtn.show(!state.submitStarted);
+
         if (this.deleteBtn) {
             this.deleteBtn.enable(!state.submitStarted);
         }

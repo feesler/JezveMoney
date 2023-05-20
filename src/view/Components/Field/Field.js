@@ -17,6 +17,7 @@ const CONTENT_CLASS = 'field__content';
 export class Field extends Component {
     static userProps = {
         elem: ['id'],
+        titleElem: ['htmlFor'],
     };
 
     constructor(...args) {
