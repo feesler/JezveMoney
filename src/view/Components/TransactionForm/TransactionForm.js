@@ -2,7 +2,6 @@ import {
     isFunction,
     insertAfter,
     show,
-    enable,
     addChilds,
     createElement,
     setProps,
@@ -52,6 +51,7 @@ import {
 import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
+import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 
 const inputProps = {
     autocomplete: 'off',
@@ -318,148 +318,42 @@ export class TransactionForm extends Component {
         this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
 
         // Source amount field
-        this.srcAmountInput = DecimalInput.create({
-            id: 'srcAmountInput',
-            className: 'input input-group__input right-align-text',
-            onInput: (e) => this.onSourceAmountInput(e),
-        });
-
-        this.srcAmountSign = createElement('div', {
-            props: {
-                id: 'srcAmountSign',
-                className: 'input-group__btn-title',
-            },
-        });
-
-        this.srcCurrBtn = Button.create({
-            id: 'srcCurrBtn',
-            className: 'input-group__btn',
-            tabIndex: -1,
-            title: this.srcAmountSign,
-        });
-
-        const srcAmountFeedback = createElement('div', {
-            props: {
-                className: 'feedback invalid-feedback',
-                textContent: __('TR_INVALID_AMOUNT'),
-            },
-        });
-
-        this.srcAmountRow = Field.create({
+        this.srcAmountRow = AmountInputField.create({
             id: 'srcAmountRow',
-            htmlFor: 'srcAmountInput',
             title: __('TR_SRC_AMOUNT'),
-            className: 'form-row validation-block',
-            content: [
-                InputGroup.create({
-                    children: [
-                        this.srcAmountInput.elem,
-                        this.srcCurrBtn.elem,
-                    ],
-                }).elem,
-                srcAmountFeedback,
-            ],
+            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            validate: true,
+            className: 'form-row',
+            onInput: (e) => this.onSourceAmountInput(e),
+            onSelectCurrency: (item) => this.onSrcCurrencySel(item),
         });
 
         // Destination amount field
-        this.destAmountInput = DecimalInput.create({
-            id: 'destAmountInput',
-            className: 'input input-group__input right-align-text',
-            onInput: (e) => this.onDestAmountInput(e),
-        });
-
-        this.destAmountSign = createElement('div', {
-            props: {
-                id: 'destAmountSign',
-                className: 'input-group__btn-title',
-            },
-        });
-
-        this.destCurrBtn = Button.create({
-            id: 'destCurrBtn',
-            className: 'input-group__btn',
-            tabIndex: -1,
-            title: this.destAmountSign,
-        });
-
-        const destAmountFeedback = createElement('div', {
-            props: {
-                className: 'feedback invalid-feedback',
-                textContent: __('TR_INVALID_AMOUNT'),
-            },
-        });
-
-        this.destAmountRow = Field.create({
+        this.destAmountRow = AmountInputField.create({
             id: 'destAmountRow',
-            htmlFor: 'destAmountInput',
             title: __('TR_DEST_AMOUNT'),
-            className: 'form-row validation-block',
-            content: [
-                InputGroup.create({
-                    children: [
-                        this.destAmountInput.elem,
-                        this.destCurrBtn.elem,
-                    ],
-                }).elem,
-                destAmountFeedback,
-            ],
+            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            validate: true,
+            className: 'form-row',
+            onInput: (e) => this.onDestAmountInput(e),
+            onSelectCurrency: (item) => this.onDestCurrencySel(item),
         });
 
         // Source result field
-        this.srcResBalanceSign = Button.create({
-            id: 'srcResBalanceSign',
-            className: 'input-group__text',
-            type: 'static',
-        });
-
-        this.srcResBalanceInput = DecimalInput.create({
-            id: 'srcResBalanceInput',
-            className: 'input input-group__input right-align-text',
-            onInput: (e) => this.onSourceResultInput(e),
-        });
-
-        this.srcResBalanceRow = Field.create({
+        this.srcResBalanceRow = AmountInputField.create({
             id: 'srcResBalanceRow',
-            htmlFor: 'srcResBalanceInput',
             title: __('TR_RESULT'),
             className: 'form-row',
-            content: [
-                InputGroup.create({
-                    children: [
-                        this.srcResBalanceInput.elem,
-                        this.srcResBalanceSign.elem,
-                    ],
-                }).elem,
-            ],
+            onInput: (e) => this.onSourceResultInput(e),
         });
         this.srcResBalanceRow.hide();
 
         // Destination result field
-        this.destResBalanceInput = DecimalInput.create({
-            id: 'destResBalanceInput',
-            className: 'input input-group__input right-align-text',
-            onInput: (e) => this.onDestResultInput(e),
-        });
-
-        this.destResBalanceSign = Button.create({
-            id: 'destResBalanceSign',
-            className: 'input-group__text',
-            type: 'static',
-        });
-
-        this.destResBalanceRow = Field.create({
+        this.destResBalanceRow = AmountInputField.create({
             id: 'destResBalanceRow',
-            htmlFor: 'destResBalanceInput',
             title: __('TR_RESULT'),
             className: 'form-row',
-            content: [
-                InputGroup.create({
-                    children: [
-                        this.destResBalanceInput.elem,
-                        this.destResBalanceSign.elem,
-                    ],
-                }).elem,
-            ],
+            onInput: (e) => this.onDestResultInput(e),
         });
         this.destResBalanceRow.hide();
 
@@ -481,7 +375,7 @@ export class TransactionForm extends Component {
 
         this.exchangeRow = Field.create({
             id: 'exchangeRow',
-            htmlFor: 'destAmountInput',
+            htmlFor: 'exchangeInput',
             title: __('TR_EXCHANGE_RATE'),
             className: 'form-row',
             content: [
@@ -790,49 +684,6 @@ export class TransactionForm extends Component {
         }
     }
 
-    /** Initialize DropDown for currency */
-    createCurrencyList({ elem, onItemSelect, currId }) {
-        const res = DropDown.create({
-            elem,
-            onItemSelect,
-            listAttach: true,
-            enableFilter: true,
-        });
-
-        window.app.initUserCurrencyList(res);
-        if (currId) {
-            res.setSelection(currId);
-        }
-
-        return res;
-    }
-
-    /** Initialize DropDown for source currency */
-    initSrcCurrList(state) {
-        if (this.srcCurrDDList) {
-            return;
-        }
-
-        this.srcCurrDDList = this.createCurrencyList({
-            elem: this.srcAmountSign,
-            currId: state.transaction.src_curr,
-            onItemSelect: (item) => this.onSrcCurrencySel(item),
-        });
-    }
-
-    /** Initialize DropDown for destination currency */
-    initDestCurrList(state) {
-        if (this.destCurrDDList) {
-            return;
-        }
-
-        this.destCurrDDList = this.createCurrencyList({
-            elem: this.destAmountSign,
-            currId: state.transaction.dest_curr,
-            onItemSelect: (item) => this.onDestCurrencySel(item),
-        });
-    }
-
     /**
      * Common function for toggle switch
      * @param {string|Element} inputRow - input row element
@@ -906,63 +757,6 @@ export class TransactionForm extends Component {
             this.exchangeRow.elem,
             this.exchangeInfo,
             options,
-        );
-    }
-
-    /**
-     * Set currency sign for specified field
-     * @param {string} obj - currency sign element id
-     * @param {DropDown} ddown - DropDown object
-     * @param {number} currencyId - currency id
-     */
-    setSign(elem, ddown, currencyId) {
-        const signElem = elem;
-        if (!signElem) {
-            return;
-        }
-
-        const curr = window.app.model.currency.getItem(currencyId);
-        if (!curr) {
-            return;
-        }
-
-        signElem.textContent = curr.sign;
-
-        if (ddown) {
-            ddown.setSelection(currencyId);
-        }
-    }
-
-    /** Enable/disable specified currency button */
-    enableCurrencySelect(currBtn, signElem, ddown, value) {
-        currBtn.classList.toggle('btn', value);
-        currBtn.classList.toggle('input-group__btn', value);
-        currBtn.classList.toggle('input-group__text', !value);
-        signElem.classList.toggle('input-group__btn-title', value);
-        signElem.classList.toggle('input-group__text-title', !value);
-
-        if (ddown) {
-            ddown.enable(value);
-        }
-    }
-
-    /** Enable/disable source currency button */
-    enableSourceCurrencySelect(value) {
-        this.enableCurrencySelect(
-            this.srcCurrBtn.elem,
-            this.srcAmountSign,
-            this.srcCurrDDList,
-            value,
-        );
-    }
-
-    /** Enable/disable destination currency button */
-    enableDestCurrencySelect(value) {
-        this.enableCurrencySelect(
-            this.destCurrBtn.elem,
-            this.destAmountSign,
-            this.destCurrDDList,
-            value,
         );
     }
 
@@ -1322,8 +1116,8 @@ export class TransactionForm extends Component {
         this.srcResBalanceRow.setTitle(__('TR_RESULT'));
         this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
-        this.enableSourceCurrencySelect(false);
-        this.enableDestCurrencySelect(true);
+        this.srcAmountRow.enableSelect(false);
+        this.destAmountRow.enableSelect(true);
     }
 
     renderIncome(state) {
@@ -1369,8 +1163,8 @@ export class TransactionForm extends Component {
         this.srcResBalanceRow.setTitle(__('TR_RESULT'));
         this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
-        this.enableSourceCurrencySelect(true);
-        this.enableDestCurrencySelect(false);
+        this.srcAmountRow.enableSelect(true);
+        this.destAmountRow.enableSelect(false);
     }
 
     renderTransfer(state) {
@@ -1445,8 +1239,8 @@ export class TransactionForm extends Component {
         this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_SOURCE')})`);
         this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_DESTINATION')})`);
 
-        this.enableSourceCurrencySelect(false);
-        this.enableDestCurrencySelect(false);
+        this.srcAmountRow.enableSelect(false);
+        this.destAmountRow.enableSelect(false);
     }
 
     renderDebt(state) {
@@ -1618,8 +1412,8 @@ export class TransactionForm extends Component {
         this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${srcResultTarget})`);
         this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${destResultTarget})`);
 
-        this.enableSourceCurrencySelect(debtType);
-        this.enableDestCurrencySelect(!debtType);
+        this.srcAmountRow.enableSelect(debtType);
+        this.destAmountRow.enableSelect(!debtType);
 
         this.personIdInp.value = state.person.id;
 
@@ -1671,8 +1465,8 @@ export class TransactionForm extends Component {
 
         this.destResBalanceRow.setTitle(__('TR_RESULT'));
 
-        this.enableSourceCurrencySelect(false);
-        this.enableDestCurrencySelect(false);
+        this.srcAmountRow.enableSelect(false);
+        this.destAmountRow.enableSelect(false);
     }
 
     render(state, prevState = {}) {
@@ -1823,46 +1617,42 @@ export class TransactionForm extends Component {
         }
 
         // Source amount field
-        this.srcAmountRow.setTitle(sourceAmountLbl);
-        this.srcAmountInput.setState((inpState) => ({
-            ...inpState,
-            digits: srcCurrency.precision,
+        const enableSrcCurr = (
+            (transaction.type === INCOME)
+            || (transaction.type === DEBT && transaction.debtType)
+        );
+
+        this.srcAmountRow.setState((srcAmountState) => ({
+            ...srcAmountState,
+            title: sourceAmountLbl,
+            value: state.form.sourceAmount,
+            disabled: state.submitStarted,
+            currencyId: transaction.src_curr,
+            valid: state.validation.sourceAmount,
+            enableSelect: enableSrcCurr,
         }));
-        this.srcAmountInput.value = state.form.sourceAmount;
-        enable(this.srcAmountInput.elem, !state.submitStarted);
-        window.app.setValidation(this.srcAmountRow.elem, state.validation.sourceAmount);
 
         // Source currency
         this.srcCurrInp.value = transaction.src_curr;
-        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
-        if (
-            transaction.type === INCOME
-            || (transaction.type === DEBT && transaction.debtType)
-        ) {
-            this.initSrcCurrList(state);
-        }
-        this.srcCurrBtn.enable(!state.submitStarted);
 
         // Destination amount field
-        this.destAmountRow.setTitle(destAmountLbl);
-        this.destAmountInput.setState((inpState) => ({
-            ...inpState,
-            digits: destCurrency.precision,
+        const enableDestCurr = (
+            (transaction.type === EXPENSE)
+            || (transaction.type === DEBT && !transaction.debtType)
+        );
+
+        this.destAmountRow.setState((destAmountState) => ({
+            ...destAmountState,
+            title: destAmountLbl,
+            value: state.form.destAmount,
+            disabled: state.submitStarted,
+            currencyId: transaction.dest_curr,
+            valid: state.validation.destAmount,
+            enableSelect: enableDestCurr,
         }));
-        this.destAmountInput.value = state.form.destAmount;
-        enable(this.destAmountInput.elem, !state.submitStarted);
-        window.app.setValidation(this.destAmountRow.elem, state.validation.destAmount);
 
         // Destination currency
         this.destCurrInp.value = transaction.dest_curr;
-        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
-        if (
-            transaction.type === EXPENSE
-            || (transaction.type === DEBT && !transaction.debtType)
-        ) {
-            this.initDestCurrList(state);
-        }
-        this.destCurrBtn.enable(!state.submitStarted);
 
         // Exchange rate field
         this.exchangeInput.value = (state.form.useBackExchange)
@@ -1872,22 +1662,20 @@ export class TransactionForm extends Component {
         this.renderExchangeRate(state);
 
         // Source result field
-        this.srcResBalanceInput.setState((inpState) => ({
-            ...inpState,
-            digits: srcCurrency.precision,
+        this.srcResBalanceRow.setState((srcResultState) => ({
+            ...srcResultState,
+            value: state.form.sourceResult,
+            disabled: state.submitStarted,
+            currencyId: transaction.src_curr,
         }));
-        this.srcResBalanceInput.value = state.form.sourceResult;
-        enable(this.srcResBalanceInput.elem, !state.submitStarted);
-        this.setSign(this.srcResBalanceSign.elem, null, transaction.src_curr);
 
         // Destination result field
-        this.destResBalanceInput.setState((inpState) => ({
-            ...inpState,
-            digits: destCurrency.precision,
+        this.destResBalanceRow.setState((destResultState) => ({
+            ...destResultState,
+            value: state.form.destResult,
+            disabled: state.submitStarted,
+            currencyId: transaction.dest_curr,
         }));
-        this.destResBalanceInput.value = state.form.destResult;
-        this.destResBalanceInput.enable(!state.submitStarted);
-        this.setSign(this.destResBalanceSign.elem, null, transaction.dest_curr);
 
         // Date field
         this.dateInput.enable(!state.submitStarted);

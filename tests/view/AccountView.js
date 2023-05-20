@@ -53,10 +53,10 @@ export class AccountView extends AppView {
 
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
-        res.balance = await InputRow.create(this, await query('#initbal-inp-block'));
+        res.balance = await InputRow.create(this, await query('#initBalanceField'));
         assert(res.name, 'Account balance input not found');
 
-        res.limit = await InputRow.create(this, await query('#limitField'));
+        res.limit = await InputRow.create(this, await query('#initLimitField'));
         assert(res.limit, 'Credit limit field not found');
 
         res.flagsInp = await query('#flags');

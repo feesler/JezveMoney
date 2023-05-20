@@ -34,27 +34,9 @@
                                 <div id="nameFeedback" class="feedback invalid-feedback"></div>
                             </div>
 
-                            <div id="currency-block" class="field form-row">
+                            <div id="currencyField" class="field form-row">
                                 <label for="currency" class="field__title"><?= __("ACCOUNT_CURRENCY") ?></label>
                                 <select id="currency" name="curr_id"></select>
-                            </div>
-
-                            <div id="initbal-inp-block" class="field validation-block form-row">
-                                <label for="balanceInp" class="field__title"><?= __("ACCOUNT_INITIAL_BALANCE") ?></label>
-                                <div class="input-group">
-                                    <input id="balanceInp" class="input input-group__input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
-                                    <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
-                                </div>
-                                <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_BALANCE") ?></div>
-                            </div>
-
-                            <div id="limitField" class="field validation-block form-row">
-                                <label for="limitInp" class="field__title"><?= __("ACCOUNT_INITIAL_CREDIT_LIMIT") ?></label>
-                                <div class="input-group">
-                                    <input id="limitInp" class="input input-group__input right-align-text" name="initlimit" type="text" autocomplete="off" value="<?= e($accInfo->initlimit) ?>">
-                                    <div id="limitCurrencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
-                                </div>
-                                <div class="feedback invalid-feedback"><?= __("ACCOUNT_INVALID_LIMIT") ?></div>
                             </div>
 
                             <div class="form-controls">
