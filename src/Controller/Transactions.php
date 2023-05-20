@@ -249,6 +249,7 @@ class Transactions extends ListViewController
             $tr["dest_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
             $tr["person_id"] = $person_id;
             $tr["debtType"] = $debtType;
+            $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = $noAccount;
         } else {
@@ -375,6 +376,7 @@ class Transactions extends ListViewController
 
             $tr["person_id"] = $person_id;
             $tr["debtType"] = $debtType;
+            $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = $noAccount;
         }
