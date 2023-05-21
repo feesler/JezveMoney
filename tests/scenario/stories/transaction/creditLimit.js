@@ -49,4 +49,10 @@ export const stateLoop = async () => {
         { action: 'changeDestAccount', data: CREDIT_CARD },
         { action: 'inputDestAmount', data: '100' },
     ]);
+
+    // Test handling invalid date string on show date picker
+    await Actions.runActions([
+        { action: 'inputDate', data: '' },
+        { action: 'selectDate', data: App.dates.now },
+    ]);
 };
