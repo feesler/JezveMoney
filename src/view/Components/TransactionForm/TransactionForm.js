@@ -9,8 +9,6 @@ import {
 } from 'jezvejs';
 
 import { Button } from 'jezvejs/Button';
-import { DateInput } from 'jezvejs/DateInput';
-import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { Input } from 'jezvejs/Input';
@@ -36,7 +34,9 @@ import {
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { AccountTile } from '../AccountTile/AccountTile.js';
+import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../CategorySelect/CategorySelect.js';
+import { DateInputField } from '../DateInputField/DateInputField.js';
 import { Field } from '../Field/Field.js';
 import { Tile } from '../Tile/Tile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
@@ -51,7 +51,6 @@ import {
 import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
-import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 
 const inputProps = {
     autocomplete: 'off',
@@ -390,58 +389,15 @@ export class TransactionForm extends Component {
         this.exchangeRow.hide();
 
         // Date field
-        this.dateInputBtn = Button.create({
-            id: 'dateInputBtn',
-            className: 'input-group__btn',
-            icon: 'calendar-icon',
-            onClick: () => this.showCalendar(),
-        });
-
-        this.dateInput = DateInput.create({
-            id: 'dateInput',
-            className: 'input input-group__input',
-            locales: window.app.dateFormatLocale,
-            onInput: (e) => this.onDateInput(e),
-        });
-
-        this.datePickerWrapper = createElement('div', {
-            props: {
-                id: 'datePickerWrapper',
-                className: 'calendar',
-            },
-        });
-
-        const dateFeedback = createElement('div', {
-            props: {
-                className: 'feedback invalid-feedback',
-                textContent: __('TR_INVALID_DATE'),
-            },
-        });
-
-        const dateFieldContainer = createElement('div', {
-            props: {
-                className: 'column-container',
-            },
-            children: [
-                InputGroup.create({
-                    children: [
-                        this.dateInput.elem,
-                        this.dateInputBtn.elem,
-                    ],
-                }).elem,
-                this.datePickerWrapper,
-            ],
-        });
-
-        this.dateRow = Field.create({
+        this.dateRow = DateInputField.create({
             id: 'dateRow',
-            htmlFor: 'dateInput',
             title: __('TR_DATE'),
-            className: 'form-row validation-block',
-            content: [
-                dateFieldContainer,
-                dateFeedback,
-            ],
+            feedbackMessage: __('TR_INVALID_DATE'),
+            className: 'form-row',
+            locales: window.app.dateFormatLocale,
+            validate: true,
+            onInput: (e) => this.onDateInput(e),
+            onDateSelect: (e) => this.onDateSelect(e),
         });
 
         // Category field
@@ -760,29 +716,6 @@ export class TransactionForm extends Component {
         );
     }
 
-    /** Shows date picker */
-    showCalendar() {
-        if (!this.datePicker) {
-            this.datePicker = DatePicker.create({
-                relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.getCurrrentLocale(),
-                onDateSelect: (d) => this.onSelectDate(d),
-            });
-            this.datePickerWrapper.append(this.datePicker.elem);
-        }
-        if (!this.datePicker) {
-            return;
-        }
-
-        const visible = this.datePicker.visible();
-        if (!visible) {
-            const { transaction } = this.store.getState();
-            this.datePicker.setSelection(timeToDate(transaction.date));
-        }
-
-        this.datePicker.show(!visible);
-    }
-
     /**
      * Transaction type change event handler
      * @param {String} value - selected type
@@ -899,9 +832,9 @@ export class TransactionForm extends Component {
      * Date select callback
      * @param {Date} date - selected date object
      */
-    onSelectDate(date) {
+    onDateSelect(date) {
         this.store.dispatch(actions.dateChange(window.app.formatInputDate(date)));
-        this.datePicker.hide();
+        this.dateRow.datePicker.hide();
         this.notifyChanged();
     }
 
@@ -1543,13 +1476,12 @@ export class TransactionForm extends Component {
         }
 
         this.dateRow.show(state.isAvailable);
-        this.dateInput.value = state.form.date;
-
         this.categoryRow.show(state.isAvailable);
         this.commentRow.show(state.isAvailable);
         show(this.submitControls, state.isAvailable);
 
         if (!state.isAvailable) {
+            this.dateRow.input.value = state.form.date;
             return;
         }
 
@@ -1678,9 +1610,13 @@ export class TransactionForm extends Component {
         }));
 
         // Date field
-        this.dateInput.enable(!state.submitStarted);
-        this.dateInputBtn.enable(!state.submitStarted);
-        window.app.setValidation(this.dateRow.elem, state.validation.date);
+        this.dateRow.setState((dateState) => ({
+            ...dateState,
+            value: state.form.date,
+            date: transaction.date,
+            disabled: state.submitStarted,
+            valid: state.validation.date,
+        }));
 
         // Category field
         this.categorySelect.setType(transaction.type);
