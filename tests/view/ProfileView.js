@@ -173,7 +173,7 @@ export class ProfileView extends AppView {
         }
 
         const { scheduleCheck } = this.content.resetDataPopup;
-        if (('scheduledTransactions' in options) && !scheduleCheck.checked) {
+        if (('schedule' in options) && !scheduleCheck.checked) {
             await this.performAction(() => scheduleCheck.toggle());
         }
 

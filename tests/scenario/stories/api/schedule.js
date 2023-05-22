@@ -7,7 +7,7 @@ import {
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/scheduledTransaction.js';
+import * as Actions from '../../../actions/api/schedule.js';
 import { dateToSeconds, formatProps } from '../../../common.js';
 import {
     INTERVAL_DAY,
@@ -221,7 +221,7 @@ const createWithChainedRequest = async () => {
         interval_step: 1,
         interval_offset: 20,
         returnState: {
-            scheduledtransactions: {},
+            schedule: {},
         },
     }];
 
@@ -811,7 +811,7 @@ const delInvalid = async () => {
     }, data);
 };
 
-export const apiScheduledTransactionsTests = {
+export const apiScheduleTests = {
     async createTests() {
         await create();
         await createWithChainedRequest();

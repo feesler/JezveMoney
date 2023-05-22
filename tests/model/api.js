@@ -450,35 +450,35 @@ export const api = {
         },
     },
 
-    scheduledtransaction: {
+    schedule: {
         async read(ids) {
-            const { request, options } = idsRequest('scheduledtransaction/', ids);
+            const { request, options } = idsRequest('schedule/', ids);
             const { data } = await apiGet(request, options);
             return data;
         },
 
         async create(options) {
-            const { data } = await apiPost('scheduledtransaction/create', options);
+            const { data } = await apiPost('schedule/create', options);
             return data;
         },
 
         async createMultiple(options) {
-            const { data } = await apiPost('scheduledtransaction/createMultiple', options);
+            const { data } = await apiPost('schedule/createMultiple', options);
             return data;
         },
 
         async update(options) {
-            const response = await apiPost('scheduledtransaction/update', options);
+            const response = await apiPost('schedule/update', options);
             return response.data ?? {};
         },
 
         async del(options) {
-            const response = await apiPost('scheduledtransaction/delete', options);
+            const response = await apiPost('schedule/delete', options);
             return response.data ?? {};
         },
 
         async list() {
-            const { data } = await apiGet('scheduledtransaction/list');
+            const { data } = await apiGet('schedule/list');
             return data;
         },
     },

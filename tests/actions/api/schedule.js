@@ -26,7 +26,7 @@ export const create = async (params) => {
 
         let createRes;
         try {
-            createRes = await api.scheduledtransaction.create(reqParams);
+            createRes = await api.schedule.create(reqParams);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -68,7 +68,7 @@ export const createMultiple = async (params) => {
 
         let createRes;
         try {
-            createRes = await api.scheduledtransaction.createMultiple(params);
+            createRes = await api.schedule.createMultiple(params);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
@@ -114,14 +114,14 @@ export const update = async (params) => {
     await test(`Update scheduled transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.updateScheduledTransaction(params);
 
-        const item = App.state.scheduledTransactions.getItem(params.id);
+        const item = App.state.schedule.getItem(params.id);
         const updParams = (item) ? copyObject(item) : {};
         Object.assign(updParams, params);
 
         const reqParams = App.state.prepareChainedRequestData(updParams);
 
         try {
-            updateRes = await api.scheduledtransaction.update(reqParams);
+            updateRes = await api.schedule.update(reqParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -147,7 +147,7 @@ export const del = async (params) => {
         const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.scheduledtransaction.del(reqParams);
+            deleteRes = await api.schedule.del(reqParams);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -169,11 +169,11 @@ export const read = async (id) => {
     let res = [];
 
     await test(`Read scheduled transaction(s) [${formatProps(id)}]`, async () => {
-        const resExpected = App.state.scheduledTransactions.getItems(id);
+        const resExpected = App.state.schedule.getItems(id);
 
         let createRes;
         try {
-            createRes = await api.scheduledtransaction.read(id);
+            createRes = await api.schedule.read(id);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -200,7 +200,7 @@ export const list = async (params) => {
 
         let listRes;
         try {
-            listRes = await api.scheduledtransaction.list(params);
+            listRes = await api.schedule.list(params);
             assert.deepMeet(listRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

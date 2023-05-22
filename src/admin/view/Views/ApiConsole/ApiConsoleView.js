@@ -233,7 +233,7 @@ class AdminApiConsoleView extends AdminView {
             click: (e) => this.onReadItemsSubmit(
                 e,
                 'read_scheduled_trans_id',
-                'scheduledtransaction/',
+                'schedule/',
                 apiTypes.isScheduledTransactionsArray,
             ),
         });

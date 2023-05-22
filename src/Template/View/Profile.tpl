@@ -121,7 +121,7 @@
             </label>
 
             <label id="scheduleCheck" class="checkbox">
-                <input type="checkbox" name="scheduledTransactions">
+                <input type="checkbox" name="schedule">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label"><?= __("RESET_SCHEDULE") ?></span>
             </label>

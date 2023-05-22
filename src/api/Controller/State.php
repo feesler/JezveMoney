@@ -145,13 +145,13 @@ class State extends ApiController
     }
 
     /**
-     * Returns planed transactions data for specified request
+     * Returns schedule data for specified request
      *
      * @param array $options
      *
      * @return object
      */
-    protected function getScheduledTransactions(array $options = [])
+    protected function getSchedule(array $options = [])
     {
         return $this->getList(ScheduledTransactionModel::getInstance(), $options);
     }
@@ -344,7 +344,7 @@ class State extends ApiController
             "accounts" => ["autoIncrement" => true],
             "persons" => ["autoIncrement" => true],
             "transactions" => ["count" => 0, "autoIncrement" => true],
-            "scheduledtransactions" => ["autoIncrement" => true],
+            "schedule" => ["autoIncrement" => true],
             "reminders" => ["autoIncrement" => true],
             "categories" => ["autoIncrement" => true],
             "importtemplates" => ["autoIncrement" => true],
@@ -418,8 +418,8 @@ class State extends ApiController
             $res->categories = $this->getCategories($request["categories"]);
         }
         // Scheduled transactions
-        if (isset($request["scheduledtransactions"])) {
-            $res->scheduledtransactions = $this->getScheduledTransactions($request["scheduledtransactions"]);
+        if (isset($request["schedule"])) {
+            $res->schedule = $this->getSchedule($request["schedule"]);
         }
         // Scheduled transaction reminders
         if (isset($request["reminders"])) {

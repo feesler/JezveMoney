@@ -279,7 +279,7 @@ class Profile extends ApiController
             "persons",
             "categories",
             "transactions",
-            "scheduledTransactions",
+            "schedule",
             "keepbalance",
             "importtpl",
             "importrules"
@@ -306,7 +306,7 @@ class Profile extends ApiController
         if ($request["transactions"]) {
             $this->resetTransactions($request["keepbalance"]);
         }
-        if ($request["scheduledTransactions"]) {
+        if ($request["schedule"]) {
             $this->resetScheduledTransactions();
         }
         if ($request["importtpl"]) {

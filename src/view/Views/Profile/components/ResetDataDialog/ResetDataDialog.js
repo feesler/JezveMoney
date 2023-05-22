@@ -53,7 +53,7 @@ export class ResetDataDialog extends ProfileDialog {
             transactions: false,
             keepBalance: false,
             enableKeepBalance: false,
-            scheduledTransactions: false,
+            schedule: false,
             importTpl: false,
             importRules: false,
             loading: false,
@@ -89,7 +89,7 @@ export class ResetDataDialog extends ProfileDialog {
             categories: this.categoriesCheck.checked,
             transactions: this.transactionsCheck.checked,
             keepBalance: this.keepBalanceCheck.checked,
-            scheduledTransactions: this.scheduleCheck.checked,
+            schedule: this.scheduleCheck.checked,
             importTpl: this.importTplCheck.checked,
             importRules: this.importRulesCheck.checked,
         };
@@ -99,7 +99,7 @@ export class ResetDataDialog extends ProfileDialog {
             && state.persons
             && state.categories
             && state.transactions
-            && state.scheduledTransactions
+            && state.schedule
             && state.importTpl
             && state.importRules
         );
@@ -131,8 +131,8 @@ export class ResetDataDialog extends ProfileDialog {
         if (state.enableKeepBalance && state.keepBalance) {
             request.keepbalance = true;
         }
-        if (state.scheduledTransactions) {
-            request.scheduledTransactions = true;
+        if (state.schedule) {
+            request.schedule = true;
         }
         if (state.importTpl) {
             request.importtpl = true;
@@ -154,7 +154,7 @@ export class ResetDataDialog extends ProfileDialog {
         this.keepBalanceCheck.check(state.keepBalance);
         this.keepBalanceCheck.enable(state.enableKeepBalance);
 
-        this.scheduleCheck.check(state.scheduledTransactions);
+        this.scheduleCheck.check(state.schedule);
 
         this.importTplCheck.check(state.importTpl);
         this.importRulesCheck.check(state.importRules);

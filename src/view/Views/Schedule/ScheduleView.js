@@ -334,7 +334,7 @@ class ScheduleView extends View {
 
         try {
             const request = this.prepareRequest({ id: ids });
-            const response = await API.scheduledtransaction.del(request);
+            const response = await API.schedule.del(request);
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
@@ -351,7 +351,7 @@ class ScheduleView extends View {
 
         try {
             const request = this.getListRequest();
-            const { data } = await API.scheduledtransaction.list(request);
+            const { data } = await API.schedule.list(request);
             this.setListData(data, keepState);
         } catch (e) {
             window.app.createErrorNotification(e.message);
@@ -368,13 +368,13 @@ class ScheduleView extends View {
         return {
             ...data,
             returnState: {
-                scheduledtransactions: this.getListRequest(),
+                schedule: this.getListRequest(),
             },
         };
     }
 
     getListDataFromResponse(response) {
-        return response?.data?.state?.scheduledtransactions?.data;
+        return response?.data?.state?.schedule?.data;
     }
 
     setListData(data, keepState = false) {
@@ -389,7 +389,7 @@ class ScheduleView extends View {
         }
 
         try {
-            const { data } = await API.scheduledtransaction.read(state.detailsId);
+            const { data } = await API.schedule.read(state.detailsId);
             const [item] = data;
 
             this.store.dispatch(actions.itemDetailsLoaded(item));

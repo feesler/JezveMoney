@@ -12,7 +12,7 @@ import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createCategories } from './data/categories.js';
 import { createTransactions } from './data/transactions.js';
-import { createScheduledTransactions } from './data/scheduledTransactions.js';
+import { createScheduledTransactions } from './data/schedule.js';
 import {
     getAccountCSV,
     getCardCSV,

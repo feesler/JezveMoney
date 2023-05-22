@@ -7,7 +7,7 @@ const resetAllOptions = {
     persons: true,
     categories: true,
     transactions: true,
-    scheduledTransactions: true,
+    schedule: true,
     importtpl: true,
     importrules: true,
 };
@@ -126,7 +126,7 @@ export class ProfileStory extends TestStory {
         await App.scenario.createTestData();
 
         await App.scenario.runner.runGroup(Actions.resetData, [
-            { scheduledTransactions: true },
+            { schedule: true },
             { accounts: true },
             resetAllOptions,
         ]);

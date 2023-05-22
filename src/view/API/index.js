@@ -262,29 +262,29 @@ export const API = {
         },
     },
 
-    scheduledtransaction: {
+    schedule: {
         async createMultiple(data) {
-            return apiPost('scheduledtransaction/createMultiple', data);
+            return apiPost('schedule/createMultiple', data);
         },
 
         async list(options = {}) {
-            return apiGet('scheduledtransaction/list', options);
+            return apiGet('schedule/list', options);
         },
 
         async read(data) {
-            return idsRequest('scheduledtransaction/', data);
+            return idsRequest('schedule/', data);
         },
 
         async create(data) {
-            return apiPost('scheduledtransaction/create', data);
+            return apiPost('schedule/create', data);
         },
 
         async update(data) {
-            return apiPost('scheduledtransaction/update', data);
+            return apiPost('schedule/update', data);
         },
 
         async del(data) {
-            return apiPost('scheduledtransaction/delete', data);
+            return apiPost('schedule/delete', data);
         },
     },
 

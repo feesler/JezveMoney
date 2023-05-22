@@ -105,7 +105,7 @@ export class AppState {
         this.personsCache = null;
         this.sortedPersonsCache = null;
         this.transactions = null;
-        this.scheduledTransactions = null;
+        this.schedule = null;
         this.reminders = null;
         this.templates = null;
         this.rules = null;
@@ -144,12 +144,11 @@ export class AppState {
         this.transactions.setData(transactions);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
-        if (!this.scheduledTransactions) {
-            this.scheduledTransactions = ScheduledTransactionsList.create();
+        if (!this.schedule) {
+            this.schedule = ScheduledTransactionsList.create();
         }
-        const scheduledTransactions = state.scheduledtransactions ?? state.scheduledTransactions;
-        this.scheduledTransactions.setData(scheduledTransactions.data);
-        this.scheduledTransactions.autoincrement = scheduledTransactions.autoincrement;
+        this.schedule.setData(state.schedule.data);
+        this.schedule.autoincrement = state.schedule.autoincrement;
 
         if (!this.reminders) {
             this.reminders = RemindersList.create();
@@ -204,7 +203,7 @@ export class AppState {
         res.persons = this.persons.clone();
         res.categories = this.categories.clone();
         res.transactions = this.transactions.clone();
-        res.scheduledTransactions = this.scheduledTransactions.clone();
+        res.schedule = this.schedule.clone();
         res.reminders = this.reminders.clone();
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
@@ -243,7 +242,7 @@ export class AppState {
     meetExpectation(expected) {
         this.compareLists(this.accounts, expected.accounts);
         this.compareLists(this.transactions, expected.transactions);
-        this.compareLists(this.scheduledTransactions, expected.scheduledTransactions);
+        this.compareLists(this.schedule, expected.schedule);
         this.compareLists(this.reminders, expected.reminders);
         this.compareLists(this.persons, expected.persons);
         this.compareLists(this.categories, expected.categories);
@@ -305,8 +304,8 @@ export class AppState {
             this.accounts?.setData(accountsData);
         }
 
-        if ('scheduledTransactions' in options) {
-            this.scheduledTransactions?.reset();
+        if ('schedule' in options) {
+            this.schedule?.reset();
             this.reminders?.reset();
         }
 
@@ -326,7 +325,7 @@ export class AppState {
         this.categories?.reset();
         this.resetPersonsCache();
         this.transactions?.reset();
-        this.scheduledTransactions?.reset();
+        this.schedule?.reset();
         this.reminders?.reset();
         this.templates?.reset();
         this.rules?.reset();
@@ -548,7 +547,7 @@ export class AppState {
 
     getScheduledTransactions() {
         return {
-            data: copyObject(this.scheduledTransactions.data),
+            data: copyObject(this.schedule.data),
         };
     }
 
@@ -575,11 +574,11 @@ export class AppState {
         if (request.transactions) {
             res.transactions = this.getTransactions(request.transactions);
         }
-        if (request.scheduledTransactions) {
-            res.transactions = this.getScheduledTransactions(request.scheduledTransactions);
+        if (request.schedule) {
+            res.schedule = this.getScheduledTransactions(request.schedule);
         }
         if (request.reminders) {
-            res.transactions = this.getReminders(request.reminders);
+            res.reminders = this.getReminders(request.reminders);
         }
         if (request.statistics) {
             res.statistics = this.getStatistics(request.statistics);
@@ -854,7 +853,7 @@ export class AppState {
         this.transactions = this.transactions.updateAccount(this.accounts.data, expAccount);
 
         // Prepare expected updates of scheduled transactions list
-        this.scheduledTransactions = this.scheduledTransactions.updateAccount(
+        this.schedule = this.schedule.updateAccount(
             this.accounts.data,
             expAccount,
         );
@@ -881,7 +880,7 @@ export class AppState {
         this.rules.deleteAccounts(ids);
         this.templates.deleteAccounts(ids);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
-        this.scheduledTransactions = this.scheduledTransactions.deleteAccounts(
+        this.schedule = this.schedule.deleteAccounts(
             this.accounts.data,
             ids,
         );
@@ -1118,7 +1117,7 @@ export class AppState {
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, accountsToDelete);
-        this.scheduledTransactions = this.scheduledTransactions.deleteAccounts(
+        this.schedule = this.schedule.deleteAccounts(
             this.accounts.data,
             accountsToDelete,
         );
@@ -1424,7 +1423,7 @@ export class AppState {
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteCategories(itemsToDelete);
-        this.scheduledTransactions = this.scheduledTransactions.deleteCategories(itemsToDelete);
+        this.schedule = this.schedule.deleteCategories(itemsToDelete);
         this.rules.deleteCategories(...itemsToDelete);
 
         this.categories.deleteItems(itemsToDelete);
@@ -2063,8 +2062,8 @@ export class AppState {
         }
 
         const data = copyFields(itemData, ScheduledTransaction.availProps);
-        const ind = this.scheduledTransactions.create(data);
-        const item = this.scheduledTransactions.getItemByIndex(ind);
+        const ind = this.schedule.create(data);
+        const item = this.schedule.getItemByIndex(ind);
 
         if (!this.createReminders(item.id)) {
             return false;
@@ -2074,7 +2073,7 @@ export class AppState {
     }
 
     updateScheduledTransaction(params) {
-        const origItem = this.scheduledTransactions.getItem(params.id);
+        const origItem = this.schedule.getItem(params.id);
         if (!origItem) {
             return false;
         }
@@ -2088,7 +2087,7 @@ export class AppState {
             return false;
         }
 
-        this.scheduledTransactions.update(expItem);
+        this.schedule.update(expItem);
 
         const remindersChanged = (
             origItem.start_date !== expItem.start_date
@@ -2111,12 +2110,12 @@ export class AppState {
             return false;
         }
 
-        const itemsToDelete = ids.map((id) => this.scheduledTransactions.getItem(id));
+        const itemsToDelete = ids.map((id) => this.schedule.getItem(id));
         if (!itemsToDelete.every((item) => !!item)) {
             return false;
         }
 
-        this.scheduledTransactions.deleteItems(ids);
+        this.schedule.deleteItems(ids);
 
         if (!this.deleteReminders(ids)) {
             return false;
@@ -2126,7 +2125,7 @@ export class AppState {
     }
 
     createReminders(scheduleId) {
-        const item = this.scheduledTransactions.getItem(scheduleId);
+        const item = this.schedule.getItem(scheduleId);
         if (!item) {
             return false;
         }
@@ -2168,7 +2167,7 @@ export class AppState {
         }
 
         if (params.schedule_id !== 0) {
-            const schedule = this.scheduledTransactions.getItem(params.schedule_id);
+            const schedule = this.schedule.getItem(params.schedule_id);
             if (!schedule) {
                 return false;
             }
@@ -2260,7 +2259,7 @@ export class AppState {
 
     getDefaultReminderTransaction(id) {
         const reminder = this.reminders.getItem(id);
-        const schedule = this.scheduledTransactions.getItem(reminder?.schedule_id);
+        const schedule = this.schedule.getItem(reminder?.schedule_id);
         if (!reminder) {
             return null;
         }

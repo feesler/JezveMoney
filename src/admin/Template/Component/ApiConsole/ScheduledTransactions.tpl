@@ -1,6 +1,6 @@
 <div id="listScheduledTrForm" class="request-data-form">
     <h3>List</h3>
-    <form action="<?= BASEURL ?>api/scheduledtransaction/list" method="get">
+    <form action="<?= BASEURL ?>api/schedule/list" method="get">
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="Submit">
         </div>
@@ -20,7 +20,7 @@
 
 <div id="createScheduledTrForm" class="request-data-form">
     <h3>Create</h3>
-    <form action="<?= BASEURL ?>api/scheduledtransaction/create" method="post">
+    <form action="<?= BASEURL ?>api/schedule/create" method="post">
         <div class="std_margin">
             <label for="create_scheduled_trans_type">Type (1-5)</label>
             <input id="create_scheduled_trans_type" class="input stretch-input" name="type" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
@@ -103,7 +103,7 @@
 
 <div id="updateScheduledTrForm" class="request-data-form">
     <h3>Update</h3>
-    <form action="<?= BASEURL ?>api/scheduledtransaction/update" method="post">
+    <form action="<?= BASEURL ?>api/schedule/update" method="post">
         <div class="std_margin">
             <label for="update_scheduled_trans_id">Scheduled transaction id</label>
             <input id="update_scheduled_trans_id" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
@@ -192,7 +192,7 @@
 
 <div id="delScheduledTrForm" class="request-data-form">
     <h3>Delete scheduled transactions</h3>
-    <form action="<?= BASEURL ?>api/scheduledtransaction/delete" method="post">
+    <form action="<?= BASEURL ?>api/schedule/delete" method="post">
         <div class="std_margin">
             <label for="deltransactions">Transactions (comma separated ids)</label>
             <input id="deltransactions" class="input stretch-input" name="id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
