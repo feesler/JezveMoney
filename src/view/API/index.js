@@ -262,6 +262,32 @@ export const API = {
         },
     },
 
+    scheduledtransaction: {
+        async createMultiple(data) {
+            return apiPost('scheduledtransaction/createMultiple', data);
+        },
+
+        async list(options = {}) {
+            return apiGet('scheduledtransaction/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('scheduledtransaction/', data);
+        },
+
+        async create(data) {
+            return apiPost('scheduledtransaction/create', data);
+        },
+
+        async update(data) {
+            return apiPost('scheduledtransaction/update', data);
+        },
+
+        async del(data) {
+            return apiPost('scheduledtransaction/delete', data);
+        },
+    },
+
     import: {
         async upload(data, requestOptions = {}) {
             return apiPost('import/upload', data, requestOptions);

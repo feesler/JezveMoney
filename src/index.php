@@ -13,6 +13,7 @@ $router->setRoutes([
     "persons" => "Persons",
     "categories" => "Categories",
     "transactions" => "Transactions",
+    "schedule" => "Schedule",
     "profile" => "Profile",
     "settings" => "Settings",
     "statistics" => "Statistics",

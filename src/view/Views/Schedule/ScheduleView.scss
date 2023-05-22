@@ -1,0 +1,41 @@
+.schedule-view {
+  main {
+    width: 100%;
+  }
+
+  .item-details {
+    position: absolute;
+    width: 100%;
+    left: auto;
+    right: 0;
+  }
+}
+
+/* Scheduled transaction details */
+.schedule-item-details {
+  --offcanvas-bg: var(--main-bg-color);
+
+  padding: 0 12px;
+  width: 100%;
+  max-width: var(--section-width);
+}
+
+/* Scheduled transactions list component */
+.schedule-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 4px;
+}
+
+.schedule-list_select .schedule-item {
+  cursor: pointer;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .schedule-item-details {
+    padding-top: var(--header-size);
+  }
+}

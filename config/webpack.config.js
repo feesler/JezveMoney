@@ -83,6 +83,10 @@ export default {
             import: './src/view/Views/Transaction/TransactionView.js',
             filename: 'view/js/[name].js',
         },
+        ScheduleView: {
+            import: './src/view/Views/Schedule/ScheduleView.js',
+            filename: 'view/js/[name].js',
+        },
         ImportView: {
             import: './src/view/Views/Import/ImportView.js',
             filename: 'view/js/[name].js',

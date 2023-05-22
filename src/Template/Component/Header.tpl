@@ -60,6 +60,12 @@
                     <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>schedule/"><?= __("SCHEDULE") ?></a>
+                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>schedule/create/">
+                    <?= useIcon("plus-light", "btn__icon") ?>
+                </a>
+            </li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/"><?= __("STATISTICS") ?></a></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/"><?= __("IMPORT") ?></a></li>
             <li class="nav-separator"></li>
