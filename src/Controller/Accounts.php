@@ -15,8 +15,6 @@ use JezveMoney\App\Model\UserCurrencyModel;
  */
 class Accounts extends ListViewController
 {
-    protected $requiredFields = ["type", "name", "initbalance", "limit", "curr_id", "icon_id", "flags"];
-
     /**
      * Controller initialization
      */
