@@ -1,6 +1,6 @@
 <?php include(TPL_PATH . "Header.tpl"); ?>
 
-<div class="page transaction-view-view">
+<div class="page transaction-view">
     <div class="page_wrapper">
         <?php require_once(TPL_PATH . "Component/Header.tpl");    ?>
         <div class="container">
