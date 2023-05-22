@@ -20,7 +20,6 @@ import {
     cutTime,
     EXCHANGE_PRECISION,
     normalizeExch,
-    timeToDate,
     __,
 } from '../../utils/utils.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
@@ -110,7 +109,7 @@ export class TransactionForm extends Component {
                 fExchange: 1,
                 backExchange: 1,
                 fBackExchange: 1,
-                date: window.app.formatInputDate(timeToDate(transaction.date)),
+                date: window.app.formatInputDate(transaction.date),
                 comment: transaction.comment,
                 useBackExchange: false,
             },

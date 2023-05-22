@@ -1,4 +1,4 @@
-import { __, timeToDate } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 
 import { Transaction } from '../../../../Models/Transaction.js';
 import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
@@ -135,7 +135,7 @@ export class ScheduleItemDetails extends ItemDetails {
 
     renderEndDate(item) {
         return (item.end_date)
-            ? __('SCHEDULE_ITEM_END', window.app.formatDate(timeToDate(item.end_date)))
+            ? __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date))
             : __('SCHED_TR_NO_END_DATE');
     }
 

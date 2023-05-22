@@ -6,7 +6,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { timeToDate, __ } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -425,17 +425,13 @@ export class ScheduleListItem extends Component {
         show(this.controlsElem, state.showControls);
     }
 
-    renderDate(date) {
-        return window.app.formatDate(timeToDate(date));
-    }
-
     renderDateRange(item) {
-        const start = __('SCHEDULE_ITEM_START', this.renderDate(item.start_date));
+        const start = __('SCHEDULE_ITEM_START', window.app.formatDate(item.start_date));
         if (!item.end_date) {
             return start;
         }
 
-        const end = __('SCHEDULE_ITEM_END', this.renderDate(item.end_date));
+        const end = __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date));
         return `${start} ${end}`;
     }
 
@@ -466,10 +462,10 @@ export class ScheduleListItem extends Component {
 
         // Schedule
         // Start date
-        this.startDateField.setContent(this.renderDate(item.start_date));
+        this.startDateField.setContent(window.app.formatDate(item.start_date));
 
         // End date
-        this.endDateField.setContent(this.renderDate(item.end_date));
+        this.endDateField.setContent(window.app.formatDate(item.end_date));
 
         // Interval
         this.intervalField.setContent(item.renderInterval());

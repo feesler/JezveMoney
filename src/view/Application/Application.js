@@ -10,7 +10,12 @@ import {
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 import { API } from '../API/index.js';
-import { parseCookies, setCookie, __ } from '../utils/utils.js';
+import {
+    parseCookies,
+    setCookie,
+    __,
+    timeToDate,
+} from '../utils/utils.js';
 
 /** CSS classes */
 const INVALID_BLOCK_CLASS = 'invalid-block';
@@ -118,7 +123,8 @@ export class Application {
         });
     }
 
-    formatDate(date, params = {}) {
+    formatDate(value, params = {}) {
+        const date = (isDate(value)) ? value : timeToDate(value);
         if (!isDate(date)) {
             throw new Error('Invalid date object');
         }

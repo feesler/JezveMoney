@@ -17,7 +17,6 @@ import {
     formatNumberShort,
     normalize,
     __,
-    timeToDate,
     getWeekRange,
     getMonthRange,
     getHalfYearRange,
@@ -637,21 +636,20 @@ class StatisticsView extends View {
     renderDateLabel(value) {
         const state = this.store.getState();
         const { group } = state.form;
-        const date = timeToDate(value);
 
         if (group === 'day' || group === 'week') {
-            return window.app.formatDate(date);
+            return window.app.formatDate(value);
         }
 
         if (group === 'month') {
-            return window.app.formatDate(date, {
+            return window.app.formatDate(value, {
                 locales: window.app.dateFormatLocale,
                 options: { year: 'numeric', month: '2-digit' },
             });
         }
 
         if (group === 'year') {
-            return window.app.formatDate(date, {
+            return window.app.formatDate(value, {
                 locales: window.app.dateFormatLocale,
                 options: { year: 'numeric' },
             });
