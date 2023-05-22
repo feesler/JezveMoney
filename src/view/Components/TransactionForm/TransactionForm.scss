@@ -40,6 +40,12 @@
   cursor: pointer;
 }
 
+/* Interval offset field */
+.interval-offset-field .field__content {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
 /* Desktop */
 @media (min-width: 768px) {
   .swap-btn {

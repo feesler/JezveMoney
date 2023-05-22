@@ -12,6 +12,7 @@ import { CategoryListView } from './view/CategoryListView.js';
 import { TransactionListView } from './view/TransactionListView.js';
 import { TransactionView } from './view/TransactionView.js';
 import { ScheduleView } from './view/ScheduleView.js';
+import { ScheduleItemView } from './view/ScheduleItemView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
 import { SettingsView } from './view/SettingsView.js';
@@ -43,6 +44,7 @@ const routeMap = {
     },
     schedule: {
         list: ScheduleView,
+        item: ScheduleItemView,
     },
 };
 const listViews = ['accounts', 'persons', 'categories', 'transactions'];

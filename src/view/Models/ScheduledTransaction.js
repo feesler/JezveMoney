@@ -82,13 +82,13 @@ export class ScheduledTransaction extends ListItem {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', offset);
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', (offset + 1));
     }
 
     renderYearOffset(offset) {
         const date = new Date();
         date.setMonth(Math.floor(offset / 100));
-        date.setDate(offset % 100);
+        date.setDate((offset % 100) + 1);
 
         return window.app.formatDate(date, {
             locales: window.app.locale,

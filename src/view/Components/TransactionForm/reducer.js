@@ -1131,6 +1131,59 @@ const slice = createSlice({
         },
     }),
 
+    intervalTypeChange: (state, value) => {
+        const type = parseInt(value, 10);
+        const newState = {
+            ...state,
+            form: {
+                ...state.form,
+                intervalType: type,
+                intervalOffset: 0,
+            },
+            transaction: {
+                ...state.transaction,
+                interval_type: type,
+                interval_offset: 0,
+            },
+        };
+
+        return newState;
+    },
+
+    intervalStepChange: (state, value) => {
+        const step = parseInt(value, 10);
+        const newState = {
+            ...state,
+            form: {
+                ...state.form,
+                intervalStep: step,
+            },
+            transaction: {
+                ...state.transaction,
+                interval_step: step,
+            },
+        };
+
+        return newState;
+    },
+
+    intervalOffsetChange: (state, value) => {
+        const offset = parseInt(value, 10);
+        const newState = {
+            ...state,
+            form: {
+                ...state.form,
+                intervalOffset: offset,
+            },
+            transaction: {
+                ...state.transaction,
+                interval_offset: offset,
+            },
+        };
+
+        return newState;
+    },
+
     invalidateSourceAmount: (state) => ({
         ...state,
         id: stateTransition(state, {
@@ -1192,6 +1245,22 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             date: false,
+        },
+    }),
+
+    invalidateStartDate: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            startDate: false,
+        },
+    }),
+
+    invalidateEndDate: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            endDate: false,
         },
     }),
 
