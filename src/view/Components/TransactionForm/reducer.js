@@ -1131,6 +1131,38 @@ const slice = createSlice({
         },
     }),
 
+    startDateChange: (state, value) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            start_date: dateStringToTime(value),
+        },
+        form: {
+            ...state.form,
+            startDate: value,
+        },
+        validation: {
+            ...state.validation,
+            startDate: true,
+        },
+    }),
+
+    endDateChange: (state, value) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            end_date: (value) ? dateStringToTime(value) : null,
+        },
+        form: {
+            ...state.form,
+            endDate: value ?? '',
+        },
+        validation: {
+            ...state.validation,
+            endDate: true,
+        },
+    }),
+
     intervalTypeChange: (state, value) => {
         const type = parseInt(value, 10);
         const newState = {

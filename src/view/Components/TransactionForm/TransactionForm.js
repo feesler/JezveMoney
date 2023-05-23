@@ -1012,6 +1012,36 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
+    onStartDateInput(e) {
+        this.store.dispatch(actions.startDateChange(e.target.value));
+        this.notifyChanged();
+    }
+
+    /**
+     * Start date select callback
+     * @param {Date} date - selected date object
+     */
+    onStartDateSelect(date) {
+        this.store.dispatch(actions.startDateChange(window.app.formatInputDate(date)));
+        this.startDateRow.datePicker.hide();
+        this.notifyChanged();
+    }
+
+    onEndDateInput(e) {
+        this.store.dispatch(actions.dateChange(e.target.value));
+        this.notifyChanged();
+    }
+
+    /**
+     * End date select callback
+     * @param {Date} date - selected date object
+     */
+    onEndDateSelect(date) {
+        this.store.dispatch(actions.endDateChange(window.app.formatInputDate(date)));
+        this.endDateRow.datePicker.hide();
+        this.notifyChanged();
+    }
+
     onIntervalTypeChanged(type) {
         const typeId = parseInt(type.id, 10);
         this.store.dispatch(actions.intervalTypeChange(typeId));
