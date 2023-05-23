@@ -1254,14 +1254,16 @@ export class TransactionForm extends Component {
     }
 
     renderExpense(state) {
+        const isTransaction = (state.type === 'transaction');
+
         this.resBalanceDestSwitch(HIDE_BOTH);
 
         if (state.id === STATE.E_D_AMOUNT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.E_S_RESULT) {
+        } else if (state.id === STATE.E_S_RESULT && isTransaction) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1269,14 +1271,14 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.E_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === STATE.E_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
-            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === STATE.E_S_AMOUNT_S_RESULT) {
+        } else if (state.id === STATE.E_S_AMOUNT_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1290,21 +1292,25 @@ export class TransactionForm extends Component {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRow.setTitle(__('TR_RESULT'));
-        this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        if (isTransaction) {
+            this.srcResBalanceRow.setTitle(__('TR_RESULT'));
+            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        }
 
         this.srcAmountRow.enableSelect(false);
         this.destAmountRow.enableSelect(true);
     }
 
     renderIncome(state) {
+        const isTransaction = (state.type === 'transaction');
+
         if (state.id === STATE.I_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.I_D_RESULT) {
+        } else if (state.id === STATE.I_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1313,16 +1319,16 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.I_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === STATE.I_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === STATE.I_S_AMOUNT_D_RESULT) {
+        } else if (state.id === STATE.I_S_AMOUNT_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1337,27 +1343,31 @@ export class TransactionForm extends Component {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRow.setTitle(__('TR_RESULT'));
-        this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        if (isTransaction) {
+            this.srcResBalanceRow.setTitle(__('TR_RESULT'));
+            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        }
 
         this.srcAmountRow.enableSelect(true);
         this.destAmountRow.enableSelect(false);
     }
 
     renderTransfer(state) {
+        const isTransaction = (state.type === 'transaction');
+
         if (state.id === STATE.T_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.T_S_RESULT) {
+        } else if (state.id === STATE.T_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.T_D_RESULT) {
+        } else if (state.id === STATE.T_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1366,22 +1376,22 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT) {
+        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === STATE.T_S_AMOUNT_D_RESULT) {
+        } else if (state.id === STATE.T_S_AMOUNT_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === STATE.T_S_RESULT_D_RESULT) {
+        } else if (state.id === STATE.T_S_RESULT_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1390,10 +1400,10 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.T_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === STATE.T_EXCH_S_RESULT) {
+        } else if (state.id === STATE.T_EXCH_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1413,27 +1423,31 @@ export class TransactionForm extends Component {
             this.destResBalanceInfo.elem,
         ]);
 
-        this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_SOURCE')})`);
-        this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_DESTINATION')})`);
+        if (isTransaction) {
+            this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_SOURCE')})`);
+            this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_DESTINATION')})`);
+        }
 
         this.srcAmountRow.enableSelect(false);
         this.destAmountRow.enableSelect(false);
     }
 
     renderDebt(state) {
+        const isTransaction = (state.type === 'transaction');
+
         if (state.id === STATE.DG_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DG_S_RESULT) {
+        } else if (state.id === STATE.DG_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DG_D_RESULT) {
+        } else if (state.id === STATE.DG_D_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1442,16 +1456,16 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.DT_D_AMOUNT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DT_D_RESULT) {
+        } else if (state.id === STATE.DT_D_RESULT && isTransaction) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DT_S_RESULT) {
+        } else if (state.id === STATE.DT_S_RESULT && isTransaction) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1460,22 +1474,22 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
-            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.resBalanceDestSwitch(HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DT_NOACC_D_AMOUNT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DT_NOACC_D_RESULT) {
+        } else if (state.id === STATE.DT_NOACC_D_RESULT && isTransaction) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DG_NOACC_S_RESULT) {
+        } else if (state.id === STATE.DG_NOACC_S_RESULT && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1487,12 +1501,15 @@ export class TransactionForm extends Component {
         ) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INFO);
         } else if (
-            state.id === STATE.DG_D_AMOUNT_S_RESULT
-            || state.id === STATE.DT_D_AMOUNT_S_RESULT
+            (
+                (state.id === STATE.DG_D_AMOUNT_S_RESULT)
+                || (state.id === STATE.DT_D_AMOUNT_S_RESULT)
+            )
+            && isTransaction
         ) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
@@ -1502,18 +1519,20 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.DG_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === STATE.DG_S_RESULT_EXCH) {
+        } else if (state.id === STATE.DG_S_RESULT_EXCH && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
         } else if (
-            state.id === STATE.DG_S_RESULT_D_RESULT
-            || state.id === STATE.DT_S_RESULT_D_RESULT
+            (
+                (state.id === STATE.DG_S_RESULT_D_RESULT)
+                || (state.id === STATE.DT_S_RESULT_D_RESULT)
+            ) && isTransaction
         ) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
@@ -1521,8 +1540,10 @@ export class TransactionForm extends Component {
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
         } else if (
-            state.id === STATE.DG_S_AMOUNT_D_RESULT
-            || state.id === STATE.DT_S_AMOUNT_D_RESULT
+            (
+                (state.id === STATE.DG_S_AMOUNT_D_RESULT)
+                || (state.id === STATE.DT_S_AMOUNT_D_RESULT)
+            ) && isTransaction
         ) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
@@ -1532,10 +1553,10 @@ export class TransactionForm extends Component {
         } else if (state.id === STATE.DT_D_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
-            this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === STATE.DT_D_RESULT_EXCH) {
+        } else if (state.id === STATE.DT_D_RESULT_EXCH && isTransaction) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1584,10 +1605,12 @@ export class TransactionForm extends Component {
         );
         this.debtAccountContainer.togglerButton.enable(!state.submitStarted);
 
-        const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
-        const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
-        this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${srcResultTarget})`);
-        this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${destResultTarget})`);
+        if (isTransaction) {
+            const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
+            const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
+            this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${srcResultTarget})`);
+            this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${destResultTarget})`);
+        }
 
         this.srcAmountRow.enableSelect(debtType);
         this.destAmountRow.enableSelect(!debtType);
@@ -1621,7 +1644,9 @@ export class TransactionForm extends Component {
     }
 
     renderLimitChange(state) {
-        if (state.id === STATE.L_RESULT) {
+        const isTransaction = (state.type === 'transaction');
+
+        if (state.id === STATE.L_RESULT && isTransaction) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
@@ -1631,7 +1656,7 @@ export class TransactionForm extends Component {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
-            this.resBalanceDestSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch((isTransaction) ? SHOW_INFO : HIDE_BOTH);
             this.exchRateSwitch(HIDE_BOTH);
         }
 
@@ -1640,13 +1665,19 @@ export class TransactionForm extends Component {
             this.destResBalanceInfo.elem,
         ]);
 
-        this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        if (isTransaction) {
+            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+        }
 
         this.srcAmountRow.enableSelect(false);
         this.destAmountRow.enableSelect(false);
     }
 
     renderScheduleFields(state) {
+        if (state?.type !== 'scheduleItem') {
+            return;
+        }
+
         const { transaction, form } = state;
 
         // Start date field
