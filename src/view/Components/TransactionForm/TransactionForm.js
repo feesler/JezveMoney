@@ -595,8 +595,10 @@ export class TransactionForm extends Component {
             className: 'form-row',
             locales: window.app.dateFormatLocale,
             validate: true,
+            clearButton: true,
             onInput: (e) => this.onEndDateInput(e),
             onDateSelect: (e) => this.onEndDateSelect(e),
+            onClear: (e) => this.onEndDateClear(e),
         });
 
         // Interval step field
@@ -1028,7 +1030,7 @@ export class TransactionForm extends Component {
     }
 
     onEndDateInput(e) {
-        this.store.dispatch(actions.dateChange(e.target.value));
+        this.store.dispatch(actions.endDateChange(e.target.value));
         this.notifyChanged();
     }
 
@@ -1038,6 +1040,15 @@ export class TransactionForm extends Component {
      */
     onEndDateSelect(date) {
         this.store.dispatch(actions.endDateChange(window.app.formatInputDate(date)));
+        this.endDateRow.datePicker.hide();
+        this.notifyChanged();
+    }
+
+    /**
+     * End date clear callback
+     */
+    onEndDateClear() {
+        this.store.dispatch(actions.endDateChange(null));
         this.endDateRow.datePicker.hide();
         this.notifyChanged();
     }
