@@ -1,5 +1,6 @@
 import { createElement, isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { CloseButton } from 'jezvejs/CloseButton';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { InputGroup } from 'jezvejs/InputGroup';
@@ -15,7 +16,9 @@ const defaultProps = {
     validate: false,
     feedbackMessage: null,
     valid: true,
+    clearButton: false,
     onInput: null,
+    onClear: null,
     onDateSelect: null,
 };
 
@@ -49,9 +52,22 @@ export class DateInputField extends Field {
             onClick: () => this.showCalendar(),
         });
 
+        this.inputOuter = createElement('div', {
+            props: { className: 'input-group__input-outer' },
+            children: this.input.elem,
+        });
+
+        if (this.props.clearButton) {
+            this.clearBtn = CloseButton.create({
+                className: 'input-group__inner-btn clear-btn',
+                onClick: (e) => this.onClear(e),
+            });
+            this.inputOuter.append(this.clearBtn.elem);
+        }
+
         this.group = InputGroup.create({
             children: [
-                this.input.elem,
+                this.inputOuter,
                 this.datePickerBtn.elem,
             ],
         });
@@ -123,6 +139,12 @@ export class DateInputField extends Field {
         }
     }
 
+    onClear(e) {
+        if (isFunction(this.props.onClear)) {
+            this.props.onClear(e);
+        }
+    }
+
     renderInput(state, prevState) {
         if (state.value !== prevState?.value) {
             this.input.value = state.value;
@@ -147,5 +169,9 @@ export class DateInputField extends Field {
         }
 
         this.renderInput(state, prevState);
+
+        if (this.clearBtn) {
+            this.clearBtn.show(state.clearButton && state.value.length > 0);
+        }
     }
 }
