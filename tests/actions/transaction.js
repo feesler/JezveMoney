@@ -75,17 +75,17 @@ export const runAction = async ({ action, data }) => {
     }
 
     if (action === 'toggleAccount') {
-        testDescr = App.view.model.noAccount ? 'Enable account' : 'Disable account';
+        testDescr = App.view.formModel.noAccount ? 'Enable account' : 'Disable account';
     }
 
     if (action === 'changeAccount') {
         if (data === null) {
-            if (!App.view.model.noAccount) {
+            if (!App.view.formModel.noAccount) {
                 await test('Disable account', () => App.view.toggleAccount());
                 return;
             }
         } else {
-            if (App.view.model.noAccount) {
+            if (App.view.formModel.noAccount) {
                 await test('Enable account', () => App.view.toggleAccount());
             }
 
@@ -256,22 +256,22 @@ export const update = async (type, pos) => {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
         if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.model.state = (isDiff) ? 2 : 0;
+            App.view.formModel.state = (isDiff) ? 2 : 0;
         }
 
         if (origTransaction.type === TRANSFER) {
-            App.view.model.state = (isDiff) ? 3 : 0;
+            App.view.formModel.state = (isDiff) ? 3 : 0;
         }
 
         if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.model;
+            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
 
             if (isDiffCurr) {
-                App.view.model.state = (debtType) ? 10 : 16;
+                App.view.formModel.state = (debtType) ? 10 : 16;
             } else if (debtType) {
-                App.view.model.state = (noAccount) ? 6 : 0;
+                App.view.formModel.state = (noAccount) ? 6 : 0;
             } else {
-                App.view.model.state = (noAccount) ? 7 : 3;
+                App.view.formModel.state = (noAccount) ? 7 : 3;
             }
         }
 
@@ -291,22 +291,22 @@ export const updateFromMainView = async (pos) => {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
         if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.model.state = (isDiff) ? 2 : 0;
+            App.view.formModel.state = (isDiff) ? 2 : 0;
         }
 
         if (origTransaction.type === TRANSFER) {
-            App.view.model.state = (isDiff) ? 3 : 0;
+            App.view.formModel.state = (isDiff) ? 3 : 0;
         }
 
         if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.model;
+            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
 
             if (isDiffCurr) {
-                App.view.model.state = (debtType) ? 10 : 16;
+                App.view.formModel.state = (debtType) ? 10 : 16;
             } else if (debtType) {
-                App.view.model.state = (noAccount) ? 6 : 0;
+                App.view.formModel.state = (noAccount) ? 6 : 0;
             } else {
-                App.view.model.state = (noAccount) ? 7 : 3;
+                App.view.formModel.state = (noAccount) ? 7 : 3;
             }
         }
 
@@ -556,7 +556,7 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
             if (type === LIMIT_CHANGE) {
-                const { srcAccount, destAccount } = App.view.model;
+                const { srcAccount, destAccount } = App.view.formModel;
                 const isCreditCard = (
                     (srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
                     || (destAccount?.type === ACCOUNT_TYPE_CREDIT_CARD)
@@ -596,7 +596,7 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             stateId = 0;
         }
 
-        App.view.model.state = stateId;
+        App.view.formModel.state = stateId;
         const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
@@ -607,7 +607,7 @@ export const checkDebtNoAccountURL = async () => {
         const requestURL = `${baseUrl()}transactions/create/?type=debt&acc_id=0`;
         await goTo(requestURL);
 
-        App.view.model.state = (App.state.persons.length > 0) ? 6 : -1;
+        App.view.formModel.state = (App.state.persons.length > 0) ? 6 : -1;
         const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
