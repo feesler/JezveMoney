@@ -163,7 +163,7 @@ export class ScheduleItemDetails extends ItemDetails {
         this.offsetField.setContent(item.renderIntervalOffset());
 
         // Transaction
-        this.destinationField.show(showSource);
+        this.sourceField.show(showSource);
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
 
         this.destinationField.show(showDest);
