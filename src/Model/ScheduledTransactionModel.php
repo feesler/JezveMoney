@@ -61,6 +61,7 @@ class ScheduledTransactionModel extends CachedTable
         $this->currMod = CurrencyModel::getInstance();
         $this->catModel = CategoryModel::getInstance();
         $this->reminderModel = ReminderModel::getInstance();
+        TransactionModel::getInstance();
     }
 
     /**
@@ -355,6 +356,91 @@ class ScheduledTransactionModel extends CachedTable
         }
 
         return $offset;
+    }
+
+    /**
+     * Converts debt specific params to common transaction fields
+     *
+     * @param array $params debt fields
+     *
+     * @return array
+     */
+    public function prepareDebt(array $params)
+    {
+        $mandatoryParams = [
+            "person_id",
+            "op",
+            "src_amount",
+            "dest_amount",
+            "src_curr",
+            "dest_curr",
+            "category_id",
+            "comment",
+            "start_date",
+            "end_date",
+            "interval_type",
+            "interval_step",
+            "interval_offset",
+        ];
+
+        checkFields($params, $mandatoryParams, true);
+
+        $res = [
+            "type" => DEBT,
+        ];
+
+        if (isset($params["id"])) {
+            $res["id"] = intval($params["id"]);
+        }
+
+        $op = intval($params["op"]);
+        if ($op != 1 && $op != 2) {
+            throw new \Error("Unknown debt operation: $op");
+        }
+
+        $person_id = intval($params["person_id"]);
+
+        $res["src_curr"] = intval($params["src_curr"]);
+        $res["dest_curr"] = intval($params["dest_curr"]);
+        if (!$res["src_curr"] || !$res["dest_curr"]) {
+            throw new \Error("Invalid currency");
+        }
+
+        $personCurrencyId = ($op == 1) ? $res["src_curr"] : $res["dest_curr"];
+        $personAccount = $this->accModel->getPersonAccount($person_id, $personCurrencyId);
+        if (!$personAccount) {
+            $personAccount = $this->accModel->createPersonAccount($person_id, $personCurrencyId);
+        }
+        if (!$personAccount) {
+            throw new \Error("Fail to obtain person account: person_id: $person_id, curr_id: $personCurrencyId");
+        }
+
+        $account_id = isset($params["acc_id"]) ? intval($params["acc_id"]) : 0;
+
+        if ($op == 1) {        // give
+            $res["src_id"] = $personAccount->id;
+            $res["dest_id"] = $account_id;
+        } elseif ($op == 2) {    // take
+            $res["src_id"] = $account_id;
+            $res["dest_id"] = $personAccount->id;
+        }
+
+        $res["src_amount"] = floatval($params["src_amount"]);
+        $res["dest_amount"] = floatval($params["dest_amount"]);
+        if ($res["src_amount"] == 0.0 || $res["dest_amount"] == 0.0) {
+            throw new \Error("Invalid amount");
+        }
+
+        $res["category_id"] = $params["category_id"];
+        $res["comment"] = $params["comment"];
+
+        $res["start_date"] = $params["start_date"];
+        $res["end_date"] = $params["end_date"];
+        $res["interval_type"] = $params["interval_type"];
+        $res["interval_step"] = $params["interval_step"];
+        $res["interval_offset"] = $params["interval_offset"];
+
+        return $res;
     }
 
     /**

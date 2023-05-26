@@ -27,7 +27,7 @@ const MAX_DAYS_IN_YEAR = 366;
 
 /** Scheduled transaction item */
 export class ScheduledTransaction {
-    static availProps = [
+    static requiredProps = [
         'type',
         'src_id',
         'dest_id',
@@ -42,6 +42,47 @@ export class ScheduledTransaction {
         'interval_type',
         'interval_step',
         'interval_offset',
+    ];
+
+    static availProps = [
+        'id',
+        'type',
+        'src_id',
+        'dest_id',
+        'src_amount',
+        'dest_amount',
+        'src_curr',
+        'dest_curr',
+        'category_id',
+        'comment',
+        'start_date',
+        'end_date',
+        'interval_type',
+        'interval_step',
+        'interval_offset',
+        'createdate',
+        'updatedate',
+    ];
+
+    static debtProps = [
+        'id',
+        'type',
+        'person_id',
+        'acc_id',
+        'op',
+        'src_amount',
+        'dest_amount',
+        'src_curr',
+        'dest_curr',
+        'category_id',
+        'comment',
+        'start_date',
+        'end_date',
+        'interval_type',
+        'interval_step',
+        'interval_offset',
+        'createdate',
+        'updatedate',
     ];
 
     static availIntervals = [
@@ -174,12 +215,10 @@ export class ScheduledTransaction {
             ...data,
         };
 
-        if (props.id) {
-            this.id = props.id;
-        }
-
         ScheduledTransaction.availProps.forEach((propName) => {
-            assert(propName in props, `Property '${propName}' not found.`);
+            if (ScheduledTransaction.requiredProps.includes(propName)) {
+                assert(propName in props, `Property '${propName}' not found.`);
+            }
 
             this[propName] = props[propName];
         });

@@ -1932,6 +1932,36 @@ export class AppState {
             return false;
         }
 
+        if (params.type === DEBT && ('person_id' in params)) {
+            const person = this.persons.getItem(params.person_id);
+            if (!person) {
+                return false;
+            }
+
+            if ('op' in params && params.op !== 1 && params.op !== 2) {
+                return false;
+            }
+
+            if (params.acc_id) {
+                const account = this.accounts.getItem(params.acc_id);
+                if (
+                    !account
+                    || (params.op === 2 && srcCurr.id !== account.curr_id)
+                    || (params.op === 1 && destCurr.id !== account.curr_id)
+                ) {
+                    return false;
+                }
+            }
+        }
+
+        if (
+            ('src_id' in params)
+            && ('dest_id' in params)
+            && (params.src_id === params.dest_id)
+        ) {
+            return false;
+        }
+
         let srcAccount = null;
         if (params.src_id) {
             if (params.type === INCOME) {
@@ -1982,11 +2012,7 @@ export class AppState {
             return false;
         }
 
-        if (params.src_id === params.dest_id) {
-            return false;
-        }
-
-        if (params.type === DEBT) {
+        if (params.type === DEBT && !('person_id' in params)) {
             // Both source and destination are accounts of person
             if (
                 srcAccount
@@ -2050,19 +2076,65 @@ export class AppState {
         return true;
     }
 
+    getExpectedScheduledTransaction(params) {
+        const isPersonRequest = ('person_id' in params);
+        const fields = (params.type === DEBT && isPersonRequest)
+            ? ScheduledTransaction.debtProps
+            : ScheduledTransaction.availProps;
+        const itemData = {
+            ...ScheduledTransaction.defaultProps,
+            ...params,
+        };
+
+        const res = copyFields(itemData, fields);
+
+        if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
+            return res;
+        }
+
+        const reqCurr = (res.op === 1) ? res.src_curr : res.dest_curr;
+        const personAcc = this.getExpectedPersonAccount(res.person_id, reqCurr);
+        if (!personAcc) {
+            return null;
+        }
+
+        if (res.op === 1) {
+            res.src_id = personAcc.id;
+            res.dest_id = res.acc_id;
+        } else {
+            res.src_id = res.acc_id;
+            res.dest_id = personAcc.id;
+        }
+
+        delete res.op;
+        delete res.person_id;
+        delete res.acc_id;
+
+        return res;
+    }
+
     createScheduledTransaction(params) {
         const itemData = {
             ...ScheduledTransaction.defaultProps,
             ...params,
         };
 
-        const resExpected = this.validateScheduledTransaction(itemData);
+        let resExpected = this.validateScheduledTransaction(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, ScheduledTransaction.availProps);
-        const ind = this.schedule.create(data);
+        const expItem = this.getExpectedScheduledTransaction(itemData);
+        if (!expItem) {
+            return false;
+        }
+
+        resExpected = checkFields(expItem, ScheduledTransaction.requiredProps);
+        if (!resExpected) {
+            return false;
+        }
+
+        const ind = this.schedule.create(expItem);
         const item = this.schedule.getItemByIndex(ind);
 
         if (!this.createReminders(item.id)) {
@@ -2078,12 +2150,17 @@ export class AppState {
             return false;
         }
 
-        const expItem = copyObject(origItem);
+        const itemData = copyObject(origItem);
         const data = copyFields(params, ScheduledTransaction.availProps);
-        Object.assign(expItem, data);
+        Object.assign(itemData, data);
 
-        const resExpected = this.validateScheduledTransaction(expItem);
+        const resExpected = this.validateScheduledTransaction(itemData);
         if (!resExpected) {
+            return false;
+        }
+
+        const expItem = this.getExpectedScheduledTransaction(itemData);
+        if (!expItem) {
             return false;
         }
 
