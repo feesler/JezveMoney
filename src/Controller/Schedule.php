@@ -47,6 +47,12 @@ class Schedule extends ListViewController
             "titleString" => __("APP_NAME") . " | " . __("SCHEDULE"),
         ];
 
+        // Obtain requested view mode
+        $showDetails = false;
+        if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
+            $showDetails = true;
+        }
+
         $detailsId = $this->getRequestedItem();
 
         $data["appProps"] = [
@@ -57,6 +63,7 @@ class Schedule extends ListViewController
             "categories" => $this->catModel->getData(),
             "schedule" => $this->model->getData(),
             "view" => [
+                "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
                 "detailsItem" => $this->model->getItem($detailsId),
             ],

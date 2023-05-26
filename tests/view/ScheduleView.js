@@ -22,6 +22,7 @@ import { Counter } from './component/Counter.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { ScheduleItemDetails } from './component/Schedule/ScheduleItemDetails.js';
 import { ScheduleList } from './component/Schedule/ScheduleList.js';
+import { __ } from '../model/locale.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -79,6 +80,8 @@ export class ScheduleView extends AppView {
         if (res.contextMenu.itemId) {
             await this.parseMenuItems(res, contextMenuItems);
         }
+
+        res.modeSelector = await Button.create(this, await query('.mode-selector'));
 
         const listContainer = await query('.list-container');
         assert(listContainer, 'List container not found');
@@ -253,7 +256,12 @@ export class ScheduleView extends AppView {
 
     getExpectedList(model = this.model) {
         const items = model.data;
-        return ScheduleList.render(items.data, App.state);
+
+        const options = {
+            detailsMode: model.detailsMode,
+        };
+
+        return ScheduleList.render(items.data, App.state, options);
     }
 
     getExpectedState(model = this.model) {
@@ -272,6 +280,7 @@ export class ScheduleView extends AppView {
         const res = {
             totalCounter: { visible: true, value: model.data.length },
             selectedCounter: { visible: selectMode, value: selected.length },
+            modeSelector: { visible: isItemsAvailable },
             scheduleList: {
                 ...list,
                 visible: true,
@@ -313,6 +322,12 @@ export class ScheduleView extends AppView {
             res.ctxDetailsBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxDeleteBtn = { visible: true };
+        }
+
+        if (isItemsAvailable) {
+            res.modeSelector.title = (model.detailsMode)
+                ? __('TR_LIST_SHOW_MAIN', this.locale)
+                : __('TR_LIST_SHOW_DETAILS', this.locale);
         }
 
         return res;
@@ -417,6 +432,37 @@ export class ScheduleView extends AppView {
 
     async setSelectMode() {
         return this.changeListMode('select');
+    }
+
+    async toggleMode(directNavigate = false) {
+        assert(this.content.modeSelector, 'Mode toggler button not available');
+
+        this.model.detailsMode = !this.model.detailsMode;
+        const expected = this.getExpectedState();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.modeSelector.click());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async setClassicMode(directNavigate = false) {
+        if (!this.model.detailsMode) {
+            return true;
+        }
+
+        return this.toggleMode(directNavigate);
+    }
+
+    async setDetailsMode(directNavigate = false) {
+        if (this.model.detailsMode) {
+            return true;
+        }
+
+        return this.toggleMode(directNavigate);
     }
 
     /** Click on add button */

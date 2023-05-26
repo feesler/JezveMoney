@@ -9,11 +9,11 @@ import {
 import { ScheduleListItem } from './ScheduleListItem.js';
 
 export class ScheduleList extends TestComponent {
-    static render(data, state) {
+    static render(data, state, options) {
         assert.isArray(data);
 
         return {
-            items: data.map((item) => ScheduleListItem.render(item, state)),
+            items: data.map((item) => ScheduleListItem.render(item, state, options)),
             noDataMessage: { visible: data.length === 0 },
         };
     }

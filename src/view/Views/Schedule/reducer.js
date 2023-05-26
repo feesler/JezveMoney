@@ -89,6 +89,13 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
+    toggleMode: (state) => ({
+        ...state,
+        mode: (state.mode === 'details') ? 'classic' : 'details',
+        contextItem: null,
+        renderTime: Date.now(),
+    }),
+
     startLoading: (state) => (
         (state.loading)
             ? state
@@ -100,6 +107,11 @@ const slice = createSlice({
             ? { ...state, loading: false }
             : state
     ),
+
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
 
     listRequestLoaded: (state, keepState) => ({
         ...state,

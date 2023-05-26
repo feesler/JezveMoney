@@ -38,12 +38,17 @@ export class ScheduleStory extends TestStory {
         await Actions.securityTests();
 
         await this.create();
-        await this.select();
-        await this.details();
+        await this.list();
         await this.update();
         await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
+    }
+
+    async list() {
+        await this.detailsMode();
+        await this.select();
+        await this.details();
     }
 
     async create() {
@@ -129,6 +134,13 @@ export class ScheduleStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(Actions.delFromUpdate, data);
+    }
+
+    async detailsMode() {
+        setBlock('Scheduled transactions list details mode', 1);
+
+        await Actions.toggleMode();
+        await Actions.toggleMode();
     }
 
     async select() {

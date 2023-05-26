@@ -11,6 +11,22 @@
   }
 }
 
+/* List header */
+.list-header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Mode selector */
+.btn.mode-selector {
+  --btn-title-color: var(--accent-color);
+  --btn-icon-color: var(--accent-color);
+  --btn-hover-icon-color: var(--accent-color);
+  --btn-hover-title-color: var(--accent-hover-color);
+}
+
 /* Scheduled transaction details */
 .schedule-item-details {
   --offcanvas-bg: var(--main-bg-color);

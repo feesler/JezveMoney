@@ -456,6 +456,12 @@ export class ScheduleListItem extends Component {
         this.commentElem.setAttribute('title', item.comment);
     }
 
+    renderEndDate(item) {
+        return (item.end_date)
+            ? __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date))
+            : __('SCHED_TR_NO_END_DATE');
+    }
+
     renderDetails(state) {
         const { item } = state;
         const { currency } = window.app.model;
@@ -465,13 +471,13 @@ export class ScheduleListItem extends Component {
         this.startDateField.setContent(window.app.formatDate(item.start_date));
 
         // End date
-        this.endDateField.setContent(window.app.formatDate(item.end_date));
+        this.endDateField.setContent(this.renderEndDate(item));
 
         // Interval
         this.intervalField.setContent(item.renderInterval());
 
         // Offset
-        this.intervalField.setContent(item.renderIntervalOffset());
+        this.offsetField.setContent(item.renderIntervalOffset());
 
         // Transaction
         // Source

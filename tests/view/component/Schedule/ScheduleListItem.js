@@ -27,12 +27,27 @@ export class ScheduleListItem extends TestComponent {
             };
 
             // Schedule fields
-            const dateRangeElem = elem.querySelector(
-                (detailsMode)
-                    ? '.schedule-item__date-range-field .field__content'
-                    : '.schedule-item__date-range',
-            );
-            item.dateRange = dateRangeElem?.textContent;
+            if (detailsMode) {
+                const startDateElem = elem.querySelector(
+                    (detailsMode)
+                        ? '.schedule-item__start-date-field .field__content'
+                        : '.schedule-item__start-date',
+                );
+                item.startDate = startDateElem?.textContent;
+                const endDateElem = elem.querySelector(
+                    (detailsMode)
+                        ? '.schedule-item__end-date-field .field__content'
+                        : '.schedule-item__end-date',
+                );
+                item.endDate = endDateElem?.textContent;
+            } else {
+                const dateRangeElem = elem.querySelector(
+                    (detailsMode)
+                        ? '.schedule-item__date-range-field .field__content'
+                        : '.schedule-item__date-range',
+                );
+                item.dateRange = dateRangeElem?.textContent;
+            }
 
             const intervalElem = elem.querySelector(
                 (detailsMode)
@@ -130,13 +145,29 @@ export class ScheduleListItem extends TestComponent {
         return `${start} ${end}`;
     }
 
-    static render(item, state) {
+    static renderEndDate(item) {
+        if (!item.end_date) {
+            return __('SCHED_TR_NO_END_DATE', App.view.locale);
+        }
+
+        return __('SCHEDULE_ITEM_END', App.view.locale, App.secondsToDateString(item.end_date));
+    }
+
+    static render(item, state, options = {}) {
+        const detailsMode = options?.detailsMode;
+
         const res = {};
 
         assert.instanceOf(item, ScheduledTransaction, 'Invalid item');
         assert(state, 'Invalid state object');
 
-        res.dateRange = this.renderDateRange(item);
+        if (detailsMode) {
+            res.startDate = App.secondsToDateString(item.start_date);
+            res.endDate = this.renderEndDate(item);
+        } else {
+            res.dateRange = this.renderDateRange(item);
+        }
+
         res.interval = item.renderInterval();
         res.offset = item.renderIntervalOffset();
 

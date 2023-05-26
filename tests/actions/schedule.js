@@ -24,7 +24,6 @@ import { __ } from '../model/locale.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../model/AccountsList.js';
 import { ScheduledTransaction } from '../model/ScheduledTransaction.js';
 import { ScheduleItemView } from '../view/ScheduleItemView.js';
-import { ScheduleList } from '../view/component/Schedule/ScheduleList.js';
 
 export const decimalInputTestStrings = [
     '-',
@@ -349,9 +348,8 @@ export const deleteFromContextMenu = async (index) => {
 
         App.view.model.data = App.state.schedule.clone();
 
-        const expectedItems = App.view.model.data;
         const expected = {
-            scheduleList: ScheduleList.render(expectedItems.data, App.state),
+            scheduleList: App.view.getExpectedList(),
         };
         App.view.checkState(expected);
 
@@ -591,6 +589,15 @@ export const closeDetails = async ({ directNavigate = false } = {}) => {
         return App.view.closeDetails(directNavigate);
     });
 };
+
+/** Clicks by mode selector button */
+export const toggleMode = async () => {
+    await test('Toggle details/classic mode', async () => {
+        await checkNavigation();
+        return App.view.toggleMode();
+    });
+};
+
 /** Set list mode */
 export const setListMode = async () => {
     await test('Set list mode', async () => {

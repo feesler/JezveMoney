@@ -102,13 +102,19 @@ class ScheduleView extends View {
 
         this.scheduleList = ListContainer.create({
             ItemComponent: ScheduleListItem,
-            getItemProps: (item, { listMode }) => ({
+            getItemProps: (item, state) => ({
                 item: ScheduledTransaction.create(item),
                 selected: item.selected,
-                listMode,
-                mode: 'classic',
-                showControls: (listMode === 'list'),
+                listMode: state.listMode,
+                mode: state.mode,
+                showControls: (state.listMode === 'list'),
             }),
+            isListChanged: (state, prevState) => (
+                state.items !== prevState.items
+                || state.mode !== prevState.mode
+                || state.listMode !== prevState.listMode
+                || state.showControls !== prevState.showControls
+            ),
             getItemById: (id) => this.getItemById(id),
             className: LIST_CLASS,
             itemSelector: ScheduleListItem.selector,
@@ -141,6 +147,15 @@ class ScheduleView extends View {
             this.scheduleList.elem,
             this.loadingIndicator.elem,
         );
+
+        // List mode selected
+        const listHeader = document.querySelector('.list-header');
+        this.modeSelector = Button.create({
+            type: 'link',
+            className: 'mode-selector',
+            onClick: (e) => this.onToggleMode(e),
+        });
+        listHeader.append(this.modeSelector.elem);
 
         this.subscribeToStore(this.store);
     }
@@ -236,6 +251,12 @@ class ScheduleView extends View {
         menuAction();
     }
 
+    onToggleMode(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.toggleMode());
+    }
+
     getItemById(itemId) {
         return window.app.model.schedule.getItem(itemId);
     }
@@ -300,6 +321,11 @@ class ScheduleView extends View {
 
     stopLoading() {
         this.store.dispatch(actions.stopLoading());
+    }
+
+    /** Updates render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
     }
 
     getSelectedItems(state) {
@@ -525,11 +551,20 @@ class ScheduleView extends View {
     getURL(state) {
         const { baseURL } = window.app;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return new URL(`${baseURL}schedule/${itemPart}`);
+        const res = new URL(`${baseURL}schedule/${itemPart}`);
+
+        if (state.mode === 'details') {
+            res.searchParams.set('mode', 'details');
+        }
+
+        return res;
     }
 
     renderHistory(state, prevState) {
-        if (state.detailsId === prevState?.detailsId) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.mode === prevState?.mode
+        ) {
             return;
         }
 
@@ -541,6 +576,7 @@ class ScheduleView extends View {
     renderList(state, prevState) {
         if (
             state.items === prevState?.items
+            && state.mode === prevState?.mode
             && state.listMode === prevState?.listMode
         ) {
             return;
@@ -558,6 +594,7 @@ class ScheduleView extends View {
         this.scheduleList.setState((listState) => ({
             ...listState,
             items: listData(state.items),
+            mode: state.mode,
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
@@ -573,6 +610,19 @@ class ScheduleView extends View {
         if (state.loading) {
             this.loadingIndicator.show();
         }
+
+        const isDetails = (state.mode === 'details');
+
+        const modeURL = this.getURL(state);
+        modeURL.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
+
+        this.modeSelector.show(state.items.length > 0);
+        this.modeSelector.setState((modeSelectorState) => ({
+            ...modeSelectorState,
+            icon: (isDetails) ? 'mode-list' : 'mode-details',
+            title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
+            url: modeURL.toString(),
+        }));
 
         this.renderList(state, prevState);
         this.renderContextMenu(state);
