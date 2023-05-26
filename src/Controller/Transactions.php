@@ -66,16 +66,11 @@ class Transactions extends ListViewController
         $trParams = $this->model->getRequestFilters($_GET, $trParamsDefault);
         $filterObj = $this->model->getFilterObject($trParams);
 
-        $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
-        $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
-        $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
-
         // Obtain requested view mode
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
         }
-        $data["showDetails"] = $showDetails;
 
         $transactions = $this->model->getData($trParams);
 
