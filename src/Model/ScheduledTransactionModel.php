@@ -620,6 +620,8 @@ class ScheduledTransactionModel extends CachedTable
      */
     protected function postUpdate(int $item_id)
     {
+        $this->cleanCache();
+
         if ($this->remindersChanged) {
             $this->updateReminders($item_id);
         }
