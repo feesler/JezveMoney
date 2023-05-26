@@ -1188,7 +1188,7 @@ const slice = createSlice({
             ...state,
             form: {
                 ...state.form,
-                intervalStep: step,
+                intervalStep: value,
             },
             transaction: {
                 ...state.transaction,

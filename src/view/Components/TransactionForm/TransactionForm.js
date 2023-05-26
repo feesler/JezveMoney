@@ -1060,8 +1060,7 @@ export class TransactionForm extends Component {
     }
 
     onIntervalStepChanged(e) {
-        const step = parseInt(e.target.value, 10);
-        this.store.dispatch(actions.intervalStepChange(step));
+        this.store.dispatch(actions.intervalStepChange(e.target.value));
         this.notifyChanged();
     }
 
