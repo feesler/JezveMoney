@@ -25,6 +25,7 @@ import {
     EXCHANGE_PRECISION,
     normalizeExch,
     __,
+    MAX_DAYS_IN_MONTH,
 } from '../../utils/utils.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
 import {
@@ -660,7 +661,7 @@ export class TransactionForm extends Component {
         this.monthDaySelect = DropDown.create({
             id: 'monthDaySelect',
             onChange: (offset) => this.onMonthDayOffsetChanged(offset),
-            data: Array(30).fill().map((_, index) => ({
+            data: Array(MAX_DAYS_IN_MONTH).fill().map((_, index) => ({
                 id: index,
                 title: index + 1,
             })),

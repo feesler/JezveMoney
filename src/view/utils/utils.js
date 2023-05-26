@@ -8,6 +8,7 @@ import {
     shiftMonth,
 } from 'jezvejs';
 
+export const MAX_DAYS_IN_MONTH = 31;
 export const MS_IN_SECOND = 1000;
 
 export const SORT_BY_CREATEDATE_ASC = 1;
