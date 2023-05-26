@@ -14,6 +14,8 @@ import {
     secondsToTime,
     shiftDate,
 } from '../common.js';
+import { __ } from './locale.js';
+import { App } from '../Application.js';
 
 /** Types of transactions */
 export const INTERVAL_NONE = 0;
@@ -24,7 +26,30 @@ export const INTERVAL_YEAR = 4;
 
 const DAYS_IN_WEEK = 7;
 const MAX_DAYS_IN_MONTH = 31;
-const MAX_DAYS_IN_YEAR = 366;
+
+/* Schedule interval type tokens */
+const intervalTokens = {
+    [INTERVAL_DAY]: 'SCHEDULE_ITEM_EVERY_DAY',
+    [INTERVAL_WEEK]: 'SCHEDULE_ITEM_EVERY_WEEK',
+    [INTERVAL_MONTH]: 'SCHEDULE_ITEM_EVERY_MONTH',
+    [INTERVAL_YEAR]: 'SCHEDULE_ITEM_EVERY_YEAR',
+};
+const stepIntervalTokens = {
+    [INTERVAL_DAY]: 'SCHEDULE_ITEM_EVERY_N_DAY',
+    [INTERVAL_WEEK]: 'SCHEDULE_ITEM_EVERY_N_WEEK',
+    [INTERVAL_MONTH]: 'SCHEDULE_ITEM_EVERY_N_MONTH',
+    [INTERVAL_YEAR]: 'SCHEDULE_ITEM_EVERY_N_YEAR',
+};
+/* Schedule interval offset tokens */
+const weekOffsetTokens = [
+    'SCHEDULE_ITEM_ON_MONDAYS',
+    'SCHEDULE_ITEM_ON_TUESDAYS',
+    'SCHEDULE_ITEM_ON_WEDNESDAYS',
+    'SCHEDULE_ITEM_ON_THURSDAYS',
+    'SCHEDULE_ITEM_ON_FRIDAYS',
+    'SCHEDULE_ITEM_ON_SATURDAYS',
+    'SCHEDULE_ITEM_ON_SUNDAYS',
+];
 
 /** Scheduled transaction item */
 export class ScheduledTransaction {
@@ -97,6 +122,14 @@ export class ScheduledTransaction {
     static defaultProps = {
         category_id: 0,
         comment: '',
+    };
+
+    static intervalTypes = {
+        [INTERVAL_NONE]: 'none',
+        [INTERVAL_DAY]: 'day',
+        [INTERVAL_WEEK]: 'week',
+        [INTERVAL_MONTH]: 'month',
+        [INTERVAL_YEAR]: 'year',
     };
 
     static isValidIntervalType(value) {
@@ -239,6 +272,53 @@ export class ScheduledTransaction {
 
             this[propName] = props[propName];
         });
+    }
+
+    renderInterval() {
+        const renderSteps = (this.interval_step > 1);
+        const tokens = (renderSteps) ? stepIntervalTokens : intervalTokens;
+        const token = tokens[this.interval_type];
+        if (!token) {
+            return '';
+        }
+
+        return (renderSteps)
+            ? __(token, App.view.locale, this.interval_step)
+            : __(token, App.view.locale);
+    }
+
+    renderWeekOffset(offset) {
+        const token = weekOffsetTokens[offset];
+        return (token) ? __(token, App.view.locale) : '';
+    }
+
+    renderMonthOffset(offset) {
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', App.view.locale, (offset + 1));
+    }
+
+    renderYearOffset(offset) {
+        const date = new Date();
+        date.setMonth(Math.floor(offset / 100));
+        date.setDate((offset % 100) + 1);
+
+        return App.formatDate(date, {
+            locales: App.view.locale,
+            options: { month: 'long', day: 'numeric' },
+        });
+    }
+
+    renderIntervalOffset() {
+        if (this.interval_type === INTERVAL_WEEK) {
+            return this.renderWeekOffset(this.interval_offset);
+        }
+        if (this.interval_type === INTERVAL_MONTH) {
+            return this.renderMonthOffset(this.interval_offset);
+        }
+        if (this.interval_type === INTERVAL_YEAR) {
+            return this.renderYearOffset(this.interval_offset);
+        }
+
+        return '';
     }
 
     getFirstInterval() {

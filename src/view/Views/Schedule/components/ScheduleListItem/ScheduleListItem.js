@@ -446,7 +446,7 @@ export class ScheduleListItem extends Component {
 
         this.dateRangeElem.textContent = this.renderDateRange(item);
         this.intervalElem.textContent = item.renderInterval();
-        this.offsetElem.textContent = item.renderIntervalOffset(item);
+        this.offsetElem.textContent = item.renderIntervalOffset();
 
         const categoryTitle = this.getCategoryTitle(state);
         show(this.categoryElem, !!categoryTitle);

@@ -8,6 +8,7 @@ import {
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
+export const MONTHS_IN_YEAR = 12;
 
 export const SORT_BY_CREATEDATE_ASC = 1;
 export const SORT_BY_CREATEDATE_DESC = 2;

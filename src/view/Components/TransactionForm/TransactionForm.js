@@ -623,7 +623,7 @@ export class TransactionForm extends Component {
         this.intervalTypeSelect = DropDown.create({
             id: 'intervalTypeSelect',
             name: 'interval_type',
-            className: 'dd_fullwidth',
+            className: 'dd_fullwidth interval-type-select',
             onChange: (type) => this.onIntervalTypeChanged(type),
             data: [
                 { id: INTERVAL_DAY, title: __('SCHED_TR_INTERVAL_DAY') },
@@ -653,13 +653,14 @@ export class TransactionForm extends Component {
 
         this.weekDaySelect = DropDown.create({
             id: 'weekDaySelect',
-            className: 'dd_fullwidth',
+            className: 'dd_fullwidth weekday-select',
             onChange: (offset) => this.onWeekdayOffsetChanged(offset),
             data: weekDaysData,
         });
 
         this.monthDaySelect = DropDown.create({
             id: 'monthDaySelect',
+            className: 'month-day-select',
             onChange: (offset) => this.onMonthDayOffsetChanged(offset),
             data: Array(MAX_DAYS_IN_MONTH).fill().map((_, index) => ({
                 id: index,
@@ -669,7 +670,7 @@ export class TransactionForm extends Component {
 
         this.monthSelect = DropDown.create({
             id: 'monthSelect',
-            className: 'dd_fullwidth',
+            className: 'dd_fullwidth month-select',
             onChange: (offset) => this.onMonthOffsetChanged(offset),
             data: Array(MONTHS_COUNT).fill().map((_, index) => ({
                 id: index,

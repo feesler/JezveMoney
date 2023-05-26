@@ -47,7 +47,7 @@ const routeMap = {
         item: ScheduleItemView,
     },
 };
-const listViews = ['accounts', 'persons', 'categories', 'transactions'];
+const listViews = ['accounts', 'persons', 'categories', 'transactions', 'schedule'];
 
 /** Process request url and return view class if match */
 export async function route(env, url) {

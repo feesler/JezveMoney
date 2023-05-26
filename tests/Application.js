@@ -12,6 +12,7 @@ import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
 import {
     cutDate,
+    dateStringToSeconds,
     dateToSeconds,
     fixDate,
     formatInputDate,
@@ -118,6 +119,13 @@ class Application extends TestApplication {
 
     secondsToDateString(value) {
         return secondsToDateString(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    dateStringToSeconds(value) {
+        return dateStringToSeconds(value, {
             locales: this.state.getDateFormatLocale(),
             options: this.dateFormatOptions,
         });

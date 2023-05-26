@@ -38,6 +38,15 @@ import {
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
+import {
+    INTERVAL_DAY,
+    INTERVAL_MONTH,
+    INTERVAL_WEEK,
+    INTERVAL_YEAR,
+} from '../../../model/ScheduledTransaction.js';
+
+export const TRANSACTION_FORM = 'transaction';
+export const SCHEDULE_ITEM_FORM = 'scheduleItem';
 
 const infoItemSelectors = [
     '#srcAmountInfo',
@@ -60,6 +69,9 @@ export class TransactionForm extends TestComponent {
     static getExpectedState(model) {
         const state = parseInt(model.state, 10);
         assert(!Number.isNaN(state), 'Invalid state specified');
+
+        const isTransactionForm = (model.formType === TRANSACTION_FORM);
+        const isScheduleItemForm = (model.formType === SCHEDULE_ITEM_FORM);
 
         const isExpense = model.type === EXPENSE;
         const isIncome = model.type === INCOME;
@@ -139,11 +151,58 @@ export class TransactionForm extends TestComponent {
                 res.exchangeInfo.value = model.fmtExch;
             }
 
-            res.datePicker = {
-                visible: true,
-                value: App.reformatDate(model.date),
-                isInvalid: model.dateInvalidated,
-            };
+            if (isTransactionForm) {
+                res.datePicker = {
+                    visible: true,
+                    value: App.reformatDate(model.date),
+                    isInvalid: model.dateInvalidated,
+                };
+            } else if (isScheduleItemForm) {
+                res.startDateRow = {
+                    visible: true,
+                    value: App.reformatDate(model.startDate),
+                    isInvalid: model.startDateInvalidated,
+                };
+                res.endDateRow = {
+                    visible: true,
+                    value: App.reformatDate(model.endDate),
+                    isInvalid: model.endDateInvalidated,
+                };
+                res.intervalStepRow = {
+                    visible: true,
+                    value: model.intervalStep,
+                };
+                res.intervalTypeSelect = {
+                    visible: true,
+                    value: model.intervalType.toString(),
+                };
+
+                res.weekDayOffsetSelect = {
+                    visible: model.intervalType === INTERVAL_WEEK,
+                };
+                if (res.weekDayOffsetSelect.visible) {
+                    res.weekDayOffsetSelect.value = model.intervalOffset.toString();
+                }
+
+                const dayOffsetIntervals = [INTERVAL_MONTH, INTERVAL_YEAR];
+
+                res.monthDayOffsetSelect = {
+                    visible: dayOffsetIntervals.includes(model.intervalType),
+                };
+                res.monthOffsetSelect = {
+                    visible: model.intervalType === INTERVAL_YEAR,
+                };
+
+                if (model.intervalType === INTERVAL_MONTH) {
+                    res.monthDayOffsetSelect.value = model.intervalOffset.toString();
+                } else if (model.intervalType === INTERVAL_YEAR) {
+                    const dayIndex = (model.intervalOffset % 100);
+                    const monthIndex = Math.floor(model.intervalOffset / 100);
+
+                    res.monthDayOffsetSelect.value = dayIndex.toString();
+                    res.monthOffsetSelect.value = monthIndex.toString();
+                }
+            }
 
             const visibleCategories = App.view.appState()
                 .getCategoriesForType(model.type)
@@ -224,11 +283,14 @@ export class TransactionForm extends TestComponent {
         if (isExpense) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
-            if (isAvailable) {
+            if (isAvailable && isTransactionForm) {
                 res.srcResBalanceRow.label = resultBalanceTok;
             }
 
             res.srcAmountInfo.visible = false;
+            if (isScheduleItemForm) {
+                this.hideInputRow(res, 'srcResBalance');
+            }
             this.hideInputRow(res, 'destResBalance');
 
             if (state === -1) {
@@ -239,9 +301,11 @@ export class TransactionForm extends TestComponent {
             } else if (state === 0) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1) {
+            } else if (state === 1 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -249,14 +313,18 @@ export class TransactionForm extends TestComponent {
             } else if (state === 2) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', false);
             } else if (state === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
-                this.showInputRow(res, 'srcResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 4) {
+            } else if (state === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -267,11 +335,14 @@ export class TransactionForm extends TestComponent {
         if (isIncome) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
-            if (isAvailable) {
+            if (isAvailable && isTransactionForm) {
                 res.destResBalanceRow.label = resultBalanceTok;
             }
 
             this.hideInputRow(res, 'srcResBalance');
+            if (isScheduleItemForm) {
+                this.hideInputRow(res, 'destResBalance');
+            }
 
             if (state === -1) {
                 this.hideInputRow(res, 'srcAmount');
@@ -281,9 +352,11 @@ export class TransactionForm extends TestComponent {
             } else if (state === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1) {
+            } else if (state === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'destResBalance', true);
@@ -291,14 +364,18 @@ export class TransactionForm extends TestComponent {
             } else if (state === 2) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', false);
             } else if (state === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 4) {
+            } else if (state === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'destResBalance', true);
@@ -309,9 +386,14 @@ export class TransactionForm extends TestComponent {
         if (isTransfer) {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
-            if (isAvailable) {
+            if (isAvailable && isTransactionForm) {
                 res.srcResBalanceRow.label = `${resultBalanceTok} (${__('TR_SOURCE', locale)})`;
                 res.destResBalanceRow.label = `${resultBalanceTok} (${__('TR_DESTINATION', locale)})`;
+            }
+
+            if (isScheduleItemForm) {
+                this.hideInputRow(res, 'srcResBalance');
+                this.hideInputRow(res, 'destResBalance');
             }
 
             if (state === -1) {
@@ -323,16 +405,18 @@ export class TransactionForm extends TestComponent {
             } else if (state === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1) {
+            } else if (state === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 2) {
+            } else if (state === 2 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', false);
@@ -341,22 +425,24 @@ export class TransactionForm extends TestComponent {
             } else if (state === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 4) {
+            } else if (state === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 5) {
+            } else if (state === 5 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 6) {
+            } else if (state === 6 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -365,10 +451,12 @@ export class TransactionForm extends TestComponent {
             } else if (state === 7) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 8) {
+            } else if (state === 8 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -388,7 +476,7 @@ export class TransactionForm extends TestComponent {
             res.noacc_btn = { visible: isAvailable && !noAccount };
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
-            if (isAvailable) {
+            if (isAvailable && isTransactionForm) {
                 const personTok = __('TR_PERSON', locale);
                 const accountTok = __('TR_ACCOUNT', locale);
 
@@ -438,6 +526,11 @@ export class TransactionForm extends TestComponent {
                 this.hideInputRow(res, 'exchange');
             }
 
+            if (isScheduleItemForm) {
+                this.hideInputRow(res, 'srcResBalance');
+                this.hideInputRow(res, 'destResBalance');
+            }
+
             if (state === -1) {
                 this.hideInputRow(res, 'srcAmount');
                 this.hideInputRow(res, 'destAmount');
@@ -446,14 +539,16 @@ export class TransactionForm extends TestComponent {
             } else if (state === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 1) {
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
+            } else if (state === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 2) {
+            } else if (state === 2 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', false);
@@ -461,14 +556,16 @@ export class TransactionForm extends TestComponent {
             } else if (state === 3) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 4) {
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
+            } else if (state === 4 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 5) {
+            } else if (state === 5 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -476,19 +573,23 @@ export class TransactionForm extends TestComponent {
             } else if (state === 6) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
-                this.showInputRow(res, 'srcResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                }
                 this.hideInputRow(res, 'destResBalance');
             } else if (state === 7) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
                 this.hideInputRow(res, 'srcResBalance');
-                this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 8) {
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'destResBalance', false);
+                }
+            } else if (state === 8 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.hideInputRow(res, 'srcResBalance');
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 9) {
+            } else if (state === 9 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
@@ -496,10 +597,12 @@ export class TransactionForm extends TestComponent {
             } else if (state === 10 || state === 16) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 11) {
+            } else if (state === 11 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -508,22 +611,24 @@ export class TransactionForm extends TestComponent {
             } else if (state === 12) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 13) {
+            } else if (state === 13 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 14 || state === 20) {
+            } else if ((state === 14 || state === 20) && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 15 || state === 17) {
+            } else if ((state === 15 || state === 17) && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
@@ -532,16 +637,18 @@ export class TransactionForm extends TestComponent {
             } else if (state === 18) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'srcResBalance', false);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'srcResBalance', false);
+                    this.showInputRow(res, 'destResBalance', false);
+                }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 19) {
+            } else if (state === 19 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 21) {
+            } else if (state === 21 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -554,16 +661,21 @@ export class TransactionForm extends TestComponent {
             this.hideInputRow(res, 'srcAmount');
             this.hideInputRow(res, 'exchange');
             this.hideInputRow(res, 'srcResBalance');
+            if (isScheduleItemForm) {
+                this.hideInputRow(res, 'destResBalance');
+            }
 
             if (state === -1) {
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'destResBalance');
-            } else if (state === 0) {
+            } else if (state === 0 && isTransactionForm) {
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'destResBalance', true);
             } else if (state === 1) {
                 this.showInputRow(res, 'destAmount', true);
-                this.showInputRow(res, 'destResBalance', false);
+                if (isTransactionForm) {
+                    this.showInputRow(res, 'destResBalance', false);
+                }
             }
         }
 
@@ -592,6 +704,19 @@ export class TransactionForm extends TestComponent {
         res[infoName].visible = false;
 
         return res;
+    }
+
+    constructor(parent, elem, formType = TRANSACTION_FORM) {
+        super(parent, elem);
+        this.formType = formType;
+    }
+
+    isTransactionForm() {
+        return this.formType === TRANSACTION_FORM;
+    }
+
+    isScheduleItemForm() {
+        return this.formType === SCHEDULE_ITEM_FORM;
     }
 
     async parseContent() {
@@ -678,7 +803,19 @@ export class TransactionForm extends TestComponent {
             async (selector) => InputRow.create(this, await query(selector)),
         );
 
-        res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
+        if (this.isTransactionForm()) {
+            res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
+        } else if (this.isScheduleItemForm()) {
+            res.startDateRow = await DatePickerRow.create(this, await query('#startDateRow'));
+            res.endDateRow = await DatePickerRow.create(this, await query('#endDateRow'));
+            res.intervalStepRow = await InputRow.create(this, await query('#intervalStepRow'));
+            const intervalTypeSel = await query('.interval-type-select');
+            res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
+
+            res.weekDayOffsetSelect = await DropDown.create(this, await query('.weekday-select'));
+            res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
+            res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
+        }
 
         res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
@@ -698,6 +835,8 @@ export class TransactionForm extends TestComponent {
 
     buildModel(cont) {
         const res = this.model;
+
+        res.formType = this.formType;
 
         res.type = cont.typeMenu.value;
         assert(Transaction.availTypes.includes(res.type), 'Invalid type selected');
@@ -962,8 +1101,33 @@ export class TransactionForm extends TestComponent {
             );
         }
 
-        res.date = cont.datePicker.value;
-        res.dateInvalidated = cont.datePicker.isInvalid;
+        if (this.isTransactionForm()) {
+            res.date = cont.datePicker.value;
+            res.dateInvalidated = cont.datePicker.isInvalid;
+        } else if (this.isScheduleItemForm()) {
+            res.startDate = cont.startDateRow.value;
+            res.startDateInvalidated = cont.startDateRow.isInvalid;
+
+            res.endDate = cont.endDateRow.value;
+            res.endDateInvalidated = cont.endDateRow.isInvalid;
+
+            res.intervalStep = cont.intervalStepRow.value;
+            res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
+
+            if (res.intervalType === INTERVAL_DAY) {
+                res.intervalOffset = 0;
+            } else if (res.intervalType === INTERVAL_WEEK) {
+                const offset = parseInt(cont.weekDayOffsetSelect.value, 10);
+                res.intervalOffset = offset;
+            } else if (res.intervalType === INTERVAL_MONTH) {
+                const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
+                res.intervalOffset = offset;
+            } else if (res.intervalType === INTERVAL_YEAR) {
+                const dayIndex = parseInt(cont.monthDayOffsetSelect.value, 10);
+                const monthIndex = parseInt(cont.monthOffsetSelect.value, 10);
+                res.intervalOffset = (monthIndex * 100) + dayIndex;
+            }
+        }
 
         res.categoryId = parseInt(cont.categorySelect.value, 10);
         res.comment = cont.commentRow.value;
@@ -1000,8 +1164,17 @@ export class TransactionForm extends TestComponent {
             return false;
         }
 
-        if (!this.isValidDate(this.model.date)) {
-            return false;
+        if (this.isTransactionForm()) {
+            if (!this.isValidDate(this.model.date)) {
+                return false;
+            }
+        } else if (this.isScheduleItemForm()) {
+            if (!this.isValidDate(this.model.startDate)) {
+                return false;
+            }
+            if (this.model.endDate && !this.isValidDate(this.model.endDate)) {
+                return false;
+            }
         }
 
         return true;
@@ -1722,13 +1895,27 @@ export class TransactionForm extends TestComponent {
             }
         }
 
-        this.model.dateInvalidated = !this.isValidDate(this.model.date);
-
-        const isValid = (
+        let isValid = (
             !this.model.srcAmountInvalidated
             && !this.model.destAmountInvalidated
-            && !this.model.dateInvalidated
         );
+
+        if (this.isTransactionForm()) {
+            const dateValid = this.isValidDate(this.model.date);
+            this.model.dateInvalidated = !dateValid;
+
+            isValid = isValid && dateValid;
+        } else if (this.isScheduleItemForm()) {
+            const { startDate, endDate } = this.model;
+
+            const startDateValid = this.isValidDate(startDate);
+            const endDateValid = !endDate || this.isValidDate(endDate);
+
+            this.model.startDateInvalidated = !startDateValid;
+            this.model.endDateInvalidated = !endDateValid;
+
+            isValid = isValid && startDateValid && endDateValid;
+        }
 
         const action = () => click(this.content.submitBtn);
 
@@ -1745,6 +1932,82 @@ export class TransactionForm extends TestComponent {
 
     async cancel() {
         await navigation(() => click(this.content.cancelBtn));
+    }
+
+    async changeIntervalType(val) {
+        const type = parseInt(val, 10);
+        assert.notEqual(this.model.intervalType, type, `Interval type is already ${type}`);
+
+        this.model.intervalType = type;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.intervalTypeSelect.setSelection(val));
+
+        return this.checkState();
+    }
+
+    async inputIntervalStep(val) {
+        this.model.intervalStep = val;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.intervalStepRow.input(val));
+
+        return this.checkState();
+    }
+
+    async selectWeekDayOffset(val) {
+        const { intervalType } = this.model;
+        assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
+
+        const offset = parseInt(val, 10);
+        assert.notEqual(this.model.intervalOffset, offset, `Weekday offset is already ${offset}`);
+
+        this.model.intervalOffset = offset;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.weekDayOffsetSelect.setSelection(val));
+
+        return this.checkState();
+    }
+
+    async selectMonthDayOffset(val) {
+        const availIntervalTypes = [INTERVAL_MONTH, INTERVAL_YEAR];
+        const { intervalType, intervalOffset } = this.model;
+
+        assert(availIntervalTypes.includes(intervalType), `Invalid interval type: ${intervalType}`);
+
+        const monthDay = parseInt(val, 10);
+        const dayIndex = monthDay - 1;
+        if (intervalType === INTERVAL_MONTH) {
+            this.model.intervalOffset = dayIndex;
+        } else if (intervalType === INTERVAL_YEAR) {
+            const monthIndex = Math.floor(intervalOffset / 100);
+            const offset = (monthIndex * 100) + dayIndex;
+            this.model.intervalOffset = offset;
+        }
+
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.monthDayOffsetSelect.setSelection(dayIndex));
+
+        return this.checkState();
+    }
+
+    async selectMonthOffset(val) {
+        const { intervalType, intervalOffset } = this.model;
+
+        assert.equal(intervalType, INTERVAL_YEAR, `Invalid interval type: ${intervalType}`);
+
+        const monthIndex = parseInt(val, 10);
+        const monthDay = (intervalOffset % 100);
+        const offset = (monthIndex * 100) + monthDay;
+        this.model.intervalOffset = offset;
+
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.monthOffsetSelect.setSelection(val));
+
+        return this.checkState();
     }
 
     async changeSrcAccount(val) {
