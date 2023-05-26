@@ -8,6 +8,7 @@ import {
     Transaction,
 } from './Transaction.js';
 import {
+    MONTHS_IN_YEAR,
     cutDate,
     getLastDayOfMonth,
     secondsToTime,
@@ -115,13 +116,29 @@ export class ScheduledTransaction {
 
         const offset = parseInt(value, 10);
         const type = parseInt(intervalType, 10);
-        return (
-            (type === INTERVAL_NONE && offset === 0)
-            || (type === INTERVAL_DAY && offset === 0)
-            || (type === INTERVAL_WEEK && offset >= 0 && offset < DAYS_IN_WEEK)
-            || (type === INTERVAL_MONTH && offset >= 0 && offset < MAX_DAYS_IN_MONTH)
-            || (type === INTERVAL_YEAR && offset >= 0 && offset < MAX_DAYS_IN_YEAR)
-        );
+
+        if (type === INTERVAL_NONE || type === INTERVAL_DAY) {
+            return offset === 0;
+        }
+        if (type === INTERVAL_WEEK) {
+            return offset >= 0 && offset < DAYS_IN_WEEK;
+        }
+        if (type === INTERVAL_MONTH) {
+            return offset >= 0 && offset < MAX_DAYS_IN_MONTH;
+        }
+        if (type === INTERVAL_YEAR) {
+            const monthIndex = Math.floor(offset / 100);
+            const dayIndex = (offset % 100);
+
+            return (
+                monthIndex >= 0
+                && monthIndex < MONTHS_IN_YEAR
+                && dayIndex >= 0
+                && dayIndex < MAX_DAYS_IN_MONTH
+            );
+        }
+
+        return false;
     }
 
     /** Converts short scheduled transaction declaration to full object */

@@ -350,7 +350,14 @@ class ScheduledTransactionModel extends CachedTable
                 throw new \Error("Invalid offset for month interval specified");
             }
         } elseif ($type === INTERVAL_YEAR) {
-            if ($offset < 0 || $offset >= MAX_DAYS_IN_YEAR) {
+            $monthIndex = intval($offset / 100);
+            $dayIndex = ($offset % 100);
+            if (
+                $monthIndex < 0
+                || $monthIndex >= MONTHS_IN_YEAR
+                || $dayIndex < 0
+                || $dayIndex >= MAX_DAYS_IN_MONTH
+            ) {
                 throw new \Error("Invalid offset for year interval specified");
             }
         }

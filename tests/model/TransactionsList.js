@@ -11,6 +11,7 @@ import {
     dateToSeconds,
     MS_IN_SECOND,
     secondsToDate,
+    MONTHS_IN_YEAR,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -26,7 +27,6 @@ import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
 
 const WEEKS_IN_YEAR = 52;
-const MONTHS_IN_YEAR = 12;
 const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
 
