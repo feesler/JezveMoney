@@ -658,3 +658,9 @@ export const goToNextPage = async ({ directNavigate = false } = {}) => {
 
     await test('Navigate to next page', () => App.view.goToNextPage(directNavigate));
 };
+
+export const showMore = async () => {
+    await checkNavigation();
+
+    await test('Show more items', () => App.view.showMore());
+};

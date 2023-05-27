@@ -89,7 +89,8 @@ export class ScheduleView extends AppView {
         }
 
         res.modeSelector = await Button.create(this, await query('.mode-selector'));
-
+        res.showMoreBtn = { elem: await query('.show-more-btn') };
+        res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
         res.paginator = await Paginator.create(this, await query('.paginator'));
 
         const listContainer = await query('.list-container');
@@ -171,7 +172,8 @@ export class ScheduleView extends AppView {
             res.detailsMode = this.hasDetailsModeParam(locURL);
         }
 
-        res.loading = cont.loadingIndicator.visible;
+        res.isLoadingMore = cont.showMoreSpinner.visible;
+        res.loading = (cont.loadingIndicator.visible || res.isLoadingMore);
 
         return res;
     }
@@ -234,6 +236,29 @@ export class ScheduleView extends AppView {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
+        return this.getExpectedState();
+    }
+
+    setModelRange(model, range) {
+        assert(
+            range >= 1
+            && range <= model.list.pages - model.list.page + 1,
+            `Invalid pages range ${range}`,
+        );
+
+        const res = this.cloneModel(model);
+        const onPage = App.config.transactionsOnPage;
+
+        res.list.range = range;
+        const pageItems = this.items.getPage(model.list.page, onPage, range, true);
+        const { items } = ScheduleList.render(pageItems.data, App.state);
+        res.list.items = items;
+
+        return res;
+    }
+
+    onRangeChanged(range) {
+        this.model = this.setModelRange(this.model, range);
         return this.getExpectedState();
     }
 
@@ -324,6 +349,9 @@ export class ScheduleView extends AppView {
             totalCounter: { visible: true, value: itemsCount },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
+            showMoreBtn: {
+                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
+            },
             paginator: { visible: isItemsAvailable },
             scheduleList: {
                 ...list,
@@ -459,6 +487,16 @@ export class ScheduleView extends AppView {
         }
 
         return App.view.checkState(expected);
+    }
+
+    async showMore() {
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        const expected = this.onRangeChanged(this.currentRange() + 1);
+
+        await this.waitForList(() => click(this.content.showMoreBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async openContextMenu(num) {

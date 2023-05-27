@@ -11,6 +11,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { Spinner } from 'jezvejs/Spinner';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 
@@ -72,6 +73,7 @@ class ScheduleView extends View {
                 total: 0,
             },
             loading: false,
+            isLoadingMore: false,
             listMode: 'list',
             showMenu: false,
             showContextMenu: false,
@@ -173,14 +175,24 @@ class ScheduleView extends View {
         });
         listHeader.append(this.modeSelector.elem);
 
-        const listFooter = document.querySelector('.list-footer');
+        // 'Show more' button
+        this.spinner = Spinner.create({ className: 'request-spinner' });
+        this.spinner.hide();
+        this.showMoreBtn = Button.create({
+            className: 'show-more-btn',
+            title: __('SHOW_MORE'),
+            onClick: (e) => this.showMore(e),
+        });
+
         // Paginator
         this.paginator = Paginator.create({
             arrows: true,
             breakLimit: 3,
             onChange: (page) => this.onChangePage(page),
         });
-        listFooter.append(this.paginator.elem);
+
+        const listFooter = document.querySelector('.list-footer');
+        listFooter.append(this.showMoreBtn.elem, this.spinner.elem, this.paginator.elem);
 
         this.subscribeToStore(this.store);
     }
@@ -274,6 +286,10 @@ class ScheduleView extends View {
         }
 
         menuAction();
+    }
+
+    showMore() {
+        this.store.dispatch(actions.showMore());
     }
 
     onChangePage(page) {
@@ -608,6 +624,7 @@ class ScheduleView extends View {
         if (
             state.detailsId === prevState?.detailsId
             && state.mode === prevState?.mode
+            && state.page === prevState?.page
         ) {
             return;
         }
@@ -622,7 +639,12 @@ class ScheduleView extends View {
             state.items === prevState?.items
             && state.mode === prevState?.mode
             && state.listMode === prevState?.listMode
-            && state.pagination === prevState?.pagination
+            && state.pagination.page === prevState?.pagination?.page
+            && state.pagination.range === prevState?.pagination?.range
+            && state.pagination.pagesCount === prevState?.pagination?.pagesCount
+            && state.pagination.onPage === prevState?.pagination?.onPage
+            && state.loading === prevState?.loading
+            && state.isLoadingMore === prevState?.isLoadingMore
         ) {
             return;
         }
@@ -648,6 +670,15 @@ class ScheduleView extends View {
             }));
         }
 
+        // 'Show more' button
+        const loadingMore = state.loading && state.isLoadingMore;
+        this.showMoreBtn.show(
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount
+            && !loadingMore,
+        );
+        this.spinner.show(loadingMore);
+
         const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = listData(state.items).slice(firstItem, lastItem);
@@ -669,7 +700,7 @@ class ScheduleView extends View {
 
         this.renderHistory(state, prevState);
 
-        if (state.loading) {
+        if (state.loading && !state.isLoadingMore) {
             this.loadingIndicator.show();
         }
 

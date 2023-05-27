@@ -198,5 +198,9 @@ export class ScheduleStory extends TestStory {
         await Actions.goToPrevPage();
         await Actions.goToNextPage();
         await Actions.goToFirstPage();
+
+        await Actions.showMore();
+        await Actions.goToFirstPage();
+        await Actions.showMore();
     }
 }

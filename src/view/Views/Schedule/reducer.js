@@ -106,17 +106,22 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
-    changePage: (state, page) => (
-        (state.pagination.page === page)
-            ? state
-            : {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    page,
-                },
-            }
-    ),
+    showMore: (state) => ({
+        ...state,
+        pagination: {
+            ...state.pagination,
+            range: (state.pagination.range ?? 0) + 1,
+        },
+    }),
+
+    changePage: (state, page) => ({
+        ...state,
+        pagination: {
+            ...state.pagination,
+            page,
+            range: 1,
+        },
+    }),
 
     toggleMode: (state) => ({
         ...state,
