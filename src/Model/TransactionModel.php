@@ -1714,7 +1714,7 @@ class TransactionModel extends SortableModel
         // Limit
         if (isset($request["onPage"])) {
             $onPage = intval($request["onPage"]);
-            if ($onPage < 0) {
+            if ($onPage < 0 && $throw) {
                 throw new \Error("Invalid page limit");
             }
             if ($onPage > 0) {

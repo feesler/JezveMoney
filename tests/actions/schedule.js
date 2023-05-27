@@ -345,8 +345,7 @@ export const deleteFromContextMenu = async (index) => {
 
         const id = App.state.schedule.indexesToIds(index);
         App.state.deleteScheduledTransaction({ id });
-
-        App.view.model.data = App.state.schedule.clone();
+        App.view.loadScheduleItems();
 
         const expected = {
             scheduleList: App.view.getExpectedList(),
@@ -626,4 +625,36 @@ export const deselectAll = async () => {
         await checkNavigation();
         return App.view.deselectAll();
     });
+};
+
+export const goToFirstPage = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to first page', () => App.view.goToFirstPage(directNavigate));
+};
+
+export const goToLastPage = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to last page', () => App.view.goToLastPage(directNavigate));
+};
+
+export const goToPrevPage = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to previous page', () => App.view.goToPrevPage(directNavigate));
+};
+
+export const goToNextPage = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to next page', () => App.view.goToNextPage(directNavigate));
 };

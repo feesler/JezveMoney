@@ -9,6 +9,7 @@ import {
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
+import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
@@ -33,12 +34,19 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { ScheduleListItem } from './components/ScheduleListItem/ScheduleListItem.js';
 import { ScheduleItemDetails } from './components/ScheduleItemDetails/ScheduleItemDetails.js';
 
-import { actions, createList, reducer } from './reducer.js';
+import {
+    actions,
+    reducer,
+    createList,
+    updateList,
+} from './reducer.js';
 import './ScheduleView.scss';
 
 /* CSS classes */
 const LIST_CLASS = 'schedule-list';
 const SELECT_MODE_CLASS = 'schedule-list_select';
+
+const SHOW_ON_PAGE = 10;
 
 /**
  * List of scheduled transactions view
@@ -56,6 +64,13 @@ class ScheduleView extends View {
         const initialState = {
             ...this.props,
             items: createList(window.app.model.schedule),
+            pagination: {
+                onPage: SHOW_ON_PAGE,
+                page: 1,
+                range: 1,
+                pagesCount: 0,
+                total: 0,
+            },
             loading: false,
             listMode: 'list',
             showMenu: false,
@@ -63,6 +78,7 @@ class ScheduleView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+        updateList(initialState);
 
         this.store = createStore(reducer, { initialState });
     }
@@ -157,6 +173,15 @@ class ScheduleView extends View {
         });
         listHeader.append(this.modeSelector.elem);
 
+        const listFooter = document.querySelector('.list-footer');
+        // Paginator
+        this.paginator = Paginator.create({
+            arrows: true,
+            breakLimit: 3,
+            onChange: (page) => this.onChangePage(page),
+        });
+        listFooter.append(this.paginator.elem);
+
         this.subscribeToStore(this.store);
     }
 
@@ -249,6 +274,10 @@ class ScheduleView extends View {
         }
 
         menuAction();
+    }
+
+    onChangePage(page) {
+        this.store.dispatch(actions.changePage(page));
     }
 
     onToggleMode(e) {
@@ -560,6 +589,21 @@ class ScheduleView extends View {
         return res;
     }
 
+    /** Returns absolute index for relative index on current page */
+    getAbsoluteIndex(index, state) {
+        if (index === -1) {
+            return index;
+        }
+
+        const { pagination } = state;
+        if (!pagination) {
+            return index;
+        }
+
+        const firstItemIndex = (pagination.page - 1) * pagination.onPage;
+        return firstItemIndex + index;
+    }
+
     renderHistory(state, prevState) {
         if (
             state.detailsId === prevState?.detailsId
@@ -578,6 +622,7 @@ class ScheduleView extends View {
             state.items === prevState?.items
             && state.mode === prevState?.mode
             && state.listMode === prevState?.listMode
+            && state.pagination === prevState?.pagination
         ) {
             return;
         }
@@ -590,10 +635,27 @@ class ScheduleView extends View {
         const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
         this.selItemsCount.textContent = selected.length;
 
+        // Paginator
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
+        if (this.paginator) {
+            this.paginator.show(state.items.length > 0);
+            this.paginator.setState((paginatorState) => ({
+                ...paginatorState,
+                url: this.getURL(state),
+                pagesCount: state.pagination.pagesCount,
+                pageNum,
+            }));
+        }
+
+        const firstItem = this.getAbsoluteIndex(0, state);
+        const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
+        const items = listData(state.items).slice(firstItem, lastItem);
+
         // List of scheduled transactions
         this.scheduleList.setState((listState) => ({
             ...listState,
-            items: listData(state.items),
+            items,
             mode: state.mode,
             listMode: state.listMode,
             renderTime: Date.now(),

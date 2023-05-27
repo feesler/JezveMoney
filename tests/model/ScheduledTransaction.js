@@ -265,12 +265,8 @@ export class ScheduledTransaction {
             ...data,
         };
 
-        ScheduledTransaction.availProps.forEach((propName) => {
-            if (ScheduledTransaction.requiredProps.includes(propName)) {
-                assert(propName in props, `Property '${propName}' not found.`);
-            }
-
-            this[propName] = props[propName];
+        Object.keys(props).forEach((key) => {
+            this[key] = props[key];
         });
     }
 

@@ -49,6 +49,7 @@ export class ScheduleStory extends TestStory {
         await this.detailsMode();
         await this.select();
         await this.details();
+        await this.pagination();
     }
 
     async create() {
@@ -93,6 +94,25 @@ export class ScheduleStory extends TestStory {
             { action: 'inputDestAmount', data: '1000' },
             { action: 'inputIntervalStep', data: '6' },
             { action: 'selectMonthDayOffset', data: 1 },
+        ]);
+
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '7' },
+        ]);
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '8' },
+        ]);
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '9' },
+        ]);
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '10' },
+        ]);
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '11' },
+        ]);
+        await Actions.createAndSubmit([
+            { action: 'inputDestAmount', data: '12' },
         ]);
     }
 
@@ -169,5 +189,14 @@ export class ScheduleStory extends TestStory {
         await Actions.showDetails({ index: 0, directNavigate: true });
         await Actions.showDetails({ index: 1, directNavigate: true });
         await Actions.closeDetails();
+    }
+
+    async pagination() {
+        setBlock('Scheduled transaction list pagination', 1);
+
+        await Actions.goToLastPage();
+        await Actions.goToPrevPage();
+        await Actions.goToNextPage();
+        await Actions.goToFirstPage();
     }
 }

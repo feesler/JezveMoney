@@ -14,6 +14,23 @@ const reduceDeselectAll = (state) => ({
     items: state.items.map(reduceDeselectItem),
 });
 
+export const updateList = (state) => {
+    const { schedule } = window.app.model;
+    const result = state;
+    const { pagination } = result;
+
+    const items = schedule.data;
+    result.items = items;
+
+    pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+    pagination.page = (pagination.pagesCount > 0)
+        ? Math.min(pagination.pagesCount, pagination.page)
+        : 1;
+    pagination.total = items.length;
+
+    return result;
+};
+
 const slice = createSlice({
     showDetails: (state) => ({
         ...state,
@@ -88,6 +105,18 @@ const slice = createSlice({
 
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
+
+    changePage: (state, page) => (
+        (state.pagination.page === page)
+            ? state
+            : {
+                ...state,
+                pagination: {
+                    ...state.pagination,
+                    page,
+                },
+            }
+    ),
 
     toggleMode: (state) => ({
         ...state,

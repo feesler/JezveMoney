@@ -67,18 +67,6 @@ class ScheduledTransaction extends ApiListController
     }
 
     /**
-     * Returns list request prepared for controller-specific model
-     *
-     * @param array $request
-     *
-     * @return array
-     */
-    protected function prepareListRequest(array $request)
-    {
-        return [];
-    }
-
-    /**
      * Returns array of mandatory fields
      *
      * @param array $request

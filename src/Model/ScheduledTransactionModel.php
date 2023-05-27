@@ -681,6 +681,50 @@ class ScheduledTransactionModel extends CachedTable
         return true;
     }
 
+
+    /**
+     * Converts request object to transaction request parameters
+     *
+     * @param array $request
+     * @param array $defaults array of default filter values
+     * @param bool $throw if true then throws on error
+     *
+     * @return array
+     */
+    public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
+    {
+        $res = $defaults;
+
+        // Page
+        if (isset($request["page"])) {
+            $page = intval($request["page"]);
+            if ($page > 1) {
+                $res["page"] = $page - 1;
+            }
+        }
+
+        // Limit
+        if (isset($request["onPage"])) {
+            $onPage = intval($request["onPage"]);
+            if ($onPage < 0 && $throw) {
+                throw new \Error("Invalid page limit");
+            }
+            if ($onPage > 0) {
+                $res["onPage"] = $onPage;
+            }
+        }
+
+        // Pages range
+        if (isset($request["range"])) {
+            $range = intval($request["range"]);
+            if ($range > 0) {
+                $res["range"] = $range;
+            }
+        }
+
+        return $res;
+    }
+
     /**
      * Returns array of scheduled transactions
      *
@@ -696,7 +740,25 @@ class ScheduledTransactionModel extends CachedTable
             return $res;
         }
 
-        foreach ($this->cache as $item) {
+        $items = $this->cache;
+
+        $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
+        if ($onPage > 0) {
+            $pageNum = isset($params["page"]) ? intval($params["page"]) : 0;
+            $pagesRange = isset($params["range"]) ? intval($params["range"]) : 1;
+            if ($pagesRange < 1) {
+                $pagesRange = 1;
+            }
+
+            $itemsCount = $this->getCount();
+
+            $limitOffset = ($onPage * $pageNum);
+            $limitRows = min($itemsCount - $limitOffset, $onPage * $pagesRange);
+
+            $items = array_slice($this->cache, $limitOffset, $limitRows);
+        }
+
+        foreach ($items as $item) {
             $res[] = $item;
         }
 
