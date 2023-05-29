@@ -66,6 +66,9 @@
                     <?= useIcon("plus-light", "btn__icon") ?>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>reminders/"><?= __("REMINDERS") ?></a>
+            </li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/"><?= __("STATISTICS") ?></a></li>
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/"><?= __("IMPORT") ?></a></li>
             <li class="nav-separator"></li>

@@ -25,25 +25,6 @@ import { ACCOUNT_TYPE_CREDIT_CARD } from '../model/AccountsList.js';
 import { ScheduledTransaction } from '../model/ScheduledTransaction.js';
 import { ScheduleItemView } from '../view/ScheduleItemView.js';
 
-export const decimalInputTestStrings = [
-    '-',
-    '-.0',
-    '-.015',
-    '-0',
-    '-0.0',
-    '-0.015',
-    '.',
-    '.0',
-    '.015',
-    '0',
-    '0.0',
-    '0.015',
-    '',
-    '1',
-    '1.0',
-    '1.015',
-];
-
 /** Navigate to schedule page */
 const checkNavigation = async () => {
     if (App.view instanceof ScheduleView) {

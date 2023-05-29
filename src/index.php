@@ -14,6 +14,7 @@ $router->setRoutes([
     "categories" => "Categories",
     "transactions" => "Transactions",
     "schedule" => "Schedule",
+    "reminders" => "Reminders",
     "profile" => "Profile",
     "settings" => "Settings",
     "statistics" => "Statistics",

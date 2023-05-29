@@ -39,6 +39,7 @@ import { TransactionsStory } from './stories/transaction/TransactionsStory.js';
 import { ImportStory } from './stories/import/ImportStory.js';
 import { TransactionListStory } from './stories/TransactionListStory.js';
 import { ScheduleStory } from './stories/ScheduleStory.js';
+import { RemindersStory } from './stories/RemindersStory.js';
 import { StatisticsStory } from './stories/StatisticsStory.js';
 import { ImportListStory } from './stories/import/ImportListStory.js';
 import { ImportTemplateStory } from './stories/import/ImportTemplateStory.js';
@@ -59,6 +60,7 @@ const storiesMap = {
     transactions: TransactionsStory,
     transactionList: TransactionListStory,
     schedule: ScheduleStory,
+    reminders: RemindersStory,
     import: ImportStory,
     importTemplates: ImportTemplateStory,
     importRules: ImportRulesStory,

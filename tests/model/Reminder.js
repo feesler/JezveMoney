@@ -13,6 +13,19 @@ export class Reminder {
         'transaction_id',
     ];
 
+    static commonTransactionProps = [
+        'type',
+        'src_id',
+        'dest_id',
+        'src_curr',
+        'dest_curr',
+        'dest_curr',
+        'src_amount',
+        'dest_amount',
+        'category_id',
+        'comment',
+    ];
+
     static defaultProps = {
         transaction_id: 0,
     };
@@ -28,17 +41,25 @@ export class Reminder {
         return this.availStates.includes(state);
     }
 
-    constructor(props) {
-        assert.isObject(props, 'Invalid props');
+    constructor(data) {
+        assert.isObject(data, 'Invalid props');
 
-        if (props.id) {
-            this.id = props.id;
-        }
+        const props = {
+            ...Reminder.defaultProps,
+            ...data,
+        };
 
-        Reminder.availProps.forEach((propName) => {
-            assert(propName in props, `Property '${propName}' not found.`);
+        Object.keys(props).forEach((key) => {
+            this[key] = props[key];
+        });
+    }
 
-            this[propName] = props[propName];
+    extend(state) {
+        const scheduleItem = state.schedule.getItem(this.schedule_id);
+        assert(scheduleItem, 'Scheduled transaction not found');
+
+        Reminder.commonTransactionProps.forEach((field) => {
+            this[field] = scheduleItem[field];
         });
     }
 

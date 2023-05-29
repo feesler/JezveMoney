@@ -13,6 +13,7 @@ import { TransactionListView } from './view/TransactionListView.js';
 import { TransactionView } from './view/TransactionView.js';
 import { ScheduleView } from './view/ScheduleView.js';
 import { ScheduleItemView } from './view/ScheduleItemView.js';
+import { ReminderListView } from './view/ReminderListView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
 import { SettingsView } from './view/SettingsView.js';
@@ -46,6 +47,7 @@ const routeMap = {
         list: ScheduleView,
         item: ScheduleItemView,
     },
+    reminders: ReminderListView,
 };
 const listViews = ['accounts', 'persons', 'categories', 'transactions', 'schedule'];
 

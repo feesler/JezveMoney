@@ -345,13 +345,11 @@ class ReminderModel extends CachedTable
         if ($item->state === REMINDER_CONFIRMED) {
             throw new \Error("Reminder already confirmed");
         }
-        wlog("confirm() item_id: " . $item_id . " request: " . var_export($request, true));
+
         if (isset($request["transaction_id"])) {
             $transaction_id = $request["transaction_id"];
         } else {
             $transaction = $this->getDefaultTransaction($item_id);
-
-            wlog("confirm() transaction: " . var_export($transaction, true));
 
             $transactionModel = TransactionModel::getInstance();
             $transaction_id = $transactionModel->create($transaction);
@@ -359,7 +357,6 @@ class ReminderModel extends CachedTable
                 throw new \Error("Failed to create transaction");
             }
         }
-        wlog("confirm() transaction_id: " . var_export($transaction_id, true));
 
         return $this->update($item_id, [
             "state" => REMINDER_CONFIRMED,

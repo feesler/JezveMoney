@@ -12,6 +12,7 @@ const navLinksMap = {
     categoriesLink: '/categories/',
     transactionsLink: '/transactions/',
     scheduleLink: '/schedule/',
+    remindersLink: '/reminders/',
     statisticsLink: '/statistics/',
     importLink: '/import/',
     aboutLink: '/about/',
@@ -60,6 +61,10 @@ export class Navigation extends TestComponent {
 
     async goToSchedule() {
         await click(this.content.scheduleLink.elem);
+    }
+
+    async goToReminders() {
+        await click(this.content.remindersLink.elem);
     }
 
     async goToStatistics() {

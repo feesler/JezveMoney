@@ -288,6 +288,24 @@ export const API = {
         },
     },
 
+    reminder: {
+        async list(options = {}) {
+            return apiGet('reminder/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('reminder/', data);
+        },
+
+        async confirm(data) {
+            return apiPost('reminder/confirm', data);
+        },
+
+        async cancel(data) {
+            return apiPost('reminder/cancel', data);
+        },
+    },
+
     import: {
         async upload(data, requestOptions = {}) {
             return apiPost('import/upload', data, requestOptions);

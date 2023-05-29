@@ -14,43 +14,36 @@ import {
     DEBT,
     LIMIT_CHANGE,
 } from '../../../../Models/Transaction.js';
-import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
+import { Reminder } from '../../../../Models/Reminder.js';
 import { Field } from '../../../../Components/Field/Field.js';
-import './ScheduleListItem.scss';
+import './ReminderListItem.scss';
 
 /** CSS classes */
-const ITEM_CLASS = 'schedule-item';
-const CONTENT_CLASS = 'schedule-item__content';
-const SCHEDULE_GROUP_CLASS = 'schedule-item__schedule';
-const DATE_RANGE_CLASS = 'schedule-item__date-range';
-const START_DATE_CLASS = 'schedule-item__start-date';
-const END_DATE_CLASS = 'schedule-item__end-date';
-const INTERVAL_CLASS = 'schedule-item__interval';
-const OFFSET_CLASS = 'schedule-item__offset';
-const TITLE_CLASS = 'schedule-item__title';
-const AMOUNT_CLASS = 'schedule-item__amount';
-const CATEGORY_CLASS = 'schedule-item__category';
-const COMMENT_CLASS = 'schedule-item__comment';
-const AMOUNT_CATEGORY_CLASS = 'schedule-item__amount-category';
+const ITEM_CLASS = 'reminder-item';
+const CONTENT_CLASS = 'reminder-item__content';
+const TITLE_CLASS = 'reminder-item__title';
+const AMOUNT_CLASS = 'reminder-item__amount';
+const DATE_CLASS = 'reminder-item__date';
+const CATEGORY_CLASS = 'reminder-item__category';
+const COMMENT_CLASS = 'reminder-item__comment';
+const AMOUNT_CATEGORY_CLASS = 'reminder-item__amount-category';
+const DATE_COMMENT_CLASS = 'reminder-item__date-comment';
 /* Details mode */
-const DETAILS_CLASS = 'schedule-item_details';
-const COLUMN_CLASS = 'schedule-item__column';
+const DETAILS_CLASS = 'reminder-item_details';
+const COLUMN_CLASS = 'reminder-item__column';
 /* Fields */
-const START_DATE_FIELD_CLASS = 'schedule-item__start-date-field';
-const END_DATE_FIELD_CLASS = 'schedule-item__end-date-field';
-const INTERVAL_FIELD_CLASS = 'schedule-item__interval-field';
-const OFFSET_FIELD_CLASS = 'schedule-item__offset-field';
-const TITLE_FIELD_CLASS = 'schedule-item__account-field';
-const AMOUNT_FIELD_CLASS = 'schedule-item__amount-field';
-const CATEGORY_FIELD_CLASS = 'schedule-item__category-field';
-const COMMENT_FIELD_CLASS = 'schedule-item__comment-field';
+const TITLE_FIELD_CLASS = 'reminder-item__account-field';
+const AMOUNT_FIELD_CLASS = 'reminder-item__amount-field';
+const DATE_FIELD_CLASS = 'reminder-item__date-field';
+const CATEGORY_FIELD_CLASS = 'reminder-item__category-field';
+const COMMENT_FIELD_CLASS = 'reminder-item__comment-field';
 /* Select controls */
-const SELECT_CONTROLS_CLASS = 'schedule-item__select';
+const SELECT_CONTROLS_CLASS = 'reminder-item__select';
 /* Controls */
-const CONTROLS_CLASS = 'schedule-item__controls';
+const CONTROLS_CLASS = 'reminder-item__controls';
 /* Other */
-const SELECTED_CLASS = 'schedule-item_selected';
-const SORT_CLASS = 'schedule-item_sort';
+const SELECTED_CLASS = 'reminder-item_selected';
+const SORT_CLASS = 'reminder-item_sort';
 
 const defaultProps = {
     selected: false,
@@ -59,24 +52,22 @@ const defaultProps = {
 };
 
 /**
- * Scheduled transaction list item component
+ * Scheduled transaction reminder list item component
  */
-export class ScheduleListItem extends Component {
+export class ReminderListItem extends Component {
     static get selector() {
         return `.${ITEM_CLASS}`;
     }
 
-    constructor(props) {
-        super(props);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
 
         this.state = {
             ...this.props,
-            item: ScheduledTransaction.create(props.item),
+            item: Reminder.createExtended(props.item),
         };
 
         this.selectControls = null;
@@ -100,18 +91,6 @@ export class ScheduleListItem extends Component {
     }
 
     initClassic() {
-        this.dateRangeElem = createElement('div', { props: { className: DATE_RANGE_CLASS } });
-        this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
-        this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
-        const scheduleElem = createElement('div', {
-            props: { className: SCHEDULE_GROUP_CLASS },
-            children: [
-                this.dateRangeElem,
-                this.intervalElem,
-                this.offsetElem,
-            ],
-        });
-
         this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
         this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
@@ -123,57 +102,24 @@ export class ScheduleListItem extends Component {
             ],
         });
 
+        this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
+        const dateCommentElem = createElement('div', {
+            props: { className: DATE_COMMENT_CLASS },
+            children: [
+                this.dateElem,
+                this.commentElem,
+            ],
+        });
 
         this.contentElem.append(
-            scheduleElem,
             this.titleElem,
             amountCategoryElem,
-            this.commentElem,
+            dateCommentElem,
         );
     }
 
     initDetails() {
-        // Start date
-        this.startDateElem = createElement('div', { props: { className: START_DATE_CLASS } });
-        this.startDateField = Field.create({
-            title: __('SCHED_TR_START_DATE'),
-            content: this.startDateElem,
-            className: START_DATE_FIELD_CLASS,
-        });
-        // End date
-        this.endDateElem = createElement('div', { props: { className: END_DATE_CLASS } });
-        this.endDateField = Field.create({
-            title: __('SCHED_TR_END_DATE'),
-            content: this.endDateElem,
-            className: END_DATE_FIELD_CLASS,
-        });
-        // Interval
-        this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
-        this.intervalField = Field.create({
-            title: __('SCHED_TR_INTERVAL'),
-            content: this.intervalElem,
-            className: INTERVAL_FIELD_CLASS,
-        });
-        // Interval offset
-        this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
-        this.offsetField = Field.create({
-            title: __('SCHED_TR_OFFSET'),
-            content: this.offsetElem,
-            className: OFFSET_FIELD_CLASS,
-        });
-
-        const scheduleGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [
-                this.startDateField.elem,
-                this.endDateField.elem,
-                this.intervalField.elem,
-                this.offsetField.elem,
-            ],
-        });
-
-        // Main content
         // Accounts
         this.sourceField = Field.create({
             title: __('TR_SOURCE'),
@@ -200,7 +146,13 @@ export class ScheduleListItem extends Component {
             props: { className: COLUMN_CLASS },
             children: [this.srcAmountField.elem, this.destAmountField.elem],
         });
-
+        // Date
+        this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
+        this.dateField = Field.create({
+            title: __('TR_DATE'),
+            content: this.dateElem,
+            className: DATE_FIELD_CLASS,
+        });
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
@@ -208,6 +160,15 @@ export class ScheduleListItem extends Component {
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
+
+        const dateCategoryGroup = createElement('div', {
+            props: { className: COLUMN_CLASS },
+            children: [
+                this.dateField.elem,
+                this.categoryField.elem,
+            ],
+        });
+
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
@@ -216,19 +177,11 @@ export class ScheduleListItem extends Component {
             className: COMMENT_FIELD_CLASS,
         });
 
-        const transactionGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [
-                sourceDestGroup,
-                amountGroup,
-                this.categoryField.elem,
-                this.commentField.elem,
-            ],
-        });
-
         this.contentElem.append(
-            scheduleGroup,
-            transactionGroup,
+            sourceDestGroup,
+            amountGroup,
+            dateCategoryGroup,
+            this.commentField.elem,
         );
     }
 
@@ -242,18 +195,11 @@ export class ScheduleListItem extends Component {
         this.destField = null;
         this.srcAmountField = null;
         this.destAmountField = null;
-        this.startDateField = null;
-        this.endDateField = null;
-        this.intervalField = null;
-        this.offsetField = null;
+        this.dateField = null;
         this.categoryField = null;
         this.commentField = null;
         // Common
-        this.startDateElem = null;
-        this.endDateElem = null;
-        this.dateRangeElem = null;
-        this.intervalElem = null;
-        this.offsetElem = null;
+        this.dateElem = null;
         this.categoryElem = null;
         this.commentElem = null;
     }
@@ -447,9 +393,7 @@ export class ScheduleListItem extends Component {
 
         this.amountElem.textContent = this.formatAmount(item);
 
-        this.dateRangeElem.textContent = this.renderDateRange(item);
-        this.intervalElem.textContent = item.renderInterval();
-        this.offsetElem.textContent = item.renderIntervalOffset();
+        this.dateElem.textContent = window.app.formatDate(item.date);
 
         const categoryTitle = this.getCategoryTitle(state);
         show(this.categoryElem, !!categoryTitle);
@@ -459,30 +403,10 @@ export class ScheduleListItem extends Component {
         this.commentElem.setAttribute('title', item.comment);
     }
 
-    renderEndDate(item) {
-        return (item.end_date)
-            ? __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date))
-            : __('SCHED_TR_NO_END_DATE');
-    }
-
     renderDetails(state) {
         const { item } = state;
         const { currency } = window.app.model;
 
-        // Schedule
-        // Start date
-        this.startDateField.setContent(window.app.formatDate(item.start_date));
-
-        // End date
-        this.endDateField.setContent(this.renderEndDate(item));
-
-        // Interval
-        this.intervalField.setContent(item.renderInterval());
-
-        // Offset
-        this.offsetField.setContent(item.renderIntervalOffset());
-
-        // Transaction
         // Source
         const showSource = (item.src_id !== 0);
         if (showSource) {
@@ -513,6 +437,9 @@ export class ScheduleListItem extends Component {
             this.srcAmountField.setContent(amountFmt);
         }
         this.destAmountField.show(isDiff);
+
+        // Date
+        this.dateField.setContent(window.app.formatDate(item.date));
 
         // Category field
         const categoryTitle = this.getCategoryTitle(state);

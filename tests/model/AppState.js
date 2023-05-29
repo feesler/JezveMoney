@@ -2378,6 +2378,32 @@ export class AppState {
         });
     }
 
+    confirmReminders(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        if (!ids.every((id) => this.confirmReminder({ id }))) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
+    cancelReminders(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        if (!ids.every((id) => this.cancelReminder({ id }))) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
     /**
      * Import templates
      */

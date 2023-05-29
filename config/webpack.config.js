@@ -91,6 +91,10 @@ export default {
             import: './src/view/Views/ScheduleItem/ScheduleItemView.js',
             filename: 'view/js/[name].js',
         },
+        ReminderListView: {
+            import: './src/view/Views/ReminderList/ReminderListView.js',
+            filename: 'view/js/[name].js',
+        },
         ImportView: {
             import: './src/view/Views/Import/ImportView.js',
             filename: 'view/js/[name].js',

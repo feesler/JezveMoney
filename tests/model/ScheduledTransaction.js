@@ -261,7 +261,7 @@ export class ScheduledTransaction {
         assert.isObject(data, 'Invalid props');
 
         const props = {
-            ...this.defaultProps,
+            ...ScheduledTransaction.defaultProps,
             ...data,
         };
 
