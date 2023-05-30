@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\Model;
 
+use JezveMoney\App\Item\UserItem;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\MySqlDB;
@@ -36,24 +37,11 @@ class UserModel extends CachedTable
      *
      * @param array|null $row array of table row fields
      *
-     * @return object|null
+     * @return UserItem|null
      */
     protected function rowToObj(?array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->login = $row["login"];
-        $res->passhash = $row["passhash"];
-        $res->owner_id = intval($row["owner_id"]);
-        $res->access = intval($row["access"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return UserItem::fromTableRow($row);
     }
 
     /**
