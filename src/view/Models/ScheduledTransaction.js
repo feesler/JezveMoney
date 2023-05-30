@@ -43,13 +43,13 @@ const stepIntervalTokens = {
 };
 /* Schedule interval offset tokens */
 const weekOffsetTokens = [
+    'SCHEDULE_ITEM_ON_SUNDAYS',
     'SCHEDULE_ITEM_ON_MONDAYS',
     'SCHEDULE_ITEM_ON_TUESDAYS',
     'SCHEDULE_ITEM_ON_WEDNESDAYS',
     'SCHEDULE_ITEM_ON_THURSDAYS',
     'SCHEDULE_ITEM_ON_FRIDAYS',
     'SCHEDULE_ITEM_ON_SATURDAYS',
-    'SCHEDULE_ITEM_ON_SUNDAYS',
 ];
 
 /**

@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert, isDate } from 'jezve-test';
 import {
     DEBT,
     EXPENSE,
@@ -42,13 +42,13 @@ const stepIntervalTokens = {
 };
 /* Schedule interval offset tokens */
 const weekOffsetTokens = [
+    'SCHEDULE_ITEM_ON_SUNDAYS',
     'SCHEDULE_ITEM_ON_MONDAYS',
     'SCHEDULE_ITEM_ON_TUESDAYS',
     'SCHEDULE_ITEM_ON_WEDNESDAYS',
     'SCHEDULE_ITEM_ON_THURSDAYS',
     'SCHEDULE_ITEM_ON_FRIDAYS',
     'SCHEDULE_ITEM_ON_SATURDAYS',
-    'SCHEDULE_ITEM_ON_SUNDAYS',
 ];
 
 /** Scheduled transaction item */
@@ -317,8 +317,36 @@ export class ScheduledTransaction {
         return '';
     }
 
+    getIntervalStart(timestamp, intervalType) {
+        assert(ScheduledTransaction.isValidIntervalType(intervalType), 'Invalid group type');
+
+        const date = isDate(timestamp) ? timestamp : new Date(timestamp);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthDay = date.getDate();
+        let res = 0;
+
+        if (intervalType === INTERVAL_DAY) {
+            res = Date.UTC(year, month, monthDay);
+        }
+        if (intervalType === INTERVAL_WEEK) {
+            let weekday = date.getDay();
+            weekday = (weekday === 0) ? 6 : (weekday - 1);
+            res = Date.UTC(year, month, monthDay - weekday);
+        }
+        if (intervalType === INTERVAL_MONTH) {
+            res = Date.UTC(year, month, 1);
+        }
+        if (intervalType === INTERVAL_YEAR) {
+            res = Date.UTC(year, 0, 1);
+        }
+
+        return new Date(res);
+    }
+
     getFirstInterval() {
-        return secondsToTime(this.start_date);
+        const time = secondsToTime(this.start_date);
+        return this.getIntervalStart(time, this.interval_type);
     }
 
     getNextInterval(timestamp) {
@@ -342,7 +370,6 @@ export class ScheduledTransaction {
             const targetWeek = shiftDate(date, this.interval_step * DAYS_IN_WEEK);
             res = targetWeek.getTime();
         } else if (this.interval_type === INTERVAL_MONTH) {
-            const startDate = new Date(this.getFirstInterval());
             const targetMonth = new Date(Date.UTC(
                 date.getFullYear(),
                 date.getMonth() + this.interval_step,
@@ -353,7 +380,7 @@ export class ScheduledTransaction {
             res = Date.UTC(
                 date.getFullYear(),
                 date.getMonth() + this.interval_step,
-                Math.min(startDate.getDate(), maxDate.getDate()),
+                Math.min(date.getDate(), maxDate.getDate()),
             );
         } else if (this.interval_type === INTERVAL_YEAR) {
             res = Date.UTC(
@@ -365,17 +392,26 @@ export class ScheduledTransaction {
             throw new Error('Invalid type of interval');
         }
 
-        return (endDate && endDate < res) ? null : res;
+        if (endDate && endDate < res) {
+            return null;
+        }
+
+        return this.getIntervalStart(res, this.interval_type);
     }
 
     getReminderDate(timestamp) {
         let res = new Date(cutDate(new Date(timestamp)));
+        let offset = this.interval_offset;
 
         if (
             this.interval_type !== INTERVAL_NONE
-            && this.interval_offset > 0
+            && offset > 0
         ) {
-            res = shiftDate(res, this.interval_offset);
+            if (this.interval_type === INTERVAL_WEEK) {
+                offset = (offset === 0) ? 6 : (offset - 1);
+            }
+
+            res = shiftDate(res, offset);
         }
 
         return res.getTime();
@@ -386,16 +422,24 @@ export class ScheduledTransaction {
             limit = 100,
             endDate = Date.now(),
         } = options;
+        const startDate = secondsToTime(this.start_date);
 
         const res = [];
         let interval = this.getFirstInterval();
-        while (interval && (limit === 0 || res.length < limit) && interval <= endDate) {
-            const date = this.getReminderDate(interval);
-            if (date > endDate) {
-                break;
+        while (
+            interval
+            && (limit === 0 || res.length < limit)
+            && interval <= endDate
+        ) {
+            if (interval >= startDate) {
+                const date = this.getReminderDate(interval);
+                if (date > endDate) {
+                    break;
+                }
+
+                res.push(date);
             }
 
-            res.push(date);
             interval = this.getNextInterval(interval);
         }
 

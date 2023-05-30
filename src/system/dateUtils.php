@@ -135,6 +135,8 @@ function getDateIntervalStart(mixed $dateInfo, int $intervalType)
         throw new \Error("Invalid group type");
     }
 
+    $dateInfo = is_int($dateInfo) ? getDateInfo($dateInfo, $intervalType) : $dateInfo;
+
     $date = new DateTime("@" . $dateInfo["time"], new DateTimeZone('UTC'));
     $info = $dateInfo["info"];
     $date->setTime(0, 0);

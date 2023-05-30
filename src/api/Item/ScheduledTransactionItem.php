@@ -77,7 +77,8 @@ class ScheduledTransactionItem
      */
     public function getFirstInterval()
     {
-        return $this->start_date;
+        $dateInfo = getDateIntervalStart($this->start_date, $this->interval_type);
+        return $dateInfo["time"];
     }
 
     /**
@@ -102,17 +103,12 @@ class ScheduledTransactionItem
         $date->setTime(0, 0);
 
         if ($this->interval_type === INTERVAL_MONTH) {
-            $startDate = new DateTime("@" . $this->start_date, new DateTimeZone('UTC'));
-            $startDate->setTime(0, 0);
-            $startDateInfo = getdate($startDate->getTimestamp());
-            $monthDay = $startDateInfo["mday"];
-
             $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
             $maxDate->setTime(0, 0);
             $maxDate->modify("last day of next month");
 
             $dateInfo = getdate($date->getTimestamp());
-            $res = mktime(0, 0, 0, $dateInfo["mon"] + $this->interval_step, $monthDay, $dateInfo["year"]);
+            $res = mktime(0, 0, 0, $dateInfo["mon"] + $this->interval_step, 1, $dateInfo["year"]);
             $res = min($res, $maxDate->getTimestamp());
         } else {
             $duration = "P" . $this->interval_step . self::$durationMap[$this->interval_type];
@@ -120,7 +116,12 @@ class ScheduledTransactionItem
             $res = $date->getTimestamp();
         }
 
-        return ($this->end_date && $this->end_date < $res) ? null : $res;
+        if ($this->end_date && $this->end_date < $res) {
+            return null;
+        }
+
+        $dateInfo = getDateIntervalStart($res, $this->interval_type);
+        return $dateInfo["time"];
     }
 
     /**
@@ -133,12 +134,17 @@ class ScheduledTransactionItem
     public function getReminderDate(int $timestamp)
     {
         $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+        $offset = $this->interval_offset;
 
         if (
             $this->interval_type !== INTERVAL_NONE
-            && $this->interval_offset > 0
+            && $offset > 0
         ) {
-            $duration = "P" . $this->interval_offset . "D";
+            if ($this->interval_type === INTERVAL_WEEK) {
+                $offset = ($offset === 0) ? 6 : ($offset - 1);
+            }
+
+            $duration = "P" . $offset . "D";
             $date->add(new DateInterval($duration));
         }
 
@@ -159,13 +165,19 @@ class ScheduledTransactionItem
 
         $res = [];
         $interval = $this->getFirstInterval();
-        while ($interval && ($limit === 0 || count($res) < $limit) && $interval <= $endDate) {
-            $date = $this->getReminderDate($interval);
-            if ($date > $endDate) {
-                break;
-            }
+        while (
+            $interval
+            && ($limit === 0 || count($res) < $limit)
+            && $interval <= $endDate
+        ) {
+            if ($interval >= $this->start_date) {
+                $date = $this->getReminderDate($interval);
+                if ($date > $endDate) {
+                    break;
+                }
 
-            $res[] = $date;
+                $res[] = $date;
+            }
 
             $interval = $this->getNextInterval($interval);
         }
