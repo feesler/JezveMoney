@@ -1545,10 +1545,7 @@ export class AppState {
             return false;
         }
 
-        if (params.type === DEBT) {
-            if (!params.person_id) {
-                return false;
-            }
+        if (params.type === DEBT && ('person_id' in params)) {
             if ('op' in params && params.op !== 1 && params.op !== 2) {
                 return false;
             }
@@ -1568,58 +1565,62 @@ export class AppState {
                     return false;
                 }
             }
-        } else {
-            if (params.src_id) {
-                if (params.type === INCOME) {
-                    return false;
-                }
+        }
 
-                const account = this.accounts.getItem(params.src_id);
-                if (
-                    !account
-                    || srcCurr.id !== account.curr_id
-                    || account.owner_id !== this.profile.owner_id
-                ) {
-                    return false;
-                }
+        if (
+            ('src_id' in params)
+            && ('dest_id' in params)
+            && (params.src_id === params.dest_id)
+        ) {
+            return false;
+        }
 
-                if (
-                    params.type === LIMIT_CHANGE
-                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
-                ) {
-                    return false;
-                }
-            } else if (params.type === EXPENSE || params.type === TRANSFER) {
+        if (params.src_id) {
+            if (params.type === INCOME) {
                 return false;
             }
 
-            if (params.dest_id) {
-                if (params.type === EXPENSE) {
-                    return false;
-                }
-
-                const account = this.accounts.getItem(params.dest_id);
-                if (
-                    !account
-                    || destCurr.id !== account.curr_id
-                    || account.owner_id !== this.profile.owner_id
-                ) {
-                    return false;
-                }
-
-                if (
-                    params.type === LIMIT_CHANGE
-                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
-                ) {
-                    return false;
-                }
-            } else if (params.type === INCOME || params.type === TRANSFER) {
+            const account = this.accounts.getItem(params.src_id);
+            if (
+                !account
+                || srcCurr.id !== account.curr_id
+                || (params.type !== DEBT && account.owner_id !== this.profile.owner_id)
+            ) {
                 return false;
             }
 
-            if (params.src_id === params.dest_id) {
+            if (
+                params.type === LIMIT_CHANGE
+                && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
                 return false;
             }
+        } else if (params.type === EXPENSE || params.type === TRANSFER) {
+            return false;
+        }
+
+        if (params.dest_id) {
+            if (params.type === EXPENSE) {
+                return false;
+            }
+
+            const account = this.accounts.getItem(params.dest_id);
+            if (
+                !account
+                || destCurr.id !== account.curr_id
+                || (params.type !== DEBT && account.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === INCOME || params.type === TRANSFER) {
+            return false;
         }
 
         if (params.category_id !== 0) {
@@ -1714,7 +1715,10 @@ export class AppState {
     }
 
     getExpectedTransaction(params) {
-        const fields = (params.type === DEBT) ? Transaction.debtProps : Transaction.availProps;
+        const isPersonRequest = ('person_id' in params);
+        const fields = (params.type === DEBT && isPersonRequest)
+            ? Transaction.debtProps
+            : Transaction.availProps;
         const itemData = {
             ...Transaction.defaultProps,
             ...params,
@@ -1725,7 +1729,7 @@ export class AppState {
             res.id = itemData.id;
         }
 
-        if (res.type !== DEBT) {
+        if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
             return res;
         }
 

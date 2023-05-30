@@ -94,7 +94,7 @@ class Transaction extends ApiSortableListController
     protected function preCreate(array $request)
     {
         $trans_type = isset($request["type"]) ? intval($request["type"]) : 0;
-        if ($trans_type == DEBT) {
+        if ($trans_type == DEBT && isset($request["person_id"])) {
             return $this->model->prepareDebt($request);
         } else {
             return $request;
