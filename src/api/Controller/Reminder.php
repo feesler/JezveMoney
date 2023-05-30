@@ -82,23 +82,15 @@ class Reminder extends ApiListController
         if (!$request || !isset($request["id"])) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
-        $ids = asArray($request["id"]);
 
         $reqData = copyFields($request, ["transaction_id"]);
         if ($reqData === false) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
-        if (count($ids) > 0 && isset($reqData["transaction_id"])) {
-            throw new \Error(__("ERR_CONFIRM_MULTIPLE_REMINDERS_WITH_TRANSACTION"));
-        }
-
         $this->begin();
 
-        foreach ($ids as $itemId) {
-            $this->model->confirm($itemId, $reqData);
-        }
-
+        $this->model->confirm($request["id"], $reqData);
         $result = $this->getStateResult($request);
 
         $this->commit();

@@ -336,39 +336,51 @@ class ReminderModel extends CachedTable
     }
 
     /**
-     * Changes state of reminder to 'Confirmed'
+     * Changes state of reminder(s) to 'Confirmed'
      *
-     * @param int $item_id item id
+     * @param mixed $ids reminder id or array of ids
      * @param array $request request data
      *
      * @return bool
      */
-    public function confirm(int $item_id, array $request)
+    public function confirm(mixed $ids, array $request)
     {
-        $item = $this->getItem($item_id);
-        if (!$item) {
-            throw new \Error("Invalid reminder");
-        }
-        if ($item->state === REMINDER_CONFIRMED) {
-            throw new \Error("Reminder already confirmed");
+        $ids = asArray($ids);
+        if (count($ids) > 1 && isset($request["transaction_id"])) {
+            throw new \Error(__("ERR_CONFIRM_MULTIPLE_REMINDERS_WITH_TRANSACTION"));
         }
 
-        if (isset($request["transaction_id"])) {
-            $transaction_id = $request["transaction_id"];
-        } else {
-            $transaction = $this->getDefaultTransaction($item_id);
+        foreach ($ids as $item_id) {
+            $item = $this->getItem($item_id);
+            if (!$item) {
+                throw new \Error("Invalid reminder");
+            }
+            if ($item->state === REMINDER_CONFIRMED) {
+                throw new \Error("Reminder already confirmed");
+            }
 
-            $transactionModel = TransactionModel::getInstance();
-            $transaction_id = $transactionModel->create($transaction);
-            if (!$transaction_id) {
-                throw new \Error("Failed to create transaction");
+            if (isset($request["transaction_id"])) {
+                $transaction_id = $request["transaction_id"];
+            } else {
+                $transaction = $this->getDefaultTransaction($item_id);
+
+                $transactionModel = TransactionModel::getInstance();
+                $transaction_id = $transactionModel->create($transaction);
+                if (!$transaction_id) {
+                    throw new \Error("Failed to create transaction");
+                }
+            }
+
+            $updRes = $this->update($item_id, [
+                "state" => REMINDER_CONFIRMED,
+                "transaction_id" => $transaction_id,
+            ]);
+            if (!$updRes) {
+                return false;
             }
         }
 
-        return $this->update($item_id, [
-            "state" => REMINDER_CONFIRMED,
-            "transaction_id" => $transaction_id,
-        ]);
+        return true;
     }
 
     /**
