@@ -5,6 +5,7 @@ namespace JezveMoney\App\Model;
 use JezveMoney\App\Item\ScheduledTransactionItem;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
+use JezveMoney\Core\Model;
 use JezveMoney\Core\Singleton;
 
 use function JezveMoney\Core\inSetCondition;
@@ -51,6 +52,8 @@ class ScheduledTransactionModel extends CachedTable
         $this->catModel = CategoryModel::getInstance();
         $this->reminderModel = ReminderModel::getInstance();
         TransactionModel::getInstance();
+
+        $this->updateAllReminders();
     }
 
     /**
@@ -562,12 +565,34 @@ class ScheduledTransactionModel extends CachedTable
         parent::postCreate($items);
 
         $items = asArray($items);
+        $params = $this->getRemindersDateRange(true);
 
         foreach ($items as $item_id) {
-            $this->createReminders($item_id);
+            $this->createReminders($item_id, $params);
         }
 
         return true;
+    }
+
+    /**
+     * Returns date range for reminders
+     *
+     * @return array
+     */
+    protected function getRemindersDateRange($initialRun = false)
+    {
+        $settingsModel = UserSettingsModel::getInstance();
+
+        $startDate = null;
+        if (!$initialRun) {
+            $userModel = UserModel::getInstance();
+            $startDate = $userModel->getRemindersDate();
+        }
+
+        return [
+            "startDate" => $startDate,
+            "endDate" => $settingsModel->getClientTime(),
+        ];
     }
 
     /**
@@ -619,7 +644,8 @@ class ScheduledTransactionModel extends CachedTable
         $this->cleanCache();
 
         if ($this->remindersChanged) {
-            $this->updateReminders($item_id);
+            $params = $this->getRemindersDateRange(true);
+            $this->updateReminders($item_id, $params);
         }
 
         return true;
@@ -977,33 +1003,34 @@ class ScheduledTransactionModel extends CachedTable
      * Creates reminders for specified scheduled transaction
      *
      * @param int $item_id scheduled transaction id
+     * @param array $params
      *
      * @return bool
      */
-    protected function createReminders(int $item_id)
+    protected function createReminders(int $item_id, array $params = [])
     {
         $item = $this->getItem($item_id);
         if (!$item) {
             throw new \Error("Item not found");
         }
 
-        $settingsModel = UserSettingsModel::getInstance();
-
-        $reminderDates = $item->getReminders([
-            "endDate" => $settingsModel->getClientTime(),
-        ]);
+        $reminderDates = $item->getReminders($params);
         if (count($reminderDates) === 0) {
             return true;
         }
 
         $reminders = [];
         foreach ($reminderDates as $date) {
-            $reminders[] = [
+            $reminder = [
                 "schedule_id" => $item_id,
                 "state" => REMINDER_SCHEDULED,
                 "date" => $date,
                 "transaction_id" => 0,
             ];
+
+            if (!$this->reminderModel->isSameItemExist($reminder)) {
+                $reminders[] = $reminder;
+            }
         }
 
         $this->reminderModel->createMultiple($reminders);
@@ -1018,10 +1045,10 @@ class ScheduledTransactionModel extends CachedTable
      *
      * @return bool
      */
-    protected function updateReminders(int $item_id)
+    protected function updateReminders(int $item_id, array $params = [])
     {
         $this->deleteReminders($item_id);
-        return $this->createReminders($item_id);
+        return $this->createReminders($item_id, $params);
     }
 
     /**
@@ -1034,5 +1061,42 @@ class ScheduledTransactionModel extends CachedTable
     protected function deleteReminders(int $item_id)
     {
         return $this->reminderModel->deleteRemindersBySchedule($item_id);
+    }
+
+    /**
+     * Creates transaction reminders for period from last update
+     *
+     * @return bool
+     */
+    public function updateAllReminders()
+    {
+        try {
+            $userModel = UserModel::getInstance();
+
+            if (!$this->checkCache()) {
+                return false;
+            }
+
+            $params = $this->getRemindersDateRange();
+            $diff = getDateDiff($params["startDate"], $params["endDate"], INTERVAL_DAY);
+
+            Model::begin();
+
+            if ($diff !== 0) {
+                $userModel->setRemindersDate();
+
+                foreach ($this->cache as $item) {
+                    $this->createReminders($item->id, $params);
+                }
+            }
+
+            Model::commit();
+        } catch (\Error $e) {
+            $message = $e->getMessage();
+            wlog($message);
+            Model::rollback();
+        }
+
+        return true;
     }
 }

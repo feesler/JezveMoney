@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 29);
+define("DB_VERSION", 30);
 
 /**
  * Database version manager class
@@ -936,13 +936,35 @@ class DBVersion
         $tableName = "user_settings";
         $res = $this->dbClient->addColumns(
             $tableName,
-            ["tz_offset" => "INT(11) NOT NULL DEFAULT 0",],
+            ["tz_offset" => "INT(11) NOT NULL DEFAULT 0"],
         );
         if (!$res) {
             throw new \Error("Failed to update table '$tableName'");
         }
 
         return 29;
+    }
+
+    /**
+     * Creates database version 30
+     *
+     * @return int
+     */
+    private function version30()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+        $tableName = "users";
+        $res = $this->dbClient->addColumns(
+            $tableName,
+            ["reminders_date" => "DATETIME NULL"],
+        );
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        return 30;
     }
 
     /**
@@ -1231,6 +1253,7 @@ class DBVersion
                 "passhash" => "VARCHAR(64) NOT NULL",
                 "owner_id" => "INT(11) NOT NULL",
                 "access" => "INT(11) NOT NULL DEFAULT '0'",
+                "reminders_date" => "DATETIME NULL DEFAULT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",

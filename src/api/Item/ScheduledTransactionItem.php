@@ -71,14 +71,26 @@ class ScheduledTransactionItem
     }
 
     /**
-     * Returns timestamp for first interval of specified scheduled transaction
+     * Returns timestamp for the beginning of interval for specified date
+     *
+     * @param int $timestamp
+     *
+     * @return int|null
+     */
+    public function getInterval(int $timestamp)
+    {
+        $dateInfo = getDateIntervalStart($timestamp, $this->interval_type);
+        return $dateInfo["time"];
+    }
+
+    /**
+     * Returns timestamp for first interval of scheduled transaction
      *
      * @return int|null
      */
     public function getFirstInterval()
     {
-        $dateInfo = getDateIntervalStart($this->start_date, $this->interval_type);
-        return $dateInfo["time"];
+        return $this->getInterval($this->start_date);
     }
 
     /**
@@ -161,16 +173,21 @@ class ScheduledTransactionItem
     public function getReminders(array $params = [])
     {
         $limit = isset($params["limit"]) ? intval($params["limit"]) : 100;
-        $endDate = isset($params["endDate"]) ? intval($params["endDate"]) : time();
+        $startDate = isset($params["startDate"])
+            ? intval($params["startDate"])
+            : $this->start_date;
+        $endDate = isset($params["endDate"])
+            ? intval($params["endDate"])
+            : time();
 
         $res = [];
-        $interval = $this->getFirstInterval();
+        $interval = $this->getInterval($startDate);
         while (
             $interval
             && ($limit === 0 || count($res) < $limit)
             && $interval <= $endDate
         ) {
-            if ($interval >= $this->start_date) {
+            if ($interval >= $startDate) {
                 $date = $this->getReminderDate($interval);
                 if ($date > $endDate) {
                     break;

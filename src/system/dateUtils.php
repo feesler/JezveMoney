@@ -82,6 +82,12 @@ function getDateInfo(int $time, int $intervalType)
  */
 function getDateDiff(mixed $itemA, mixed $itemB, int $intervalType)
 {
+    $itemA = $itemA ?? 0;
+    $itemB = $itemB ?? 0;
+
+    $itemA = is_int($itemA) ? getDateInfo($itemA, $intervalType) : $itemA;
+    $itemB = is_int($itemB) ? getDateInfo($itemB, $intervalType) : $itemB;
+
     if (!is_array($itemA) || !is_array($itemB)) {
         throw new \Error("Invalid parameters");
     }

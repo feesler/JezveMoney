@@ -341,6 +341,20 @@ class UserModel extends CachedTable
     }
 
     /**
+     * Returns reminders update date
+     *
+     * @return int|null
+     */
+    public function getRemindersDate()
+    {
+        if (!$this->currentUser) {
+            return null;
+        }
+
+        return $this->currentUser->reminders_date;
+    }
+
+    /**
      * Returns user id for specified login
      *
      * @param string $login
@@ -435,6 +449,37 @@ class UserModel extends CachedTable
                     "updatedate" => $curDate
                 ],
                 "login=" . qnull($elogin)
+            )
+        ) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    /**
+     * Updates reminders date
+     *
+     * @return bool
+     */
+    public function setRemindersDate()
+    {
+        $settingsModel = UserSettingsModel::getInstance();
+        $date = date("Y-m-d H:i:s", $settingsModel->getClientTime());
+        $curDate = date("Y-m-d H:i:s");
+
+        $user_id = $this->getUser();
+
+        if (
+            !$this->dbObj->updateQ(
+                $this->tbl_name,
+                [
+                    "reminders_date" => $date,
+                    "updatedate" => $curDate
+                ],
+                "id=" . qnull($user_id)
             )
         ) {
             return false;

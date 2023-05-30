@@ -149,7 +149,7 @@ class ReminderModel extends CachedTable
      *
      * @return bool
      */
-    protected function isSameItemExist(array $params, int $item_id = 0)
+    public function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["schedule_id"]) || !isset($params["date"])) {
             return false;
