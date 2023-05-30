@@ -6,6 +6,7 @@ import {
 } from 'jezve-test';
 import { ReminderListView } from '../view/ReminderListView.js';
 import { App } from '../Application.js';
+import { TransactionView } from '../view/TransactionView.js';
 
 /** Navigate to reminders page */
 const checkNavigation = async () => {
@@ -22,6 +23,18 @@ export const confirmFromContextMenu = async (index) => {
 
         await App.view.confirmFromContextMenu(index);
         return App.state.fetchAndTest();
+    });
+};
+
+export const updateFromContextMenu = async (index) => {
+    await test(`Update reminder from context menu [${index}]`, async () => {
+        await checkNavigation();
+
+        await App.view.goToUpdateItem(index);
+        assert.instanceOf(App.view, TransactionView, 'Invalid view');
+
+        App.view.expectedState = App.view.getExpectedState();
+        return App.view.checkState();
     });
 };
 

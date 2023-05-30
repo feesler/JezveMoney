@@ -531,7 +531,7 @@ class ReminderListView extends View {
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
         items.ctxDetailsBtn.setURL(`${baseURL}reminders/${itemId}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}schedule/update/${itemId}`);
+        items.ctxUpdateBtn.setURL(`${baseURL}transactions/create/?reminder_id=${itemId}`);
 
         this.contextMenu.attachAndShow(menuButton);
     }

@@ -67,6 +67,7 @@ class TransactionModel extends SortableModel
     protected $catModel = null;
     protected $affectedTransactions = null;
     protected $balanceChanges = null;
+    protected $confirmReminders = null;
     protected $removedItems = null;
     protected $originalTrans = null;
 
@@ -490,6 +491,12 @@ class TransactionModel extends SortableModel
 
         $this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
 
+        if (is_null($this->confirmReminders)) {
+            $this->confirmReminders = [];
+        }
+        $reminderId = (isset($params["reminder_id"])) ? intval($params["reminder_id"]) : 0;
+        $this->confirmReminders[] = $reminderId;
+
         $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
         $res["src_result"] = ($res["src_id"] != 0)
@@ -521,10 +528,21 @@ class TransactionModel extends SortableModel
         $this->accModel->updateBalances($this->balanceChanges);
         $this->balanceChanges = null;
 
+        $reminderModel = ReminderModel::getInstance();
+
         foreach ($items as $item_id) {
             $trObj = $this->getItem($item_id);
             if (!$trObj) {
                 return false;
+            }
+
+            if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
+                $reminderId = array_shift($this->confirmReminders);
+                if ($reminderId !== 0) {
+                    $reminderModel->confirm($reminderId, [
+                        "transaction_id" => $item_id,
+                    ]);
+                }
             }
 
             // Update position of transaction if target date is not today
@@ -533,6 +551,8 @@ class TransactionModel extends SortableModel
                 $this->updatePos($item_id, $latest_pos + 1);
             }
         }
+
+        $this->confirmReminders = null;
 
         $this->commitAffected();
 

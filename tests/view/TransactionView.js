@@ -33,7 +33,8 @@ export class TransactionView extends AppView {
     async parseContent() {
         const res = {};
 
-        res.isUpdate = (await url()).includes('/update/');
+        const viewURL = await url();
+        res.isUpdate = viewURL.includes('/update/');
 
         if (res.isUpdate) {
             const hiddenEl = await query('#idInp');
@@ -85,6 +86,9 @@ export class TransactionView extends AppView {
 
         res.form = cont.form.model;
 
+        const viewURL = new URL(this.location);
+        res.reminderId = viewURL.searchParams.get('reminder_id');
+
         return res;
     }
 
@@ -132,6 +136,10 @@ export class TransactionView extends AppView {
         });
         res.category_id = form.categoryId;
         res.comment = form.comment;
+
+        if (this.model.reminderId) {
+            res.reminder_id = this.model.reminderId;
+        }
 
         return res;
     }

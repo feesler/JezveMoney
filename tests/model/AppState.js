@@ -1790,6 +1790,13 @@ export class AppState {
 
         const item = this.transactions.getItemByIndex(ind);
 
+        if (itemData.reminder_id) {
+            this.confirmReminder({
+                id: itemData.reminder_id,
+                transaction_id: item.id,
+            });
+        }
+
         return this.returnState(params.returnState, { id: item.id });
     }
 

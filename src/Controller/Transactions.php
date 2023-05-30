@@ -10,6 +10,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -167,14 +168,22 @@ class Transactions extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
-        $tr = [
-            "type" => $this->getRequestedType($_GET, EXPENSE),
-            "src_amount" => 0,
-            "dest_amount" => 0,
-            "date" => time(),
-            "category_id" => 0,
-            "comment" => ""
-        ];
+        if (isset($_GET["reminder_id"])) {
+            $reminderModel = ReminderModel::getInstance();
+            $tr = $reminderModel->getDefaultTransaction($_GET["reminder_id"]);
+            $tr["reminder_id"] = intval($_GET["reminder_id"]);
+        } else {
+            $tr = [
+                "type" => EXPENSE,
+                "src_amount" => 0,
+                "dest_amount" => 0,
+                "date" => time(),
+                "category_id" => 0,
+                "comment" => "",
+            ];
+        }
+
+        $tr["type"] = $this->getRequestedType($_GET, ($tr["type"] ?? EXPENSE));
 
         // Check availability of selected type of transaction
         $trAvailable = false;

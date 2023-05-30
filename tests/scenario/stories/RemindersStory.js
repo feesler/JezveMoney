@@ -1,5 +1,6 @@
 import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../../actions/reminder.js';
+import * as trActions from '../../actions/transaction.js';
 import { App } from '../../Application.js';
 
 export class RemindersStory extends TestStory {
@@ -26,6 +27,7 @@ export class RemindersStory extends TestStory {
         await this.cancel();
         await this.confirmFromContextMenu();
         await this.cancelFromContextMenu();
+        await this.updateAndConfirm();
     }
 
     async list() {
@@ -75,6 +77,16 @@ export class RemindersStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(Actions.cancelFromContextMenu, data);
+    }
+
+    async updateAndConfirm() {
+        setBlock('Edit reminder transaction and submit', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.runActions([
+            { action: 'inputSrcAmount', data: '100' },
+        ]);
+        await trActions.submit();
     }
 
     async detailsMode() {

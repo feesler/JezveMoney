@@ -166,6 +166,15 @@
 
         <div class="std_margin">
             <label class="checkbox">
+                <input type="checkbox" data-target="reminder_id">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Reminder</span>
+            </label>
+            <input class="input stretch-input" name="reminder_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="0" disabled hidden>
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
                 <input type="checkbox" data-target="returnState">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Return state</span>
@@ -227,6 +236,15 @@
         <div class="std_margin">
             <label for="create_debt_comment">Comment</label>
             <input id="create_debt_comment" class="input stretch-input" name="comment" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
+                <input type="checkbox" data-target="reminder_id">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Reminder</span>
+            </label>
+            <input class="input stretch-input" name="reminder_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="0" disabled hidden>
         </div>
 
         <div class="std_margin">

@@ -196,6 +196,10 @@ class TransactionView extends View {
                 url.searchParams.set('person_id', transaction.person_id);
                 url.searchParams.set('acc_id', transaction.acc_id);
             }
+
+            if (transaction.reminder_id) {
+                url.searchParams.set('reminder_id', transaction.reminder_id);
+            }
         }
 
         const title = (state.isUpdate)

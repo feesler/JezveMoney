@@ -222,10 +222,8 @@ export class TransactionForm extends Component {
             }
         }
 
-        if (transaction.id) {
-            initialState.form.sourceAmount = transaction.src_amount;
-            initialState.form.destAmount = transaction.dest_amount;
-        }
+        initialState.form.sourceAmount = (transaction.src_amount) ? transaction.src_amount : '';
+        initialState.form.destAmount = (transaction.dest_amount) ? transaction.dest_amount : '';
 
         calculateSourceResult(initialState);
         calculateDestResult(initialState);
@@ -1253,6 +1251,10 @@ export class TransactionForm extends Component {
 
         if (state.isUpdate) {
             res.id = transaction.id;
+        }
+
+        if (transaction.reminder_id) {
+            res.reminder_id = transaction.reminder_id;
         }
 
         if (res.type === DEBT) {
