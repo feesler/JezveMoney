@@ -257,6 +257,7 @@ class ReminderModel extends CachedTable
      * @param array $params array of options:
      *     - 'schedule_id' => (int) - scheduled transaction filter
      *     - 'transaction_id' => (int) - transaction filter
+     *     - 'state' => (int) - reminder state filter
      *     - 'date' => (int) - exact date filter
      *     - 'returnIds' => (bool) - return array of ids instead of ReminderItem
      *
@@ -266,6 +267,7 @@ class ReminderModel extends CachedTable
     {
         $scheduleFilter = isset($params["schedule_id"]) ? intval($params["schedule_id"]) : null;
         $trFilter = isset($params["transaction_id"]) ? intval($params["transaction_id"]) : null;
+        $stateFilter = isset($params["state"]) ? intval($params["state"]) : null;
         $dateFilter = isset($params["date"]) ? intval($params["date"]) : null;
         $returnIds = $params["returnIds"] ?? false;
 
@@ -280,6 +282,9 @@ class ReminderModel extends CachedTable
                 continue;
             }
             if (!is_null($trFilter) && $item->transaction_id != $trFilter) {
+                continue;
+            }
+            if (!is_null($stateFilter) && $item->state != $stateFilter) {
                 continue;
             }
             if (!is_null($dateFilter) && $item->date != $dateFilter) {

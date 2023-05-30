@@ -12,6 +12,15 @@
 
         <div class="std_margin">
             <label class="checkbox">
+                <input type="checkbox" data-target="state">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">State</span>
+            </label>
+            <input class="input stretch-input" name="state" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+        </div>
+
+        <div class="std_margin">
+            <label class="checkbox">
                 <input type="checkbox" data-target="date">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Date</span>
