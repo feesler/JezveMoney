@@ -177,6 +177,7 @@ const create = async () => {
     [
         App.scenario.REMINDER_EXPENSE_1_1,
         App.scenario.REMINDER_EXPENSE_1_2,
+        App.scenario.REMINDER_EXPENSE_1_3,
     ] = App.state.reminders.getRemindersBySchedule(App.scenario.SCHEDULED_TR_EXPENSE_1, true);
     [
         App.scenario.REMINDER_INCOME_2_1,
@@ -195,6 +196,7 @@ const create = async () => {
     const reminderIds = [
         'REMINDER_EXPENSE_1_1',
         'REMINDER_EXPENSE_1_2',
+        'REMINDER_EXPENSE_1_3',
         'REMINDER_INCOME_2_1',
         'REMINDER_INCOME_2_2',
         'REMINDER_TRANSFER_1_1',

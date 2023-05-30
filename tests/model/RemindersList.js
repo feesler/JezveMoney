@@ -1,6 +1,6 @@
 import { asArray, assert, copyObject } from 'jezve-test';
 import { List } from './List.js';
-import { Reminder } from './Reminder.js';
+import { REMINDER_SCHEDULED, Reminder } from './Reminder.js';
 import { App } from '../Application.js';
 
 /** List of scheduled transaction reminders */
@@ -147,5 +147,19 @@ export class RemindersList extends List {
 
     sortDesc() {
         return this.sortItems(this.data, true);
+    }
+
+    deleteTransactions(transactions) {
+        const ids = asArray(transactions);
+
+        this.data = this.data.map((item) => (
+            (ids.includes(item.transaction_id))
+                ? Reminder.create({
+                    ...item,
+                    state: REMINDER_SCHEDULED,
+                    transaction_id: 0,
+                })
+                : item
+        ));
     }
 }

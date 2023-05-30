@@ -46,6 +46,7 @@ export class ApiStory extends TestStory {
         await apiScheduleTests.createTests();
 
         await apiRemindersTests.run();
+        await apiTransactionsTests.confirmRemindersTests();
 
         await apiSecurityTests.run();
 

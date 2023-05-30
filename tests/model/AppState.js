@@ -1846,6 +1846,7 @@ export class AppState {
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
+        this.reminders.deleteTransactions(ids);
         this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();

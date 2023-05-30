@@ -7,6 +7,8 @@ use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\App\Item\ReminderItem;
 
+use function JezveMoney\Core\inSetCondition;
+
 // Reminder state
 define("REMINDER_SCHEDULED", 1);
 define("REMINDER_CONFIRMED", 2);
@@ -407,5 +409,38 @@ class ReminderModel extends CachedTable
         ]);
 
         return $this->del($ids);
+    }
+
+    /**
+     * Handles transaction delete event
+     * Changes state of reminders to 'Scheduled'
+     *
+     * @param mixed $transactions id or array of transaction ids
+     *
+     * @return bool
+     */
+    public function onTransactionDelete(mixed $transactions)
+    {
+        if (is_null($transactions)) {
+            return false;
+        }
+
+        $transactions = asArray($transactions);
+        if (count($transactions) === 0) {
+            return true;
+        }
+
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            ["transaction_id" => 0, "state" => REMINDER_SCHEDULED],
+            "transaction_id" . inSetCondition($transactions),
+        );
+        if (!$updRes) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
     }
 }

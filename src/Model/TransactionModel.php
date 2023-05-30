@@ -1185,6 +1185,9 @@ class TransactionModel extends SortableModel
             unset($this->cache[$trObj->id]);
         }
 
+        $reminderModel = ReminderModel::getInstance();
+        $reminderModel->onTransactionDelete($items);
+
         return true;
     }
 
