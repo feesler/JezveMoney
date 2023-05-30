@@ -197,6 +197,7 @@ export class ReminderListView extends AppView {
         this.items = state.reminders.applyFilter({
             state: REMINDER_SCHEDULED,
         });
+        this.items.sort();
     }
 
     currentPage(model = this.model) {

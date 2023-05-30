@@ -131,10 +131,10 @@ export class RemindersList extends List {
         const res = copyObject(list);
 
         if (desc) {
-            return res.sort((a, b) => b.pos - a.pos);
+            return res.sort((a, b) => b.date - a.date);
         }
 
-        return res.sort((a, b) => a.pos - b.pos);
+        return res.sort((a, b) => a.date - b.date);
     }
 
     sort() {
