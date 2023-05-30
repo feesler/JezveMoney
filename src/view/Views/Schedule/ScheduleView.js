@@ -482,7 +482,7 @@ class ScheduleView extends View {
             ? __('SCHED_TRANS_DELETE_MULTIPLE')
             : __('SCHED_TRANS_DELETE');
         const content = (multiple)
-            ? __('MSG_CATEGORY_DELETE_MULTIPLE')
+            ? __('MSG_SCHED_TRANS_DELETE_MULTIPLE')
             : __('MSG_SCHED_TRANS_DELETE');
 
         ConfirmDialog.create({
