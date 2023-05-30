@@ -9,17 +9,6 @@ use JezveMoney\Core\Singleton;
 
 use function JezveMoney\Core\inSetCondition;
 
-// Repeat interval types
-define("INTERVAL_NONE", 0);
-define("INTERVAL_DAY", 1);
-define("INTERVAL_WEEK", 2);
-define("INTERVAL_MONTH", 3);
-define("INTERVAL_YEAR", 4);
-
-const DAYS_IN_WEEK = 7;
-const MAX_DAYS_IN_MONTH = 31;
-const MAX_DAYS_IN_YEAR = 366;
-
 /**
  * Scheduled transactions model
  */

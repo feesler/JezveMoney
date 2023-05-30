@@ -22,13 +22,10 @@ define("DEBT", 4);
 define("LIMIT_CHANGE", 5);
 
 // Statistics group types
-define("GROUP_BY_DAY", 1);
-define("GROUP_BY_WEEK", 2);
-define("GROUP_BY_MONTH", 3);
-define("GROUP_BY_YEAR", 4);
-
-const MONTHS_IN_YEAR = 12;
-const WEEKS_IN_YEAR = 52;
+define("GROUP_BY_DAY", INTERVAL_DAY);
+define("GROUP_BY_WEEK", INTERVAL_WEEK);
+define("GROUP_BY_MONTH", INTERVAL_MONTH);
+define("GROUP_BY_YEAR", INTERVAL_YEAR);
 
 const DEFAULT_REPORT_TYPE = "category";
 const DEFAULT_TRANSACTION_TYPE = EXPENSE;
@@ -1991,141 +1988,6 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns fixed year for week number
-     *
-     * @param mixed $info
-     *
-     * @return int
-     */
-    protected function getFixedWeekYear(mixed $info)
-    {
-        $fixedYear = $info["year"];
-        if ($info["mon"] === 1 && $info["week"] >= WEEKS_IN_YEAR - 2) {
-            $fixedYear--;
-        } elseif ($info["mon"] === MONTHS_IN_YEAR && $info["week"] === 1) {
-            $fixedYear++;
-        }
-
-        return $fixedYear;
-    }
-
-    /**
-     * Returns date info for specified timestamp and group type
-     *
-     * @param int $time timestamp
-     * @param int $groupType group type
-     *
-     * @return array
-     */
-    protected function getDateInfo(int $time, int $groupType)
-    {
-        $info = getdate($time);
-        $info["week"] = intval(date("W", $time));
-        $info["wday"] = ($info["wday"] === 0) ? 6 : ($info["wday"] - 1);
-        $res = [
-            "time" => $time,
-            "info" => $info,
-        ];
-
-        if ($groupType == GROUP_BY_DAY) {
-            $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
-        } elseif ($groupType == GROUP_BY_WEEK) {
-            $fixedYear = $this->getFixedWeekYear($info);
-            $res["id"] = $info["week"] . "." . $fixedYear;
-        } elseif ($groupType == GROUP_BY_MONTH) {
-            $res["id"] = $info["mon"] . "." . $info["year"];
-        } elseif ($groupType == GROUP_BY_YEAR) {
-            $res["id"] = $info["year"];
-        }
-
-        return $res;
-    }
-
-    /**
-     * Returns difference between dates for specified group type
-     *
-     * @param mixed $itemA
-     * @param mixed $itemB
-     * @param mixed $groupType group type
-     *
-     * @return int
-     */
-    protected function getDateDiff(mixed $itemA, mixed $itemB, $groupType)
-    {
-        if (!is_array($itemA) || !is_array($itemB)) {
-            throw new \Error("Invalid parameters");
-        }
-
-        if ($groupType == GROUP_BY_DAY) {
-            $timeA = new DateTime("@" . $itemA["time"], new DateTimeZone('UTC'));
-            $timeB = new DateTime("@" . $itemB["time"], new DateTimeZone('UTC'));
-
-            $timeDiff = $timeA->diff($timeB, true);
-
-            return $timeDiff->days;
-        }
-
-        if ($groupType == GROUP_BY_WEEK) {
-            $yearA = $this->getFixedWeekYear($itemA["info"]);
-            $yearB = $this->getFixedWeekYear($itemB["info"]);
-            $weekA = $itemA["info"]["week"];
-            $weekB = $itemB["info"]["week"];
-
-            return (
-                ($yearB - $yearA) * WEEKS_IN_YEAR
-                + ($weekB - $weekA)
-            );
-        }
-
-        if ($groupType == GROUP_BY_MONTH) {
-            return (
-                ($itemB["info"]["year"] - $itemA["info"]["year"]) * MONTHS_IN_YEAR
-                + ($itemB["info"]["mon"] - $itemA["info"]["mon"])
-            );
-        }
-
-        if ($groupType == GROUP_BY_YEAR) {
-            return $itemB["info"]["year"] - $itemA["info"]["year"];
-        }
-
-        throw new \Error("Invalid group type");
-    }
-
-    /**
-     * Returns date info object for group start in specified group type
-     *
-     * @param mixed $dateInfo date info object
-     * @param int $groupType group type
-     *
-     * @return array
-     */
-    protected function getGroupStart(mixed $dateInfo, int $groupType)
-    {
-        if (!isset(self::$durationMap[$groupType])) {
-            throw new \Error("Invalid group type");
-        }
-
-        $date = new DateTime("@" . $dateInfo["time"], new DateTimeZone('UTC'));
-        $info = $dateInfo["info"];
-        $date->setTime(0, 0);
-
-        if ($groupType === GROUP_BY_WEEK) {
-            $date->sub(new DateInterval("P" . $info["wday"] . "D"));
-        }
-
-        if ($groupType === GROUP_BY_MONTH) {
-            $date->setDate($info["year"], $info["mon"], 1);
-        }
-
-        if ($groupType === GROUP_BY_YEAR) {
-            $date->setDate($info["year"], 1, 1);
-        }
-
-        $timestamp = $date->getTimestamp();
-        return $this->getDateInfo($timestamp, $groupType);
-    }
-
-    /**
      * Returns date info object for next date in specified group type
      *
      * @param mixed $dateInfo date info object
@@ -2139,12 +2001,12 @@ class TransactionModel extends SortableModel
             throw new \Error("Invalid group type");
         }
 
-        $groupStart = $this->getGroupStart($dateInfo, $groupType);
+        $groupStart = getDateIntervalStart($dateInfo, $groupType);
         $date = new DateTime("@" . $groupStart["time"], new DateTimeZone('UTC'));
         $duration = "P1" . self::$durationMap[$groupType];
 
         $timestamp = $date->add(new DateInterval($duration))->getTimestamp();
-        return $this->getDateInfo($timestamp, $groupType);
+        return getDateInfo($timestamp, $groupType);
     }
 
     /**
@@ -2166,7 +2028,7 @@ class TransactionModel extends SortableModel
         $duration = "P" . $limit . self::$durationMap[$groupType];
 
         if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
-            $dateInfo = $this->getDateInfo($endTime, $groupType);
+            $dateInfo = getDateInfo($endTime, $groupType);
             $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
             $date->setDate($dateInfo["info"]["year"], $month, 1);
         }
@@ -2422,15 +2284,15 @@ class TransactionModel extends SortableModel
                 continue;
             }
 
-            $dateInfo = $this->getDateInfo($item->date, $group_type);
+            $dateInfo = getDateInfo($item->date, $group_type);
             $amount = ($isSource) ? $item->src_amount : $item->dest_amount;
             $curDate = $dateInfo;
 
             if (is_null($sumDate)) {        // first iteration
-                $groupStart = $this->getGroupStart($curDate, $group_type);
+                $groupStart = getDateIntervalStart($curDate, $group_type);
                 $sumDate = $curDate;
             } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
-                $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
+                $dateDiff = getDateDiff($sumDate, $curDate, $group_type);
 
                 foreach ($transTypes as $type) {
                     foreach ($dataCategories as $cat) {
@@ -2454,7 +2316,7 @@ class TransactionModel extends SortableModel
                 }
 
                 $sumDate = $curDate;
-                $groupStart = $this->getGroupStart($sumDate, $group_type);
+                $groupStart = getDateIntervalStart($sumDate, $group_type);
             }
 
             $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);

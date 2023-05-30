@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 defineHostConstants();
 
 require_once(APP_ROOT . "system/common.php");
+require_once(APP_ROOT . "system/dateUtils.php");
 
 // Error settings
 if (PRODUCTION) {
