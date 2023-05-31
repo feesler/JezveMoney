@@ -231,7 +231,7 @@ export class AppState {
 
             assert.deepMeet(local.data, noDatesData);
         } catch (e) {
-            console.log('Local: ', local.data);
+            console.log('Real data: ', local.data);
             console.log('Expected: ', noDatesData);
 
             throw e;

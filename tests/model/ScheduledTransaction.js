@@ -326,7 +326,7 @@ export class ScheduledTransaction {
         const monthDay = date.getDate();
         let res = 0;
 
-        if (intervalType === INTERVAL_DAY) {
+        if (intervalType === INTERVAL_NONE || intervalType === INTERVAL_DAY) {
             res = Date.UTC(year, month, monthDay);
         }
         if (intervalType === INTERVAL_WEEK) {
@@ -426,6 +426,7 @@ export class ScheduledTransaction {
 
         const res = [];
         let interval = this.getFirstInterval();
+
         while (
             interval
             && (limit === 0 || res.length < limit)

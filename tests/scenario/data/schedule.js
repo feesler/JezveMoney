@@ -7,6 +7,7 @@ import {
     INTERVAL_MONTH,
     INTERVAL_YEAR,
     ScheduledTransaction,
+    INTERVAL_NONE,
 } from '../../model/ScheduledTransaction.js';
 import {
     EXPENSE,
@@ -29,6 +30,7 @@ export const createScheduledTransactions = async () => {
         CREDIT_CARD,
         MARIA,
         FOOD_CATEGORY,
+        INVEST_CATEGORY,
     } = App.scenario;
 
     const weekDate1 = new Date(2022, 11, 30);
@@ -58,6 +60,17 @@ export const createScheduledTransactions = async () => {
         end_date: App.datesSec.weekAfter,
         interval_type: INTERVAL_DAY,
         interval_step: 2,
+        interval_offset: 0,
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 100000,
+        comment: 'One time expense',
+        category_id: INVEST_CATEGORY,
+        start_date: App.datesSec.weekAfter,
+        end_date: null,
+        interval_type: INTERVAL_NONE,
+        interval_step: 0,
         interval_offset: 0,
     }, {
         type: INCOME,

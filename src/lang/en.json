@@ -218,6 +218,7 @@
     "SCHED_TR_END_DATE": "End date",
     "SCHED_TR_NO_END_DATE": "Endless",
     "SCHED_TR_INTERVAL": "Interval",
+    "SCHED_TR_INTERVAL_NONE": "Don't repeat",
     "SCHED_TR_INTERVAL_DAY": "Day",
     "SCHED_TR_INTERVAL_WEEK": "Week",
     "SCHED_TR_INTERVAL_MONTH": "Month",

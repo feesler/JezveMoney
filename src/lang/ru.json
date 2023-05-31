@@ -218,6 +218,7 @@
     "SCHED_TR_END_DATE": "Дата окончания",
     "SCHED_TR_NO_END_DATE": "Бессрочно",
     "SCHED_TR_INTERVAL": "Интервал",
+    "SCHED_TR_INTERVAL_NONE": "Не повторять",
     "SCHED_TR_INTERVAL_DAY": "День",
     "SCHED_TR_INTERVAL_WEEK": "Неделя",
     "SCHED_TR_INTERVAL_MONTH": "Месяц",

@@ -41,6 +41,7 @@ import { __ } from '../../../model/locale.js';
 import {
     INTERVAL_DAY,
     INTERVAL_MONTH,
+    INTERVAL_NONE,
     INTERVAL_WEEK,
     INTERVAL_YEAR,
 } from '../../../model/ScheduledTransaction.js';
@@ -164,12 +165,12 @@ export class TransactionForm extends TestComponent {
                     isInvalid: model.startDateInvalidated,
                 };
                 res.endDateRow = {
-                    visible: true,
+                    visible: model.intervalType !== INTERVAL_NONE,
                     value: App.reformatDate(model.endDate),
                     isInvalid: model.endDateInvalidated,
                 };
                 res.intervalStepRow = {
-                    visible: true,
+                    visible: model.intervalType !== INTERVAL_NONE,
                     value: model.intervalStep,
                 };
                 res.intervalTypeSelect = {
@@ -1939,6 +1940,9 @@ export class TransactionForm extends TestComponent {
         assert.notEqual(this.model.intervalType, type, `Interval type is already ${type}`);
 
         this.model.intervalType = type;
+        if (type === INTERVAL_NONE) {
+            this.model.endDate = '';
+        }
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.intervalTypeSelect.setSelection(val));

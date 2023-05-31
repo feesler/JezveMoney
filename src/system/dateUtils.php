@@ -137,8 +137,8 @@ function getDateDiff(mixed $itemA, mixed $itemB, int $intervalType)
  */
 function getDateIntervalStart(mixed $dateInfo, int $intervalType)
 {
-    if (!isset(INTERVAL_DURATION_MAP[$intervalType])) {
-        throw new \Error("Invalid group type");
+    if ($intervalType !== INTERVAL_NONE && !isset(INTERVAL_DURATION_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
     }
 
     $dateInfo = is_int($dateInfo) ? getDateInfo($dateInfo, $intervalType) : $dateInfo;

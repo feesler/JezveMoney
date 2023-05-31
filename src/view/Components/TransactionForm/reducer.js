@@ -15,6 +15,7 @@ import {
 } from '../../Models/Transaction.js';
 import * as STATE from './stateId.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
+import { INTERVAL_NONE } from '../../Models/ScheduledTransaction.js';
 
 // Tools
 
@@ -1178,6 +1179,11 @@ const slice = createSlice({
                 interval_offset: 0,
             },
         };
+
+        if (type === INTERVAL_NONE) {
+            newState.form.endDate = '';
+            newState.transaction.end_date = null;
+        }
 
         return newState;
     },

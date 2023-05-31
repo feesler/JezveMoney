@@ -624,6 +624,7 @@ export class TransactionForm extends Component {
             className: 'dd_fullwidth interval-type-select',
             onChange: (type) => this.onIntervalTypeChanged(type),
             data: [
+                { id: INTERVAL_NONE, title: __('SCHED_TR_INTERVAL_NONE') },
                 { id: INTERVAL_DAY, title: __('SCHED_TR_INTERVAL_DAY') },
                 { id: INTERVAL_WEEK, title: __('SCHED_TR_INTERVAL_WEEK') },
                 { id: INTERVAL_MONTH, title: __('SCHED_TR_INTERVAL_MONTH') },
@@ -1751,7 +1752,11 @@ export class TransactionForm extends Component {
         this.intervalTypeSelect.enable(!state.submitStarted);
 
         // Interval offset field
-        if (form.intervalType === INTERVAL_NONE || form.intervalType === INTERVAL_DAY) {
+        if (form.intervalType === INTERVAL_NONE) {
+            this.endDateRow.hide();
+            this.intervalStepRow.hide();
+            this.intervalOffsetRow.hide();
+        } else if (form.intervalType === INTERVAL_DAY) {
             this.intervalOffsetRow.hide();
         } else if (form.intervalType === INTERVAL_WEEK) {
             this.weekDaySelect.setSelection(transaction.interval_offset);
