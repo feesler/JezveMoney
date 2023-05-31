@@ -40,10 +40,13 @@ class Application extends TestApplication {
         this.dates = {
             now,
             monthAgo: new Date(Date.UTC(year, month - 1, day)),
+            monthAfter: new Date(Date.UTC(year, month + 1, day)),
             weekAgo: new Date(Date.UTC(year, month, day - 7)),
             weekAfter: new Date(Date.UTC(year, month, day + 7)),
             yesterday: new Date(Date.UTC(year, month, day - 1)),
+            tomorrow: new Date(Date.UTC(year, month, day + 1)),
             yearAgo: new Date(Date.UTC(year - 1, month, day)),
+            yearAfter: new Date(Date.UTC(year + 1, month, day)),
         };
 
         const self = this;
@@ -63,6 +66,10 @@ class Application extends TestApplication {
                 return self.formatDate(self.dates.monthAgo);
             },
 
+            get monthAfter() {
+                return self.formatDate(self.dates.monthAfter);
+            },
+
             get weekAgo() {
                 return self.formatDate(self.dates.weekAgo);
             },
@@ -75,8 +82,16 @@ class Application extends TestApplication {
                 return self.formatDate(self.dates.yesterday);
             },
 
+            get tomorrow() {
+                return self.formatDate(self.dates.tomorrow);
+            },
+
             get yearAgo() {
                 return self.formatDate(self.dates.yearAgo);
+            },
+
+            get yearAfter() {
+                return self.formatDate(self.dates.yearAfter);
             },
         };
 

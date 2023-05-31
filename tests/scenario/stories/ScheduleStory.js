@@ -59,12 +59,14 @@ export class ScheduleStory extends TestStory {
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '1000' },
             { action: 'inputComment', data: 'some fee' },
+            { action: 'inputStartDate', data: App.datesFmt.weekAgo },
         ]);
 
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputComment', data: 'Daily expense' },
             { action: 'changeIntervalType', data: INTERVAL_DAY },
+            { action: 'selectStartDate', data: App.dates.weekAfter },
         ]);
 
         await Actions.createAndSubmit([
@@ -78,6 +80,7 @@ export class ScheduleStory extends TestStory {
             { action: 'inputSrcAmount', data: '500' },
             { action: 'inputComment', data: 'Percents' },
             { action: 'selectMonthDayOffset', data: 31 },
+            { action: 'inputEndDate', data: App.datesFmt.yearAfter },
         ]);
 
         await Actions.createAndSubmit([
@@ -94,6 +97,7 @@ export class ScheduleStory extends TestStory {
             { action: 'inputSrcAmount', data: '5000' },
             { action: 'changeIntervalType', data: INTERVAL_WEEK },
             { action: 'selectWeekDayOffset', data: 4 },
+            { action: 'selectEndDate', data: App.dates.yearAfter },
         ]);
 
         await Actions.createAndSubmit([
@@ -101,6 +105,8 @@ export class ScheduleStory extends TestStory {
             { action: 'inputDestAmount', data: '1000' },
             { action: 'inputIntervalStep', data: '6' },
             { action: 'selectMonthDayOffset', data: 1 },
+            { action: 'selectEndDate', data: App.dates.tomorrow },
+            { action: 'clearEndDate' },
         ]);
 
         await Actions.createAndSubmit([

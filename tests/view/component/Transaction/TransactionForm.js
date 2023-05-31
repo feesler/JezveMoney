@@ -1935,6 +1935,64 @@ export class TransactionForm extends TestComponent {
         await navigation(() => click(this.content.cancelBtn));
     }
 
+    async inputStartDate(val) {
+        this.model.startDate = val.toString();
+        this.model.startDateInvalidated = false;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.startDateRow.input(val));
+
+        return this.checkState();
+    }
+
+    async selectStartDate(val) {
+        assert.isDate(val, 'Invalid date');
+
+        const locales = this.appState().getDateFormatLocale();
+        this.model.startDate = formatDate(val, { locales, options: App.dateFormatOptions });
+        this.model.startDateInvalidated = false;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.startDateRow.selectDate(val));
+
+        return this.checkState();
+    }
+
+    async inputEndDate(val) {
+        this.model.endDate = val.toString();
+        this.model.endDateInvalidated = false;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.endDateRow.input(val));
+
+        return this.checkState();
+    }
+
+    async selectEndDate(val) {
+        assert.isDate(val, 'Invalid date');
+
+        const locales = this.appState().getDateFormatLocale();
+        this.model.endDate = formatDate(val, { locales, options: App.dateFormatOptions });
+        this.model.endDateInvalidated = false;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.endDateRow.selectDate(val));
+
+        return this.checkState();
+    }
+
+    async clearEndDate() {
+        assert(this.model.endDate.length > 0, 'End date field is already empty');
+
+        this.model.endDate = '';
+        this.model.endDateInvalidated = false;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.endDateRow.clear());
+
+        return this.checkState();
+    }
+
     async changeIntervalType(val) {
         const type = parseInt(val, 10);
         assert.notEqual(this.model.intervalType, type, `Interval type is already ${type}`);
