@@ -11,7 +11,7 @@ import {
     isValidDateString,
     TestComponent,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
+import { DropDown, LinkMenu } from 'jezvejs-test';
 import {
     correct,
     correctExch,
@@ -813,7 +813,7 @@ export class TransactionForm extends TestComponent {
             const intervalTypeSel = await query('.interval-type-select');
             res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
 
-            res.weekDayOffsetSelect = await DropDown.create(this, await query('.weekday-select'));
+            res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
             res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
             res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
         }
@@ -2027,7 +2027,7 @@ export class TransactionForm extends TestComponent {
         this.model.intervalOffset = offset;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.weekDayOffsetSelect.setSelection(val));
+        await this.performAction(() => this.content.weekDayOffsetSelect.select(val));
 
         return this.checkState();
     }

@@ -6,8 +6,6 @@ import {
     createElement,
     setProps,
     Component,
-    getWeekDays,
-    getWeekdayShort,
     getLongMonthName,
     MONTHS_COUNT,
 } from 'jezvejs';
@@ -18,6 +16,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { Input } from 'jezvejs/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Spinner } from 'jezvejs/Spinner';
+import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 import { createStore } from 'jezvejs/Store';
 
 import {
@@ -641,20 +640,10 @@ export class TransactionForm extends Component {
         });
 
         // Interval offset
-        const weekDayParams = {
-            locales: this.props.locales,
-        };
-        const weekDays = getWeekDays(new Date(), weekDayParams);
-        const weekDaysData = weekDays.map((weekday, id) => ({
-            id,
-            title: getWeekdayShort(weekday, this.props.locales),
-        }));
-
-        this.weekDaySelect = DropDown.create({
+        this.weekDaySelect = WeekDaySelect.create({
             id: 'weekDaySelect',
-            className: 'dd_fullwidth weekday-select',
+            type: 'buttons',
             onChange: (offset) => this.onWeekdayOffsetChanged(offset),
-            data: weekDaysData,
         });
 
         this.monthDaySelect = DropDown.create({
@@ -1066,7 +1055,7 @@ export class TransactionForm extends Component {
     }
 
     onWeekdayOffsetChanged(weekday) {
-        const offset = parseInt(weekday.id, 10);
+        const offset = parseInt(weekday, 10);
         this.store.dispatch(actions.intervalOffsetChange(offset));
         this.notifyChanged();
     }

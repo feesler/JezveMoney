@@ -967,6 +967,11 @@ svg * {
   --link-menu-selected-color: var(--main-text-color);
 }
 
+.link-menu[multiple] {
+  --link-menu-selected-color: var(--accent-color);
+  --link-menu-selected-font-weight: 400;
+}
+
 /* Counters */
 .counters {
   display: flex;
