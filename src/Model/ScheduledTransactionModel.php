@@ -32,8 +32,10 @@ class ScheduledTransactionModel extends CachedTable
     protected $accModel = null;
     protected $currMod = null;
     protected $catModel = null;
+    protected $offsetsModel = null;
     protected $reminderModel = null;
     protected $affectedItems = null;
+    protected $intervalOffsets = false;
     protected $remindersChanged = false;
 
     /**
@@ -50,6 +52,7 @@ class ScheduledTransactionModel extends CachedTable
         $this->accModel = AccountModel::getInstance();
         $this->currMod = CurrencyModel::getInstance();
         $this->catModel = CategoryModel::getInstance();
+        $this->offsetsModel = IntervalOffsetModel::getInstance();
         $this->reminderModel = ReminderModel::getInstance();
         TransactionModel::getInstance();
 
@@ -285,10 +288,14 @@ class ScheduledTransactionModel extends CachedTable
         }
 
         if (isset($params["interval_offset"])) {
-            $res["interval_offset"] = $this->validateIntervalOffset(
-                $params["interval_offset"],
-                $res["interval_type"],
-            );
+            $intervalOffsets = asArray($params["interval_offset"]);
+            $res["interval_offset"] = [];
+            foreach ($intervalOffsets as $offset) {
+                $res["interval_offset"][] = $this->validateIntervalOffset(
+                    $offset,
+                    $res["interval_type"],
+                );
+            }
         }
 
         return $res;
@@ -464,6 +471,8 @@ class ScheduledTransactionModel extends CachedTable
 
             $res = $this->validateParams($item);
 
+            unset($res["interval_offset"]);
+
             $res["start_date"] = date("Y-m-d H:i:s", $item["start_date"]);
             $res["end_date"] = ($item["end_date"]) ? date("Y-m-d H:i:s", $item["end_date"]) : null;
 
@@ -545,6 +554,13 @@ class ScheduledTransactionModel extends CachedTable
     protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
+
+        if (is_null($this->intervalOffsets)) {
+            $this->intervalOffsets = [];
+        }
+        $this->intervalOffsets[] = $res["interval_offset"];
+        unset($res["interval_offset"]);
+
         $res["start_date"] = date("Y-m-d H:i:s", $res["start_date"]);
         $res["end_date"] = ($res["end_date"]) ? date("Y-m-d H:i:s", $res["end_date"]) : null;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -567,11 +583,26 @@ class ScheduledTransactionModel extends CachedTable
         $items = asArray($items);
         $params = $this->getRemindersDateRange(true);
 
-        foreach ($items as $item_id) {
+        foreach ($items as $index => $item_id) {
+            $this->createOffsets($item_id, $this->intervalOffsets[$index]);
             $this->createReminders($item_id, $params);
         }
 
+        $this->intervalOffsets = null;
+
         return true;
+    }
+
+    /**
+     * Returns array of interval offsets for specified item
+     *
+     * @param int $item_id item id
+     *
+     * @return int[]
+     */
+    public function getIntervalOffsets(int $item_id)
+    {
+        return $this->offsetsModel->getOffsetsBySchedule($item_id);
     }
 
     /**
@@ -615,13 +646,11 @@ class ScheduledTransactionModel extends CachedTable
 
         $res = $this->validateParams($params, $item_id);
 
-        $this->remindersChanged = (
-            ($res["start_date"] !== $item->start_date)
-            || (isset($res["end_date"]) && $res["end_date"] !== $item->end_date)
-            || (isset($res["interval_type"]) && $res["interval_type"] !== $item->interval_type)
-            || (isset($res["interval_step"]) && $res["interval_step"] !== $item->interval_step)
-            || (isset($res["interval_offset"]) && $res["interval_offset"] !== $item->interval_offset)
-        );
+        $this->intervalOffsets = $res["interval_offset"] ?? null;
+
+        $this->remindersChanged = $this->isRemindersChanged((array)$item, $res);
+
+        unset($res["interval_offset"]);
 
         $res["start_date"] = date("Y-m-d H:i:s", $res["start_date"]);
         if (isset($res["end_date"])) {
@@ -630,6 +659,43 @@ class ScheduledTransactionModel extends CachedTable
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
+    }
+
+    /**
+     * Compares items and returns true if reminders must be updated
+     *
+     * @param array $item
+     * @param array $params
+     *
+     * @return bool
+     */
+    protected function isRemindersChanged(array $item, array $params)
+    {
+        if (
+            (isset($params["start_date"]) && $params["start_date"] !== $item["start_date"])
+            || (isset($params["end_date"]) && $params["end_date"] !== $item["end_date"])
+            || (isset($params["interval_type"]) && $params["interval_type"] !== $item["interval_type"])
+            || (isset($params["interval_step"]) && $params["interval_step"] !== $item["interval_step"])
+        ) {
+            return true;
+        }
+
+        if (!isset($params["interval_offset"])) {
+            return false;
+        }
+
+        if (count($params["interval_offset"]) !== count($item["interval_offset"])) {
+            return true;
+        }
+
+        $intervalOffset = asArray($params["interval_offset"]);
+        foreach ($intervalOffset as $offset) {
+            if (!in_array($offset, $item["interval_offset"])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -642,6 +708,11 @@ class ScheduledTransactionModel extends CachedTable
     protected function postUpdate(int $item_id)
     {
         $this->cleanCache();
+
+        if (!is_null($this->intervalOffsets)) {
+            $this->updateOffsets($item_id, $this->intervalOffsets);
+        }
+        $this->intervalOffsets = null;
 
         if ($this->remindersChanged) {
             $params = $this->getRemindersDateRange(true);
@@ -667,6 +738,7 @@ class ScheduledTransactionModel extends CachedTable
                 return false;
             }
 
+            $this->deleteOffsets($item_id);
             $this->deleteReminders($item_id);
         }
 
@@ -685,6 +757,7 @@ class ScheduledTransactionModel extends CachedTable
         }
 
         $this->reminderModel->reset();
+        $this->offsetsModel->reset();
 
         $condArr = ["user_id=" . self::$user_id];
         if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
@@ -774,7 +847,7 @@ class ScheduledTransactionModel extends CachedTable
         }
 
         foreach ($items as $item) {
-            $res[] = $item;
+            $res[] = clone $item;
         }
 
         return $res;
@@ -993,6 +1066,74 @@ class ScheduledTransactionModel extends CachedTable
         if (!$updRes) {
             return false;
         }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    /**
+     * Creates interval offsets for specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    protected function createOffsets(int $item_id, mixed $value)
+    {
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+
+        $values = asArray($value);
+
+        $res = [];
+        foreach ($values as $offset) {
+            $monthIndex = intval($offset / 100);
+            $dayIndex = ($offset % 100);
+
+            $offsetItem = [
+                "schedule_id" => $item_id,
+                "month_offset" => $monthIndex,
+                "day_offset" => $dayIndex,
+            ];
+
+            $res[] = $offsetItem;
+        }
+
+        $this->offsetsModel->createMultiple($res);
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    /**
+     * Updates interval offsets of specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     * @param mixed $params
+     *
+     * @return bool
+     */
+    protected function updateOffsets(int $item_id, mixed $params)
+    {
+        $this->deleteOffsets($item_id);
+        return $this->createOffsets($item_id, $params);
+    }
+
+    /**
+     * Removes interval offsets of specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     *
+     * @return bool
+     */
+    protected function deleteOffsets(int $item_id)
+    {
+        $this->offsetsModel->deleteOffsetsBySchedule($item_id);
 
         $this->cleanCache();
 

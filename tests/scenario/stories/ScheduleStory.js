@@ -111,9 +111,13 @@ export class ScheduleStory extends TestStory {
 
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '7' },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekDayOffset', data: [1, 2, 3, 4, 5] },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '8' },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekDayOffset', data: [] },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '9' },
@@ -135,6 +139,10 @@ export class ScheduleStory extends TestStory {
         await Actions.updateAndSubmit(0, [
             { action: 'changeIntervalType', data: INTERVAL_WEEK },
             { action: 'selectWeekDayOffset', data: 2 },
+        ]);
+
+        await Actions.updateAndSubmit(7, [
+            { action: 'selectWeekDayOffset', data: [2, 4, 6] },
         ]);
     }
 

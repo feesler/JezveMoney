@@ -10,6 +10,7 @@ import {
     formatDate,
     isValidDateString,
     TestComponent,
+    asArray,
 } from 'jezve-test';
 import { DropDown, LinkMenu } from 'jezvejs-test';
 import {
@@ -44,6 +45,7 @@ import {
     INTERVAL_NONE,
     INTERVAL_WEEK,
     INTERVAL_YEAR,
+    ScheduledTransaction,
 } from '../../../model/ScheduledTransaction.js';
 
 export const TRANSACTION_FORM = 'transaction';
@@ -182,7 +184,8 @@ export class TransactionForm extends TestComponent {
                     visible: model.intervalType === INTERVAL_WEEK,
                 };
                 if (res.weekDayOffsetSelect.visible) {
-                    res.weekDayOffsetSelect.value = model.intervalOffset.toString();
+                    const offset = asArray(model.intervalOffset).map((item) => item?.toString());
+                    res.weekDayOffsetSelect.value = offset;
                 }
 
                 const dayOffsetIntervals = [INTERVAL_MONTH, INTERVAL_YEAR];
@@ -1118,8 +1121,7 @@ export class TransactionForm extends TestComponent {
             if (res.intervalType === INTERVAL_DAY) {
                 res.intervalOffset = 0;
             } else if (res.intervalType === INTERVAL_WEEK) {
-                const offset = parseInt(cont.weekDayOffsetSelect.value, 10);
-                res.intervalOffset = offset;
+                res.intervalOffset = cont.weekDayOffsetSelect.value;
             } else if (res.intervalType === INTERVAL_MONTH) {
                 const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
                 res.intervalOffset = offset;
@@ -1995,7 +1997,8 @@ export class TransactionForm extends TestComponent {
 
     async changeIntervalType(val) {
         const type = parseInt(val, 10);
-        assert.notEqual(this.model.intervalType, type, `Interval type is already ${type}`);
+        const typeName = ScheduledTransaction.intervalTypes[type];
+        assert.notEqual(this.model.intervalType, type, `Interval type is already '${typeName}'`);
 
         this.model.intervalType = type;
         if (type === INTERVAL_NONE) {
@@ -2021,15 +2024,23 @@ export class TransactionForm extends TestComponent {
         const { intervalType } = this.model;
         assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
 
-        const offset = parseInt(val, 10);
-        assert.notEqual(this.model.intervalOffset, offset, `Weekday offset is already ${offset}`);
+        const weekDays = asArray(val).map((item) => parseInt(item, 10));
+        const currentSelection = asArray(this.model.intervalOffset);
 
-        this.model.intervalOffset = offset;
-        this.expectedState = this.getExpectedState();
+        const itemsToDeselect = currentSelection.filter((item) => !weekDays.includes(item));
+        const itemsToSelect = weekDays.filter((item) => !currentSelection.includes(item));
 
-        await this.performAction(() => this.content.weekDayOffsetSelect.select(val));
+        this.model.intervalOffset = weekDays;
+        const expected = this.getExpectedState();
 
-        return this.checkState();
+        for (const item of itemsToSelect) {
+            await this.performAction(() => this.content.weekDayOffsetSelect.toggle(item));
+        }
+        for (const item of itemsToDeselect) {
+            await this.performAction(() => this.content.weekDayOffsetSelect.toggle(item));
+        }
+
+        return this.checkState(expected);
     }
 
     async selectMonthDayOffset(val) {

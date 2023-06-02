@@ -4,6 +4,7 @@ import {
     assert,
     url,
     navigation,
+    asArray,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { App } from '../Application.js';
@@ -86,7 +87,7 @@ export class ScheduleItemView extends AppView {
             end_date: App.dateStringToSeconds(form.endDate),
             interval_type: parseInt(form.intervalType, 10),
             interval_step: parseInt(form.intervalStep, 10),
-            interval_offset: parseInt(form.intervalOffset, 10),
+            interval_offset: asArray(form.intervalOffset).map((item) => parseInt(item, 10)),
             type: form.type,
             src_amount: this.getExpectedSourceAmount(form),
             dest_amount: this.getExpectedDestAmount(form),

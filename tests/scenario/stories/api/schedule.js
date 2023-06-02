@@ -79,7 +79,7 @@ const create = async () => {
         end_date: App.datesSec.now,
         interval_type: INTERVAL_WEEK,
         interval_step: 1,
-        interval_offset: 2,
+        interval_offset: [1, 2],
     }, {
         type: TRANSFER,
         src_id: ACC_RUB,
@@ -97,11 +97,11 @@ const create = async () => {
         dest_id: ACC_USD,
         src_amount: 6500,
         dest_amount: 100,
-        start_date: App.datesSec.now,
+        start_date: App.datesSec.yearAgo,
         end_date: null,
         interval_type: INTERVAL_MONTH,
         interval_step: 1,
-        interval_offset: 20,
+        interval_offset: [],
     }, {
         type: DEBT,
         src_id: personXAccount.id,

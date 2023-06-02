@@ -1,4 +1,4 @@
-import { isObject } from 'jezvejs';
+import { asArray, isObject } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 import {
     normalize,
@@ -1206,7 +1206,7 @@ const slice = createSlice({
     },
 
     intervalOffsetChange: (state, value) => {
-        const offset = parseInt(value, 10);
+        const offset = asArray(value).map((item) => parseInt(item, 10));
         const newState = {
             ...state,
             form: {

@@ -5,6 +5,7 @@ namespace JezveMoney\App\Item;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use JezveMoney\App\Model\IntervalOffsetModel;
 
 class ScheduledTransactionItem
 {
@@ -23,7 +24,7 @@ class ScheduledTransactionItem
     public $end_date = null;
     public $interval_type = 0;
     public $interval_step = 0;
-    public $interval_offset = 0;
+    public $interval_offset = [];
     public $createdate = 0;
     public $updatedate = 0;
 
@@ -63,11 +64,21 @@ class ScheduledTransactionItem
         $res->end_date = ($row["end_date"]) ? strtotime($row["end_date"]) : null;
         $res->interval_type = intval($row["interval_type"]);
         $res->interval_step = intval($row["interval_step"]);
-        $res->interval_offset = intval($row["interval_offset"]);
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
 
+        $res->loadIntervalOffsets();
+
         return $res;
+    }
+
+    /**
+     * Sets interval offset property of item
+     */
+    public function loadIntervalOffsets()
+    {
+        $offsetsModel = IntervalOffsetModel::getInstance();
+        $this->interval_offset = $offsetsModel->getOffsetsBySchedule($this->id);
     }
 
     /**
@@ -137,30 +148,40 @@ class ScheduledTransactionItem
     }
 
     /**
-     * Returns reminder timestamp for for specified interval of scheduled transaction
+     * Returns reminder timestamp for specified interval of scheduled transaction
      *
      * @param int $timestamp interval timestamp
      *
-     * @return int|null
+     * @return int[]
      */
-    public function getReminderDate(int $timestamp)
+    public function getReminderDates(int $timestamp)
     {
-        $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
-        $offset = $this->interval_offset;
+        $res = [];
 
-        if (
-            $this->interval_type !== INTERVAL_NONE
-            && $offset > 0
-        ) {
-            if ($this->interval_type === INTERVAL_WEEK) {
-                $offset = ($offset === 0) ? 6 : ($offset - 1);
-            }
-
-            $duration = "P" . $offset . "D";
-            $date->add(new DateInterval($duration));
+        $offsets = asArray($this->interval_offset);
+        if (count($offsets) === 0) {
+            $offsets[] = getDateIntervalOffset($this->start_date, $this->interval_type);
         }
 
-        return $date->getTimestamp();
+        foreach ($offsets as $offset) {
+            $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+
+            if (
+                $this->interval_type !== INTERVAL_NONE
+                && $offset > 0
+            ) {
+                if ($this->interval_type === INTERVAL_WEEK) {
+                    $offset = ($offset === 0) ? 6 : ($offset - 1);
+                }
+
+                $duration = "P" . $offset . "D";
+                $date->add(new DateInterval($duration));
+            }
+
+            $res[] = $date->getTimestamp();
+        }
+
+        return $res;
     }
 
     /**
@@ -182,18 +203,19 @@ class ScheduledTransactionItem
 
         $res = [];
         $interval = $this->getInterval($startDate);
+
         while (
             $interval
             && ($limit === 0 || count($res) < $limit)
             && $interval <= $endDate
         ) {
             if ($interval >= $startDate) {
-                $date = $this->getReminderDate($interval);
-                if ($date > $endDate) {
-                    break;
+                $dates = $this->getReminderDates($interval);
+                foreach ($dates as $date) {
+                    if ($date <= $endDate) {
+                        $res[] = $date;
+                    }
                 }
-
-                $res[] = $date;
             }
 
             $interval = $this->getNextInterval($interval);

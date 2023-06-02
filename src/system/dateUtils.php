@@ -128,9 +128,9 @@ function getDateDiff(mixed $itemA, mixed $itemB, int $intervalType)
 }
 
 /**
- * Returns date info object for group start in specified group type
+ * Returns date info object for start of specified interval type
  *
- * @param mixed $dateInfo date info object
+ * @param mixed $dateInfo timestamp or date info object
  * @param int $intervalType date interval type
  *
  * @return array
@@ -161,4 +161,36 @@ function getDateIntervalStart(mixed $dateInfo, int $intervalType)
 
     $timestamp = $date->getTimestamp();
     return getDateInfo($timestamp, $intervalType);
+}
+
+/**
+ * Returns date offset inside of specified interval type
+ *
+ * @param mixed $dateInfo timestamp or date info object
+ * @param int $intervalType date interval type
+ *
+ * @return int
+ */
+function getDateIntervalOffset(mixed $dateInfo, int $intervalType)
+{
+    if ($intervalType !== INTERVAL_NONE && !isset(INTERVAL_DURATION_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
+    }
+
+    $dateInfo = is_int($dateInfo) ? getDateInfo($dateInfo, $intervalType) : $dateInfo;
+    $info = $dateInfo["info"];
+
+    if ($intervalType === INTERVAL_WEEK) {
+        return $info["wday"];
+    }
+
+    if ($intervalType === INTERVAL_MONTH) {
+        return $info["mday"];
+    }
+
+    if ($intervalType === INTERVAL_YEAR) {
+        return ($info["mon"] * 100) + $info["mday"];
+    }
+
+    return 0;
 }

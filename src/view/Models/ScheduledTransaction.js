@@ -1,3 +1,10 @@
+import {
+    DEFAULT_FIRST_DAY_OF_WEEK,
+    asArray,
+    getFirstDayOfWeek,
+    getWeekdayShort,
+    shiftDate,
+} from 'jezvejs';
 import { __ } from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 
@@ -77,8 +84,24 @@ export class ScheduledTransaction extends ListItem {
     }
 
     renderWeekOffset(offset) {
-        const token = weekOffsetTokens[offset];
-        return (token) ? __(token) : '';
+        const intervalOffsets = asArray(offset).sort((a, b) => a - b);
+        if (intervalOffsets.length === 1) {
+            const token = weekOffsetTokens[offset];
+            return (token) ? __(token) : '';
+        }
+
+        const firstDay = getFirstDayOfWeek(new Date(), {
+            locales: window.app.locale,
+            options: { firstDay: DEFAULT_FIRST_DAY_OF_WEEK },
+        });
+        const weekdaysFmt = intervalOffsets.map((item) => (
+            getWeekdayShort(
+                shiftDate(firstDay, item),
+                window.app.locale,
+            )
+        ));
+
+        return weekdaysFmt.join(' ');
     }
 
     renderMonthOffset(offset) {

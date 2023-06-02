@@ -1,4 +1,4 @@
-import { assert, isDate } from 'jezve-test';
+import { asArray, assert, isDate } from 'jezve-test';
 import {
     DEBT,
     EXPENSE,
@@ -11,6 +11,7 @@ import {
     MONTHS_IN_YEAR,
     cutDate,
     getLastDayOfMonth,
+    getWeekdayShort,
     secondsToTime,
     shiftDate,
 } from '../common.js';
@@ -284,8 +285,23 @@ export class ScheduledTransaction {
     }
 
     renderWeekOffset(offset) {
-        const token = weekOffsetTokens[offset];
-        return (token) ? __(token, App.view.locale) : '';
+        const intervalOffsets = asArray(offset).sort((a, b) => a - b);
+        if (intervalOffsets.length === 1) {
+            const token = weekOffsetTokens[offset];
+            return (token) ? __(token, App.view.locale) : '';
+        }
+
+        const date = new Date();
+        const firstDay = shiftDate(date, -date.getDay());
+
+        const weekdaysFmt = intervalOffsets.map((item) => (
+            getWeekdayShort(
+                shiftDate(firstDay, item),
+                App.view.locale,
+            )
+        ));
+
+        return weekdaysFmt.join(' ');
     }
 
     renderMonthOffset(offset) {
@@ -344,9 +360,33 @@ export class ScheduledTransaction {
         return new Date(res);
     }
 
+    getDateIntervalOffset(timestamp, intervalType) {
+        assert(ScheduledTransaction.isValidIntervalType(intervalType), 'Invalid group type');
+
+        const date = isDate(timestamp) ? timestamp : new Date(timestamp);
+
+        if (intervalType === INTERVAL_WEEK) {
+            const weekday = date.getDay();
+            return (weekday === 0) ? 6 : (weekday - 1);
+        }
+        if (intervalType === INTERVAL_MONTH) {
+            return date.getDate();
+        }
+        if (intervalType === INTERVAL_YEAR) {
+            return (date.getMonth() * 100) + date.getDate();
+        }
+
+        return 0;
+    }
+
     getFirstInterval() {
         const time = secondsToTime(this.start_date);
         return this.getIntervalStart(time, this.interval_type);
+    }
+
+    getDefaultIntervalOffset() {
+        const time = secondsToTime(this.start_date);
+        return this.getDateIntervalOffset(time, this.interval_type);
     }
 
     getNextInterval(timestamp) {
@@ -399,22 +439,31 @@ export class ScheduledTransaction {
         return this.getIntervalStart(res, this.interval_type);
     }
 
-    getReminderDate(timestamp) {
-        let res = new Date(cutDate(new Date(timestamp)));
-        let offset = this.interval_offset;
+    getReminderDates(timestamp) {
+        const dayStart = cutDate(new Date(timestamp));
 
-        if (
-            this.interval_type !== INTERVAL_NONE
-            && offset > 0
-        ) {
-            if (this.interval_type === INTERVAL_WEEK) {
-                offset = (offset === 0) ? 6 : (offset - 1);
-            }
-
-            res = shiftDate(res, offset);
+        const offsets = [...asArray(this.interval_offset)];
+        if (offsets.length === 0) {
+            offsets.push(this.getDefaultIntervalOffset());
         }
 
-        return res.getTime();
+        return offsets.map((value) => {
+            let res = new Date(dayStart);
+            let offset = value;
+
+            if (
+                this.interval_type !== INTERVAL_NONE
+                && offset > 0
+            ) {
+                if (this.interval_type === INTERVAL_WEEK) {
+                    offset = (offset === 0) ? 6 : (offset - 1);
+                }
+
+                res = shiftDate(res, offset);
+            }
+
+            return res.getTime();
+        });
     }
 
     getReminders(options = {}) {
@@ -433,12 +482,12 @@ export class ScheduledTransaction {
             && interval <= endDate
         ) {
             if (interval >= startDate) {
-                const date = this.getReminderDate(interval);
-                if (date > endDate) {
-                    break;
-                }
-
-                res.push(date);
+                const dates = this.getReminderDates(interval);
+                dates.forEach((date) => {
+                    if (date <= endDate) {
+                        res.push(date);
+                    }
+                });
             }
 
             interval = this.getNextInterval(interval);

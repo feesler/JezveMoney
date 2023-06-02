@@ -172,6 +172,19 @@ export const getLastDayOfMonth = (date) => (
     ))
 );
 
+function firstUpperCase(str, locales = []) {
+    const first = str.substring(0, 1);
+    const rest = str.substring(1);
+
+    return first.toLocaleUpperCase(locales)
+        .concat(rest.toLocaleLowerCase(locales));
+}
+
+export const getWeekdayShort = (date, locales = []) => {
+    const weekdayName = formatDate(date, { locales, options: { weekday: 'short' } });
+    return firstUpperCase(weekdayName.substr(0, 3), locales);
+};
+
 /** Format specified value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 

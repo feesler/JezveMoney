@@ -242,7 +242,7 @@ export const isScheduledTransaction = (obj) => verifyObject(obj, {
     end_date: (value) => isInt(value) || isNull(value),
     interval_type: isInt,
     interval_step: isInt,
-    interval_offset: isInt,
+    interval_offset: isIntArray,
 }, {
     user_id: isInt,
     createdate: isInt,

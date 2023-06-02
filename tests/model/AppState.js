@@ -2076,11 +2076,15 @@ export class AppState {
             return false;
         }
 
+        const offsets = asArray(params.interval_offset);
+
         if (
-            !ScheduledTransaction.isValidIntervalOffset(
-                params.interval_offset,
-                params.interval_type,
-            )
+            !offsets.every((offset) => (
+                ScheduledTransaction.isValidIntervalOffset(
+                    offset,
+                    params.interval_type,
+                )
+            ))
         ) {
             return false;
         }
@@ -2099,6 +2103,7 @@ export class AppState {
         };
 
         const res = copyFields(itemData, fields);
+        res.interval_offset = asArray(res.interval_offset);
 
         if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
             return res;
@@ -2178,19 +2183,30 @@ export class AppState {
 
         this.schedule.update(expItem);
 
-        const remindersChanged = (
-            origItem.start_date !== expItem.start_date
-            || origItem.end_date !== expItem.end_date
-            || origItem.interval_type !== expItem.interval_type
-            || origItem.interval_step !== expItem.interval_step
-            || origItem.interval_offset !== expItem.interval_offset
-        );
-
+        const remindersChanged = this.isRemindersChanged(origItem, expItem);
         if (remindersChanged && !this.updateReminders(expItem.id)) {
             return false;
         }
 
         return this.returnState(params.returnState);
+    }
+
+    isRemindersChanged(item, params) {
+        if (
+            item.start_date !== params.start_date
+            || item.end_date !== params.end_date
+            || item.interval_type !== params.interval_type
+            || item.interval_step !== params.interval_step
+        ) {
+            return true;
+        }
+
+        const origOffsets = asArray(item.interval_offset);
+        const newOffsets = asArray(params.interval_offset);
+        return (
+            (origOffsets.length !== newOffsets.length)
+            || (origOffsets.some((offset) => !newOffsets.includes(offset)))
+        );
     }
 
     deleteScheduledTransaction(params) {

@@ -643,6 +643,7 @@ export class TransactionForm extends Component {
         this.weekDaySelect = WeekDaySelect.create({
             id: 'weekDaySelect',
             type: 'buttons',
+            multiple: true,
             onChange: (offset) => this.onWeekdayOffsetChanged(offset),
         });
 
@@ -1054,8 +1055,7 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    onWeekdayOffsetChanged(weekday) {
-        const offset = parseInt(weekday, 10);
+    onWeekdayOffsetChanged(offset) {
         this.store.dispatch(actions.intervalOffsetChange(offset));
         this.notifyChanged();
     }

@@ -46,7 +46,8 @@
   flex-flow: row nowrap;
 }
 
-.weekday-select {
+.weekday-select,
+.weekday-select[multiple] {
   --wds-item-size: 2rem;
   --link-menu-border-width: 1px;
   --link-menu-border-color: var(--accent-color);

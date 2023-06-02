@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 30);
+define("DB_VERSION", 31);
 
 /**
  * Database version manager class
@@ -32,6 +32,7 @@ class DBVersion
         "persons",
         "transactions",
         "scheduled_transactions",
+        "interval_offset",
         "reminders",
         "categories",
         "user_settings",
@@ -64,6 +65,7 @@ class DBVersion
             $this->createPersonsTable();
             $this->createTransactionsTable();
             $this->createScheduledTransactionsTable();
+            $this->createIntervalOffsetTable();
             $this->createRemindersTable();
             $this->createCategoriesTable();
             $this->createUsersTable();
@@ -968,6 +970,58 @@ class DBVersion
     }
 
     /**
+     * Creates database version 31
+     *
+     * @return int
+     */
+    private function version31()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $this->createIntervalOffsetTable();
+
+        $tableName = "scheduled_transactions";
+        $offsetsTable = "interval_offset";
+
+        $qResult = $this->dbClient->selectQ(
+            ["id", "user_id", "interval_type", "interval_offset"],
+            $tableName,
+            "interval_offset<>0",
+        );
+        if (!$qResult) {
+            throw new \Error("Failed to real scheduled transactions");
+        }
+
+        $offsets = [];
+        while ($row = $this->dbClient->fetchRow($qResult)) {
+            $offsetItem = [
+                "id" => null,
+                "user_id" => intval($row["user_id"]),
+                "schedule_id" => intval($row["id"]),
+                "month_offset" => intval($row["month_offset"]),
+                "day_offset" => intval($row["day_offset"]),
+            ];
+
+            unset($row);
+
+            $offsets[] = $offsetItem;
+        }
+
+        if (!$this->dbClient->insertMultipleQ($offsetsTable, $offsets)) {
+            throw new \Error("insertMultipleQ failed");
+        }
+
+        $res = $this->dbClient->dropColumns($tableName, ["interval_offset"]);
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        return 31;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1149,11 +1203,41 @@ class DBVersion
                 "comment" => "text NOT NULL",
                 "interval_type" => "INT(11) NOT NULL",
                 "interval_step" => "INT(11) NOT NULL",
-                "interval_offset" => "INT(11) NOT NULL",
                 "start_date" => "DATETIME NOT NULL",
                 "end_date" => "DATETIME NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates scheduled transactions interval offsets table
+     */
+    private function createIntervalOffsetTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "interval_offset";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "schedule_id" => "INT(11) NOT NULL",
+                "month_offset" => "INT(11) NOT NULL",
+                "day_offset" => "INT(11) NOT NULL",
                 "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,
