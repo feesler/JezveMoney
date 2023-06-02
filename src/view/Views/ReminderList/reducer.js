@@ -112,6 +112,14 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
+    changeStateFilter: (state, value) => updateList({
+        ...state,
+        filter: {
+            ...state.filter,
+            state: value,
+        },
+    }),
+
     showMore: (state) => ({
         ...state,
         pagination: {

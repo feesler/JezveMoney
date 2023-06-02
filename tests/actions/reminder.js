@@ -7,6 +7,7 @@ import {
 import { ReminderListView } from '../view/ReminderListView.js';
 import { App } from '../Application.js';
 import { TransactionView } from '../view/TransactionView.js';
+import { Reminder } from '../model/Reminder.js';
 
 /** Navigate to reminders page */
 const checkNavigation = async () => {
@@ -101,6 +102,17 @@ export const toggleSelect = async (transactions) => {
         assert.deepMeet(items, expectedItems);
 
         return true;
+    });
+};
+
+export const filterByState = async ({ state, directNavigate = false }) => {
+    const stateType = parseInt(state, 10);
+    const stateName = Reminder.stateNames[stateType];
+    assert(stateName, 'Invalid reminder state');
+
+    await test(`Filter reminders by state '${stateName}'`, async () => {
+        await checkNavigation();
+        return App.view.filterByState(state, directNavigate);
     });
 };
 

@@ -48,34 +48,19 @@ class Reminders extends ListViewController
             "titleString" => __("APP_NAME") . " | " . __("REMINDERS"),
         ];
 
-        $pagination = [
-            "onPage" => 10,
-            "page" => 1,
-            "pagesCount" => 1,
-            "total" => 0,
-        ];
         $requestDefaults = [
+            "page" => 1,
+            "range" => 1,
             "onPage" => 10,
-            "desc" => true
+            "desc" => true,
         ];
 
-        $request = $requestDefaults;
+        $request = $this->model->getRequestFilters($_GET, $requestDefaults);
 
         // Obtain requested view mode
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
-        }
-
-        $itemsCount = $this->model->getCount();
-        $pagination["total"] = $itemsCount;
-
-        // Build data for paginator
-        if ($request["onPage"] > 0) {
-            $pageCount = ceil($itemsCount / $request["onPage"]);
-            $pagination["pagesCount"] = $pageCount;
-            $page_num = isset($request["page"]) ? intval($request["page"]) : 0;
-            $pagination["page"] = $page_num + 1;
         }
 
         $detailsId = $this->getRequestedItem();
@@ -89,7 +74,8 @@ class Reminders extends ListViewController
             "schedule" => $this->scheduleModel->getData(),
             "reminders" => $this->model->getData(),
             "view" => [
-                "pagination" => $pagination,
+                "filter" => $request["filter"],
+                "pagination" => $request["pagination"],
                 "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
                 "detailsItem" => $this->model->getItem($detailsId),

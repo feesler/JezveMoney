@@ -2,6 +2,11 @@ import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../../actions/reminder.js';
 import * as trActions from '../../actions/transaction.js';
 import { App } from '../../Application.js';
+import {
+    REMINDER_CANCELLED,
+    REMINDER_CONFIRMED,
+    REMINDER_SCHEDULED,
+} from '../../model/Reminder.js';
 
 export class RemindersStory extends TestStory {
     async beforeRun() {
@@ -20,7 +25,7 @@ export class RemindersStory extends TestStory {
     }
 
     async run() {
-        setBlock('Schedule', 1);
+        setBlock('Reminders', 1);
 
         await this.list();
         await this.confirm();
@@ -28,6 +33,7 @@ export class RemindersStory extends TestStory {
         await this.confirmFromContextMenu();
         await this.cancelFromContextMenu();
         await this.updateAndConfirm();
+        await this.filters();
     }
 
     async list() {
@@ -135,5 +141,15 @@ export class RemindersStory extends TestStory {
         await Actions.showMore();
         await Actions.goToFirstPage();
         await Actions.showMore();
+    }
+
+    async filters() {
+        setBlock('Filter reminders', 1);
+
+        await Actions.filterByState({ state: REMINDER_CONFIRMED });
+        await Actions.filterByState({ state: REMINDER_CANCELLED });
+        await Actions.filterByState({ state: REMINDER_CANCELLED, directNavigate: true });
+        await Actions.filterByState({ state: REMINDER_CONFIRMED, directNavigate: true });
+        await Actions.filterByState({ state: REMINDER_SCHEDULED });
     }
 }

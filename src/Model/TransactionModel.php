@@ -1635,11 +1635,7 @@ class TransactionModel extends SortableModel
         // Type filter
         $typeFilter = [];
         if (isset($request["type"])) {
-            $typeReq = $request["type"];
-            if (!is_array($typeReq)) {
-                $typeReq = [$typeReq];
-            }
-
+            $typeReq = asArray($request["type"]);
             foreach ($typeReq as $type_str) {
                 $type_id = intval($type_str);
                 if (!$type_id) {
@@ -1677,10 +1673,7 @@ class TransactionModel extends SortableModel
         $personModel = PersonModel::getInstance();
         $personFilter = [];
         if (isset($request["person_id"])) {
-            $personsReq = $request["person_id"];
-            if (!is_array($personsReq)) {
-                $personsReq = [$personsReq];
-            }
+            $personsReq = asArray($request["person_id"]);
             foreach ($personsReq as $person_id) {
                 if ($personModel->isExist($person_id)) {
                     $personFilter[] = intval($person_id);

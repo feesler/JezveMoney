@@ -13,6 +13,22 @@
                         </header>
 
                         <header id="contentHeader" class="content-header">
+                            <aside id="filtersContainer" class="filters-container">
+                                <header class="filters-heading">
+                                    <span class="filters-heading__title"><?= __("FILTERS") ?></span>
+                                </header>
+
+                                <hr class="filters-separator">
+
+                                <div class="filters-list">
+                                    <div class="filters-row">
+                                        <section id="stateFilter" class="filter-item trans-type-filter">
+                                            <header class="filter-item__title"><?= __("FILTER_STATE") ?></header>
+                                        </section>
+                                    </div>
+                                </div>
+                            </aside>
+
                             <header class="list-header">
                                 <div class="counters">
                                     <div id="itemsCounter" class="counter">

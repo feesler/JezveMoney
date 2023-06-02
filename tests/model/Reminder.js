@@ -36,6 +36,12 @@ export class Reminder {
         REMINDER_CANCELLED,
     ];
 
+    static stateNames = {
+        [REMINDER_SCHEDULED]: 'scheduled',
+        [REMINDER_CONFIRMED]: 'confirmed',
+        [REMINDER_CANCELLED]: 'cancelled',
+    };
+
     static isValidState(value) {
         const state = parseInt(value, 10);
         return this.availStates.includes(state);

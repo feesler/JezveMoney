@@ -32,6 +32,18 @@ export const REMINDER_CANCELLED = 3;
  * Scheduled transaction reminder class
  */
 export class Reminder extends ListItem {
+    static stateTypes = [
+        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'REMINDER_STATE_SCHEDULED' },
+        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'REMINDER_STATE_CONFIRMED' },
+        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'REMINDER_STATE_CANCELLED' },
+    ];
+
+    static getStateName(stateType) {
+        const type = parseInt(stateType, 10);
+        const state = this.stateTypes.find((item) => item.id === type);
+        return state?.name ?? null;
+    }
+
     /**
      * Creates new extended reminder
      *

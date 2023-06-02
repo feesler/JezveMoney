@@ -7,6 +7,7 @@ import {
 } from 'jezvejs';
 
 import { Button } from 'jezvejs/Button';
+import { LinkMenu } from 'jezvejs/LinkMenu';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Paginator } from 'jezvejs/Paginator';
@@ -26,10 +27,12 @@ import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Schedule } from '../../Models/Schedule.js';
+import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -37,17 +40,13 @@ import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js
 import {
     actions,
     reducer,
-    createList,
     updateList,
 } from './reducer.js';
 import './ReminderListView.scss';
-import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
 
 /* CSS classes */
 const LIST_CLASS = 'reminder-list';
 const SELECT_MODE_CLASS = 'reminder-list_select';
-
-const SHOW_ON_PAGE = 10;
 
 /**
  * Scheduled transaction reminders list view
@@ -63,21 +62,8 @@ class ReminderListView extends View {
         window.app.loadModel(Schedule, 'schedule', window.app.props.schedule);
         window.app.loadModel(ReminderList, 'reminders', window.app.props.reminders);
 
-        const filter = {
-            state: [REMINDER_SCHEDULED],
-        };
-
-        const initialState = {
+        const initialState = updateList({
             ...this.props,
-            items: createList(window.app.model.reminders, { filter }),
-            filter,
-            pagination: {
-                onPage: SHOW_ON_PAGE,
-                page: 1,
-                range: 1,
-                pagesCount: 0,
-                total: 0,
-            },
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
@@ -85,8 +71,7 @@ class ReminderListView extends View {
             showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
-        };
-        updateList(initialState);
+        });
 
         this.store = createStore(reducer, { initialState });
     }
@@ -97,6 +82,8 @@ class ReminderListView extends View {
     onStart() {
         this.loadElementsByIds([
             'contentHeader',
+            'filtersContainer',
+            'stateFilter',
             'itemsCount',
             'selectedCounter',
             'selItemsCount',
@@ -107,6 +94,32 @@ class ReminderListView extends View {
         this.heading = Heading.fromElement(this.heading, {
             title: __('REMINDERS'),
         });
+
+        // Filters
+        this.filtersBtn = Button.create({
+            id: 'filtersBtn',
+            className: 'circle-btn',
+            icon: 'filter',
+            onClick: () => this.filters.toggle(),
+        });
+        this.heading.actionsContainer.prepend(this.filtersBtn.elem);
+
+        // State filter
+        this.stateMenu = LinkMenu.create({
+            id: 'stateMenu',
+            itemParam: 'state',
+            items: Reminder.stateTypes.map((stateType) => ({
+                value: stateType.id,
+                title: __(stateType.token),
+            })),
+            onChange: (value) => this.onSelectStateType(value),
+        });
+        this.stateFilter.append(this.stateMenu.elem);
+
+        this.filters = FiltersContainer.create({
+            content: this.filtersContainer,
+        });
+        this.contentHeader.prepend(this.filters.elem);
 
         // Scheduled transaction reminder details
         this.itemInfo = Offcanvas.create({
@@ -283,6 +296,14 @@ class ReminderListView extends View {
 
     hideMenu() {
         this.store.dispatch(actions.hideMenu());
+    }
+
+    /**
+     * Reminder state filter change callback
+     * @param {string} value - selected state types
+     */
+    onSelectStateType(value) {
+        this.store.dispatch(actions.changeStateFilter(value));
     }
 
     onMenuClick(item) {
@@ -604,10 +625,19 @@ class ReminderListView extends View {
     }
 
     /** Returns URL for specified state */
-    getURL(state) {
+    getURL(state, keepPage = true) {
         const { baseURL } = window.app;
+        const { filter } = state;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         const res = new URL(`${baseURL}reminders/${itemPart}`);
+
+        if (filter.state !== REMINDER_SCHEDULED) {
+            res.searchParams.set('state', Reminder.getStateName(filter.state));
+        }
+
+        if (keepPage) {
+            res.searchParams.set('page', state.pagination.page);
+        }
 
         if (state.mode === 'details') {
             res.searchParams.set('mode', 'details');
@@ -635,7 +665,7 @@ class ReminderListView extends View {
         if (
             state.detailsId === prevState?.detailsId
             && state.mode === prevState?.mode
-            && state.page === prevState?.page
+            && state.pagination?.page === prevState?.pagination?.page
         ) {
             return;
         }
@@ -645,9 +675,23 @@ class ReminderListView extends View {
         window.history.replaceState({}, pageTitle, url);
     }
 
+    renderFilters(state, prevState) {
+        if (
+            state.filter === prevState?.filter
+        ) {
+            return;
+        }
+
+        const filterUrl = this.getURL(state, false);
+
+        this.stateMenu.setURL(filterUrl);
+        this.stateMenu.setSelection(state.filter.state);
+    }
+
     renderList(state, prevState) {
         if (
             state.items === prevState?.items
+            && state.filter === prevState?.filter
             && state.mode === prevState?.mode
             && state.listMode === prevState?.listMode
             && state.pagination.page === prevState?.pagination?.page
@@ -728,6 +772,7 @@ class ReminderListView extends View {
             url: modeURL.toString(),
         }));
 
+        this.renderFilters(state, prevState);
         this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);

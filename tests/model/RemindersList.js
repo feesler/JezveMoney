@@ -102,6 +102,10 @@ export class RemindersList extends List {
         return Math.max(Math.ceil(list.length / onPage), 1);
     }
 
+    expectedPages(limit) {
+        return this.getExpectedPages(this.data, limit);
+    }
+
     getItemsPage(list, num, limit, range, desc = false) {
         const onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
         const pagesRange = (typeof range !== 'undefined') ? range : 1;

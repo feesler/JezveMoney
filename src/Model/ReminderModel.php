@@ -27,10 +27,35 @@ class ReminderModel extends CachedTable
         REMINDER_CANCELLED,
     ];
 
+    public static $stateNames = [
+        REMINDER_SCHEDULED => "scheduled",
+        REMINDER_CONFIRMED => "confirmed",
+        REMINDER_CANCELLED => "cancelled",
+    ];
+
     protected static $user_id = 0;
     protected static $owner_id = 0;
 
     protected $tbl_name = "reminders";
+
+    /**
+     * Returns state type for specified name
+     *
+     * @param string $name state name
+     *
+     * @return int|false
+     */
+    public static function getStateTypeByName(string $name)
+    {
+        $lname = strtolower($name);
+        foreach (self::$stateNames as $stateType => $stateName) {
+            if ($lname == strtolower($stateName)) {
+                return $stateType;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Model initialization
@@ -251,6 +276,82 @@ class ReminderModel extends CachedTable
         $this->cleanCache();
 
         return true;
+    }
+
+    /**
+     * Converts request object to reminders request parameters
+     *
+     * @param array $request
+     * @param array $defaults array of default filter values
+     * @param bool $throw if true then throws on error
+     *
+     * @return array
+     */
+    public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
+    {
+        $request = array_merge($defaults, $request);
+
+        $filter = [];
+        $pagination = [];
+
+        // State type
+        if (isset($request["state"])) {
+            $requestedState = $request["state"];
+            $stateType = intval($requestedState);
+            if (!$stateType) {
+                $stateType = self::getStateTypeByName($requestedState);
+            }
+            if (!$stateType && $throw) {
+                throw new \Error("Invalid state type '$requestedState'");
+            }
+
+            $filter["state"] = $stateType;
+        } else {
+            $filter["state"] = REMINDER_SCHEDULED;
+        }
+
+        // Page
+        if (isset($request["page"])) {
+            $page = intval($request["page"]);
+            if ($page > 0) {
+                $pagination["page"] = $page;
+            }
+        }
+
+        // Limit
+        if (isset($request["onPage"])) {
+            $onPage = intval($request["onPage"]);
+            if ($onPage < 0 && $throw) {
+                throw new \Error("Invalid page limit");
+            }
+            if ($onPage > 0) {
+                $pagination["onPage"] = $onPage;
+            }
+        }
+
+        // Pages range
+        if (isset($request["range"])) {
+            $range = intval($request["range"]);
+            if ($range > 0) {
+                $pagination["range"] = $range;
+            }
+        }
+
+        $itemsCount = $this->getCount();
+        $pagination["total"] = $itemsCount;
+
+        // Pagination
+        if (isset($pagination["onPage"]) && $pagination["onPage"] > 0) {
+            $pagesCount = ceil($itemsCount / $pagination["onPage"]);
+            $pagination["pagesCount"] = $pagesCount;
+            $page = $pagination["page"] ?? 1;
+            $pagination["page"] = min($pagesCount, $page);
+        }
+
+        return [
+            "filter" => $filter,
+            "pagination" => $pagination,
+        ];
     }
 
     /**

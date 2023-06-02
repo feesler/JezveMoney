@@ -769,7 +769,6 @@ class ScheduledTransactionModel extends CachedTable
         return true;
     }
 
-
     /**
      * Converts request object to transaction request parameters
      *
