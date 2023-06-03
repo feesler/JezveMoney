@@ -935,13 +935,21 @@ class DBVersion
         if (!$this->dbClient) {
             throw new \Error("Invalid DB client");
         }
+
         $tableName = "user_settings";
-        $res = $this->dbClient->addColumns(
-            $tableName,
-            ["tz_offset" => "INT(11) NOT NULL DEFAULT 0"],
-        );
-        if (!$res) {
-            throw new \Error("Failed to update table '$tableName'");
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
+        if (!isset($columns["tz_offset"])) {
+            $res = $this->dbClient->addColumns(
+                $tableName,
+                ["tz_offset" => "INT(11) NOT NULL DEFAULT 0"],
+            );
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
         }
 
         return 29;
@@ -957,13 +965,21 @@ class DBVersion
         if (!$this->dbClient) {
             throw new \Error("Invalid DB client");
         }
+
         $tableName = "users";
-        $res = $this->dbClient->addColumns(
-            $tableName,
-            ["reminders_date" => "DATETIME NULL"],
-        );
-        if (!$res) {
-            throw new \Error("Failed to update table '$tableName'");
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
+        if (!isset($columns["reminders_date"])) {
+            $res = $this->dbClient->addColumns(
+                $tableName,
+                ["reminders_date" => "DATETIME NULL"],
+            );
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
         }
 
         return 30;
@@ -983,39 +999,56 @@ class DBVersion
         $this->createIntervalOffsetTable();
 
         $tableName = "scheduled_transactions";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
         $offsetsTable = "interval_offset";
+        if (isset($columns["interval_offset"])) {
+            $qResult = $this->dbClient->selectQ(
+                ["id", "user_id", "interval_type", "interval_offset"],
+                $tableName,
+                "interval_offset<>0",
+            );
+            if (!$qResult) {
+                throw new \Error("Failed to real scheduled transactions");
+            }
 
-        $qResult = $this->dbClient->selectQ(
-            ["id", "user_id", "interval_type", "interval_offset"],
-            $tableName,
-            "interval_offset<>0",
-        );
-        if (!$qResult) {
-            throw new \Error("Failed to real scheduled transactions");
-        }
+            $offsets = [];
+            while ($row = $this->dbClient->fetchRow($qResult)) {
+                $intervalType = intval($row["interval_type"]);
+                $intervalOffset = intval($row["interval_offset"]);
 
-        $offsets = [];
-        while ($row = $this->dbClient->fetchRow($qResult)) {
-            $offsetItem = [
-                "id" => null,
-                "user_id" => intval($row["user_id"]),
-                "schedule_id" => intval($row["id"]),
-                "month_offset" => intval($row["month_offset"]),
-                "day_offset" => intval($row["day_offset"]),
-            ];
+                if ($intervalType === INTERVAL_YEAR) {
+                    $monthIndex = intval($intervalOffset / 100);
+                    $dayindex = $intervalOffset % 100;
+                } else {
+                    $monthIndex = 0;
+                    $dayindex = $intervalOffset;
+                }
 
-            unset($row);
+                $offsetItem = [
+                    "id" => null,
+                    "user_id" => intval($row["user_id"]),
+                    "schedule_id" => intval($row["id"]),
+                    "month_offset" => $monthIndex,
+                    "day_offset" => $dayindex,
+                ];
 
-            $offsets[] = $offsetItem;
-        }
+                unset($row);
 
-        if (!$this->dbClient->insertMultipleQ($offsetsTable, $offsets)) {
-            throw new \Error("insertMultipleQ failed");
-        }
+                $offsets[] = $offsetItem;
+            }
 
-        $res = $this->dbClient->dropColumns($tableName, ["interval_offset"]);
-        if (!$res) {
-            throw new \Error("Failed to update table '$tableName'");
+            if (!$this->dbClient->insertMultipleQ($offsetsTable, $offsets)) {
+                throw new \Error("insertMultipleQ failed");
+            }
+
+            $res = $this->dbClient->dropColumns($tableName, ["interval_offset"]);
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
         }
 
         return 31;
