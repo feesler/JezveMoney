@@ -1132,34 +1132,21 @@ const slice = createSlice({
         },
     }),
 
-    startDateChange: (state, value) => ({
+    scheduleRangeChange: (state, range) => ({
         ...state,
         transaction: {
             ...state.transaction,
-            start_date: dateStringToTime(value),
+            start_date: dateStringToTime(range.stdate),
+            end_date: (range.enddate) ? dateStringToTime(range.enddate) : null,
         },
         form: {
             ...state.form,
-            startDate: value,
+            startDate: range.stdate,
+            endDate: range.enddate ?? '',
         },
         validation: {
             ...state.validation,
             startDate: true,
-        },
-    }),
-
-    endDateChange: (state, value) => ({
-        ...state,
-        transaction: {
-            ...state.transaction,
-            end_date: (value) ? dateStringToTime(value) : null,
-        },
-        form: {
-            ...state.form,
-            endDate: value ?? '',
-        },
-        validation: {
-            ...state.validation,
             endDate: true,
         },
     }),

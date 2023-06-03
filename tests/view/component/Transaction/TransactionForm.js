@@ -47,6 +47,7 @@ import {
     INTERVAL_YEAR,
     ScheduledTransaction,
 } from '../../../model/ScheduledTransaction.js';
+import { DatePickerFilter } from '../DatePickerFilter.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';
@@ -161,15 +162,13 @@ export class TransactionForm extends TestComponent {
                     isInvalid: model.dateInvalidated,
                 };
             } else if (isScheduleItemForm) {
-                res.startDateRow = {
+                res.dateRangeInput = {
                     visible: true,
-                    value: App.reformatDate(model.startDate),
-                    isInvalid: model.startDateInvalidated,
-                };
-                res.endDateRow = {
-                    visible: model.intervalType !== INTERVAL_NONE,
-                    value: App.reformatDate(model.endDate),
-                    isInvalid: model.endDateInvalidated,
+                    value: {
+                        startDate: App.reformatDate(model.startDate),
+                        endDate: App.reformatDate(model.endDate),
+                    },
+                    invalidated: model.dateRangeInvalidated,
                 };
                 res.intervalStepRow = {
                     visible: model.intervalType !== INTERVAL_NONE,
@@ -810,8 +809,7 @@ export class TransactionForm extends TestComponent {
         if (this.isTransactionForm()) {
             res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
         } else if (this.isScheduleItemForm()) {
-            res.startDateRow = await DatePickerRow.create(this, await query('#startDateRow'));
-            res.endDateRow = await DatePickerRow.create(this, await query('#endDateRow'));
+            res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
             res.intervalStepRow = await InputRow.create(this, await query('#intervalStepRow'));
             const intervalTypeSel = await query('.interval-type-select');
             res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
@@ -1109,11 +1107,9 @@ export class TransactionForm extends TestComponent {
             res.date = cont.datePicker.value;
             res.dateInvalidated = cont.datePicker.isInvalid;
         } else if (this.isScheduleItemForm()) {
-            res.startDate = cont.startDateRow.value;
-            res.startDateInvalidated = cont.startDateRow.isInvalid;
-
-            res.endDate = cont.endDateRow.value;
-            res.endDateInvalidated = cont.endDateRow.isInvalid;
+            res.startDate = cont.dateRangeInput.value.startDate;
+            res.endDate = cont.dateRangeInput.value.endDate;
+            res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
 
             res.intervalStep = cont.intervalStepRow.value;
             res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
@@ -1914,8 +1910,7 @@ export class TransactionForm extends TestComponent {
             const startDateValid = this.isValidDate(startDate);
             const endDateValid = !endDate || this.isValidDate(endDate);
 
-            this.model.startDateInvalidated = !startDateValid;
-            this.model.endDateInvalidated = !endDateValid;
+            this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
 
             isValid = isValid && startDateValid && endDateValid;
         }
@@ -1939,10 +1934,10 @@ export class TransactionForm extends TestComponent {
 
     async inputStartDate(val) {
         this.model.startDate = val.toString();
-        this.model.startDateInvalidated = false;
+        this.model.dateRangeInvalidated = false;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.startDateRow.input(val));
+        await this.performAction(() => this.content.dateRangeInput.inputStart(val));
 
         return this.checkState();
     }
@@ -1952,20 +1947,20 @@ export class TransactionForm extends TestComponent {
 
         const locales = this.appState().getDateFormatLocale();
         this.model.startDate = formatDate(val, { locales, options: App.dateFormatOptions });
-        this.model.startDateInvalidated = false;
+        this.model.dateRangeInvalidated = false;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.startDateRow.selectDate(val));
+        await this.performAction(() => this.content.dateRangeInput.selectStart(val));
 
         return this.checkState();
     }
 
     async inputEndDate(val) {
         this.model.endDate = val.toString();
-        this.model.endDateInvalidated = false;
+        this.model.dateRangeInvalidated = false;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.endDateRow.input(val));
+        await this.performAction(() => this.content.dateRangeInput.inputEnd(val));
 
         return this.checkState();
     }
@@ -1975,10 +1970,10 @@ export class TransactionForm extends TestComponent {
 
         const locales = this.appState().getDateFormatLocale();
         this.model.endDate = formatDate(val, { locales, options: App.dateFormatOptions });
-        this.model.endDateInvalidated = false;
+        this.model.dateRangeInvalidated = false;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.endDateRow.selectDate(val));
+        await this.performAction(() => this.content.dateRangeInput.selectEnd(val));
 
         return this.checkState();
     }
@@ -1987,10 +1982,10 @@ export class TransactionForm extends TestComponent {
         assert(this.model.endDate.length > 0, 'End date field is already empty');
 
         this.model.endDate = '';
-        this.model.endDateInvalidated = false;
+        this.model.dateRangeInvalidated = false;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.endDateRow.clear());
+        await this.performAction(() => this.content.dateRangeInput.clearEnd());
 
         return this.checkState();
     }

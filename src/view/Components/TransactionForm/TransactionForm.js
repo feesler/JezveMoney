@@ -47,6 +47,7 @@ import { AccountTile } from '../AccountTile/AccountTile.js';
 import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../CategorySelect/CategorySelect.js';
 import { DateInputField } from '../DateInputField/DateInputField.js';
+import { DateRangeInput } from '../DateRangeInput/DateRangeInput.js';
 import { Field } from '../Field/Field.js';
 import { Tile } from '../Tile/Tile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
@@ -567,30 +568,21 @@ export class TransactionForm extends Component {
 
     /** Creates schedule fields */
     createScheduleFields() {
-        // Start date field
-        this.startDateRow = DateInputField.create({
-            id: 'startDateRow',
-            title: __('SCHED_TR_START_DATE'),
-            feedbackMessage: __('TR_INVALID_DATE'),
-            className: 'form-row',
-            locales: window.app.dateFormatLocale,
-            validate: true,
-            onInput: (e) => this.onStartDateInput(e),
-            onDateSelect: (e) => this.onStartDateSelect(e),
+        // Date range field
+        this.dateRangeInput = DateRangeInput.create({
+            id: 'dateRangeInput',
+            startPlaceholder: __('DATE_RANGE_FROM'),
+            endPlaceholder: __('DATE_RANGE_TO'),
+            startClearable: false,
+            onChange: (range) => this.onScheduleRangeChange(range),
         });
 
-        // End date field
-        this.endDateRow = DateInputField.create({
-            id: 'endDateRow',
-            title: __('SCHED_TR_END_DATE'),
-            feedbackMessage: __('TR_INVALID_DATE'),
+        this.dateRangeField = Field.create({
+            id: 'dateRangeField',
+            htmlFor: 'dateRangeInput',
+            title: __('FILTER_DATE_RANGE'),
             className: 'form-row',
-            locales: window.app.dateFormatLocale,
-            validate: true,
-            clearButton: true,
-            onInput: (e) => this.onEndDateInput(e),
-            onDateSelect: (e) => this.onEndDateSelect(e),
-            onClear: (e) => this.onEndDateClear(e),
+            content: this.dateRangeInput.elem,
         });
 
         // Interval step field
@@ -682,8 +674,7 @@ export class TransactionForm extends Component {
         });
 
         return [
-            this.startDateRow.elem,
-            this.endDateRow.elem,
+            this.dateRangeField.elem,
             intervalGroup,
             this.intervalOffsetRow.elem,
         ];
@@ -1014,42 +1005,11 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    onStartDateInput(e) {
-        this.store.dispatch(actions.startDateChange(e.target.value));
-        this.notifyChanged();
-    }
-
     /**
-     * Start date select callback
-     * @param {Date} date - selected date object
+     * Schedule date range change callback
      */
-    onStartDateSelect(date) {
-        this.store.dispatch(actions.startDateChange(window.app.formatInputDate(date)));
-        this.startDateRow.datePicker.hide();
-        this.notifyChanged();
-    }
-
-    onEndDateInput(e) {
-        this.store.dispatch(actions.endDateChange(e.target.value));
-        this.notifyChanged();
-    }
-
-    /**
-     * End date select callback
-     * @param {Date} date - selected date object
-     */
-    onEndDateSelect(date) {
-        this.store.dispatch(actions.endDateChange(window.app.formatInputDate(date)));
-        this.endDateRow.datePicker.hide();
-        this.notifyChanged();
-    }
-
-    /**
-     * End date clear callback
-     */
-    onEndDateClear() {
-        this.store.dispatch(actions.endDateChange(null));
-        this.endDateRow.datePicker.hide();
+    onScheduleRangeChange(range) {
+        this.store.dispatch(actions.scheduleRangeChange(range));
         this.notifyChanged();
     }
 
@@ -1716,30 +1676,40 @@ export class TransactionForm extends Component {
         this.destAmountRow.enableSelect(false);
     }
 
-    renderScheduleFields(state) {
+    renderScheduleFields(state, prevState) {
         if (state?.type !== 'scheduleItem') {
             return;
         }
 
-        const { transaction, form } = state;
+        const { transaction, form, validation } = state;
 
-        // Start date field
-        this.startDateRow.setState((fieldState) => ({
-            ...fieldState,
-            value: form.startDate,
-            date: transaction.start_date,
-            disabled: state.submitStarted,
-            valid: state.validation.startDate,
-        }));
-
-        // End date field
-        this.endDateRow.setState((fieldState) => ({
-            ...fieldState,
-            value: form.endDate,
-            date: transaction.end_date,
-            disabled: state.submitStarted,
-            valid: state.validation.endDate,
-        }));
+        // Date range field
+        if (
+            (form.startDate !== prevState?.form?.startDate)
+            || (form.endDate !== prevState?.form?.endDate)
+            || (validation.startDate !== prevState?.validation?.startDate)
+            || (validation.endDate !== prevState?.validation?.endDate)
+        ) {
+            this.dateRangeInput.setState((rangeState) => ({
+                ...rangeState,
+                form: {
+                    ...rangeState.form,
+                    stdate: form.startDate,
+                    enddate: form.endDate,
+                },
+                filter: {
+                    ...rangeState.filter,
+                    stdate: transaction.start_date,
+                    enddate: transaction.end_date,
+                },
+                validation: {
+                    ...state.validation,
+                    startDate: validation.startDate,
+                    endDate: validation.endDate,
+                    valid: (validation.startDate && validation.endDate),
+                },
+            }));
+        }
 
         // Interval step field
         this.intervalStepInput.value = form.intervalStep;
@@ -1751,7 +1721,6 @@ export class TransactionForm extends Component {
 
         // Interval offset field
         if (form.intervalType === INTERVAL_NONE) {
-            this.endDateRow.hide();
             this.intervalStepRow.hide();
             this.intervalOffsetRow.hide();
         } else if (form.intervalType === INTERVAL_DAY) {
@@ -1863,8 +1832,7 @@ export class TransactionForm extends Component {
         }
 
         if (isScheduleItem) {
-            this.startDateRow.show(state.isAvailable);
-            this.endDateRow.show(state.isAvailable);
+            this.dateRangeField.show(state.isAvailable);
             this.intervalStepRow.show(state.isAvailable);
             this.intervalTypeRow.show(state.isAvailable);
             this.intervalOffsetRow.show(state.isAvailable);
@@ -2028,7 +1996,7 @@ export class TransactionForm extends Component {
 
         // Schedule fields
         if (isScheduleItem) {
-            this.renderScheduleFields(state);
+            this.renderScheduleFields(state, prevState);
         }
 
         // Controls
