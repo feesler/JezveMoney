@@ -1,5 +1,4 @@
 import {
-    copyObject,
     TestComponent,
     assert,
     query,
@@ -62,7 +61,7 @@ export class ImportRuleForm extends TestComponent {
     }
 
     static getExpectedState(model) {
-        const localModel = copyObject(model);
+        const localModel = structuredClone(model);
 
         const res = {
             conditionsList: { visible: true },
@@ -214,10 +213,10 @@ export class ImportRuleForm extends TestComponent {
     buildModel(cont) {
         const res = {
             conditions: cont.conditionsList.items.map(
-                (item) => copyObject(item.model),
+                (item) => structuredClone(item.model),
             ),
             actions: cont.actionsList.items.map(
-                (item) => copyObject(item.model),
+                (item) => structuredClone(item.model),
             ),
             feedbackVisible: cont.feedbackElem.visible,
         };

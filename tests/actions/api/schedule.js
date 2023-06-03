@@ -1,7 +1,6 @@
 import {
     test,
     assert,
-    copyObject,
 } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
@@ -17,7 +16,7 @@ export const create = async (params) => {
     let itemId = 0;
 
     const typeStr = Transaction.typeToString(params.type);
-    const titleParams = copyObject(params);
+    const titleParams = structuredClone(params);
     delete titleParams.type;
 
     await test(`Create scheduled transaction ${typeStr} (${formatProps(titleParams)})`, async () => {
@@ -115,7 +114,7 @@ export const update = async (params) => {
         const resExpected = App.state.updateScheduledTransaction(params);
 
         const item = App.state.schedule.getItem(params.id);
-        const updParams = (item) ? copyObject(item) : {};
+        const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, params);
 
         const reqParams = App.state.prepareChainedRequestData(updParams);

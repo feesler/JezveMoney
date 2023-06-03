@@ -1,7 +1,6 @@
 import {
     isObject,
     isInt,
-    copyObject,
     assert,
     asArray,
 } from 'jezve-test';
@@ -89,7 +88,7 @@ function copyFields(fields, expFields) {
     const res = {};
     expFields.forEach((f) => {
         if (f in fields) {
-            res[f] = copyObject(fields[f]);
+            res[f] = structuredClone(fields[f]);
         }
     });
 
@@ -119,7 +118,7 @@ export class AppState {
     }
 
     setState(state) {
-        this.profile = copyObject(state.profile);
+        this.profile = structuredClone(state.profile);
 
         if (!this.accounts) {
             this.accounts = AccountsList.create();
@@ -208,7 +207,7 @@ export class AppState {
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
         res.userCurrencies = this.userCurrencies.clone();
-        res.profile = copyObject(this.profile);
+        res.profile = structuredClone(this.profile);
 
         return res;
     }
@@ -266,7 +265,7 @@ export class AppState {
      * Profile
      */
     setUserProfile(profile) {
-        this.profile = copyObject(profile);
+        this.profile = structuredClone(profile);
         if (this.profile.password) {
             delete this.profile.password;
         }
@@ -450,7 +449,7 @@ export class AppState {
 
     getImportTemplates() {
         const res = {
-            data: copyObject(this.templates.data),
+            data: structuredClone(this.templates.data),
         };
 
         return res;
@@ -481,7 +480,7 @@ export class AppState {
     }
 
     getProfile() {
-        return copyObject(this.profile);
+        return structuredClone(this.profile);
     }
 
     getTransactions(options = {}) {
@@ -547,7 +546,7 @@ export class AppState {
 
     getScheduledTransactions() {
         return {
-            data: copyObject(this.schedule.data),
+            data: structuredClone(this.schedule.data),
         };
     }
 
@@ -695,7 +694,7 @@ export class AppState {
         }
 
         // Prepare expected item object
-        const expectedItem = copyObject(original);
+        const expectedItem = structuredClone(original);
         const data = copyFields(params, UserCurrency.availProps);
         Object.assign(expectedItem, data);
 
@@ -823,7 +822,7 @@ export class AppState {
         }
 
         // Prepare expected account object
-        const expAccount = copyObject(origAcc);
+        const expAccount = structuredClone(origAcc);
         const data = copyFields(params, Account.availProps);
         data.owner_id = this.profile.owner_id;
         Object.assign(expAccount, data);
@@ -1084,7 +1083,7 @@ export class AppState {
             return false;
         }
 
-        const expPerson = copyObject(origPerson);
+        const expPerson = structuredClone(origPerson);
         const data = copyFields(params, Person.availProps);
         Object.assign(expPerson, data);
 
@@ -1191,7 +1190,7 @@ export class AppState {
             (item) => item.owner_id === pId && item.curr_id === currId,
         );
 
-        return copyObject(accObj);
+        return structuredClone(accObj);
     }
 
     /**
@@ -1360,7 +1359,7 @@ export class AppState {
             return false;
         }
 
-        const expItem = copyObject(origItem);
+        const expItem = structuredClone(origItem);
         const data = copyFields(params, Category.availProps);
         Object.assign(expItem, data);
 
@@ -1648,7 +1647,7 @@ export class AppState {
             return transaction;
         }
 
-        const res = copyObject(transaction);
+        const res = structuredClone(transaction);
         if (transaction.type !== DEBT) {
             return res;
         }
@@ -2167,7 +2166,7 @@ export class AppState {
             return false;
         }
 
-        const itemData = copyObject(origItem);
+        const itemData = structuredClone(origItem);
         const data = copyFields(params, ScheduledTransaction.availProps);
         Object.assign(itemData, data);
 
@@ -2332,7 +2331,7 @@ export class AppState {
             return false;
         }
 
-        const expItem = copyObject(origItem);
+        const expItem = structuredClone(origItem);
         const data = copyFields(params, Reminder.availProps);
         Object.assign(expItem, data);
 
@@ -2480,7 +2479,7 @@ export class AppState {
         }
 
         const origItem = this.templates.getItem(request.id) ?? { columns: {} };
-        const res = copyObject(origItem);
+        const res = structuredClone(origItem);
         const data = copyFields(request, ImportTemplate.availProps);
         Object.assign(res, data);
 
@@ -2524,11 +2523,11 @@ export class AppState {
     getUpdateTemplateRequest(params) {
         const origItem = this.templates.getItem(params.id) ?? { columns: {} };
 
-        const expTemplate = copyObject(origItem);
+        const expTemplate = structuredClone(origItem);
         const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
-        const res = copyObject(expTemplate);
+        const res = structuredClone(expTemplate);
         delete res.columns;
 
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
@@ -2550,7 +2549,7 @@ export class AppState {
             return false;
         }
 
-        const expTemplate = copyObject(origItem);
+        const expTemplate = structuredClone(origItem);
         const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 

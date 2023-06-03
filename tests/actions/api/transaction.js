@@ -1,7 +1,6 @@
 import {
     test,
     assert,
-    copyObject,
 } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
@@ -26,7 +25,7 @@ export const create = async (params) => {
     let transactionId = 0;
 
     const typeStr = Transaction.typeToString(params.type);
-    const titleParams = copyObject(params);
+    const titleParams = structuredClone(params);
     delete titleParams.type;
 
     await test(`Create ${typeStr} transaction (${formatProps(titleParams)})`, async () => {
@@ -188,7 +187,7 @@ export const setCategory = async (params) => {
     await test(`Set category of transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.setTransactionCategory(params);
 
-        let reqParams = copyObject(params);
+        let reqParams = structuredClone(params);
         reqParams.category_id = reqParams.category;
         delete reqParams.category;
 

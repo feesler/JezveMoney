@@ -1,4 +1,4 @@
-import { copyObject, hasFlag, assert } from 'jezve-test';
+import { hasFlag, assert } from 'jezve-test';
 import { SortableList } from './SortableList.js';
 import {
     SORT_BY_CREATEDATE_ASC,
@@ -26,7 +26,7 @@ export class PersonsList extends SortableList {
             res = this.find((item) => item.name.toLowerCase() === lookupName);
         }
 
-        return copyObject(res);
+        return structuredClone(res);
     }
 
     isHidden(item) {
@@ -39,7 +39,7 @@ export class PersonsList extends SortableList {
         const res = this.filter((item) => !this.isHidden(item));
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return PersonsList.create(res);
@@ -49,7 +49,7 @@ export class PersonsList extends SortableList {
         const res = this.filter((item) => this.isHidden(item));
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return PersonsList.create(res);

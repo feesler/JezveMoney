@@ -1,7 +1,6 @@
 import {
     createElement,
     show,
-    copyObject,
     addChilds,
     removeChilds,
     Component,
@@ -121,8 +120,8 @@ export class ImportRuleItem extends Component {
             res.id = this.state.ruleId;
         }
 
-        res.actions = copyObject(this.state.actions);
-        res.conditions = copyObject(this.state.conditions);
+        res.actions = structuredClone(this.state.actions);
+        res.conditions = structuredClone(this.state.conditions);
 
         return res;
     }

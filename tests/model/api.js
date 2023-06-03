@@ -1,5 +1,4 @@
 import {
-    copyObject,
     baseUrl,
     httpReq,
     assert,
@@ -425,7 +424,7 @@ export const api = {
         },
 
         async list(params = {}) {
-            const reqParams = copyObject(params);
+            const reqParams = structuredClone(params);
             if (!('count' in reqParams)) {
                 reqParams.count = 0;
             }

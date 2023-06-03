@@ -1,5 +1,4 @@
 import {
-    copyObject,
     assert,
     formatDate,
     asArray,
@@ -120,7 +119,7 @@ export class TransactionsList extends SortableList {
                 continue;
             }
 
-            const convTrans = copyObject(trans);
+            const convTrans = structuredClone(trans);
             if (convTrans.type === TRANSFER) {
                 if (itemIds.includes(convTrans.src_id)) {
                     convTrans.type = INCOME;
@@ -490,7 +489,7 @@ export class TransactionsList extends SortableList {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = copyObject(list);
+        const res = structuredClone(list);
 
         if (desc) {
             return res.sort((a, b) => b.pos - a.pos);

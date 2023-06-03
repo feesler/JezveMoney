@@ -2,7 +2,6 @@ import {
     setBlock,
     assert,
     TestStory,
-    copyObject,
 } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
@@ -504,7 +503,7 @@ export class ImportRulesStory extends TestStory {
         };
 
         for (let i = 1; i <= RULES_TO_CREATE; i += 1) {
-            const rule = copyObject(ruleBase);
+            const rule = structuredClone(ruleBase);
             rule.conditions[0].value = `Cond ${i}`;
             rule.actions[0].value = `Act ${i}`;
             data.push(rule);

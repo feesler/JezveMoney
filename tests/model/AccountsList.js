@@ -1,5 +1,4 @@
 import {
-    copyObject,
     hasFlag,
     assert,
     asArray,
@@ -53,7 +52,7 @@ export class AccountsList extends SortableList {
         assert.isArray(accounts, 'Invalid accounts list specified');
         assert(transaction, 'Invalid transaction specified');
 
-        const res = copyObject(accounts);
+        const res = structuredClone(accounts);
 
         const srcAcc = (transaction.src_id)
             ? res.find((item) => item.id === transaction.src_id)
@@ -87,7 +86,7 @@ export class AccountsList extends SortableList {
         assert.isArray(accounts, 'Invalid accounts list specified');
         assert(transaction, 'Invalid transaction specified');
 
-        const res = copyObject(accounts);
+        const res = structuredClone(accounts);
 
         const srcAcc = (transaction.src_id)
             ? res.find((item) => item.id === transaction.src_id)
@@ -146,7 +145,7 @@ export class AccountsList extends SortableList {
 
         const res = transList.reduce((data, transaction) => (
             AccountsList.cancelTransaction(data, transaction)
-        ), copyObject(this.data));
+        ), structuredClone(this.data));
 
         if (returnRaw) {
             return res;
@@ -203,7 +202,7 @@ export class AccountsList extends SortableList {
         const res = this.filter((item) => item.owner_id === App.owner_id);
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return AccountsList.create(res);
@@ -213,7 +212,7 @@ export class AccountsList extends SortableList {
         const res = this.filter((item) => item.owner_id !== App.owner_id);
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return AccountsList.create(res);
@@ -229,7 +228,7 @@ export class AccountsList extends SortableList {
         const res = this.filter((item) => !this.isHidden(item));
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return AccountsList.create(res);
@@ -239,7 +238,7 @@ export class AccountsList extends SortableList {
         const res = this.filter((item) => this.isHidden(item));
 
         if (returnRaw) {
-            return copyObject(res);
+            return structuredClone(res);
         }
 
         return AccountsList.create(res);

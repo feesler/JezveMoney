@@ -9,7 +9,6 @@ import {
     waitForFunction,
     goTo,
     baseUrl,
-    copyObject,
     isVisible,
     wait,
     httpReq,
@@ -277,7 +276,7 @@ export class TransactionListView extends AppView {
     }
 
     cloneModel(model) {
-        const res = copyObject(model);
+        const res = structuredClone(model);
 
         res.data = model.data.clone();
         res.filtered = model.filtered.clone();

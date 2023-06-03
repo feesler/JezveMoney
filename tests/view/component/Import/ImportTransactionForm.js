@@ -4,7 +4,6 @@ import {
     click,
     input,
     assert,
-    copyObject,
     asyncMap,
     evaluate,
 } from 'jezve-test';
@@ -462,7 +461,7 @@ export class ImportTransactionForm extends TestComponent {
     restoreOriginal() {
         assert(this.model.original, 'Original data not found');
 
-        const res = copyObject(this.model);
+        const res = structuredClone(this.model);
 
         res.mainAccount = App.state.accounts.findByName(res.original.mainAccount);
         assert(res.mainAccount, `Account ${res.original.mainAccount} not found`);

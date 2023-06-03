@@ -1,5 +1,3 @@
-import { copyObject } from 'jezvejs';
-
 /**
  * Base List class
  * @param {object[]} props - array of list items
@@ -83,7 +81,7 @@ export class List {
             throw new Error('Invalid list props');
         }
 
-        const newData = copyObject(data);
+        const newData = structuredClone(data);
         this.data = newData.map(this.createItem.bind(this));
     }
 

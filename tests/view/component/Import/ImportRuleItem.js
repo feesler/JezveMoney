@@ -3,7 +3,6 @@ import {
     query,
     click,
     assert,
-    copyObject,
     evaluate,
 } from 'jezve-test';
 import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
@@ -76,10 +75,10 @@ export class ImportRuleItem extends TestComponent {
         const res = {
             id: parseInt(cont.ruleId, 10),
             conditions: cont.conditions.content.items.map(
-                (item) => copyObject(item.model),
+                (item) => structuredClone(item.model),
             ),
             actions: cont.actions.content.items.map(
-                (item) => copyObject(item.model),
+                (item) => structuredClone(item.model),
             ),
         };
 

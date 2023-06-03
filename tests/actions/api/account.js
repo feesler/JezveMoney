@@ -1,6 +1,5 @@
 import {
     test,
-    copyObject,
     assert,
     asArray,
 } from 'jezve-test';
@@ -155,13 +154,13 @@ export const list = async (params) => {
  */
 export const update = async (params) => {
     let updateRes = false;
-    const props = copyObject(params);
+    const props = structuredClone(params);
 
     await test(`Update account (${formatProps(props)})`, async () => {
         const resExpected = App.state.updateAccount(props);
 
         const item = App.state.accounts.getItem(props.id);
-        let updParams = (item) ? copyObject(item) : {};
+        let updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, props);
 
         updParams = App.state.prepareChainedRequestData(updParams);

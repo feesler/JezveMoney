@@ -1,6 +1,5 @@
 import {
     test,
-    copyObject,
     assert,
     asArray,
 } from 'jezve-test';
@@ -154,7 +153,7 @@ export const update = async (params) => {
         const resExpected = App.state.updatePerson(params);
 
         const item = App.state.persons.getItem(params.id);
-        const updParams = (item) ? copyObject(item) : {};
+        const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, params);
 
         const reqParams = App.state.prepareChainedRequestData(updParams);

@@ -9,7 +9,6 @@ import {
     waitForFunction,
     goTo,
     baseUrl,
-    copyObject,
     wait,
     prop,
 } from 'jezve-test';
@@ -183,7 +182,7 @@ export class ScheduleView extends AppView {
     }
 
     cloneModel(model) {
-        return copyObject(model);
+        return structuredClone(model);
     }
 
     getItems() {

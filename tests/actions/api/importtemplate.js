@@ -1,4 +1,4 @@
-import { test, copyObject, assert } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
@@ -96,7 +96,7 @@ export const createMultiple = async (params) => {
  */
 export const update = async (params) => {
     let result = false;
-    const props = copyObject(params);
+    const props = structuredClone(params);
 
     await test('Update import template', async () => {
         const expTemplate = App.state.templateFromRequest(props);

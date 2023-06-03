@@ -4,7 +4,6 @@ import {
     query,
     click,
     input,
-    copyObject,
     evaluate,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
@@ -76,7 +75,7 @@ export class DatePickerFilter extends TestComponent {
     }
 
     getSelectedRange() {
-        return copyObject(this.content.value);
+        return structuredClone(this.content.value);
     }
 
     async input(val) {

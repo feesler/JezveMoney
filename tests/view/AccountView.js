@@ -4,7 +4,6 @@ import {
     prop,
     navigation,
     click,
-    copyObject,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -163,7 +162,7 @@ export class AccountView extends AppView {
     }
 
     setExpectedAccount(account) {
-        this.origAccount = copyObject(account);
+        this.origAccount = structuredClone(account);
 
         this.setModelType(account.type);
         this.model.name = account.name.toString();

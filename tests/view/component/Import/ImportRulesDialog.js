@@ -1,5 +1,4 @@
 import {
-    copyObject,
     TestComponent,
     assert,
     hasFlag,
@@ -95,7 +94,7 @@ export class ImportRulesDialog extends TestComponent {
         res.loading = cont.loadingIndicator.visible;
         res.renderTime = cont.rulesList.renderTime;
         res.filter = cont.searchField.value;
-        res.rules = cont.items.map((item) => copyObject(item.model));
+        res.rules = cont.items.map((item) => structuredClone(item.model));
 
         res.contextMenuVisible = cont.contextMenu.visible;
 
@@ -113,7 +112,7 @@ export class ImportRulesDialog extends TestComponent {
             const isUpdate = (cont.header.title === updateRuleTok);
             res.state = (isUpdate) ? 'update' : 'create';
             if (cont.ruleForm) {
-                res.rule = copyObject(cont.ruleForm.model);
+                res.rule = structuredClone(cont.ruleForm.model);
                 res.ruleItem = cont.ruleForm.getExpectedRule();
             }
         }

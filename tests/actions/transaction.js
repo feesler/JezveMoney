@@ -4,7 +4,6 @@ import {
     setBlock,
     baseUrl,
     goTo,
-    copyObject,
     asArray,
     formatDate,
 } from 'jezve-test';
@@ -385,7 +384,7 @@ export const del = async (type, transactions) => {
     await App.view.navigateToTransactions();
     await App.view.filterByType(type);
 
-    let tr = copyObject(transactions);
+    let tr = structuredClone(transactions);
     const onPage = App.config.transactionsOnPage;
 
     while (true) {

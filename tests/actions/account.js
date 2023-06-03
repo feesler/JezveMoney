@@ -1,7 +1,6 @@
 import {
     test,
     asArray,
-    copyObject,
     assert,
     setBlock,
     baseUrl,
@@ -249,7 +248,7 @@ export const toggleSelect = async (accounts) => {
         }
 
         let expectedItems = origItems.map((item, ind) => {
-            const res = copyObject(item);
+            const res = structuredClone(item);
             if (indexes.includes(ind)) {
                 res.isActive = !res.isActive;
             }

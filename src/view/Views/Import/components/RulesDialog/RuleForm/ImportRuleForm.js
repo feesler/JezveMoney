@@ -1,7 +1,6 @@
 import {
     createElement,
     isFunction,
-    copyObject,
     Component,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -508,7 +507,7 @@ export class ImportRuleForm extends Component {
 
                 return condition;
             }),
-            actions: copyObject(state.rule.actions.data),
+            actions: structuredClone(state.rule.actions.data),
         };
         if (state.rule.id) {
             res.id = state.rule.id;

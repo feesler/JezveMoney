@@ -7,7 +7,6 @@ import {
     click,
     wait,
     waitForFunction,
-    copyObject,
     asArray,
     asyncMap,
     evaluate,
@@ -1007,14 +1006,14 @@ export class ImportView extends AppView {
         this.checkRulesFormState();
 
         const { ruleForm } = this.rulesDialog.content;
-        return copyObject(ruleForm.model.conditions);
+        return structuredClone(ruleForm.model.conditions);
     }
 
     getRuleActions() {
         this.checkRulesFormState();
 
         const { ruleForm } = this.rulesDialog.content;
-        return copyObject(ruleForm.model.actions);
+        return structuredClone(ruleForm.model.actions);
     }
 
     async addRuleAction() {

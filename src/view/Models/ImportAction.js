@@ -1,4 +1,4 @@
-import { copyObject, isFunction } from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { __ } from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 import { ImportTransaction } from './ImportTransaction.js';
@@ -66,7 +66,7 @@ export class ImportAction extends ListItem {
 
     /** Return array of available action types */
     static getTypes() {
-        return copyObject(this.actionTypes);
+        return structuredClone(this.actionTypes);
     }
 
     /** Search action type by id */
@@ -81,7 +81,7 @@ export class ImportAction extends ListItem {
             return null;
         }
 
-        return copyObject(res);
+        return structuredClone(res);
     }
 
     /** Check action type requires select value from list */
@@ -116,7 +116,7 @@ export class ImportAction extends ListItem {
 
     /** Return array of available transaction types */
     static getTransactionTypes() {
-        return copyObject(this.transactionTypes);
+        return structuredClone(this.transactionTypes);
     }
 
     /** Search transaction type by id */
@@ -126,7 +126,7 @@ export class ImportAction extends ListItem {
             return null;
         }
 
-        return copyObject(res);
+        return structuredClone(res);
     }
 
     /**

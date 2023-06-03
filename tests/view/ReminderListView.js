@@ -9,7 +9,6 @@ import {
     waitForFunction,
     goTo,
     baseUrl,
-    copyObject,
     wait,
     prop,
 } from 'jezve-test';
@@ -193,7 +192,7 @@ export class ReminderListView extends AppView {
     }
 
     cloneModel(model) {
-        return copyObject(model);
+        return structuredClone(model);
     }
 
     updateModelFilter(model) {

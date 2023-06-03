@@ -4,7 +4,6 @@ import {
     setBlock,
     baseUrl,
     goTo,
-    copyObject,
     asArray,
     formatDate,
 } from 'jezve-test';
@@ -349,7 +348,7 @@ export const del = async (index) => {
 
     await checkNavigation();
 
-    let tr = copyObject(indexes);
+    let tr = structuredClone(indexes);
     const onPage = App.config.transactionsOnPage;
 
     while (true) {
@@ -531,7 +530,7 @@ export const toggleSelect = async (transactions) => {
         }
 
         let expectedItems = origItems.map((item, ind) => {
-            const res = copyObject(item);
+            const res = structuredClone(item);
             if (indexes.includes(ind)) {
                 res.selected = !res.selected;
             }

@@ -1,7 +1,6 @@
 import {
     test,
     assert,
-    copyObject,
     asArray,
 } from 'jezve-test';
 import { ReminderListView } from '../view/ReminderListView.js';
@@ -83,7 +82,7 @@ export const toggleSelect = async (transactions) => {
         }
 
         let expectedItems = origItems.map((item, ind) => {
-            const res = copyObject(item);
+            const res = structuredClone(item);
             if (indexes.includes(ind)) {
                 res.selected = !res.selected;
             }

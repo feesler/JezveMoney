@@ -1,7 +1,6 @@
 import {
     ge,
     isFunction,
-    copyObject,
     show,
     enable,
     Component,
@@ -190,7 +189,7 @@ export class ImportTemplateManager extends Component {
     setRawData(data, filename) {
         this.setState({
             ...this.state,
-            rawData: copyObject(data),
+            rawData: structuredClone(data),
             filename,
         });
 

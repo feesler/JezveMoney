@@ -1,4 +1,4 @@
-import { test, copyObject, assert } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
@@ -41,7 +41,7 @@ export const create = async (params) => {
  */
 export const update = async (params) => {
     let result = false;
-    const props = copyObject(params);
+    const props = structuredClone(params);
 
     await test('Update import rule', async () => {
         const resExpected = App.state.updateRule(props);
