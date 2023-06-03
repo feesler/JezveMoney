@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\Model;
 
+use JezveMoney\App\Item\UserItem;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\MySqlDB;
@@ -36,24 +37,11 @@ class UserModel extends CachedTable
      *
      * @param array|null $row array of table row fields
      *
-     * @return object|null
+     * @return UserItem|null
      */
     protected function rowToObj(?array $row)
     {
-        if (is_null($row)) {
-            return null;
-        }
-
-        $res = new \stdClass();
-        $res->id = intval($row["id"]);
-        $res->login = $row["login"];
-        $res->passhash = $row["passhash"];
-        $res->owner_id = intval($row["owner_id"]);
-        $res->access = intval($row["access"]);
-        $res->createdate = strtotime($row["createdate"]);
-        $res->updatedate = strtotime($row["updatedate"]);
-
-        return $res;
+        return UserItem::fromTableRow($row);
     }
 
     /**
@@ -353,6 +341,20 @@ class UserModel extends CachedTable
     }
 
     /**
+     * Returns reminders update date
+     *
+     * @return int|null
+     */
+    public function getRemindersDate()
+    {
+        if (!$this->currentUser) {
+            return null;
+        }
+
+        return $this->currentUser->reminders_date;
+    }
+
+    /**
      * Returns user id for specified login
      *
      * @param string $login
@@ -447,6 +449,37 @@ class UserModel extends CachedTable
                     "updatedate" => $curDate
                 ],
                 "login=" . qnull($elogin)
+            )
+        ) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    /**
+     * Updates reminders date
+     *
+     * @return bool
+     */
+    public function setRemindersDate()
+    {
+        $settingsModel = UserSettingsModel::getInstance();
+        $date = date("Y-m-d H:i:s", $settingsModel->getClientTime());
+        $curDate = date("Y-m-d H:i:s");
+
+        $user_id = $this->getUser();
+
+        if (
+            !$this->dbObj->updateQ(
+                $this->tbl_name,
+                [
+                    "reminders_date" => $date,
+                    "updatedate" => $curDate
+                ],
+                "id=" . qnull($user_id)
             )
         ) {
             return false;
@@ -950,6 +983,8 @@ class UserModel extends CachedTable
             "accounts",
             "persons",
             "transactions",
+            "scheduled_transactions",
+            "reminders",
             "categories",
             "import_tpl",
             "import_rule",

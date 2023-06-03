@@ -263,8 +263,10 @@ class AccountModel extends SortableModel
 
         if ($this->currencyUpdated || $this->balanceUpdated || $this->limitUpdated) {
             $transMod = TransactionModel::getInstance();
+            $scheduledTrMod = ScheduledTransactionModel::getInstance();
 
             $transMod->onAccountUpdate($item_id);
+            $scheduledTrMod->onAccountUpdate($item_id);
         }
 
         $this->currencyUpdated = false;
@@ -315,10 +317,12 @@ class AccountModel extends SortableModel
         $this->cleanCache();
 
         $transMod = TransactionModel::getInstance();
+        $scheduledTrMod = ScheduledTransactionModel::getInstance();
         $ruleModel = ImportRuleModel::getInstance();
         $tplModel = ImportTemplateModel::getInstance();
 
         $res = $transMod->onAccountDelete($this->removedItems)
+            && $scheduledTrMod->onAccountDelete($this->removedItems)
             && $ruleModel->onAccountDelete($items)
             && $tplModel->onAccountDelete($items);
         $this->removedItems = null;
@@ -527,14 +531,21 @@ class AccountModel extends SortableModel
         $tplModel = ImportTemplateModel::getInstance();
         $tplModel->onAccountDelete($accountsToDelete);
 
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+
         // if delete person accounts, then delete all transactions
         if ($deletePersons) {
             if (!$this->dbObj->deleteQ("transactions", $condArr)) {
                 return false;
             }
+            $scheduleModel->reset();
         } else {
             $transMod = TransactionModel::getInstance();
             $res = $transMod->onAccountDelete($userAccounts);
+            if (!$res) {
+                return false;
+            }
+            $res = $scheduleModel->onAccountDelete($userAccounts);
             if (!$res) {
                 return false;
             }

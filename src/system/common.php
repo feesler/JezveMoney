@@ -1,13 +1,13 @@
 <?php
 
 use JezveMoney\Core\Locale;
+use JezveMoney\Core\Settings;
 
 define("WHITE_THEME", 0);
 define("DARK_THEME", 1);
 
 // Icon types
 define("ICON_TILE", 1);
-
 
 /**
  * Checks request is HTTPS
@@ -55,18 +55,13 @@ function responseLog()
 }
 
 /**
- * Enables/disabled logs
+ * Returns true if system logs are enabled
  *
- * @param bool $enable enable flag
+ * @return bool
  */
-function setLogs(bool $enable)
+function isLogsEnabled()
 {
-    global $noLogs;
-    $writeBootLog = ($noLogs && $enable);
-    $noLogs = !$enable;
-    if ($writeBootLog) {
-        bootLog();
-    }
+    return Settings::getValue("enableLogs", false);
 }
 
 /**
@@ -74,20 +69,16 @@ function setLogs(bool $enable)
  */
 function setupLogs()
 {
-    global $noLogs;
-
     function wlog(?string $str = null)
     {
-        global $noLogs;
-
-        if ((isset($noLogs) && $noLogs) || is_null($str)) {
+        if (!isLogsEnabled()) {
             return;
         }
 
         \JezveMoney\Core\Logger::write((string)$str);
     }
 
-    if (!isset($noLogs) || !$noLogs) {
+    if (isLogsEnabled()) {
         bootLog();
     }
 }

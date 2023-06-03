@@ -3,11 +3,11 @@
     <form action="<?= BASEURL ?>api/login/" method="post">
         <div class="std_margin">
             <label for="login_login">Login</label>
-            <input id="login_login" class="input stretch-input" name="login" type="text"><br>
+            <input id="login_login" class="input stretch-input" name="login" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"><br>
         </div>
         <div class="std_margin">
             <label for="login_password">Password</label>
-            <input id="login_password" class="input stretch-input" name="password" type="text"><br>
+            <input id="login_password" class="input stretch-input" name="password" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"><br>
         </div>
 
         <div class="form-controls">
@@ -30,15 +30,15 @@
     <form action="<?= BASEURL ?>api/register/" method="post">
         <div class="std_margin">
             <label for="reg_login">Login</label>
-            <input id="reg_login" class="input stretch-input" name="login" type="text">
+            <input id="reg_login" class="input stretch-input" name="login" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
         <div class="std_margin">
             <label for="reg_password">Password</label>
-            <input id="reg_password" class="input stretch-input" name="password" type="text">
+            <input id="reg_password" class="input stretch-input" name="password" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
         <div class="std_margin">
             <label for="reg_name">Name</label>
-            <input id="reg_name" class="input stretch-input" name="name" type="text">
+            <input id="reg_name" class="input stretch-input" name="name" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="form-controls">

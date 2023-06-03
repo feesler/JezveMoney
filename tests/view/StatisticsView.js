@@ -11,7 +11,7 @@ import {
 } from 'jezve-test';
 import { DropDown, LinkMenu, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { availTransTypes } from '../model/Transaction.js';
+import { Transaction } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
@@ -370,13 +370,13 @@ export class StatisticsView extends AppView {
             await this.waitForData(() => App.view.content.typeMenu.select(type));
         } else {
             // Select new types
-            for (const type of availTransTypes) {
+            for (const type of Transaction.availTypes) {
                 if (!typesBefore.includes(type) && types.includes(type)) {
                     await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }
             }
             // Deselect previous types
-            for (const type of availTransTypes) {
+            for (const type of Transaction.availTypes) {
                 if (typesBefore.includes(type) && !types.includes(type)) {
                     await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }

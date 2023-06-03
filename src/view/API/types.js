@@ -79,6 +79,9 @@ export const isCreateResult = (obj) => verifyObject(obj, { id: isInt });
 /** Verify object is string */
 export const isString = (obj) => (typeof obj === 'string');
 
+/** Verity object is null */
+export const isNull = (obj) => (obj === null);
+
 /**
  * Returns function to verify object is array and each item of it pass verification
  * @param {Object} data - object to verify
@@ -222,6 +225,48 @@ export const isStatistics = (obj) => verifyObject(obj, {
     histogram: isStatisticsHistogram,
     filter: isStatisticsFilter,
 });
+
+/** Verify object is scheduled transaction */
+export const isScheduledTransaction = (obj) => verifyObject(obj, {
+    id: isInt,
+    type: isInt,
+    src_id: isInt,
+    dest_id: isInt,
+    src_amount: isNum,
+    dest_amount: isNum,
+    src_curr: isInt,
+    dest_curr: isInt,
+    category_id: isInt,
+    comment: isString,
+    start_date: isInt,
+    end_date: (value) => isInt(value) || isNull(value),
+    interval_type: isInt,
+    interval_step: isInt,
+    interval_offset: isIntArray,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is array of scheduled transactions */
+export const isScheduledTransactionsArray = isArrayOf(isScheduledTransaction);
+
+/** Verify object is reminder */
+export const isReminder = (obj) => verifyObject(obj, {
+    id: isInt,
+    schedule_id: isInt,
+    state: isInt,
+    date: isInt,
+    transaction_id: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is array of reminders */
+export const isRemindersArray = isArrayOf(isReminder);
 
 /** Verify object is import template */
 export const isTemplateColumns = (obj) => verifyObject(obj, {

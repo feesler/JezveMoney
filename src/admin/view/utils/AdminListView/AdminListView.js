@@ -8,8 +8,8 @@ import {
     setEvents,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
-import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
-import { AdminView } from './AdminView.js';
+import { ConfirmDialog } from '../../../../view/Components/ConfirmDialog/ConfirmDialog.js';
+import { AdminView } from '../AdminView/AdminView.js';
 
 /**
  * Admin list view constructor

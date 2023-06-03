@@ -8,7 +8,6 @@ import {
     show,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
@@ -33,6 +32,7 @@ import { actions, reducer } from './reducer.js';
 import '../../Components/Field/Field.scss';
 import '../../Application/Application.scss';
 import './AccountView.scss';
+import { AmountInputField } from '../../Components/AmountInputField/AmountInputField.js';
 
 /**
  * Create/update account view
@@ -83,11 +83,7 @@ class AccountView extends View {
             'accountForm',
             'tileField',
             'iconField',
-            'currencySign',
-            'balanceInp',
-            'limitField',
-            'limitInp',
-            'limitCurrencySign',
+            'currencyField',
             'nameInp',
             'nameFeedback',
             'submitBtn',
@@ -129,15 +125,27 @@ class AccountView extends View {
         });
         window.app.initUserCurrencyList(this.currencySelect);
 
-        this.initBalanceDecimalInput = DecimalInput.create({
-            elem: this.balanceInp,
+        // Initial balance field
+        this.initBalanceField = AmountInputField.create({
+            id: 'initBalanceField',
+            title: __('ACCOUNT_INITIAL_BALANCE'),
+            feedbackMessage: __('ACCOUNT_INVALID_BALANCE'),
+            validate: true,
+            className: 'form-row',
             onInput: (e) => this.onInitBalanceInput(e),
         });
+        insertAfter(this.initBalanceField.elem, this.currencyField);
 
-        this.limitDecimalInput = DecimalInput.create({
-            elem: this.limitInp,
+        // Initial credit limit field
+        this.initLimitField = AmountInputField.create({
+            id: 'initLimitField',
+            title: __('ACCOUNT_INITIAL_CREDIT_LIMIT'),
+            feedbackMessage: __('ACCOUNT_INVALID_LIMIT'),
+            validate: true,
+            className: 'form-row',
             onInput: (e) => this.onLimitInput(e),
         });
+        insertAfter(this.initLimitField.elem, this.initBalanceField.elem);
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
@@ -229,13 +237,13 @@ class AccountView extends View {
 
         if (initbalance.length === 0) {
             this.store.dispatch(actions.invalidateInitialBalanceField());
-            this.balanceInp.focus();
+            this.initBalanceField.input.elem.focus();
         }
 
         const isCreditCard = Account.isCreditCard(state.data.type);
         if (isCreditCard && initlimit.length === 0) {
             this.store.dispatch(actions.invalidateLimitField());
-            this.balanceInp.focus();
+            this.initLimitField.input.elem.focus();
         }
 
         const { validation } = this.store.getState();
@@ -362,24 +370,24 @@ class AccountView extends View {
         enable(this.nameInp, !state.submitStarted);
 
         // Initial balance field
-        this.initBalanceDecimalInput.setState((inpState) => ({
-            ...inpState,
-            digits: currencyObj.precision,
+        this.initBalanceField.setState((balanceState) => ({
+            ...balanceState,
+            value: state.data.initbalance,
+            disabled: state.submitStarted,
+            currencyId: state.data.curr_id,
+            valid: state.validation.initbalance,
         }));
-        window.app.setValidation('initbal-inp-block', state.validation.initbalance);
-        enable(this.balanceInp, !state.submitStarted);
-        this.currencySign.textContent = currencyObj.sign;
 
         // Credit limit field
         const isCreditCard = Account.isCreditCard(state.data.type);
-        show(this.limitField, isCreditCard);
-        this.limitDecimalInput.setState((inpState) => ({
-            ...inpState,
-            digits: currencyObj.precision,
+        this.initLimitField.show(isCreditCard);
+        this.initLimitField.setState((limitState) => ({
+            ...limitState,
+            value: state.data.initlimit,
+            disabled: state.submitStarted,
+            currencyId: state.data.curr_id,
+            valid: state.validation.initlimit,
         }));
-        window.app.setValidation(this.limitField, state.validation.initlimit);
-        enable(this.limitInp, !state.submitStarted);
-        this.limitCurrencySign.textContent = currencyObj.sign;
 
         // Icon select
         this.iconSelect.setSelection(state.data.icon_id);

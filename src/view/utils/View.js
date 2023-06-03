@@ -22,6 +22,7 @@ export class View {
     onReady() {
         window.app.setupLocale();
         window.app.setupTheme();
+        window.app.updateTimeZone();
 
         const headerElem = document.querySelector('.header');
         this.header = (headerElem) ? Header.fromElement(headerElem) : null;

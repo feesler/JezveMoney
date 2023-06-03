@@ -64,7 +64,7 @@ class Person extends ApiSortableListController
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
+        if (!is_array($ids) || !count($ids)) {
             throw new \Error(__("ERR_NO_IDS"));
         }
 
@@ -92,7 +92,7 @@ class Person extends ApiSortableListController
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
+        if (!is_array($ids) || !count($ids)) {
             throw new \Error(__("ERR_NO_IDS"));
         }
 

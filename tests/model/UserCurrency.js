@@ -2,6 +2,11 @@ import { assert } from 'jezve-test';
 
 /** User currency model */
 export class UserCurrency {
+    static availProps = [
+        'curr_id',
+        'flags',
+    ];
+
     constructor(data) {
         assert(data, 'Invalid data');
 

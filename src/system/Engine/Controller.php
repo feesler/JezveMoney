@@ -137,15 +137,9 @@ abstract class Controller
         $res = [];
 
         if (isset($httpSrc["id"])) {
-            if (is_array($httpSrc["id"])) {
-                foreach ($httpSrc["id"] as $val) {
-                    $val = intval($val);
-                    if ($val) {
-                        $res[] = $val;
-                    }
-                }
-            } else {
-                $val = intval($httpSrc["id"]);
+            $ids = asArray($httpSrc["id"]);
+            foreach ($ids as $val) {
+                $val = intval($val);
                 if ($val) {
                     $res[] = $val;
                 }

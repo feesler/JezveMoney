@@ -8,13 +8,14 @@ import {
     isObject,
     isFunction,
     removeChilds,
+    show,
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import * as apiTypes from '../../../../view/API/types.js';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
-import '../../css/admin.scss';
-import { AdminView } from '../../js/AdminView.js';
+import '../../utils/AdminView/AdminView.scss';
+import { AdminView } from '../../utils/AdminView/AdminView.js';
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
 import './ApiConsoleView.scss';
 
@@ -72,6 +73,8 @@ class AdminApiConsoleView extends AdminView {
         this.initPersonForms();
         this.initCategoryForms();
         this.initTransactionForms();
+        this.initScheduledTransactionForms();
+        this.initRemindersForms();
         this.initTemplateForms();
         this.initRuleForms();
         this.initConditionForms();
@@ -209,9 +212,60 @@ class AdminApiConsoleView extends AdminView {
                 const { value } = statisticsFilter;
                 enable('statistics_curr', (value === 'currency'));
                 enable('statistics_acc', (value === 'account'));
-                enable('statistics_cat', (value === 'account'));
+                enable('statistics_cat', (value === 'category'));
             },
         });
+    }
+
+    /** Initialization of forms for Scheduled Transaction API controller */
+    initScheduledTransactionForms() {
+        this.initForm(
+            '#listScheduledTrForm > form',
+            this.getVerifyHandler(apiTypes.isScheduledTransactionsArray),
+        );
+
+        // Read scheduled transactions by ids form
+        const readtransbtn = ge('readScheduledTransBtn');
+        if (!readtransbtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readtransbtn, {
+            click: (e) => this.onReadItemsSubmit(
+                e,
+                'read_scheduled_trans_id',
+                'schedule/',
+                apiTypes.isScheduledTransactionsArray,
+            ),
+        });
+
+        this.initForm('#createScheduledTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
+        this.initForm('#updateScheduledTrForm > form');
+        this.initIdsForm('#delScheduledTrForm > form');
+    }
+
+    /** Initialization of forms for Reminder API controller */
+    initRemindersForms() {
+        this.initForm(
+            '#listReminderForm > form',
+            this.getVerifyHandler(apiTypes.isRemindersArray),
+        );
+
+        // Read reminders by ids form
+        const readRemindersBtn = ge('readRemindersBtn');
+        if (!readRemindersBtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readRemindersBtn, {
+            click: (e) => this.onReadItemsSubmit(
+                e,
+                'read_reminder_id',
+                'reminder/',
+                apiTypes.isRemindersArray,
+            ),
+        });
+
+        this.initForm('#confirmReminderForm > form');
+        this.initForm('#cancelReminderForm > form');
     }
 
     /** Initialization of forms for Import template API controller */
@@ -557,11 +611,36 @@ class AdminApiConsoleView extends AdminView {
             if (el instanceof NodeList) {
                 for (let i = 0; i < el.length; i += 1) {
                     el[i].disabled = disableElements;
+                    this.showFormField(el[i], !disableElements);
                 }
             } else {
                 el.disabled = disableElements;
+                this.showFormField(el, !disableElements);
             }
         }
+    }
+
+    /**
+     * Shows/hides specified form field
+     * @param {Element} elem
+     * @param {boolean} value
+     * @returns
+     */
+    showFormField(elem, value) {
+        if (!elem) {
+            return;
+        }
+
+        let el = elem;
+
+        const inputType = elem.type?.toLowerCase();
+        if (inputType === 'radio') {
+            el = elem.closest('.radio');
+        } else if (inputType === 'checkbox') {
+            el = elem.closest('.checkbox');
+        }
+
+        show(el, value);
     }
 
     /**

@@ -21,7 +21,6 @@ import {
     listData,
     normalize,
     __,
-    timeToDate,
 } from '../../utils/utils.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { Application } from '../../Application/Application.js';
@@ -216,9 +215,7 @@ class MainView extends View {
             this.histogram = Histogram.create({
                 data: this.props.chartData,
                 height: 200,
-                renderXAxisLabel: (value) => (
-                    window.app.formatDate(timeToDate(value))
-                ),
+                renderXAxisLabel: (value) => window.app.formatDate(value),
                 renderYAxisLabel: (value) => formatNumberShort(value),
             });
             chart.append(this.histogram.elem);

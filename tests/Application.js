@@ -11,6 +11,8 @@ import { Scenario } from './scenario/index.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
 import {
+    cutDate,
+    dateStringToSeconds,
     dateToSeconds,
     fixDate,
     formatInputDate,
@@ -31,17 +33,20 @@ class Application extends TestApplication {
 
         this.scenario = await Scenario.create(this.environment);
 
-        const now = new Date();
+        const now = new Date(cutDate(new Date()));
         const year = now.getFullYear();
         const month = now.getMonth();
         const day = now.getDate();
         this.dates = {
             now,
             monthAgo: new Date(Date.UTC(year, month - 1, day)),
+            monthAfter: new Date(Date.UTC(year, month + 1, day)),
             weekAgo: new Date(Date.UTC(year, month, day - 7)),
             weekAfter: new Date(Date.UTC(year, month, day + 7)),
             yesterday: new Date(Date.UTC(year, month, day - 1)),
+            tomorrow: new Date(Date.UTC(year, month, day + 1)),
             yearAgo: new Date(Date.UTC(year - 1, month, day)),
+            yearAfter: new Date(Date.UTC(year + 1, month, day)),
         };
 
         const self = this;
@@ -61,6 +66,10 @@ class Application extends TestApplication {
                 return self.formatDate(self.dates.monthAgo);
             },
 
+            get monthAfter() {
+                return self.formatDate(self.dates.monthAfter);
+            },
+
             get weekAgo() {
                 return self.formatDate(self.dates.weekAgo);
             },
@@ -73,8 +82,16 @@ class Application extends TestApplication {
                 return self.formatDate(self.dates.yesterday);
             },
 
+            get tomorrow() {
+                return self.formatDate(self.dates.tomorrow);
+            },
+
             get yearAgo() {
                 return self.formatDate(self.dates.yearAgo);
+            },
+
+            get yearAfter() {
+                return self.formatDate(self.dates.yearAfter);
             },
         };
 
@@ -122,6 +139,13 @@ class Application extends TestApplication {
         });
     }
 
+    dateStringToSeconds(value) {
+        return dateStringToSeconds(value, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
     parseDate(date) {
         return fixDate(date, {
             locales: this.state.getDateFormatLocale(),
@@ -137,6 +161,11 @@ class Application extends TestApplication {
         return formatter.format(value);
     }
 
+    getTimezoneOffset() {
+        const date = new Date();
+        return date.getTimezoneOffset();
+    }
+
     async setupUser() {
         const userProfile = await api.profile.read();
         assert(userProfile?.user_id, 'Fail to read user profile');
@@ -146,8 +175,24 @@ class Application extends TestApplication {
 
         this.state = new AppState();
         await this.state.fetch();
+
+        await this.updateTimezone();
+
         this.currency = await CurrencyList.create();
         this.icons = await IconsList.create();
+    }
+
+    async updateTimezone() {
+        const tzOffset = this.state.getTimezoneOffset();
+        const currentTzOffset = this.getTimezoneOffset();
+        if (tzOffset === currentTzOffset) {
+            return;
+        }
+
+        await api.profile.updateSettings({
+            tz_offset: currentTzOffset,
+        });
+        await this.state.fetch();
     }
 
     async startTests() {

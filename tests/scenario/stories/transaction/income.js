@@ -146,4 +146,10 @@ export const stateLoop = async () => {
         { action: 'clickDestResultBalance' },
         { action: 'inputDestResBalance', data: '555.12345678' },
     ]);
+
+    // Test handling invalid date string on show date picker
+    await Actions.runActions([
+        { action: 'inputDate', data: '' },
+        { action: 'selectDate', data: App.dates.now },
+    ]);
 };

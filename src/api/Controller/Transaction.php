@@ -79,7 +79,7 @@ class Transaction extends ApiSortableListController
      */
     protected function getExpectedFields(array $request)
     {
-        $trans_type = intval($request["type"]);
+        $trans_type = isset($request["type"]) ? intval($request["type"]) : 0;
 
         return ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
     }
@@ -93,8 +93,8 @@ class Transaction extends ApiSortableListController
      */
     protected function preCreate(array $request)
     {
-        $trans_type = intval($request["type"]);
-        if ($trans_type == DEBT) {
+        $trans_type = isset($request["type"]) ? intval($request["type"]) : 0;
+        if ($trans_type == DEBT && isset($request["person_id"])) {
             return $this->model->prepareDebt($request);
         } else {
             return $request;
@@ -118,15 +118,14 @@ class Transaction extends ApiSortableListController
      */
     public function setCategory()
     {
+        $requiredFields = ["id", "category_id"];
+
         if (!$this->isPOST()) {
             throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, ["id", "category_id"]);
-        if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 

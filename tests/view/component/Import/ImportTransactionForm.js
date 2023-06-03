@@ -297,9 +297,6 @@ export class ImportTransactionForm extends TestComponent {
             srcAmountField: {
                 disabled: !showSrcAmount,
                 visible: showSrcAmount,
-                dropDown: {
-                    disabled: !isIncome,
-                },
                 invFeedback: {
                     visible: showSrcAmount && !model.validation.srcAmount,
                 },
@@ -307,9 +304,6 @@ export class ImportTransactionForm extends TestComponent {
             destAmountField: {
                 disabled: !showDestAmount,
                 visible: showDestAmount,
-                dropDown: {
-                    disabled: !isExpense,
-                },
                 invFeedback: {
                     visible: showDestAmount && !model.validation.destAmount,
                 },
@@ -352,16 +346,20 @@ export class ImportTransactionForm extends TestComponent {
         }
         if (!res.srcAmountField.disabled) {
             res.srcAmountField.value = model.srcAmount.toString();
+
+            if (isIncome) {
+                res.srcAmountField.dropDown = { value: model.srcCurrId.toString() };
+            }
         }
-        if (!res.srcAmountField.dropDown.disabled) {
-            res.srcAmountField.dropDown.value = model.srcCurrId.toString();
-        }
+
         if (!res.destAmountField.disabled) {
             res.destAmountField.value = model.destAmount.toString();
+
+            if (isExpense) {
+                res.destAmountField.dropDown = { value: model.destCurrId.toString() };
+            }
         }
-        if (!res.destAmountField.dropDown.disabled) {
-            res.destAmountField.dropDown.value = model.destCurrId.toString();
-        }
+
         if (!res.transferAccountField.disabled) {
             const transferAccountId = (model.type === 'transfer_out')
                 ? model.destId
@@ -870,9 +868,6 @@ export class ImportTransactionForm extends TestComponent {
             srcAmountField: {
                 disabled: !showSrcAmount,
                 visible: showSrcAmount,
-                dropDown: {
-                    disabled: !isIncome,
-                },
                 invFeedback: {
                     visible: false,
                 },
@@ -880,9 +875,6 @@ export class ImportTransactionForm extends TestComponent {
             destAmountField: {
                 disabled: !showDestAmount,
                 visible: showDestAmount,
-                dropDown: {
-                    disabled: !isExpense,
-                },
                 invFeedback: {
                     visible: false,
                 },
@@ -913,16 +905,20 @@ export class ImportTransactionForm extends TestComponent {
         }
         if (!res.srcAmountField.disabled) {
             res.srcAmountField.value = item.src_amount.toString();
+
+            if (isIncome) {
+                res.srcAmountField.dropDown = { value: item.src_curr.toString() };
+            }
         }
-        if (!res.srcAmountField.dropDown.disabled) {
-            res.srcAmountField.dropDown.value = item.src_curr.toString();
-        }
+
         if (!res.destAmountField.disabled) {
             res.destAmountField.value = item.dest_amount.toString();
+
+            if (!isExpense) {
+                res.destAmountField.dropDown = { value: item.dest_curr.toString() };
+            }
         }
-        if (!res.destAmountField.dropDown.disabled) {
-            res.destAmountField.dropDown.value = item.dest_curr.toString();
-        }
+
         if (!res.transferAccountField.disabled) {
             const transferAccountId = (item.type === 'transfer_out')
                 ? item.dest_id

@@ -4,15 +4,6 @@ import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';
 
-export const tplColumns = [
-    'accountAmount',
-    'transactionAmount',
-    'accountCurrency',
-    'transactionCurrency',
-    'date',
-    'comment',
-];
-
 export const IMPORT_DATE_LOCALE = 'ru';
 
 const amountColumns = ['accountAmount', 'transactionAmount'];
@@ -20,6 +11,31 @@ const currencyColumns = ['accountCurrency', 'transactionCurrency'];
 
 /** Import template model */
 export class ImportTemplate {
+    static availProps = [
+        'name',
+        'type_id',
+        'account_id',
+        'first_row',
+    ];
+
+    static columns = [
+        'accountAmount',
+        'transactionAmount',
+        'accountCurrency',
+        'transactionCurrency',
+        'date',
+        'comment',
+    ];
+
+    static columnsMap = {
+        account_amount_col: 'accountAmount',
+        account_curr_col: 'accountCurrency',
+        trans_amount_col: 'transactionAmount',
+        trans_curr_col: 'transactionCurrency',
+        date_col: 'date',
+        comment_col: 'comment',
+    };
+
     constructor(data) {
         assert(data, 'Invalid data');
 
@@ -82,7 +98,7 @@ export class ImportTemplate {
     getRowData(row) {
         const res = {};
 
-        tplColumns.forEach((column) => {
+        ImportTemplate.columns.forEach((column) => {
             assert(column in this.columns, `Column '${column}' not found`);
 
             let value = ImportTemplate.getColumn(row, this.columns[column]);
@@ -105,7 +121,7 @@ export class ImportTemplate {
         const start = this.first_row - 1;
         const [row] = data.slice(start, start + 1);
 
-        const res = tplColumns.find((column) => {
+        const res = ImportTemplate.columns.find((column) => {
             const value = ImportTemplate.getColumn(row, this.columns[column], true);
             return (
                 (value === null)

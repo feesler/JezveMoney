@@ -202,11 +202,9 @@ export const createTransactions = async () => {
     }
 
     // Add transaction year after latest for statistics tests
-    const now = new Date();
-    const yearAfter = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
     multi.push({
         ...lastExpense,
-        date: dateToSeconds(yearAfter),
+        date: dateToSeconds(App.dates.yearAfter),
     });
 
     // Statistics group by week tests

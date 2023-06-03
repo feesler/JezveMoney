@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 26);
+define("DB_VERSION", 31);
 
 /**
  * Database version manager class
@@ -31,6 +31,9 @@ class DBVersion
         "import_tpl",
         "persons",
         "transactions",
+        "scheduled_transactions",
+        "interval_offset",
+        "reminders",
         "categories",
         "user_settings",
         "user_currency",
@@ -61,6 +64,9 @@ class DBVersion
             $this->createAccountsTable();
             $this->createPersonsTable();
             $this->createTransactionsTable();
+            $this->createScheduledTransactionsTable();
+            $this->createIntervalOffsetTable();
+            $this->createRemindersTable();
             $this->createCategoriesTable();
             $this->createUsersTable();
             $this->createUserSettingsTable();
@@ -896,6 +902,159 @@ class DBVersion
     }
 
     /**
+     * Creates database version 27
+     *
+     * @return int
+     */
+    private function version27()
+    {
+        $this->createScheduledTransactionsTable();
+
+        return 27;
+    }
+
+    /**
+     * Creates database version 28
+     *
+     * @return int
+     */
+    private function version28()
+    {
+        $this->createRemindersTable();
+
+        return 28;
+    }
+
+    /**
+     * Creates database version 29
+     *
+     * @return int
+     */
+    private function version29()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "user_settings";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
+        if (!isset($columns["tz_offset"])) {
+            $res = $this->dbClient->addColumns(
+                $tableName,
+                ["tz_offset" => "INT(11) NOT NULL DEFAULT 0"],
+            );
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
+        }
+
+        return 29;
+    }
+
+    /**
+     * Creates database version 30
+     *
+     * @return int
+     */
+    private function version30()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "users";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
+        if (!isset($columns["reminders_date"])) {
+            $res = $this->dbClient->addColumns(
+                $tableName,
+                ["reminders_date" => "DATETIME NULL"],
+            );
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
+        }
+
+        return 30;
+    }
+
+    /**
+     * Creates database version 31
+     *
+     * @return int
+     */
+    private function version31()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $this->createIntervalOffsetTable();
+
+        $tableName = "scheduled_transactions";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Failed to obtian columns of table '$tableName'");
+        }
+
+        $offsetsTable = "interval_offset";
+        if (isset($columns["interval_offset"])) {
+            $qResult = $this->dbClient->selectQ(
+                ["id", "user_id", "interval_type", "interval_offset"],
+                $tableName,
+                "interval_offset<>0",
+            );
+            if (!$qResult) {
+                throw new \Error("Failed to real scheduled transactions");
+            }
+
+            $offsets = [];
+            while ($row = $this->dbClient->fetchRow($qResult)) {
+                $intervalType = intval($row["interval_type"]);
+                $intervalOffset = intval($row["interval_offset"]);
+
+                if ($intervalType === INTERVAL_YEAR) {
+                    $monthIndex = intval($intervalOffset / 100);
+                    $dayindex = $intervalOffset % 100;
+                } else {
+                    $monthIndex = 0;
+                    $dayindex = $intervalOffset;
+                }
+
+                $offsetItem = [
+                    "id" => null,
+                    "user_id" => intval($row["user_id"]),
+                    "schedule_id" => intval($row["id"]),
+                    "month_offset" => $monthIndex,
+                    "day_offset" => $dayindex,
+                ];
+
+                unset($row);
+
+                $offsets[] = $offsetItem;
+            }
+
+            if (!$this->dbClient->insertMultipleQ($offsetsTable, $offsets)) {
+                throw new \Error("insertMultipleQ failed");
+            }
+
+            $res = $this->dbClient->dropColumns($tableName, ["interval_offset"]);
+            if (!$res) {
+                throw new \Error("Failed to update table '$tableName'");
+            }
+        }
+
+        return 31;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1031,12 +1190,121 @@ class DBVersion
                 "src_curr" => "INT(11) NOT NULL",
                 "dest_curr" => "INT(11) NOT NULL",
                 "date" => "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
+                "category_id" => "INT(11) NOT NULL",
                 "comment" => "text NOT NULL",
                 "pos" => "INT(11) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "src_result" => DECIMAL_TYPE . " NOT NULL",
                 "dest_result" => DECIMAL_TYPE . " NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates scheduled transactions table
+     */
+    private function createScheduledTransactionsTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "scheduled_transactions";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "src_id" => "INT(11) NOT NULL",
+                "dest_id" => "INT(11) NOT NULL",
+                "type" => "INT(11) NOT NULL",
+                "src_amount" => DECIMAL_TYPE . " NOT NULL",
+                "dest_amount" => DECIMAL_TYPE . " NOT NULL",
+                "src_curr" => "INT(11) NOT NULL",
+                "dest_curr" => "INT(11) NOT NULL",
+                "category_id" => "INT(11) NOT NULL",
+                "comment" => "text NOT NULL",
+                "interval_type" => "INT(11) NOT NULL",
+                "interval_step" => "INT(11) NOT NULL",
+                "start_date" => "DATETIME NOT NULL",
+                "end_date" => "DATETIME NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates scheduled transactions interval offsets table
+     */
+    private function createIntervalOffsetTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "interval_offset";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "schedule_id" => "INT(11) NOT NULL",
+                "month_offset" => "INT(11) NOT NULL",
+                "day_offset" => "INT(11) NOT NULL",
+                "PRIMARY KEY (`id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates scheduled transactions reminders table
+     */
+    private function createRemindersTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "reminders";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "user_id" => "INT(11) NOT NULL",
+                "schedule_id" => "INT(11) NOT NULL",
+                "state" => "INT(11) NOT NULL",
+                "date" => "DATETIME NOT NULL",
+                "transaction_id" => "INT(11) NOT NULL",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,
@@ -1102,6 +1370,7 @@ class DBVersion
                 "passhash" => "VARCHAR(64) NOT NULL",
                 "owner_id" => "INT(11) NOT NULL",
                 "access" => "INT(11) NOT NULL DEFAULT '0'",
+                "reminders_date" => "DATETIME NULL DEFAULT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
@@ -1138,6 +1407,7 @@ class DBVersion
                 "date_locale" => "VARCHAR(64) NOT NULL",
                 "decimal_locale" => "VARCHAR(64) NOT NULL",
                 "tr_group_by_date" => "INT(11) NOT NULL DEFAULT 0",
+                "tz_offset" => "INT(11) NOT NULL DEFAULT 0",
                 "PRIMARY KEY (`id`)",
                 "UNIQUE KEY `user_id` (`user_id`)",
             ],

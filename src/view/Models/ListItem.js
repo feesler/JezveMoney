@@ -19,7 +19,7 @@ export class ListItem {
 
     /** Static alias for ListItem constructor */
     static create(props) {
-        return new ListItem(props);
+        return new this(props);
     }
 
     /**

@@ -11,7 +11,7 @@ import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __, timeToDate } from '../../../../../utils/utils.js';
+import { __ } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
@@ -256,7 +256,7 @@ export class ImportRulesDialog extends Component {
                 };
 
                 if (ImportCondition.isDateField(condition.field_id)) {
-                    res.value = window.app.formatDate(timeToDate(condition.value));
+                    res.value = window.app.formatDate(condition.value);
                 }
 
                 return res;

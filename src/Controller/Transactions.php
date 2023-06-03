@@ -10,6 +10,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -66,16 +67,11 @@ class Transactions extends ListViewController
         $trParams = $this->model->getRequestFilters($_GET, $trParamsDefault);
         $filterObj = $this->model->getFilterObject($trParams);
 
-        $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
-        $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
-        $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
-
         // Obtain requested view mode
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
         }
-        $data["showDetails"] = $showDetails;
 
         $transactions = $this->model->getData($trParams);
 
@@ -163,47 +159,47 @@ class Transactions extends ListViewController
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "create",
+            "headString" => __("TR_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("TR_CREATE"),
         ];
-        $form = [];
 
         $userAccounts = $this->accModel->getUserAccounts();
-        $acc_count = count($userAccounts);
-        $data["acc_count"] = $acc_count;
-
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
-        $tr = [
-            "type" => $this->getRequestedType($_GET, EXPENSE),
-            "src_amount" => 0,
-            "dest_amount" => 0,
-            "date" => time(),
-            "category_id" => 0,
-            "comment" => ""
-        ];
+        if (isset($_GET["reminder_id"])) {
+            $reminderModel = ReminderModel::getInstance();
+            $tr = $reminderModel->getDefaultTransaction($_GET["reminder_id"]);
+            $tr["reminder_id"] = intval($_GET["reminder_id"]);
+        } else {
+            $tr = [
+                "type" => EXPENSE,
+                "src_amount" => 0,
+                "dest_amount" => 0,
+                "date" => time(),
+                "category_id" => 0,
+                "comment" => "",
+            ];
+        }
+
+        $tr["type"] = $this->getRequestedType($_GET, ($tr["type"] ?? EXPENSE));
 
         // Check availability of selected type of transaction
-        $notAvailMessage = null;
         $trAvailable = false;
         $creditCardAccounts = null;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
-            $trAvailable = $acc_count > 0;
-            $notAvailMessage = __("TR_NO_ACCOUNTS");
+            $trAvailable = count($userAccounts) > 0;
         } elseif ($tr["type"] == TRANSFER) {
-            $trAvailable = $acc_count > 1;
-            $notAvailMessage = __("TR_TRANSFER_NO_ACCOUNTS");
+            $trAvailable = count($userAccounts) > 1;
         } elseif ($tr["type"] == DEBT) {
             $trAvailable = is_array($persons) && count($persons) > 0;
-            $notAvailMessage = __("TR_DEBT_NO_PERSONS");
         } elseif ($tr["type"] == LIMIT_CHANGE) {
             $creditCardAccounts = $this->accModel->getUserAccounts([
                 "type" => ACCOUNT_TYPE_CREDIT_CARD,
             ]);
             $trAvailable = count($creditCardAccounts) > 0;
         }
-        $data["trAvailable"] = $trAvailable;
-        $data["notAvailMessage"] = $notAvailMessage;
 
         // Check specified account
         $accountRequested = isset($_GET["acc_id"]);
@@ -221,26 +217,24 @@ class Transactions extends ListViewController
                 if (is_array($creditCardAccounts) && count($creditCardAccounts) > 0) {
                     $acc_id = $creditCardAccounts[0]->id;
                 }
-            } elseif ($acc_count > 0) {
+            } elseif (count($userAccounts) > 0) {
                 $acc_id = $userAccounts[0]->id;
             }
         }
 
         // Check person parameter
         $person_id = 0;
-        $pObj = null;
         if (isset($_GET["person_id"]) && $tr["type"] == DEBT) {
             $person_id = intval($_GET["person_id"]);
         }
-        if ($person_id) {
-            $pObj = $this->personMod->getItem($person_id);
-            if (!$pObj) {
-                $this->fail($defMsg);
-            }
-        }
         if (!$person_id && count($persons) > 0) {
             $person_id = $persons[0]->id;
-            $pObj = $this->personMod->getItem($person_id);
+        }
+        if ($person_id) {
+            $person = $this->personMod->getItem($person_id);
+            if (!$person) {
+                $this->fail(__("ERR_PERSON_NOT_FOUND"));
+            }
         }
 
         $debtType = true;
@@ -251,13 +245,6 @@ class Transactions extends ListViewController
         $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
         $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
         $person_acc_id = ($person_acc) ? $person_acc->id : 0;
-        $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
-
-        $data["person_id"] = $person_id;
-        $data["debtType"] = $debtType;
-        $data["noAccount"] = $noAccount;
-
-        $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
 
         if ($tr["type"] == DEBT) {
             $tr["src_id"] = $person_acc_id;
@@ -266,8 +253,9 @@ class Transactions extends ListViewController
             $tr["dest_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
             $tr["person_id"] = $person_id;
             $tr["debtType"] = $debtType;
+            $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
-            $tr["noAccount"] = $data["noAccount"];
+            $tr["noAccount"] = $noAccount;
         } else {
             // set source and destination accounts
             $src_id = 0;
@@ -313,101 +301,7 @@ class Transactions extends ListViewController
                 $tr["dest_curr"] = $tr["src_curr"];
             }
         }
-        $data["tr"] = $tr;
-        $isDiffCurr = ($tr["src_curr"] != $tr["dest_curr"]);
 
-        // get information about source and destination accounts
-        $src = $this->accModel->getItem($tr["src_id"]);
-        $dest = $this->accModel->getItem($tr["dest_id"]);
-        $data["src"] = $src;
-        $data["dest"] = $dest;
-
-        $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
-
-        $srcBalTitle = __("TR_RESULT");
-        if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
-        } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
-        }
-        $data["srcBalTitle"] = $srcBalTitle;
-
-        $destBalTitle = __("TR_RESULT");
-        if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
-        } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
-        }
-        $data["destBalTitle"] = $destBalTitle;
-
-        /**
-         * Show destination amount input for expense and source amount input for income by default,
-         * because it's amount with changing currency.
-         * Meanwhile source amount for expense and destination amount for income are
-         * always have the same currency as account.
-         */
-        $showSrcAmount = false;
-        $showDestAmount = false;
-        if ($tr["type"] == EXPENSE) {
-            $showSrcAmount = $isDiffCurr;
-            $showDestAmount = true;
-        } elseif ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
-            $showSrcAmount = true;
-            $showDestAmount = $isDiffCurr;
-        } elseif ($tr["type"] == DEBT) {
-            $showSrcAmount = true;
-            $showDestAmount = false;
-        } elseif ($tr["type"] == LIMIT_CHANGE) {
-            $showSrcAmount = false;
-            $showDestAmount = true;
-        }
-
-        $form["src_amount"] = "";
-        $form["dest_amount"] = "";
-
-        $data["showSrcAmount"] = $showSrcAmount;
-        $data["showDestAmount"] = $showDestAmount;
-
-        if ($tr["type"] == LIMIT_CHANGE) {
-            $data["srcAmountLbl"] = "";
-            $data["destAmountLbl"] = __("TR_LIMIT_DELTA");
-        } else {
-            $showBothAmounts = $showSrcAmount && $showDestAmount;
-            $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
-            $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
-        }
-
-        $currObj = $this->currModel->getItem($tr["src_curr"]);
-        $srcAmountSign = $currObj ? $currObj->sign : null;
-        $form["srcCurrSign"] = $srcAmountSign;
-
-        $currObj = $this->currModel->getItem($tr["dest_curr"]);
-        $destAmountSign = $currObj ? $currObj->sign : null;
-        $form["destCurrSign"] = $destAmountSign;
-
-        $form["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
-        $form["exchange"] = 1;
-
-        if ($tr["type"] != DEBT) {
-            $srcResBalance = ($src) ? $src->balance : 0;
-            $destResBalance = ($dest) ? $dest->balance : 0;
-        } else {
-            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
-
-            $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
-            $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
-        }
-        $form["srcResult"] = $srcResBalance;
-        $form["destResult"] = $destResBalance;
-
-        $data["form"] = $form;
-
-        $data["dateFmt"] = date("d.m.Y");
-
-        $data["headString"] = __("TR_CREATE");
-        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
-
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -416,6 +310,7 @@ class Transactions extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,
@@ -440,10 +335,10 @@ class Transactions extends ListViewController
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "update",
+            "headString" => __("TR_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("TR_UPDATE"),
         ];
-        $form = [];
 
-        $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_UPDATE");
 
@@ -460,165 +355,36 @@ class Transactions extends ListViewController
             $this->fail($defMsg);
         }
         $tr = (array)$item;
-        $isDiffCurr = ($tr["src_curr"] != $tr["dest_curr"]);
 
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
 
-        $userAccounts = $this->accModel->getUserAccounts();
-        $data["acc_count"] = count($userAccounts);
-
-        $notAvailMessage = null;
-        $data["notAvailMessage"] = $notAvailMessage;
-        $trAvailable = true;
-        $data["trAvailable"] = $trAvailable;
-
-        // get information about source and destination accounts
-        $src = $this->accModel->getItem($tr["src_id"]);
-        $dest = $this->accModel->getItem($tr["dest_id"]);
-        $data["src"] = $src;
-        $data["dest"] = $dest;
-
-        $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
-
-        $showSrcAmount = false;
-        $showDestAmount = false;
-        if ($tr["type"] == EXPENSE) {
-            $showSrcAmount = $isDiffCurr;
-            $showDestAmount = true;
-        } elseif ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
-            $showSrcAmount = true;
-            $showDestAmount = $isDiffCurr;
-        } elseif ($tr["type"] == DEBT) {
-            $showSrcAmount = true;
-            $showDestAmount = false;
-        } elseif ($tr["type"] == LIMIT_CHANGE) {
-            $showSrcAmount = false;
-            $showDestAmount = true;
-        }
-
         if ($tr["type"] == DEBT) {
-            $uObj = $this->uMod->getItem($this->user_id);
-            if (!$uObj) {
-                throw new \Error(__("ERR_USER_NOT_FOUND"));
-            }
+            $src = $this->accModel->getItem($tr["src_id"]);
+            $dest = $this->accModel->getItem($tr["dest_id"]);
 
-            $debtType = (!is_null($src) && $src->owner_id != $uObj->owner_id);
+            $debtType = (!is_null($src) && $src->owner_id !== $this->owner_id);
 
             $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
-
-            $pObj = $this->personMod->getItem($person_id);
-            if (!$pObj) {
+            $person = $this->personMod->getItem($person_id);
+            if (!$person) {
                 throw new \Error(__("ERR_PERSON_NOT_FOUND"));
             }
-
-            $person_acc_id = ($debtType) ? $tr["src_id"] : $tr["dest_id"];
-            $person_acc = $this->accModel->getItem($person_acc_id);
-            $person_curr = $person_acc->curr_id;
-            $person_res_balance = $person_acc->balance;
 
             $debtAcc = $debtType ? $dest : $src;
             $noAccount = is_null($debtAcc);
 
-            if ($noAccount) {
-                $acc_id = $this->accModel->getAnother();
-                $debtAcc = $this->accModel->getItem($acc_id);
-            } else {
-                $acc_id = $debtAcc->id;
-            }
+            $acc_id = ($noAccount)
+                ? $this->accModel->getAnother()
+                : $debtAcc->id;
 
             $tr["person_id"] = $person_id;
             $tr["debtType"] = $debtType;
+            $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = $noAccount;
-        } else {
-            $debtType = true;
-            $noAccount = false;
-
-            $acc_id = $this->accModel->getAnother();
-            $debtAcc = $this->accModel->getItem($acc_id);
-
-            $person_id = (is_array($persons) && count($persons) > 0)
-                ? $persons[0]->id
-                : 0;
-            $pObj = $this->personMod->getItem($person_id);
-
-            $person_curr = $tr["src_curr"];
-            $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
-            $person_acc_id = ($person_acc) ? $person_acc->id : 0;
-            $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
         }
 
-        $srcBalTitle = __("TR_RESULT");
-        if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
-        } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
-        }
-
-        $destBalTitle = __("TR_RESULT");
-        if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
-        } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
-        }
-
-        $form["src_amount"] = $tr["src_amount"];
-        $form["dest_amount"] = $tr["dest_amount"];
-
-        $data["showSrcAmount"] = $showSrcAmount;
-        $data["showDestAmount"] = $showDestAmount;
-        $data["srcBalTitle"] = $srcBalTitle;
-        $data["destBalTitle"] = $destBalTitle;
-
-        $data["person_id"] = $person_id;
-        $data["debtType"] = $debtType;
-        $data["noAccount"] = $noAccount;
-
-        $data["tr"] = $tr;
-
-        if ($tr["type"] == LIMIT_CHANGE) {
-            $data["srcAmountLbl"] = "";
-            $data["destAmountLbl"] = __("TR_LIMIT_DELTA");
-        } else {
-            $showBothAmounts = $showSrcAmount && $showDestAmount;
-            $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
-            $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
-        }
-
-        $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
-
-        $currObj = $this->currModel->getItem($tr["src_curr"]);
-        $form["srcCurrSign"] = $currObj ? $currObj->sign : null;
-
-        $currObj = $this->currModel->getItem($tr["dest_curr"]);
-        $form["destCurrSign"] = $currObj ? $currObj->sign : null;
-
-        $form["exchSign"] = $form["destCurrSign"] . "/" . $form["srcCurrSign"];
-        $form["exchange"] = normalize($tr["dest_amount"] / $tr["src_amount"], 4);
-
-        if ($tr["type"] != DEBT) {
-            $srcResBalance = ($src) ? $src->balance : 0;
-            $destResBalance = ($dest) ? $dest->balance : 0;
-        } else {
-            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
-            if ($noAccount) {
-                $acc_res_balance += ($debtType) ? $tr["dest_amount"] : -$tr["src_amount"];
-            }
-            $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
-            $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
-        }
-        $form["srcResult"] = $srcResBalance;
-        $form["destResult"] = $destResBalance;
-
-        $data["form"] = $form;
-
-        $data["dateFmt"] = date("d.m.Y", $tr["date"]);
-
-        $data["headString"] = __("TR_UPDATE");
-        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
-
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
@@ -627,10 +393,11 @@ class Transactions extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,
-                "trAvailable" => $trAvailable,
+                "trAvailable" => true,
                 "requestedType" => $requestedType,
             ],
         ];

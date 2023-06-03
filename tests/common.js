@@ -8,6 +8,7 @@ import {
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
+export const MONTHS_IN_YEAR = 12;
 
 export const SORT_BY_CREATEDATE_ASC = 1;
 export const SORT_BY_CREATEDATE_DESC = 2;
@@ -46,11 +47,16 @@ export const cutDate = (date) => {
     return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
+/** Converts timestamp to seconds */
+export const timeToSeconds = (timestamp) => {
+    assert(timestamp, 'Invalid timestamp');
+    return timestamp / MS_IN_SECOND;
+};
+
 /** Converts Date instance to seconds */
 export const dateToSeconds = (date) => {
     const ms = cutDate(date);
-    assert(ms, 'Invalid date');
-    return ms / MS_IN_SECOND;
+    return timeToSeconds(ms);
 };
 
 /** Converts date string to seconds */
@@ -59,11 +65,16 @@ export const dateStringToSeconds = (dateStr, params = {}) => {
     return (isDate(date)) ? dateToSeconds(date) : null;
 };
 
-/** Converts seconds to Date instance */
-export const secondsToDate = (seconds) => {
+/** Converts seconds to timestamp */
+export const secondsToTime = (seconds) => {
     assert.isInteger(seconds, `Invalid seconds value: ${seconds}`);
-    return new Date(seconds * MS_IN_SECOND);
+    return seconds * MS_IN_SECOND;
 };
+
+/** Converts seconds to Date instance */
+export const secondsToDate = (seconds) => (
+    new Date(secondsToTime(seconds))
+);
 
 /** Converts seconds to date string */
 export const secondsToDateString = (seconds, params = {}) => {
@@ -151,6 +162,28 @@ export const shiftDate = (date, shift) => (
         date.getDate() + shift,
     ))
 );
+
+/** Returns last date of month */
+export const getLastDayOfMonth = (date) => (
+    new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0,
+    ))
+);
+
+function firstUpperCase(str, locales = []) {
+    const first = str.substring(0, 1);
+    const rest = str.substring(1);
+
+    return first.toLocaleUpperCase(locales)
+        .concat(rest.toLocaleLowerCase(locales));
+}
+
+export const getWeekdayShort = (date, locales = []) => {
+    const weekdayName = formatDate(date, { locales, options: { weekday: 'short' } });
+    return firstUpperCase(weekdayName.substr(0, 3), locales);
+};
 
 /** Format specified value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');

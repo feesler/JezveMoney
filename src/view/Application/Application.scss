@@ -832,7 +832,7 @@ svg * {
 /* Datepicker */
 .dp__container {
   --dp-bg-color: var(--main-bg-color);
-  --dp-border-color: var(--border-color-1);
+  --dp-border-color: var(--active-input-border-color);
   --dp-border-width: 1px;
   --dp-text-color: var(--main-text-color);
   --dp-other-text-color: var(--text-color-6);
@@ -965,6 +965,11 @@ svg * {
   --link-menu-icon-color: var(--accent-color);
   --link-menu-item-padding: 0;
   --link-menu-selected-color: var(--main-text-color);
+}
+
+.link-menu[multiple] {
+  --link-menu-selected-color: var(--accent-color);
+  --link-menu-selected-font-weight: 400;
 }
 
 /* Counters */

@@ -5,7 +5,9 @@ import { App } from '../../Application.js';
 const resetAllOptions = {
     accounts: true,
     persons: true,
+    categories: true,
     transactions: true,
+    schedule: true,
     importtpl: true,
     importrules: true,
 };
@@ -124,6 +126,7 @@ export class ProfileStory extends TestStory {
         await App.scenario.createTestData();
 
         await App.scenario.runner.runGroup(Actions.resetData, [
+            { schedule: true },
             { accounts: true },
             resetAllOptions,
         ]);

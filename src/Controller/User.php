@@ -64,7 +64,7 @@ class User extends TemplateController
             setLocation(BASEURL . "login/");
         }
 
-        $reqData = checkFields($_POST, $loginFields);
+        $reqData = checkFields($_POST, $loginFields, true);
         if (isset($_POST["remember"])) {
             $reqData["remember"] = true;
         }
@@ -124,7 +124,7 @@ class User extends TemplateController
 
         $this->begin();
 
-        $reqData = checkFields($_POST, $registerFields);
+        $reqData = checkFields($_POST, $registerFields, true);
 
         $user_id = null;
         try {

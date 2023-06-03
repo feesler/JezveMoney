@@ -10,14 +10,15 @@ import {
     availSortTypes,
     normalize,
     dateStringToSeconds,
+    timeToSeconds,
 } from '../common.js';
 import {
     EXPENSE,
     INCOME,
     DEBT,
-    availTransTypes,
     TRANSFER,
     LIMIT_CHANGE,
+    Transaction,
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { ImportRule } from './ImportRule.js';
@@ -35,47 +36,34 @@ import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
 import { ImportCondition } from './ImportCondition.js';
+import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
+import { ScheduledTransaction } from './ScheduledTransaction.js';
+import { RemindersList } from './RemindersList.js';
+import {
+    REMINDER_CANCELLED,
+    REMINDER_CONFIRMED,
+    REMINDER_SCHEDULED,
+    Reminder,
+} from './Reminder.js';
+import { Account } from './Account.js';
+import { Person } from './Person.js';
+import { Category } from './Category.js';
+import { UserCurrency } from './UserCurrency.js';
+import { ImportTemplate } from './ImportTemplate.js';
 
 /** Settings */
 const sortSettings = ['sort_accounts', 'sort_persons', 'sort_categories'];
-const availSettings = [...sortSettings, 'date_locale', 'decimal_locale', 'tr_group_by_date'];
-
-/** Accounts */
-const accReqFields = ['type', 'name', 'balance', 'initbalance', 'initlimit', 'limit', 'curr_id', 'icon_id', 'flags'];
-
-/** Persons */
-const pReqFields = ['name', 'flags'];
-
-/** User currencies */
-const uCurrReqFields = ['curr_id', 'flags'];
+const availSettings = [
+    ...sortSettings,
+    'date_locale',
+    'decimal_locale',
+    'tr_group_by_date',
+    'tz_offset',
+];
 
 /** Categories */
-const catReqFields = ['name', 'parent_id', 'type'];
 const ANY_TYPE = 0;
-const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
-
-/** Transactions */
-const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
-const trAvailFields = [...trReqFields, 'id', 'person_id', 'acc_id', 'op'];
-
-/** Import templates */
-const tplReqFields = [
-    'name',
-    'type_id',
-    'account_id',
-    'first_row',
-];
-const tplReqColumns = {
-    account_amount_col: 'accountAmount',
-    account_curr_col: 'accountCurrency',
-    trans_amount_col: 'transactionAmount',
-    trans_curr_col: 'transactionCurrency',
-    date_col: 'date',
-    comment_col: 'comment',
-};
-
-/** Import rules */
-const ruleReqFields = ['flags', 'conditions', 'actions'];
+const transTypes = [...Transaction.availTypes, ANY_TYPE];
 
 /**
  * Check all properties of expected object are presents in specified object
@@ -117,6 +105,8 @@ export class AppState {
         this.personsCache = null;
         this.sortedPersonsCache = null;
         this.transactions = null;
+        this.schedule = null;
+        this.reminders = null;
         this.templates = null;
         this.rules = null;
         this.userCurrencies = null;
@@ -153,6 +143,18 @@ export class AppState {
         const transactions = state.transactions?.items ?? state.transactions.data;
         this.transactions.setData(transactions);
         this.transactions.autoincrement = state.transactions.autoincrement;
+
+        if (!this.schedule) {
+            this.schedule = ScheduledTransactionsList.create();
+        }
+        this.schedule.setData(state.schedule.data);
+        this.schedule.autoincrement = state.schedule.autoincrement;
+
+        if (!this.reminders) {
+            this.reminders = RemindersList.create();
+        }
+        this.reminders.setData(state.reminders.data);
+        this.reminders.autoincrement = state.reminders.autoincrement;
 
         if (!this.categories) {
             this.categories = CategoryList.create();
@@ -201,6 +203,8 @@ export class AppState {
         res.persons = this.persons.clone();
         res.categories = this.categories.clone();
         res.transactions = this.transactions.clone();
+        res.schedule = this.schedule.clone();
+        res.reminders = this.reminders.clone();
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
         res.userCurrencies = this.userCurrencies.clone();
@@ -227,7 +231,7 @@ export class AppState {
 
             assert.deepMeet(local.data, noDatesData);
         } catch (e) {
-            console.log('Local: ', local.data);
+            console.log('Real data: ', local.data);
             console.log('Expected: ', noDatesData);
 
             throw e;
@@ -238,6 +242,8 @@ export class AppState {
     meetExpectation(expected) {
         this.compareLists(this.accounts, expected.accounts);
         this.compareLists(this.transactions, expected.transactions);
+        this.compareLists(this.schedule, expected.schedule);
+        this.compareLists(this.reminders, expected.reminders);
         this.compareLists(this.persons, expected.persons);
         this.compareLists(this.categories, expected.categories);
         this.compareLists(this.templates, expected.templates);
@@ -298,6 +304,11 @@ export class AppState {
             this.accounts?.setData(accountsData);
         }
 
+        if ('schedule' in options) {
+            this.schedule?.reset();
+            this.reminders?.reset();
+        }
+
         if ('importtpl' in options) {
             this.templates?.reset();
         }
@@ -314,6 +325,8 @@ export class AppState {
         this.categories?.reset();
         this.resetPersonsCache();
         this.transactions?.reset();
+        this.schedule?.reset();
+        this.reminders?.reset();
         this.templates?.reset();
         this.rules?.reset();
         this.userCurrencies?.reset();
@@ -328,12 +341,32 @@ export class AppState {
         delete this.profile;
     }
 
+    getAccountsSortMode() {
+        return this.profile.settings.sort_accounts;
+    }
+
+    getPersonsSortMode() {
+        return this.profile.settings.sort_persons;
+    }
+
+    getCategoriesSortMode() {
+        return this.profile.settings.sort_categories;
+    }
+
     getDateFormatLocale() {
         return this.profile.settings.date_locale;
     }
 
     getDecimalFormatLocale() {
         return this.profile.settings.decimal_locale;
+    }
+
+    getGroupByDate() {
+        return this.profile.settings.tr_group_by_date === 1;
+    }
+
+    getTimezoneOffset() {
+        return this.profile.settings.tz_offset;
     }
 
     getCurrencies() {
@@ -512,6 +545,17 @@ export class AppState {
         return res;
     }
 
+    getScheduledTransactions() {
+        return {
+            data: copyObject(this.schedule.data),
+        };
+    }
+
+    getReminders(options) {
+        const res = this.reminders.clone();
+        return res.applyFilter(options);
+    }
+
     getState(request) {
         const res = {};
 
@@ -529,6 +573,12 @@ export class AppState {
         }
         if (request.transactions) {
             res.transactions = this.getTransactions(request.transactions);
+        }
+        if (request.schedule) {
+            res.schedule = this.getScheduledTransactions(request.schedule);
+        }
+        if (request.reminders) {
+            res.reminders = this.getReminders(request.reminders);
         }
         if (request.statistics) {
             res.statistics = this.getStatistics(request.statistics);
@@ -603,7 +653,7 @@ export class AppState {
      * User currencies
      */
 
-    checkUserCurrencyCorrectness(params) {
+    validateUserCurrency(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -625,12 +675,12 @@ export class AppState {
     }
 
     createUserCurrency(params) {
-        const resExpected = this.checkUserCurrencyCorrectness(params);
+        const resExpected = this.validateUserCurrency(params);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(params, uCurrReqFields);
+        const data = copyFields(params, UserCurrency.availProps);
 
         const ind = this.userCurrencies.create(data);
         const item = this.userCurrencies.getItemByIndex(ind);
@@ -646,10 +696,10 @@ export class AppState {
 
         // Prepare expected item object
         const expectedItem = copyObject(original);
-        const data = copyFields(params, uCurrReqFields);
+        const data = copyFields(params, UserCurrency.availProps);
         Object.assign(expectedItem, data);
 
-        const resExpected = this.checkUserCurrencyCorrectness(expectedItem);
+        const resExpected = this.validateUserCurrency(expectedItem);
         if (!resExpected) {
             return false;
         }
@@ -703,7 +753,7 @@ export class AppState {
      * Accounts
      */
 
-    checkAccountCorrectness(params) {
+    validateAccount(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -743,23 +793,17 @@ export class AppState {
     }
 
     createAccount(params) {
-        const defaults = {
-            type: 0,
-            initlimit: 0,
-            icon_id: 0,
-            flags: 0,
-        };
         const itemData = {
-            ...defaults,
+            ...Account.defaultProps,
             ...params,
         };
 
-        const resExpected = this.checkAccountCorrectness(itemData);
+        const resExpected = this.validateAccount(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, accReqFields);
+        const data = copyFields(itemData, Account.availProps);
         data.owner_id = this.profile.owner_id;
         data.balance = data.initbalance;
         data.limit = data.initlimit;
@@ -780,11 +824,11 @@ export class AppState {
 
         // Prepare expected account object
         const expAccount = copyObject(origAcc);
-        const data = copyFields(params, accReqFields);
+        const data = copyFields(params, Account.availProps);
         data.owner_id = this.profile.owner_id;
         Object.assign(expAccount, data);
 
-        const resExpected = this.checkAccountCorrectness(expAccount);
+        const resExpected = this.validateAccount(expAccount);
         if (!resExpected) {
             return false;
         }
@@ -808,6 +852,12 @@ export class AppState {
         // Prepare expected updates of transactions list
         this.transactions = this.transactions.updateAccount(this.accounts.data, expAccount);
 
+        // Prepare expected updates of scheduled transactions list
+        this.schedule = this.schedule.updateAccount(
+            this.accounts.data,
+            expAccount,
+        );
+
         // Prepare expected updates of accounts list
         this.accounts.update(expAccount);
 
@@ -830,6 +880,10 @@ export class AppState {
         this.rules.deleteAccounts(ids);
         this.templates.deleteAccounts(ids);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
+        this.schedule = this.schedule.deleteAccounts(
+            this.accounts.data,
+            ids,
+        );
 
         // Prepare expected updates of accounts list
         this.accounts.deleteItems(ids);
@@ -902,10 +956,6 @@ export class AppState {
     getUserAccounts() {
         this.cacheUserAccounts();
         return this.userAccountsCache;
-    }
-
-    getAccountsSortMode() {
-        return this.profile.settings.sort_accounts;
     }
 
     sortAccounts() {
@@ -985,7 +1035,7 @@ export class AppState {
      * Persons
      */
 
-    checkPersonCorrectness(params) {
+    validatePerson(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -1008,20 +1058,17 @@ export class AppState {
     }
 
     createPerson(params) {
-        const defaults = {
-            flags: 0,
-        };
         const itemData = {
-            ...defaults,
+            ...Person.defaultProps,
             ...params,
         };
 
-        const resExpected = this.checkPersonCorrectness(itemData);
+        const resExpected = this.validatePerson(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, pReqFields);
+        const data = copyFields(itemData, Person.availProps);
         const ind = this.persons.create(data);
         const item = this.persons.getItemByIndex(ind);
         item.accounts = [];
@@ -1038,10 +1085,10 @@ export class AppState {
         }
 
         const expPerson = copyObject(origPerson);
-        const data = copyFields(params, pReqFields);
+        const data = copyFields(params, Person.availProps);
         Object.assign(expPerson, data);
 
-        const resExpected = this.checkPersonCorrectness(expPerson);
+        const resExpected = this.validatePerson(expPerson);
         if (!resExpected) {
             return false;
         }
@@ -1070,6 +1117,11 @@ export class AppState {
 
         // Prepare expected updates of transactions
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, accountsToDelete);
+        this.schedule = this.schedule.deleteAccounts(
+            this.accounts.data,
+            accountsToDelete,
+        );
+
         this.accounts.deleteItems(accountsToDelete);
         this.transactions.updateResults(this.accounts);
 
@@ -1187,10 +1239,6 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
-    getPersonsSortMode() {
-        return this.profile.settings.sort_persons;
-    }
-
     sortPersons() {
         const sortMode = this.getPersonsSortMode();
         this.persons.sortBy(sortMode);
@@ -1241,7 +1289,7 @@ export class AppState {
      * Categories
      */
 
-    checkCategoryCorrectness(params) {
+    validateCategory(params) {
         if (!isObject(params)) {
             return false;
         }
@@ -1272,7 +1320,7 @@ export class AppState {
             }
         }
 
-        if (params.type !== 0 && !availTransTypes.includes(params.type)) {
+        if (params.type !== 0 && !Transaction.availTypes.includes(params.type)) {
             return false;
         }
 
@@ -1293,12 +1341,12 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkCategoryCorrectness(itemData);
+        const resExpected = this.validateCategory(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, catReqFields);
+        const data = copyFields(itemData, Category.availProps);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
         this.sortCategories();
@@ -1313,10 +1361,10 @@ export class AppState {
         }
 
         const expItem = copyObject(origItem);
-        const data = copyFields(params, catReqFields);
+        const data = copyFields(params, Category.availProps);
         Object.assign(expItem, data);
 
-        const resExpected = this.checkCategoryCorrectness(expItem);
+        const resExpected = this.validateCategory(expItem);
         if (!resExpected) {
             return false;
         }
@@ -1354,14 +1402,14 @@ export class AppState {
             return false;
         }
 
-        const categoriesToDelete = [...ids];
+        const itemsToDelete = [...ids];
         const childrenCategories = ids.flatMap((id) => (
             this.categories.findByParent(id).map((item) => item.id)
         ));
 
         const removeChildren = params.removeChildren ?? true;
         if (removeChildren) {
-            categoriesToDelete.push(...childrenCategories);
+            itemsToDelete.push(...childrenCategories);
         } else {
             childrenCategories.forEach((id) => {
                 const item = this.categories.getItem(id);
@@ -1374,10 +1422,11 @@ export class AppState {
         }
 
         // Prepare expected updates of transactions
-        this.transactions = this.transactions.deleteCategories(categoriesToDelete);
-        this.rules.deleteCategories(...categoriesToDelete);
+        this.transactions = this.transactions.deleteCategories(itemsToDelete);
+        this.schedule = this.schedule.deleteCategories(itemsToDelete);
+        this.rules.deleteCategories(...itemsToDelete);
 
-        this.categories.deleteItems(categoriesToDelete);
+        this.categories.deleteItems(itemsToDelete);
 
         this.sortCategories();
 
@@ -1401,10 +1450,6 @@ export class AppState {
         this.sortCategories();
 
         return this.returnState(params.returnState);
-    }
-
-    getCategoriesSortMode() {
-        return this.profile.settings.sort_categories;
     }
 
     sortCategories() {
@@ -1474,16 +1519,12 @@ export class AppState {
      * Transactions
      */
 
-    getGroupByDate() {
-        return this.profile.settings.tr_group_by_date === 1;
-    }
-
-    checkTransactionCorrectness(params) {
+    validateTransaction(params) {
         if (!isObject(params)) {
             return false;
         }
 
-        if (!availTransTypes.includes(params.type)) {
+        if (!Transaction.availTypes.includes(params.type)) {
             return false;
         }
         // Amount must be greather than zero
@@ -1504,10 +1545,7 @@ export class AppState {
             return false;
         }
 
-        if (params.type === DEBT) {
-            if (!params.person_id) {
-                return false;
-            }
+        if (params.type === DEBT && ('person_id' in params)) {
             if ('op' in params && params.op !== 1 && params.op !== 2) {
                 return false;
             }
@@ -1527,58 +1565,62 @@ export class AppState {
                     return false;
                 }
             }
-        } else {
-            if (params.src_id) {
-                if (params.type === INCOME) {
-                    return false;
-                }
+        }
 
-                const account = this.accounts.getItem(params.src_id);
-                if (
-                    !account
-                    || srcCurr.id !== account.curr_id
-                    || account.owner_id !== this.profile.owner_id
-                ) {
-                    return false;
-                }
+        if (
+            ('src_id' in params)
+            && ('dest_id' in params)
+            && (params.src_id === params.dest_id)
+        ) {
+            return false;
+        }
 
-                if (
-                    params.type === LIMIT_CHANGE
-                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
-                ) {
-                    return false;
-                }
-            } else if (params.type === EXPENSE || params.type === TRANSFER) {
+        if (params.src_id) {
+            if (params.type === INCOME) {
                 return false;
             }
 
-            if (params.dest_id) {
-                if (params.type === EXPENSE) {
-                    return false;
-                }
-
-                const account = this.accounts.getItem(params.dest_id);
-                if (
-                    !account
-                    || destCurr.id !== account.curr_id
-                    || account.owner_id !== this.profile.owner_id
-                ) {
-                    return false;
-                }
-
-                if (
-                    params.type === LIMIT_CHANGE
-                    && account.type !== ACCOUNT_TYPE_CREDIT_CARD
-                ) {
-                    return false;
-                }
-            } else if (params.type === INCOME || params.type === TRANSFER) {
+            const account = this.accounts.getItem(params.src_id);
+            if (
+                !account
+                || srcCurr.id !== account.curr_id
+                || (params.type !== DEBT && account.owner_id !== this.profile.owner_id)
+            ) {
                 return false;
             }
 
-            if (params.src_id === params.dest_id) {
+            if (
+                params.type === LIMIT_CHANGE
+                && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
                 return false;
             }
+        } else if (params.type === EXPENSE || params.type === TRANSFER) {
+            return false;
+        }
+
+        if (params.dest_id) {
+            if (params.type === EXPENSE) {
+                return false;
+            }
+
+            const account = this.accounts.getItem(params.dest_id);
+            if (
+                !account
+                || destCurr.id !== account.curr_id
+                || (params.type !== DEBT && account.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && account.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === INCOME || params.type === TRANSFER) {
+            return false;
         }
 
         if (params.category_id !== 0) {
@@ -1673,17 +1715,21 @@ export class AppState {
     }
 
     getExpectedTransaction(params) {
-        const res = copyFields(params, trAvailFields);
-        if (!res.date) {
-            res.date = App.datesSec.now;
+        const isPersonRequest = ('person_id' in params);
+        const fields = (params.type === DEBT && isPersonRequest)
+            ? Transaction.debtProps
+            : Transaction.availProps;
+        const itemData = {
+            ...Transaction.defaultProps,
+            ...params,
+        };
+
+        const res = copyFields(itemData, fields);
+        if (itemData.id) {
+            res.id = itemData.id;
         }
-        if (typeof res.category_id !== 'number') {
-            res.category_id = 0;
-        }
-        if (!res.comment) {
-            res.comment = '';
-        }
-        if (res.type !== DEBT) {
+
+        if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
             return res;
         }
 
@@ -1716,16 +1762,12 @@ export class AppState {
     }
 
     createTransaction(params) {
-        const defaults = {
-            category_id: 0,
-            comment: '',
-        };
         const itemData = {
-            ...defaults,
+            ...Transaction.defaultProps,
             ...params,
         };
 
-        let resExpected = this.checkTransactionCorrectness(itemData);
+        let resExpected = this.validateTransaction(itemData);
         if (!resExpected) {
             return false;
         }
@@ -1737,7 +1779,7 @@ export class AppState {
         }
         expTrans.pos = 0;
 
-        resExpected = checkFields(expTrans, trReqFields);
+        resExpected = checkFields(expTrans, Transaction.availProps);
         if (!resExpected) {
             return false;
         }
@@ -1751,6 +1793,13 @@ export class AppState {
         this.updatePersonAccounts();
 
         const item = this.transactions.getItemByIndex(ind);
+
+        if (itemData.reminder_id) {
+            this.confirmReminder({
+                id: itemData.reminder_id,
+                transaction_id: item.id,
+            });
+        }
 
         return this.returnState(params.returnState, { id: item.id });
     }
@@ -1766,7 +1815,7 @@ export class AppState {
         const updTrans = this.transactionToRequest(origTrans);
         Object.assign(updTrans, params);
 
-        const correct = this.checkTransactionCorrectness(updTrans);
+        const correct = this.validateTransaction(updTrans);
         if (!correct) {
             return false;
         }
@@ -1801,6 +1850,7 @@ export class AppState {
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
+        this.reminders.deleteTransactions(ids);
         this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
@@ -1846,7 +1896,7 @@ export class AppState {
     }
 
     isAvailableTransactionType(type) {
-        assert(availTransTypes.includes(type), 'Invalid transaction type');
+        assert(Transaction.availTypes.includes(type), 'Invalid transaction type');
 
         this.cacheUserAccounts();
 
@@ -1865,14 +1915,532 @@ export class AppState {
     }
 
     /**
-     * Import templates
+     * Scheduled transactions
      */
-    checkTemplateCorrectness(params) {
+
+    validateScheduledTransaction(params) {
         if (!isObject(params)) {
             return false;
         }
 
-        if (!checkFields(params, tplReqFields)) {
+        if (!Transaction.availTypes.includes(params.type)) {
+            return false;
+        }
+        // Amount must be greather than zero
+        if (params.src_amount <= 0 || params.dest_amount <= 0) {
+            return false;
+        }
+        // Source and destination amounts must be equal if currencies are same
+        if (params.src_curr === params.dest_curr && params.src_amount !== params.dest_amount) {
+            return false;
+        }
+
+        const srcCurr = App.currency.getItem(params.src_curr);
+        if (!srcCurr) {
+            return false;
+        }
+        const destCurr = App.currency.getItem(params.dest_curr);
+        if (!destCurr) {
+            return false;
+        }
+
+        if (params.type === DEBT && ('person_id' in params)) {
+            const person = this.persons.getItem(params.person_id);
+            if (!person) {
+                return false;
+            }
+
+            if ('op' in params && params.op !== 1 && params.op !== 2) {
+                return false;
+            }
+
+            if (params.acc_id) {
+                const account = this.accounts.getItem(params.acc_id);
+                if (
+                    !account
+                    || (params.op === 2 && srcCurr.id !== account.curr_id)
+                    || (params.op === 1 && destCurr.id !== account.curr_id)
+                ) {
+                    return false;
+                }
+            }
+        }
+
+        if (
+            ('src_id' in params)
+            && ('dest_id' in params)
+            && (params.src_id === params.dest_id)
+        ) {
+            return false;
+        }
+
+        let srcAccount = null;
+        if (params.src_id) {
+            if (params.type === INCOME) {
+                return false;
+            }
+
+            srcAccount = this.accounts.getItem(params.src_id);
+            if (
+                !srcAccount
+                || (srcCurr.id !== srcAccount.curr_id)
+                || (params.type !== DEBT && srcAccount.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && srcAccount.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === EXPENSE || params.type === TRANSFER) {
+            return false;
+        }
+
+        let destAccount = null;
+        if (params.dest_id) {
+            if (params.type === EXPENSE) {
+                return false;
+            }
+
+            destAccount = this.accounts.getItem(params.dest_id);
+            if (
+                !destAccount
+                || (destCurr.id !== destAccount.curr_id)
+                || (params.type !== DEBT && destAccount.owner_id !== this.profile.owner_id)
+            ) {
+                return false;
+            }
+
+            if (
+                params.type === LIMIT_CHANGE
+                && destAccount.type !== ACCOUNT_TYPE_CREDIT_CARD
+            ) {
+                return false;
+            }
+        } else if (params.type === INCOME || params.type === TRANSFER) {
+            return false;
+        }
+
+        if (params.type === DEBT && !('person_id' in params)) {
+            // Both source and destination are accounts of person
+            if (
+                srcAccount
+                && srcAccount.owner_id !== this.profile.owner_id
+                && destAccount
+                && destAccount.owner_id !== this.profile.owner_id
+            ) {
+                return false;
+            }
+
+            // Neither source nor destination are accounts of person
+            if (
+                (!srcAccount || srcAccount.owner_id === this.profile.owner_id)
+                && (!destAccount || destAccount.owner_id === this.profile.owner_id)
+            ) {
+                return false;
+            }
+        }
+
+        if (params.category_id !== 0) {
+            const category = this.categories.getItem(params.category_id);
+            if (!category) {
+                return false;
+            }
+        }
+
+        if ('start_date' in params && !isInt(params.start_date)) {
+            return false;
+        }
+
+        if ('end_date' in params && !isInt(params.end_date) && params.end_date !== null) {
+            return false;
+        }
+
+        // End date must be greater than start date
+        if (
+            isInt(params.start_date)
+            && isInt(params.end_date)
+            && params.start_date >= params.end_date
+        ) {
+            return false;
+        }
+
+        if (!ScheduledTransaction.isValidIntervalType(params.interval_type)) {
+            return false;
+        }
+
+        if (!ScheduledTransaction.isValidIntervalStep(params.interval_step)) {
+            return false;
+        }
+
+        const offsets = asArray(params.interval_offset);
+
+        if (
+            !offsets.every((offset) => (
+                ScheduledTransaction.isValidIntervalOffset(
+                    offset,
+                    params.interval_type,
+                )
+            ))
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    getExpectedScheduledTransaction(params) {
+        const isPersonRequest = ('person_id' in params);
+        const fields = (params.type === DEBT && isPersonRequest)
+            ? ScheduledTransaction.debtProps
+            : ScheduledTransaction.availProps;
+        const itemData = {
+            ...ScheduledTransaction.defaultProps,
+            ...params,
+        };
+
+        const res = copyFields(itemData, fields);
+        res.interval_offset = asArray(res.interval_offset);
+
+        if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
+            return res;
+        }
+
+        const reqCurr = (res.op === 1) ? res.src_curr : res.dest_curr;
+        const personAcc = this.getExpectedPersonAccount(res.person_id, reqCurr);
+        if (!personAcc) {
+            return null;
+        }
+
+        if (res.op === 1) {
+            res.src_id = personAcc.id;
+            res.dest_id = res.acc_id;
+        } else {
+            res.src_id = res.acc_id;
+            res.dest_id = personAcc.id;
+        }
+
+        delete res.op;
+        delete res.person_id;
+        delete res.acc_id;
+
+        return res;
+    }
+
+    createScheduledTransaction(params) {
+        const itemData = {
+            ...ScheduledTransaction.defaultProps,
+            ...params,
+        };
+
+        let resExpected = this.validateScheduledTransaction(itemData);
+        if (!resExpected) {
+            return false;
+        }
+
+        const expItem = this.getExpectedScheduledTransaction(itemData);
+        if (!expItem) {
+            return false;
+        }
+
+        resExpected = checkFields(expItem, ScheduledTransaction.requiredProps);
+        if (!resExpected) {
+            return false;
+        }
+
+        const ind = this.schedule.create(expItem);
+        const item = this.schedule.getItemByIndex(ind);
+
+        if (!this.createReminders(item.id)) {
+            return false;
+        }
+
+        return this.returnState(params.returnState, { id: item.id });
+    }
+
+    updateScheduledTransaction(params) {
+        const origItem = this.schedule.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const itemData = copyObject(origItem);
+        const data = copyFields(params, ScheduledTransaction.availProps);
+        Object.assign(itemData, data);
+
+        const resExpected = this.validateScheduledTransaction(itemData);
+        if (!resExpected) {
+            return false;
+        }
+
+        const expItem = this.getExpectedScheduledTransaction(itemData);
+        if (!expItem) {
+            return false;
+        }
+
+        this.schedule.update(expItem);
+
+        const remindersChanged = this.isRemindersChanged(origItem, expItem);
+        if (remindersChanged && !this.updateReminders(expItem.id)) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
+    isRemindersChanged(item, params) {
+        if (
+            item.start_date !== params.start_date
+            || item.end_date !== params.end_date
+            || item.interval_type !== params.interval_type
+            || item.interval_step !== params.interval_step
+        ) {
+            return true;
+        }
+
+        const origOffsets = asArray(item.interval_offset);
+        const newOffsets = asArray(params.interval_offset);
+        return (
+            (origOffsets.length !== newOffsets.length)
+            || (origOffsets.some((offset) => !newOffsets.includes(offset)))
+        );
+    }
+
+    deleteScheduledTransaction(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        const itemsToDelete = ids.map((id) => this.schedule.getItem(id));
+        if (!itemsToDelete.every((item) => !!item)) {
+            return false;
+        }
+
+        this.schedule.deleteItems(ids);
+
+        if (!this.deleteReminders(ids)) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
+    createReminders(scheduleId) {
+        const item = this.schedule.getItem(scheduleId);
+        if (!item) {
+            return false;
+        }
+
+        const reminderDates = item.getReminders({
+            endDate: App.dates.now.getTime(),
+        });
+        return reminderDates.every((timestamp) => (
+            this.createReminder({
+                schedule_id: scheduleId,
+                state: REMINDER_SCHEDULED,
+                date: timeToSeconds(timestamp),
+                transaction_id: 0,
+            })
+        ));
+    }
+
+    updateReminders(scheduleId) {
+        this.deleteReminders(scheduleId);
+        return this.createReminders(scheduleId);
+    }
+
+    deleteReminders(scheduleId) {
+        this.reminders.deleteRemindersBySchedule(scheduleId);
+        return true;
+    }
+
+    /**
+     * Scheduled transactions reminders
+     */
+
+    validateReminder(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (!checkFields(params, Reminder.availProps)) {
+            return false;
+        }
+
+        if (params.schedule_id !== 0) {
+            const schedule = this.schedule.getItem(params.schedule_id);
+            if (!schedule) {
+                return false;
+            }
+        }
+
+        if (!Reminder.isValidState(params.state)) {
+            return false;
+        }
+
+        if ('date' in params && !isInt(params.date)) {
+            return false;
+        }
+
+        if (params.transaction_id !== 0) {
+            const transaction = this.transactions.getItem(params.transaction_id);
+            if (!transaction) {
+                return false;
+            }
+
+            const reminder = this.reminders.getReminderByTransaction(params.transaction_id);
+            if (reminder && reminder.id !== params.id) {
+                return false;
+            }
+        }
+
+        if (
+            (params.state === REMINDER_CONFIRMED && params.transaction_id === 0)
+            || (params.state !== REMINDER_CONFIRMED && params.transaction_id !== 0)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    createReminder(params) {
+        const itemData = {
+            ...Reminder.defaultProps,
+            ...params,
+        };
+
+        const resExpected = this.validateReminder(itemData);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(itemData, Reminder.availProps);
+        const ind = this.reminders.create(data);
+        const item = this.reminders.getItemByIndex(ind);
+
+        return this.returnState(params.returnState, { id: item.id });
+    }
+
+    updateReminder(params) {
+        const origItem = this.reminders.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expItem = copyObject(origItem);
+        const data = copyFields(params, Reminder.availProps);
+        Object.assign(expItem, data);
+
+        const resExpected = this.validateReminder(expItem);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.reminders.update(expItem);
+
+        return this.returnState(params.returnState);
+    }
+
+    deleteReminder(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        const itemsToDelete = ids.map((id) => this.reminders.getItem(id));
+        if (!itemsToDelete.every((item) => !!item)) {
+            return false;
+        }
+
+        this.reminders.deleteItems(ids);
+
+        return this.returnState(params.returnState);
+    }
+
+    getDefaultReminderTransaction(id) {
+        const reminder = this.reminders.getItem(id);
+        const schedule = this.schedule.getItem(reminder?.schedule_id);
+        if (!reminder) {
+            return null;
+        }
+
+        return {
+            type: schedule.type,
+            src_id: schedule.src_id,
+            dest_id: schedule.dest_id,
+            src_amount: schedule.src_amount,
+            dest_amount: schedule.dest_amount,
+            src_curr: schedule.src_curr,
+            dest_curr: schedule.dest_curr,
+            category_id: schedule.category_id,
+            date: reminder.date,
+            comment: schedule.comment,
+        };
+    }
+
+    confirmReminder(params) {
+        let transactionId = params?.transaction_id;
+        if (typeof transactionId === 'undefined') {
+            const transaction = this.getDefaultReminderTransaction(params.id);
+            const res = this.createTransaction(transaction);
+            transactionId = res?.id;
+        }
+
+        return this.updateReminder({
+            id: params.id,
+            state: REMINDER_CONFIRMED,
+            transaction_id: transactionId,
+        });
+    }
+
+    cancelReminder(params) {
+        return this.updateReminder({
+            id: params.id,
+            state: REMINDER_CANCELLED,
+            transaction_id: 0,
+        });
+    }
+
+    confirmReminders(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        if (!ids.every((id) => this.confirmReminder({ id }))) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
+    cancelReminders(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        if (!ids.every((id) => this.cancelReminder({ id }))) {
+            return false;
+        }
+
+        return this.returnState(params.returnState);
+    }
+
+    /**
+     * Import templates
+     */
+    validateTemplate(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (!checkFields(params, ImportTemplate.availProps)) {
             return false;
         }
 
@@ -1899,7 +2467,7 @@ export class AppState {
             return false;
         }
         // Check every column value is present and have correct value
-        return Object.values(tplReqColumns).every((columnName) => (
+        return Object.values(ImportTemplate.columnsMap).every((columnName) => (
             (columnName in params.columns)
             && isInt(params.columns[columnName])
             && params.columns[columnName] > 0
@@ -1913,11 +2481,11 @@ export class AppState {
 
         const origItem = this.templates.getItem(request.id) ?? { columns: {} };
         const res = copyObject(origItem);
-        const data = copyFields(request, tplReqFields);
+        const data = copyFields(request, ImportTemplate.availProps);
         Object.assign(res, data);
 
-        Object.keys(tplReqColumns).forEach((columnName) => {
-            const targetProp = tplReqColumns[columnName];
+        Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+            const targetProp = ImportTemplate.columnsMap[columnName];
             if (request[columnName]) {
                 res.columns[targetProp] = request[columnName];
             }
@@ -1936,14 +2504,14 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkTemplateCorrectness(itemData);
+        const resExpected = this.validateTemplate(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, tplReqFields);
+        const data = copyFields(itemData, ImportTemplate.availProps);
         data.columns = {};
-        Object.values(tplReqColumns).forEach((columnName) => {
+        Object.values(ImportTemplate.columnsMap).forEach((columnName) => {
             data.columns[columnName] = itemData.columns[columnName];
         });
 
@@ -1957,14 +2525,14 @@ export class AppState {
         const origItem = this.templates.getItem(params.id) ?? { columns: {} };
 
         const expTemplate = copyObject(origItem);
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
         const res = copyObject(expTemplate);
         delete res.columns;
 
-        Object.keys(tplReqColumns).forEach((columnName) => {
-            const targetProp = tplReqColumns[columnName];
+        Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+            const targetProp = ImportTemplate.columnsMap[columnName];
 
             if (params[columnName]) {
                 expTemplate.columns[targetProp] = params[columnName];
@@ -1983,19 +2551,19 @@ export class AppState {
         }
 
         const expTemplate = copyObject(origItem);
-        const data = copyFields(params, tplReqFields);
+        const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
         if (params.columns) {
-            Object.keys(tplReqColumns).forEach((columnName) => {
-                const targetProp = tplReqColumns[columnName];
+            Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
+                const targetProp = ImportTemplate.columnsMap[columnName];
                 if (params.columns && params.columns[targetProp]) {
                     expTemplate.columns[targetProp] = params.columns[targetProp];
                 }
             });
         }
 
-        const resExpected = this.checkTemplateCorrectness(expTemplate);
+        const resExpected = this.validateTemplate(expTemplate);
         if (!resExpected) {
             return false;
         }
@@ -2025,8 +2593,8 @@ export class AppState {
     /**
      * Import rules
      */
-    checkRuleCorrectness(params) {
-        if (!checkFields(params, ruleReqFields)) {
+    validateRule(params) {
+        if (!checkFields(params, ImportRule.availProps)) {
             return false;
         }
 
@@ -2078,12 +2646,12 @@ export class AppState {
             ...params,
         };
 
-        const resExpected = this.checkRuleCorrectness(itemData);
+        const resExpected = this.validateRule(itemData);
         if (!resExpected) {
             return false;
         }
 
-        const data = copyFields(itemData, ruleReqFields);
+        const data = copyFields(itemData, ImportRule.availProps);
         data.conditions = this.prepareConditions(data.conditions);
         data.actions = this.prepareActions(data.actions);
 
@@ -2100,10 +2668,10 @@ export class AppState {
         }
 
         const expRule = origItem.toPlain();
-        const data = copyFields(params, ruleReqFields);
+        const data = copyFields(params, ImportRule.availProps);
         Object.assign(expRule, data);
 
-        const resExpected = this.checkRuleCorrectness(expRule);
+        const resExpected = this.validateRule(expRule);
         if (!resExpected) {
             return false;
         }

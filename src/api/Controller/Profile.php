@@ -10,6 +10,7 @@ use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
@@ -63,17 +64,13 @@ class Profile extends ApiController
     public function changename()
     {
         $requiredFields = ["name"];
-        $defMsg = __("ERR_PROFILE_NAME");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 
@@ -84,7 +81,7 @@ class Profile extends ApiController
             wlog("Change name error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_NAME"));
         }
 
         $this->commit();
@@ -99,23 +96,19 @@ class Profile extends ApiController
     public function changepass()
     {
         $requiredFields = ["current", "new"];
-        $defMsg = __("ERR_PROFILE_PASSWORD");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
+        $reqData = checkFields($request, $requiredFields, true);
 
         $this->begin();
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_PASSWORD"));
         }
 
         $result = false;
@@ -125,7 +118,7 @@ class Profile extends ApiController
             wlog("Change password error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error($defMsg);
+            throw new \Error(__("ERR_PROFILE_PASSWORD"));
         }
 
         $this->commit();
@@ -221,6 +214,23 @@ class Profile extends ApiController
     }
 
     /**
+     * Removes all scheduled transactions of user
+     */
+    private function resetScheduledTransactions()
+    {
+        $model = ScheduledTransactionModel::getInstance();
+        $result = false;
+        try {
+            $result = $model->reset();
+        } catch (\Error $e) {
+            wlog("Reset scheduled transactions error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(__("ERR_PROFILE_RESET"));
+        }
+    }
+
+    /**
      * Removes all import templates of user
      */
     private function resetImportTemplates()
@@ -269,6 +279,7 @@ class Profile extends ApiController
             "persons",
             "categories",
             "transactions",
+            "schedule",
             "keepbalance",
             "importtpl",
             "importrules"
@@ -294,6 +305,9 @@ class Profile extends ApiController
         }
         if ($request["transactions"]) {
             $this->resetTransactions($request["keepbalance"]);
+        }
+        if ($request["schedule"]) {
+            $this->resetScheduledTransactions();
         }
         if ($request["importtpl"]) {
             $this->resetImportTemplates();

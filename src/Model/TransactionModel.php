@@ -22,13 +22,10 @@ define("DEBT", 4);
 define("LIMIT_CHANGE", 5);
 
 // Statistics group types
-define("GROUP_BY_DAY", 1);
-define("GROUP_BY_WEEK", 2);
-define("GROUP_BY_MONTH", 3);
-define("GROUP_BY_YEAR", 4);
-
-const MONTHS_IN_YEAR = 12;
-const WEEKS_IN_YEAR = 52;
+define("GROUP_BY_DAY", INTERVAL_DAY);
+define("GROUP_BY_WEEK", INTERVAL_WEEK);
+define("GROUP_BY_MONTH", INTERVAL_MONTH);
+define("GROUP_BY_YEAR", INTERVAL_YEAR);
 
 const DEFAULT_REPORT_TYPE = "category";
 const DEFAULT_TRANSACTION_TYPE = EXPENSE;
@@ -41,12 +38,12 @@ class TransactionModel extends SortableModel
 {
     use Singleton;
 
-    private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $srcMandatoryTypes = [EXPENSE, TRANSFER];
+    public static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $srcMandatoryTypes = [EXPENSE, TRANSFER];
 
-    private static $destAvailTypes = [INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
-    private static $destMandatoryTypes = [INCOME, TRANSFER];
+    public static $destAvailTypes = [INCOME, TRANSFER, DEBT, LIMIT_CHANGE];
+    public static $destMandatoryTypes = [INCOME, TRANSFER];
 
     private static $availReports = ["account", "currency", "category"];
 
@@ -70,6 +67,7 @@ class TransactionModel extends SortableModel
     protected $catModel = null;
     protected $affectedTransactions = null;
     protected $balanceChanges = null;
+    protected $confirmReminders = null;
     protected $removedItems = null;
     protected $originalTrans = null;
 
@@ -260,6 +258,16 @@ class TransactionModel extends SortableModel
 
         if ($srcCurrId === $destCurrId && $srcAmount != $destAmount) {
             throw new \Error("src_amount and dest_amount must be equal when src_curr and dest_curr are same");
+        }
+
+        if (
+            $res["type"] === DEBT
+            && $srcAcc
+            && $srcAcc->owner_id !== self::$owner_id
+            && $destAcc
+            && $destAcc->owner_id !== self::$owner_id
+        ) {
+            throw new \Error("Both source and destination accounts are owned by persons");
         }
 
         if (isset($params["date"])) {
@@ -483,6 +491,12 @@ class TransactionModel extends SortableModel
 
         $this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
 
+        if (is_null($this->confirmReminders)) {
+            $this->confirmReminders = [];
+        }
+        $reminderId = (isset($params["reminder_id"])) ? intval($params["reminder_id"]) : 0;
+        $this->confirmReminders[] = $reminderId;
+
         $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
         $res["src_result"] = ($res["src_id"] != 0)
@@ -514,10 +528,21 @@ class TransactionModel extends SortableModel
         $this->accModel->updateBalances($this->balanceChanges);
         $this->balanceChanges = null;
 
+        $reminderModel = ReminderModel::getInstance();
+
         foreach ($items as $item_id) {
             $trObj = $this->getItem($item_id);
             if (!$trObj) {
                 return false;
+            }
+
+            if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
+                $reminderId = array_shift($this->confirmReminders);
+                if ($reminderId !== 0) {
+                    $reminderModel->confirm($reminderId, [
+                        "transaction_id" => $item_id,
+                    ]);
+                }
             }
 
             // Update position of transaction if target date is not today
@@ -526,6 +551,8 @@ class TransactionModel extends SortableModel
                 $this->updatePos($item_id, $latest_pos + 1);
             }
         }
+
+        $this->confirmReminders = null;
 
         $this->commitAffected();
 
@@ -1158,6 +1185,9 @@ class TransactionModel extends SortableModel
             unset($this->cache[$trObj->id]);
         }
 
+        $reminderModel = ReminderModel::getInstance();
+        $reminderModel->onTransactionDelete($items);
+
         return true;
     }
 
@@ -1605,11 +1635,7 @@ class TransactionModel extends SortableModel
         // Type filter
         $typeFilter = [];
         if (isset($request["type"])) {
-            $typeReq = $request["type"];
-            if (!is_array($typeReq)) {
-                $typeReq = [$typeReq];
-            }
-
+            $typeReq = asArray($request["type"]);
             foreach ($typeReq as $type_str) {
                 $type_id = intval($type_str);
                 if (!$type_id) {
@@ -1647,10 +1673,7 @@ class TransactionModel extends SortableModel
         $personModel = PersonModel::getInstance();
         $personFilter = [];
         if (isset($request["person_id"])) {
-            $personsReq = $request["person_id"];
-            if (!is_array($personsReq)) {
-                $personsReq = [$personsReq];
-            }
+            $personsReq = asArray($request["person_id"]);
             foreach ($personsReq as $person_id) {
                 if ($personModel->isExist($person_id)) {
                     $personFilter[] = intval($person_id);
@@ -1704,7 +1727,7 @@ class TransactionModel extends SortableModel
         // Limit
         if (isset($request["onPage"])) {
             $onPage = intval($request["onPage"]);
-            if ($onPage < 0) {
+            if ($onPage < 0 && $throw) {
                 throw new \Error("Invalid page limit");
             }
             if ($onPage > 0) {
@@ -1906,15 +1929,6 @@ class TransactionModel extends SortableModel
             return $res;
         }
 
-        if (!$this->accModel->getCount(["full" => true])) {
-            return $res;
-        }
-
-        // Skip if no transactions at all
-        if (!$this->dbObj->countQ($this->tbl_name, "user_id=" . self::$user_id)) {
-            return $res;
-        }
-
         $condArr = $this->getDBCondition($params);
 
         // Sort order condition
@@ -1990,141 +2004,6 @@ class TransactionModel extends SortableModel
     }
 
     /**
-     * Returns fixed year for week number
-     *
-     * @param mixed $info
-     *
-     * @return int
-     */
-    protected function getFixedWeekYear(mixed $info)
-    {
-        $fixedYear = $info["year"];
-        if ($info["mon"] === 1 && $info["week"] >= WEEKS_IN_YEAR - 2) {
-            $fixedYear--;
-        } elseif ($info["mon"] === MONTHS_IN_YEAR && $info["week"] === 1) {
-            $fixedYear++;
-        }
-
-        return $fixedYear;
-    }
-
-    /**
-     * Returns date info for specified timestamp and group type
-     *
-     * @param int $time timestamp
-     * @param int $groupType group type
-     *
-     * @return array
-     */
-    protected function getDateInfo(int $time, int $groupType)
-    {
-        $info = getdate($time);
-        $info["week"] = intval(date("W", $time));
-        $info["wday"] = ($info["wday"] === 0) ? 6 : ($info["wday"] - 1);
-        $res = [
-            "time" => $time,
-            "info" => $info,
-        ];
-
-        if ($groupType == GROUP_BY_DAY) {
-            $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
-        } elseif ($groupType == GROUP_BY_WEEK) {
-            $fixedYear = $this->getFixedWeekYear($info);
-            $res["id"] = $info["week"] . "." . $fixedYear;
-        } elseif ($groupType == GROUP_BY_MONTH) {
-            $res["id"] = $info["mon"] . "." . $info["year"];
-        } elseif ($groupType == GROUP_BY_YEAR) {
-            $res["id"] = $info["year"];
-        }
-
-        return $res;
-    }
-
-    /**
-     * Returns difference between dates for specified group type
-     *
-     * @param mixed $itemA
-     * @param mixed $itemB
-     * @param mixed $groupType group type
-     *
-     * @return int
-     */
-    protected function getDateDiff(mixed $itemA, mixed $itemB, $groupType)
-    {
-        if (!is_array($itemA) || !is_array($itemB)) {
-            throw new \Error("Invalid parameters");
-        }
-
-        if ($groupType == GROUP_BY_DAY) {
-            $timeA = new DateTime("@" . $itemA["time"], new DateTimeZone('UTC'));
-            $timeB = new DateTime("@" . $itemB["time"], new DateTimeZone('UTC'));
-
-            $timeDiff = $timeA->diff($timeB, true);
-
-            return $timeDiff->days;
-        }
-
-        if ($groupType == GROUP_BY_WEEK) {
-            $yearA = $this->getFixedWeekYear($itemA["info"]);
-            $yearB = $this->getFixedWeekYear($itemB["info"]);
-            $weekA = $itemA["info"]["week"];
-            $weekB = $itemB["info"]["week"];
-
-            return (
-                ($yearB - $yearA) * WEEKS_IN_YEAR
-                + ($weekB - $weekA)
-            );
-        }
-
-        if ($groupType == GROUP_BY_MONTH) {
-            return (
-                ($itemB["info"]["year"] - $itemA["info"]["year"]) * MONTHS_IN_YEAR
-                + ($itemB["info"]["mon"] - $itemA["info"]["mon"])
-            );
-        }
-
-        if ($groupType == GROUP_BY_YEAR) {
-            return $itemB["info"]["year"] - $itemA["info"]["year"];
-        }
-
-        throw new \Error("Invalid group type");
-    }
-
-    /**
-     * Returns date info object for group start in specified group type
-     *
-     * @param mixed $dateInfo date info object
-     * @param int $groupType group type
-     *
-     * @return array
-     */
-    protected function getGroupStart(mixed $dateInfo, int $groupType)
-    {
-        if (!isset(self::$durationMap[$groupType])) {
-            throw new \Error("Invalid group type");
-        }
-
-        $date = new DateTime("@" . $dateInfo["time"], new DateTimeZone('UTC'));
-        $info = $dateInfo["info"];
-        $date->setTime(0, 0);
-
-        if ($groupType === GROUP_BY_WEEK) {
-            $date->sub(new DateInterval("P" . $info["wday"] . "D"));
-        }
-
-        if ($groupType === GROUP_BY_MONTH) {
-            $date->setDate($info["year"], $info["mon"], 1);
-        }
-
-        if ($groupType === GROUP_BY_YEAR) {
-            $date->setDate($info["year"], 1, 1);
-        }
-
-        $timestamp = $date->getTimestamp();
-        return $this->getDateInfo($timestamp, $groupType);
-    }
-
-    /**
      * Returns date info object for next date in specified group type
      *
      * @param mixed $dateInfo date info object
@@ -2138,12 +2017,12 @@ class TransactionModel extends SortableModel
             throw new \Error("Invalid group type");
         }
 
-        $groupStart = $this->getGroupStart($dateInfo, $groupType);
+        $groupStart = getDateIntervalStart($dateInfo, $groupType);
         $date = new DateTime("@" . $groupStart["time"], new DateTimeZone('UTC'));
         $duration = "P1" . self::$durationMap[$groupType];
 
         $timestamp = $date->add(new DateInterval($duration))->getTimestamp();
-        return $this->getDateInfo($timestamp, $groupType);
+        return getDateInfo($timestamp, $groupType);
     }
 
     /**
@@ -2165,7 +2044,7 @@ class TransactionModel extends SortableModel
         $duration = "P" . $limit . self::$durationMap[$groupType];
 
         if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
-            $dateInfo = $this->getDateInfo($endTime, $groupType);
+            $dateInfo = getDateInfo($endTime, $groupType);
             $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
             $date->setDate($dateInfo["info"]["year"], $month, 1);
         }
@@ -2421,15 +2300,15 @@ class TransactionModel extends SortableModel
                 continue;
             }
 
-            $dateInfo = $this->getDateInfo($item->date, $group_type);
+            $dateInfo = getDateInfo($item->date, $group_type);
             $amount = ($isSource) ? $item->src_amount : $item->dest_amount;
             $curDate = $dateInfo;
 
             if (is_null($sumDate)) {        // first iteration
-                $groupStart = $this->getGroupStart($curDate, $group_type);
+                $groupStart = getDateIntervalStart($curDate, $group_type);
                 $sumDate = $curDate;
             } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
-                $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
+                $dateDiff = getDateDiff($sumDate, $curDate, $group_type);
 
                 foreach ($transTypes as $type) {
                     foreach ($dataCategories as $cat) {
@@ -2453,7 +2332,7 @@ class TransactionModel extends SortableModel
                 }
 
                 $sumDate = $curDate;
-                $groupStart = $this->getGroupStart($sumDate, $group_type);
+                $groupStart = getDateIntervalStart($sumDate, $group_type);
             }
 
             $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);

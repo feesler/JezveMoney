@@ -1,5 +1,5 @@
-import { View } from '../../../view/utils/View.js';
-import { Header } from '../../../view/Components/Header/Header.js';
+import { View } from '../../../../view/utils/View.js';
+import { Header } from '../../../../view/Components/Header/Header.js';
 
 /**
  * Base Admin view

@@ -6,6 +6,8 @@ import { apiAccountsTests } from './accounts.js';
 import { apiPersonsTests } from './persons.js';
 import { apiCategoriesTests } from './categories.js';
 import { apiTransactionsTests } from './transactions.js';
+import { apiScheduleTests } from './schedule.js';
+import { apiRemindersTests } from './reminders.js';
 import { apiImportTemplateTests } from './template.js';
 import { apiImportRulesTests } from './rules.js';
 import { apiSecurityTests } from './security.js';
@@ -41,6 +43,10 @@ export class ApiStory extends TestStory {
         await apiPersonsTests.createTests();
         await apiCategoriesTests.createTests();
         await apiTransactionsTests.createTests();
+        await apiScheduleTests.createTests();
+
+        await apiRemindersTests.run();
+        await apiTransactionsTests.confirmRemindersTests();
 
         await apiSecurityTests.run();
 
@@ -50,9 +56,11 @@ export class ApiStory extends TestStory {
         await apiCategoriesTests.listTests();
 
         await apiTransactionsTests.updateTests();
+        await apiScheduleTests.updateTests();
         await apiImportTemplateTests.run();
         await apiImportRulesTests.run();
         await apiTransactionsTests.filterTests();
+        await apiScheduleTests.listTests();
 
         await apiUserCurrenciesTests.updateAndDeleteTests();
         await apiAccountsTests.updateAndDeleteTests();
@@ -60,6 +68,7 @@ export class ApiStory extends TestStory {
         await apiCategoriesTests.updateAndDeleteTests();
 
         await apiTransactionsTests.deleteTests();
+        await apiScheduleTests.deleteTests();
 
         await apiProfileTests.run();
 

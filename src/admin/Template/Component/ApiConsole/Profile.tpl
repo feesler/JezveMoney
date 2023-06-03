@@ -12,7 +12,7 @@
     <form action="<?= BASEURL ?>api/profile/changename" method="post">
         <div class="std_margin">
             <label for="change_name">Name</label>
-            <input id="change_name" class="input stretch-input" name="name" type="text">
+            <input id="change_name" class="input stretch-input" name="name" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="form-controls">
@@ -26,11 +26,11 @@
     <form action="<?= BASEURL ?>api/profile/changepass" method="post">
         <div class="std_margin">
             <label for="change_pass_current">Current password</label>
-            <input id="change_pass_current" class="input stretch-input" name="current" type="text">
+            <input id="change_pass_current" class="input stretch-input" name="current" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
         <div class="std_margin">
             <label for="change_pass_new">New password</label>
-            <input id="change_pass_new" class="input stretch-input" name="new" type="text">
+            <input id="change_pass_new" class="input stretch-input" name="new" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="form-controls">
@@ -44,11 +44,11 @@
     <form action="<?= BASEURL ?>api/profile/updateSettings" method="post">
         <div class="std_margin">
             <label for="upd_settings_name">Settings name</label>
-            <input id="upd_settings_name" class="input stretch-input" type="text">
+            <input id="upd_settings_name" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
         <div class="std_margin">
             <label for="upd_settings_value">Value</label>
-            <input id="upd_settings_value" class="input stretch-input" type="text">
+            <input id="upd_settings_value" class="input stretch-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <div class="form-controls">
@@ -90,10 +90,16 @@
             <span class="checkbox__label">Transactions</span>
         </label>
 
-        <label class="checkbox std_margin suboption">
+        <label class="checkbox std_margin suboption" hidden>
             <input type="checkbox" name="keepbalance" disabled>
             <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
             <span class="checkbox__label">Keep current balance of accounts</span>
+        </label>
+
+        <label class="checkbox std_margin">
+            <input type="checkbox" name="schedule">
+            <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+            <span class="checkbox__label">Scheduled transactions</span>
         </label>
 
         <label class="checkbox std_margin">

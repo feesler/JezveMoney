@@ -475,6 +475,31 @@ const createMultipleInvalid = async () => {
     await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
 };
 
+const confirmReminders = async () => {
+    setBlock('Create transaction confirming reminder', 2);
+
+    const {
+        ACC_RUB,
+        REMINDER_EXPENSE_1_3,
+    } = App.scenario;
+
+    const data = [{
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 100,
+        comment: 'Confirm reminder',
+        reminder_id: REMINDER_EXPENSE_1_3,
+    }];
+
+    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
+    // Double check all transactions created
+    res.forEach((item) => assert(item, 'Failed to create transaction'));
+
+    [
+        App.scenario.TR_EXPENSE_REMINDER_1,
+    ] = res;
+};
+
 const update = async () => {
     setBlock('Update transactions', 3);
 
@@ -702,6 +727,16 @@ const delInvalid = async () => {
         [null, null],
         [],
         [-1],
+    ];
+
+    await App.scenario.runner.runGroup(Actions.del, data);
+};
+
+const delReminderConfirmation = async () => {
+    setBlock('Delete transactions confirmed reminders', 2);
+
+    const data = [
+        App.scenario.TR_EXPENSE_REMINDER_1,
     ];
 
     await App.scenario.runner.runGroup(Actions.del, data);
@@ -948,6 +983,10 @@ export const apiTransactionsTests = {
         await createMultipleInvalid();
     },
 
+    async confirmRemindersTests() {
+        await confirmReminders();
+    },
+
     async updateTests() {
         await update();
         await updateWithChainedRequest();
@@ -968,5 +1007,6 @@ export const apiTransactionsTests = {
         await del();
         await delWithChainedRequest();
         await delInvalid();
+        await delReminderConfirmation();
     },
 };

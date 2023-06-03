@@ -266,9 +266,11 @@ class CategoryModel extends SortableModel
         $this->cleanCache();
 
         $transMod = TransactionModel::getInstance();
+        $scheduledTrMod = ScheduledTransactionModel::getInstance();
         $ruleModel = ImportRuleModel::getInstance();
 
         $res = $transMod->onCategoryDelete($items)
+            && $scheduledTrMod->onCategoryDelete($items)
             && $ruleModel->onCategoryDelete($items);
 
         return $res;

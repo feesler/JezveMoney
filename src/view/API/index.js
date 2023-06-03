@@ -4,7 +4,7 @@ import { asArray } from 'jezvejs';
 const MSG_REQUEST_FAIL = 'API request failed';
 
 /** Send API request */
-const apiRequest = async (method, path, data = null, options = {}) => {
+export const apiRequest = async (method, path, data = null, options = {}) => {
     const { baseURL } = window.app;
     const isPOST = method.toLowerCase() === 'post';
     const url = new URL(`${baseURL}api/${path}`);
@@ -43,12 +43,12 @@ const apiRequest = async (method, path, data = null, options = {}) => {
 };
 
 /** Send GET API request */
-const apiGet = (...args) => apiRequest('GET', ...args);
+export const apiGet = (...args) => apiRequest('GET', ...args);
 /** Send GET API request */
-const apiPost = (...args) => apiRequest('POST', ...args);
+export const apiPost = (...args) => apiRequest('POST', ...args);
 
 /** Send GET request for items by ids */
-const idsRequest = (path, val) => {
+export const idsRequest = (path, val) => {
     if (!path) {
         throw new Error('Invalid request path');
     }
@@ -259,6 +259,50 @@ export const API = {
 
         async statistics(options = {}, requestOptions = {}) {
             return apiGet('transaction/statistics', options, requestOptions);
+        },
+    },
+
+    schedule: {
+        async createMultiple(data) {
+            return apiPost('schedule/createMultiple', data);
+        },
+
+        async list(options = {}) {
+            return apiGet('schedule/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('schedule/', data);
+        },
+
+        async create(data) {
+            return apiPost('schedule/create', data);
+        },
+
+        async update(data) {
+            return apiPost('schedule/update', data);
+        },
+
+        async del(data) {
+            return apiPost('schedule/delete', data);
+        },
+    },
+
+    reminder: {
+        async list(options = {}) {
+            return apiGet('reminder/list', options);
+        },
+
+        async read(data) {
+            return idsRequest('reminder/', data);
+        },
+
+        async confirm(data) {
+            return apiPost('reminder/confirm', data);
+        },
+
+        async cancel(data) {
+            return apiPost('reminder/cancel', data);
         },
     },
 

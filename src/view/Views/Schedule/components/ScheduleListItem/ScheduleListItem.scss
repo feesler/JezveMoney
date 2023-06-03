@@ -1,0 +1,242 @@
+.schedule-item {
+  --schedule-item-amount-color: var(--accent-color-alt);
+  --schedule-item-selected-color: var(--accent-color);
+  --schedule-item-column-gap: 16px;
+  --schedule-item-row-gap: 2px;
+  --schedule-item-details-row-gap: 8px;
+  --schedule-item-min-column-width: 130px;
+
+  border: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  position: relative;
+}
+
+.schedule-item__select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 0;
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+
+  .checkbox {
+    --checkbox-size: 24px;
+
+    margin: 0;
+  }
+
+  .checkbox__check {
+    margin: 0;
+    border-radius: 50%;
+  }
+}
+
+.schedule-item__content {
+  display: grid;
+  align-items: start;
+  row-gap: var(--schedule-item-row-gap);
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 auto;
+  padding: 8px 0 8px 8px;
+  background-color: var(--list-item-bg-color);
+}
+
+.schedule-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: var(--list-item-bg-color);
+
+  .btn.menu-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 0;
+    --btn-background: none;
+    --btn-icon-color: var(--list-item-icon-fill);
+
+    margin: 0 4px;
+  }
+
+  .menu-btn:focus {
+    .btn__icon {
+      fill: var(--list-item-hover-icon-fill);
+    }
+  }
+}
+
+.schedule-item_placeholder {
+  opacity: 0;
+}
+
+/* Select mode */
+.schedule-list_select {
+  .schedule-item__select {
+    width: 32px;
+  }
+
+  .schedule-item__content {
+    padding: 8px;
+  }
+}
+
+.schedule-item_selected::after {
+  border: 2px solid var(--schedule-item-selected-color);
+  bottom: 0;
+  content: "";
+  cursor: pointer;
+  display: block;
+  left: 32px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.schedule-item__date-range,
+.schedule-item__start-date,
+.schedule-item__end-date,
+.schedule-item__interval,
+.schedule-item__offset,
+.schedule-item__category,
+.schedule-item__comment,
+.schedule-item__start-date-field .field__content,
+.schedule-item__end-date-field .field__content,
+.schedule-item__interval-field .field__content,
+.schedule-item__offset-field .field__content,
+.schedule-item__category-field .field__content,
+.schedule-item__comment-field .field__content {
+  color: var(--list-item-text-color);
+}
+
+.schedule-item__date-range,
+.schedule-item__start-date,
+.schedule-item__end-date,
+.schedule-item__interval,
+.schedule-item__offset,
+.schedule-item__amount,
+.schedule-item__comment,
+.schedule-item__category,
+.schedule-item__title {
+  min-height: 23px;
+  line-height: 23px;
+}
+
+.schedule-item__date-range,
+.schedule-item__start-date,
+.schedule-item__end-date,
+.schedule-item__interval,
+.schedule-item__offset {
+  flex: 0 0 auto;
+}
+
+.schedule-item__date-range,
+.schedule-item__interval,
+.schedule-item__offset {
+  font-size: 0.9rem;
+}
+
+.schedule-item__comment,
+.schedule-item__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.schedule-item__title {
+  font-size: 14px;
+  color: var(--main-text-color);
+}
+
+.schedule-item__amount {
+  color: var(--schedule-item-amount-color);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.schedule-item__schedule,
+.schedule-item__amount-category {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  row-gap: var(--schedule-item-row-gap);
+  column-gap: var(--schedule-item-column-gap);
+  overflow: hidden;
+}
+
+.schedule-item__category {
+  padding: 0 12px;
+  margin-left: auto;
+  border-radius: 100vh;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  background-color: var(--btn-bg);
+}
+
+.schedule-item__comment {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.schedule-item__category,
+.schedule-item__comment {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schedule-item_details {
+  .schedule-item__content {
+    gap: var(--schedule-item-details-row-gap) var(--schedule-item-column-gap);
+  }
+
+  .field {
+    --field-title-font-size: 12px;
+    --field-content-font-size: 14px;
+  }
+
+  .field__title {
+    margin-bottom: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--dimmed-text-color);
+  }
+
+  .field__content {
+    min-height: 23px;
+    line-height: 23px;
+  }
+
+  .schedule-item__column {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(var(--schedule-item-min-column-width), 1fr)
+    );
+    gap: var(--schedule-item-details-row-gap) var(--schedule-item-column-gap);
+  }
+
+  .schedule-item__amount-field .field__content {
+    color: var(--schedule-item-amount-color);
+  }
+}
+
+@media (min-width: 1200px) {
+  .schedule-item_details {
+    .schedule-item__content {
+      grid-template-columns: 1fr 2fr 1fr 1fr;
+    }
+  }
+}
+
+@media (hover: hover) {
+  .schedule-item__controls .menu-btn:hover {
+    .btn__icon {
+      fill: var(--list-item-hover-icon-fill);
+    }
+  }
+}

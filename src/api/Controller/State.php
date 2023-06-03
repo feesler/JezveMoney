@@ -9,6 +9,7 @@ use JezveMoney\Core\DBVersion;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\CategoryModel;
@@ -16,6 +17,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
@@ -140,6 +142,30 @@ class State extends ApiController
     protected function getCategories(array $options = [])
     {
         return $this->getList(CategoryModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns schedule data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getSchedule(array $options = [])
+    {
+        return $this->getList(ScheduledTransactionModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns scheduled transactions reminders data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getReminders(array $options = [])
+    {
+        return $this->getList(ReminderModel::getInstance(), $options);
     }
 
     /**
@@ -318,6 +344,8 @@ class State extends ApiController
             "accounts" => ["autoIncrement" => true],
             "persons" => ["autoIncrement" => true],
             "transactions" => ["count" => 0, "autoIncrement" => true],
+            "schedule" => ["autoIncrement" => true],
+            "reminders" => ["autoIncrement" => true],
             "categories" => ["autoIncrement" => true],
             "importtemplates" => ["autoIncrement" => true],
             "importrules" => ["autoIncrement" => true],
@@ -388,6 +416,14 @@ class State extends ApiController
         // Categories
         if (isset($request["categories"])) {
             $res->categories = $this->getCategories($request["categories"]);
+        }
+        // Scheduled transactions
+        if (isset($request["schedule"])) {
+            $res->schedule = $this->getSchedule($request["schedule"]);
+        }
+        // Scheduled transaction reminders
+        if (isset($request["reminders"])) {
+            $res->reminders = $this->getReminders($request["reminders"]);
         }
         // Import templates
         if (isset($request["importtemplates"])) {

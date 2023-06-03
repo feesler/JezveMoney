@@ -8,7 +8,7 @@ import {
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { TransactionListView } from '../view/TransactionListView.js';
-import { availTransTypes, Transaction } from '../model/Transaction.js';
+import { Transaction } from '../model/Transaction.js';
 import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
 
 /** Navigate to transactions list page */
@@ -245,7 +245,7 @@ export const filterByType = async ({ type, directNavigate = false, iteratePages 
         await checkNavigation();
     }
 
-    const types = asArray(type).filter((item) => availTransTypes.includes(item));
+    const types = asArray(type).filter((item) => Transaction.availTypes.includes(item));
     const names = types.map((item) => Transaction.typeToString(item));
 
     const descr = (types.length)

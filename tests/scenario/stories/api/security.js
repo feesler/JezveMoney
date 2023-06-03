@@ -11,6 +11,8 @@ import * as accountActions from '../../../actions/api/account.js';
 import * as personActions from '../../../actions/api/person.js';
 import * as categoryActions from '../../../actions/api/category.js';
 import * as transactionActions from '../../../actions/api/transaction.js';
+import * as scheduleActions from '../../../actions/api/schedule.js';
+import { INTERVAL_DAY } from '../../../model/ScheduledTransaction.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);
@@ -56,12 +58,39 @@ const prepareTests = async () => {
 
     [
         App.scenario.API_USER_TRANSACTION,
+        App.scenario.API_USER_TRANSACTION_DEBT,
     ] = await App.scenario.runner.runGroup(transactionActions.extractAndCreate, [{
         type: EXPENSE,
         src_id: App.scenario.API_USER_ACC_RUB,
         src_amount: 100,
+    }, {
+        type: DEBT,
+        op: 1,
+        person_id: App.scenario.API_USER_PERSON,
+        src_amount: 100,
+        src_curr: RUB,
     }]);
-    assert(App.scenario.API_USER_TRANSACTION, 'Failed to create transaction');
+    assert(
+        App.scenario.API_USER_TRANSACTION && App.scenario.API_USER_TRANSACTION_DEBT,
+        'Failed to create transaction',
+    );
+
+    const personAccount = App.state.getPersonAccount(App.scenario.API_USER_PERSON, RUB);
+    App.scenario.API_USER_PERSON_ACCOUNT = personAccount.id;
+
+    [
+        App.scenario.API_USER_SCHEDULED_TRANSACTION,
+    ] = await App.scenario.runner.runGroup(scheduleActions.extractAndCreate, [{
+        type: EXPENSE,
+        src_id: App.scenario.API_USER_ACC_RUB,
+        src_amount: 100,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }]);
+    assert(App.scenario.API_USER_SCHEDULED_TRANSACTION, 'Failed to create scheduled transaction');
 };
 
 const accountsTests = async () => {
@@ -244,6 +273,147 @@ const transactionsTests = async () => {
     await deleteTransaction();
 };
 
+const createScheduledTransaction = async () => {
+    setBlock('Create', 3);
+
+    const {
+        RUB,
+        ACC_RUB,
+        CASH_RUB,
+        API_USER_ACC_RUB,
+        API_USER_CATEGORY,
+        API_USER_PERSON_ACCOUNT,
+    } = App.scenario;
+
+    const data = [{
+        type: EXPENSE,
+        src_id: API_USER_ACC_RUB,
+        dest_id: 0,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        dest_id: 0,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        category_id: API_USER_CATEGORY,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }, {
+        type: INCOME,
+        src_id: 0,
+        dest_id: API_USER_ACC_RUB,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }, {
+        type: TRANSFER,
+        src_id: CASH_RUB,
+        dest_id: API_USER_ACC_RUB,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }, {
+        type: DEBT,
+        src_id: API_USER_PERSON_ACCOUNT,
+        dest_id: 0,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        start_date: App.datesSec.now,
+        end_date: App.datesSec.weekAfter,
+        interval_type: INTERVAL_DAY,
+        interval_step: 2,
+        interval_offset: 0,
+    }];
+
+    await App.scenario.runner.runGroup(transactionActions.create, data);
+};
+
+const updateScheduledTransaction = async () => {
+    setBlock('Update', 3);
+
+    const {
+        SCHEDULED_TR_EXPENSE_1,
+        SCHEDULED_TR_INCOME_1,
+        SCHEDULED_TR_TRANSFER_1,
+        SCHEDULED_TR_DEBT_1,
+        API_USER_ACC_RUB,
+        API_USER_ACC_USD,
+        API_USER_PERSON_ACCOUNT,
+        API_USER_CATEGORY,
+        API_USER_SCHEDULED_TRANSACTION,
+    } = App.scenario;
+
+    const data = [{
+        id: SCHEDULED_TR_EXPENSE_1,
+        src_id: API_USER_ACC_RUB,
+    }, {
+        id: SCHEDULED_TR_EXPENSE_1,
+        category_id: API_USER_CATEGORY,
+    }, {
+        id: SCHEDULED_TR_INCOME_1,
+        dest_id: API_USER_ACC_RUB,
+    }, {
+        id: SCHEDULED_TR_TRANSFER_1,
+        src_id: API_USER_ACC_RUB,
+        dest_id: API_USER_ACC_USD,
+    }, {
+        id: SCHEDULED_TR_DEBT_1,
+        src_id: API_USER_PERSON_ACCOUNT,
+    }, {
+        // Trying to update transaction of another user
+        id: API_USER_SCHEDULED_TRANSACTION,
+        src_amount: 500,
+    }];
+
+    await App.scenario.runner.runGroup(transactionActions.update, data);
+};
+
+const deleteScheduledTransaction = async () => {
+    setBlock('Delete', 3);
+
+    const data = [
+        [App.scenario.API_USER_SCHEDULED_TRANSACTION],
+    ];
+
+    await App.scenario.runner.runGroup(transactionActions.del, data);
+};
+
+const scheduledTransactionsTests = async () => {
+    setBlock('Scheduled transaction security', 2);
+
+    await createScheduledTransaction();
+    await updateScheduledTransaction();
+    await deleteScheduledTransaction();
+};
+
 export const apiSecurityTests = {
     async prepare() {
         await prepareTests();
@@ -254,5 +424,6 @@ export const apiSecurityTests = {
         await personsTests();
         await categoriesTests();
         await transactionsTests();
+        await scheduledTransactionsTests();
     },
 };

@@ -32,6 +32,9 @@ export default {
                             cacheDirectory: true,
                             babelrc: false,
                             rootMode: 'upward',
+                            plugins: [
+                                '@babel/plugin-syntax-import-assertions',
+                            ],
                         },
                     },
                 ],

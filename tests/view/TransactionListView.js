@@ -1242,7 +1242,7 @@ export class TransactionListView extends AppView {
 
     async goToFirstPage(directNavigate = false) {
         if (this.isFirstPage()) {
-            return this;
+            return true;
         }
 
         if (directNavigate) {

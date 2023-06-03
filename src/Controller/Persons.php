@@ -12,8 +12,6 @@ use JezveMoney\Core\Message;
  */
 class Persons extends ListViewController
 {
-    protected $requiredFields = ["name", "flags"];
-
     /**
      * Controller initialization
      */

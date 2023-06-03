@@ -1,6 +1,5 @@
 import { Component, createElement, isFunction } from 'jezvejs';
 import { TransactionList } from '../TransactionList/TransactionList.js';
-import { timeToDate } from '../../utils/utils.js';
 import './TransactionListGroup.scss';
 
 /* CSS classes */
@@ -64,12 +63,8 @@ export class TransactionListGroup extends Component {
         }
     }
 
-    renderDate(date) {
-        return window.app.formatDate(timeToDate(date));
-    }
-
     render(state) {
-        this.title.textContent = this.renderDate(state.item.date);
+        this.title.textContent = window.app.formatDate(state.item.date);
 
         // Render list
         this.list.setState((listState) => ({

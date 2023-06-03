@@ -3,7 +3,7 @@ import {
     EXPENSE,
     INCOME,
     DEBT,
-    availTransTypes,
+    Transaction,
 } from '../../model/Transaction.js';
 import * as Actions from '../../actions/transactionList.js';
 import { testLocales } from '../../actions/locale.js';
@@ -50,7 +50,7 @@ export class TransactionListStory extends TestStory {
 
         await App.scenario.runner.runGroup(
             Actions.filterByType,
-            availTransTypes.map((type) => ({ type, directNavigate })),
+            Transaction.availTypes.map((type) => ({ type, directNavigate })),
         );
 
         // Show all types

@@ -12,6 +12,10 @@ const defaultProps = {
  * Category DropDown component
  */
 export class CategorySelect extends DropDown {
+    static userProps = {
+        selectElem: ['id', 'name', 'form'],
+    };
+
     constructor(props = {}) {
         super({
             ...defaultProps,

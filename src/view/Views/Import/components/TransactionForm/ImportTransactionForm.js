@@ -2,30 +2,23 @@ import {
     createElement,
     enable,
     isFunction,
-    insertAfter,
     Component,
-    getClassName,
     fixFloat,
 } from 'jezvejs';
-import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { DateInput } from 'jezvejs/DateInput';
-import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import 'jezvejs/style/Input';
-import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
 import {
-    getCurrencyPrecision,
     __,
     dateStringToTime,
-    timeToDate,
     parseDate,
 } from '../../../../utils/utils.js';
 import { transTypeMap, typeNames, ImportTransaction } from '../../../../Models/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
+import { AmountInputField } from '../../../../Components/AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
+import { DateInputField } from '../../../../Components/DateInputField/DateInputField.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
@@ -35,13 +28,7 @@ import './ImportTransactionForm.scss';
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
-const VALIDATION_CLASS = 'validation-block';
-const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
-const IG_INPUT_CLASS = 'input stretch-input input-group__input';
-const IG_BUTTON_CLASS = 'btn input-group__btn';
-const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'input stretch-input';
-const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const TYPE_FIELD_CLASS = 'form-row type-field';
 const ACCOUNT_FIELD_CLASS = 'form-row account-field';
@@ -206,139 +193,45 @@ export class ImportTransactionForm extends Component {
         });
     }
 
-    /** Returns invalid feedback element with specified message */
-    createInvalidFeedback(message) {
-        return createElement('div', {
-            props: {
-                className: INV_FEEDBACK_CLASS,
-                textContent: message,
-            },
-        });
-    }
-
     /** Create source amount field */
     createSourceAmountField() {
-        this.srcAmountInp = createElement('input', {
-            props: {
-                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
-                type: 'text',
-                name: 'src_amount[]',
-                disabled: true,
-                placeholder: __('TR_AMOUNT'),
-                autocomplete: 'off',
-            },
-        });
-        this.srcAmountDecimalInput = DecimalInput.create({
-            elem: this.srcAmountInp,
-            onInput: () => this.onSrcAmountInput(),
-        });
-
-        this.srcCurrencySign = createElement('div', {
-            props: { className: IG_BUTTON_TITLE_CLASS },
-        });
-        this.srcCurrencyBtn = createElement('button', {
-            props: {
-                type: 'button',
-                className: IG_BUTTON_CLASS,
-                tabIndex: -1,
-            },
-            children: this.srcCurrencySign,
-        });
-
-        this.srcCurrencyDropDown = DropDown.create({
-            elem: this.srcCurrencySign,
-            listAttach: true,
-            enableFilter: true,
-            onChange: (currency) => this.onSrcCurrChanged(currency),
-        });
-        window.app.initUserCurrencyList(this.srcCurrencyDropDown);
-
-        this.srcAmountGroup = InputGroup.create({
-            children: [this.srcAmountInp, this.srcCurrencyBtn],
-        });
-        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_AMOUNT'));
-
-        this.srcAmountField = Field.create({
+        this.srcAmountField = AmountInputField.create({
             title: __('TR_AMOUNT'),
-            content: [this.srcAmountGroup.elem, invalidFeedback],
-            className: [SRC_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
+            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            placeholder: __('TR_AMOUNT'),
+            validate: true,
+            className: SRC_AMOUNT_FIELD_CLASS,
+            onInput: (e) => this.onSrcAmountInput(e),
+            onSelectCurrency: (item) => this.onSrcCurrChanged(item),
         });
     }
 
     /** Create destination amount field */
     createDestAmountField() {
-        this.destAmountInp = createElement('input', {
-            props: {
-                className: getClassName(IG_INPUT_CLASS, AMOUNT_INPUT_CLASS),
-                type: 'text',
-                name: 'dest_amount[]',
-                placeholder: __('TR_DEST_AMOUNT'),
-                autocomplete: 'off',
-            },
-        });
-        this.destAmountDecimalInput = DecimalInput.create({
-            elem: this.destAmountInp,
-            onInput: () => this.onDestAmountInput(),
-        });
-
-        this.destCurrencySign = createElement('div', {
-            props: { className: IG_BUTTON_TITLE_CLASS },
-        });
-        this.destCurrencyBtn = createElement('button', {
-            props: {
-                type: 'button',
-                className: IG_BUTTON_CLASS,
-                tabIndex: -1,
-            },
-            children: this.destCurrencySign,
-        });
-
-        this.destCurrencyDropDown = DropDown.create({
-            elem: this.destCurrencySign,
-            listAttach: true,
-            enableFilter: true,
-            onChange: (currency) => this.onDestCurrChanged(currency),
-        });
-        window.app.initUserCurrencyList(this.destCurrencyDropDown);
-
-        this.destAmountGroup = InputGroup.create({
-            children: [this.destAmountInp, this.destCurrencyBtn],
-        });
-        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_AMOUNT'));
-
-        this.destAmountField = Field.create({
+        this.destAmountField = AmountInputField.create({
             title: __('TR_DEST_AMOUNT'),
-            content: [this.destAmountGroup.elem, invalidFeedback],
-            className: [DEST_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
+            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            placeholder: __('TR_DEST_AMOUNT'),
+            validate: true,
+            className: DEST_AMOUNT_FIELD_CLASS,
+            onInput: (e) => this.onDestAmountInput(e),
+            onSelectCurrency: (item) => this.onDestCurrChanged(item),
         });
         this.destAmountField.hide();
     }
 
     /** Create date field */
     createDateField() {
-        this.dateInp = DateInput.create({
-            className: IG_INPUT_CLASS,
+        this.dateField = DateInputField.create({
+            title: __('TR_DATE'),
+            feedbackMessage: __('TR_INVALID_DATE'),
+            className: DATE_FIELD_CLASS,
             name: 'date[]',
             placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
-            onInput: () => this.onDateInput(),
-        });
-
-        this.dateBtn = Button.create({
-            icon: 'calendar-icon',
-            className: IG_BUTTON_CLASS,
-            onClick: () => this.showDatePicker(),
-        });
-
-        this.dateGroup = InputGroup.create({
-            children: [this.dateInp.elem, this.dateBtn.elem],
-        });
-        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_DATE'));
-
-        this.dateField = Field.create({
-            title: __('TR_DATE'),
-            content: [this.dateGroup.elem, invalidFeedback],
-            className: [DATE_FIELD_CLASS, VALIDATION_CLASS],
+            validate: true,
+            onInput: (e) => this.onDateInput(e),
+            onDateSelect: (e) => this.onDateSelect(e),
         });
     }
 
@@ -443,8 +336,8 @@ export class ImportTransactionForm extends Component {
     }
 
     /** Source amount field 'input' event handler */
-    onSrcAmountInput() {
-        const { value } = this.srcAmountInp;
+    onSrcAmountInput(e) {
+        const { value } = e.target;
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -454,8 +347,8 @@ export class ImportTransactionForm extends Component {
     }
 
     /** Destination amount field 'input' event handler */
-    onDestAmountInput() {
-        const { value } = this.destAmountInp;
+    onDestAmountInput(e) {
+        const { value } = e.target;
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -485,8 +378,8 @@ export class ImportTransactionForm extends Component {
     }
 
     /** Date field 'input' event handler */
-    onDateInput() {
-        const { value } = this.dateInp;
+    onDateInput(e) {
+        const { value } = e.target;
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -505,7 +398,7 @@ export class ImportTransactionForm extends Component {
             validation: defaultValidation,
         });
 
-        this.datePicker.hide();
+        this.dateField.datePicker.hide();
     }
 
     /** Category select 'change' event handler */
@@ -596,57 +489,6 @@ export class ImportTransactionForm extends Component {
         if (isFunction(this.props.onCancel)) {
             this.props.onCancel();
         }
-    }
-
-    renderCurrency(elem, ddown, currencyId) {
-        const signElem = elem;
-        if (!signElem) {
-            return;
-        }
-
-        const curr = window.app.model.currency.getItem(currencyId);
-        if (!curr) {
-            return;
-        }
-
-        signElem.textContent = curr.sign;
-        ddown?.setSelection(currencyId);
-    }
-
-    enableCurrency(currBtn, signElem, value) {
-        currBtn.classList.toggle('input-group__btn', value);
-        currBtn.classList.toggle('input-group__text', !value);
-        signElem.classList.toggle('input-group__btn-title', value);
-        signElem.classList.toggle('input-group__text-title', !value);
-    }
-
-    enableSourceCurrency(value) {
-        this.enableCurrency(this.srcCurrencyBtn, this.srcCurrencySign, value);
-    }
-
-    enableDestCurrency(value) {
-        this.enableCurrency(this.destCurrencyBtn, this.destCurrencySign, value);
-    }
-
-    /** Show date pciker */
-    showDatePicker() {
-        if (!this.datePicker) {
-            this.datePicker = DatePicker.create({
-                relparent: this.dateGroup.elem,
-                locales: window.app.getCurrrentLocale(),
-                onDateSelect: (date) => this.onDateSelect(date),
-            });
-            insertAfter(this.datePicker.elem, this.dateGroup.elem);
-        }
-
-        const visible = this.datePicker.visible();
-        if (!visible) {
-            const { transaction } = this.state;
-            const time = dateStringToTime(transaction.date);
-            this.datePicker.setSelection(timeToDate(time));
-        }
-
-        this.datePicker.show(!visible);
     }
 
     renderOriginalData(state, prevState) {
@@ -740,26 +582,16 @@ export class ImportTransactionForm extends Component {
             : __('TR_SRC_AMOUNT');
 
         this.srcAmountField.show(showSrcAmount);
-        this.srcAmountField.setTitle(srcAmountLabel);
-        window.app.setValidation(this.srcAmountField.elem, state.validation.sourceAmount);
-
-        enable(this.srcAmountInp, transaction.enabled && showSrcAmount);
-        this.srcAmountInp.value = transaction.sourceAmount;
-        this.srcAmountInp.placeholder = srcAmountLabel;
-
-        this.srcAmountDecimalInput.setState((inpState) => ({
-            ...inpState,
-            digits: getCurrencyPrecision(transaction.srcCurrId),
+        this.srcAmountField.setState((srcAmountState) => ({
+            ...srcAmountState,
+            title: srcAmountLabel,
+            value: transaction.sourceAmount,
+            placeholder: srcAmountLabel,
+            disabled: !(transaction.enabled && showSrcAmount),
+            currencyId: transaction.srcCurrId,
+            valid: state.validation.sourceAmount,
+            enableSelect: transaction.enabled && isIncome,
         }));
-
-        this.enableSourceCurrency(isIncome);
-        this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
-        enable(this.srcCurrencyBtn, transaction.enabled);
-        this.renderCurrency(
-            this.srcCurrencySign,
-            this.srcCurrencyDropDown,
-            transaction.srcCurrId,
-        );
 
         // Destination amount field
         const showDestAmount = (isExpense || isLimit || isDiff);
@@ -768,26 +600,16 @@ export class ImportTransactionForm extends Component {
             : __('TR_DEST_AMOUNT');
 
         this.destAmountField.show(showDestAmount);
-        this.destAmountField.setTitle(destAmountLabel);
-        window.app.setValidation(this.destAmountField.elem, state.validation.destAmount);
-
-        enable(this.destAmountInp, transaction.enabled && showDestAmount);
-        this.destAmountInp.value = transaction.destAmount;
-        this.destAmountInp.placeholder = destAmountLabel;
-
-        this.destAmountDecimalInput.setState((inpState) => ({
-            ...inpState,
-            digits: getCurrencyPrecision(transaction.destCurrId),
+        this.destAmountField.setState((destAmountState) => ({
+            ...destAmountState,
+            title: destAmountLabel,
+            value: transaction.destAmount,
+            placeholder: destAmountLabel,
+            disabled: !(transaction.enabled && showDestAmount),
+            currencyId: transaction.destCurrId,
+            valid: state.validation.destAmount,
+            enableSelect: transaction.enabled && isExpense,
         }));
-
-        this.enableDestCurrency(isExpense);
-        this.destCurrencyDropDown.enable(isExpense && transaction.enabled);
-        enable(this.destCurrencyBtn, transaction.enabled);
-        this.renderCurrency(
-            this.destCurrencySign,
-            this.destCurrencyDropDown,
-            transaction.destCurrId,
-        );
 
         // Transfer account field
         this.transferAccDropDown.enable(transaction.enabled && isTransfer);
@@ -821,10 +643,13 @@ export class ImportTransactionForm extends Component {
         this.personField.show(isDebt);
 
         // Date field
-        this.dateBtn.enable(transaction.enabled);
-        this.dateInp.enable(transaction.enabled);
-        this.dateInp.value = transaction.date;
-        window.app.setValidation(this.dateField.elem, state.validation.date);
+        this.dateField.setState((dateState) => ({
+            ...dateState,
+            value: transaction.date,
+            date: dateStringToTime(transaction.date),
+            disabled: !transaction.enabled,
+            valid: state.validation.date,
+        }));
 
         // Category field
         this.categorySelect.setType(realType);

@@ -4,7 +4,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
 import { View } from '../../../../view/utils/View.js';
-import '../../css/admin.scss';
+import '../../utils/AdminView/AdminView.scss';
 import './BalanceView.scss';
 
 /**

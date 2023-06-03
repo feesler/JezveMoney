@@ -83,6 +83,18 @@ export default {
             import: './src/view/Views/Transaction/TransactionView.js',
             filename: 'view/js/[name].js',
         },
+        ScheduleView: {
+            import: './src/view/Views/Schedule/ScheduleView.js',
+            filename: 'view/js/[name].js',
+        },
+        ScheduleItemView: {
+            import: './src/view/Views/ScheduleItem/ScheduleItemView.js',
+            filename: 'view/js/[name].js',
+        },
+        ReminderListView: {
+            import: './src/view/Views/ReminderList/ReminderListView.js',
+            filename: 'view/js/[name].js',
+        },
         ImportView: {
             import: './src/view/Views/Import/ImportView.js',
             filename: 'view/js/[name].js',

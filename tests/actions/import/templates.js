@@ -1,6 +1,6 @@
 import { assert, test } from 'jezve-test';
 import { App } from '../../Application.js';
-import { tplColumns } from '../../model/ImportTemplate.js';
+import { ImportTemplate } from '../../model/ImportTemplate.js';
 import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
@@ -132,7 +132,7 @@ export const cancelTemplate = async () => {
 /** Creates template from specified props and submit */
 export const addTemplate = async (props) => {
     assert.isObject(props);
-    tplColumns.forEach((column) => {
+    ImportTemplate.columns.forEach((column) => {
         assert(column in props, `Column '${column}' not found`);
     });
     assert(typeof props.name === 'string' && props.name.length > 0, 'Invalid name');

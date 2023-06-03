@@ -10,7 +10,6 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    Transaction,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 
@@ -163,7 +162,7 @@ export class TransactionListItem extends TestComponent {
             }
         }
 
-        res.dateFmt = Transaction.formatDate(transaction.date);
+        res.dateFmt = App.secondsToDateString(transaction.date);
 
         const category = state.categories.getItem(transaction.category_id);
         res.category = (transaction.category_id === 0) ? '' : category.name;

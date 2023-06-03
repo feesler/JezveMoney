@@ -1097,7 +1097,7 @@ export class ImportView extends AppView {
         }
 
         const expectedTransaction = this.transactionForm.getExpectedTransaction();
-        const isValid = App.state.checkTransactionCorrectness(expectedTransaction);
+        const isValid = App.state.validateTransaction(expectedTransaction);
         if (isValid) {
             return true;
         }
@@ -1491,7 +1491,11 @@ export class ImportView extends AppView {
         let removed = 0;
         for (const ind of items) {
             await this.openContextMenu(ind - removed);
-            await this.performAction(() => this.content.ctxDeleteBtn.click());
+            await this.performAction(async () => {
+                await this.content.ctxDeleteBtn.click();
+                await wait('#contextMenu', { hidden: true });
+                await this.parse();
+            });
 
             this.items.splice(ind - removed, 1);
 

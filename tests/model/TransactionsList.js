@@ -11,6 +11,7 @@ import {
     dateToSeconds,
     MS_IN_SECOND,
     secondsToDate,
+    MONTHS_IN_YEAR,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -19,7 +20,6 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-    availTransTypes,
     Transaction,
     LIMIT_CHANGE,
 } from './Transaction.js';
@@ -27,7 +27,6 @@ import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
 
 const WEEKS_IN_YEAR = 52;
-const MONTHS_IN_YEAR = 12;
 const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
 
@@ -43,6 +42,127 @@ const defaultTransactionType = EXPENSE;
 const defaultGroupType = 'week';
 
 export class TransactionsList extends SortableList {
+    /** Returns expected list of transactions after update specified account */
+    static onUpdateAccount(list, accList, account) {
+        const origAcc = accList.find((item) => item.id === account.id);
+        assert(origAcc, 'Specified account not found in the original list');
+
+        if (
+            origAcc.curr_id === account.curr_id
+            && origAcc.type === account.type
+        ) {
+            return list;
+        }
+
+        const isCreditCard = account.type === ACCOUNT_TYPE_CREDIT_CARD;
+
+        return list.map((item) => {
+            const res = { ...item };
+
+            if (res.src_id === account.id) {
+                res.src_curr = account.curr_id;
+                if (res.dest_curr === account.curr_id) {
+                    res.src_amount = res.dest_amount;
+                }
+
+                if (res.type === LIMIT_CHANGE && !isCreditCard) {
+                    res.type = EXPENSE;
+                }
+            }
+
+            if (res.dest_id === account.id) {
+                res.dest_curr = account.curr_id;
+                if (res.src_curr === account.curr_id) {
+                    res.dest_amount = res.src_amount;
+                }
+
+                if (res.type === LIMIT_CHANGE && !isCreditCard) {
+                    res.type = INCOME;
+                }
+            }
+
+            return res;
+        });
+    }
+
+    /** Returns expected list of transactions after delete specified accounts */
+    static onDeleteAccounts(list, accList, ids) {
+        const res = [];
+
+        const itemIds = asArray(ids);
+        for (const trans of list) {
+            const srcRemoved = itemIds.includes(trans.src_id);
+            const destRemoved = itemIds.includes(trans.dest_id);
+
+            if (
+                (trans.type === EXPENSE || trans.type === LIMIT_CHANGE)
+                && srcRemoved
+            ) {
+                continue;
+            }
+            if (
+                (trans.type === INCOME || trans.type === LIMIT_CHANGE)
+                && destRemoved
+            ) {
+                continue;
+            }
+            if (
+                (trans.type === TRANSFER || trans.type === DEBT)
+                && srcRemoved
+                && destRemoved
+            ) {
+                continue;
+            }
+            if (trans.type === DEBT && srcRemoved && trans.dest_id === 0) {
+                continue;
+            }
+            if (trans.type === DEBT && destRemoved && trans.src_id === 0) {
+                continue;
+            }
+
+            const convTrans = copyObject(trans);
+            if (convTrans.type === TRANSFER) {
+                if (itemIds.includes(convTrans.src_id)) {
+                    convTrans.type = INCOME;
+                    convTrans.src_id = 0;
+                } else if (itemIds.includes(convTrans.dest_id)) {
+                    convTrans.type = EXPENSE;
+                    convTrans.dest_id = 0;
+                }
+            } else if (convTrans.type === DEBT) {
+                for (const accountId of itemIds) {
+                    const acc = accList.find((item) => item.id === accountId);
+
+                    if (convTrans.src_id === accountId) {
+                        if (acc.owner_id !== App.owner_id) {
+                            convTrans.type = INCOME;
+                        }
+                        convTrans.src_id = 0;
+                    } else if (convTrans.dest_id === accountId) {
+                        if (acc.owner_id !== App.owner_id) {
+                            convTrans.type = EXPENSE;
+                        }
+                        convTrans.dest_id = 0;
+                    }
+                }
+            }
+
+            res.push(convTrans);
+        }
+
+        return res;
+    }
+
+    /** Returns expected list of transactions after delete specified categories */
+    static onDeleteCategories(list, ids) {
+        const itemIds = asArray(ids);
+        return list.map((item) => (
+            (item.category_id && itemIds.includes(item.category_id))
+                ? { ...item, category_id: 0 }
+                : item
+        ));
+    }
+
     async fetch() {
         return api.transaction.list();
     }
@@ -160,7 +280,7 @@ export class TransactionsList extends SortableList {
     // Empty array, zero or undefined assumed filter is set as ALL
     getItemsByType(list, type) {
         let types = asArray(type);
-        types = types.filter((item) => availTransTypes.includes(item));
+        types = types.filter((item) => Transaction.availTypes.includes(item));
         if (!types.length) {
             return list;
         }
@@ -401,142 +521,23 @@ export class TransactionsList extends SortableList {
         return this.getExpectedPages(this.data, limit);
     }
 
-    // Return expected list of transactions after update specified account
-    onUpdateAccount(list, accList, account) {
-        const origAcc = accList.find((item) => item.id === account.id);
-        assert(origAcc, 'Specified account not found in the original list');
-
-        if (
-            origAcc.curr_id === account.curr_id
-            && origAcc.type === account.type
-        ) {
-            return list;
-        }
-
-        const isCreditCard = account.type === ACCOUNT_TYPE_CREDIT_CARD;
-
-        return list.map((item) => {
-            const res = { ...item };
-
-            if (res.src_id === account.id) {
-                res.src_curr = account.curr_id;
-                if (res.dest_curr === account.curr_id) {
-                    res.src_amount = res.dest_amount;
-                }
-
-                if (res.type === LIMIT_CHANGE && !isCreditCard) {
-                    res.type = EXPENSE;
-                }
-            }
-
-            if (res.dest_id === account.id) {
-                res.dest_curr = account.curr_id;
-                if (res.src_curr === account.curr_id) {
-                    res.dest_amount = res.src_amount;
-                }
-
-                if (res.type === LIMIT_CHANGE && !isCreditCard) {
-                    res.type = INCOME;
-                }
-            }
-
-            return res;
-        });
-    }
-
-    // Return expected list of transactions after update specified account
+    /** Returns expected list of transactions after update specified account */
     updateAccount(accList, account) {
-        const res = this.onUpdateAccount(this.data, accList, account);
+        const res = TransactionsList.onUpdateAccount(this.data, accList, account);
 
         return TransactionsList.create(res);
     }
 
-    /** Return expected list of transactions after delete specified accounts */
-    onDeleteAccounts(list, accList, ids) {
-        const res = [];
-
-        const itemIds = asArray(ids);
-        for (const trans of list) {
-            const srcRemoved = itemIds.includes(trans.src_id);
-            const destRemoved = itemIds.includes(trans.dest_id);
-
-            if (
-                (trans.type === EXPENSE || trans.type === LIMIT_CHANGE)
-                && srcRemoved
-            ) {
-                continue;
-            }
-            if (
-                (trans.type === INCOME || trans.type === LIMIT_CHANGE)
-                && destRemoved
-            ) {
-                continue;
-            }
-            if (
-                (trans.type === TRANSFER || trans.type === DEBT)
-                && srcRemoved
-                && destRemoved
-            ) {
-                continue;
-            }
-            if (trans.type === DEBT && srcRemoved && trans.dest_id === 0) {
-                continue;
-            }
-            if (trans.type === DEBT && destRemoved && trans.src_id === 0) {
-                continue;
-            }
-
-            const convTrans = copyObject(trans);
-            if (convTrans.type === TRANSFER) {
-                if (itemIds.includes(convTrans.src_id)) {
-                    convTrans.type = INCOME;
-                    convTrans.src_id = 0;
-                } else if (itemIds.includes(convTrans.dest_id)) {
-                    convTrans.type = EXPENSE;
-                    convTrans.dest_id = 0;
-                }
-            } else if (convTrans.type === DEBT) {
-                for (const accountId of itemIds) {
-                    const acc = accList.find((item) => item.id === accountId);
-
-                    if (convTrans.src_id === accountId) {
-                        if (acc.owner_id !== App.owner_id) {
-                            convTrans.type = INCOME;
-                        }
-                        convTrans.src_id = 0;
-                    } else if (convTrans.dest_id === accountId) {
-                        if (acc.owner_id !== App.owner_id) {
-                            convTrans.type = EXPENSE;
-                        }
-                        convTrans.dest_id = 0;
-                    }
-                }
-            }
-
-            res.push(convTrans);
-        }
-
-        return res;
-    }
-
+    /** Returns expected list of transactions after delete specified accounts */
     deleteAccounts(accList, ids) {
-        const res = this.onDeleteAccounts(this.data, accList, ids);
+        const res = TransactionsList.onDeleteAccounts(this.data, accList, ids);
 
         return TransactionsList.create(res);
     }
 
-    /** Return expected list of transactions after delete specified categories */
-    onDeleteCategories(list, ids) {
-        const itemIds = asArray(ids);
-        return list.map((item) => (
-            (item.category_id && itemIds.includes(item.category_id))
-                ? { ...item, category_id: 0 }
-                : item
-        ));
-    }
-
+    /** Returns expected list of transactions after delete specified categories */
     deleteCategories(ids) {
-        const res = this.onDeleteCategories(this.data, ids);
+        const res = TransactionsList.onDeleteCategories(this.data, ids);
 
         return TransactionsList.create(res);
     }

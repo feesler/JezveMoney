@@ -120,6 +120,12 @@
                 <span class="checkbox__label"><?= __("RESET_KEEP_BALANCE") ?></span>
             </label>
 
+            <label id="scheduleCheck" class="checkbox">
+                <input type="checkbox" name="schedule">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label"><?= __("RESET_SCHEDULE") ?></span>
+            </label>
+
             <label id="importTplCheck" class="checkbox">
                 <input type="checkbox" name="importtpl">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>

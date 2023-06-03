@@ -139,6 +139,9 @@ abstract class Model
         if (!is_array($params)) {
             throw new \Error("Invalid params");
         }
+        if (count($params) === 0) {
+            return [];
+        }
 
         $prepared = [];
         foreach ($params as $item) {

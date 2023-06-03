@@ -19,7 +19,7 @@ import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
 import { CategoryItem } from './component/CategoryItem.js';
-import { availTransTypes } from '../model/Transaction.js';
+import { Transaction } from '../model/Transaction.js';
 import { CategoryDetails } from './component/Category/CategoryDetails.js';
 import { Category } from '../model/Category.js';
 import {
@@ -54,7 +54,7 @@ const contextMenuItems = [
 ];
 
 const ANY_TYPE = 0;
-const transTypes = [...availTransTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
+const transTypes = [...Transaction.availTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
 
 /** List of categories view class */
 export class CategoryListView extends AppView {

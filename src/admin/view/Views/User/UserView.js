@@ -7,9 +7,10 @@ import {
     setEvents,
 } from 'jezvejs';
 import { Application } from '../../../../view/Application/Application.js';
+import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';
-import { AdminListView } from '../../js/AdminListView.js';
-import '../../css/admin.scss';
+import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
+import '../../utils/AdminView/AdminView.scss';
 
 /**
  * Admin currecny list view
@@ -20,7 +21,7 @@ class AdminUserListView extends AdminListView {
 
         this.apiController = 'user';
         this.statePath = 'users';
-        this.deleteConfirmMessage = 'Are you sure want to delete selected user?';
+        this.deleteConfirmMessage = __('MSG_USER_DELETE');
     }
 
     /**

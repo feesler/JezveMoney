@@ -19,10 +19,13 @@ $router->setRoutes([
     "account" => "Account",
     "person" => "Person",
     "transaction" => "Transaction",
+    "schedule" => "ScheduledTransaction",
+    "reminder" => "Reminder",
     "category" => "Category",
     "user" => "User",
     "profile" => "Profile",
-    "state" => "State"
+    "state" => "State",
+    "systemsettings" => "SystemSettings",
 ]);
 
 $router->setAliases([

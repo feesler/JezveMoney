@@ -4,6 +4,12 @@ import { Transaction } from './Transaction.js';
 
 /** Category model */
 export class Category {
+    static availProps = [
+        'name',
+        'parent_id',
+        'type',
+    ];
+
     static getTypeString(type) {
         return (type !== 0)
             ? Transaction.typeToString(type).toLowerCase()

@@ -12,6 +12,7 @@ import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createCategories } from './data/categories.js';
 import { createTransactions } from './data/transactions.js';
+import { createScheduledTransactions } from './data/schedule.js';
 import {
     getAccountCSV,
     getCardCSV,
@@ -37,6 +38,8 @@ import { CategoriesStory } from './stories/CategoriesStory.js';
 import { TransactionsStory } from './stories/transaction/TransactionsStory.js';
 import { ImportStory } from './stories/import/ImportStory.js';
 import { TransactionListStory } from './stories/TransactionListStory.js';
+import { ScheduleStory } from './stories/ScheduleStory.js';
+import { RemindersStory } from './stories/RemindersStory.js';
 import { StatisticsStory } from './stories/StatisticsStory.js';
 import { ImportListStory } from './stories/import/ImportListStory.js';
 import { ImportTemplateStory } from './stories/import/ImportTemplateStory.js';
@@ -56,6 +59,8 @@ const storiesMap = {
     categories: CategoriesStory,
     transactions: TransactionsStory,
     transactionList: TransactionListStory,
+    schedule: ScheduleStory,
+    reminders: RemindersStory,
     import: ImportStory,
     importTemplates: ImportTemplateStory,
     importRules: ImportRulesStory,
@@ -233,6 +238,11 @@ export class Scenario {
         await createTransactions();
     }
 
+    /** Creates common test scheduled transactions */
+    async createScheduledTransactions() {
+        await createScheduledTransactions();
+    }
+
     /** Creates import templates */
     async createImportTemplates() {
         await createImportTemplates();
@@ -250,6 +260,7 @@ export class Scenario {
         await createPersons();
         await createCategories();
         await createTransactions();
+        await createScheduledTransactions();
     }
 
     /** Upload CSV files to server */

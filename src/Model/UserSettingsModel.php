@@ -28,6 +28,7 @@ const AVAILABLE_SETTINGS = [
     "date_locale",
     "decimal_locale",
     "tr_group_by_date",
+    "tz_offset",
 ];
 
 const DEFAULT_SETTINGS = [
@@ -37,7 +38,10 @@ const DEFAULT_SETTINGS = [
     "date_locale" => DEFAULT_LOCALE,
     "decimal_locale" => DEFAULT_LOCALE,
     "tr_group_by_date" => 0,
+    "tz_offset" => 0,
 ];
+
+const SECONDS_IN_MINUTE = 60;
 
 /**
  * User settings model
@@ -348,5 +352,21 @@ class UserSettingsModel extends CachedTable
         }
 
         throw new \Error("Invalid decimal format locale");
+    }
+
+    /**
+     * Returns timestamp for current time with client timezone correction
+     *
+     * @return int
+     */
+    public function getClientTime()
+    {
+        $settings = $this->getSettings();
+        if (is_null($settings)) {
+            throw new \Error("Settings not available");
+        }
+
+        $res = time() - ($settings->tz_offset * SECONDS_IN_MINUTE);
+        return $res;
     }
 }

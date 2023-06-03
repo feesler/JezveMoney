@@ -1,0 +1,57 @@
+.reminder-list-view {
+  main {
+    width: 100%;
+  }
+
+  .item-details {
+    position: absolute;
+    width: 100%;
+    left: auto;
+    right: 0;
+  }
+}
+
+/* List header */
+.list-header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Mode selector */
+.btn.mode-selector {
+  --btn-title-color: var(--accent-color);
+  --btn-icon-color: var(--accent-color);
+  --btn-hover-icon-color: var(--accent-color);
+  --btn-hover-title-color: var(--accent-hover-color);
+}
+
+/* Scheduled transaction reminder details */
+.reminder-item-details {
+  --offcanvas-bg: var(--main-bg-color);
+
+  padding: 0 12px;
+  width: 100%;
+  max-width: var(--section-width);
+}
+
+/* Scheduled transaction reminders list component */
+.reminder-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 4px;
+}
+
+.reminder-list_select .reminder-item {
+  cursor: pointer;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .reminder-item-details {
+    padding-top: var(--header-size);
+  }
+}

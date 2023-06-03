@@ -30,7 +30,13 @@ async function apiRequest(method, request, data = null) {
         throw new Error(`Invalid status code: ${response.status}`);
     }
 
-    const apiRes = JSON.parse(response.body);
+    let apiRes = null;
+    try {
+        apiRes = JSON.parse(response.body);
+    } catch (e) {
+        throw new Error(`Invalid response: ${response.body}`);
+    }
+
     if (apiRes?.result !== 'ok') {
         const msg = apiRes?.msg ?? 'API request failed';
         throw new ApiRequestError(msg);
@@ -440,6 +446,62 @@ export const api = {
 
         async statistics(options = {}) {
             const { data } = await apiGet('transaction/statistics', options);
+            return data;
+        },
+    },
+
+    schedule: {
+        async read(ids) {
+            const { request, options } = idsRequest('schedule/', ids);
+            const { data } = await apiGet(request, options);
+            return data;
+        },
+
+        async create(options) {
+            const { data } = await apiPost('schedule/create', options);
+            return data;
+        },
+
+        async createMultiple(options) {
+            const { data } = await apiPost('schedule/createMultiple', options);
+            return data;
+        },
+
+        async update(options) {
+            const response = await apiPost('schedule/update', options);
+            return response.data ?? {};
+        },
+
+        async del(options) {
+            const response = await apiPost('schedule/delete', options);
+            return response.data ?? {};
+        },
+
+        async list() {
+            const { data } = await apiGet('schedule/list');
+            return data;
+        },
+    },
+
+    reminder: {
+        async read(ids) {
+            const { request, options } = idsRequest('reminder/', ids);
+            const { data } = await apiGet(request, options);
+            return data;
+        },
+
+        async confirm(options) {
+            const response = await apiPost('reminder/confirm', options);
+            return response.data ?? {};
+        },
+
+        async cancel(options) {
+            const response = await apiPost('reminder/cancel', options);
+            return response.data ?? {};
+        },
+
+        async list() {
+            const { data } = await apiGet('reminder/list');
             return data;
         },
     },

@@ -12,8 +12,6 @@ use JezveMoney\Core\Message;
  */
 class Categories extends ListViewController
 {
-    protected $requiredFields = ["name", "parent_id", "type"];
-
     /**
      * Controller initialization
      */

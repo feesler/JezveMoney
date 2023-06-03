@@ -13,7 +13,6 @@ import { InputGroup } from 'jezvejs/InputGroup';
 import {
     dateStringToTime,
     parseDate,
-    timeToDate,
     __,
 } from '../../utils/utils.js';
 import './DateRangeInput.scss';
@@ -166,10 +165,10 @@ export class DateRangeInput extends Component {
 
     setData(data) {
         const stdate = (data.stdate)
-            ? window.app.formatInputDate(timeToDate(data.stdate))
+            ? window.app.formatInputDate(data.stdate)
             : null;
         const enddate = (data.enddate)
-            ? window.app.formatInputDate(timeToDate(data.enddate))
+            ? window.app.formatInputDate(data.enddate)
             : null;
 
         this.setState({
