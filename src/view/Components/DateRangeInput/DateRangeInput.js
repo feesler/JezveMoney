@@ -10,11 +10,7 @@ import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
-import {
-    dateStringToTime,
-    parseDate,
-    __,
-} from '../../utils/utils.js';
+import { parseDate, __ } from '../../utils/utils.js';
 import './DateRangeInput.scss';
 
 const CALENDAR_BUTTON_CLASS = 'btn input-group__inner-btn calendar-btn';
@@ -149,7 +145,7 @@ export class DateRangeInput extends Component {
         });
 
         this.elem = createElement('form', {
-            props: { className: 'validation-block' },
+            props: { className: 'date-range-input validation-block' },
             events: { submit: (e) => this.onSubmit(e) },
             children: [
                 this.inputGroup.elem,
@@ -180,14 +176,16 @@ export class DateRangeInput extends Component {
         });
     }
 
-    notifyChanged(data) {
+    notifyChanged() {
         if (!isFunction(this.props.onChange)) {
             return;
         }
 
+        const { form } = this.state;
+
         this.props.onChange({
-            stdate: dateStringToTime(data.stdate),
-            enddate: dateStringToTime(data.enddate),
+            stdate: form.stdate,
+            enddate: form.enddate,
         });
     }
 
@@ -259,7 +257,7 @@ export class DateRangeInput extends Component {
             return;
         }
 
-        this.notifyChanged(form);
+        this.notifyChanged();
     }
 
     /** Date range form 'submit' event handler */
@@ -268,7 +266,7 @@ export class DateRangeInput extends Component {
 
         const validation = this.validateDateRange();
         if (validation.valid) {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         } else {
             this.setState({ ...this.state, validation });
         }
@@ -283,6 +281,8 @@ export class DateRangeInput extends Component {
             },
             validation: { ...defaultValidation },
         });
+
+        this.notifyChanged();
     }
 
     onEndDateInput(e) {
@@ -294,6 +294,8 @@ export class DateRangeInput extends Component {
             },
             validation: { ...defaultValidation },
         });
+
+        this.notifyChanged();
     }
 
     validateDateRange(state = this.state) {
@@ -369,7 +371,7 @@ export class DateRangeInput extends Component {
         if (this.datePicker) {
             this.datePicker.hide();
         } else {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         }
     }
 
@@ -393,7 +395,7 @@ export class DateRangeInput extends Component {
         if (this.datePicker) {
             this.datePicker.hide();
         } else {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         }
     }
 

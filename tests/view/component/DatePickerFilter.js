@@ -9,20 +9,33 @@ import {
 import { DatePicker } from 'jezvejs-test';
 
 export class DatePickerFilter extends TestComponent {
+    get value() {
+        return { ...this.content.value };
+    }
+
+    get invalidated() {
+        return this.content.invalidated;
+    }
+
     async parseContent() {
-        const res = {};
+        const res = {
+            value: {},
+        };
 
         res.stInputElem = await query(this.elem, 'input[name="stdate"]');
         assert(res.stInputElem, 'Start date input element not found');
         res.endInputElem = await query(this.elem, 'input[name="enddate"]');
         assert(res.endInputElem, 'End date input element not found');
 
-        const [startDate, endDate] = await evaluate((startInp, endInp) => ([
+        [
+            res.invalidated,
+            res.value.startDate,
+            res.value.endDate,
+        ] = await evaluate((el, startInp, endInp) => ([
+            el.classList.contains('invalid-block'),
             startInp.value,
             endInp.value,
-        ]), res.stInputElem, res.endInputElem);
-
-        res.value = { startDate, endDate };
+        ]), this.elem, res.stInputElem, res.endInputElem);
 
         res.startDatePickerBtn = { elem: await query(this.elem, 'input[name="stdate"] ~ .calendar-btn') };
         assert(res.startDatePickerBtn, 'Date picker button not found');
@@ -78,7 +91,11 @@ export class DatePickerFilter extends TestComponent {
         return structuredClone(this.content.value);
     }
 
-    async input(val) {
-        return input(this.content.inputElem, val);
+    async inputStart(val) {
+        return input(this.content.stInputElem, val);
+    }
+
+    async inputEnd(val) {
+        return input(this.content.endInputElem, val);
     }
 }

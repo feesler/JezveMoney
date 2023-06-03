@@ -69,6 +69,7 @@ export const parseDate = (str, params = {}) => {
     }
 
     const res = parseDateString(str, {
+        ...params,
         locales: params?.locales ?? window.app.dateFormatLocale,
         options: params?.options ?? window.app.dateFormatOptions,
     });

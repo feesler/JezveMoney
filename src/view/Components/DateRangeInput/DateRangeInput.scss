@@ -1,4 +1,4 @@
-.date-range-filter {
+.date-range-input {
   .input-group {
     --ig-hor-padding: 0.5rem;
 
@@ -29,7 +29,7 @@
 }
 
 @media screen and (min-width: 576px) {
-  .date-range-filter {
+  .date-range-input {
     .date-range-part {
       --input-padding: 0 0.5rem;
     }

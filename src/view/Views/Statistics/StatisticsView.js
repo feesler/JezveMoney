@@ -20,6 +20,7 @@ import {
     getWeekRange,
     getMonthRange,
     getHalfYearRange,
+    dateStringToTime,
 } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { API } from '../../API/index.js';
@@ -365,29 +366,46 @@ class StatisticsView extends View {
         const { filter } = this.store.getState();
         const stdate = filter.stdate ?? null;
         const enddate = filter.enddate ?? null;
+        const timeData = {
+            stdate: dateStringToTime(data.stdate, { fixShortYear: false }),
+            enddate: dateStringToTime(data.enddate, { fixShortYear: false }),
+        };
 
-        if (stdate === data.stdate && enddate === data.enddate) {
+        if (stdate === timeData.stdate && enddate === timeData.enddate) {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(data));
+        this.store.dispatch(actions.changeDateFilter(timeData));
         const state = this.store.getState();
         this.requestData(state.form);
     }
 
+    formatDateRange(range) {
+        return {
+            stdate: (range?.stdate) ? window.app.formatInputDate(range.stdate) : null,
+            enddate: (range?.enddate) ? window.app.formatInputDate(range.enddate) : null,
+        };
+    }
+
     showWeekRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getWeekRange());
+
+        const range = getWeekRange();
+        this.changeDateFilter(this.formatDateRange(range));
     }
 
     showMonthRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getMonthRange());
+
+        const range = getMonthRange();
+        this.changeDateFilter(this.formatDateRange(range));
     }
 
     showHalfYearRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getHalfYearRange());
+
+        const range = getHalfYearRange();
+        this.changeDateFilter(this.formatDateRange(range));
     }
 
     /**
