@@ -76,20 +76,13 @@ export class DateRangeInput extends Component {
             onClick: () => this.showCalendar(true),
         });
 
-        const startDateOuter = createElement('div', {
-            props: { className: 'input-group__input-outer date-range-part' },
+        this.startDateGroup = InputGroup.create({
+            className: 'input-group__input-outer date-range-part',
             children: [
                 this.startDateInput.elem,
                 this.startClearBtn.elem,
                 this.startDateBtn.elem,
             ],
-        });
-
-        const textElem = createElement('div', {
-            props: {
-                className: 'input-group__text',
-                textContent: '-',
-            },
         });
 
         this.endDateInput = DateInput.create({
@@ -111,8 +104,8 @@ export class DateRangeInput extends Component {
             onClick: () => this.showCalendar(false),
         });
 
-        const endDateOuter = createElement('div', {
-            props: { className: 'input-group__input-outer date-range-part' },
+        this.endDateGroup = InputGroup.create({
+            className: 'input-group__input-outer date-range-part',
             children: [
                 this.endDateInput.elem,
                 this.endClearBtn.elem,
@@ -120,11 +113,11 @@ export class DateRangeInput extends Component {
             ],
         });
 
-        this.inputGroup = InputGroup.create({
+        const inputsContainer = createElement('div', {
+            props: { className: 'row-container' },
             children: [
-                startDateOuter,
-                textElem,
-                endDateOuter,
+                this.startDateGroup.elem,
+                this.endDateGroup.elem,
             ],
         });
 
@@ -148,7 +141,7 @@ export class DateRangeInput extends Component {
             props: { className: 'date-range-input validation-block' },
             events: { submit: (e) => this.onSubmit(e) },
             children: [
-                this.inputGroup.elem,
+                inputsContainer,
                 hiddenInp,
                 this.datePickerWrapper,
                 this.feedbackElem,

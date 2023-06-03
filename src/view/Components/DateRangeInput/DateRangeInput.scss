@@ -1,9 +1,12 @@
 .date-range-input {
+  .row-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+  }
+
   .input-group {
     --ig-hor-padding: 0.5rem;
-
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
   }
 
   .input-group__text {
