@@ -33,6 +33,8 @@ const defaultProps = {
     end: null,
     startPlaceholder: null,
     endPlaceholder: null,
+    startClearable: true,
+    endClearable: true,
     onChange: null,
 };
 
@@ -44,15 +46,14 @@ export class DateRangeInput extends Component {
         elem: ['id'],
     };
 
-    constructor(props) {
-        super(props);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
 
         this.state = {
+            ...this.props,
             selectPart: null,
         };
 
@@ -172,6 +173,7 @@ export class DateRangeInput extends Component {
             : null;
 
         this.setState({
+            ...this.state,
             form: { stdate, enddate },
             filter: { stdate, enddate },
             validation: { ...defaultValidation },
@@ -422,8 +424,8 @@ export class DateRangeInput extends Component {
         this.startDateInput.value = state.form.stdate ?? '';
         this.endDateInput.value = state.form.enddate ?? '';
 
-        this.startClearBtn.show(!!state.form.stdate);
-        this.endClearBtn.show(!!state.form.enddate);
+        this.startClearBtn.show(state.startClearable && !!state.form.stdate);
+        this.endClearBtn.show(state.endClearable && !!state.form.enddate);
 
         window.app.setValidation(this.elem, state.validation.valid);
 
