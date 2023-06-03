@@ -40,10 +40,21 @@
   cursor: pointer;
 }
 
+/* Interval type field */
+.interval-type-field {
+  flex: 1 0 auto;
+}
+
+/* Interval step field */
+.interval-step-field {
+  flex: 1 1 0;
+}
+
 /* Interval offset field */
 .interval-offset-field .field__content {
   display: flex;
   flex-flow: row nowrap;
+  column-gap: 1.5rem;
 }
 
 .weekday-select,

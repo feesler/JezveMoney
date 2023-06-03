@@ -480,14 +480,8 @@ export class TransactionForm extends Component {
 
         // Schedule fields
         if (this.props.type === 'scheduleItem') {
-            this.createScheduleFields();
-            children.push(
-                this.startDateRow.elem,
-                this.endDateRow.elem,
-                this.intervalStepRow.elem,
-                this.intervalTypeRow.elem,
-                this.intervalOffsetRow.elem,
-            );
+            const fields = this.createScheduleFields();
+            children.push(...fields);
         }
 
         // Controls
@@ -612,7 +606,7 @@ export class TransactionForm extends Component {
             id: 'intervalStepRow',
             htmlFor: 'intervalStepInput',
             title: __('SCHED_TR_INTERVAL_STEP'),
-            className: 'form-row',
+            className: 'interval-step-field',
             content: this.intervalStepInput.elem,
         });
 
@@ -635,8 +629,16 @@ export class TransactionForm extends Component {
             id: 'intervalTypeRow',
             htmlFor: 'intervalTypeSelect',
             title: __('SCHED_TR_INTERVAL'),
-            className: 'form-row',
+            className: 'interval-type-field',
             content: this.intervalTypeSelect.elem,
+        });
+
+        const intervalGroup = createElement('div', {
+            props: { className: 'form-fields-row form-row' },
+            children: [
+                this.intervalTypeRow.elem,
+                this.intervalStepRow.elem,
+            ],
         });
 
         // Interval offset
@@ -678,6 +680,13 @@ export class TransactionForm extends Component {
                 this.monthSelect.elem,
             ],
         });
+
+        return [
+            this.startDateRow.elem,
+            this.endDateRow.elem,
+            intervalGroup,
+            this.intervalOffsetRow.elem,
+        ];
     }
 
     /** Returns hidden input element */
