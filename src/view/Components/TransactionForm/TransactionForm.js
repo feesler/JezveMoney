@@ -137,6 +137,7 @@ export class TransactionForm extends Component {
                 date: true,
                 startDate: true,
                 endDate: true,
+                intervalStep: true,
             },
             srcAccount: accountModel.getItem(transaction.src_id),
             destAccount: accountModel.getItem(transaction.dest_id),
@@ -586,10 +587,12 @@ export class TransactionForm extends Component {
         });
 
         // Interval step field
-        this.intervalStepInput = Input.create({
+        this.intervalStepInput = DecimalInput.create({
             id: 'intervalStepInput',
             name: 'interval_step',
-            className: 'stretch-input',
+            className: 'input stretch-input',
+            digits: 0,
+            allowNegative: false,
             onInput: (e) => this.onIntervalStepChanged(e),
         });
         setProps(this.intervalStepInput.elem, inputProps);
@@ -600,6 +603,13 @@ export class TransactionForm extends Component {
             title: __('SCHED_TR_INTERVAL_STEP'),
             className: 'interval-step-field',
             content: this.intervalStepInput.elem,
+        });
+
+        this.intervalFeedbackElem = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('SCHED_TR_INVALID_INTERVAL_STEP'),
+            },
         });
 
         // Interval type field
@@ -625,11 +635,19 @@ export class TransactionForm extends Component {
             content: this.intervalTypeSelect.elem,
         });
 
-        const intervalGroup = createElement('div', {
-            props: { className: 'form-row form-fields-row interval-fields' },
+        const intervalFields = createElement('div', {
+            props: { className: 'form-fields-row' },
             children: [
                 this.intervalTypeRow.elem,
                 this.intervalStepRow.elem,
+            ],
+        });
+
+        this.intervalFieldsGroup = createElement('div', {
+            props: { className: 'form-row validation-block interval-fields' },
+            children: [
+                intervalFields,
+                this.intervalFeedbackElem,
             ],
         });
 
@@ -684,7 +702,7 @@ export class TransactionForm extends Component {
 
         return [
             this.dateRangeField.elem,
-            intervalGroup,
+            this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
         ];
@@ -1115,17 +1133,21 @@ export class TransactionForm extends Component {
         } else if (isScheduleItem) {
             this.validateStartDate(state);
             this.validateEndDate(state);
+            this.validateIntervalStep(state);
         }
 
         const { validation } = this.store.getState();
-        const valid = (
+        let valid = (
             validation.destAmount
             && validation.sourceAmount
-            && (
-                (isTransaction && validation.date)
-                || (isScheduleItem && validation.startDate && validation.endDate)
-            )
         );
+
+        if (isTransaction) {
+            valid = valid && validation.date;
+        } else if (isScheduleItem) {
+            valid = valid && validation.startDate && validation.endDate && validation.intervalStep;
+        }
+
         if (valid) {
             this.submitTransaction();
         }
@@ -1174,6 +1196,18 @@ export class TransactionForm extends Component {
         const valid = (endDate.length === 0 || window.app.isValidDateString(endDate));
         if (!valid) {
             this.store.dispatch(actions.invalidateEndDate());
+        }
+    }
+
+    validateIntervalStep(state) {
+        const { transaction } = state;
+
+        const valid = (
+            (transaction.interval_type === INTERVAL_NONE)
+            || (transaction.interval_step > 0)
+        );
+        if (!valid) {
+            this.store.dispatch(actions.invalidateIntervalStep());
         }
     }
 
@@ -1731,6 +1765,7 @@ export class TransactionForm extends Component {
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
         this.intervalStepRow.show(isRepeat);
+        window.app.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval type field
         this.intervalTypeSelect.setSelection(intervalType);

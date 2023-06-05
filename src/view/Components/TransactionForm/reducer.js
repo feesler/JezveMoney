@@ -1170,6 +1170,9 @@ const slice = createSlice({
         if (type === INTERVAL_NONE) {
             newState.form.endDate = '';
             newState.transaction.end_date = null;
+            newState.transaction.interval_step = 0;
+        } else if (state.transaction.interval_step === 0) {
+            newState.transaction.interval_step = parseInt(state.form.intervalStep, 10);
         }
 
         return newState;
@@ -1186,6 +1189,10 @@ const slice = createSlice({
             transaction: {
                 ...state.transaction,
                 interval_step: step,
+            },
+            validation: {
+                ...state.validation,
+                intervalStep: true,
             },
         };
 
@@ -1286,6 +1293,14 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             endDate: false,
+        },
+    }),
+
+    invalidateIntervalStep: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            intervalStep: false,
         },
     }),
 

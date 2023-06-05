@@ -177,6 +177,7 @@ export class TransactionForm extends TestComponent {
                 res.intervalStepRow = {
                     visible: isRepeat,
                     value: model.intervalStep,
+                    isInvalid: model.intervalStepInvalidated,
                 };
                 res.intervalTypeSelect = {
                     visible: true,
@@ -1116,6 +1117,7 @@ export class TransactionForm extends TestComponent {
             res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
 
             res.intervalStep = cont.intervalStepRow.value;
+            res.intervalStepInvalidated = cont.intervalStepRow.isInvalid;
             res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
 
             if (res.intervalType === INTERVAL_DAY) {
@@ -1176,6 +1178,10 @@ export class TransactionForm extends TestComponent {
                 return false;
             }
             if (this.model.endDate && !this.isValidDate(this.model.endDate)) {
+                return false;
+            }
+            const intervalStep = parseInt(this.model.intervalStep, 10);
+            if (!(intervalStep > 0)) {
                 return false;
             }
         }
@@ -1909,14 +1915,17 @@ export class TransactionForm extends TestComponent {
 
             isValid = isValid && dateValid;
         } else if (this.isScheduleItemForm()) {
-            const { startDate, endDate } = this.model;
+            const { startDate, endDate, intervalStep } = this.model;
 
             const startDateValid = this.isValidDate(startDate);
             const endDateValid = !endDate || this.isValidDate(endDate);
 
             this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
 
-            isValid = isValid && startDateValid && endDateValid;
+            const intervalStepValid = parseInt(intervalStep, 10) > 0;
+            this.model.intervalStepInvalidated = !intervalStepValid;
+
+            isValid = isValid && startDateValid && endDateValid && intervalStepValid;
         }
 
         const action = () => click(this.content.submitBtn);
@@ -2003,6 +2012,7 @@ export class TransactionForm extends TestComponent {
         if (type === INTERVAL_NONE) {
             this.model.endDate = '';
         }
+
         this.model.intervalOffset = 0;
         this.expectedState = this.getExpectedState();
 
@@ -2013,6 +2023,7 @@ export class TransactionForm extends TestComponent {
 
     async inputIntervalStep(val) {
         this.model.intervalStep = val;
+        this.model.intervalStepInvalidated = false;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.intervalStepRow.input(val));

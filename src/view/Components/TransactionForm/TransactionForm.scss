@@ -41,8 +41,14 @@
 }
 
 /* Interval type field */
-.form-fields-row.interval-fields {
-  column-gap: 1rem;
+.interval-fields {
+  .form-fields-row {
+    column-gap: 1rem;
+  }
+
+  .feedback {
+    text-align: right;
+  }
 }
 
 .interval-type-field {

@@ -302,8 +302,11 @@ export const update = async (pos) => {
     });
 };
 
-export const createAndSubmit = async (actions) => {
-    setBlock('Create scheduled transaction', 2);
+export const createAndSubmit = async (...args) => {
+    const descr = (args.length > 1) ? args[0] : 'Create scheduled transaction';
+    setBlock(descr, 2);
+
+    const actions = (args.length > 1) ? args[1] : args[0];
 
     await create();
     await runActions(actions);

@@ -7,6 +7,7 @@ import {
     hasClass,
     input,
     click,
+    closest,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 
@@ -54,12 +55,15 @@ export class InputRow extends TestComponent {
         res.valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
         res.value = await prop(res.valueInput, 'value');
 
-        res.validationEnabled = await hasClass(this.elem, 'validation-block');
+        const validationElem = await closest(this.elem, '.validation-block');
+        res.validationEnabled = !!validationElem;
         if (res.validationEnabled) {
-            res.isInvalid = await hasClass(this.elem, 'invalid-block');
-            res.feedBackElem = await query(this.elem, '.invalid-feedback');
+            res.isInvalid = await hasClass(validationElem, 'invalid-block');
+            res.feedBackElem = await query(validationElem, '.invalid-feedback');
             assert(res.feedBackElem, 'Validation feedback element not found');
             res.feedbackText = await prop(res.feedBackElem, 'textContent');
+        } else {
+            res.isInvalid = false;
         }
 
         return res;

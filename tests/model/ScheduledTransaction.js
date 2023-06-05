@@ -138,9 +138,13 @@ export class ScheduledTransaction {
         return this.availIntervals.includes(interval);
     }
 
-    static isValidIntervalStep(value) {
+    static isValidIntervalStep(value, intervalType) {
         const steps = parseInt(value, 10);
-        return steps >= 0;
+        const type = parseInt(intervalType, 10);
+        return (
+            (type === INTERVAL_NONE && steps === 0)
+            || (type !== INTERVAL_NONE && steps > 0)
+        );
     }
 
     static isValidIntervalOffset(value, intervalType) {

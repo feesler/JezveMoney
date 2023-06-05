@@ -2071,7 +2071,9 @@ export class AppState {
             return false;
         }
 
-        if (!ScheduledTransaction.isValidIntervalStep(params.interval_step)) {
+        if (
+            !ScheduledTransaction.isValidIntervalStep(params.interval_step, params.interval_type)
+        ) {
             return false;
         }
 

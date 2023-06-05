@@ -229,6 +229,7 @@
     "SCHED_TR_OFFSET_MONTH_DAY": "Day of month",
     "SCHED_TR_OFFSET_YEAR_DAY": "Day of year",
     "SCHED_TR_INTERVAL_STEP": "Step",
+    "SCHED_TR_INVALID_INTERVAL_STEP": "Input correct step",
     "SCHEDULE_ITEM_START": "from ${1}",
     "SCHEDULE_ITEM_END": "to ${1}",
     "SCHEDULE_ITEM_EVERY_DAY": "every day",

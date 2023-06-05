@@ -229,6 +229,7 @@
     "SCHED_TR_OFFSET_MONTH_DAY": "День месяца",
     "SCHED_TR_OFFSET_YEAR_DAY": "День в году",
     "SCHED_TR_INTERVAL_STEP": "Шаг",
+    "SCHED_TR_INVALID_INTERVAL_STEP": "Введите корректный шаг",
     "SCHEDULE_ITEM_START": "с ${1}",
     "SCHEDULE_ITEM_END": "по ${1}",
     "SCHEDULE_ITEM_EVERY_DAY": "ежедневно",
