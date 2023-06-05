@@ -58,14 +58,6 @@
   justify-content: space-between;
 }
 
-/* Mode selector */
-.btn.mode-selector {
-  --btn-title-color: var(--accent-color);
-  --btn-icon-color: var(--accent-color);
-  --btn-hover-icon-color: var(--accent-color);
-  --btn-hover-title-color: var(--accent-hover-color);
-}
-
 .transaction-view {
   main {
     width: 100%;
@@ -89,11 +81,5 @@
 @media (hover: hover) {
   .clear-all-btn {
     text-decoration: underline;
-  }
-
-  .mode-selector:hover {
-    .btn__content {
-      text-decoration: underline;
-    }
   }
 }

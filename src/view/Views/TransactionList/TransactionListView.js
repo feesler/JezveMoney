@@ -47,6 +47,7 @@ import { TransactionDetails } from './components/TransactionDetails/TransactionD
 import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
+import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import {
     reducer,
     actions,
@@ -270,9 +271,7 @@ class TransactionListView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = Button.create({
-            type: 'link',
-            className: 'mode-selector',
+        this.modeSelector = ToggleDetailsButton.create({
             onClick: (e) => this.onToggleMode(e),
         });
         listHeader.append(this.modeSelector.elem);
@@ -1278,8 +1277,7 @@ class TransactionListView extends View {
         this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setState((modeSelectorState) => ({
             ...modeSelectorState,
-            icon: (isDetails) ? 'mode-list' : 'mode-details',
-            title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
+            details: isDetails,
             url: modeURL.toString(),
         }));
 

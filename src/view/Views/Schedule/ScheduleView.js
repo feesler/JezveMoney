@@ -31,6 +31,7 @@ import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 
 import { ScheduleListItem } from './components/ScheduleListItem/ScheduleListItem.js';
 import { ScheduleItemDetails } from './components/ScheduleItemDetails/ScheduleItemDetails.js';
@@ -168,9 +169,7 @@ class ScheduleView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = Button.create({
-            type: 'link',
-            className: 'mode-selector',
+        this.modeSelector = ToggleDetailsButton.create({
             onClick: (e) => this.onToggleMode(e),
         });
         listHeader.append(this.modeSelector.elem);
@@ -712,8 +711,7 @@ class ScheduleView extends View {
         this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setState((modeSelectorState) => ({
             ...modeSelectorState,
-            icon: (isDetails) ? 'mode-list' : 'mode-details',
-            title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
+            details: isDetails,
             url: modeURL.toString(),
         }));
 

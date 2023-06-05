@@ -19,14 +19,6 @@
   justify-content: space-between;
 }
 
-/* Mode selector */
-.btn.mode-selector {
-  --btn-title-color: var(--accent-color);
-  --btn-icon-color: var(--accent-color);
-  --btn-hover-icon-color: var(--accent-color);
-  --btn-hover-title-color: var(--accent-hover-color);
-}
-
 /* Scheduled transaction reminder details */
 .reminder-item-details {
   --offcanvas-bg: var(--main-bg-color);

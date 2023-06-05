@@ -33,6 +33,7 @@ import { ReminderList } from '../../Models/ReminderList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -178,9 +179,7 @@ class ReminderListView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = Button.create({
-            type: 'link',
-            className: 'mode-selector',
+        this.modeSelector = ToggleDetailsButton.create({
             onClick: (e) => this.onToggleMode(e),
         });
         listHeader.append(this.modeSelector.elem);
@@ -767,8 +766,7 @@ class ReminderListView extends View {
         this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setState((modeSelectorState) => ({
             ...modeSelectorState,
-            icon: (isDetails) ? 'mode-list' : 'mode-details',
-            title: (isDetails) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
+            details: isDetails,
             url: modeURL.toString(),
         }));
 
