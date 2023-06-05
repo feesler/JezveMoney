@@ -1,12 +1,11 @@
-import { ge, setEvents } from 'jezvejs';
+import { ge } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
+import { InputField } from '../../../../Components/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /** CSS classes */
 const DIALOG_CLASS = 'password-dialog';
-const OLD_PASS_BLOCK = 'old-pwd-inp-block';
-const NEW_PASS_BLOCK = 'new-pwd-inp-block';
 
 export class ChangePasswordDialog extends ProfileDialog {
     constructor(...args) {
@@ -17,24 +16,43 @@ export class ChangePasswordDialog extends ProfileDialog {
 
     init() {
         this.elem = ge('changepass');
-        this.oldPassInp = ge('oldpwd');
-        this.newPassInp = ge('newpwd');
-        if (
-            !this.elem
-            || !this.oldPassInp
-            || !this.newPassInp
-        ) {
+        if (!this.elem) {
             throw new Error('Failed to initialize Change password form');
         }
-
-        setEvents(this.oldPassInp, { input: (e) => this.onOldPasswordInput(e) });
-        setEvents(this.newPassInp, { input: (e) => this.onNewPasswordInput(e) });
 
         this.initDialog({
             id: 'chpass_popup',
             title: __('PROFILE_CHANGE_PASS'),
             className: DIALOG_CLASS,
         });
+
+        // Old password field
+        this.oldPassField = InputField.create({
+            id: 'oldPassField',
+            inputId: 'oldPassInp',
+            className: 'form-row',
+            name: 'current',
+            type: 'password',
+            title: __('PROFILE_PASSWORD_CURRENT'),
+            validate: true,
+            feedbackMessage: __('PROFILE_INVALID_PASS_CURRENT'),
+            onInput: (e) => this.onOldPasswordInput(e),
+        });
+
+        // New password field
+        this.newPassField = InputField.create({
+            id: 'newPassField',
+            inputId: 'newPassInp',
+            className: 'form-row',
+            name: 'new',
+            type: 'password',
+            title: __('PROFILE_PASSWORD_NEW'),
+            validate: true,
+            feedbackMessage: __('PROFILE_INVALID_PASS_NEW'),
+            onInput: (e) => this.onNewPasswordInput(e),
+        });
+
+        this.form.prepend(this.oldPassField.elem, this.newPassField.elem);
 
         this.reset();
     }
@@ -110,10 +128,16 @@ export class ChangePasswordDialog extends ProfileDialog {
 
     /** Render component state */
     renderDialog(state) {
-        this.oldPassInp.value = state.oldPassword;
-        window.app.setValidation(OLD_PASS_BLOCK, state.validation.oldPassword);
+        this.oldPassField.setState((passState) => ({
+            ...passState,
+            value: state.oldPassword,
+            valid: state.validation.oldPassword,
+        }));
 
-        this.newPassInp.value = state.newPassword;
-        window.app.setValidation(NEW_PASS_BLOCK, state.validation.newPassword);
+        this.newPassField.setState((passState) => ({
+            ...passState,
+            value: state.newPassword,
+            valid: state.validation.newPassword,
+        }));
     }
 }

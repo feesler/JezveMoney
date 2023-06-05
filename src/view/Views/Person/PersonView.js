@@ -16,8 +16,8 @@ import { API } from '../../API/index.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
 import './PersonView.scss';
 
 /**
@@ -54,8 +54,6 @@ class PersonView extends View {
         this.loadElementsByIds([
             'heading',
             'personForm',
-            'nameInp',
-            'nameFeedback',
             'submitBtn',
             'cancelBtn',
         ]);
@@ -66,7 +64,17 @@ class PersonView extends View {
         });
 
         setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
+
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'nameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('PERSON_NAME'),
+            validate: true,
+            onInput: (e) => this.onNameInput(e),
+        });
+        this.personForm.prepend(this.nameField.elem);
 
         this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
@@ -88,8 +96,8 @@ class PersonView extends View {
     }
 
     /** Name input event handler */
-    onNameInput() {
-        const { value } = this.nameInp;
+    onNameInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeName(value));
     }
 
@@ -105,12 +113,12 @@ class PersonView extends View {
         const { name } = state.data;
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('PERSON_INVALID_NAME')));
-            this.nameInp.focus();
+            this.nameField.focus();
         } else {
             const person = window.app.model.persons.findByName(name);
             if (person && state.original.id !== person.id) {
                 this.store.dispatch(actions.invalidateNameField(__('PERSON_EXISTING_NAME')));
-                this.nameInp.focus();
+                this.nameField.focus();
             }
         }
 
@@ -202,13 +210,15 @@ class PersonView extends View {
             this.deleteBtn.enable(!state.submitStarted);
         }
 
-        // Name input
-        this.nameInp.value = state.data.name;
-        window.app.setValidation('name-inp-block', (state.validation.name === true));
-        this.nameFeedback.textContent = (state.validation.name === true)
-            ? ''
-            : state.validation.name;
-        enable(this.nameInp, !state.submitStarted);
+        // Name field
+        const isValidName = (state.validation.name === true);
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.data.name,
+            valid: isValidName,
+            feedbackMessage: (isValidName) ? '' : state.validation.name,
+            disabled: state.submitStarted,
+        }));
 
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);

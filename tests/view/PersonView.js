@@ -32,7 +32,7 @@ export class PersonView extends AppView {
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
-        res.name = await InputRow.create(this, await query('#name-inp-block'));
+        res.name = await InputRow.create(this, await query('#nameField'));
         assert(res.name, 'Person name input not found');
 
         res.flagsInp = await query('#flags');

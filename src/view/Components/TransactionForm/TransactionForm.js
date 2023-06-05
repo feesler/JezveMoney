@@ -4,7 +4,6 @@ import {
     show,
     addChilds,
     createElement,
-    setProps,
     Component,
     getLongMonthName,
     MONTHS_COUNT,
@@ -13,7 +12,6 @@ import {
 import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
-import { Input } from 'jezvejs/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Spinner } from 'jezvejs/Spinner';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
@@ -47,6 +45,7 @@ import { AccountTile } from '../AccountTile/AccountTile.js';
 import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../CategorySelect/CategorySelect.js';
 import { DateInputField } from '../DateInputField/DateInputField.js';
+import { InputField } from '../InputField/InputField.js';
 import { DateRangeInput } from '../DateRangeInput/DateRangeInput.js';
 import { Field } from '../Field/Field.js';
 import { Tile } from '../Tile/Tile.js';
@@ -62,13 +61,6 @@ import {
 import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
-
-const inputProps = {
-    autocomplete: 'off',
-    autocapitalize: 'none',
-    autocorrect: 'off',
-    spellcheck: false,
-};
 
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
@@ -462,20 +454,13 @@ export class TransactionForm extends Component {
         });
 
         // Comment field
-        this.commentInput = Input.create({
-            id: 'commentInput',
-            name: 'comment',
-            className: 'stretch-input',
-            onInput: (e) => this.onCommentInput(e),
-        });
-        setProps(this.commentInput.elem, inputProps);
-
-        this.commentRow = Field.create({
+        this.commentRow = InputField.create({
             id: 'commentRow',
-            htmlFor: 'commentInput',
+            inputId: 'commentInput',
+            name: 'comment',
             title: __('TR_COMMENT'),
             className: 'form-row',
-            content: this.commentInput.elem,
+            onInput: (e) => this.onCommentInput(e),
         });
 
         children.push(this.categoryRow.elem, this.commentRow.elem);
@@ -595,7 +580,6 @@ export class TransactionForm extends Component {
             allowNegative: false,
             onInput: (e) => this.onIntervalStepChanged(e),
         });
-        setProps(this.intervalStepInput.elem, inputProps);
 
         this.intervalStepRow = Field.create({
             id: 'intervalStepRow',
@@ -2040,8 +2024,11 @@ export class TransactionForm extends Component {
         this.categorySelect.enable(!state.submitStarted);
 
         // Comment field
-        this.commentInput.value = state.form.comment;
-        this.commentInput.enable(!state.submitStarted);
+        this.commentRow.setState((commentState) => ({
+            ...commentState,
+            value: state.form.comment,
+            disabled: state.submitStarted,
+        }));
 
         // Schedule fields
         if (isScheduleItem) {

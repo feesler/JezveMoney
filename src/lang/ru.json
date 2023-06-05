@@ -383,7 +383,7 @@
     "PROFILE_PASSWORD_CURRENT": "Текущий пароль",
     "PROFILE_INVALID_PASS_CURRENT": "Введите текущий пароль.",
     "PROFILE_PASSWORD_NEW": "Новый пароль",
-    "PROFILE_INVALID_PASS_NEW": "Введите новый пароль.<br>Новый пароль должен отличаться от старого.",
+    "PROFILE_INVALID_PASS_NEW": "Введите новый пароль. Новый пароль должен отличаться от старого.",
     "PROFILE_RESET_DATA": "Сбросить данные",
     "RESET_ALL": "Все",
     "RESET_ACCOUNTS": "Счета",

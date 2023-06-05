@@ -1,15 +1,16 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
+import { __ } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { View } from '../../utils/View.js';
 import { Field } from '../../Components/Field/Field.js';
+import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
+import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
+import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './RegisterView.scss';
-import { __ } from '../../utils/utils.js';
-import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
-import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 
 /**
  * User registration view
@@ -40,9 +41,6 @@ class RegisterView extends View {
     onStart() {
         this.loadElementsByIds([
             'form',
-            'loginInp',
-            'passwordInp',
-            'nameInp',
         ]);
 
         this.localeSelect = LocaleSelect.create();
@@ -62,9 +60,49 @@ class RegisterView extends View {
         this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.loginInp, { input: () => this.onLoginInput() });
-        setEvents(this.passwordInp, { input: () => this.onPasswordInput() });
-        setEvents(this.nameInp, { input: () => this.onNameInput() });
+
+        // Login field
+        this.loginField = InputField.create({
+            id: 'loginField',
+            inputId: 'loginInp',
+            className: 'form-row',
+            name: 'login',
+            title: __('REG_ACCOUNT_NAME'),
+            validate: true,
+            feedbackMessage: __('REG_INVALID_ACCOUNT_NAME'),
+            onInput: (e) => this.onLoginInput(e),
+        });
+
+        // Name field
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'nameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('REG_USER_NAME'),
+            validate: true,
+            feedbackMessage: __('REG_INVALID_USER_NAME'),
+            onInput: (e) => this.onNameInput(e),
+        });
+
+        // Password field
+        this.passwordField = InputField.create({
+            id: 'passwordField',
+            inputId: 'passwordInp',
+            className: 'form-row',
+            name: 'password',
+            type: 'password',
+            title: __('REG_PASSWORD'),
+            validate: true,
+            feedbackMessage: __('REG_INVALID_PASSWORD'),
+            onInput: (e) => this.onPasswordInput(e),
+        });
+
+        this.form.prepend(
+            this.loginField.elem,
+            this.nameField.elem,
+            this.passwordField.elem,
+        );
 
         this.subscribeToStore(this.store);
     }
@@ -72,24 +110,24 @@ class RegisterView extends View {
     /**
      * Login field input event handler
      */
-    onLoginInput() {
-        const { value } = this.loginInp;
+    onLoginInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeLogin(value));
     }
 
     /**
      * Password field input event handler
      */
-    onPasswordInput() {
-        const { value } = this.passwordInp;
+    onPasswordInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changePassword(value));
     }
 
     /**
      * Password field input event handler
      */
-    onNameInput() {
-        const { value } = this.nameInp;
+    onNameInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeName(value));
     }
 
@@ -123,17 +161,26 @@ class RegisterView extends View {
             throw new Error('Invalid state');
         }
 
-        // Login input
-        this.loginInp.value = state.form.login;
-        window.app.setValidation('login-inp-block', state.validation.login);
+        // Login field
+        this.loginField.setState((loginState) => ({
+            ...loginState,
+            value: state.form.login,
+            valid: state.validation.login,
+        }));
 
-        // Name input
-        this.nameInp.value = state.form.name;
-        window.app.setValidation('name-inp-block', state.validation.name);
+        // Name field
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.form.name,
+            valid: state.validation.name,
+        }));
 
-        // Password input
-        this.passwordInp.value = state.form.password;
-        window.app.setValidation('pwd-inp-block', state.validation.password);
+        // Password field
+        this.passwordField.setState((passState) => ({
+            ...passState,
+            value: state.form.password,
+            valid: state.validation.password,
+        }));
     }
 }
 

@@ -31,8 +31,6 @@ export class ProfileDialog extends Component {
 
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.loadingIndicator.elem);
-
-        this.reset();
     }
 
     /** Show/hide dialog */

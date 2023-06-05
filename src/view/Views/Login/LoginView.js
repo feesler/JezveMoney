@@ -1,13 +1,13 @@
 import 'jezvejs/style';
-import { setEvents } from 'jezvejs';
+import { insertBefore, setEvents } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { createStore } from 'jezvejs/Store';
 import { Application } from '../../Application/Application.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
-import { parseCookies, setCookie } from '../../utils/utils.js';
+import { __, parseCookies, setCookie } from '../../utils/utils.js';
+import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
 import './LoginView.scss';
 
 /**
@@ -39,14 +39,38 @@ class LoginView extends View {
     onStart() {
         this.loadElementsByIds([
             'form',
-            'loginInp',
-            'passwordInp',
+            'rememberField',
             'rememberCheck',
         ]);
 
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.loginInp, { input: () => this.onLoginInput() });
-        setEvents(this.passwordInp, { input: () => this.onPasswordInput() });
+
+        // Login field
+        this.loginField = InputField.create({
+            id: 'loginField',
+            inputId: 'loginInp',
+            className: 'form-row',
+            name: 'login',
+            title: __('LOG_IN_USERNAME'),
+            validate: true,
+            feedbackMessage: __('LOG_IN_INVALID_USERNAME'),
+            onInput: (e) => this.onLoginInput(e),
+        });
+        insertBefore(this.loginField.elem, this.rememberField);
+
+        // Password field
+        this.passwordField = InputField.create({
+            id: 'passwordField',
+            inputId: 'passwordInp',
+            className: 'form-row',
+            name: 'password',
+            type: 'password',
+            title: __('LOG_IN_PASSWORD'),
+            validate: true,
+            feedbackMessage: __('LOG_IN_INVALID_PASSWORD'),
+            onInput: (e) => this.onPasswordInput(e),
+        });
+        insertBefore(this.passwordField.elem, this.rememberField);
 
         this.rememberCheck = Checkbox.fromElement(this.rememberCheck, {
             onChange: () => this.onToggleRememberCheck(),
@@ -82,16 +106,16 @@ class LoginView extends View {
     /**
      * Login field input event handler
      */
-    onLoginInput() {
-        const { value } = this.loginInp;
+    onLoginInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeLogin(value));
     }
 
     /**
      * Password field input event handler
      */
-    onPasswordInput() {
-        const { value } = this.passwordInp;
+    onPasswordInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changePassword(value));
     }
 
@@ -129,13 +153,19 @@ class LoginView extends View {
             throw new Error('Invalid state');
         }
 
-        // Login input
-        this.loginInp.value = state.form.login;
-        window.app.setValidation('login-inp-block', state.validation.login);
+        // Login field
+        this.loginField.setState((loginState) => ({
+            ...loginState,
+            value: state.form.login,
+            valid: state.validation.login,
+        }));
 
-        // Password input
-        this.passwordInp.value = state.form.password;
-        window.app.setValidation('pwd-inp-block', state.validation.password);
+        // Password field
+        this.passwordField.setState((passState) => ({
+            ...passState,
+            value: state.form.password,
+            valid: state.validation.password,
+        }));
 
         // 'Remember me' checkbox
         this.rememberCheck.check(state.form.remember);

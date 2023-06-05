@@ -13,9 +13,9 @@ import { InputRow } from './component/InputRow.js';
 export class RegisterView extends AppView {
     async parseContent() {
         const res = {
-            loginInp: await InputRow.create(this, await query('#login-inp-block')),
-            nameInp: await InputRow.create(this, await query('#name-inp-block')),
-            passwordInp: await InputRow.create(this, await query('#pwd-inp-block')),
+            loginInp: await InputRow.create(this, await query('#loginField')),
+            nameInp: await InputRow.create(this, await query('#nameField')),
+            passwordInp: await InputRow.create(this, await query('#passwordField')),
             submitBtn: await query('.form-controls .submit-btn'),
             loginLink: await query('.form-controls .alter-link'),
         };

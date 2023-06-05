@@ -13,19 +13,13 @@
 
                     <main>
                         <form id="personForm" method="post" action="<?= e(BASEURL . "persons/" . $this->action) ?>/">
-                            <?php if ($this->action == "update") {        ?>
-                                <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
-                            <?php    }    ?>
-                            <div id="name-inp-block" class="field form-row validation-block">
-                                <label for="nameInp" class="field__title"><?= __("PERSON_NAME") ?></label>
-                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
-                                <div id="nameFeedback" class="feedback invalid-feedback"></div>
-                            </div>
-
                             <div class="form-controls">
                                 <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
                             </div>
+                            <?php if ($this->action == "update") {        ?>
+                                <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
+                            <?php    }    ?>
                             <input id="flags" name="flags" type="hidden" value="<?= e($pInfo->flags) ?>">
                         </form>
                     </main>

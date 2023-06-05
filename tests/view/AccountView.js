@@ -47,7 +47,7 @@ export class AccountView extends AppView {
 
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
-        res.name = await InputRow.create(this, await query('#name-inp-block'));
+        res.name = await InputRow.create(this, await query('#nameField'));
         assert(res.name, 'Account name input not found');
 
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));

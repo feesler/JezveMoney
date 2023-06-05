@@ -13,6 +13,7 @@ import { Switch } from 'jezvejs/Switch';
 import { __ } from '../../../../../utils/utils.js';
 import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTemplate.js';
 import { DateFormatSelect } from '../../../../../Components/DateFormatSelect/DateFormatSelect.js';
+import { InputField } from '../../../../../Components/InputField/InputField.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import './ImportTemplateForm.scss';
 
@@ -71,8 +72,6 @@ export class ImportTemplateForm extends Component {
     init() {
         const elemIds = [
             'templateForm',
-            'nameField',
-            'tplNameInp',
             'firstRowField',
             'firstRowInp',
             'decFirstRowBtn',
@@ -94,6 +93,19 @@ export class ImportTemplateForm extends Component {
                 throw new Error('Failed to initialize upload file dialog');
             }
         });
+
+        // Name field
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'tplNameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('TEMPLATE_NAME'),
+            validate: true,
+            feedbackMessage: __('TEMPLATE_INVALID_NAME'),
+            onInput: (e) => this.onTemplateNameInput(e),
+        });
+        this.templateForm.prepend(this.nameField.elem);
 
         this.columnDropDown = DropDown.create({
             elem: 'columnSel',
@@ -120,7 +132,6 @@ export class ImportTemplateForm extends Component {
         window.app.initAccountsList(this.tplAccountDropDown);
         this.tplAccountField.append(this.tplAccountDropDown.elem);
 
-        setEvents(this.tplNameInp, { input: () => this.onTemplateNameInput() });
         setEvents(this.firstRowInp, { input: () => this.onFirstRowInput() });
         DecimalInput.create({
             elem: this.firstRowInp,
@@ -207,12 +218,12 @@ export class ImportTemplateForm extends Component {
     }
 
     /** Template name field 'input' event handler */
-    onTemplateNameInput() {
+    onTemplateNameInput(e) {
         this.setState({
             ...this.state,
             template: new ImportTemplate({
                 ...this.state.template,
-                name: this.tplNameInp.value,
+                name: e.target.value,
             }),
             validation: {
                 ...this.state.validation,
@@ -515,11 +526,16 @@ export class ImportTemplateForm extends Component {
 
         this.columnDropDown.enable(!state.listLoading);
         this.dateFormatSelect.enable(!state.listLoading);
-        enable(this.tplNameInp, !state.listLoading);
         enable(this.submitTplBtn, !state.listLoading);
         enable(this.cancelTplBtn, !state.listLoading);
 
-        this.tplNameInp.value = (state.template) ? state.template.name : '';
+        // Name field
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.template?.name ?? '',
+            valid: validation.name,
+            disabled: state.listLoading,
+        }));
 
         // Raw data table
         if (!Array.isArray(state.rawData) || !state.rawData.length) {
@@ -542,8 +558,6 @@ export class ImportTemplateForm extends Component {
 
         re(this.dataTable?.elem);
         this.dataTable = dataTable;
-
-        window.app.setValidation(this.nameField, validation.name);
 
         this.firstRowInp.value = state.template.first_row;
         enable(this.decFirstRowBtn, state.template.first_row > 1);
