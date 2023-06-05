@@ -2003,6 +2003,7 @@ export class TransactionForm extends TestComponent {
         if (type === INTERVAL_NONE) {
             this.model.endDate = '';
         }
+        this.model.intervalOffset = 0;
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.intervalTypeSelect.setSelection(val));

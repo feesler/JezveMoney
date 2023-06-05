@@ -158,17 +158,19 @@ class Schedule extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
+        $dateInfo = getDateInfo(time(), INTERVAL_MONTH);
+
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
             "category_id" => 0,
             "comment" => "",
-            "start_date" => time(),
+            "start_date" => $dateInfo["time"],
             "end_date" => null,
             "interval_type" => INTERVAL_MONTH,
             "interval_step" => 1,
-            "interval_offset" => 0,
+            "interval_offset" => $dateInfo["info"]["mday"] - 1,
         ];
 
         // Check availability of selected type of transaction
