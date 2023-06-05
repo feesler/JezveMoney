@@ -41,6 +41,10 @@
 }
 
 /* Interval type field */
+.form-fields-row.interval-fields {
+  column-gap: 1rem;
+}
+
 .interval-type-field {
   flex: 1 0 auto;
 }
@@ -50,11 +54,11 @@
   flex: 1 1 0;
 }
 
-/* Interval offset field */
-.interval-offset-field .field__content {
+/* Interval offset: month / year day select field */
+.day-select-field .field__content {
   display: flex;
   flex-flow: row nowrap;
-  column-gap: 1.5rem;
+  column-gap: 1rem;
 }
 
 .weekday-select,
@@ -68,6 +72,8 @@
   --link-menu-hover-color: #ffffff;
   --link-menu-hover-bg: var(--accent-color);
   --link-menu-disabled-border-color: var(--link-menu-disabled-color);
+
+  justify-content: space-between;
 
   .link-menu-item,
   .link-menu-item:visited {

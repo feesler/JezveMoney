@@ -626,7 +626,7 @@ export class TransactionForm extends Component {
         });
 
         const intervalGroup = createElement('div', {
-            props: { className: 'form-fields-row form-row' },
+            props: { className: 'form-row form-fields-row interval-fields' },
             children: [
                 this.intervalTypeRow.elem,
                 this.intervalStepRow.elem,
@@ -634,6 +634,7 @@ export class TransactionForm extends Component {
         });
 
         // Interval offset
+        // Week day field
         this.weekDaySelect = WeekDaySelect.create({
             id: 'weekDaySelect',
             type: 'buttons',
@@ -641,6 +642,15 @@ export class TransactionForm extends Component {
             onChange: (offset) => this.onWeekdayOffsetChanged(offset),
         });
 
+        this.weekDayField = Field.create({
+            id: 'weekDayField',
+            htmlFor: 'weekDaySelect',
+            title: __('SCHED_TR_OFFSET_WEEK_DAYS'),
+            className: 'form-row week-day-field',
+            content: this.weekDaySelect.elem,
+        });
+
+        // Month day / year day field
         this.monthDaySelect = DropDown.create({
             id: 'monthDaySelect',
             className: 'month-day-select',
@@ -661,13 +671,12 @@ export class TransactionForm extends Component {
             })),
         });
 
-        this.intervalOffsetRow = Field.create({
-            id: 'intervalOffsetRow',
-            htmlFor: 'intervalOffsetInput',
-            title: __('SCHED_TR_OFFSET'),
-            className: 'form-row interval-offset-field',
+        this.daySelectField = Field.create({
+            id: 'daySelectField',
+            htmlFor: 'monthDaySelect',
+            title: __('SCHED_TR_OFFSET_MONTH_DAY'),
+            className: 'form-row horizontal-field day-select-field',
             content: [
-                this.weekDaySelect.elem,
                 this.monthDaySelect.elem,
                 this.monthSelect.elem,
             ],
@@ -676,7 +685,8 @@ export class TransactionForm extends Component {
         return [
             this.dateRangeField.elem,
             intervalGroup,
-            this.intervalOffsetRow.elem,
+            this.weekDayField.elem,
+            this.daySelectField.elem,
         ];
     }
 
@@ -1682,6 +1692,7 @@ export class TransactionForm extends Component {
         }
 
         const { transaction, form, validation } = state;
+        const { intervalType } = form;
 
         // Date range field
         if (
@@ -1714,47 +1725,44 @@ export class TransactionForm extends Component {
         // Interval step field
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
+        this.intervalStepRow.show(intervalType !== INTERVAL_NONE);
 
         // Interval type field
-        this.intervalTypeSelect.setSelection(form.intervalType);
+        this.intervalTypeSelect.setSelection(intervalType);
         this.intervalTypeSelect.enable(!state.submitStarted);
 
         // Interval offset field
-        if (form.intervalType === INTERVAL_NONE) {
-            this.intervalStepRow.hide();
-            this.intervalOffsetRow.hide();
-        } else if (form.intervalType === INTERVAL_DAY) {
-            this.intervalOffsetRow.hide();
-        } else if (form.intervalType === INTERVAL_WEEK) {
-            this.weekDaySelect.setSelection(transaction.interval_offset);
-            this.weekDaySelect.show();
-            this.monthDaySelect.hide();
-            this.monthSelect.hide();
-            this.intervalOffsetRow.show();
-        } else if (form.intervalType === INTERVAL_MONTH) {
-            this.weekDaySelect.hide();
-            this.monthDaySelect.setSelection(transaction.interval_offset);
-            this.monthDaySelect.show();
-            this.monthSelect.hide();
-            this.intervalOffsetRow.show();
-        } else if (form.intervalType === INTERVAL_YEAR) {
-            this.weekDaySelect.hide();
+        // Week day field
+        const isWeekInterval = (intervalType === INTERVAL_WEEK);
 
+        this.weekDaySelect.enable(!state.submitStarted);
+        this.weekDayField.show(isWeekInterval);
+        if (isWeekInterval) {
+            this.weekDaySelect.setSelection(transaction.interval_offset);
+        }
+
+        // Month / year day select field
+        const isMonthInterval = (intervalType === INTERVAL_MONTH);
+        const isYearInterval = (intervalType === INTERVAL_YEAR);
+
+        this.monthDaySelect.enable(!state.submitStarted);
+        this.monthSelect.enable(!state.submitStarted);
+
+        if (isMonthInterval) {
+            this.monthDaySelect.setSelection(transaction.interval_offset);
+            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_MONTH_DAY'));
+        } else if (isYearInterval) {
             const monthIndex = Math.floor(transaction.interval_offset / 100);
             const dayIndex = (transaction.interval_offset % 100);
 
             this.monthDaySelect.setSelection(dayIndex);
-            this.monthDaySelect.show();
-
             this.monthSelect.setSelection(monthIndex);
-            this.monthSelect.show();
 
-            this.intervalOffsetRow.show();
+            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_YEAR_DAY'));
         }
 
-        this.weekDaySelect.enable(!state.submitStarted);
-        this.monthDaySelect.enable(!state.submitStarted);
-        this.monthSelect.enable(!state.submitStarted);
+        this.daySelectField.show(isMonthInterval || isYearInterval);
+        this.monthSelect.show(isYearInterval);
     }
 
     render(state, prevState = {}) {
@@ -1835,7 +1843,8 @@ export class TransactionForm extends Component {
             this.dateRangeField.show(state.isAvailable);
             this.intervalStepRow.show(state.isAvailable);
             this.intervalTypeRow.show(state.isAvailable);
-            this.intervalOffsetRow.show(state.isAvailable);
+            this.weekDayField.show(state.isAvailable);
+            this.daySelectField.show(state.isAvailable);
         } else {
             this.dateRow.show(state.isAvailable);
         }
