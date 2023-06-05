@@ -31,6 +31,11 @@ const defaultProps = {
     endPlaceholder: null,
     startClearable: true,
     endClearable: true,
+    startVisible: true,
+    endVisible: true,
+    disabled: false,
+    startDisabled: false,
+    endDisabled: false,
     onChange: null,
 };
 
@@ -418,6 +423,19 @@ export class DateRangeInput extends Component {
     render(state, prevState = {}) {
         this.startDateInput.value = state.form.stdate ?? '';
         this.endDateInput.value = state.form.enddate ?? '';
+
+        const enableStart = (!state.disabled && !state.startDisabled);
+        this.startDateInput.enable(enableStart);
+        this.startClearBtn.enable(enableStart);
+        this.startDateBtn.enable(enableStart);
+
+        const enableEnd = (!state.disabled && !state.endDisabled);
+        this.endDateInput.enable(enableEnd);
+        this.endClearBtn.enable(enableStart);
+        this.endDateBtn.enable(enableStart);
+
+        this.startDateGroup.show(state.startVisible);
+        this.endDateGroup.show(state.endVisible);
 
         this.startClearBtn.show(state.startClearable && !!state.form.stdate);
         this.endClearBtn.show(state.endClearable && !!state.form.enddate);
