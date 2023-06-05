@@ -162,8 +162,12 @@ export class TransactionForm extends TestComponent {
                     isInvalid: model.dateInvalidated,
                 };
             } else if (isScheduleItemForm) {
+                const isRepeat = model.intervalType !== INTERVAL_NONE;
+
                 res.dateRangeInput = {
                     visible: true,
+                    startInputGroup: { visible: true },
+                    endInputGroup: { visible: isRepeat },
                     value: {
                         startDate: App.reformatDate(model.startDate),
                         endDate: App.reformatDate(model.endDate),
@@ -171,7 +175,7 @@ export class TransactionForm extends TestComponent {
                     invalidated: model.dateRangeInvalidated,
                 };
                 res.intervalStepRow = {
-                    visible: model.intervalType !== INTERVAL_NONE,
+                    visible: isRepeat,
                     value: model.intervalStep,
                 };
                 res.intervalTypeSelect = {

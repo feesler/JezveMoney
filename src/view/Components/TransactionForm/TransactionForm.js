@@ -1693,6 +1693,7 @@ export class TransactionForm extends Component {
 
         const { transaction, form, validation } = state;
         const { intervalType } = form;
+        const isRepeat = (intervalType !== INTERVAL_NONE);
 
         // Date range field
         if (
@@ -1700,6 +1701,7 @@ export class TransactionForm extends Component {
             || (form.endDate !== prevState?.form?.endDate)
             || (validation.startDate !== prevState?.validation?.startDate)
             || (validation.endDate !== prevState?.validation?.endDate)
+            || (intervalType !== prevState?.form?.intervalType)
         ) {
             this.dateRangeInput.setState((rangeState) => ({
                 ...rangeState,
@@ -1719,13 +1721,14 @@ export class TransactionForm extends Component {
                     endDate: validation.endDate,
                     valid: (validation.startDate && validation.endDate),
                 },
+                endVisible: isRepeat,
             }));
         }
 
         // Interval step field
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
-        this.intervalStepRow.show(intervalType !== INTERVAL_NONE);
+        this.intervalStepRow.show(isRepeat);
 
         // Interval type field
         this.intervalTypeSelect.setSelection(intervalType);

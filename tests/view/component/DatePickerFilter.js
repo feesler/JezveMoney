@@ -5,6 +5,7 @@ import {
     click,
     input,
     evaluate,
+    queryAll,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
 
@@ -22,20 +23,28 @@ export class DatePickerFilter extends TestComponent {
             value: {},
         };
 
-        res.stInputElem = await query(this.elem, 'input[name="stdate"]');
+        const [startGroupEl, endGroupEl] = await queryAll(this.elem, '.input-group');
+        res.startInputGroup = { elem: startGroupEl };
+        res.endInputGroup = { elem: endGroupEl };
+
+        res.stInputElem = await query(startGroupEl, 'input');
         assert(res.stInputElem, 'Start date input element not found');
-        res.endInputElem = await query(this.elem, 'input[name="enddate"]');
+        res.endInputElem = await query(endGroupEl, 'input');
         assert(res.endInputElem, 'End date input element not found');
 
         [
             res.invalidated,
+            res.startInputGroup.visible,
+            res.endInputGroup.visible,
             res.value.startDate,
             res.value.endDate,
-        ] = await evaluate((el, startInp, endInp) => ([
+        ] = await evaluate((el, startEl, endEl, startInp, endInp) => ([
             el.classList.contains('invalid-block'),
+            startEl && !startEl.hidden,
+            endEl && !endEl.hidden,
             startInp.value,
             endInp.value,
-        ]), this.elem, res.stInputElem, res.endInputElem);
+        ]), this.elem, startGroupEl, endGroupEl, res.stInputElem, res.endInputElem);
 
         res.startDatePickerBtn = { elem: await query(this.elem, 'input[name="stdate"] ~ .calendar-btn') };
         assert(res.startDatePickerBtn, 'Date picker button not found');
