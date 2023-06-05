@@ -1702,6 +1702,7 @@ export class TransactionForm extends Component {
             || (validation.startDate !== prevState?.validation?.startDate)
             || (validation.endDate !== prevState?.validation?.endDate)
             || (intervalType !== prevState?.form?.intervalType)
+            || (state.submitStarted !== prevState?.submitStarted)
         ) {
             this.dateRangeInput.setState((rangeState) => ({
                 ...rangeState,
@@ -1721,6 +1722,7 @@ export class TransactionForm extends Component {
                     endDate: validation.endDate,
                     valid: (validation.startDate && validation.endDate),
                 },
+                disabled: state.submitStarted,
                 endVisible: isRepeat,
             }));
         }
