@@ -12,7 +12,6 @@ import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
@@ -23,6 +22,7 @@ import {
     formatDateRange,
     getHalfYearRange,
     getMonthRange,
+    getSelectedItems,
     getWeekRange,
     timeToDate,
 } from '../../utils/utils.js';
@@ -49,12 +49,14 @@ import { TransactionListGroup } from '../../Components/TransactionListGroup/Tran
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
+import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
+import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';
+import { reducer, actions } from './reducer.js';
 import {
-    reducer,
-    actions,
+    getBaseFilterURL,
+    getTransactionsGroupByDate,
     isSameSelection,
-    getSelectedItems,
-} from './reducer.js';
+} from './helpers.js';
 import './TransactionListView.scss';
 
 /* CSS classes */
@@ -69,6 +71,22 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
+        this.menuActions = {
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            setCategoryBtn: () => this.showCategoryDialog(),
+            deleteBtn: () => this.confirmDelete(),
+            groupByDateBtn: () => this.toggleGroupByDate(),
+        };
+
+        this.contextMenuActions = {
+            ctxDetailsBtn: () => this.showDetails(),
+            ctxSetCategoryBtn: () => this.showCategoryDialog(),
+            ctxDeleteBtn: () => this.confirmDelete(),
+        };
+
         const { filter } = this.props;
 
         const initialState = {
@@ -80,7 +98,7 @@ class TransactionListView extends View {
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
-            groupByDate: this.getGroupByDate() === 1,
+            groupByDate: getTransactionsGroupByDate() === 1,
             showMenu: false,
             showContextMenu: false,
             contextItem: null,
@@ -329,112 +347,6 @@ class TransactionListView extends View {
         this.subscribeToStore(this.store);
     }
 
-    createMenu() {
-        if (this.menu) {
-            return;
-        }
-
-        this.menu = PopupMenu.create({
-            id: 'listMenu',
-            attachTo: this.menuButton.elem,
-            onClose: () => this.hideMenu(),
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('SELECT'),
-                onClick: () => this.onMenuClick('selectModeBtn'),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('SORT'),
-                onClick: () => this.onMenuClick('sortModeBtn'),
-            }, {
-                id: 'separator1',
-                type: 'separator',
-            }, {
-                id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
-                onClick: () => this.onMenuClick('selectAllBtn'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
-                onClick: () => this.onMenuClick('deselectAllBtn'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'exportBtn',
-                type: 'link',
-                icon: 'export',
-                title: __('TR_EXPORT_CSV'),
-                onClick: () => this.onMenuClick('exportBtn'),
-            }, {
-                id: 'setCategoryBtn',
-                title: __('SET_CATEGORY'),
-                onClick: () => this.onMenuClick('setCategoryBtn'),
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.onMenuClick('deleteBtn'),
-            }, {
-                id: 'separator3',
-                type: 'separator',
-            }, {
-                id: 'groupByDateBtn',
-                title: __('TR_LIST_GROUP_BY_DATE'),
-                onClick: () => this.onMenuClick('groupByDateBtn'),
-            }],
-        });
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            setCategoryBtn: () => this.showCategoryDialog(),
-            deleteBtn: () => this.confirmDelete(),
-            groupByDateBtn: () => this.toggleGroupByDate(),
-        };
-    }
-
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('OPEN_ITEM'),
-                onClick: (e) => this.showDetails(e),
-            }, {
-                type: 'placeholder',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('UPDATE'),
-            }, {
-                id: 'ctxSetCategoryBtn',
-                title: __('SET_CATEGORY'),
-                onClick: () => this.showCategoryDialog(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.confirmDelete(),
-            }],
-        });
-    }
-
     getListItemComponent() {
         const state = this.store.getState();
         return (state.groupByDate) ? TransactionListGroup : TransactionListItem;
@@ -452,11 +364,18 @@ class TransactionListView extends View {
         this.menu.hideMenu();
 
         const menuAction = this.menuActions[item];
-        if (!isFunction(menuAction)) {
-            return;
+        if (isFunction(menuAction)) {
+            menuAction();
         }
+    }
 
-        menuAction();
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     /** Returns true if accounts or persons is available */
@@ -628,25 +547,9 @@ class TransactionListView extends View {
         window.app.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
     }
 
-    getBaseFilterURL(path, filter) {
-        const res = new URL(`${window.app.baseURL}${path}`);
-
-        Object.keys(filter).forEach((prop) => {
-            const value = filter[prop];
-            if (Array.isArray(value)) {
-                const arrProp = `${prop}[]`;
-                value.forEach((item) => res.searchParams.append(arrProp, item));
-            } else {
-                res.searchParams.set(prop, value);
-            }
-        });
-
-        return res;
-    }
-
     /** Returns URL for filter of specified state */
     getFilterURL(state, keepPage = true) {
-        const res = this.getBaseFilterURL('transactions/', state.filter);
+        const res = getBaseFilterURL('transactions/', state.filter);
 
         if (keepPage) {
             res.searchParams.set('page', state.pagination.page);
@@ -657,11 +560,6 @@ class TransactionListView extends View {
         }
 
         return res;
-    }
-
-    /** Returns URL to export transaction */
-    getExportURL(state) {
-        return this.getBaseFilterURL('transactions/export/', state.filter);
     }
 
     /**
@@ -951,10 +849,6 @@ class TransactionListView extends View {
         }
     }
 
-    getGroupByDate() {
-        return window.app.model.profile.settings.tr_group_by_date;
-    }
-
     toggleGroupByDate() {
         const { settings } = window.app.model.profile;
         const groupByDate = (settings.tr_group_by_date === 0) ? 1 : 0;
@@ -985,79 +879,54 @@ class TransactionListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list' || !state.showContextMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-        const itemId = state.contextItem;
-        if (!itemId) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const selector = `.trans-item[data-id="${itemId}"] .menu-btn`;
-        const menuButton = this.listContainer.querySelector(selector);
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = TransactionListContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        const { baseURL } = window.app;
-        const { items } = this.contextMenu;
-        items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
-
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.contextItem,
+            showDetailsItem: true,
+        });
     }
 
     renderMenu(state) {
         const itemsCount = state.items.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
         const isSortMode = state.listMode === 'sort';
-        const selectedItems = getSelectedItems(state.items);
-        const selCount = selectedItems.length;
-        const groupByDate = this.getGroupByDate() === 1;
 
         this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
-
         this.menuButton.show(itemsCount > 0 && !isSortMode);
 
-        if (!state.showMenu) {
-            this.menu?.hideMenu();
+        if (!state.showMenu && !this.menu) {
             return;
         }
 
         const showFirstTime = !this.menu;
-        this.createMenu();
-
-        const { items } = this.menu;
-        items.selectModeBtn.show(isListMode && itemsCount > 0);
-        items.sortModeBtn.show(isListMode && itemsCount > 1);
-
-        show(items.separator1, isSelectMode);
-
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
-
-        items.exportBtn.show(itemsCount > 0);
-        if (itemsCount > 0) {
-            const exportURL = this.getExportURL(state);
-            items.exportBtn.setURL(exportURL.toString());
+        if (!this.menu) {
+            this.menu = TransactionListMainMenu.create({
+                id: 'listMenu',
+                attachTo: this.menuButton.elem,
+                onItemClick: (item) => this.onMenuClick(item),
+                onClose: () => this.hideMenu(),
+            });
         }
 
-        items.setCategoryBtn.show(isSelectMode && selCount > 0);
-        items.deleteBtn.show(isSelectMode && selCount > 0);
-
-        show(items.separator3, isListMode);
-        items.groupByDateBtn.setIcon((groupByDate) ? 'check' : null);
-        items.groupByDateBtn.show(isListMode);
+        this.menu.setState({
+            listMode: state.listMode,
+            showMenu: state.showMenu,
+            items: state.items,
+            filter: state.filter,
+        });
 
         if (showFirstTime) {
             this.menu.showMenu();
@@ -1164,7 +1033,6 @@ class TransactionListView extends View {
         this.renderHistory(state, prevState);
 
         const loadingMore = state.loading && state.isLoadingMore;
-
         if (state.loading && !state.isLoadingMore) {
             this.loadingIndicator.show();
         }
@@ -1210,7 +1078,7 @@ class TransactionListView extends View {
         this.searchInput.value = state.form.search ?? '';
 
         // Render list
-        const groupByDate = this.getGroupByDate() === 1;
+        const groupByDate = getTransactionsGroupByDate() === 1;
         let listItems = null;
         if (groupByDate) {
             let prevDate = null;

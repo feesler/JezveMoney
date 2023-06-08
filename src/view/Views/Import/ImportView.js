@@ -11,10 +11,9 @@ import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { createStore } from 'jezvejs/Store';
 
-import { MS_IN_SECOND, __ } from '../../utils/utils.js';
+import { MS_IN_SECOND, __, getSelectedItems } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
@@ -31,7 +30,9 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
+import { ImportListContextMenu } from './components/ContextMenu/ImportListContextMenu.js';
 import { ImportTransactionList } from './components/List/ImportTransactionList.js';
+import { ImportListMainMenu } from './components/MainMenu/ImportListMainMenu.js';
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 
 import { actions, reducer, getPageIndex } from './reducer.js';
@@ -56,6 +57,28 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
+        this.menuActions = {
+            createItemBtn: () => this.createItem(),
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            enableSelectedBtn: () => this.enableSelected(true),
+            disableSelectedBtn: () => this.enableSelected(false),
+            deleteSelectedBtn: () => this.deleteSelected(),
+            deleteAllBtn: () => this.removeAllItems(),
+            rulesCheck: () => this.onToggleEnableRules(),
+            rulesBtn: () => this.onRulesClick(),
+            similarCheck: () => this.onToggleCheckSimilar(),
+        };
+
+        this.contextMenuActions = {
+            ctxRestoreBtn: () => this.onRestoreItem(),
+            ctxEnableBtn: () => this.onToggleEnableItem(),
+            ctxUpdateBtn: () => this.onUpdateItem(),
+            ctxDeleteBtn: () => this.onRemoveItem(),
+        };
+
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
@@ -79,6 +102,7 @@ class ImportView extends View {
             mainAccount,
             rulesEnabled: true,
             checkSimilarEnabled: true,
+            showContextMenu: false,
             contextItemIndex: -1,
             listMode: 'list',
             showMenu: false,
@@ -186,138 +210,6 @@ class ImportView extends View {
         this.setRenderTime();
     }
 
-    createMenu() {
-        if (this.menu) {
-            return;
-        }
-
-        this.menu = PopupMenu.create({
-            id: 'listMenu',
-            attachTo: this.menuButton.elem,
-            onClose: () => this.hideMenu(),
-            items: [{
-                id: 'createItemBtn',
-                icon: 'plus',
-                title: __('IMPORT_ITEM_CREATE'),
-                onClick: () => this.onMenuClick('createItemBtn'),
-            }, {
-                id: 'separator1',
-                type: 'separator',
-            }, {
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('SELECT'),
-                onClick: () => this.onMenuClick('selectModeBtn'),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('SORT'),
-                onClick: () => this.onMenuClick('sortModeBtn'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
-                onClick: () => this.onMenuClick('selectAllBtn'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
-                onClick: () => this.onMenuClick('deselectAllBtn'),
-            }, {
-                id: 'enableSelectedBtn',
-                title: __('ENABLE_SELECTED'),
-                onClick: () => this.onMenuClick('enableSelectedBtn'),
-            }, {
-                id: 'disableSelectedBtn',
-                title: __('DISABLE_SELECTED'),
-                onClick: () => this.onMenuClick('disableSelectedBtn'),
-            }, {
-                id: 'deleteSelectedBtn',
-                icon: 'del',
-                title: __('DELETE_SELECTED'),
-                onClick: () => this.onMenuClick('deleteSelectedBtn'),
-            }, {
-                id: 'deleteAllBtn',
-                icon: 'del',
-                title: __('DELETE_ALL'),
-                onClick: () => this.onMenuClick('deleteAllBtn'),
-            }, {
-                id: 'separator3',
-                type: 'separator',
-            }, {
-                id: 'rulesCheck',
-                type: 'checkbox',
-                label: __('IMPORT_RULES_ENABLE'),
-                checked: true,
-                onChange: () => this.onMenuClick('rulesCheck'),
-            }, {
-                id: 'rulesBtn',
-                title: __('IMPORT_RULES_UPDATE'),
-                onClick: () => this.onMenuClick('rulesBtn'),
-            }, {
-                id: 'separator4',
-                type: 'separator',
-            }, {
-                id: 'similarCheck',
-                type: 'checkbox',
-                label: __('IMPORT_CHECK_SIMILAR'),
-                checked: true,
-                onChange: () => this.onMenuClick('similarCheck'),
-            }],
-        });
-
-        this.menuActions = {
-            createItemBtn: () => this.createItem(),
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            enableSelectedBtn: () => this.enableSelected(true),
-            disableSelectedBtn: () => this.enableSelected(false),
-            deleteSelectedBtn: () => this.deleteSelected(),
-            deleteAllBtn: () => this.removeAllItems(),
-            rulesCheck: () => this.onToggleEnableRules(),
-            rulesBtn: () => this.onRulesClick(),
-            similarCheck: () => this.onToggleCheckSimilar(),
-        };
-    }
-
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxRestoreBtn',
-                title: __('IMPORT_ITEM_RESTORE'),
-                className: 'warning-item',
-                onClick: () => this.onRestoreItem(),
-            }, {
-                id: 'separator1',
-                type: 'separator',
-            }, {
-                id: 'ctxEnableBtn',
-                title: __('DISABLE'),
-                onClick: () => this.onToggleEnableItem(),
-            }, {
-                id: 'ctxUpdateBtn',
-                icon: 'update',
-                title: __('UPDATE'),
-                onClick: () => this.onUpdateItem(),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.onRemoveItem(),
-            }],
-        });
-    }
-
     showMenu() {
         this.store.dispatch(actions.showMenu());
     }
@@ -330,11 +222,18 @@ class ImportView extends View {
         this.menu.hideMenu();
 
         const menuAction = this.menuActions[item];
-        if (!isFunction(menuAction)) {
-            return;
+        if (isFunction(menuAction)) {
+            menuAction();
         }
+    }
 
-        menuAction();
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     showContextMenu(itemIndex) {
@@ -342,7 +241,7 @@ class ImportView extends View {
     }
 
     hideContextMenu() {
-        this.showContextMenu(-1);
+        this.store.dispatch(actions.hideContextMenu());
     }
 
     /** Update render time data attribute of list container */
@@ -650,15 +549,6 @@ class ImportView extends View {
         return state.items.filter((item) => item.enabled);
     }
 
-    /** Filter enabled transaction items */
-    getSelectedItems(state) {
-        if (!Array.isArray(state?.items)) {
-            throw new Error('Invalid state');
-        }
-
-        return state.items.filter((item) => item.selected);
-    }
-
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
         const state = this.store.getState();
@@ -835,24 +725,8 @@ class ImportView extends View {
         this.transactionDialog.show();
     }
 
-    renderContextMenu(state, prevState) {
-        if (state === prevState) {
-            return;
-        }
-        if (state.listMode !== 'list') {
-            this.contextMenu?.detach();
-            return;
-        }
-        if (state.contextItemIndex === prevState.contextItemIndex) {
-            return;
-        }
-
+    renderContextMenu(state) {
         const index = state.contextItemIndex;
-        if (index === -1) {
-            this.contextMenu?.detach();
-            return;
-        }
-
         const pageIndex = getPageIndex(index, state);
         const startPage = state.pagination.page;
         const endPage = startPage + state.pagination.range - 1;
@@ -860,71 +734,50 @@ class ImportView extends View {
             return;
         }
 
-        const item = state.items[index];
-        const listItem = this.list.getListItemById(item.id);
-        const menuButton = listItem?.elem?.querySelector('.menu-btn');
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = ImportListContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        const itemRestoreAvail = (
-            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
-        );
-        this.contextMenu.items.ctxRestoreBtn.show(itemRestoreAvail);
-        show(this.contextMenu.items.separator1, itemRestoreAvail);
-
-        const title = (item.enabled) ? __('DISABLE') : __('ENABLE');
-        this.contextMenu.items.ctxEnableBtn.setTitle(title);
-
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItemIndex: state.contextItemIndex,
+            items: state.items,
+        });
     }
 
     renderMenu(state) {
         const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
-        const hasItems = state.items.length > 0;
-        const selectedItems = this.getSelectedItems(state);
-        const hasEnabled = selectedItems.some((item) => item.enabled);
-        const hasDisabled = selectedItems.some((item) => !item.enabled);
 
         this.uploadBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
 
-        if (!state.showMenu) {
-            this.menu?.hideMenu();
+        if (!state.showMenu && !this.menu) {
             return;
         }
 
         const showFirstTime = !this.menu;
-        this.createMenu();
+        if (!this.menu) {
+            this.menu = ImportListMainMenu.create({
+                id: 'listMenu',
+                attachTo: this.menuButton.elem,
+                onItemClick: (item) => this.onMenuClick(item),
+                onClose: () => this.hideMenu(),
+            });
+        }
 
-        const { items } = this.menu;
-
-        items.createItemBtn.show(isListMode);
-        show(items.separator1, isListMode);
-
-        items.selectModeBtn.show(isListMode && hasItems);
-        items.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(items.separator2, isListMode && hasItems);
-        show(items.separator3, isListMode);
-        show(items.separator4, isListMode);
-
-        items.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
-        items.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);
-        items.enableSelectedBtn.show(isSelectMode && hasDisabled);
-        items.disableSelectedBtn.show(isSelectMode && hasEnabled);
-        items.deleteSelectedBtn.show(isSelectMode && selectedItems.length > 0);
-        items.deleteAllBtn.enable(state.items.length > 0);
-
-        items.rulesCheck.show(isListMode);
-        items.rulesBtn.show(isListMode);
-        items.rulesBtn.enable(state.rulesEnabled);
-        items.similarCheck.show(isListMode);
+        this.menu.setState({
+            listMode: state.listMode,
+            showMenu: state.showMenu,
+            items: state.items,
+        });
 
         if (showFirstTime) {
             this.menu.showMenu();
@@ -982,7 +835,7 @@ class ImportView extends View {
         const isSelectMode = (state.listMode === 'select');
         const isListMode = (state.listMode === 'list');
         const enabledList = this.getEnabledItems(state);
-        const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
+        const selectedItems = (isSelectMode) ? getSelectedItems(state.items) : [];
 
         this.accountDropDown.setSelection(state.mainAccount.id);
         this.accountDropDown.enable(isListMode);
@@ -994,7 +847,7 @@ class ImportView extends View {
         show(this.selectedCounter, isSelectMode);
         this.selectedCount.textContent = selectedItems.length;
 
-        this.renderContextMenu(state, prevState);
+        this.renderContextMenu(state);
         this.renderMenu(state);
     }
 }

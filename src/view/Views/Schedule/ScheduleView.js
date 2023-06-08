@@ -10,7 +10,6 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Paginator } from 'jezvejs/Paginator';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Spinner } from 'jezvejs/Spinner';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
@@ -18,7 +17,7 @@ import { createStore } from 'jezvejs/Store';
 import { Application } from '../../Application/Application.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
-import { listData, __ } from '../../utils/utils.js';
+import { listData, __, getSelectedItems } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -33,6 +32,8 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 
+import { ScheduleItemContextMenu } from './components/ContextMenu/ScheduleItemContextMenu.js';
+import { ScheduleMainMenu } from './components/MainMenu/ScheduleMainMenu.js';
 import { ScheduleListItem } from './components/ScheduleListItem/ScheduleListItem.js';
 import { ScheduleItemDetails } from './components/ScheduleItemDetails/ScheduleItemDetails.js';
 
@@ -56,6 +57,18 @@ const SHOW_ON_PAGE = 10;
 class ScheduleView extends View {
     constructor(...args) {
         super(...args);
+
+        this.menuActions = {
+            selectModeBtn: () => this.setListMode('select'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            deleteBtn: () => this.confirmDelete(),
+        };
+
+        this.contextMenuActions = {
+            ctxDetailsBtn: () => this.showDetails(),
+            ctxDeleteBtn: () => this.confirmDelete(),
+        };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
@@ -196,78 +209,6 @@ class ScheduleView extends View {
         this.subscribeToStore(this.store);
     }
 
-    createMenu() {
-        if (this.menu) {
-            return;
-        }
-
-        this.menu = PopupMenu.create({
-            id: 'listMenu',
-            attachTo: this.menuButton.elem,
-            onClose: () => this.hideMenu(),
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('SELECT'),
-                onClick: () => this.onMenuClick('selectModeBtn'),
-            }, {
-                id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
-                onClick: () => this.onMenuClick('selectAllBtn'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
-                onClick: () => this.onMenuClick('deselectAllBtn'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.onMenuClick('deleteBtn'),
-            }],
-        });
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            deleteBtn: () => this.confirmDelete(),
-        };
-    }
-
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('OPEN_ITEM'),
-                onClick: (e) => this.showDetails(e),
-            }, {
-                type: 'placeholder',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('UPDATE'),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.confirmDelete(),
-            }],
-        });
-    }
-
     showMenu() {
         this.store.dispatch(actions.showMenu());
     }
@@ -280,11 +221,18 @@ class ScheduleView extends View {
         this.menu.hideMenu();
 
         const menuAction = this.menuActions[item];
-        if (!isFunction(menuAction)) {
-            return;
+        if (isFunction(menuAction)) {
+            menuAction();
         }
+    }
 
-        menuAction();
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     showMore() {
@@ -326,8 +274,7 @@ class ScheduleView extends View {
         }
     }
 
-    showDetails(e) {
-        e?.preventDefault();
+    showDetails() {
         this.store.dispatch(actions.showDetails());
     }
 
@@ -372,12 +319,8 @@ class ScheduleView extends View {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    getSelectedItems(state) {
-        return state.items.filter((item) => item.selected);
-    }
-
     getSelectedIds(state) {
-        const selArr = this.getSelectedItems(state);
+        const selArr = getSelectedItems(state.items);
         return selArr.map((item) => item.id);
     }
 
@@ -493,66 +436,51 @@ class ScheduleView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list' || !state.showContextMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const itemId = state.contextItem;
-        const scheduleItem = window.app.model.schedule.getItem(itemId);
-        if (!scheduleItem) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const selector = `.schedule-item[data-id="${itemId}"] .menu-btn`;
-        const menuButton = this.contentContainer.querySelector(selector);
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = ScheduleItemContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        const { baseURL } = window.app;
-        const { items } = this.contextMenu;
-        items.ctxDetailsBtn.setURL(`${baseURL}schedule/${itemId}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}schedule/update/${itemId}`);
-
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.contextItem,
+        });
     }
 
     renderMenu(state) {
         const itemsCount = state.items.length;
-        const selArr = this.getSelectedItems(state);
-        const selCount = selArr.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
 
         this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
-
         this.menuButton.show(itemsCount > 0);
 
-        if (!state.showMenu) {
-            this.menu?.hideMenu();
+        if (!state.showMenu && !this.menu) {
             return;
         }
 
         const showFirstTime = !this.menu;
-        this.createMenu();
+        if (!this.menu) {
+            this.menu = ScheduleMainMenu.create({
+                id: 'listMenu',
+                attachTo: this.menuButton.elem,
+                onItemClick: (item) => this.onMenuClick(item),
+                onClose: () => this.hideMenu(),
+            });
+        }
 
-        const { items } = this.menu;
-
-        items.selectModeBtn.show(isListMode && itemsCount > 0);
-
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
-
-        items.deleteBtn.show(selCount > 0);
+        this.menu.setState({
+            listMode: state.listMode,
+            showMenu: state.showMenu,
+            items: state.items,
+        });
 
         if (showFirstTime) {
             this.menu.showMenu();

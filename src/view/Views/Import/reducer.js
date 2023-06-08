@@ -83,9 +83,13 @@ const slice = createSlice({
     ),
 
     showContextMenu: (state, itemIndex) => (
-        (state.contextItemIndex === itemIndex)
+        (state.contextItemIndex === itemIndex && state.showContextMenu)
             ? state
-            : { ...state, contextItemIndex: itemIndex }
+            : { ...state, contextItemIndex: itemIndex, showContextMenu: true }
+    ),
+
+    hideContextMenu: (state) => (
+        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
     uploadFileDone: (state, data) => {
@@ -202,6 +206,7 @@ const slice = createSlice({
         ...state,
         listMode,
         contextItemIndex: -1,
+        showContextMenu: false,
         items: state.items.map((item) => item.setListMode(listMode)),
     }),
 

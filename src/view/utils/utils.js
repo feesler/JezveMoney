@@ -341,6 +341,16 @@ export const reduceToggleItem = (id) => (item) => (
         : item
 );
 
+/** Returns array of selected items */
+export const getSelectedItems = (list) => (
+    list.filter((item) => item?.selected)
+);
+
+/** Returns array of ids of selected items */
+export const getSelectedIds = (list) => (
+    getSelectedItems(list).map((item) => item.id)
+);
+
 export const getSortByNameIcon = (sortMode) => {
     if (sortMode === SORT_BY_NAME_ASC) {
         return 'sort-asc';

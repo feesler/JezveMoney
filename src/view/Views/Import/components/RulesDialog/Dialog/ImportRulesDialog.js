@@ -10,7 +10,6 @@ import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 import { ImportRule } from '../../../../../Models/ImportRule.js';
@@ -18,6 +17,7 @@ import { ImportCondition } from '../../../../../Models/ImportCondition.js';
 import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { SearchInput } from '../../../../../Components/SearchInput/SearchInput.js';
+import { RuleListContextMenu } from '../ContextMenu/RuleListContextMenu.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import './ImportRulesDialog.scss';
@@ -25,8 +25,6 @@ import './ImportRulesDialog.scss';
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
 const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
-const UPDATE_BUTTON_CLASS = 'update-btn';
-const DEL_BUTTON_CLASS = 'delete-btn';
 
 /** Other */
 const SHOW_ON_PAGE = 20;
@@ -37,6 +35,11 @@ const SHOW_ON_PAGE = 20;
 export class ImportRulesDialog extends Component {
     constructor(...args) {
         super(...args);
+
+        this.contextMenuActions = {
+            ctxUpdateRuleBtn: () => this.onUpdateItem(),
+            ctxDeleteRuleBtn: () => this.onDeleteItem(),
+        };
 
         this.LIST_STATE = 1;
         this.CREATE_STATE = 2;
@@ -108,27 +111,13 @@ export class ImportRulesDialog extends Component {
         this.reset();
     }
 
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
+    onContextMenuClick(item) {
+        this.hideContextMenu();
 
-        this.contextMenu = PopupMenu.create({
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                icon: 'update',
-                title: __('UPDATE'),
-                className: UPDATE_BUTTON_CLASS,
-                onClick: (e) => this.onUpdateItem(e),
-            }, {
-                icon: 'del',
-                title: __('DELETE'),
-                className: DEL_BUTTON_CLASS,
-                onClick: (e) => this.onDeleteItem(e),
-            }],
-        });
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     /** Show/hide dialog */
@@ -418,27 +407,21 @@ export class ImportRulesDialog extends Component {
     }
 
     renderContextMenu(state) {
-        if (state.id !== this.LIST_STATE || !state.showContextMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-        const itemId = state.contextItem;
-        if (!itemId) {
-            this.contextMenu?.detach();
-            return;
-        }
-        const listItem = this.rulesList.getListItemById(itemId);
-        const menuButton = listItem?.elem?.querySelector('.menu-btn');
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = RuleListContextMenu.create({
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.contextItem,
+        });
     }
 
     /** Render list state of component */

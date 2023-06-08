@@ -6,15 +6,6 @@ import {
     reduceToggleItem,
 } from '../../utils/utils.js';
 
-// Utils
-export const isSameSelection = (a, b) => (
-    a.length === b.length && a.every((id) => b.includes(id))
-);
-
-export const getSelectedItems = (list) => (
-    list.filter((item) => item?.selected)
-);
-
 // Reducers
 const reduceDeselectAllItems = (state) => ({
     ...state,
