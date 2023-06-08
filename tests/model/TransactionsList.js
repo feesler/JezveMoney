@@ -463,7 +463,9 @@ export class TransactionsList extends SortableList {
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at setData()
         const isDesc = params.order?.toLowerCase() === 'desc';
-        if (!isDesc) {
+        if (params.orderByDate) {
+            res.data = this.sortItemsByDate(res.data, isDesc);
+        } else if (!isDesc) {
             res.data = res.sortAsc();
         }
 
@@ -496,6 +498,24 @@ export class TransactionsList extends SortableList {
         }
 
         return res.sort((a, b) => a.pos - b.pos);
+    }
+
+    sortItemsByDate(list, desc = false) {
+        assert.isArray(list, 'Invalid list specified');
+
+        const res = structuredClone(list);
+
+        if (desc) {
+            return res.sort((a, b) => {
+                const diff = (b.date - a.date);
+                return (diff === 0) ? (b.pos - a.pos) : diff;
+            });
+        }
+
+        return res.sort((a, b) => {
+            const diff = (a.date - b.date);
+            return (diff === 0) ? (a.pos - b.pos) : diff;
+        });
     }
 
     sort() {
@@ -817,6 +837,7 @@ export class TransactionsList extends SortableList {
         const itemsFilter = {
             order: 'asc',
             type: transTypes,
+            orderByDate: true,
         };
         if (accId.length > 0) {
             itemsFilter.accounts = accId;
