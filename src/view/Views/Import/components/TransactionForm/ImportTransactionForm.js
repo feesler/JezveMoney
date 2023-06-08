@@ -43,6 +43,10 @@ const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
 const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
 
+const validateDateOptions = {
+    fixShortYear: false,
+};
+
 const defaultProps = {
     isUpdate: false,
     collapsed: true,
@@ -436,7 +440,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = window.app.isValidDateString(transaction.date);
+        const date = window.app.isValidDateString(transaction.date, validateDateOptions);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {

@@ -66,6 +66,10 @@ const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
 const HIDE_BOTH = 2;
 
+const validateDateOptions = {
+    fixShortYear: false,
+};
+
 const hiddenInputIds = [
     'typeInp',
     'srcIdInp',
@@ -1162,14 +1166,14 @@ export class TransactionForm extends Component {
     }
 
     validateDate(state) {
-        const valid = window.app.isValidDateString(state.form.date);
+        const valid = window.app.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateDate());
         }
     }
 
     validateStartDate(state) {
-        const valid = window.app.isValidDateString(state.form.startDate);
+        const valid = window.app.isValidDateString(state.form.startDate, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateStartDate());
         }
@@ -1177,7 +1181,10 @@ export class TransactionForm extends Component {
 
     validateEndDate(state) {
         const { endDate } = state.form;
-        const valid = (endDate.length === 0 || window.app.isValidDateString(endDate));
+        const valid = (
+            (endDate.length === 0)
+            || window.app.isValidDateString(endDate, validateDateOptions)
+        );
         if (!valid) {
             this.store.dispatch(actions.invalidateEndDate());
         }
@@ -1876,10 +1883,18 @@ export class TransactionForm extends Component {
         this.commentRow.show(state.isAvailable);
         show(this.submitControls, state.isAvailable);
 
+        // Date field
+        if (!isScheduleItem) {
+            this.dateRow.setState((dateState) => ({
+                ...dateState,
+                value: state.form.date,
+                date: transaction.date,
+                disabled: state.submitStarted,
+                valid: state.validation.date,
+            }));
+        }
+
         if (!state.isAvailable) {
-            if (!isScheduleItem) {
-                this.dateRow.input.value = state.form.date;
-            }
             return;
         }
 
@@ -2006,17 +2021,6 @@ export class TransactionForm extends Component {
             disabled: state.submitStarted,
             currencyId: transaction.dest_curr,
         }));
-
-        // Date field
-        if (!isScheduleItem) {
-            this.dateRow.setState((dateState) => ({
-                ...dateState,
-                value: state.form.date,
-                date: transaction.date,
-                disabled: state.submitStarted,
-                valid: state.validation.date,
-            }));
-        }
 
         // Category field
         this.categorySelect.setType(transaction.type);

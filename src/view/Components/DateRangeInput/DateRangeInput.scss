@@ -28,6 +28,10 @@
     --input-padding: 0 0.2rem 0 0.5rem;
 
     min-width: 0;
+
+    .input-group__input-outer {
+      min-width: 0;
+    }
   }
 }
 

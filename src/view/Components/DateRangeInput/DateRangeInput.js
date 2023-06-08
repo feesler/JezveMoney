@@ -4,18 +4,17 @@ import {
     Component,
     createElement,
 } from 'jezvejs';
-import { Button } from 'jezvejs/Button';
-import { CloseButton } from 'jezvejs/CloseButton';
-import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
-import 'jezvejs/style/Input';
-import { InputGroup } from 'jezvejs/InputGroup';
-import { parseDate, __ } from '../../utils/utils.js';
+import { parseDate, __, timeToDate } from '../../utils/utils.js';
+import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
 import './DateRangeInput.scss';
 
-const CALENDAR_BUTTON_CLASS = 'btn input-group__inner-btn calendar-btn';
 const DATEPICKER_CONTAINER_CLASS = 'calendar';
 const FEEDBACK_CLASS = 'feedback invalid-feedback';
+
+const validateDateOptions = {
+    fixShortYear: false,
+};
 
 const defaultValidation = {
     stdate: true,
@@ -62,60 +61,26 @@ export class DateRangeInput extends Component {
     }
 
     init() {
-        this.startDateInput = DateInput.create({
-            className: 'input input-group__input date-range-part',
+        this.startDateGroup = DateInputGroup.create({
+            className: 'input-group__input-outer date-range-part',
             name: 'stdate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
+            clearButton: this.props.startClearable,
             onInput: (e) => this.onStartDateInput(e),
+            onClear: () => this.onStartDateClear(),
+            onToggleDialog: () => this.showCalendar(true),
         });
 
-        this.startClearBtn = CloseButton.create({
-            className: 'input-group__inner-btn clear-btn',
-            onClick: () => this.onStartDateClear(),
-        });
-
-        this.startDateBtn = Button.create({
-            icon: 'calendar-icon',
-            className: CALENDAR_BUTTON_CLASS,
-            onClick: () => this.showCalendar(true),
-        });
-
-        this.startDateGroup = InputGroup.create({
+        this.endDateGroup = DateInputGroup.create({
             className: 'input-group__input-outer date-range-part',
-            children: [
-                this.startDateInput.elem,
-                this.startClearBtn.elem,
-                this.startDateBtn.elem,
-            ],
-        });
-
-        this.endDateInput = DateInput.create({
-            className: 'input input-group__input',
             name: 'enddate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
+            clearButton: this.props.endClearable,
             onInput: (e) => this.onEndDateInput(e),
-        });
-
-        this.endClearBtn = CloseButton.create({
-            className: 'input-group__inner-btn clear-btn',
-            onClick: () => this.onEndDateClear(),
-        });
-
-        this.endDateBtn = Button.create({
-            icon: 'calendar-icon',
-            className: CALENDAR_BUTTON_CLASS,
-            onClick: () => this.showCalendar(false),
-        });
-
-        this.endDateGroup = InputGroup.create({
-            className: 'input-group__input-outer date-range-part',
-            children: [
-                this.endDateInput.elem,
-                this.endClearBtn.elem,
-                this.endDateBtn.elem,
-            ],
+            onClear: () => this.onEndDateClear(),
+            onToggleDialog: () => this.showCalendar(false),
         });
 
         const inputsContainer = createElement('div', {
@@ -196,7 +161,12 @@ export class DateRangeInput extends Component {
         const { filter } = this.state;
 
         const limitValue = (rangePart === 'start') ? filter.enddate : filter.stdate;
-        const limitDate = parseDate(limitValue);
+        if (!limitValue) {
+            return false;
+        }
+        const limitDate = (typeof limitValue === 'string')
+            ? parseDate(limitValue)
+            : timeToDate(limitValue);
         if (!limitDate) {
             return false;
         }
@@ -298,15 +268,15 @@ export class DateRangeInput extends Component {
 
     validateDateRange(state = this.state) {
         const validation = { ...defaultValidation };
-        const startDate = parseDate(state.form.stdate);
-        const endDate = parseDate(state.form.enddate);
-        if (!startDate) {
+        const startDate = parseDate(state.form.stdate, validateDateOptions);
+        const endDate = parseDate(state.form.enddate, validateDateOptions);
+        if (!startDate && !state.startClearable) {
             validation.stdate = false;
         }
-        if (!endDate) {
+        if (!endDate && !state.endClearable) {
             validation.enddate = false;
         }
-        if (startDate > endDate) {
+        if (startDate && endDate && startDate > endDate) {
             validation.order = false;
         }
         validation.valid = (
@@ -421,24 +391,23 @@ export class DateRangeInput extends Component {
     }
 
     render(state, prevState = {}) {
-        this.startDateInput.value = state.form.stdate ?? '';
-        this.endDateInput.value = state.form.enddate ?? '';
-
-        const enableStart = (!state.disabled && !state.startDisabled);
-        this.startDateInput.enable(enableStart);
-        this.startClearBtn.enable(enableStart);
-        this.startDateBtn.enable(enableStart);
-
-        const enableEnd = (!state.disabled && !state.endDisabled);
-        this.endDateInput.enable(enableEnd);
-        this.endClearBtn.enable(enableStart);
-        this.endDateBtn.enable(enableStart);
-
+        // Start date field
+        this.startDateGroup.setState((startState) => ({
+            ...startState,
+            value: state.form.stdate ?? '',
+            disabled: (state.disabled || state.startDisabled),
+            clearButton: state.startClearable,
+        }));
         this.startDateGroup.show(state.startVisible);
-        this.endDateGroup.show(state.endVisible);
 
-        this.startClearBtn.show(state.startClearable && !!state.form.stdate);
-        this.endClearBtn.show(state.endClearable && !!state.form.enddate);
+        // End date field
+        this.endDateGroup.setState((endState) => ({
+            ...endState,
+            value: state.form.enddate ?? '',
+            disabled: (state.disabled || state.endDisabled),
+            clearButton: state.endClearable,
+        }));
+        this.endDateGroup.show(state.endVisible);
 
         window.app.setValidation(this.elem, state.validation.valid);
 

@@ -21,6 +21,7 @@ import {
     getMonthRange,
     getHalfYearRange,
     dateStringToTime,
+    formatDateRange,
 } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { API } from '../../API/index.js';
@@ -79,14 +80,19 @@ class StatisticsView extends View {
             ...this.props,
         };
 
+        const { filter } = this.props;
+
         const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
             selectedColumn: null,
             pieChartInfo: null,
             selectedPieChartItem: null,
-            filter: { ...this.props.filter },
-            form: { ...this.props.filter },
+            filter: { ...filter },
+            form: {
+                ...filter,
+                ...formatDateRange(filter),
+            },
             loading: false,
             renderTime: Date.now(),
         };
@@ -319,8 +325,7 @@ class StatisticsView extends View {
             this.store.dispatch(actions.changeAccountsFilter([account.id]));
         }
 
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /** Set loading state and render view */
@@ -357,8 +362,7 @@ class StatisticsView extends View {
      */
     onChangeTypeFilter(selected) {
         this.store.dispatch(actions.changeTypeFilter(selected));
-        const state = this.store.getState();
-        this.requestData(state.form);
+        this.requestData(this.getRequestData());
     }
 
     /** Date range filter change handler */
@@ -375,37 +379,29 @@ class StatisticsView extends View {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(timeData));
-        const state = this.store.getState();
-        this.requestData(state.form);
-    }
-
-    formatDateRange(range) {
-        return {
-            stdate: (range?.stdate) ? window.app.formatInputDate(range.stdate) : null,
-            enddate: (range?.enddate) ? window.app.formatInputDate(range.enddate) : null,
-        };
+        this.store.dispatch(actions.changeDateFilter(data));
+        this.requestData(this.getRequestData());
     }
 
     showWeekRange(e) {
         e.preventDefault();
 
         const range = getWeekRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showMonthRange(e) {
         e.preventDefault();
 
         const range = getMonthRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showHalfYearRange(e) {
         e.preventDefault();
 
         const range = getHalfYearRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     /**
@@ -414,8 +410,7 @@ class StatisticsView extends View {
      */
     onSelectReportType(value) {
         this.store.dispatch(actions.changeReportType(value));
-        const state = this.store.getState();
-        this.requestData(state.form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -431,8 +426,7 @@ class StatisticsView extends View {
         }
 
         this.store.dispatch(actions.changeAccountsFilter(ids));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -448,8 +442,7 @@ class StatisticsView extends View {
         }
 
         this.store.dispatch(actions.changeCategoriesFilter(ids));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -462,8 +455,7 @@ class StatisticsView extends View {
         }
 
         this.store.dispatch(actions.changeCurrencyFilter(obj.id));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -472,8 +464,7 @@ class StatisticsView extends View {
      */
     onSelectGroupType(value) {
         this.store.dispatch(actions.changeGroupType(value));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /** Histogram item 'click' event handler */
@@ -500,6 +491,18 @@ class StatisticsView extends View {
         const url = this.getFilterURL(state);
         const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
         window.history.replaceState({}, pageTitle, url);
+    }
+
+    getRequestData() {
+        const { form } = this.store.getState();
+
+        const res = {
+            ...form,
+            stdate: dateStringToTime(form.stdate, { fixShortYear: false }),
+            enddate: dateStringToTime(form.enddate, { fixShortYear: false }),
+        };
+
+        return res;
     }
 
     async requestData(options) {
@@ -732,11 +735,19 @@ class StatisticsView extends View {
         this.groupTypeMenu.setActive(group);
 
         // Date range filter
-        const dateFilter = {
-            stdate: (state.form.stdate ?? null),
-            enddate: (state.form.enddate ?? null),
-        };
-        this.dateRangeFilter.setData(dateFilter);
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            form: {
+                ...rangeState.form,
+                stdate: state.form.stdate,
+                enddate: state.form.enddate,
+            },
+            filter: {
+                ...rangeState.filter,
+                stdate: dateStringToTime(state.form.stdate),
+                enddate: dateStringToTime(state.form.enddate),
+            },
+        }));
 
         const showRangeSelectors = (group === 'day' || group === 'week');
         const dateFilterURL = this.getFilterURL(state, false);

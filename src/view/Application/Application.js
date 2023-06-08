@@ -116,10 +116,11 @@ export class Application {
         return this.config.decimalFormatOptions;
     }
 
-    isValidDateString(value) {
+    isValidDateString(value, params = {}) {
         return isValidDateString(value, {
             locales: this.dateFormatLocale,
             options: this.dateFormatOptions,
+            ...params,
         });
     }
 

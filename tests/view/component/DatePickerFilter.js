@@ -32,33 +32,43 @@ export class DatePickerFilter extends TestComponent {
         res.endInputElem = await query(endGroupEl, 'input');
         assert(res.endInputElem, 'End date input element not found');
 
+        res.startDatePickerBtn = { elem: await query(startGroupEl, '.calendar-btn') };
+        assert(res.startDatePickerBtn.elem, 'Date picker button not found');
+
+        res.endDatePickerBtn = { elem: await query(endGroupEl, '.calendar-btn') };
+        assert(res.endDatePickerBtn.elem, 'Date picker button not found');
+
+        res.clearStartBtn = { elem: await query(startGroupEl, '.clear-btn') };
+        res.clearEndBtn = { elem: await query(endGroupEl, '.clear-btn') };
+
         [
             res.invalidated,
             res.startInputGroup.visible,
             res.endInputGroup.visible,
             res.value.startDate,
             res.value.endDate,
-        ] = await evaluate((el, startEl, endEl, startInp, endInp) => ([
-            el.classList.contains('invalid-block'),
-            startEl && !startEl.hidden,
-            endEl && !endEl.hidden,
-            startInp.value,
-            endInp.value,
-        ]), this.elem, startGroupEl, endGroupEl, res.stInputElem, res.endInputElem);
-
-        res.startDatePickerBtn = { elem: await query(this.elem, 'input[name="stdate"] ~ .calendar-btn') };
-        assert(res.startDatePickerBtn, 'Date picker button not found');
-
-        res.endDatePickerBtn = { elem: await query(this.elem, 'input[name="enddate"] ~ .calendar-btn') };
-        assert(res.endDatePickerBtn, 'Date picker button not found');
+            res.clearStartBtn.visible,
+            res.clearEndBtn.visible,
+        ] = await evaluate(
+            (el, startEl, endEl, startInp, endInp, stClearBtn, endClearBtn) => ([
+                el.classList.contains('invalid-block'),
+                startEl && !startEl.hidden,
+                endEl && !endEl.hidden,
+                startInp.value,
+                endInp.value,
+                stClearBtn && !stClearBtn.hidden,
+                endClearBtn && !endClearBtn.hidden,
+            ]),
+            this.elem,
+            startGroupEl,
+            endGroupEl,
+            res.stInputElem,
+            res.endInputElem,
+            res.clearStartBtn.elem,
+            res.clearEndBtn.elem,
+        );
 
         res.datePicker = await DatePicker.create(this.parent, await query(this.elem, '.dp__container'));
-
-        res.clearStartBtn = { elem: await query(this.elem, 'input[name="stdate"] ~ .clear-btn') };
-        assert(res.clearStartBtn, 'Clear button not found');
-
-        res.clearEndBtn = { elem: await query(this.elem, 'input[name="enddate"] ~ .clear-btn') };
-        assert(res.clearEndBtn, 'Clear button not found');
 
         return res;
     }

@@ -134,6 +134,17 @@ export const cutTime = (value) => (
     cutDate(timeToDate(value))
 );
 
+/** Returns formatted date string */
+export const formatDateInputValue = (value) => (
+    (value) ? window.app.formatInputDate(value) : null
+);
+
+/** Returns formatted date range object */
+export const formatDateRange = (range) => ({
+    stdate: formatDateInputValue(range?.stdate),
+    enddate: formatDateInputValue(range?.enddate),
+});
+
 /** Returns date range object for a last week */
 export const getWeekRange = () => {
     const now = new Date();

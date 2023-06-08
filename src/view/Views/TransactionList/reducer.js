@@ -1,5 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import {
+    formatDateRange,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 
 // Utils
 export const isSameSelection = (a, b) => (
@@ -241,7 +246,10 @@ const slice = createSlice({
             )),
             pagination: { ...data.pagination },
             filter: { ...data.filter },
-            form: { ...data.filter },
+            form: {
+                ...data.filter,
+                ...formatDateRange(data.filter),
+            },
             listMode: (data.keepState) ? state.listMode : 'list',
             contextItem: null,
         };

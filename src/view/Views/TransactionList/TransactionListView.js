@@ -20,6 +20,7 @@ import {
     __,
     cutDate,
     dateStringToTime,
+    formatDateRange,
     getHalfYearRange,
     getMonthRange,
     getWeekRange,
@@ -68,9 +69,14 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
+        const { filter } = this.props;
+
         const initialState = {
             ...this.props,
-            form: { ...this.props.filter },
+            form: {
+                ...filter,
+                ...formatDateRange(filter),
+            },
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
@@ -666,8 +672,7 @@ class TransactionListView extends View {
         e.preventDefault();
 
         this.store.dispatch(actions.clearAllFilters());
-        const state = this.store.getState();
-        this.requestTransactions(state.form);
+        this.requestTransactions(this.getRequestData());
     }
 
     /**
@@ -675,8 +680,7 @@ class TransactionListView extends View {
      */
     onChangeTypeFilter(selected) {
         this.store.dispatch(actions.changeTypeFilter(selected));
-        const state = this.store.getState();
-        this.requestTransactions(state.form);
+        this.requestTransactions(this.getRequestData());
     }
 
     /**
@@ -692,7 +696,7 @@ class TransactionListView extends View {
             arr.push(itemId);
         });
 
-        let state = this.store.getState();
+        const state = this.store.getState();
         const filterAccounts = asArray(state.form.acc_id);
         const filterPersons = asArray(state.form.person_id);
         const accountsChanged = !isSameSelection(accountIds, filterAccounts);
@@ -708,8 +712,7 @@ class TransactionListView extends View {
             this.store.dispatch(actions.changePersonsFilter(personIds));
         }
 
-        state = this.store.getState();
-        this.requestTransactions(state.form);
+        this.requestTransactions(this.getRequestData());
     }
 
     /**
@@ -717,7 +720,7 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onCategoryChange(selected) {
-        let state = this.store.getState();
+        const state = this.store.getState();
         const categoryIds = asArray(selected).map(({ id }) => parseInt(id, 10));
         const filterCategories = asArray(state.form.category_id);
         if (isSameSelection(categoryIds, filterCategories)) {
@@ -726,15 +729,13 @@ class TransactionListView extends View {
 
         this.store.dispatch(actions.changeCategoriesFilter(categoryIds));
 
-        state = this.store.getState();
-        this.requestTransactions(state.form);
+        this.requestTransactions(this.getRequestData());
     }
 
     /** Search field input event handler */
     onSearchInputChange(value) {
         this.store.dispatch(actions.changeSearchQuery(value));
-        const state = this.store.getState();
-        this.requestTransactions(state.form);
+        this.requestTransactions(this.getRequestData());
     }
 
     async deleteItems() {
@@ -827,42 +828,29 @@ class TransactionListView extends View {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(timeData));
-        const { form } = this.store.getState();
-        if (
-            (!data.stdate || form.stdate)
-            && (!data.enddate || form.enddate)
-        ) {
-            this.requestTransactions(form);
-        }
-    }
-
-    formatDateRange(range) {
-        return {
-            stdate: (range?.stdate) ? window.app.formatInputDate(range.stdate) : null,
-            enddate: (range?.enddate) ? window.app.formatInputDate(range.enddate) : null,
-        };
+        this.store.dispatch(actions.changeDateFilter(data));
+        this.requestTransactions(this.getRequestData());
     }
 
     showWeekRange(e) {
         e.preventDefault();
 
         const range = getWeekRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showMonthRange(e) {
         e.preventDefault();
 
         const range = getMonthRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showHalfYearRange(e) {
         e.preventDefault();
 
         const range = getHalfYearRange();
-        this.changeDateFilter(this.formatDateRange(range));
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showMore() {
@@ -875,7 +863,7 @@ class TransactionListView extends View {
         range += 1;
 
         this.requestTransactions({
-            ...state.form,
+            ...this.getRequestData(),
             range,
             page,
             keepState: true,
@@ -884,9 +872,8 @@ class TransactionListView extends View {
     }
 
     onChangePage(page) {
-        const state = this.store.getState();
         this.requestTransactions({
-            ...state.form,
+            ...this.getRequestData(),
             page,
         });
     }
@@ -917,6 +904,18 @@ class TransactionListView extends View {
 
             this.toggleSelectItem(id);
         }
+    }
+
+    getRequestData() {
+        const { form } = this.store.getState();
+
+        const res = {
+            ...form,
+            stdate: dateStringToTime(form.stdate, { fixShortYear: false }),
+            enddate: dateStringToTime(form.enddate, { fixShortYear: false }),
+        };
+
+        return res;
     }
 
     async requestTransactions(options) {
@@ -1179,11 +1178,19 @@ class TransactionListView extends View {
         this.renderCategoriesFilter(state);
 
         // Date range filter
-        const dateFilter = {
-            stdate: (state.form.stdate ?? null),
-            enddate: (state.form.enddate ?? null),
-        };
-        this.dateRangeFilter.setData(dateFilter);
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            form: {
+                ...rangeState.form,
+                stdate: state.form.stdate,
+                enddate: state.form.enddate,
+            },
+            filter: {
+                ...rangeState.filter,
+                stdate: dateStringToTime(state.form.stdate),
+                enddate: dateStringToTime(state.form.enddate),
+            },
+        }));
 
         const dateFilterURL = this.getFilterURL(state, false);
         const weekRange = getWeekRange();
