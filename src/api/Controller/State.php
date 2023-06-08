@@ -27,6 +27,25 @@ use JezveMoney\App\Model\UserSettingsModel;
  */
 class State extends ApiController
 {
+    protected static $dataRequestMap = [
+        "currency" => "getCurrencies",
+        "icons" => "getIcons",
+        "accounts" => "getAccounts",
+        "persons" => "getPersons",
+        "transactions" => "getTransactions",
+        "statistics" => "getStatistics",
+        "categories" => "getCategories",
+        "schedule" => "getSchedule",
+        "reminders" => "getReminders",
+        "importtemplates" => "getImportTemplates",
+        "importrules" => "getImportRules",
+        "importconditions" => "getImportConditions",
+        "importactions" => "getImportActions",
+        "userCurrencies" => "getUserCurrencies",
+        "profile" => "getProfile",
+        "users" => "getUsers",
+    ];
+
     /**
      * Returns list data for specified request
      *
@@ -389,70 +408,10 @@ class State extends ApiController
         }
 
         $res = new \stdClass();
-        // Currency
-        if (isset($request["currency"])) {
-            $res->currency = $this->getCurrencies($request["currency"]);
-        }
-        // Icons
-        if (isset($request["icons"])) {
-            $res->icons = $this->getIcons($request["icons"]);
-        }
-        // Accounts
-        if (isset($request["accounts"])) {
-            $res->accounts = $this->getAccounts($request["accounts"]);
-        }
-        // Persons
-        if (isset($request["persons"])) {
-            $res->persons = $this->getPersons($request["persons"]);
-        }
-        // Transactions
-        if (isset($request["transactions"])) {
-            $res->transactions = $this->getTransactions($request["transactions"]);
-        }
-        // Statistics
-        if (isset($request["statistics"])) {
-            $res->statistics = $this->getStatistics($request["getStatistics"]);
-        }
-        // Categories
-        if (isset($request["categories"])) {
-            $res->categories = $this->getCategories($request["categories"]);
-        }
-        // Scheduled transactions
-        if (isset($request["schedule"])) {
-            $res->schedule = $this->getSchedule($request["schedule"]);
-        }
-        // Scheduled transaction reminders
-        if (isset($request["reminders"])) {
-            $res->reminders = $this->getReminders($request["reminders"]);
-        }
-        // Import templates
-        if (isset($request["importtemplates"])) {
-            $res->importtemplates = $this->getImportTemplates($request["importtemplates"]);
-        }
-        // Import rules
-        if (isset($request["importrules"])) {
-            $res->importrules = $this->getImportRules($request["importrules"]);
-        }
-        // Import conditions
-        if (isset($request["importconditions"])) {
-            $res->importconditions = $this->getImportConditions($request["importconditions"]);
-        }
-        // Import actions
-        if (isset($request["importactions"])) {
-            $res->importactions = $this->getImportActions($request["importactions"]);
-        }
-        // User currencies
-        if (isset($request["userCurrencies"])) {
-            $res->userCurrencies = $this->getUserCurrencies($request["userCurrencies"]);
-        }
-        // User profile
-        if (isset($request["profile"])) {
-            $res->profile = $this->getProfile();
-        }
-
-        // Users
-        if (isset($request["users"])) {
-            $res->users = $this->getUsers($request["users"]);
+        foreach (static::$dataRequestMap as $param => $method) {
+            if (isset($request[$param])) {
+                $res->$param = $this->$method($request[$param]);
+            }
         }
 
         return $res;
