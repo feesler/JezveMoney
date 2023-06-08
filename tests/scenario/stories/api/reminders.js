@@ -51,6 +51,21 @@ const confirmRemindersWithChainedRequest = async () => {
     }, data);
 };
 
+const confirmCancelledReminders = async () => {
+    setBlock('Confirm cancelled reminders', 2);
+
+    const { REMINDER_TRANSFER_1_1 } = App.scenario;
+
+    const data = [{
+        id: REMINDER_TRANSFER_1_1,
+    }];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.confirm(params);
+        assert(res, 'Failed to confirm reminder');
+    }, data);
+};
+
 const cancelReminders = async () => {
     setBlock('Cancel reminders', 2);
 
@@ -91,6 +106,21 @@ const cancelRemindersWithChainedRequest = async () => {
         returnState: {
             reminders: {},
         },
+    }];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.cancel(params);
+        assert(res, 'Failed to cancel reminder');
+    }, data);
+};
+
+const cancelConfirmedReminders = async () => {
+    setBlock('Cancel confirmed reminders', 2);
+
+    const { REMINDER_INCOME_2_1 } = App.scenario;
+
+    const data = [{
+        id: REMINDER_INCOME_2_1,
     }];
 
     await App.scenario.runner.runGroup(async (params) => {
@@ -148,6 +178,14 @@ export const apiRemindersTests = {
         await cancelRemindersWithChainedRequest();
     },
 
+    async confirmCancelledTests() {
+        await confirmCancelledReminders();
+    },
+
+    async cancelConfirmedTests() {
+        await cancelConfirmedReminders();
+    },
+
     async listTests() {
         await read();
         await list();
@@ -156,6 +194,8 @@ export const apiRemindersTests = {
     async run() {
         await this.confirmRemindersTests();
         await this.cancelRemindersTests();
+        await this.confirmCancelledTests();
+        await this.cancelConfirmedTests();
         await this.listTests();
     },
 };

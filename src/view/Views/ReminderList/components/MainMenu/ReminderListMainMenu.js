@@ -2,6 +2,7 @@ import { show } from 'jezvejs';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getSelectedItems } from '../../../../utils/utils.js';
+import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../Models/Reminder.js';
 
 /** Reminders list main menu component */
 export class ReminderListMainMenu extends PopupMenu {
@@ -36,6 +37,7 @@ export class ReminderListMainMenu extends PopupMenu {
             listMode: 'list',
             showMenu: false,
             items: [],
+            filter: {},
         };
     }
 
@@ -55,6 +57,9 @@ export class ReminderListMainMenu extends PopupMenu {
         const isListMode = state.listMode === 'list';
         const isSelectMode = state.listMode === 'select';
 
+        const isConfirmed = state.filter.state === REMINDER_CONFIRMED;
+        const isCancelled = state.filter.state === REMINDER_CANCELLED;
+
         const { items } = this;
 
         items.selectModeBtn.show(isListMode && itemsCount > 0);
@@ -63,7 +68,7 @@ export class ReminderListMainMenu extends PopupMenu {
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
         show(items.separator2, isSelectMode);
 
-        items.confirmBtn.show(selCount > 0);
-        items.cancelBtn.show(selCount > 0);
+        items.confirmBtn.show(selCount > 0 && !isConfirmed);
+        items.cancelBtn.show(selCount > 0 && !isCancelled);
     }
 }

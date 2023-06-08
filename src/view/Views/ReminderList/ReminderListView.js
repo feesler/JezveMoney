@@ -498,6 +498,7 @@ class ReminderListView extends View {
             listMode: state.listMode,
             showMenu: state.showMenu,
             items: state.items,
+            filter: state.filter,
         });
 
         if (showFirstTime) {

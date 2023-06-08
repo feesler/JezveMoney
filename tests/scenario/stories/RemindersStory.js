@@ -34,6 +34,8 @@ export class RemindersStory extends TestStory {
         await this.cancelFromContextMenu();
         await this.updateAndConfirm();
         await this.filters();
+        await this.confirmCancelled();
+        await this.cancelConfirmed();
     }
 
     async list() {
@@ -63,6 +65,22 @@ export class RemindersStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(Actions.cancel, data);
+    }
+
+    async confirmCancelled() {
+        setBlock('Confirm cancelled reminders', 1);
+
+        await Actions.filterByState({ state: REMINDER_CANCELLED });
+        await Actions.confirm(0);
+        await Actions.confirmFromContextMenu(0);
+    }
+
+    async cancelConfirmed() {
+        setBlock('Cancel confirmed reminders', 1);
+
+        await Actions.filterByState({ state: REMINDER_CONFIRMED });
+        await Actions.cancel(0);
+        await Actions.cancelFromContextMenu(0);
     }
 
     async confirmFromContextMenu() {

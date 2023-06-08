@@ -158,7 +158,7 @@ export class RemindersList extends List {
 
         this.data = this.data.map((item) => (
             (ids.includes(item.transaction_id))
-                ? Reminder.create({
+                ? this.createItem({
                     ...item,
                     state: REMINDER_SCHEDULED,
                     transaction_id: 0,

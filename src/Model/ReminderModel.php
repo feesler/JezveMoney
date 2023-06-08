@@ -495,6 +495,19 @@ class ReminderModel extends CachedTable
     {
         $ids = asArray($ids);
         foreach ($ids as $item_id) {
+            $item = $this->getItem($item_id);
+            if (!$item) {
+                throw new \Error("Invalid reminder");
+            }
+            if ($item->state === REMINDER_CANCELLED) {
+                throw new \Error("Reminder already cancelled");
+            }
+
+            if ($item->transaction_id !== 0) {
+                $transactionModel = TransactionModel::getInstance();
+                $transactionModel->del($item->transaction_id);
+            }
+
             $res = $this->update($item_id, [
                 "state" => REMINDER_CANCELLED,
                 "transaction_id" => 0,

@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../../../tests/model/Reminder.js';
 
 /** Reminders list context menu component */
 export class ReminderListContextMenu extends PopupMenu {
@@ -53,13 +54,13 @@ export class ReminderListContextMenu extends PopupMenu {
             this.detach();
             return;
         }
-        const item = this.getContextItem(state);
-        if (!item) {
+        const reminder = this.getContextItem(state);
+        if (!reminder) {
             this.detach();
             return;
         }
 
-        const menuButton = this.getHostElement(item.id);
+        const menuButton = this.getHostElement(reminder.id);
         if (!menuButton) {
             this.detach();
             return;
@@ -67,8 +68,11 @@ export class ReminderListContextMenu extends PopupMenu {
 
         const { baseURL } = window.app;
         const { items } = this;
-        items.ctxDetailsBtn.setURL(`${baseURL}reminders/${item.id}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}transactions/create/?reminder_id=${item.id}`);
+        items.ctxConfirmBtn.show(reminder.state !== REMINDER_CONFIRMED);
+        items.ctxUpdateBtn.show(reminder.state !== REMINDER_CONFIRMED);
+        items.ctxCancelBtn.show(reminder.state !== REMINDER_CANCELLED);
+        items.ctxDetailsBtn.setURL(`${baseURL}reminders/${reminder.id}`);
+        items.ctxUpdateBtn.setURL(`${baseURL}transactions/create/?reminder_id=${reminder.id}`);
 
         this.attachAndShow(menuButton);
     }

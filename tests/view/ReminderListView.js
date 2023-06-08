@@ -22,7 +22,12 @@ import { AppView } from './AppView.js';
 import { Counter } from './component/Counter.js';
 import { ReminderDetails } from './component/Reminder/ReminderDetails.js';
 import { TransactionRemindersList } from './component/Reminder/TransactionRemindersList.js';
-import { REMINDER_SCHEDULED, Reminder } from '../model/Reminder.js';
+import {
+    REMINDER_CANCELLED,
+    REMINDER_CONFIRMED,
+    REMINDER_SCHEDULED,
+    Reminder,
+} from '../model/Reminder.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -396,6 +401,10 @@ export class ReminderListView extends AppView {
         );
         const pageNum = this.currentPage(model);
 
+        const stateFilter = parseInt(model.filter.state, 10);
+        const isConfirmed = stateFilter === REMINDER_CONFIRMED;
+        const isCancelled = stateFilter === REMINDER_CANCELLED;
+
         const list = this.getExpectedList(model);
 
         const res = {
@@ -434,8 +443,12 @@ export class ReminderListView extends AppView {
             res.deselectAllBtn = {
                 visible: showSelectItems && selected.length > 0,
             };
-            res.confirmBtn = { visible: showSelectItems && selected.length > 0 };
-            res.cancelBtn = { visible: showSelectItems && selected.length > 0 };
+            res.confirmBtn = {
+                visible: showSelectItems && selected.length > 0 && !isConfirmed,
+            };
+            res.cancelBtn = {
+                visible: showSelectItems && selected.length > 0 && !isCancelled,
+            };
         }
 
         res.contextMenu = {
@@ -449,9 +462,9 @@ export class ReminderListView extends AppView {
             res.contextMenu.itemId = model.contextItem;
 
             res.ctxDetailsBtn = { visible: true };
-            res.ctxUpdateBtn = { visible: true };
-            res.ctxConfirmBtn = { visible: true };
-            res.ctxCancelBtn = { visible: true };
+            res.ctxUpdateBtn = { visible: contextItem.state !== REMINDER_CONFIRMED };
+            res.ctxConfirmBtn = { visible: contextItem.state !== REMINDER_CONFIRMED };
+            res.ctxCancelBtn = { visible: contextItem.state !== REMINDER_CANCELLED };
         }
 
         if (isItemsAvailable) {
@@ -645,7 +658,7 @@ export class ReminderListView extends AppView {
 
         await this.performAction(async () => {
             await item.clickMenu();
-            return wait('#ctxCancelBtn', { visible: true });
+            return wait('#ctxDetailsBtn', { visible: true });
         });
 
         return this.checkState(expected);

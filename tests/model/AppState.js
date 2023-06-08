@@ -2400,6 +2400,15 @@ export class AppState {
     }
 
     cancelReminder(params) {
+        const origItem = this.reminders.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        if (origItem.transaction_id !== 0) {
+            this.deleteTransactions({ id: origItem.transaction_id });
+        }
+
         return this.updateReminder({
             id: params.id,
             state: REMINDER_CANCELLED,
