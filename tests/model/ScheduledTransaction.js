@@ -309,7 +309,8 @@ export class ScheduledTransaction {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', App.view.locale, (offset + 1));
+        const monthDay = parseInt(offset, 10);
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', App.view.locale, (monthDay + 1));
     }
 
     renderYearOffset(offset) {

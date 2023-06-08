@@ -106,7 +106,7 @@ export class ScheduledTransaction extends ListItem {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', (offset + 1));
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', (parseInt(offset, 10) + 1));
     }
 
     renderYearOffset(offset) {
