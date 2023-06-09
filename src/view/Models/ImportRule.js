@@ -17,11 +17,11 @@ import { ImportActionValidationError } from './Error/ImportActionValidationError
  * @param {object} props - properties of instance
  */
 export class ImportRule extends ListItem {
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
-        this.conditions = new ImportConditionList(this.conditions);
-        this.actions = new ImportActionList(this.actions);
+        this.conditions = new ImportConditionList(props?.conditions);
+        this.actions = new ImportActionList(props?.actions);
     }
 
     /**

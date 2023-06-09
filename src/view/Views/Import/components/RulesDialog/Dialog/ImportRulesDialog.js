@@ -9,16 +9,26 @@ import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
-import { __ } from '../../../../../utils/utils.js';
+import { createStore } from 'jezvejs/Store';
+
+import { __, listData } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
-import { ImportRule } from '../../../../../Models/ImportRule.js';
-import { ImportCondition } from '../../../../../Models/ImportCondition.js';
+
 import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { SearchInput } from '../../../../../Components/SearchInput/SearchInput.js';
 import { RuleListContextMenu } from '../ContextMenu/RuleListContextMenu.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
+
+import {
+    actions,
+    reducer,
+    getInitialState,
+    LIST_STATE,
+    CREATE_STATE,
+    UPDATE_STATE,
+} from './reducer.js';
 import './ImportRulesDialog.scss';
 
 /** CSS classes */
@@ -29,14 +39,6 @@ const CREATE_BTN_CLASS = 'create-btn';
 const DIALOG_CONTENT_CLASS = 'rules-content';
 const LIST_CONTAINER_CLASS = 'rules-list-container';
 const LIST_CLASS = 'rules-list';
-
-/* Dialogs states */
-const LIST_STATE = 1;
-const CREATE_STATE = 2;
-const UPDATE_STATE = 3;
-
-/* Other */
-const SHOW_ON_PAGE = 20;
 
 /**
  * ImportRulesDialog component
@@ -50,8 +52,15 @@ export class ImportRulesDialog extends Component {
             ctxDeleteRuleBtn: () => this.onDeleteItem(),
         };
 
+        this.store = createStore(reducer, { initialState: getInitialState() });
+
         this.init();
-        this.reset();
+
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     init() {
@@ -150,8 +159,7 @@ export class ImportRulesDialog extends Component {
 
     /** Show/hide dialog */
     show(val) {
-        this.updateList();
-        this.render(this.state);
+        this.reset();
         this.popup.show(val);
     }
 
@@ -162,52 +170,17 @@ export class ImportRulesDialog extends Component {
 
     /** Reset dialog state */
     reset() {
-        this.state = {
-            id: LIST_STATE,
-            listLoading: false,
-            filter: '',
-            items: [],
-            pagination: {
-                onPage: SHOW_ON_PAGE,
-                page: 1,
-                pagesCount: 0,
-                total: 0,
-            },
-            showContextMenu: false,
-            contextItem: null,
-            renderTime: Date.now(),
-        };
-    }
-
-    /** Updates rules list state */
-    updateList() {
-        const { rules } = window.app.model;
-        const { pagination } = this.state;
-
-        const items = (this.state.filter !== '')
-            ? rules.filter((rule) => rule.isMatchFilter(this.state.filter))
-            : rules.data;
-        this.state.items = items;
-
-        pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
-        pagination.page = (pagination.pagesCount > 0)
-            ? Math.min(pagination.pagesCount, pagination.page)
-            : 1;
-        pagination.total = items.length;
+        this.store.dispatch(actions.reset());
     }
 
     /** Set loading state and render component */
     startLoading() {
-        this.setState({ ...this.state, listLoading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render component */
     stopLoading() {
-        this.setState({
-            ...this.state,
-            listLoading: false,
-            renderTime: Date.now(),
-        });
+        this.store.dispatch(actions.stopLoading());
     }
 
     /** Hide dialog */
@@ -217,77 +190,24 @@ export class ImportRulesDialog extends Component {
 
     /** Search input */
     onSearchInputChange(value) {
-        if (this.state.filter.toLowerCase() === value.toLowerCase()) {
-            return;
-        }
-
-        this.state.filter = value;
-        if (value.length === 0) {
-            this.state.pagination.page = 1;
-        }
-        this.updateList();
-        this.render(this.state);
+        this.store.dispatch(actions.changeSearchQuery(value));
     }
 
     /** Change page event handler */
     onChangePage(page) {
-        if (this.state.pagination.page === page) {
-            return;
-        }
-
-        this.state.pagination.page = page;
-        this.render(this.state);
+        this.store.dispatch(actions.changePage(page));
     }
 
     /** Create rule button 'click' event handler */
     onCreateRuleClick() {
-        this.setCreateRuleState();
-    }
-
-    /** Set create rule state */
-    setCreateRuleState() {
-        this.state.id = CREATE_STATE;
-        this.state.rule = new ImportRule({
-            flags: 0,
-            conditions: [],
-            actions: [],
-        });
-
-        this.render(this.state);
-    }
-
-    /** Set update rule state */
-    setUpdateRuleState(ruleId) {
-        const item = window.app.model.rules.getItem(ruleId);
-        if (!item) {
-            throw new Error('Rule not found');
-        }
-
-        this.state.id = UPDATE_STATE;
-
-        const rule = {
-            ...item,
-            conditions: item.conditions.map((condition) => {
-                const res = {
-                    ...condition,
-                };
-
-                if (ImportCondition.isDateField(condition.field_id)) {
-                    res.value = window.app.formatDate(condition.value);
-                }
-
-                return res;
-            }),
-        };
-
-        this.state.rule = new ImportRule(rule);
-
-        this.render(this.state);
+        this.store.dispatch(actions.createRule());
     }
 
     onItemClick(itemId, e) {
+        const state = this.store.getState();
+
         if (
-            this.state.id !== LIST_STATE
+            state.id !== LIST_STATE
             || !e.target.closest('.menu-btn')
         ) {
             return;
@@ -297,22 +217,11 @@ export class ImportRulesDialog extends Component {
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId && this.state.showContextMenu) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            contextItem: itemId,
-            showContextMenu: true,
-        });
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.setState({
-            ...this.state,
-            showContextMenu: false,
-        });
+        this.store.dispatch(actions.hideContextMenu());
     }
 
     /** Rule 'submit' event handler */
@@ -327,24 +236,22 @@ export class ImportRulesDialog extends Component {
     /** Rule create/update 'cancel' event handler */
     onCancelItem() {
         this.reset();
-        this.updateList();
-        this.render(this.state);
     }
 
     /** Rule 'update' event handler */
     onUpdateItem() {
-        const ruleId = this.state.contextItem;
-        this.setUpdateRuleState(ruleId);
+        this.store.dispatch(actions.updateRule());
     }
 
     /** Rule 'delete' event handler */
     onDeleteItem() {
-        const ruleId = this.state.contextItem;
+        const { contextItem } = this.store.getState();
+
         ConfirmDialog.create({
             id: 'rule_delete_warning',
             title: __('IMPORT_RULE_DELETE'),
             content: __('MSG_RULE_DELETE'),
-            onConfirm: () => this.deleteRule(ruleId),
+            onConfirm: () => this.deleteRule(contextItem),
         });
     }
 
@@ -362,14 +269,8 @@ export class ImportRulesDialog extends Component {
     }
 
     setListData(data) {
-        const { rules } = window.app.model;
-
-        rules.setData(data);
-        this.state.id = LIST_STATE;
-        this.state.contextItem = null;
-        this.updateList();
-
-        delete this.state.rule;
+        window.app.model.rules.setData(data);
+        this.store.dispatch(actions.listRequestLoaded());
 
         if (isFunction(this.props.onUpdate)) {
             this.props.onUpdate();
@@ -456,7 +357,7 @@ export class ImportRulesDialog extends Component {
     renderList(state) {
         const firstItem = state.pagination.onPage * (state.pagination.page - 1);
         const lastItem = firstItem + state.pagination.onPage;
-        const items = state.items.slice(firstItem, lastItem);
+        const items = listData(state.items).slice(firstItem, lastItem);
 
         this.rulesList.setState((listState) => ({
             ...listState,
