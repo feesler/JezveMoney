@@ -8,9 +8,9 @@ import {
     cutDate,
     getWeek,
     dateToSeconds,
-    MS_IN_SECOND,
     secondsToDate,
     MONTHS_IN_YEAR,
+    secondsToTime,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -891,7 +891,7 @@ export class TransactionsList extends SortableList {
                 [category] = itemGroup;
             }
 
-            const time = item.date * MS_IN_SECOND;
+            const time = secondsToTime(item.date);
             const dateInfo = this.getDateInfo(time, groupType);
             const amount = (isSource) ? item.src_amount : item.dest_amount;
             curDate = dateInfo;

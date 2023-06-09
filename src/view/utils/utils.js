@@ -100,11 +100,12 @@ export const timestampFromString = (str, params = {}) => {
 
 /** Returns Unix timestamp in seconds for specified date */
 export const getSeconds = (date) => {
-    if (!isDate(date)) {
-        throw new Error('Invalid date');
+    const timestamp = isDate(date) ? date.getTime() : parseInt(date, 10);
+    if (!timestamp) {
+        throw new Error('Invalid value');
     }
 
-    return Math.round(date.getTime() / MS_IN_SECOND);
+    return Math.round(timestamp / MS_IN_SECOND);
 };
 
 /** Convert date string to Unix timestamp in seconds */

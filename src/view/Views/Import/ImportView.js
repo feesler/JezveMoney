@@ -13,7 +13,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { createStore } from 'jezvejs/Store';
 
-import { MS_IN_SECOND, __, getSelectedItems } from '../../utils/utils.js';
+import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
@@ -316,8 +316,8 @@ class ImportView extends View {
             const range = this.getImportedItemsDateRange(state);
             const result = await API.transaction.list({
                 count: 0,
-                stdate: range.start / MS_IN_SECOND,
-                enddate: range.end / MS_IN_SECOND,
+                stdate: getSeconds(range.start),
+                enddate: getSeconds(range.end),
                 acc_id: state.mainAccount.id,
             });
             return result.data.items;
