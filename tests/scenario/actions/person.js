@@ -6,12 +6,12 @@ import {
     goTo,
     asArray,
 } from 'jezve-test';
-import { generateId } from '../common.js';
-import { PersonListView } from '../view/PersonListView.js';
-import { PersonView } from '../view/PersonView.js';
-import { MainView } from '../view/MainView.js';
-import { App } from '../Application.js';
-import { __ } from '../model/locale.js';
+import { generateId } from '../../common.js';
+import { PersonListView } from '../../view/PersonListView.js';
+import { PersonView } from '../../view/PersonView.js';
+import { MainView } from '../../view/MainView.js';
+import { App } from '../../Application.js';
+import { __ } from '../../model/locale.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {

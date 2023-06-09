@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/schedule.js';
+import * as Actions from '../actions/schedule.js';
 import { App } from '../../Application.js';
 import {
     DEBT,

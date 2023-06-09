@@ -1,7 +1,7 @@
 import { assert, test } from 'jezve-test';
-import { App } from '../../Application.js';
-import { ImportTemplate } from '../../model/ImportTemplate.js';
-import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
+import { App } from '../../../Application.js';
+import { ImportTemplate } from '../../../model/ImportTemplate.js';
+import { CREATE_TPL_STATE } from '../../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
 export const selectTemplateById = async (value) => {

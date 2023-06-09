@@ -2,12 +2,12 @@ import {
     test,
     assert,
 } from 'jezve-test';
-import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { Transaction } from '../../model/Transaction.js';
-import { formatProps } from '../../common.js';
-import { App } from '../../Application.js';
-import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
+import { api } from '../../../model/api.js';
+import { ApiRequestError } from '../../../error/ApiRequestError.js';
+import { Transaction } from '../../../model/Transaction.js';
+import { formatProps } from '../../../common.js';
+import { App } from '../../../Application.js';
+import { ScheduledTransaction } from '../../../model/ScheduledTransaction.js';
 
 /**
  * Creates scheduled transaction with specified params and check expected state of app

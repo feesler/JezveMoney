@@ -1,11 +1,11 @@
 import { test, assert } from 'jezve-test';
-import { LoginView } from '../view/LoginView.js';
-import { MainView } from '../view/MainView.js';
-import { App } from '../Application.js';
-import { RegisterView } from '../view/RegisterView.js';
-import { ProfileView } from '../view/ProfileView.js';
-import { AboutView } from '../view/AboutView.js';
-import { __ } from '../model/locale.js';
+import { LoginView } from '../../view/LoginView.js';
+import { MainView } from '../../view/MainView.js';
+import { App } from '../../Application.js';
+import { RegisterView } from '../../view/RegisterView.js';
+import { ProfileView } from '../../view/ProfileView.js';
+import { AboutView } from '../../view/AboutView.js';
+import { __ } from '../../model/locale.js';
 
 const checkLoginNavigation = async () => {
     if (App.view.isUserLoggedIn()) {

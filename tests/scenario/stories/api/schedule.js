@@ -7,7 +7,7 @@ import {
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/schedule.js';
+import * as Actions from '../../actions/api/schedule.js';
 import { dateToSeconds, formatProps } from '../../../common.js';
 import {
     INTERVAL_DAY,

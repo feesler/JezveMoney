@@ -1,6 +1,6 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/reminder.js';
-import * as trActions from '../../actions/transaction.js';
+import * as Actions from '../actions/reminder.js';
+import * as trActions from '../actions/transaction.js';
 import { App } from '../../Application.js';
 import {
     REMINDER_CANCELLED,

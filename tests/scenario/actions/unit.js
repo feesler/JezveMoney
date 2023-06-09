@@ -4,7 +4,7 @@ import {
     correct,
     normalize,
     isValidValue,
-} from '../../src/view/utils/utils.js';
+} from '../../../src/view/utils/utils.js';
 
 export const amountFixTest = async (descr, value, result) => {
     await test(descr, () => {

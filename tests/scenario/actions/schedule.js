@@ -7,8 +7,8 @@ import {
     asArray,
     formatDate,
 } from 'jezve-test';
-import { ScheduleView } from '../view/ScheduleView.js';
-import { MainView } from '../view/MainView.js';
+import { ScheduleView } from '../../view/ScheduleView.js';
+import { MainView } from '../../view/MainView.js';
 import {
     EXPENSE,
     INCOME,
@@ -16,13 +16,13 @@ import {
     DEBT,
     Transaction,
     LIMIT_CHANGE,
-} from '../model/Transaction.js';
-import { App } from '../Application.js';
-import { generateId } from '../common.js';
-import { __ } from '../model/locale.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../model/AccountsList.js';
-import { ScheduledTransaction } from '../model/ScheduledTransaction.js';
-import { ScheduleItemView } from '../view/ScheduleItemView.js';
+} from '../../model/Transaction.js';
+import { App } from '../../Application.js';
+import { generateId } from '../../common.js';
+import { __ } from '../../model/locale.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountsList.js';
+import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
+import { ScheduleItemView } from '../../view/ScheduleItemView.js';
 
 /** Navigate to schedule page */
 const checkNavigation = async () => {

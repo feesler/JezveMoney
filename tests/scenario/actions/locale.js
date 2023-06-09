@@ -1,18 +1,18 @@
 import { assert, isObject, test } from 'jezve-test';
-import { App } from '../Application.js';
-import { tokensMap } from '../model/locale.js';
-import { AccountListView } from '../view/AccountListView.js';
-import { AccountView } from '../view/AccountView.js';
-import { CategoryListView } from '../view/CategoryListView.js';
-import { CategoryView } from '../view/CategoryView.js';
-import { ImportView } from '../view/ImportView.js';
-import { MainView } from '../view/MainView.js';
-import { PersonListView } from '../view/PersonListView.js';
-import { PersonView } from '../view/PersonView.js';
-import { SettingsView } from '../view/SettingsView.js';
-import { StatisticsView } from '../view/StatisticsView.js';
-import { TransactionListView } from '../view/TransactionListView.js';
-import { TransactionView } from '../view/TransactionView.js';
+import { App } from '../../Application.js';
+import { tokensMap } from '../../model/locale.js';
+import { AccountListView } from '../../view/AccountListView.js';
+import { AccountView } from '../../view/AccountView.js';
+import { CategoryListView } from '../../view/CategoryListView.js';
+import { CategoryView } from '../../view/CategoryView.js';
+import { ImportView } from '../../view/ImportView.js';
+import { MainView } from '../../view/MainView.js';
+import { PersonListView } from '../../view/PersonListView.js';
+import { PersonView } from '../../view/PersonView.js';
+import { SettingsView } from '../../view/SettingsView.js';
+import { StatisticsView } from '../../view/StatisticsView.js';
+import { TransactionListView } from '../../view/TransactionListView.js';
+import { TransactionView } from '../../view/TransactionView.js';
 
 const translateExceptions = [
     'APP_NAME',

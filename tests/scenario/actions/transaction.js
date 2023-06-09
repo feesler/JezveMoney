@@ -7,9 +7,9 @@ import {
     asArray,
     formatDate,
 } from 'jezve-test';
-import { TransactionListView } from '../view/TransactionListView.js';
-import { TransactionView } from '../view/TransactionView.js';
-import { MainView } from '../view/MainView.js';
+import { TransactionListView } from '../../view/TransactionListView.js';
+import { TransactionView } from '../../view/TransactionView.js';
+import { MainView } from '../../view/MainView.js';
 import {
     EXPENSE,
     INCOME,
@@ -17,12 +17,12 @@ import {
     DEBT,
     Transaction,
     LIMIT_CHANGE,
-} from '../model/Transaction.js';
-import { App } from '../Application.js';
-import { generateId } from '../common.js';
-import { __ } from '../model/locale.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../model/AccountsList.js';
-import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
+} from '../../model/Transaction.js';
+import { App } from '../../Application.js';
+import { generateId } from '../../common.js';
+import { __ } from '../../model/locale.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountsList.js';
+import { TransactionList } from '../../view/component/TransactionList/TransactionList.js';
 
 export const decimalInputTestStrings = [
     '-',

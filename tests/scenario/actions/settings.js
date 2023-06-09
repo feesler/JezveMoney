@@ -1,6 +1,6 @@
 import { test, assert, asArray } from 'jezve-test';
-import { App } from '../Application.js';
-import { SettingsView } from '../view/SettingsView.js';
+import { App } from '../../Application.js';
+import { SettingsView } from '../../view/SettingsView.js';
 
 const checkNavigation = async () => {
     if (!(App.view instanceof SettingsView)) {

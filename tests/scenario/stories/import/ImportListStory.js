@@ -1,9 +1,9 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../../actions/import/index.js';
+import * as Actions from '../../actions/import/index.js';
 import { App } from '../../../Application.js';
 import { api } from '../../../model/api.js';
-import { testLocales } from '../../../actions/locale.js';
-import { testDateLocales, testDecimalLocales } from '../../../actions/settings.js';
+import { testLocales } from '../../actions/locale.js';
+import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {

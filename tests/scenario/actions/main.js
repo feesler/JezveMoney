@@ -1,6 +1,6 @@
 import { test } from 'jezve-test';
-import { MainView } from '../view/MainView.js';
-import { App } from '../Application.js';
+import { MainView } from '../../view/MainView.js';
+import { App } from '../../Application.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {

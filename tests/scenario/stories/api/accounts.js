@@ -8,7 +8,7 @@ import {
     ACCOUNT_TYPE_CREDIT_CARD,
     ACCOUNT_TYPE_CREDIT,
 } from '../../../model/AccountsList.js';
-import * as Actions from '../../../actions/api/account.js';
+import * as Actions from '../../actions/api/account.js';
 
 const create = async () => {
     setBlock('Create accounts', 2);

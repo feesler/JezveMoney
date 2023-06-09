@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/importtemplate.js';
+import * as Actions from '../../actions/api/importtemplate.js';
 import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
 
 const create = async () => {

@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/settings.js';
+import * as Actions from '../actions/settings.js';
 import { App } from '../../Application.js';
 
 export class SettingsStory extends TestStory {

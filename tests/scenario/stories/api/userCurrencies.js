@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/userCurrencies.js';
+import * as Actions from '../../actions/api/userCurrencies.js';
 
 const create = async () => {
     setBlock('Create user currencies', 2);

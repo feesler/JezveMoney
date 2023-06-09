@@ -1,6 +1,6 @@
 import { asArray, assert, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/reminder.js';
+import * as Actions from '../../actions/api/reminder.js';
 import { formatProps } from '../../../common.js';
 
 const confirmReminders = async () => {

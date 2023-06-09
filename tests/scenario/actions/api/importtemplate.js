@@ -1,7 +1,7 @@
 import { test, assert } from 'jezve-test';
-import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { App } from '../../Application.js';
+import { api } from '../../../model/api.js';
+import { ApiRequestError } from '../../../error/ApiRequestError.js';
+import { App } from '../../../Application.js';
 
 /**
  * Create import template with specified params and check expected state of app

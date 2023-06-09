@@ -6,12 +6,12 @@ import {
     goTo,
     asArray,
 } from 'jezve-test';
-import { generateId } from '../common.js';
-import { CategoryListView } from '../view/CategoryListView.js';
-import { CategoryView } from '../view/CategoryView.js';
-import { App } from '../Application.js';
-import { __ } from '../model/locale.js';
-import { Category } from '../model/Category.js';
+import { generateId } from '../../common.js';
+import { CategoryListView } from '../../view/CategoryListView.js';
+import { CategoryView } from '../../view/CategoryView.js';
+import { App } from '../../Application.js';
+import { __ } from '../../model/locale.js';
+import { Category } from '../../model/Category.js';
 
 /** Navigate to categories list page */
 const checkNavigation = async () => {

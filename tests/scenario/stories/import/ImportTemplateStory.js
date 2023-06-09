@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../../actions/import/index.js';
+import * as Actions from '../../actions/import/index.js';
 import { api } from '../../../model/api.js';
 import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
 import { App } from '../../../Application.js';

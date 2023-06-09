@@ -3,26 +3,27 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { formatProps } from '../../common.js';
-import { App } from '../../Application.js';
+import { api } from '../../../model/api.js';
+import { ApiRequestError } from '../../../error/ApiRequestError.js';
+import { formatProps } from '../../../common.js';
+import { App } from '../../../Application.js';
 
 /**
- * Create person with specified params and check expected state of app
+ * Create user currrency with specified params and check expected state of app
  * @param {Object} params
- * @param {string} params.name - name of person
+ * @param {number} params.curr_id - currrency id
+ * @param {number} params.flags - flags
  */
 export const create = async (params) => {
-    let personId = 0;
+    let itemId = 0;
 
-    await test(`Create person (${formatProps(params)})`, async () => {
-        let createRes = null;
-        const resExpected = App.state.createPerson(params);
+    await test(`Create user currrency (${formatProps(params)})`, async () => {
+        const resExpected = App.state.createUserCurrency(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
+        let createRes;
         try {
-            createRes = await api.person.create(reqParams);
+            createRes = await api.usercurrency.create(reqParams);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -30,28 +31,28 @@ export const create = async (params) => {
             }
         }
 
-        personId = (createRes) ? createRes.id : resExpected;
+        itemId = (createRes) ? createRes.id : resExpected;
 
         return App.state.fetchAndTest();
     });
 
-    return personId;
+    return itemId;
 };
 
 /**
- * Create multiple persons with specified params and check expected state of app
+ * Create multiple user currrencies with specified params and check expected state of app
  */
 export const createMultiple = async (params) => {
     let ids = [];
 
-    await test('Create multiple persons', async () => {
+    await test('Create multiple user currrencies', async () => {
         let expectedResult = false;
         if (Array.isArray(params)) {
             expectedResult = { ids: [] };
             for (const item of params) {
-                const resExpected = App.state.createPerson(item);
+                const resExpected = App.state.createUserCurrency(item);
                 if (!resExpected) {
-                    App.state.deletePersons({ id: expectedResult.ids });
+                    App.state.deleteUserCurrencies({ id: expectedResult.ids });
                     expectedResult = false;
                     break;
                 }
@@ -62,7 +63,7 @@ export const createMultiple = async (params) => {
 
         let createRes;
         try {
-            createRes = await api.person.createMultiple(params);
+            createRes = await api.usercurrency.createMultiple(params);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
@@ -79,8 +80,8 @@ export const createMultiple = async (params) => {
 };
 
 /**
- * Reads persons by ids and returns array of results
- * @param {number} id - person id or array of ids
+ * Reads user currrencies by ids and returns array of results
+ * @param {number} id - user currrency id or array of ids
  */
 export const read = async (id) => {
     let res = [];
@@ -89,14 +90,14 @@ export const read = async (id) => {
         .filter((item) => !!item)
         .map((item) => item.toString());
 
-    await test(`Read person(s) [${ids}]`, async () => {
-        const resExpected = App.state.persons.filter((item) => (
+    await test(`Read user currrencies [${ids}]`, async () => {
+        const resExpected = App.state.userCurrencies.filter((item) => (
             ids.includes(item?.id?.toString())
         ));
 
         let createRes;
         try {
-            createRes = await api.person.read(id);
+            createRes = await api.usercurrency.read(id);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -113,18 +114,18 @@ export const read = async (id) => {
 };
 
 /**
- * Reads list of persons
+ * Reads list of user currrencies
  * @param {Object} params - list filter object
  */
 export const list = async (params) => {
     let res = [];
 
-    await test(`Persons list (${formatProps(params)})`, async () => {
-        const { data: resExpected } = App.state.getPersons(params);
+    await test(`User currencies list (${formatProps(params)})`, async () => {
+        const { data: resExpected } = App.state.getUserCurrencies(params);
 
         let listRes;
         try {
-            listRes = await api.person.list(params);
+            listRes = await api.usercurrency.list(params);
             assert.deepMeet(listRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -141,25 +142,27 @@ export const list = async (params) => {
 };
 
 /**
- * Update person with specified params and check expected state of app
+ * Update user currency with specified params and check expected state of app
  * @param {Object} params
- * @param {string} params.id - person identifier
- * @param {string} params.name - name of person
+ * @param {string} params.id - identifier of user currency
+ * @param {number} params.curr_id - currrency id
+ * @param {number} params.flags - flags
  */
 export const update = async (params) => {
     let updateRes = false;
+    const props = structuredClone(params);
 
-    await test(`Update person (${formatProps(params)})`, async () => {
-        const resExpected = App.state.updatePerson(params);
+    await test(`Update user currency (${formatProps(props)})`, async () => {
+        const resExpected = App.state.updateUserCurrency(props);
 
-        const item = App.state.persons.getItem(params.id);
+        const item = App.state.userCurrencies.getItem(props.id);
         const updParams = (item) ? structuredClone(item) : {};
-        Object.assign(updParams, params);
+        Object.assign(updParams, props);
 
         const reqParams = App.state.prepareChainedRequestData(updParams);
 
         try {
-            updateRes = await api.person.update(reqParams);
+            updateRes = await api.usercurrency.update(reqParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -174,18 +177,18 @@ export const update = async (params) => {
 };
 
 /**
- * Delete specified person(s) and check expected state of app
- * @param {number[]} ids - array of person identificators
+ * Delete specified user currencies and check expected state of app
+ * @param {object} params - delete request object
  */
 export const del = async (params) => {
     let deleteRes = false;
 
-    await test(`Delete person (${params})`, async () => {
-        const resExpected = App.state.deletePersons(params);
+    await test(`Delete user currencies (${params})`, async () => {
+        const resExpected = App.state.deleteUserCurrencies(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.person.del(reqParams);
+            deleteRes = await api.usercurrency.del(reqParams);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -199,16 +202,16 @@ export const del = async (params) => {
     return deleteRes;
 };
 
-/** Set new position for specified person */
+/** Set new position for specified user currency */
 export const setPos = async (params) => {
     let result;
 
-    await test(`Set position of person (${formatProps(params)})`, async () => {
-        const resExpected = App.state.setPersonPos(params);
+    await test(`Set position of user currency (${formatProps(params)})`, async () => {
+        const resExpected = App.state.setUserCurrencyPos(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.person.setPos(reqParams);
+            result = await api.usercurrency.setPos(reqParams);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

@@ -6,13 +6,13 @@ import {
     baseUrl,
     goTo,
 } from 'jezve-test';
-import { MainView } from '../view/MainView.js';
-import { AccountListView } from '../view/AccountListView.js';
-import { generateId } from '../common.js';
-import { App } from '../Application.js';
-import { AccountView } from '../view/AccountView.js';
-import { __ } from '../model/locale.js';
-import { getAccountTypeName } from '../model/AccountsList.js';
+import { MainView } from '../../view/MainView.js';
+import { AccountListView } from '../../view/AccountListView.js';
+import { generateId } from '../../common.js';
+import { App } from '../../Application.js';
+import { AccountView } from '../../view/AccountView.js';
+import { __ } from '../../model/locale.js';
+import { getAccountTypeName } from '../../model/AccountsList.js';
 
 /** Navigate to accounts list page */
 const checkNavigation = async () => {

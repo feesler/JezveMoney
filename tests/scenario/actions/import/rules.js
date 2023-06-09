@@ -4,12 +4,12 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { App } from '../../Application.js';
-import { __ } from '../../model/locale.js';
-import { ImportTransaction } from '../../model/ImportTransaction.js';
-import { ImportCondition } from '../../model/ImportCondition.js';
-import { ImportAction } from '../../model/ImportAction.js';
-import { ImportView } from '../../view/ImportView.js';
+import { App } from '../../../Application.js';
+import { __ } from '../../../model/locale.js';
+import { ImportTransaction } from '../../../model/ImportTransaction.js';
+import { ImportCondition } from '../../../model/ImportCondition.js';
+import { ImportAction } from '../../../model/ImportAction.js';
+import { ImportView } from '../../../view/ImportView.js';
 
 /** Navigate to import page */
 const checkNavigation = async () => {

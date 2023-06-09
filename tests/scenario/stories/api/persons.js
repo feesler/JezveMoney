@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/person.js';
+import * as Actions from '../../actions/api/person.js';
 
 const create = async () => {
     setBlock('Create persons', 2);

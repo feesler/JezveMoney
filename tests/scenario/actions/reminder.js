@@ -3,10 +3,10 @@ import {
     assert,
     asArray,
 } from 'jezve-test';
-import { ReminderListView } from '../view/ReminderListView.js';
-import { App } from '../Application.js';
-import { TransactionView } from '../view/TransactionView.js';
-import { Reminder } from '../model/Reminder.js';
+import { ReminderListView } from '../../view/ReminderListView.js';
+import { App } from '../../Application.js';
+import { TransactionView } from '../../view/TransactionView.js';
+import { Reminder } from '../../model/Reminder.js';
 
 /** Navigate to reminders page */
 const checkNavigation = async () => {

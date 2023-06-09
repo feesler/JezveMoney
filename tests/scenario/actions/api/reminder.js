@@ -1,8 +1,8 @@
 import { test, assert } from 'jezve-test';
-import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { formatProps } from '../../common.js';
-import { App } from '../../Application.js';
+import { api } from '../../../model/api.js';
+import { ApiRequestError } from '../../../error/ApiRequestError.js';
+import { formatProps } from '../../../common.js';
+import { App } from '../../../Application.js';
 
 /**
  * Confirms reminder with specified params and check expected state of app

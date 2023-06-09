@@ -3,9 +3,9 @@ import {
     asArray,
     assert,
 } from 'jezve-test';
-import { App } from '../Application.js';
-import { Transaction } from '../model/Transaction.js';
-import { StatisticsView } from '../view/StatisticsView.js';
+import { App } from '../../Application.js';
+import { Transaction } from '../../model/Transaction.js';
+import { StatisticsView } from '../../view/StatisticsView.js';
 
 /** Navigate to statistics page */
 const checkNavigation = async () => {

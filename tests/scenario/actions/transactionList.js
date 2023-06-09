@@ -5,10 +5,10 @@ import {
     goTo,
     asArray,
 } from 'jezve-test';
-import { App } from '../Application.js';
-import { TransactionListView } from '../view/TransactionListView.js';
-import { Transaction } from '../model/Transaction.js';
-import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
+import { App } from '../../Application.js';
+import { TransactionListView } from '../../view/TransactionListView.js';
+import { Transaction } from '../../model/Transaction.js';
+import { TransactionList } from '../../view/component/TransactionList/TransactionList.js';
 
 /** Navigate to transactions list page */
 const checkNavigation = async () => {

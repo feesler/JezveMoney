@@ -6,8 +6,8 @@ import {
     httpReq,
     setBlock,
 } from 'jezve-test';
-import { App } from '../../Application.js';
-import { ImportView } from '../../view/ImportView.js';
+import { App } from '../../../Application.js';
+import { ImportView } from '../../../view/ImportView.js';
 
 /** Reexport import templates and import rules runners */
 export * from './templates.js';
