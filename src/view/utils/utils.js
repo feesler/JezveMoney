@@ -263,11 +263,19 @@ export const __ = (token, ...args) => {
     if (typeof token !== 'string') {
         throw new Error('Invalid token');
     }
-    if (typeof localeTokens[token] !== 'string') {
-        throw new Error(`Token ${token} not found`);
-    }
 
-    return formatTokenString(localeTokens[token], args);
+    const tokenPath = token.split('.');
+    const path = [];
+    const tokenString = tokenPath.reduce((res, key) => {
+        path.push(key);
+        if (typeof res[key] === 'undefined') {
+            throw new Error(`Token ${path.join('.')} not found`);
+        }
+
+        return res[key];
+    }, localeTokens);
+
+    return formatTokenString(tokenString, args);
 };
 /* eslint-enable no-underscore-dangle */
 

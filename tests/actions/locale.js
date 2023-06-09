@@ -1,4 +1,4 @@
-import { assert, test } from 'jezve-test';
+import { assert, isObject, test } from 'jezve-test';
 import { App } from '../Application.js';
 import { tokensMap } from '../model/locale.js';
 import { AccountListView } from '../view/AccountListView.js';
@@ -18,6 +18,58 @@ const translateExceptions = [
     'APP_NAME',
 ];
 
+/**
+ * Compares structure and translation of token object according to reference
+ * Throws in case of error
+ *
+ * @param {Object} tokens tokens object to test
+ * @param {Object} referenceTokens reference tokens object
+ * @param {string} locale current locale name
+ * @param {string} currentPath current path of tokens in the locale object
+ */
+const compareTokenObjects = (tokens, referenceTokens, locale, currentPath = '') => {
+    const refTokenNames = Object.keys(referenceTokens);
+
+    // Check all tokens from base locale present in the current locale and translated
+    refTokenNames.forEach((name) => {
+        const reference = referenceTokens[name];
+        const token = tokens[name];
+        const currentKeyPath = `${currentPath}.${name}`;
+
+        if (isObject(reference)) {
+            assert.isObject(token, `Value '${currentKeyPath}' expected to be object at locale '${locale}'`);
+
+            compareTokenObjects(token, reference, locale, currentKeyPath);
+        } else if (typeof reference === 'string') {
+            assert.isString(token, `Token '${currentKeyPath}' not defined at locale '${locale}'`);
+
+            if (!translateExceptions.includes(name)) {
+                assert.notEqual(token, reference, `Token '${currentKeyPath}' not translated`);
+            }
+        } else {
+            throw new Error(`Invalid type of value '${currentKeyPath}' at base locale`);
+        }
+    });
+
+    // Check current locale not includes excess tokens
+    const tokenNames = Object.keys(tokens);
+    tokenNames.forEach((name) => {
+        const reference = referenceTokens[name];
+        const token = tokens[name];
+        const currentKeyPath = `${currentPath}.${name}`;
+
+        if (isObject(token)) {
+            assert.isObject(reference, `Invalid token '${currentKeyPath}' at locale '${locale}'`);
+        } else if (typeof token === 'string') {
+            assert.isString(reference, `Invalid token '${currentKeyPath}' at locale '${locale}'`);
+        } else {
+            throw new Error(`Invalid type of value '${currentKeyPath}' at locale '${locale}'`);
+        }
+    });
+
+    return true;
+};
+
 export const translationTest = async () => {
     const [baseLocale, ...locales] = Object.keys(tokensMap);
     await test('Base locale', () => {
@@ -25,33 +77,10 @@ export const translationTest = async () => {
         return true;
     });
 
-    const baseTokens = tokensMap[baseLocale];
-    const baseTokenNames = Object.keys(baseTokens);
-
     for (const locale of locales) {
-        await test(`Locale translation [${locale}]`, () => {
-            const localeTokens = tokensMap[locale];
-
-            // Check all tokens from base locale present in the current locale and translated
-            baseTokenNames.forEach((name) => {
-                const token = localeTokens[name];
-                assert.isString(token, `Token '${name}' not defined at locale '${locale}'`);
-
-                if (translateExceptions.includes(name)) {
-                    return;
-                }
-
-                assert(token !== baseTokens[name], `Token '${name}' not translated at locale '${locale}'`);
-            });
-
-            // Check current locale not includes excess tokens
-            const tokenNames = Object.keys(localeTokens);
-            tokenNames.forEach((name) => {
-                assert.isString(baseTokens[name], `Unknown token '${name}' at locale '${locale}'`);
-            });
-
-            return true;
-        });
+        await test(`Locale translation [${locale}]`, () => (
+            compareTokenObjects(tokensMap[locale], tokensMap[baseLocale], locale)
+        ));
     }
 };
 

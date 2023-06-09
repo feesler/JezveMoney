@@ -89,7 +89,7 @@ class AccountView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('ACCOUNT_UPDATE') : __('ACCOUNT_CREATE'),
+            title: (isUpdate) ? __('accounts.update') : __('accounts.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -121,7 +121,7 @@ class AccountView extends View {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('ACCOUNT_NAME'),
+            title: __('accounts.name'),
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
@@ -139,8 +139,8 @@ class AccountView extends View {
         // Initial balance field
         this.initBalanceField = AmountInputField.create({
             id: 'initBalanceField',
-            title: __('ACCOUNT_INITIAL_BALANCE'),
-            feedbackMessage: __('ACCOUNT_INVALID_BALANCE'),
+            title: __('accounts.initialBalance'),
+            feedbackMessage: __('accounts.invalidBalance'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onInitBalanceInput(e),
@@ -150,8 +150,8 @@ class AccountView extends View {
         // Initial credit limit field
         this.initLimitField = AmountInputField.create({
             id: 'initLimitField',
-            title: __('ACCOUNT_INITIAL_CREDIT_LIMIT'),
-            feedbackMessage: __('ACCOUNT_INVALID_LIMIT'),
+            title: __('accounts.initialCreditLimit'),
+            feedbackMessage: __('accounts.invalidLimit'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onLimitInput(e),
@@ -235,12 +235,12 @@ class AccountView extends View {
 
         const { name, initbalance, initlimit } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_INVALID_NAME')));
+            this.store.dispatch(actions.invalidateNameField(__('accounts.invalidName')));
             this.nameField.focus();
         } else {
             const account = window.app.model.accounts.findByName(name);
             if (account && state.original.id !== account.id) {
-                this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_EXISTING_NAME')));
+                this.store.dispatch(actions.invalidateNameField(__('accounts.existingName')));
                 this.nameField.focus();
             }
         }
@@ -334,8 +334,8 @@ class AccountView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('ACCOUNT_DELETE'),
-            content: __('MSG_ACCOUNT_DELETE'),
+            title: __('accounts.delete'),
+            content: __('accounts.deleteMessage'),
             onConfirm: () => this.deleteAccount(),
         });
     }
@@ -355,7 +355,7 @@ class AccountView extends View {
             + state.data.fInitBalance - state.original.initbalance;
 
         const name = (!state.original.id && !state.nameChanged)
-            ? __('ACCOUNT_NAME_NEW')
+            ? __('accounts.nameNew')
             : state.data.name;
 
         this.tile.setState((tileState) => ({

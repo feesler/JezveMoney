@@ -123,9 +123,16 @@ class Locale
             throw new \Error("Invalid token");
         }
 
-        $res = static::$tokens[$token] ?? null;
-        if (is_null($res)) {
-            throw new \Error("Token '$token' not found");
+        $tokenPath = explode(".", $token);
+        $res = static::$tokens;
+        $validPath = [];
+        foreach ($tokenPath as $key) {
+            $res = $res[$key] ?? null;
+            $validPath[] = $key;
+            if (is_null($res)) {
+                $notFound = implode(".", $validPath);
+                throw new \Error("Token '$notFound' not found");
+            }
         }
 
         return $res;

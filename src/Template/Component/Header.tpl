@@ -37,7 +37,7 @@
     <ul class="nav-list">
         <?php if ($this->user_id != 0) {        ?>
             <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>accounts/"><?= __("ACCOUNTS") ?></a>
+                <a class="nav-item__link" href="<?= BASEURL ?>accounts/"><?= __("accounts.listTitle") ?></a>
                 <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
                     <?= useIcon("plus-light", "btn__icon") ?>
                 </a>

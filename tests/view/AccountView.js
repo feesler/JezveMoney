@@ -218,7 +218,7 @@ export class AccountView extends AppView {
         const accTile = Tile.renderAccount(account);
 
         if (!model.nameTyped && !model.isUpdate) {
-            accTile.title = __('ACCOUNT_NAME_NEW', this.locale);
+            accTile.title = __('accounts.nameNew', this.locale);
         }
 
         accTile.visible = true;
@@ -243,7 +243,7 @@ export class AccountView extends AppView {
                 visible: true,
             },
             iconDropDown: {
-                textValue: __(model.tileIcon.name, this.locale),
+                textValue: __(`icons.${model.tileIcon.name}`, this.locale),
                 visible: true,
             },
         };

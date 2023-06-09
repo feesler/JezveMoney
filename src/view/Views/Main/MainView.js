@@ -172,7 +172,7 @@ class MainView extends View {
             items: [{
                 id: 'accounts',
                 value: 'accounts',
-                title: __('ACCOUNTS'),
+                title: __('accounts.listTitle'),
                 content: [
                     this.visibleAccounts.elem,
                     this.hiddenAccounts.elem,

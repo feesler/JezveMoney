@@ -204,12 +204,12 @@ class TransactionListView extends View {
             window.app.appendAccounts(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'a',
-                group: __('ACCOUNTS'),
+                group: __('accounts.listTitle'),
             });
             window.app.appendAccounts(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'a',
-                group: __('ACCOUNTS_HIDDEN'),
+                group: __('accounts.hiddenListTitle'),
             });
             window.app.appendPersons(this.accountDropDown, {
                 visible: true,

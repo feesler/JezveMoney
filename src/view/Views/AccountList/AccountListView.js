@@ -109,7 +109,7 @@ class AccountListView extends View {
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
-            noItemsMessage: __('ACCOUNTS_NO_DATA'),
+            noItemsMessage: __('accounts.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };
@@ -127,7 +127,7 @@ class AccountListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('ACCOUNTS'),
+            title: __('accounts.listTitle'),
         });
 
         this.createBtn = Button.create({
@@ -487,8 +487,8 @@ class AccountListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? __('ACCOUNT_DELETE_MULTIPLE') : __('ACCOUNT_DELETE'),
-            content: (multiple) ? __('MSG_ACCOUNT_DELETE_MULTIPLE') : __('MSG_ACCOUNT_DELETE'),
+            title: (multiple) ? __('accounts.deleteMultiple') : __('accounts.delete'),
+            content: (multiple) ? __('accounts.deleteMultipleMessage') : __('accounts.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -591,7 +591,7 @@ class AccountListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('ACCOUNTS')}`;
+        const pageTitle = `${__('APP_NAME')} | ${__('accounts.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

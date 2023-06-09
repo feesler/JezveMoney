@@ -30,12 +30,12 @@ export const ACCOUNT_TYPE_DEPOSIT = 5;
 
 /** Account type names map */
 export const accountTypes = {
-    [ACCOUNT_TYPE_OTHER]: 'ACCOUNT_TYPE_OTHER',
-    [ACCOUNT_TYPE_CASH]: 'ACCOUNT_TYPE_CASH',
-    [ACCOUNT_TYPE_DEBIT_CARD]: 'ACCOUNT_TYPE_DEBIT_CARD',
-    [ACCOUNT_TYPE_CREDIT_CARD]: 'ACCOUNT_TYPE_CREDIT_CARD',
-    [ACCOUNT_TYPE_CREDIT]: 'ACCOUNT_TYPE_CREDIT',
-    [ACCOUNT_TYPE_DEPOSIT]: 'ACCOUNT_TYPE_DEPOSIT',
+    [ACCOUNT_TYPE_OTHER]: 'accounts.types.other',
+    [ACCOUNT_TYPE_CASH]: 'accounts.types.cash',
+    [ACCOUNT_TYPE_DEBIT_CARD]: 'accounts.types.debitCard',
+    [ACCOUNT_TYPE_CREDIT_CARD]: 'accounts.types.creditCard',
+    [ACCOUNT_TYPE_CREDIT]: 'accounts.types.credit',
+    [ACCOUNT_TYPE_DEPOSIT]: 'accounts.types.deposit',
 };
 
 /** Returns string for account type name */

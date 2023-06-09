@@ -97,7 +97,7 @@ export const changeCurrency = async (value) => {
 
 export const changeIcon = async (value) => {
     const icon = App.icons.getItem(value);
-    const name = (icon) ? __(icon.name, 'en') : `(${value})`;
+    const name = (icon) ? __(`icons.${icon.name}`, 'en') : `(${value})`;
 
     await test(`Change icon to '${name}'`, () => App.view.changeIcon(value));
 };
