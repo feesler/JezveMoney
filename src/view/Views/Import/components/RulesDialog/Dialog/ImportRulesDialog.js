@@ -1,7 +1,6 @@
 import {
     re,
     show,
-    insertAfter,
     isFunction,
     Component,
     createElement,
@@ -23,8 +22,13 @@ import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import './ImportRulesDialog.scss';
 
 /** CSS classes */
-export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
-const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
+const DIALOG_CLASS = 'rules-dialog';
+const POPUP_CLASS = 'rules-popup';
+const HEADER_CLASS = 'rules-header';
+const CREATE_BTN_CLASS = 'create-btn';
+const DIALOG_CONTENT_CLASS = 'rules-content';
+const LIST_CONTAINER_CLASS = 'rules-list-container';
+const LIST_CLASS = 'rules-list';
 
 /* Dialogs states */
 const LIST_STATE = 1;
@@ -46,28 +50,42 @@ export class ImportRulesDialog extends Component {
             ctxDeleteRuleBtn: () => this.onDeleteItem(),
         };
 
-        this.headerElem = this.elem.querySelector('.rules-header');
-        this.titleElem = this.headerElem?.querySelector('label');
-        this.rulesContent = this.elem.querySelector('.rules-content');
-        if (
-            !this.titleElem
-            || !this.rulesContent
-        ) {
-            throw new Error('Failed to initialize import rules dialog');
-        }
+        this.init();
+        this.reset();
+    }
 
+    init() {
+        // Header title
+        this.titleElem = createElement('label', { props: { textContent: __('IMPORT_RULES') } });
+
+        // Create new rule button
         this.createRuleBtn = Button.create({
             id: 'createRuleBtn',
-            className: 'create-btn',
+            className: CREATE_BTN_CLASS,
             icon: 'plus',
             onClick: () => this.onCreateRuleClick(),
         });
-        this.headerElem.append(this.createRuleBtn.elem);
 
+        // Header
+        this.headerElem = createElement('div', {
+            props: { className: HEADER_CLASS },
+            children: [
+                this.titleElem,
+                this.createRuleBtn.elem,
+            ],
+        });
+
+        // Search input
+        this.searchInput = SearchInput.create({
+            placeholder: __('TYPE_TO_FILTER'),
+            onChange: (value) => this.onSearchInputChange(value),
+        });
+
+        // Rules list
         this.rulesList = ListContainer.create({
             ItemComponent: ImportRuleItem,
-            className: 'rules-list',
-            itemSelector: '.rule-item',
+            className: LIST_CLASS,
+            itemSelector: ImportRuleItem.selector,
             getItemProps: (rule) => ({
                 data: rule,
                 ruleId: rule.id,
@@ -77,24 +95,38 @@ export class ImportRulesDialog extends Component {
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
-        this.listContainer = createElement('div', {
-            props: { className: 'rules-list-container' },
-            children: this.rulesList.elem,
-        });
-        this.rulesContent.append(this.listContainer);
-
-        this.searchInput = SearchInput.create({
-            placeholder: __('TYPE_TO_FILTER'),
-            onChange: (value) => this.onSearchInputChange(value),
-        });
-        insertAfter(this.searchInput.elem, this.headerElem);
-
+        // Paginator
         this.paginator = Paginator.create({
             arrows: true,
             onChange: (page) => this.onChangePage(page),
         });
 
-        this.listContainer.append(this.paginator.elem);
+        this.listContainer = createElement('div', {
+            props: { className: LIST_CONTAINER_CLASS },
+            children: [
+                this.rulesList.elem,
+                this.paginator.elem,
+            ],
+        });
+
+        // Dialog content
+        this.rulesContent = createElement('div', {
+            props: { className: DIALOG_CONTENT_CLASS },
+            children: this.listContainer,
+        });
+
+        // Loading indicator
+        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
+
+        this.elem = createElement('div', {
+            props: { className: DIALOG_CLASS },
+            children: [
+                this.headerElem,
+                this.searchInput.elem,
+                this.rulesContent,
+                this.loadingIndicator.elem,
+            ],
+        });
 
         this.popup = Popup.create({
             id: 'rules_popup',
@@ -102,14 +134,9 @@ export class ImportRulesDialog extends Component {
             title: this.headerElem,
             closeButton: true,
             onClose: () => this.onClose(),
-            className: IMPORT_RULES_POPUP_CLASS,
+            className: POPUP_CLASS,
         });
         show(this.elem, true);
-
-        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
-        this.elem.append(this.loadingIndicator.elem);
-
-        this.reset();
     }
 
     onContextMenuClick(item) {

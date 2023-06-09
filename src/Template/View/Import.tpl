@@ -50,7 +50,6 @@
 </div>
 
 <?php include(TPL_PATH . "Component/ImportUploadDialog.tpl");    ?>
-<?php include(TPL_PATH . "Component/ImportRulesDialog.tpl");    ?>
 
 <?php include(ICONS_PATH . "Common.tpl");    ?>
 <?php include(TPL_PATH . "Footer.tpl");    ?>

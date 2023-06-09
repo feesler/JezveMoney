@@ -16,11 +16,18 @@ import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import './ImportRuleItem.scss';
 
+/* CSS classes */
+const ITEM_CLASS = 'rule-item';
+
 /**
  * ImportRuleItem component
  * @param {Object} props
  */
 export class ImportRuleItem extends Component {
+    static get selector() {
+        return `.${ITEM_CLASS}`;
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -83,7 +90,7 @@ export class ImportRuleItem extends Component {
 
         this.collapse = Collapsible.create({
             toggleOnClick: false,
-            className: 'rule-item',
+            className: ITEM_CLASS,
             header: [this.infoContainer, this.controls],
             content: [
                 this.conditionsHeader,

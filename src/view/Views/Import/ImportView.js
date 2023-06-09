@@ -29,7 +29,7 @@ import { ImportTemplateList } from '../../Models/ImportTemplateList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
-import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
+import { ImportRulesDialog } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportListContextMenu } from './components/ContextMenu/ImportListContextMenu.js';
 import { ImportTransactionList } from './components/List/ImportTransactionList.js';
 import { ImportListMainMenu } from './components/MainMenu/ImportListMainMenu.js';
@@ -656,7 +656,6 @@ class ImportView extends View {
     showRulesDialog() {
         if (!this.rulesDialog) {
             this.rulesDialog = ImportRulesDialog.create({
-                elem: document.querySelector(`.${IMPORT_RULES_DIALOG_CLASS}`),
                 onUpdate: () => this.onUpdateRules(),
             });
         }
