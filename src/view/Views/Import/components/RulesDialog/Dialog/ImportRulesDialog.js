@@ -26,7 +26,12 @@ import './ImportRulesDialog.scss';
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
 const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
 
-/** Other */
+/* Dialogs states */
+const LIST_STATE = 1;
+const CREATE_STATE = 2;
+const UPDATE_STATE = 3;
+
+/* Other */
 const SHOW_ON_PAGE = 20;
 
 /**
@@ -40,10 +45,6 @@ export class ImportRulesDialog extends Component {
             ctxUpdateRuleBtn: () => this.onUpdateItem(),
             ctxDeleteRuleBtn: () => this.onDeleteItem(),
         };
-
-        this.LIST_STATE = 1;
-        this.CREATE_STATE = 2;
-        this.UPDATE_STATE = 3;
 
         this.headerElem = this.elem.querySelector('.rules-header');
         this.titleElem = this.headerElem?.querySelector('label');
@@ -135,7 +136,7 @@ export class ImportRulesDialog extends Component {
     /** Reset dialog state */
     reset() {
         this.state = {
-            id: this.LIST_STATE,
+            id: LIST_STATE,
             listLoading: false,
             filter: '',
             items: [],
@@ -218,7 +219,7 @@ export class ImportRulesDialog extends Component {
 
     /** Set create rule state */
     setCreateRuleState() {
-        this.state.id = this.CREATE_STATE;
+        this.state.id = CREATE_STATE;
         this.state.rule = new ImportRule({
             flags: 0,
             conditions: [],
@@ -235,7 +236,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Rule not found');
         }
 
-        this.state.id = this.UPDATE_STATE;
+        this.state.id = UPDATE_STATE;
 
         const rule = {
             ...item,
@@ -259,7 +260,7 @@ export class ImportRulesDialog extends Component {
 
     onItemClick(itemId, e) {
         if (
-            this.state.id !== this.LIST_STATE
+            this.state.id !== LIST_STATE
             || !e.target.closest('.menu-btn')
         ) {
             return;
@@ -337,7 +338,7 @@ export class ImportRulesDialog extends Component {
         const { rules } = window.app.model;
 
         rules.setData(data);
-        this.state.id = this.LIST_STATE;
+        this.state.id = LIST_STATE;
         this.state.contextItem = null;
         this.updateList();
 
@@ -484,12 +485,12 @@ export class ImportRulesDialog extends Component {
             this.loadingIndicator.show();
         }
 
-        if (state.id === this.LIST_STATE) {
+        if (state.id === LIST_STATE) {
             this.titleElem.textContent = __('IMPORT_RULES');
 
             this.renderList(state);
-        } else if (state.id === this.CREATE_STATE || state.id === this.UPDATE_STATE) {
-            this.titleElem.textContent = (state.id === this.CREATE_STATE)
+        } else if (state.id === CREATE_STATE || state.id === UPDATE_STATE) {
+            this.titleElem.textContent = (state.id === CREATE_STATE)
                 ? __('IMPORT_RULE_CREATE')
                 : __('IMPORT_RULE_UPDATE');
 
