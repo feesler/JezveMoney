@@ -582,10 +582,10 @@ export class AppState {
         const res = {};
 
         if (request.currency) {
-            res.currency = this.getCurrency(App.currency);
+            res.currency = this.getCurrencies(request.currency);
         }
         if (request.icons) {
-            res.icons = this.getIcons(App.icons);
+            res.icons = this.getIcons(request.icons);
         }
         if (request.accounts) {
             res.accounts = this.getAccounts(request.accounts);
@@ -609,7 +609,7 @@ export class AppState {
             res.categories = this.getCategories(request.categories);
         }
         if (request.importtemplates) {
-            res.categories = this.getImportTemplates(request.importtemplates);
+            res.importtemplates = this.getImportTemplates(request.importtemplates);
         }
         if (request.importrules) {
             res.importrules = this.getImportRules(request.importrules);
