@@ -10,6 +10,7 @@ import {
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import './Header.scss';
+import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
 
 /* CSS classes */
 const SHOW_ACTIONS_CLASS = 'show-actions';
@@ -38,6 +39,10 @@ export class Header extends Component {
         }
 
         this.navigationContent = document.querySelector('.main-navigation');
+
+        this.navigationMenu = NavigationMenu.create();
+        this.navigationContent.append(this.navigationMenu.elem);
+
         this.navigation = Offcanvas.create({
             content: this.navigationContent,
             className: 'navigation main-navigation-offcanvas',

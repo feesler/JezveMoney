@@ -116,6 +116,10 @@ export class Application {
         return this.config.decimalFormatOptions;
     }
 
+    isUserLoggedIn() {
+        return !!this.model.profile?.user_id;
+    }
+
     isValidDateString(value, params = {}) {
         return isValidDateString(value, {
             locales: this.dateFormatLocale,
