@@ -6,74 +6,74 @@ import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
 const create = async () => {
     setBlock('Create import template', 2);
 
-    const data = [{
-        name: 'Template 1',
-        type_id: 0,
-        first_row: 2,
-        date_locale: IMPORT_DATE_LOCALE,
-        account_id: App.scenario.CASH_RUB,
-        account_amount_col: 1,
-        account_curr_col: 2,
-        trans_amount_col: 3,
-        trans_curr_col: 4,
-        date_col: 5,
-        comment_col: 6,
-    }, {
-        name: 'Template 2',
-        type_id: 1,
-        first_row: 2,
-        date_locale: IMPORT_DATE_LOCALE,
-        account_id: App.scenario.ACC_RUB,
-        account_amount_col: 1,
-        account_curr_col: 2,
-        trans_amount_col: 1,
-        trans_curr_col: 2,
-        date_col: 5,
-        comment_col: 5,
-    }, {
-        name: 'Template 3',
-        type_id: 0,
-        first_row: 3,
-        account_id: 0,
-        date_locale: IMPORT_DATE_LOCALE,
-        account_amount_col: 10,
-        account_curr_col: 20,
-        trans_amount_col: 30,
-        trans_curr_col: 40,
-        date_col: 50,
-        comment_col: 60,
-    }];
+    const data = {
+        TEMPLATE_1: {
+            name: 'Template 1',
+            type_id: 0,
+            first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
+            account_id: App.scenario.CASH_RUB,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 3,
+            trans_curr_col: 4,
+            date_col: 5,
+            comment_col: 6,
+        },
+        TEMPLATE_2: {
+            name: 'Template 2',
+            type_id: 1,
+            first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
+            account_id: App.scenario.ACC_RUB,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 1,
+            trans_curr_col: 2,
+            date_col: 5,
+            comment_col: 5,
+        },
+        TEMPLATE_3: {
+            name: 'Template 3',
+            type_id: 0,
+            first_row: 3,
+            account_id: 0,
+            date_locale: IMPORT_DATE_LOCALE,
+            account_amount_col: 10,
+            account_curr_col: 20,
+            trans_amount_col: 30,
+            trans_curr_col: 40,
+            date_col: 50,
+            comment_col: 60,
+        },
+    };
 
-    [
-        App.scenario.TEMPLATE_1,
-        App.scenario.TEMPLATE_2,
-        App.scenario.TEMPLATE_3,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
     setBlock('Create import template with chained request', 2);
 
-    const data = [{
-        name: 'Template chained',
-        type_id: 0,
-        first_row: 2,
-        date_locale: 'en',
-        account_id: App.scenario.CASH_RUB,
-        account_amount_col: 10,
-        account_curr_col: 20,
-        trans_amount_col: 30,
-        trans_curr_col: 40,
-        date_col: 50,
-        comment_col: 60,
-        returnState: {
-            importtemplates: {},
+    const data = {
+        TEMPLATE_CHAINED: {
+            name: 'Template chained',
+            type_id: 0,
+            first_row: 2,
+            date_locale: 'en',
+            account_id: App.scenario.CASH_RUB,
+            account_amount_col: 10,
+            account_curr_col: 20,
+            trans_amount_col: 30,
+            trans_curr_col: 40,
+            date_col: 50,
+            comment_col: 60,
+            returnState: {
+                importtemplates: {},
+            },
         },
-    }];
+    };
 
-    [
-        App.scenario.TEMPLATE_CHAINED,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {

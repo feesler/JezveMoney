@@ -15,35 +15,31 @@ const create = async () => {
 
     const { RUB, USD } = App.scenario;
 
-    const data = [{
-        type: ACCOUNT_TYPE_DEBIT_CARD,
-        name: 'acc ru',
-        curr_id: RUB,
-        initbalance: 100,
-        icon_id: 1,
-    }, {
-        type: ACCOUNT_TYPE_CASH,
-        name: 'cash ru',
-        curr_id: RUB,
-        initbalance: 5000,
-        icon_id: 3,
-    }, {
-        type: ACCOUNT_TYPE_DEBIT_CARD,
-        name: 'acc usd',
-        curr_id: USD,
-        initbalance: 10.5,
-        icon_id: 5,
-    }];
+    const data = {
+        ACC_RUB: {
+            type: ACCOUNT_TYPE_DEBIT_CARD,
+            name: 'acc ru',
+            curr_id: RUB,
+            initbalance: 100,
+            icon_id: 1,
+        },
+        CASH_RUB: {
+            type: ACCOUNT_TYPE_CASH,
+            name: 'cash ru',
+            curr_id: RUB,
+            initbalance: 5000,
+            icon_id: 3,
+        },
+        ACC_USD: {
+            type: ACCOUNT_TYPE_DEBIT_CARD,
+            name: 'acc usd',
+            curr_id: USD,
+            initbalance: 10.5,
+            icon_id: 5,
+        },
+    };
 
-    const res = await App.scenario.runner.runGroup(Actions.create, data);
-    // Double check all accounts are created
-    res.forEach((item) => assert(item, 'Failed to create account'));
-
-    [
-        App.scenario.ACC_RUB,
-        App.scenario.CASH_RUB,
-        App.scenario.ACC_USD,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -51,34 +47,30 @@ const createWithChainedRequest = async () => {
 
     const { RUB, USD } = App.scenario;
 
-    const data = [{
-        type: ACCOUNT_TYPE_OTHER,
-        name: 'Chained rub',
-        curr_id: RUB,
-        initbalance: 100,
-        flags: ACCOUNT_HIDDEN,
-        returnState: {
-            accounts: { visibility: 'visible' },
+    const data = {
+        ACC_CHAINED_RUB: {
+            type: ACCOUNT_TYPE_OTHER,
+            name: 'Chained rub',
+            curr_id: RUB,
+            initbalance: 100,
+            flags: ACCOUNT_HIDDEN,
+            returnState: {
+                accounts: { visibility: 'visible' },
+            },
         },
-    }, {
-        type: ACCOUNT_TYPE_OTHER,
-        name: 'Chained usd',
-        curr_id: USD,
-        initbalance: 50,
-        icon_id: 2,
-        returnState: {
-            accounts: { visibility: 'all' },
+        ACC_CHAINED_USD: {
+            type: ACCOUNT_TYPE_OTHER,
+            name: 'Chained usd',
+            curr_id: USD,
+            initbalance: 50,
+            icon_id: 2,
+            returnState: {
+                accounts: { visibility: 'all' },
+            },
         },
-    }];
+    };
 
-    const res = await App.scenario.runner.runGroup(Actions.create, data);
-    // Double check all accounts are created
-    res.forEach((item) => assert(item, 'Failed to create account'));
-
-    [
-        App.scenario.ACC_CHAINED_RUB,
-        App.scenario.ACC_CHAINED_USD,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -147,43 +139,39 @@ const createMultiple = async () => {
 
     const { RUB, USD, BTC } = App.scenario;
 
-    const data = [{
-        type: ACCOUNT_TYPE_CASH,
-        name: 'Account 1',
-        curr_id: RUB,
-        initbalance: 100,
-    }, {
-        type: ACCOUNT_TYPE_DEBIT_CARD,
-        name: 'Account 2',
-        curr_id: RUB,
-        initbalance: 0,
-        icon_id: 4,
-    }, {
-        type: ACCOUNT_TYPE_CREDIT_CARD,
-        name: 'Account 3',
-        curr_id: USD,
-        initbalance: 100,
-        initlimit: 100,
-        icon_id: 5,
-    }, {
-        type: ACCOUNT_TYPE_CREDIT_CARD,
-        name: 'BTC_CREDIT',
-        curr_id: BTC,
-        initbalance: 0.123456,
-        initlimit: 0.125,
-        icon_id: 3,
-    }];
+    const data = {
+        ACCOUNT_1: {
+            type: ACCOUNT_TYPE_CASH,
+            name: 'Account 1',
+            curr_id: RUB,
+            initbalance: 100,
+        },
+        ACCOUNT_2: {
+            type: ACCOUNT_TYPE_DEBIT_CARD,
+            name: 'Account 2',
+            curr_id: RUB,
+            initbalance: 0,
+            icon_id: 4,
+        },
+        ACCOUNT_3: {
+            type: ACCOUNT_TYPE_CREDIT_CARD,
+            name: 'Account 3',
+            curr_id: USD,
+            initbalance: 100,
+            initlimit: 100,
+            icon_id: 5,
+        },
+        BTC_CREDIT: {
+            type: ACCOUNT_TYPE_CREDIT_CARD,
+            name: 'BTC_CREDIT',
+            curr_id: BTC,
+            initbalance: 0.123456,
+            initlimit: 0.125,
+            icon_id: 3,
+        },
+    };
 
-    const res = await Actions.createMultiple(data);
-    // Double check all accounts are created
-    res.forEach((item) => assert(item, 'Failed to create account'));
-
-    [
-        App.scenario.ACCOUNT_1,
-        App.scenario.ACCOUNT_2,
-        App.scenario.ACCOUNT_3,
-        App.scenario.BTC_CREDIT,
-    ] = res;
+    await App.scenario.createMultiple(Actions, data);
 };
 
 const createMultipleInvalid = async () => {

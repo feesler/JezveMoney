@@ -5,38 +5,38 @@ import * as Actions from '../../actions/api/person.js';
 const create = async () => {
     setBlock('Create persons', 2);
 
-    const data = [{
-        name: 'Person X',
-    }, {
-        name: 'Y',
-    }];
+    const data = {
+        PERSON_X: {
+            name: 'Person X',
+        },
+        PERSON_Y: {
+            name: 'Y',
+        },
+    };
 
-    [
-        App.scenario.PERSON_X,
-        App.scenario.PERSON_Y,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
     setBlock('Create persons with chained request', 2);
 
-    const data = [{
-        name: 'Person Z',
-        returnState: {
-            persons: { visibility: 'visible' },
+    const data = {
+        PERSON_CHAINED_Z: {
+            name: 'Person Z',
+            returnState: {
+                persons: { visibility: 'visible' },
+            },
         },
-    }, {
-        name: 'AA',
-        returnState: {
-            persons: { visibility: 'all' },
-            accounts: { visibility: 'all' },
+        PERSON_CHAINED_AA: {
+            name: 'AA',
+            returnState: {
+                persons: { visibility: 'all' },
+                accounts: { visibility: 'all' },
+            },
         },
-    }];
+    };
 
-    [
-        App.scenario.PERSON_CHAINED_Z,
-        App.scenario.PERSON_CHAINED_AA,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {

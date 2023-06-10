@@ -85,18 +85,21 @@ export class Scenario {
         this.runner = new Runner();
     }
 
+    assignKeys(keys, values) {
+        assert.isArray(keys, 'Invalid keys');
+        assert.isArray(values, 'Invalid values');
+        assert(keys.length === values.length, 'Invalid count of values');
+
+        keys.forEach((key, index) => {
+            assert(values[index], `Invalid value for '${key}'`);
+            this[key] = values[index];
+        });
+    }
+
     setupCurrencies() {
-        [
-            this.RUB,
-            this.USD,
-            this.EUR,
-            this.PLN,
-            this.KRW,
-            this.CNY,
-            this.JPY,
-            this.SEK,
-            this.BTC,
-        ] = App.currency.getItemsByCodes(['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK', 'BTC']);
+        const data = ['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK', 'BTC'];
+        const values = App.currency.getItemsByCodes(data);
+        this.assignKeys(data, values);
     }
 
     async run() {
@@ -159,6 +162,29 @@ export class Scenario {
 
             await this.runStory(story);
         }
+    }
+
+    /** Creates multiple items using API request and save result ids as fields of instance */
+    async createMultiple(controller, data) {
+        const isAPI = (typeof controller === 'string');
+        const action = (isAPI) ? api[controller] : controller;
+        assert.isFunction(action?.createMultiple, 'Invalid action');
+
+        const request = Object.values(data);
+        const keys = Object.keys(data);
+
+        const createRes = await action.createMultiple(request);
+        const values = (isAPI) ? createRes?.ids : createRes;
+        this.assignKeys(keys, values);
+    }
+
+    /** Creates multiple items using action and save result ids as fields of instance */
+    async createOneByOne(action, data) {
+        const request = Object.values(data);
+        const keys = Object.keys(data);
+
+        const createRes = await this.runner.runGroup(action, request);
+        this.assignKeys(keys, createRes);
     }
 
     /** Register test user and set 'Tester' access */

@@ -38,141 +38,134 @@ const create = async () => {
 
     const personXAccount = App.state.getPersonAccount(PERSON_X, RUB);
 
-    const data = [{
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 100,
-        comment: '11',
-        start_date: dateToSeconds(weekDate1),
-        end_date: null,
-        interval_type: INTERVAL_MONTH,
-        interval_step: 1,
-        interval_offset: 0,
-    }, {
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 7608,
-        dest_amount: 100,
-        dest_curr: EUR,
-        comment: '22',
-        category_id: FOOD_CATEGORY,
-        start_date: App.datesSec.now,
-        end_date: App.datesSec.weekAfter,
-        interval_type: INTERVAL_DAY,
-        interval_step: 2,
-        interval_offset: 0,
-    }, {
-        type: INCOME,
-        dest_id: ACC_RUB,
-        dest_amount: 1000.50,
-        comment: 'Salary',
-        start_date: App.datesSec.now,
-        end_date: null,
-        interval_type: INTERVAL_MONTH,
-        interval_step: 1,
-        interval_offset: 20,
-    }, {
-        type: INCOME,
-        dest_id: ACC_RUB,
-        dest_amount: 456,
-        start_date: dateToSeconds(weekDate2),
-        end_date: App.datesSec.now,
-        interval_type: INTERVAL_WEEK,
-        interval_step: 1,
-        interval_offset: [1, 2],
-    }, {
-        type: TRANSFER,
-        src_id: ACC_RUB,
-        dest_id: CASH_RUB,
-        src_amount: 500,
-        dest_amount: 500,
-        start_date: App.datesSec.now,
-        end_date: App.datesSec.weekAfter,
-        interval_type: INTERVAL_DAY,
-        interval_step: 2,
-        interval_offset: 0,
-    }, {
-        type: TRANSFER,
-        src_id: ACC_RUB,
-        dest_id: ACC_USD,
-        src_amount: 6500,
-        dest_amount: 100,
-        start_date: App.datesSec.yearAgo,
-        end_date: null,
-        interval_type: INTERVAL_MONTH,
-        interval_step: 1,
-        interval_offset: [],
-    }, {
-        type: DEBT,
-        src_id: personXAccount.id,
-        dest_id: 0,
-        src_amount: 500,
-        src_curr: RUB,
-        comment: 'к кк',
-        start_date: App.datesSec.now,
-        end_date: App.datesSec.weekAfter,
-        interval_type: INTERVAL_DAY,
-        interval_step: 2,
-        interval_offset: 0,
-    }, {
-        type: DEBT,
-        src_id: ACC_RUB,
-        dest_id: personXAccount.id,
-        dest_amount: 1000,
-        dest_curr: RUB,
-        comment: 'к',
-        start_date: App.datesSec.now,
-        end_date: null,
-        interval_type: INTERVAL_YEAR,
-        interval_step: 1,
-        interval_offset: 20,
-    }, {
-        type: LIMIT_CHANGE,
-        src_id: 0,
-        dest_id: ACCOUNT_3,
-        src_amount: 100,
-        dest_amount: 100,
-        src_curr: USD,
-        dest_curr: USD,
-        start_date: App.datesSec.now,
-        end_date: App.datesSec.weekAfter,
-        interval_type: INTERVAL_DAY,
-        interval_step: 2,
-        interval_offset: 0,
-    }, {
-        type: LIMIT_CHANGE,
-        src_id: BTC_CREDIT,
-        dest_id: 0,
-        src_amount: 0.01,
-        dest_amount: 0.01,
-        src_curr: BTC,
-        dest_curr: BTC,
-        start_date: App.datesSec.now,
-        end_date: null,
-        interval_type: INTERVAL_MONTH,
-        interval_step: 1,
-        interval_offset: 20,
-    }];
+    const data = {
+        SCHEDULED_TR_EXPENSE_1: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 100,
+            comment: '11',
+            start_date: dateToSeconds(weekDate1),
+            end_date: null,
+            interval_type: INTERVAL_MONTH,
+            interval_step: 1,
+            interval_offset: 0,
+        },
+        SCHEDULED_TR_EXPENSE_2: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 7608,
+            dest_amount: 100,
+            dest_curr: EUR,
+            comment: '22',
+            category_id: FOOD_CATEGORY,
+            start_date: App.datesSec.now,
+            end_date: App.datesSec.weekAfter,
+            interval_type: INTERVAL_DAY,
+            interval_step: 2,
+            interval_offset: 0,
+        },
+        SCHEDULED_TR_INCOME_1: {
+            type: INCOME,
+            dest_id: ACC_RUB,
+            dest_amount: 1000.50,
+            comment: 'Salary',
+            start_date: App.datesSec.now,
+            end_date: null,
+            interval_type: INTERVAL_MONTH,
+            interval_step: 1,
+            interval_offset: 20,
+        },
+        SCHEDULED_TR_INCOME_2: {
+            type: INCOME,
+            dest_id: ACC_RUB,
+            dest_amount: 456,
+            start_date: dateToSeconds(weekDate2),
+            end_date: App.datesSec.now,
+            interval_type: INTERVAL_WEEK,
+            interval_step: 1,
+            interval_offset: [1, 2],
+        },
+        SCHEDULED_TR_TRANSFER_1: {
+            type: TRANSFER,
+            src_id: ACC_RUB,
+            dest_id: CASH_RUB,
+            src_amount: 500,
+            dest_amount: 500,
+            start_date: App.datesSec.now,
+            end_date: App.datesSec.weekAfter,
+            interval_type: INTERVAL_DAY,
+            interval_step: 2,
+            interval_offset: 0,
+        },
+        SCHEDULED_TR_TRANSFER_2: {
+            type: TRANSFER,
+            src_id: ACC_RUB,
+            dest_id: ACC_USD,
+            src_amount: 6500,
+            dest_amount: 100,
+            start_date: App.datesSec.yearAgo,
+            end_date: null,
+            interval_type: INTERVAL_MONTH,
+            interval_step: 1,
+            interval_offset: [],
+        },
+        SCHEDULED_TR_DEBT_1: {
+            type: DEBT,
+            src_id: personXAccount.id,
+            dest_id: 0,
+            src_amount: 500,
+            src_curr: RUB,
+            comment: 'к кк',
+            start_date: App.datesSec.now,
+            end_date: App.datesSec.weekAfter,
+            interval_type: INTERVAL_DAY,
+            interval_step: 2,
+            interval_offset: 0,
+        },
+        SCHEDULED_TR_DEBT_2: {
+            type: DEBT,
+            src_id: ACC_RUB,
+            dest_id: personXAccount.id,
+            dest_amount: 1000,
+            dest_curr: RUB,
+            comment: 'к',
+            start_date: App.datesSec.now,
+            end_date: null,
+            interval_type: INTERVAL_YEAR,
+            interval_step: 1,
+            interval_offset: 20,
+        },
+        SCHEDULED_TR_LIMIT_1: {
+            type: LIMIT_CHANGE,
+            src_id: 0,
+            dest_id: ACCOUNT_3,
+            src_amount: 100,
+            dest_amount: 100,
+            src_curr: USD,
+            dest_curr: USD,
+            start_date: App.datesSec.now,
+            end_date: App.datesSec.weekAfter,
+            interval_type: INTERVAL_DAY,
+            interval_step: 2,
+            interval_offset: 0,
+        },
+        SCHEDULED_TR_LIMIT_2: {
+            type: LIMIT_CHANGE,
+            src_id: BTC_CREDIT,
+            dest_id: 0,
+            src_amount: 0.01,
+            dest_amount: 0.01,
+            src_curr: BTC,
+            dest_curr: BTC,
+            start_date: App.datesSec.now,
+            end_date: null,
+            interval_type: INTERVAL_MONTH,
+            interval_step: 1,
+            interval_offset: 20,
+        },
+    };
 
-    const res = await App.scenario.runner.runGroup(async (params) => {
-        const item = await Actions.extractAndCreate(params);
-        // Double check all transactions created
-        assert(item, 'Failed to create scheduled transaction');
-        return item;
-    }, data);
-
-    [
-        App.scenario.SCHEDULED_TR_EXPENSE_1,
-        App.scenario.SCHEDULED_TR_EXPENSE_2,
-        App.scenario.SCHEDULED_TR_INCOME_1,
-        App.scenario.SCHEDULED_TR_INCOME_2,
-        App.scenario.SCHEDULED_TR_TRANSFER_1,
-        App.scenario.SCHEDULED_TR_TRANSFER_2,
-        App.scenario.SCHEDULED_TR_DEBT_1,
-        App.scenario.SCHEDULED_TR_DEBT_2,
-        App.scenario.SCHEDULED_TR_LIMIT_1,
-        App.scenario.SCHEDULED_TR_LIMIT_2,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.extractAndCreate, data);
 
     [
         App.scenario.REMINDER_EXPENSE_1_1,
@@ -212,31 +205,24 @@ const createWithChainedRequest = async () => {
 
     const { ACC_RUB } = App.scenario;
 
-    const data = [{
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 10,
-        comment: 'Chained',
-        start_date: App.datesSec.now,
-        end_date: null,
-        interval_type: INTERVAL_MONTH,
-        interval_step: 1,
-        interval_offset: 20,
-        returnState: {
-            schedule: {},
+    const data = {
+        SCHEDULED_TR_EXPENSE_CHAINED_1: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 10,
+            comment: 'Chained',
+            start_date: App.datesSec.now,
+            end_date: null,
+            interval_type: INTERVAL_MONTH,
+            interval_step: 1,
+            interval_offset: 20,
+            returnState: {
+                schedule: {},
+            },
         },
-    }];
+    };
 
-    const res = await App.scenario.runner.runGroup(async (params) => {
-        const item = await Actions.extractAndCreate(params);
-        // Double check all transactions created
-        assert(item, 'Failed to create scheduled transaction');
-        return item;
-    }, data);
-
-    [
-        App.scenario.SCHEDULED_TR_EXPENSE_CHAINED_1,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.extractAndCreate, data);
 };
 
 const createInvalid = async () => {
