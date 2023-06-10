@@ -254,14 +254,15 @@ class ApiListController extends ApiController
         }
 
         $request = $this->getRequestData();
-        if (!is_array($request)) {
+        $requestData = asArray($request["data"] ?? null);
+        if (!is_array($requestData) || count($requestData) === 0) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         $items = [];
-        foreach ($request as $item) {
+        foreach ($requestData as $item) {
             if (!is_array($item)) {
                 throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
             }

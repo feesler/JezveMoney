@@ -61,9 +61,10 @@ export const createMultiple = async (params) => {
             }
         }
 
+        const request = { data: params };
         let createRes;
         try {
-            createRes = await api.usercurrency.createMultiple(params);
+            createRes = await api.usercurrency.createMultiple(request);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

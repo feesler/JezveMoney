@@ -170,12 +170,13 @@ export class Scenario {
         const action = (isAPI) ? api[controller] : controller;
         assert.isFunction(action?.createMultiple, 'Invalid action');
 
-        const request = Object.values(data);
+        const values = Object.values(data);
+        const request = (isAPI) ? { data: values } : values;
         const keys = Object.keys(data);
 
         const createRes = await action.createMultiple(request);
-        const values = (isAPI) ? createRes?.ids : createRes;
-        this.assignKeys(keys, values);
+        const result = (isAPI) ? createRes?.ids : createRes;
+        this.assignKeys(keys, result);
     }
 
     /** Creates multiple items using action and save result ids as fields of instance */

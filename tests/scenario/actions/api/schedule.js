@@ -65,9 +65,10 @@ export const createMultiple = async (params) => {
             }
         }
 
+        const request = { data: params };
         let createRes;
         try {
-            createRes = await api.schedule.createMultiple(params);
+            createRes = await api.schedule.createMultiple(request);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

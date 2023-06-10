@@ -62,10 +62,10 @@ export const createMultiple = async (params) => {
             }
         }
 
-        // Send API sequest to server
+        const request = { data: params };
         let createRes;
         try {
-            createRes = await api.category.createMultiple(params);
+            createRes = await api.category.createMultiple(request);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

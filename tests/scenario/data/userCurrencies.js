@@ -2,7 +2,7 @@ import { App } from '../../Application.js';
 import { api } from '../../model/api.js';
 
 export const createUserCurrencies = async () => {
-    const userCurrenciesList = [{
+    const data = [{
         curr_id: App.scenario.RUB,
     }, {
         curr_id: App.scenario.USD,
@@ -14,7 +14,7 @@ export const createUserCurrencies = async () => {
         curr_id: App.scenario.KRW,
     }];
 
-    await api.usercurrency.createMultiple(userCurrenciesList);
+    await api.usercurrency.createMultiple({ data });
 
     await App.state.fetch();
 };
