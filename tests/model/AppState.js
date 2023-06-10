@@ -355,7 +355,13 @@ export class AppState {
     }
 
     changeName(name) {
+        if (name.length === 0 || name === this.profile.name) {
+            return false;
+        }
+
         this.profile.name = name;
+
+        return {};
     }
 
     deleteProfile() {
@@ -668,7 +674,7 @@ export class AppState {
         const data = copyFields(params, availSettings);
         Object.assign(this.profile.settings, data);
 
-        return true;
+        return {};
     }
 
     /**

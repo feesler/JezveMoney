@@ -58,31 +58,24 @@ export const loginTest = async (userData) => {
 /** Change user name and check update in profile */
 export const changeName = async (name) => {
     await test('Change user name', async () => {
-        const resExpected = name.length > 0 && name !== App.state.profile.name;
+        const resExpected = App.state.changeName(name);
 
         try {
-            const chNameRes = await api.profile.changeName({ name });
-            if (resExpected !== chNameRes) {
-                return false;
-            }
+            const result = await api.profile.changeName({ name });
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
             }
         }
 
-        if (resExpected) {
-            App.state.changeName(name);
-            return App.state.fetchAndTest();
-        }
-
-        return true;
+        return App.state.fetchAndTest();
     });
 };
 
 export const changePassword = async ({ user, newPassword }) => {
     await test('Change user password', async () => {
-        await api.profile.changePassword({ oldPassword: user.password, newPassword });
+        await api.profile.changePassword({ current: user.password, new: newPassword });
 
         await api.user.logout();
         await api.user.login({
@@ -90,7 +83,7 @@ export const changePassword = async ({ user, newPassword }) => {
             password: newPassword,
         });
 
-        return api.profile.changePassword({ oldPassword: newPassword, newPassword: user.password });
+        return api.profile.changePassword({ current: newPassword, new: user.password });
     });
 };
 
@@ -100,7 +93,7 @@ export const updateSettings = async (options) => {
 
         try {
             const result = await api.profile.updateSettings(options);
-            assert.equal(result, resExpected);
+            assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
                 throw e;
