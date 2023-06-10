@@ -8,5 +8,5 @@ export const config = {
     transactionsOnPage: 10,
     latestTransactions: 5,
     importTransactionsOnPage: 20,
-    testsExpected: 3545,
+    testsExpected: 3573,
 };

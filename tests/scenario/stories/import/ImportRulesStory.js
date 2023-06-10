@@ -489,12 +489,13 @@ export class ImportRulesStory extends TestStory {
         setBlock('Import rules pagination', 1);
 
         const data = [];
-        const RULES_TO_CREATE = 25;
+        const RULES_TO_CREATE = 45;
         const ruleBase = {
             conditions: [{
                 field_id: IMPORT_COND_FIELD_COMMENT,
                 operator: IMPORT_COND_OP_EQUAL,
                 value: '',
+                flags: 0,
             }],
             actions: [{
                 action_id: IMPORT_ACTION_SET_COMMENT,
@@ -510,11 +511,27 @@ export class ImportRulesStory extends TestStory {
         }
 
         // Create rules via API
-        const ruleIds = await App.scenario.runner.runGroup(apiActions.create, data);
+        const ruleIds = [];
+        for (const item of data) {
+            const id = await apiActions.create(item);
+            assert(id, 'Failed to create import rule');
+            ruleIds.push(id);
+        }
+
         // Refresh page
         await App.view.navigateToImport();
         // Iterate rules list pages
         await Actions.iterateRulesList();
+
+        await Actions.goToFirstRulesPage();
+        await Actions.goToNextRulesPage();
+        await Actions.goToPrevRulesPage();
+        await Actions.showMoreRules();
+        await Actions.goToFirstRulesPage();
+        await Actions.goToLastRulesPage();
+        await Actions.goToPrevRulesPage();
+        await Actions.showMoreRules();
+
         // Remove previously created rules via API
         await apiActions.del({ id: ruleIds });
         // Refresh page

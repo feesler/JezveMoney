@@ -53,6 +53,46 @@ export const closeRulesDialog = async () => {
     });
 };
 
+/** Navigates to the first page */
+export const goToFirstRulesPage = async () => {
+    await test('Navigate to first page', async () => {
+        await checkRulesDialog();
+        return App.view.goToFirstRulesPage();
+    });
+};
+
+/** Navigates to the last page */
+export const goToLastRulesPage = async () => {
+    await test('Navigate to last page', async () => {
+        await checkRulesDialog();
+        return App.view.goToLastRulesPage();
+    });
+};
+
+/** Navigates to previous page */
+export const goToPrevRulesPage = async () => {
+    await test('Navigate to previous page', async () => {
+        await checkRulesDialog();
+        return App.view.goToPrevRulesPage();
+    });
+};
+
+/** Navigates to next page */
+export const goToNextRulesPage = async () => {
+    await test('Navigate to next page', async () => {
+        await checkRulesDialog();
+        return App.view.goToNextRulesPage();
+    });
+};
+
+/** Clicks by 'Show more' button */
+export const showMoreRules = async () => {
+    await test('Show more items', async () => {
+        await checkRulesDialog();
+        return App.view.showMoreRules();
+    });
+};
+
 /** Click by create import rule button */
 export const iterateRulesList = async () => {
     await test('Iterate rules list', async () => {

@@ -20,6 +20,7 @@ export const getInitialState = () => ({
     pagination: {
         onPage: SHOW_ON_PAGE,
         page: 1,
+        range: 1,
         pagesCount: 0,
         total: 0,
     },
@@ -27,6 +28,21 @@ export const getInitialState = () => ({
     contextItem: null,
     renderTime: Date.now(),
 });
+
+/** Returns absolute index for relative index on current page */
+export const getAbsoluteIndex = (index, state) => {
+    if (index === -1) {
+        return index;
+    }
+
+    const { pagination } = state;
+    if (!pagination) {
+        return index;
+    }
+
+    const firstItemIndex = (pagination.page - 1) * pagination.onPage;
+    return firstItemIndex + index;
+};
 
 /** Returns rules list according to current filters */
 export const createList = (items, state) => {
@@ -101,17 +117,24 @@ const slice = createSlice({
             })
     ),
 
-    changePage: (state, page) => (
-        (state.pagination.page === page)
-            ? state
-            : {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    page,
-                },
-            }
-    ),
+    changePage: (state, page) => ({
+        ...state,
+        contextItem: null,
+        pagination: {
+            ...state.pagination,
+            page,
+            range: 1,
+        },
+    }),
+
+    showMore: (state) => ({
+        ...state,
+        contextItem: null,
+        pagination: {
+            ...state.pagination,
+            range: state.pagination.range + 1,
+        },
+    }),
 
     listRequestLoaded: (state) => updateList({
         ...state,

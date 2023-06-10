@@ -940,6 +940,41 @@ export class ImportView extends AppView {
         return true;
     }
 
+    async goToFirstRulesPage() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.goToFirstPage());
+        return true;
+    }
+
+    async goToLastRulesPage() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.goToLastPage());
+        return true;
+    }
+
+    async goToPrevRulesPage() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.goToPrevPage());
+        return true;
+    }
+
+    async goToNextRulesPage() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.goToNextPage());
+        return true;
+    }
+
+    async showMoreRules() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.showMore());
+        return true;
+    }
+
     async iterateRulesList() {
         this.checkRulesListState();
 

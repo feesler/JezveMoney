@@ -28,6 +28,7 @@ import {
     LIST_STATE,
     CREATE_STATE,
     UPDATE_STATE,
+    getAbsoluteIndex,
 } from './reducer.js';
 import './ImportRulesDialog.scss';
 
@@ -104,6 +105,13 @@ export class ImportRulesDialog extends Component {
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
+        // 'Show more' button
+        this.showMoreBtn = Button.create({
+            className: 'show-more-btn',
+            title: __('SHOW_MORE'),
+            onClick: () => this.showMore(),
+        });
+
         // Paginator
         this.paginator = Paginator.create({
             arrows: true,
@@ -114,6 +122,7 @@ export class ImportRulesDialog extends Component {
             props: { className: LIST_CONTAINER_CLASS },
             children: [
                 this.rulesList.elem,
+                this.showMoreBtn.elem,
                 this.paginator.elem,
             ],
         });
@@ -196,6 +205,11 @@ export class ImportRulesDialog extends Component {
     /** Change page event handler */
     onChangePage(page) {
         this.store.dispatch(actions.changePage(page));
+    }
+
+    /** 'Show more' button 'click' event handler */
+    showMore() {
+        this.store.dispatch(actions.showMore());
     }
 
     /** Create rule button 'click' event handler */
@@ -355,8 +369,8 @@ export class ImportRulesDialog extends Component {
 
     /** Render list state of component */
     renderList(state) {
-        const firstItem = state.pagination.onPage * (state.pagination.page - 1);
-        const lastItem = firstItem + state.pagination.onPage;
+        const firstItem = getAbsoluteIndex(0, state);
+        const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = listData(state.items).slice(firstItem, lastItem);
 
         this.rulesList.setState((listState) => ({
@@ -368,15 +382,25 @@ export class ImportRulesDialog extends Component {
 
         this.searchInput.value = state.filter;
 
+        // Paginator
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
+
         const showPaginator = state.pagination.pagesCount > 1;
         this.paginator.show(showPaginator);
         if (showPaginator) {
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page,
+                pageNum,
             }));
         }
+
+        // 'Show more' button
+        this.showMoreBtn.show(
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount,
+        );
 
         this.searchInput.show(true);
         this.rulesList.show(true);

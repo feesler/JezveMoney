@@ -74,7 +74,8 @@ export class ImportRulesDialog extends TestComponent {
             (item) => ImportRuleItem.create(this.parent, item),
         );
 
-        res.paginator = await Paginator.create(res.rulesList.elem, await query('.paginator'));
+        res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
+        res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
 
         const ruleFormElem = await query(this.elem, '.rule-form');
         if (ruleFormElem) {
@@ -99,8 +100,9 @@ export class ImportRulesDialog extends TestComponent {
         res.contextMenuVisible = cont.contextMenu.visible;
 
         res.pagination = {
-            page: (cont.paginator) ? cont.paginator.active : 1,
-            pages: (cont.paginator) ? cont.paginator.pages : 1,
+            page: cont.paginator?.active ?? 1,
+            pages: cont.paginator?.pages ?? 1,
+            range: Math.max(Math.ceil(cont.items.length / ITEMS_ON_PAGE), 1),
         };
 
         const importRulesTok = __('IMPORT_RULES', App.view.locale);
@@ -140,20 +142,27 @@ export class ImportRulesDialog extends TestComponent {
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
                 : App.state.rules.data;
 
+            const pageNum = this.currentPage(model);
+
             const pagesCount = Math.ceil(filteredRules.length / ITEMS_ON_PAGE);
             const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
-            const lastItem = firstItem + ITEMS_ON_PAGE;
+            const lastItem = firstItem + ITEMS_ON_PAGE * model.pagination.range;
             const pageItems = filteredRules.slice(firstItem, lastItem);
+            const hasItems = pageItems.length > 0;
 
             res.items = pageItems.map((rule) => ImportRuleItem.render(rule));
 
             if (pagesCount > 1) {
                 res.paginator = {
                     visible: true,
-                    active: model.pagination.page,
+                    active: pageNum,
                     pages: pagesCount,
                 };
             }
+
+            res.showMoreBtn = {
+                visible: hasItems && pageNum < model.pagination.pages,
+            };
         } else if (isForm) {
             const titleToken = (model.state === 'create')
                 ? 'IMPORT_RULE_CREATE'
@@ -164,6 +173,10 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         return res;
+    }
+
+    currentPage(model = this.model) {
+        return model.pagination.page + model.pagination.range - 1;
     }
 
     getState(model = this.model) {
@@ -216,9 +229,39 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         this.model.pagination.page = 1;
+        this.model.pagination.range = 1;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.paginator.goToFirstPage());
+
+        return this.checkState();
+    }
+
+    async goToLastPage() {
+        assert(this.isListState(), 'Invalid state');
+
+        if (this.isLastPage()) {
+            return true;
+        }
+
+        this.model.pagination.page = this.model.pagination.pages;
+        this.model.pagination.range = 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => this.content.paginator.goToLastPage());
+
+        return this.checkState();
+    }
+
+    async goToPrevPage() {
+        assert(this.isListState(), 'Invalid state');
+        assert(!this.isFirstPage(), 'Can\'t go to previous page');
+
+        this.model.pagination.page -= 1;
+        this.model.pagination.range = 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => this.content.paginator.goToPrevPage());
 
         return this.checkState();
     }
@@ -228,9 +271,22 @@ export class ImportRulesDialog extends TestComponent {
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
         this.model.pagination.page += 1;
+        this.model.pagination.range = 1;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.paginator.goToNextPage());
+
+        return this.checkState();
+    }
+
+    async showMore() {
+        assert(this.isListState(), 'Invalid state');
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        this.model.pagination.range += 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => click(this.content.showMoreBtn.elem));
 
         return this.checkState();
     }
