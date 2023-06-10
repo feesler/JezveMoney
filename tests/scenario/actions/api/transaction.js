@@ -22,14 +22,16 @@ import { App } from '../../../Application.js';
  * @param {string} params.comment - comment
  */
 export const create = async (params) => {
-    let transactionId = 0;
+    let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple transactions'
+        : `Create transaction (${formatProps(params)})`;
 
-    const typeStr = Transaction.typeToString(params.type);
-    const titleParams = structuredClone(params);
-    delete titleParams.type;
-
-    await test(`Create ${typeStr} transaction (${formatProps(titleParams)})`, async () => {
-        const resExpected = App.state.createTransaction(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createTransaction', params)
+            : App.state.createTransaction(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -42,40 +44,16 @@ export const create = async (params) => {
             }
         }
 
-        transactionId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return transactionId;
-};
-
-/**
- * Create multiple transaction with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple transactions', async () => {
-        const expectedResult = App.state.createMultiple('createTransaction', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.transaction.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 export const extractAndCreate = async (data) => {
@@ -98,7 +76,7 @@ export const extractAndCreateMultiple = async (params) => {
         })
         : data;
 
-    return createMultiple({ data: extracted, ...rest });
+    return create({ data: extracted, ...rest });
 };
 
 /**

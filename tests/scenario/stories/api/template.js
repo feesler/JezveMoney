@@ -151,7 +151,7 @@ const createMultiple = async () => {
         comment_col: 6,
     }];
 
-    await Actions.createMultiple(data);
+    await Actions.create(data);
 };
 
 const createMultipleWithChainedRequest = async () => {
@@ -231,7 +231,7 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.createMultiple, invData);
+    await App.scenario.runner.runGroup(Actions.create, invData);
 };
 
 const update = async () => {

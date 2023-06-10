@@ -17,10 +17,16 @@ import { App } from '../../../Application.js';
  * @param {number} params.icon_id - icon identifier
  */
 export const create = async (params) => {
-    let accountId = 0;
+    let result = false;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple accounts'
+        : `Create account (${formatProps(params)})`;
 
-    await test(`Create account (${formatProps(params)})`, async () => {
-        const resExpected = App.state.createAccount(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createAccount', params)
+            : App.state.createAccount(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -33,40 +39,16 @@ export const create = async (params) => {
             }
         }
 
-        accountId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return accountId;
-};
-
-/**
- * Create multiple accounts with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple accounts', async () => {
-        const expectedResult = App.state.createMultiple('createAccount', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.account.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 /**

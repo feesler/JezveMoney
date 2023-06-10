@@ -71,15 +71,6 @@ class ImportAction extends ApiListController
     }
 
     /**
-     * Creates multiple items
-     */
-    public function createMultiple()
-    {
-        $this->checkAdminAccess();
-        parent::createMultiple();
-    }
-
-    /**
      * Updates item
      */
     public function update()

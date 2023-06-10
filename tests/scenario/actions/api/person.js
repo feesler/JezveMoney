@@ -14,13 +14,19 @@ import { App } from '../../../Application.js';
  * @param {string} params.name - name of person
  */
 export const create = async (params) => {
-    let personId = 0;
+    let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple persons'
+        : `Create person (${formatProps(params)})`;
 
-    await test(`Create person (${formatProps(params)})`, async () => {
-        let createRes = null;
-        const resExpected = App.state.createPerson(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createPerson', params)
+            : App.state.createPerson(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
+        let createRes = null;
         try {
             createRes = await api.person.create(reqParams);
             assert.deepMeet(createRes, resExpected);
@@ -30,40 +36,16 @@ export const create = async (params) => {
             }
         }
 
-        personId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return personId;
-};
-
-/**
- * Create multiple persons with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple persons', async () => {
-        const expectedResult = App.state.createMultiple('createPerson', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.person.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 /**

@@ -14,7 +14,7 @@ export const createUserCurrencies = async () => {
         curr_id: App.scenario.KRW,
     }];
 
-    await api.usercurrency.createMultiple({ data });
+    await api.usercurrency.create({ data });
 
     await App.state.fetch();
 };

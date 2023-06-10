@@ -15,10 +15,16 @@ import { App } from '../../../Application.js';
  * @param {number} params.flags - flags
  */
 export const create = async (params) => {
-    let itemId = 0;
+    let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple user currrencies'
+        : `Create user currrency (${formatProps(params)})`;
 
-    await test(`Create user currrency (${formatProps(params)})`, async () => {
-        const resExpected = App.state.createUserCurrency(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createUserCurrency', params)
+            : App.state.createUserCurrency(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -31,40 +37,16 @@ export const create = async (params) => {
             }
         }
 
-        itemId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return itemId;
-};
-
-/**
- * Create multiple user currrencies with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple user currrencies', async () => {
-        const expectedResult = App.state.createMultiple('createUserCurrency', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.usercurrency.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 /**

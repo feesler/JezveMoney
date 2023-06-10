@@ -16,10 +16,16 @@ import { App } from '../../../Application.js';
  * @param {number} params.type - transaction type
  */
 export const create = async (params) => {
-    let itemId = 0;
+    let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple categories'
+        : `Create category (${formatProps(params)})`;
 
-    await test(`Create category (${formatProps(params)})`, async () => {
-        const resExpected = App.state.createCategory(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createCategory', params)
+            : App.state.createCategory(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -32,40 +38,16 @@ export const create = async (params) => {
             }
         }
 
-        itemId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return itemId;
-};
-
-/**
- * Create multiple categories with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple categories', async () => {
-        const expectedResult = App.state.createMultiple('createCategory', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.category.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 /**

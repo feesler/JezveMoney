@@ -17,10 +17,15 @@ import { App } from '../../../Application.js';
  */
 export const create = async (params) => {
     let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple import templates'
+        : 'Create import template';
 
-    await test('Create import template', async () => {
-        const expTemplate = App.state.templateFromRequest(params);
-        const resExpected = App.state.createTemplate(expTemplate);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createTemplateFromRequest', params)
+            : App.state.createTemplateFromRequest(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -33,40 +38,16 @@ export const create = async (params) => {
             }
         }
 
-        result = (createRes) ? createRes.id : resExpected;
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
+        }
 
         return App.state.fetchAndTest();
     });
 
     return result;
-};
-
-/**
- * Create multiple import templates with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple import templates', async () => {
-        const expectedResult = App.state.createMultiple('createTemplateFromRequest', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.importtemplate.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
-        }
-
-        ids = (createRes) ? createRes.ids : expectedResult;
-
-        return App.state.fetchAndTest();
-    });
-
-    return ids;
 };
 
 /**

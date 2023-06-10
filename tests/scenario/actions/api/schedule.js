@@ -4,7 +4,6 @@ import {
 } from 'jezve-test';
 import { api } from '../../../model/api.js';
 import { ApiRequestError } from '../../../error/ApiRequestError.js';
-import { Transaction } from '../../../model/Transaction.js';
 import { formatProps } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { ScheduledTransaction } from '../../../model/ScheduledTransaction.js';
@@ -13,14 +12,16 @@ import { ScheduledTransaction } from '../../../model/ScheduledTransaction.js';
  * Creates scheduled transaction with specified params and check expected state of app
  */
 export const create = async (params) => {
-    let itemId = 0;
+    let result = 0;
+    const isMultiple = params?.data?.length > 1;
+    const descr = (isMultiple)
+        ? 'Create multiple scheduled transactions'
+        : `Create scheduled transaction (${formatProps(params)})`;
 
-    const typeStr = Transaction.typeToString(params.type);
-    const titleParams = structuredClone(params);
-    delete titleParams.type;
-
-    await test(`Create scheduled transaction ${typeStr} (${formatProps(titleParams)})`, async () => {
-        const resExpected = App.state.createScheduledTransaction(params);
+    await test(descr, async () => {
+        const resExpected = (isMultiple)
+            ? App.state.createMultiple('createScheduledTransaction', params)
+            : App.state.createScheduledTransaction(params);
         const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
@@ -33,40 +34,16 @@ export const create = async (params) => {
             }
         }
 
-        itemId = (createRes) ? createRes.id : resExpected;
-
-        return App.state.fetchAndTest();
-    });
-
-    return itemId;
-};
-
-/**
- * Create multiple scheduled transaction with specified params and check expected state of app
- */
-export const createMultiple = async (params) => {
-    let ids = [];
-
-    await test('Create multiple scheduled transactions', async () => {
-        const expectedResult = App.state.createMultiple('createScheduledTransaction', params);
-        const reqParams = App.state.prepareChainedRequestData(params);
-
-        let createRes;
-        try {
-            createRes = await api.schedule.createMultiple(reqParams);
-            assert.deepMeet(createRes, expectedResult);
-        } catch (e) {
-            if (!(e instanceof ApiRequestError) || expectedResult) {
-                throw e;
-            }
+        if (createRes) {
+            result = (isMultiple) ? createRes.ids : createRes.id;
+        } else {
+            result = resExpected;
         }
 
-        ids = (createRes) ? createRes.ids : expectedResult;
-
         return App.state.fetchAndTest();
     });
 
-    return ids;
+    return result;
 };
 
 export const extractAndCreate = async (data) => {
@@ -89,7 +66,7 @@ export const extractAndCreateMultiple = async (params) => {
         })
         : data;
 
-    return createMultiple({ data: extracted, ...rest });
+    return create({ data: extracted, ...rest });
 };
 
 /**

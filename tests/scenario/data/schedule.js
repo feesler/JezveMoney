@@ -170,6 +170,6 @@ export const createScheduledTransactions = async () => {
         ScheduledTransaction.extract(item, App.state)
     ));
 
-    await api.schedule.createMultiple({ data: multi });
+    await api.schedule.create({ data: multi });
     await App.state.fetch();
 };

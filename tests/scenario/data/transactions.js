@@ -252,7 +252,7 @@ export const createTransactions = async () => {
 
     multi.push(extracted21, extracted22);
 
-    await api.transaction.createMultiple({ data: multi });
+    await api.transaction.create({ data: multi });
 
     await App.state.fetch();
 };

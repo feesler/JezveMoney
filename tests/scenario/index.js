@@ -168,7 +168,7 @@ export class Scenario {
     async createMultiple(controller, params) {
         const isAPI = (typeof controller === 'string');
         const action = (isAPI) ? api[controller] : controller;
-        assert.isFunction(action?.createMultiple, 'Invalid action');
+        assert.isFunction(action?.create, 'Invalid action');
 
         const source = (params?.data) ? params : { data: params };
         const { data, ...rest } = source;
@@ -177,7 +177,7 @@ export class Scenario {
         const request = { data: values, ...rest };
         const keys = Object.keys(data);
 
-        const createRes = await action.createMultiple(request);
+        const createRes = await action.create(request);
         const result = (isAPI) ? createRes?.ids : createRes;
         this.assignKeys(keys, result);
     }

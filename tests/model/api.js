@@ -80,11 +80,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('currency/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             await apiPost('currency/update', options);
             return true;
@@ -110,11 +105,6 @@ export const api = {
 
         async create(options) {
             const { data } = await apiPost('icon/create', options);
-            return data;
-        },
-
-        async createMultiple(options) {
-            const { data } = await apiPost('icon/createMultiple', options);
             return data;
         },
 
@@ -229,11 +219,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('usercurrency/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             const response = await apiPost('usercurrency/update', options);
             return response.data ?? {};
@@ -271,11 +256,6 @@ export const api = {
 
         async create(options) {
             const { data } = await apiPost('account/create', options);
-            return data;
-        },
-
-        async createMultiple(options) {
-            const { data } = await apiPost('account/createMultiple', options);
             return data;
         },
 
@@ -322,11 +302,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('person/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             const response = await apiPost('person/update', options);
             return response.data ?? {};
@@ -370,11 +345,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('category/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             const response = await apiPost('category/update', options);
             return response.data ?? {};
@@ -405,11 +375,6 @@ export const api = {
 
         async create(options) {
             const { data } = await apiPost('transaction/create', options);
-            return data;
-        },
-
-        async createMultiple(options) {
-            const { data } = await apiPost('transaction/createMultiple', options);
             return data;
         },
 
@@ -458,11 +423,6 @@ export const api = {
 
         async create(options) {
             const { data } = await apiPost('schedule/create', options);
-            return data;
-        },
-
-        async createMultiple(options) {
-            const { data } = await apiPost('schedule/createMultiple', options);
             return data;
         },
 
@@ -545,11 +505,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('importcond/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             const response = await apiPost('importcond/update', options);
             return response.data ?? {};
@@ -579,11 +534,6 @@ export const api = {
             return data;
         },
 
-        async createMultiple(options) {
-            const { data } = await apiPost('importaction/createMultiple', options);
-            return data;
-        },
-
         async update(options) {
             const response = await apiPost('importaction/update', options);
             return response.data ?? {};
@@ -610,11 +560,6 @@ export const api = {
 
         async create(options) {
             const { data } = await apiPost('importtpl/create', options);
-            return data;
-        },
-
-        async createMultiple(options) {
-            const { data } = await apiPost('importtpl/createMultiple', options);
             return data;
         },
 

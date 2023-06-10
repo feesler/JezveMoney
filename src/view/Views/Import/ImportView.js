@@ -594,7 +594,7 @@ class ImportView extends View {
     async submitChunk() {
         try {
             const chunk = this.submitQueue.pop();
-            await API.transaction.createMultiple({ data: chunk });
+            await API.transaction.create({ data: chunk });
             this.onSubmitResult();
         } catch (e) {
             this.submitProgress.hide();

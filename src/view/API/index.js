@@ -202,10 +202,6 @@ export const API = {
             return apiPost('category/create', data);
         },
 
-        async createMultiple(data) {
-            return apiPost('category/createMultiple', data);
-        },
-
         async update(data) {
             return apiPost('category/update', data);
         },
@@ -220,10 +216,6 @@ export const API = {
     },
 
     transaction: {
-        async createMultiple(data) {
-            return apiPost('transaction/createMultiple', data);
-        },
-
         async list(options = {}, requestOptions = {}) {
             const data = {
                 order: 'desc',
@@ -263,10 +255,6 @@ export const API = {
     },
 
     schedule: {
-        async createMultiple(data) {
-            return apiPost('schedule/createMultiple', data);
-        },
-
         async list(options = {}) {
             return apiGet('schedule/list', options);
         },

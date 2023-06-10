@@ -120,7 +120,7 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const read = async () => {
