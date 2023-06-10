@@ -174,6 +174,35 @@ const createMultiple = async () => {
     await App.scenario.createMultiple(Actions, data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple accounts with chained request', 2);
+
+    const { RUB, USD } = App.scenario;
+
+    const data = {
+        data: {
+            ACCOUNT_MULTI_CHAINED_1: {
+                type: ACCOUNT_TYPE_CASH,
+                name: 'Account multi chained 1',
+                curr_id: RUB,
+                initbalance: 1000,
+            },
+            ACCOUNT_MULTI_CHAINED_2: {
+                type: ACCOUNT_TYPE_DEBIT_CARD,
+                name: 'Account multi chained 2',
+                curr_id: USD,
+                initbalance: 0,
+                icon_id: 4,
+            },
+        },
+        returnState: {
+            accounts: { visibility: 'all' },
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple accounts with invalid data', 2);
 
@@ -387,6 +416,7 @@ export const apiAccountsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

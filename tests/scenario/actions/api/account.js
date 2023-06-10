@@ -49,10 +49,11 @@ export const createMultiple = async (params) => {
 
     await test('Create multiple accounts', async () => {
         const expectedResult = App.state.createMultiple('createAccount', params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.account.createMultiple(params);
+            createRes = await api.account.createMultiple(reqParams);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

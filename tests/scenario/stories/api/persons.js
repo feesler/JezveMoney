@@ -77,6 +77,26 @@ const createMultiple = async () => {
     await App.scenario.createMultiple(Actions, data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple persons with chained request', 2);
+
+    const data = {
+        data: {
+            PERSON_MULTI_CHAINED_1: {
+                name: 'Person multi chained 1',
+            },
+            PERSON_MULTI_CHAINED_2: {
+                name: 'Person multi chained 2',
+            },
+        },
+        returnState: {
+            persons: { visibility: 'all' },
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple persons with invalid data', 2);
 
@@ -260,6 +280,7 @@ export const apiPersonsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

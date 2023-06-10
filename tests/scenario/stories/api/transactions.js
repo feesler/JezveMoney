@@ -443,6 +443,48 @@ const createMultiple = async () => {
     await Actions.extractAndCreateMultiple(data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple transactions with chained request', 2);
+
+    const {
+        RUB,
+        EUR,
+        ACC_RUB,
+        ACC_USD,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = {
+        data: {
+            TR_MULTI_CHAINED_1: {
+                type: EXPENSE,
+                src_id: ACC_RUB,
+                src_amount: 7608,
+                dest_amount: 100,
+                dest_curr: EUR,
+                date: App.datesSec.yesterday,
+                comment: 'multiple chained expense',
+                category_id: FOOD_CATEGORY,
+            },
+            TR_MULTI_CHAINED_2: {
+                type: INCOME,
+                dest_id: ACC_USD,
+                src_amount: 6500,
+                dest_amount: 100,
+                src_curr: RUB,
+                comment: 'multiple chained income',
+            },
+        },
+        returnState: {
+            transactions: {
+                type: [EXPENSE, INCOME],
+            },
+        },
+    };
+
+    await App.scenario.extractAndCreateMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple transactions with invalid data', 2);
 
@@ -976,6 +1018,7 @@ export const apiTransactionsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

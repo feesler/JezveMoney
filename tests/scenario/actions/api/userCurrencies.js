@@ -47,10 +47,11 @@ export const createMultiple = async (params) => {
 
     await test('Create multiple user currrencies', async () => {
         const expectedResult = App.state.createMultiple('createUserCurrency', params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.usercurrency.createMultiple(params);
+            createRes = await api.usercurrency.createMultiple(reqParams);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

@@ -58,10 +58,11 @@ export const createMultiple = async (params) => {
 
     await test('Create multiple transactions', async () => {
         const expectedResult = App.state.createMultiple('createTransaction', params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.transaction.createMultiple(params);
+            createRes = await api.transaction.createMultiple(reqParams);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
@@ -84,7 +85,9 @@ export const extractAndCreate = async (data) => {
 };
 
 export const extractAndCreateMultiple = async (params) => {
-    const data = params?.data ?? params;
+    const source = (params?.data) ? params : { data: params };
+    const { data, ...rest } = source;
+
     const extracted = Array.isArray(data)
         ? data.map((item) => {
             try {
@@ -95,7 +98,7 @@ export const extractAndCreateMultiple = async (params) => {
         })
         : data;
 
-    return createMultiple({ data: extracted });
+    return createMultiple({ data: extracted, ...rest });
 };
 
 /**

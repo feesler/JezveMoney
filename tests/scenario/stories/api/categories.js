@@ -120,6 +120,30 @@ const createMultiple = async () => {
     await App.scenario.createMultiple(Actions, data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple categories with chained request', 2);
+
+    const data = {
+        data: {
+            MULTI_CHAINED_CATEGORY_1: {
+                name: 'Multi chained 1',
+                parent_id: 0,
+                type: EXPENSE,
+            },
+            MULTI_CHAINED_CATEGORY_2: {
+                name: 'Multi chained 2',
+                parent_id: 0,
+                type: EXPENSE,
+            },
+        },
+        returnState: {
+            categories: {},
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple categories with invalid data', 2);
 
@@ -347,6 +371,7 @@ export const apiCategoriesTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

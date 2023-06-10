@@ -62,6 +62,26 @@ const createMultiple = async () => {
     await App.scenario.createMultiple(Actions, data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple user currencies with chained request', 2);
+
+    const data = {
+        data: {
+            USER_CURR_SEK: {
+                curr_id: App.scenario.SEK,
+            },
+            USER_CURR_BTC: {
+                curr_id: App.scenario.BTC,
+            },
+        },
+        returnState: {
+            userCurrencies: {},
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple user currencies with invalid data', 2);
 
@@ -235,6 +255,7 @@ export const apiUserCurrenciesTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

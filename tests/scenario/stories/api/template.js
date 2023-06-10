@@ -154,6 +154,46 @@ const createMultiple = async () => {
     await Actions.createMultiple(data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple import templates with chained request', 2);
+
+    const data = {
+        data: {
+            TEMPLATE_MULTI_CHAINED_1: {
+                name: 'Template multi chained 1',
+                type_id: 0,
+                first_row: 2,
+                date_locale: IMPORT_DATE_LOCALE,
+                account_id: App.scenario.CASH_RUB,
+                account_amount_col: 2,
+                account_curr_col: 3,
+                trans_amount_col: 4,
+                trans_curr_col: 5,
+                date_col: 6,
+                comment_col: 7,
+            },
+            TEMPLATE_MULTI_CHAINED_2: {
+                name: 'Template multi chained 2',
+                type_id: 1,
+                first_row: 3,
+                date_locale: IMPORT_DATE_LOCALE,
+                account_id: 0,
+                account_amount_col: 7,
+                account_curr_col: 6,
+                trans_amount_col: 5,
+                trans_curr_col: 4,
+                date_col: 3,
+                comment_col: 2,
+            },
+        },
+        returnState: {
+            importtemplates: {},
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple import templates with invalid data', 2);
 
@@ -280,6 +320,7 @@ export const apiImportTemplateTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
         await update();
         await updateWithChainedRequest();

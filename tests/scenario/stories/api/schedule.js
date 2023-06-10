@@ -506,6 +506,52 @@ const createMultiple = async () => {
     ids.forEach((id) => assert(id, 'Failed to create multiple scheduled transactions'));
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple scheduled transactions with chained request', 2);
+
+    const {
+        RUB,
+        ACC_RUB,
+        ACC_USD,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = {
+        data: {
+            SCHEDULED_TR_MULTI_CHAINED_1: {
+                type: EXPENSE,
+                src_id: ACC_RUB,
+                src_amount: 5500,
+                comment: 'multiple chained expense',
+                category_id: FOOD_CATEGORY,
+                start_date: App.datesSec.yesterday,
+                end_date: null,
+                interval_type: INTERVAL_MONTH,
+                interval_step: 1,
+                interval_offset: 5,
+            },
+            SCHEDULED_TR_MULTI_CHAINED_2: {
+                type: INCOME,
+                dest_id: ACC_USD,
+                src_amount: 1000,
+                dest_amount: 30,
+                src_curr: RUB,
+                comment: 'multiple chained income',
+                start_date: App.datesSec.yesterday,
+                end_date: null,
+                interval_type: INTERVAL_MONTH,
+                interval_step: 1,
+                interval_offset: 5,
+            },
+        },
+        returnState: {
+            schedule: {},
+        },
+    };
+
+    await App.scenario.extractAndCreateMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple scheduled transactions with invalid data', 2);
 
@@ -811,6 +857,7 @@ export const apiScheduleTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

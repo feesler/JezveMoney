@@ -165,17 +165,35 @@ export class Scenario {
     }
 
     /** Creates multiple items using API request and save result ids as fields of instance */
-    async createMultiple(controller, data) {
+    async createMultiple(controller, params) {
         const isAPI = (typeof controller === 'string');
         const action = (isAPI) ? api[controller] : controller;
         assert.isFunction(action?.createMultiple, 'Invalid action');
 
+        const source = (params?.data) ? params : { data: params };
+        const { data, ...rest } = source;
+
         const values = Object.values(data);
-        const request = { data: values };
+        const request = { data: values, ...rest };
         const keys = Object.keys(data);
 
         const createRes = await action.createMultiple(request);
         const result = (isAPI) ? createRes?.ids : createRes;
+        this.assignKeys(keys, result);
+    }
+
+    /** Creates multiple items using API request and save result ids as fields of instance */
+    async extractAndCreateMultiple(action, params) {
+        assert.isFunction(action?.extractAndCreateMultiple, 'Invalid action');
+
+        const source = (params?.data) ? params : { data: params };
+        const { data, ...rest } = source;
+
+        const values = Object.values(data);
+        const request = { data: values, ...rest };
+        const keys = Object.keys(data);
+
+        const result = await action.extractAndCreateMultiple(request);
         this.assignKeys(keys, result);
     }
 

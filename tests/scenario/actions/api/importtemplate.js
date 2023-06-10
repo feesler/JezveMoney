@@ -49,10 +49,11 @@ export const createMultiple = async (params) => {
 
     await test('Create multiple import templates', async () => {
         const expectedResult = App.state.createMultiple('createTemplateFromRequest', params);
+        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.importtemplate.createMultiple(params);
+            createRes = await api.importtemplate.createMultiple(reqParams);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
