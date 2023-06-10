@@ -1674,64 +1674,61 @@ export class ImportView extends AppView {
         return !this.itemsList.paginator || this.itemsList.paginator.isLastPage();
     }
 
-    async goToFirstPage() {
+    onPageChanged(page) {
         this.checkMainState();
+        assert(page >= 1 && page <= this.model.pagination.pages, `Invalid page: ${page}`);
 
+        this.model.pagination.page = page;
+        this.model.pagination.range = 1;
+        const res = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        res.itemsList.items = expectedList.items;
+
+        return res;
+    }
+
+    async goToFirstPage() {
         if (this.isFirstPage()) {
             return true;
         }
 
-        this.model.pagination.page = 1;
-        this.model.pagination.range = 1;
-        this.expectedState = this.getExpectedState(this.model);
-        const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        const expected = this.onPageChanged(1);
 
         await this.performAction(() => this.itemsList.paginator.goToFirstPage());
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async goToNextPage() {
-        this.checkMainState();
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
-        this.model.pagination.page = this.currentPage() + 1;
-        this.model.pagination.range = 1;
-        this.expectedState = this.getExpectedState(this.model);
-        const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        const expected = this.onPageChanged(this.currentPage() + 1);
 
         await this.performAction(() => this.itemsList.paginator.goToNextPage());
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async goToPrevPage() {
-        this.checkMainState();
         assert(!this.isFirstPage(), 'Can\'t go to previous page');
 
-        this.model.pagination.page = this.currentPage() - 1;
-        this.model.pagination.range = 1;
-        this.expectedState = this.getExpectedState(this.model);
-        const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        const expected = this.onPageChanged(this.currentPage() - 1);
 
         await this.performAction(() => this.itemsList.paginator.goToPrevPage());
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async showMore() {
         assert(!this.isLastPage(), 'Can\'t show more items');
 
         this.model.pagination.range += 1;
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        expected.itemsList.items = expectedList.items;
 
         await this.performAction(() => click(this.itemsList.showMoreBtn.elem));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 }
