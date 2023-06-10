@@ -19,6 +19,29 @@
                                     <div class="switch-slider"></div>
                                 </label>
                             </div>
+
+                            <hr class="form-separator">
+
+                            <div class="field form-row horizontal-field">
+                                <span class="field__title">Latest DB version</span>
+                                <span><?= e($latestDBVersion) ?></span>
+                            </div>
+
+                            <div class="field form-row horizontal-field">
+                                <span class="field__title">Current DB version:</span>
+                                <span><?= e($currentDBVersion) ?></span>
+                            </div>
+
+                            <div class="field form-row horizontal-field">
+                                <?php if ($currentDBVersion == $latestDBVersion) {        ?>
+                                    <div class="feedback valid-feedback">Database is up to date</div>
+                                <?php    } else {        ?>
+                                    <div class="feedback invalid-feedback">Database update is required</div>
+                                <?php    }        ?>
+                                <form method="POST" action="<?= BASEURL . "admin/update" ?>">
+                                    <input class="btn submit-btn" type="submit" value="Update" <?= hidden($currentDBVersion == $latestDBVersion) ?>>
+                                </form>
+                            </div>
                         </div>
                     </section>
                 </div>
