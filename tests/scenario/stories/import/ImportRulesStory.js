@@ -27,7 +27,6 @@ import {
 } from '../../../model/ImportAction.js';
 import { api } from '../../../model/api.js';
 import * as Actions from '../../actions/import/index.js';
-import * as apiActions from '../../actions/api/importrule.js';
 import { testLocales } from '../../actions/locale.js';
 import { App } from '../../../Application.js';
 import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
@@ -513,10 +512,11 @@ export class ImportRulesStory extends TestStory {
         // Create rules via API
         const ruleIds = [];
         for (const item of data) {
-            const id = await apiActions.create(item);
-            assert(id, 'Failed to create import rule');
-            ruleIds.push(id);
+            const createRes = await api.importrule.create(item);
+            assert(createRes?.id, 'Failed to create import rule');
+            ruleIds.push(createRes.id);
         }
+        await App.state.fetch();
 
         // Refresh page
         await App.view.navigateToImport();
@@ -533,7 +533,8 @@ export class ImportRulesStory extends TestStory {
         await Actions.showMoreRules();
 
         // Remove previously created rules via API
-        await apiActions.del({ id: ruleIds });
+        await api.importrule.del({ id: ruleIds });
+        await App.state.fetch();
         // Refresh page
         await App.view.navigateToImport();
     }
