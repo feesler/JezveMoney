@@ -96,6 +96,22 @@ function copyFields(fields, expFields) {
 }
 
 export class AppState {
+    static dataRequestMap = {
+        currency: 'getCurrencies',
+        icons: 'getIcons',
+        accounts: 'getAccounts',
+        persons: 'getPersons',
+        transactions: 'getTransactions',
+        schedule: 'getScheduledTransactions',
+        reminders: 'getReminders',
+        statistics: 'getStatistics',
+        categories: 'getCategories',
+        importtemplates: 'getImportTemplates',
+        importrules: 'getImportRules',
+        userCurrencies: 'getUserCurrencies',
+        profile: 'getProfile',
+    };
+
     constructor() {
         this.accounts = null;
         this.userAccountsCache = null;
@@ -587,45 +603,12 @@ export class AppState {
     getState(request) {
         const res = {};
 
-        if (request.currency) {
-            res.currency = this.getCurrencies(request.currency);
-        }
-        if (request.icons) {
-            res.icons = this.getIcons(request.icons);
-        }
-        if (request.accounts) {
-            res.accounts = this.getAccounts(request.accounts);
-        }
-        if (request.persons) {
-            res.persons = this.getPersons(request.persons);
-        }
-        if (request.transactions) {
-            res.transactions = this.getTransactions(request.transactions);
-        }
-        if (request.schedule) {
-            res.schedule = this.getScheduledTransactions(request.schedule);
-        }
-        if (request.reminders) {
-            res.reminders = this.getReminders(request.reminders);
-        }
-        if (request.statistics) {
-            res.statistics = this.getStatistics(request.statistics);
-        }
-        if (request.categories) {
-            res.categories = this.getCategories(request.categories);
-        }
-        if (request.importtemplates) {
-            res.importtemplates = this.getImportTemplates(request.importtemplates);
-        }
-        if (request.importrules) {
-            res.importrules = this.getImportRules(request.importrules);
-        }
-        if (request.userCurrencies) {
-            res.userCurrencies = this.getUserCurrencies(request.userCurrencies);
-        }
-        if (request.profile) {
-            res.profile = this.getProfile();
-        }
+        const requestParams = Object.entries(AppState.dataRequestMap);
+        requestParams.forEach(([param, method]) => {
+            if (request[param]) {
+                res[param] = this[method](request[param]);
+            }
+        });
 
         return res;
     }
