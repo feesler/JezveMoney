@@ -125,20 +125,26 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            name: '',
-            parent_id: 0,
-            type: 0,
-        }, {
-            name: 'Invalid category 1',
-            parent_id: 0,
-        }],
-        [{
-            name: 'Invalid category 2',
-            parent_id: 0,
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                name: '',
+                parent_id: 0,
+                type: 0,
+            }, {
+                name: 'Invalid category 1',
+                parent_id: 0,
+            }],
+        },
+        {
+            data: [{
+                name: 'Invalid category 2',
+                parent_id: 0,
+            }, null],
+        },
     ];
 
     await App.scenario.runner.runGroup(Actions.createMultiple, data);

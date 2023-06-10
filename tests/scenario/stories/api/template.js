@@ -159,31 +159,38 @@ const createMultipleInvalid = async () => {
 
     const invData = [
         null,
-        [null],
-        [null, null],
-        [{
-            // Invalid templates
-            name: 'Invalid template',
-        }, {
-            name: null,
-        }, {
-            name: 'Invalid template',
-            account_id: 'null',
-        }, {
-            name: 'Invalid template',
-            account_id: App.scenario.API_USER_ACC_RUB,
-        }],
-        [{
-            name: 'Template 12',
-            type_id: 1,
-            account_amount_col: 7,
-            account_curr_col: 6,
-            trans_amount_col: 5,
-            trans_curr_col: 4,
-            date_col: 3,
-            comment_col: 2,
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                // Invalid templates
+                name: 'Invalid template',
+            }, {
+                name: null,
+            }, {
+                name: 'Invalid template',
+                account_id: 'null',
+            }, {
+                name: 'Invalid template',
+                account_id: App.scenario.API_USER_ACC_RUB,
+            }],
+        },
+        {
+            data: [{
+                name: 'Template 12',
+                type_id: 1,
+                account_amount_col: 7,
+                account_curr_col: 6,
+                trans_amount_col: 5,
+                trans_curr_col: 4,
+                date_col: 3,
+                comment_col: 2,
+            }, null],
+        },
     ];
+
     await App.scenario.runner.runGroup(Actions.createMultiple, invData);
 };
 

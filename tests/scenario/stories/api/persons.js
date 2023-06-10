@@ -62,15 +62,19 @@ const createInvalid = async () => {
 const createMultiple = async () => {
     setBlock('Create multiple persons', 2);
 
-    const data = [{
-        name: 'Person 1',
-    }, {
-        name: 'Person 2',
-    }, {
-        name: 'Person 3',
-    }];
+    const data = {
+        PERSON_1: {
+            name: 'Person 1',
+        },
+        PERSON_2: {
+            name: 'Person 2',
+        },
+        PERSON_3: {
+            name: 'Person 3',
+        },
+    };
 
-    await Actions.createMultiple(data);
+    await App.scenario.createMultiple(Actions, data);
 };
 
 const createMultipleInvalid = async () => {
@@ -78,16 +82,22 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            name: '',
-        }, {
-            name: 'Person 2',
-        }],
-        [{
-            name: 'Person 4',
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                name: '',
+            }, {
+                name: 'Person 2',
+            }],
+        },
+        {
+            data: [{
+                name: 'Person 4',
+            }, null],
+        },
     ];
 
     await App.scenario.runner.runGroup(Actions.createMultiple, data);

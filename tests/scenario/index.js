@@ -171,7 +171,7 @@ export class Scenario {
         assert.isFunction(action?.createMultiple, 'Invalid action');
 
         const values = Object.values(data);
-        const request = (isAPI) ? { data: values } : values;
+        const request = { data: values };
         const keys = Object.keys(data);
 
         const createRes = await action.createMultiple(request);

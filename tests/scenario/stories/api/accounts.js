@@ -181,31 +181,37 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            // Empty name
-            type: ACCOUNT_TYPE_OTHER,
-            name: '',
-            curr_id: USD,
-            initbalance: 10.5,
-            icon_id: 5,
-        }, {
-            // Invalid currency
-            type: ACCOUNT_TYPE_OTHER,
-            name: 'Account 3',
-            curr_id: 999,
-            initbalance: 100,
-            icon_id: 5,
-        }],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                // Empty name
+                type: ACCOUNT_TYPE_OTHER,
+                name: '',
+                curr_id: USD,
+                initbalance: 10.5,
+                icon_id: 5,
+            }, {
+                // Invalid currency
+                type: ACCOUNT_TYPE_OTHER,
+                name: 'Account 3',
+                curr_id: 999,
+                initbalance: 100,
+                icon_id: 5,
+            }],
+        },
         // Valid and invalid items in array
-        [{
-            type: ACCOUNT_TYPE_CASH,
-            name: 'Account 4',
-            curr_id: RUB,
-            initbalance: 0,
-            icon_id: 4,
-        }, null],
+        {
+            data: [{
+                type: ACCOUNT_TYPE_CASH,
+                name: 'Account 4',
+                curr_id: RUB,
+                initbalance: 0,
+                icon_id: 4,
+            }, null],
+        },
     ];
 
     await App.scenario.runner.runGroup(Actions.createMultiple, data);

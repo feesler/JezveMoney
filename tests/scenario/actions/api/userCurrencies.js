@@ -46,25 +46,11 @@ export const createMultiple = async (params) => {
     let ids = [];
 
     await test('Create multiple user currrencies', async () => {
-        let expectedResult = false;
-        if (Array.isArray(params)) {
-            expectedResult = { ids: [] };
-            for (const item of params) {
-                const resExpected = App.state.createUserCurrency(item);
-                if (!resExpected) {
-                    App.state.deleteUserCurrencies({ id: expectedResult.ids });
-                    expectedResult = false;
-                    break;
-                }
+        const expectedResult = App.state.createMultiple('createUserCurrency', params);
 
-                expectedResult.ids.push(resExpected.id);
-            }
-        }
-
-        const request = { data: params };
         let createRes;
         try {
-            createRes = await api.usercurrency.createMultiple(request);
+            createRes = await api.usercurrency.createMultiple(params);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {

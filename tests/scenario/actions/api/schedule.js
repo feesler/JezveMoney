@@ -48,27 +48,11 @@ export const createMultiple = async (params) => {
     let ids = [];
 
     await test('Create multiple scheduled transactions', async () => {
-        let expectedResult = false;
-        if (Array.isArray(params)) {
-            expectedResult = { ids: [] };
-            const origState = App.state.clone();
+        const expectedResult = App.state.createMultiple('createScheduledTransaction', params);
 
-            for (const item of params) {
-                const resExpected = App.state.createScheduledTransaction(item);
-                if (!resExpected) {
-                    App.state.setState(origState);
-                    expectedResult = false;
-                    break;
-                }
-
-                expectedResult.ids.push(resExpected.id);
-            }
-        }
-
-        const request = { data: params };
         let createRes;
         try {
-            createRes = await api.schedule.createMultiple(request);
+            createRes = await api.schedule.createMultiple(params);
             assert.deepMeet(createRes, expectedResult);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || expectedResult) {
@@ -90,7 +74,8 @@ export const extractAndCreate = async (data) => {
     return create(extracted);
 };
 
-export const extractAndCreateMultiple = async (data) => {
+export const extractAndCreateMultiple = async (params) => {
+    const data = params?.data ?? params;
     const extracted = Array.isArray(data)
         ? data.map((item) => {
             try {
@@ -101,7 +86,7 @@ export const extractAndCreateMultiple = async (data) => {
         })
         : data;
 
-    return createMultiple(extracted);
+    return createMultiple({ data: extracted });
 };
 
 /**

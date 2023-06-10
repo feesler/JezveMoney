@@ -261,6 +261,29 @@ export class AppState {
         return true;
     }
 
+    createMultiple(method, params) {
+        assert.isFunction(this[method], 'Invalid method');
+
+        if (!Array.isArray(params?.data)) {
+            return false;
+        }
+
+        const ids = [];
+        const origState = this.clone();
+
+        for (const item of params.data) {
+            const resExpected = this[method](item);
+            if (!resExpected) {
+                this.setState(origState);
+                return false;
+            }
+
+            ids.push(resExpected.id);
+        }
+
+        return this.returnState(params.returnState, { ids });
+    }
+
     /**
      * Profile
      */
@@ -2529,6 +2552,10 @@ export class AppState {
         const item = this.templates.getItemByIndex(ind);
 
         return this.returnState(params.returnState, { id: item.id });
+    }
+
+    createTemplateFromRequest(params) {
+        return this.createTemplate(this.templateFromRequest(params));
     }
 
     getUpdateTemplateRequest(params) {

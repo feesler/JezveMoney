@@ -511,22 +511,28 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            type: EXPENSE,
-            src_id: 0,
-            src_amount: 100,
-        }, {
-            type: EXPENSE,
-            src_id: App.scenario.ACC_RUB,
-            src_amount: 100,
-        }],
-        [{
-            type: EXPENSE,
-            src_id: App.scenario.ACC_RUB,
-            src_amount: 100,
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                type: EXPENSE,
+                src_id: 0,
+                src_amount: 100,
+            }, {
+                type: EXPENSE,
+                src_id: App.scenario.ACC_RUB,
+                src_amount: 100,
+            }],
+        },
+        {
+            data: [{
+                type: EXPENSE,
+                src_id: App.scenario.ACC_RUB,
+                src_amount: 100,
+            }, null],
+        },
     ];
 
     await App.scenario.runner.runGroup(async (params) => {
