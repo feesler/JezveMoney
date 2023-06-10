@@ -130,11 +130,11 @@ export const changePass = async ({ oldPassword, newPassword }) => {
     await test(`Change password ('${oldPassword}' > '${newPassword}')`, async () => {
         await checkProfileNavigation();
 
-        const validInput = oldPassword
-            && oldPassword.length > 0
-            && newPassword
-            && newPassword.length > 0
-            && oldPassword !== newPassword;
+        const validInput = (
+            oldPassword?.length > 0
+            && newPassword?.length > 0
+            && oldPassword !== newPassword
+        );
 
         await App.view.changePassword(oldPassword, newPassword);
         if (validInput) {

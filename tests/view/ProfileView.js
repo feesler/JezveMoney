@@ -120,10 +120,8 @@ export class ProfileView extends AppView {
         assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
         const validInput = (
-            oldPass
-            && oldPass.length > 0
-            && newPass
-            && newPass.length > 0
+            oldPass?.length > 0
+            && newPass?.length > 0
             && oldPass !== newPass
         );
 
