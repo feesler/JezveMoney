@@ -275,6 +275,7 @@ export class ImportRulesStory extends TestStory {
                 { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
             ],
         });
+        await Actions.submitRule();
 
         setBlock('Submit Date condition with invalid value', 2);
         await Actions.updateRuleCondition({
@@ -284,6 +285,10 @@ export class ImportRulesStory extends TestStory {
         await Actions.submitRule();
 
         setBlock('Submit rule without guard condition for `Set account` action', 2);
+        await Actions.updateRuleCondition({
+            pos: 0,
+            action: { action: 'inputValue', data: App.datesFmt.now },
+        });
         await Actions.deleteRuleAction(0);
         await Actions.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
