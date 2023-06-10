@@ -273,12 +273,20 @@ export class ImportView extends AppView {
             visible: model.enabled,
             disabled: !listMode,
         };
+
+        const showPaginator = hasItems && model.pagination.pages > 1;
         res.itemsList = {
             visible: true,
             noDataMsg: { visible: !hasItems },
             showMoreBtn: { visible: hasItems && pageNum < model.pagination.pages },
-            paginator: { visible: hasItems && model.pagination.pages > 1 },
+            paginator: { visible: showPaginator },
         };
+
+        if (showPaginator) {
+            res.itemsList.paginator.pages = model.pagination.pages;
+            res.itemsList.paginator.active = pageNum;
+        }
+
         res.submitBtn.disabled = !(listMode && hasItems && enabledItems.length > 0);
 
         // Main menu
