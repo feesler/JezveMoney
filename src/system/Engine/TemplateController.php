@@ -185,10 +185,14 @@ abstract class TemplateController extends Controller
     /**
      * Returns profile data for view
      *
-     * @return array
+     * @return array|null
      */
     public function getProfileData()
     {
+        if (!$this->user_id) {
+            return null;
+        }
+
         return [
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,

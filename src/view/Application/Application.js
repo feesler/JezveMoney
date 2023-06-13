@@ -55,8 +55,10 @@ export class Application {
             this.model.profile = { ...this.props.profile };
 
             const { settings } = this.model.profile;
-            this.config.dateFormatLocale = settings.date_locale;
-            this.config.decimalFormatLocale = settings.decimal_locale;
+            if (settings) {
+                this.config.dateFormatLocale = settings.date_locale;
+                this.config.decimalFormatLocale = settings.decimal_locale;
+            }
         }
 
         this.notification = null;
