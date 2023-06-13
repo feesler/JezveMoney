@@ -136,5 +136,10 @@ export class ProfileStory extends TestStory {
         setBlock('About view', 2);
 
         await Actions.openAbout();
+        await Actions.logout();
+        await Actions.goToRegistration();
+        await Actions.openAbout();
+        await App.view.clickByLogo();
+        await Actions.relogin(App.config.testUser);
     }
 }

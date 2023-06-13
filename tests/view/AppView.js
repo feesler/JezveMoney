@@ -12,9 +12,12 @@ import { Notification } from './component/Notification.js';
 
 export class AppView extends TestView {
     isUserLoggedIn() {
+        /*
         const loggedOutLocations = ['login', 'register'];
 
         return loggedOutLocations.every((item) => !this.location.includes(`/${item}`));
+        */
+        return this.content.header?.userBtn?.title?.length > 0;
     }
 
     get locale() {
@@ -102,9 +105,12 @@ export class AppView extends TestView {
         await navigation(() => this.content.header.clickLogoutMenuItem());
     }
 
+    async clickByLogo() {
+        await navigation(() => this.content.header.clickLogo());
+    }
+
     async goToMainView() {
         assert(this.isUserLoggedIn(), 'User not logged in');
-
-        await navigation(() => this.content.header.clickLogo());
+        return this.clickByLogo();
     }
 }

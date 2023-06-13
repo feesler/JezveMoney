@@ -6,9 +6,14 @@ import {
     prop,
     click,
     asyncMap,
+    evaluate,
 } from 'jezve-test';
 
 export class Header extends TestComponent {
+    get userBtn() {
+        return this.content.userBtn;
+    }
+
     async parseContent() {
         // no header is ok for login view
         if (!this.elem) {
@@ -24,10 +29,9 @@ export class Header extends TestComponent {
         res.userBtn = { elem: await query(this.elem, '.header .user-btn') };
         assert(res.userBtn.elem, 'User button not found');
 
-        res.userBtn.titleElem = await query(res.userBtn.elem, '.btn__content');
-        if (res.userBtn.titleElem) {
-            res.userBtn.title = await prop(res.userBtn.titleElem, 'textContent');
-        }
+        res.userBtn.title = await evaluate((btnEl) => (
+            btnEl.querySelector('.btn__content')?.textContent
+        ), res.userBtn.elem);
 
         res.userNav = { elem: await query('.user-navigation') };
         assert(res.userNav.elem, 'User navigation not found');

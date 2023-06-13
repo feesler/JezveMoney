@@ -20,6 +20,31 @@ const checkProfileNavigation = async () => {
     assert.instanceOf(App.view, ProfileView, 'Invalid view');
 };
 
+export const logout = async () => {
+    await test('Logout user', async () => {
+        assert(App.view.isUserLoggedIn(), 'User already logged out');
+
+        await App.view.logoutUser();
+
+        assert.instanceOf(App.view, LoginView, 'Invalid view');
+
+        return true;
+    });
+};
+
+export const goToRegistration = async () => {
+    await test('Go to registration view', async () => {
+        assert(!App.view.isUserLoggedIn(), 'User logged in');
+        assert.instanceOf(App.view, LoginView, 'Invalid view');
+
+        await App.view.goToRegistration();
+
+        assert.instanceOf(App.view, RegisterView, 'Invalid view');
+
+        return true;
+    });
+};
+
 export const relogin = async ({ login, password }) => {
     await checkLoginNavigation();
 
