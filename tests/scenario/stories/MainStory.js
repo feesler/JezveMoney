@@ -29,9 +29,6 @@ export class MainStory extends TestStory {
         await Actions.toggleHiddenAccounts();
         await Actions.toggleHiddenAccounts();
         await Actions.toggleHiddenAccounts();
-        await Actions.toggleHiddenPersons();
-        await Actions.toggleHiddenPersons();
-        await Actions.toggleHiddenPersons();
     }
 
     async toggleHiddenPersons() {
