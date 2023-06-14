@@ -780,13 +780,15 @@ class ScheduledTransactionModel extends CachedTable
      */
     public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
     {
-        $res = $defaults;
+        $request = array_merge($defaults, $request);
+
+        $pagination = [];
 
         // Page
         if (isset($request["page"])) {
             $page = intval($request["page"]);
             if ($page > 1) {
-                $res["page"] = $page - 1;
+                $pagination["page"] = $page - 1;
             }
         }
 
@@ -797,7 +799,7 @@ class ScheduledTransactionModel extends CachedTable
                 throw new \Error("Invalid page limit");
             }
             if ($onPage > 0) {
-                $res["onPage"] = $onPage;
+                $pagination["onPage"] = $onPage;
             }
         }
 
@@ -805,11 +807,24 @@ class ScheduledTransactionModel extends CachedTable
         if (isset($request["range"])) {
             $range = intval($request["range"]);
             if ($range > 0) {
-                $res["range"] = $range;
+                $pagination["range"] = $range;
             }
         }
 
-        return $res;
+        $itemsCount = $this->getCount();
+        $pagination["total"] = $itemsCount;
+
+        // Build data for paginator
+        if (isset($pagination["onPage"]) && $pagination["onPage"] > 0) {
+            $pagesCount = ceil($itemsCount / $pagination["onPage"]);
+            $pagination["pagesCount"] = $pagesCount;
+            $page = $pagination["page"] ?? 1;
+            $pagination["page"] = min($pagesCount, $page);
+        }
+
+        return [
+            "pagination" => $pagination,
+        ];
     }
 
     /**
