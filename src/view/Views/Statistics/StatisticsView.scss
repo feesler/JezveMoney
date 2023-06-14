@@ -53,6 +53,8 @@
 
   .loading-indicator {
     z-index: auto;
+    min-height: 320px;
+    background-color: #32323217;
   }
 }
 
@@ -60,7 +62,7 @@
 .chart__popup {
   position: absolute;
   border: 0 none;
-  border-radius: 5px;
+  border-radius: var(--default-border-radius);
   box-shadow: var(--popup-menu-box-shadow);
   backdrop-filter: var(--popup-menu-backdrop-filter);
   padding: 8px;

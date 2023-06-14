@@ -15,6 +15,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --warning-color: #c60000;
   --warning-color-alt: #e63030;
   --action-btn-border-radius: 6px;
+  --default-border-radius: 5px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
   --input-padding: 0 0.5rem;
@@ -505,7 +506,9 @@ svg * {
 .alter-link:visited {
   text-decoration: none;
   border: 0 none;
-  padding: 6px 24px;
+  padding: 0 24px;
+  height: var(--input-height);
+  line-height: var(--input-height);
   overflow: visible;
   cursor: pointer;
 }
@@ -701,6 +704,10 @@ svg * {
   --checkbox-bg: var(--input-bg-color);
   --checkbox-border: var(--input-border-color);
   --checkbox-checked-fill: var(--accent-color);
+
+  .checkbox__check {
+    border-radius: var(--default-border-radius);
+  }
 }
 
 /* Radio */
@@ -727,7 +734,7 @@ svg * {
 
   /* Combo box */
   --dd-border-width: 1px;
-  --dd-combo-border-radius: 5px;
+  --dd-combo-border-radius: var(--default-border-radius);
   --dd-combo-height: var(--input-height);
 
   /* Input element */
@@ -740,7 +747,7 @@ svg * {
   --dd-btn-hover-fill: var(--main-text-color);
 
   /* List menu */
-  --dd-list-border-radius: 5px;
+  --dd-list-border-radius: var(--default-border-radius);
 
   /* List item */
   --dd-list-item-text: var(--main-text-color);
@@ -848,7 +855,7 @@ svg * {
   --dp-nav-hover-fill: var(--accent-color);
 
   .dp__wrapper {
-    border-radius: 5px;
+    border-radius: var(--default-border-radius);
   }
 }
 
@@ -890,7 +897,7 @@ svg * {
 /* Popup menu */
 .popup-menu-list {
   --popupmenu-border-width: 0;
-  --popupmenu-border-radius: 5px;
+  --popupmenu-border-radius: var(--default-border-radius);
   --popupmenu-border-color: var(--popup-menu-border);
   --popupmenu-separator-color: var(--list-separator-color);
   --popupmenu-background: var(--popup-menu-bg);

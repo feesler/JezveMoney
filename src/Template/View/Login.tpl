@@ -13,7 +13,7 @@
             <form id="form" class="login-form" action="<?= BASEURL ?>login/" method="post">
                 <h1><?= __("LOG_IN") ?></h1>
 
-                <div id="rememberField" class="form-row">
+                <div id="rememberField" class="field form-row">
                     <label id="rememberCheck" class="checkbox">
                         <input type="checkbox" name="remember" checked>
                         <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
