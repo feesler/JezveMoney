@@ -26,11 +26,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createTemplateFromRequest', params)
             : App.state.createTemplateFromRequest(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.importtemplate.create(reqParams);
+            createRes = await api.importtemplate.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -70,10 +69,9 @@ export const update = async (params) => {
         const expTemplate = App.state.templateFromRequest(props);
         const resExpected = App.state.updateTemplate(expTemplate);
         const updParams = App.state.getUpdateTemplateRequest(props);
-        const reqParams = App.state.prepareChainedRequestData(updParams);
 
         try {
-            result = await api.importtemplate.update(reqParams);
+            result = await api.importtemplate.update(updParams);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -96,10 +94,9 @@ export const del = async (params) => {
 
     await test(`Delete import template(s) (${params})`, async () => {
         const resExpected = App.state.deleteTemplates(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.importtemplate.del(reqParams);
+            result = await api.importtemplate.del(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

@@ -120,10 +120,6 @@ class State extends ApiController
         $autoIncrement = $options["autoIncrement"] ?? false;
         unset($options["autoIncrement"]);
 
-        $options = array_merge([
-            "onPage" => 0,
-        ], $options);
-
         $factory = TransactionsFactory::getInstance();
         $res = $factory->getList($options);
 
@@ -362,7 +358,7 @@ class State extends ApiController
         $res = $this->getData([
             "accounts" => ["autoIncrement" => true],
             "persons" => ["autoIncrement" => true],
-            "transactions" => ["count" => 0, "autoIncrement" => true],
+            "transactions" => ["onPage" => 0, "autoIncrement" => true],
             "schedule" => ["autoIncrement" => true],
             "reminders" => ["autoIncrement" => true],
             "categories" => ["autoIncrement" => true],

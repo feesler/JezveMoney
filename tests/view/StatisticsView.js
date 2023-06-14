@@ -250,9 +250,9 @@ export class StatisticsView extends AppView {
         if (report === 'currency') {
             params.curr_id = model.filter.curr_id;
         } else if (report === 'account') {
-            params.acc_id = model.filter.accounts;
+            params.accounts = model.filter.accounts;
         } else if (report === 'category') {
-            params.category_id = model.filter.categories;
+            params.categories = model.filter.categories;
         }
 
         if (model.filter.startDate) {

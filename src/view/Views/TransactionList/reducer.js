@@ -107,7 +107,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            acc_id: accounts,
+            accounts,
         },
     }),
 
@@ -115,7 +115,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            person_id: persons,
+            persons,
         },
     }),
 
@@ -123,7 +123,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            category_id: categories,
+            categories,
         },
     }),
 

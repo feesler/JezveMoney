@@ -142,16 +142,16 @@ export const formatDateInputValue = (value) => (
 
 /** Returns formatted date range object */
 export const formatDateRange = (range) => ({
-    stdate: formatDateInputValue(range?.stdate),
-    enddate: formatDateInputValue(range?.enddate),
+    startDate: formatDateInputValue(range?.startDate),
+    endDate: formatDateInputValue(range?.endDate),
 });
 
 /** Returns date range object for a last week */
 export const getWeekRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
+        endDate: cutDate(now),
     };
 };
 
@@ -159,8 +159,8 @@ export const getWeekRange = () => {
 export const getMonthRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftMonth(now, -1)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftMonth(now, -1)),
+        endDate: cutDate(now),
     };
 };
 
@@ -168,8 +168,8 @@ export const getMonthRange = () => {
 export const getHalfYearRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftMonth(now, -6)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftMonth(now, -6)),
+        endDate: cutDate(now),
     };
 };
 

@@ -29,11 +29,11 @@
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="count">
+                <input type="checkbox" data-target="onPage">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label">Max. count</span>
+                <span class="checkbox__label">Items on page</span>
             </label>
-            <input class="input stretch-input" name="count" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="10" disabled hidden>
+            <input class="input stretch-input" name="onPage" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="10" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -53,43 +53,43 @@
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="acc_id">
+                <input type="checkbox" data-target="accounts">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Account ids</span>
             </label>
-            <input class="input stretch-input" name="acc_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+            <input class="input stretch-input" name="accounts" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="person_id">
+                <input type="checkbox" data-target="persons">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Person ids</span>
             </label>
-            <input class="input stretch-input" name="person_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+            <input class="input stretch-input" name="persons" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="category_id">
+                <input type="checkbox" data-target="categories">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Category ids</span>
             </label>
-            <input class="input stretch-input" name="category_id" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+            <input class="input stretch-input" name="categories" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="stdate">
+                <input type="checkbox" data-target="startDate">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">Start date</span>
             </label>
-            <input class="input stretch-input" name="stdate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+            <input class="input stretch-input" name="startDate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
-                <input type="checkbox" data-target="enddate">
+                <input type="checkbox" data-target="endDate">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">End date</span>
             </label>
-            <input class="input stretch-input" name="enddate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+            <input class="input stretch-input" name="endDate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
         </div>
         <div class="std_margin">
             <label class="checkbox">
@@ -522,19 +522,19 @@
 
             <div class="std_margin">
                 <label class="checkbox">
-                    <input type="checkbox" data-target="stdate">
+                    <input type="checkbox" data-target="startDate">
                     <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                     <span class="checkbox__label">Start date</span>
                 </label>
-                <input class="input stretch-input" name="stdate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+                <input class="input stretch-input" name="startDate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
-                    <input type="checkbox" data-target="enddate">
+                    <input type="checkbox" data-target="endDate">
                     <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                     <span class="checkbox__label">End date</span>
                 </label>
-                <input class="input stretch-input" name="enddate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
+                <input class="input stretch-input" name="endDate" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="" disabled hidden>
             </div>
         </div>
 

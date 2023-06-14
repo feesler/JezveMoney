@@ -26,11 +26,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createCategory', params)
             : App.state.createCategory(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.category.create(reqParams);
+            createRes = await api.category.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -131,10 +130,8 @@ export const update = async (params) => {
         const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, props);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            updateRes = await api.category.update(reqParams);
+            updateRes = await api.category.update(updParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -157,10 +154,9 @@ export const del = async (params) => {
 
     await test(`Delete categories (${params})`, async () => {
         const resExpected = App.state.deleteCategories(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.category.del(reqParams);
+            deleteRes = await api.category.del(params);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -180,10 +176,9 @@ export const setPos = async (params) => {
 
     await test(`Set position of category (${formatProps(params)})`, async () => {
         const resExpected = App.state.setCategoryPos(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.category.setPos(reqParams);
+            result = await api.category.setPos(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

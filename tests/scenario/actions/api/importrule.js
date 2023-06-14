@@ -15,11 +15,10 @@ export const create = async (params) => {
 
     await test('Create import rule', async () => {
         const resExpected = App.state.createRule(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.importrule.create(reqParams);
+            createRes = await api.importrule.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -55,10 +54,8 @@ export const update = async (params) => {
 
         Object.assign(updParams, props);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            result = await api.importrule.update(reqParams);
+            result = await api.importrule.update(updParams);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -81,10 +78,9 @@ export const del = async (params) => {
 
     await test(`Delete import rule(s) (${params})`, async () => {
         const resExpected = App.state.deleteRules(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.importrule.del(reqParams);
+            result = await api.importrule.del(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

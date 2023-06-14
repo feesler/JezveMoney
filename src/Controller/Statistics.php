@@ -38,7 +38,7 @@ class Statistics extends TemplateController
         if ($selectedReport === "currency") {
             $accCurr = $filterObj->curr_id;
         } else {
-            $accounts = $filterObj->acc_id ?? null;
+            $accounts = $filterObj->accounts ?? null;
             $account = (is_array($accounts) && count($accounts) > 0)
                 ? $accMod->getItem($accounts[0])
                 : null;

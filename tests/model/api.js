@@ -231,7 +231,7 @@ export const api = {
         del: apiDelete,
         setPos: apiSetPos,
         setCategory: apiPostMethod('setCategory'),
-        list: apiGetMethod('list', { count: 0 }),
+        list: apiGetMethod('list', { onPage: 10 }),
         statistics: apiGetMethod('statistics'),
     }),
 

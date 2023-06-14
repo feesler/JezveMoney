@@ -13,10 +13,9 @@ export const confirm = async (params) => {
 
     await test(`Confirm reminder (${formatProps(params)})`, async () => {
         const resExpected = App.state.confirmReminder(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.reminder.confirm(reqParams);
+            result = await api.reminder.confirm(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -39,10 +38,9 @@ export const cancel = async (params) => {
 
     await test(`Cancel reminder (${formatProps(params)})`, async () => {
         const resExpected = App.state.cancelReminder(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.reminder.cancel(reqParams);
+            result = await api.reminder.cancel(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

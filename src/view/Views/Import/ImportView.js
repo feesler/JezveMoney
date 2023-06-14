@@ -315,10 +315,10 @@ class ImportView extends View {
             const state = this.store.getState();
             const range = this.getImportedItemsDateRange(state);
             const result = await API.transaction.list({
-                count: 0,
-                stdate: getSeconds(range.start),
-                enddate: getSeconds(range.end),
-                acc_id: state.mainAccount.id,
+                onPage: 0,
+                startDate: getSeconds(range.start),
+                endDate: getSeconds(range.end),
+                accounts: state.mainAccount.id,
             });
             return result.data.items;
         } catch (e) {

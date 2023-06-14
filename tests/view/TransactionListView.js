@@ -366,15 +366,15 @@ export class TransactionListView extends AppView {
         }
 
         if (model.filter.accounts.length > 0) {
-            params.acc_id = model.filter.accounts;
+            params.accounts = model.filter.accounts;
         }
 
         if (model.filter.persons.length > 0) {
-            params.person_id = model.filter.persons;
+            params.persons = model.filter.persons;
         }
 
         if (model.filter.categories.length > 0) {
-            params.category_id = model.filter.categories;
+            params.categories = model.filter.categories;
         }
 
         if (model.filter.search.length > 0) {
@@ -382,10 +382,10 @@ export class TransactionListView extends AppView {
         }
 
         if (model.filter.startDate) {
-            params.stdate = model.filter.startDate;
+            params.startDate = model.filter.startDate;
         }
         if (model.filter.endDate) {
-            params.enddate = model.filter.endDate;
+            params.endDate = model.filter.endDate;
         }
 
         if (model.list.page !== 0) {

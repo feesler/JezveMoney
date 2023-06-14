@@ -543,10 +543,10 @@ export class AppState {
         const { onPage } = request;
         const isDesc = request.order?.toLowerCase() === 'desc';
 
-        if ('page' in request || 'range' in request || 'onPage' in request) {
+        if (onPage > 0) {
             const targetPage = request.page ?? 1;
             const targetRange = request.range ?? 1;
-            items = items.getPage(targetPage, request.onPage, targetRange, isDesc);
+            items = items.getPage(targetPage, onPage, targetRange, isDesc);
         }
 
         if (!isDesc) {
@@ -560,7 +560,7 @@ export class AppState {
             pagination: {
                 total: filtered.length,
                 onPage,
-                pagesCount: Math.ceil(filtered.length / onPage),
+                pagesCount: (onPage > 0) ? Math.ceil(filtered.length / onPage) : 1,
                 page: request.page ?? 1,
             },
         };
@@ -606,7 +606,14 @@ export class AppState {
         const requestParams = Object.entries(AppState.dataRequestMap);
         requestParams.forEach(([param, method]) => {
             if (request[param]) {
-                res[param] = this[method](request[param]);
+                const [methodName, defaults] = asArray(method);
+
+                const requestData = {
+                    ...(defaults ?? {}),
+                    ...request[param],
+                };
+
+                res[param] = this[methodName](requestData);
             }
         });
 
@@ -621,20 +628,6 @@ export class AppState {
         }
 
         return res;
-    }
-
-    prepareChainedRequestData(request) {
-        if (!request?.returnState?.transactions) {
-            return request;
-        }
-
-        return {
-            ...request,
-            returnState: {
-                ...request.returnState,
-                transactions: this.getTransactionsListRequest(request.returnState.transactions),
-            },
-        };
     }
 
     isValidSettings(settings) {
@@ -1680,47 +1673,6 @@ export class AppState {
 
         delete res.src_id;
         delete res.dest_id;
-
-        return res;
-    }
-
-    /** Prepares transaction list request parameters */
-    getTransactionsListRequest(params) {
-        const res = {};
-
-        if ('order' in params) {
-            res.order = params.order;
-        }
-        if ('type' in params) {
-            res.type = params.type;
-        }
-        if ('accounts' in params) {
-            res.acc_id = params.accounts;
-        }
-        if ('persons' in params) {
-            res.person_id = params.persons;
-        }
-        if ('categories' in params) {
-            res.category_id = params.categories;
-        }
-        if ('startDate' in params) {
-            res.stdate = params.startDate;
-        }
-        if ('endDate' in params) {
-            res.enddate = params.endDate;
-        }
-        if ('search' in params) {
-            res.search = params.search;
-        }
-        if ('onPage' in params) {
-            res.count = params.onPage;
-        }
-        if ('page' in params) {
-            res.page = params.page;
-        }
-        if ('range' in params) {
-            res.range = params.range;
-        }
 
         return res;
     }

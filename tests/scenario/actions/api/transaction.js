@@ -32,11 +32,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createTransaction', params)
             : App.state.createTransaction(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.transaction.create(reqParams);
+            createRes = await api.transaction.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -104,10 +103,8 @@ export const update = async (params) => {
             : { date: App.datesSec.now, comment: '' };
         Object.assign(updParams, params);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            updateRes = await api.transaction.update(reqParams);
+            updateRes = await api.transaction.update(updParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -130,10 +127,9 @@ export const del = async (params) => {
 
     await test(`Delete transaction (${params})`, async () => {
         const resExpected = App.state.deleteTransactions(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.transaction.del(reqParams);
+            deleteRes = await api.transaction.del(params);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -154,11 +150,9 @@ export const setCategory = async (params) => {
     await test(`Set category of transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.setTransactionCategory(params);
 
-        let reqParams = structuredClone(params);
+        const reqParams = structuredClone(params);
         reqParams.category_id = reqParams.category;
         delete reqParams.category;
-
-        reqParams = App.state.prepareChainedRequestData(reqParams);
 
         try {
             result = await api.transaction.setCategory(reqParams);
@@ -181,10 +175,9 @@ export const setPos = async (params) => {
 
     await test(`Set position of transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.setTransactionPos(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.transaction.setPos(reqParams);
+            result = await api.transaction.setPos(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -203,26 +196,28 @@ export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
-        if ('page' in params || 'range' in params || 'onPage' in params) {
+
+        const isDesc = params.order?.toLowerCase() === 'desc';
+        const onPage = params?.onPage ?? App.config.transactionsOnPage;
+        if (onPage > 0) {
             const targetPage = params.page ?? 1;
             const targetRange = params.range ?? 1;
-            expTransList = expTransList.getPage(targetPage, params.onPage, targetRange);
+            expTransList = expTransList.getPage(targetPage, params.onPage, targetRange, isDesc);
         }
+
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at TransactionsList.setData()
-        const isDesc = params.order?.toLowerCase() === 'desc';
         if (!isDesc) {
             expTransList.data = expTransList.sortAsc();
         }
 
-        // Prepare request parameters
-        const reqParams = App.state.getTransactionsListRequest(params);
-
         // Send API sequest to server
-        const trList = await api.transaction.list(reqParams);
+        const trList = await api.transaction.list(params);
         assert(trList, 'Fail to read list of transactions');
 
-        return assert.deepMeet(trList.items, expTransList.data);
+        assert.deepMeet(trList.items, expTransList.data);
+
+        return true;
     });
 };
 
@@ -230,11 +225,11 @@ export const filter = async (params) => {
 export const statistics = async (params) => {
     await test(`Statistics (${formatProps(params)})`, async () => {
         const stateParams = { ...params };
-        if (params.stdate) {
-            stateParams.startDate = params.stdate;
+        if (params.startDate) {
+            stateParams.startDate = params.startDate;
         }
-        if (params.enddate) {
-            stateParams.endDate = params.enddate;
+        if (params.endDate) {
+            stateParams.endDate = params.endDate;
         }
         const histogram = App.state.transactions.getStatistics(stateParams);
         const expected = { histogram };

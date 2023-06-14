@@ -22,11 +22,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createScheduledTransaction', params)
             : App.state.createScheduledTransaction(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.schedule.create(reqParams);
+            createRes = await api.schedule.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -83,10 +82,8 @@ export const update = async (params) => {
         const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, params);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            updateRes = await api.schedule.update(reqParams);
+            updateRes = await api.schedule.update(updParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -109,10 +106,9 @@ export const del = async (params) => {
 
     await test(`Delete scheduled transaction (${formatProps(params)})`, async () => {
         const resExpected = App.state.deleteScheduledTransaction(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.schedule.del(reqParams);
+            deleteRes = await api.schedule.del(params);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

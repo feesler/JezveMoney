@@ -1136,13 +1136,13 @@ const slice = createSlice({
         ...state,
         transaction: {
             ...state.transaction,
-            start_date: dateStringToTime(range.stdate),
-            end_date: (range.enddate) ? dateStringToTime(range.enddate) : null,
+            start_date: dateStringToTime(range.startDate),
+            end_date: (range.endDate) ? dateStringToTime(range.endDate) : null,
         },
         form: {
             ...state.form,
-            startDate: range.stdate,
-            endDate: range.enddate ?? '',
+            startDate: range.startDate,
+            endDate: range.endDate ?? '',
         },
         validation: {
             ...state.validation,

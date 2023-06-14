@@ -595,8 +595,8 @@ class TransactionListView extends View {
         });
 
         const state = this.store.getState();
-        const filterAccounts = asArray(state.form.acc_id);
-        const filterPersons = asArray(state.form.person_id);
+        const filterAccounts = asArray(state.form.accounts);
+        const filterPersons = asArray(state.form.persons);
         const accountsChanged = !isSameSelection(accountIds, filterAccounts);
         const personsChanged = !isSameSelection(personIds, filterPersons);
         if (!accountsChanged && !personsChanged) {
@@ -620,7 +620,7 @@ class TransactionListView extends View {
     onCategoryChange(selected) {
         const state = this.store.getState();
         const categoryIds = asArray(selected).map(({ id }) => parseInt(id, 10));
-        const filterCategories = asArray(state.form.category_id);
+        const filterCategories = asArray(state.form.categories);
         if (isSameSelection(categoryIds, filterCategories)) {
             return;
         }
@@ -715,14 +715,14 @@ class TransactionListView extends View {
     /** Date range filter change handler */
     changeDateFilter(data) {
         const { filter } = this.store.getState();
-        const stdate = filter.stdate ?? null;
-        const enddate = filter.enddate ?? null;
+        const startDate = filter.startDate ?? null;
+        const endDate = filter.endDate ?? null;
         const timeData = {
-            stdate: dateStringToTime(data.stdate, { fixShortYear: false }),
-            enddate: dateStringToTime(data.enddate, { fixShortYear: false }),
+            startDate: dateStringToTime(data.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(data.endDate, { fixShortYear: false }),
         };
 
-        if (stdate === timeData.stdate && enddate === timeData.enddate) {
+        if (startDate === timeData.startDate && endDate === timeData.endDate) {
             return;
         }
 
@@ -809,8 +809,8 @@ class TransactionListView extends View {
 
         const res = {
             ...form,
-            stdate: dateStringToTime(form.stdate, { fixShortYear: false }),
-            enddate: dateStringToTime(form.enddate, { fixShortYear: false }),
+            startDate: dateStringToTime(form.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(form.endDate, { fixShortYear: false }),
         };
 
         return res;
@@ -940,8 +940,8 @@ class TransactionListView extends View {
         }
 
         const idsToSelect = [
-            ...asArray(state.form.acc_id).map((id) => `a${id}`),
-            ...asArray(state.form.person_id).map((id) => `p${id}`),
+            ...asArray(state.form.accounts).map((id) => `a${id}`),
+            ...asArray(state.form.persons).map((id) => `p${id}`),
         ];
 
         this.accountDropDown.setSelection(idsToSelect);
@@ -953,7 +953,7 @@ class TransactionListView extends View {
             return;
         }
 
-        this.categoriesDropDown.setSelection(state.form.category_id);
+        this.categoriesDropDown.setSelection(state.form.categories);
     }
 
     renderCategoryDialog(state, prevState) {
@@ -1050,28 +1050,28 @@ class TransactionListView extends View {
             ...rangeState,
             form: {
                 ...rangeState.form,
-                stdate: state.form.stdate,
-                enddate: state.form.enddate,
+                startDate: state.form.startDate,
+                endDate: state.form.endDate,
             },
             filter: {
                 ...rangeState.filter,
-                stdate: dateStringToTime(state.form.stdate),
-                enddate: dateStringToTime(state.form.enddate),
+                startDate: dateStringToTime(state.form.startDate),
+                endDate: dateStringToTime(state.form.endDate),
             },
         }));
 
         const dateFilterURL = this.getFilterURL(state, false);
         const weekRange = getWeekRange();
-        dateFilterURL.searchParams.set('stdate', weekRange.stdate);
-        dateFilterURL.searchParams.set('enddate', weekRange.enddate);
+        dateFilterURL.searchParams.set('startDate', weekRange.startDate);
+        dateFilterURL.searchParams.set('endDate', weekRange.endDate);
         this.weekRangeBtn.setURL(dateFilterURL.toString());
 
         const monthRange = getMonthRange();
-        dateFilterURL.searchParams.set('stdate', monthRange.stdate);
+        dateFilterURL.searchParams.set('startDate', monthRange.startDate);
         this.monthRangeBtn.setURL(dateFilterURL.toString());
 
         const halfYearRange = getHalfYearRange();
-        dateFilterURL.searchParams.set('stdate', halfYearRange.stdate);
+        dateFilterURL.searchParams.set('startDate', halfYearRange.startDate);
         this.halfYearRangeBtn.setURL(dateFilterURL.toString());
 
         // Search form

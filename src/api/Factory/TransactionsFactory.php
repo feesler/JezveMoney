@@ -47,8 +47,8 @@ class TransactionsFactory
             $res["desc"] = true;
         }
 
-        if (isset($request["count"]) && is_numeric($request["count"])) {
-            $res["onPage"] = intval($request["count"]);
+        if (isset($request["onPage"]) && is_numeric($request["onPage"])) {
+            $res["onPage"] = intval($request["onPage"]);
         }
 
         return $res;

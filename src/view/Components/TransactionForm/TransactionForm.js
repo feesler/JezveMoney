@@ -1733,13 +1733,13 @@ export class TransactionForm extends Component {
                 ...rangeState,
                 form: {
                     ...rangeState.form,
-                    stdate: form.startDate,
-                    enddate: form.endDate,
+                    startDate: form.startDate,
+                    endDate: form.endDate,
                 },
                 filter: {
                     ...rangeState.filter,
-                    stdate: transaction.start_date,
-                    enddate: transaction.end_date,
+                    startDate: transaction.start_date,
+                    endDate: transaction.end_date,
                 },
                 validation: {
                     ...state.validation,

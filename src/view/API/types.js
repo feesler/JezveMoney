@@ -151,11 +151,11 @@ export const isTransaction = (obj) => verifyObject(obj, {
 /** Verify object is transactions filter */
 export const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
     type: isIntArray,
-    acc_id: isIntArray,
-    person_id: isIntArray,
-    category_id: isIntArray,
-    stdate: isString,
-    enddate: isString,
+    accounts: isIntArray,
+    persons: isIntArray,
+    categories: isIntArray,
+    startDate: isString,
+    endDate: isString,
     search: isString,
 });
 
@@ -212,12 +212,12 @@ export const isStatisticsFilter = (obj) => verifyObject(obj, {
     report: isString,
 }, {
     type: isIntArray,
-    category_id: isIntArray,
-    acc_id: isIntArray,
+    categories: isIntArray,
+    accounts: isIntArray,
     curr_id: isInt,
     group: isString,
-    stdate: isString,
-    enddate: isString,
+    startDate: isString,
+    endDate: isString,
 });
 
 /** Verify object is statistics response */

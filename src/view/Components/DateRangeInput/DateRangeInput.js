@@ -17,8 +17,8 @@ const validateDateOptions = {
 };
 
 const defaultValidation = {
-    stdate: true,
-    enddate: true,
+    startDate: true,
+    endDate: true,
     order: true,
     valid: true,
 };
@@ -63,7 +63,7 @@ export class DateRangeInput extends Component {
     init() {
         this.startDateGroup = DateInputGroup.create({
             className: 'input-group__input-outer date-range-part',
-            name: 'stdate',
+            name: 'startDate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
             clearButton: this.props.startClearable,
@@ -74,7 +74,7 @@ export class DateRangeInput extends Component {
 
         this.endDateGroup = DateInputGroup.create({
             className: 'input-group__input-outer date-range-part',
-            name: 'enddate',
+            name: 'endDate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
             clearButton: this.props.endClearable,
@@ -124,17 +124,17 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const stdate = (data.stdate)
-            ? window.app.formatInputDate(data.stdate)
+        const startDate = (data.startDate)
+            ? window.app.formatInputDate(data.startDate)
             : null;
-        const enddate = (data.enddate)
-            ? window.app.formatInputDate(data.enddate)
+        const endDate = (data.endDate)
+            ? window.app.formatInputDate(data.endDate)
             : null;
 
         this.setState({
             ...this.state,
-            form: { stdate, enddate },
-            filter: { stdate, enddate },
+            form: { startDate, endDate },
+            filter: { startDate, endDate },
             validation: { ...defaultValidation },
         });
     }
@@ -147,8 +147,8 @@ export class DateRangeInput extends Component {
         const { form } = this.state;
 
         this.props.onChange({
-            stdate: form.stdate,
-            enddate: form.enddate,
+            startDate: form.startDate,
+            endDate: form.endDate,
         });
     }
 
@@ -160,7 +160,7 @@ export class DateRangeInput extends Component {
 
         const { filter } = this.state;
 
-        const limitValue = (rangePart === 'start') ? filter.enddate : filter.stdate;
+        const limitValue = (rangePart === 'start') ? filter.endate : filter.startDate;
         if (!limitValue) {
             return false;
         }
@@ -190,17 +190,17 @@ export class DateRangeInput extends Component {
         };
 
         if (this.state.selectPart === 'start') {
-            if (dateFmt === this.state.form.stdate) {
+            if (dateFmt === this.state.form.startDate) {
                 return;
             }
 
-            form.stdate = dateFmt;
+            form.startDate = dateFmt;
         } else if (this.state.selectPart === 'end') {
-            if (dateFmt === this.state.form.enddate) {
+            if (dateFmt === this.state.form.endDate) {
                 return;
             }
 
-            form.enddate = dateFmt;
+            form.endDate = dateFmt;
         }
 
         this.setState({
@@ -221,7 +221,7 @@ export class DateRangeInput extends Component {
         });
 
         const { filter, form } = this.state;
-        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
+        if (filter.startDate === form.startDate && filter.endDate === form.endDate) {
             return;
         }
 
@@ -245,7 +245,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                stdate: e.target.value,
+                startDate: e.target.value,
             },
             validation: { ...defaultValidation },
         });
@@ -258,7 +258,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                enddate: e.target.value,
+                endDate: e.target.value,
             },
             validation: { ...defaultValidation },
         });
@@ -268,20 +268,20 @@ export class DateRangeInput extends Component {
 
     validateDateRange(state = this.state) {
         const validation = { ...defaultValidation };
-        const startDate = parseDate(state.form.stdate, validateDateOptions);
-        const endDate = parseDate(state.form.enddate, validateDateOptions);
+        const startDate = parseDate(state.form.startDate, validateDateOptions);
+        const endDate = parseDate(state.form.endDate, validateDateOptions);
         if (!startDate && !state.startClearable) {
-            validation.stdate = false;
+            validation.startDate = false;
         }
         if (!endDate && !state.endClearable) {
-            validation.enddate = false;
+            validation.endDate = false;
         }
         if (startDate && endDate && startDate > endDate) {
             validation.order = false;
         }
         validation.valid = (
-            validation.stdate
-            && validation.enddate
+            validation.startDate
+            && validation.endDate
             && validation.order
         );
 
@@ -323,7 +323,7 @@ export class DateRangeInput extends Component {
      * Clear start date of range
      */
     onStartDateClear() {
-        if (!this.state.form.stdate) {
+        if (!this.state.form.startDate) {
             return;
         }
 
@@ -331,7 +331,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                stdate: null,
+                startDate: null,
             },
             validation: { ...defaultValidation },
         });
@@ -347,7 +347,7 @@ export class DateRangeInput extends Component {
      * Clear end date of range
      */
     onEndDateClear() {
-        if (!this.state.form.enddate) {
+        if (!this.state.form.endDate) {
             return;
         }
 
@@ -355,7 +355,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                enddate: null,
+                endDate: null,
             },
             validation: { ...defaultValidation },
         });
@@ -375,9 +375,9 @@ export class DateRangeInput extends Component {
         let value = null;
         const { selectPart } = state;
         if (selectPart === 'start') {
-            value = state.filter.stdate;
+            value = state.filter.startDate;
         } else if (selectPart === 'end') {
-            value = state.filter.enddate;
+            value = state.filter.endDate;
         } else {
             return;
         }
@@ -394,7 +394,7 @@ export class DateRangeInput extends Component {
         // Start date field
         this.startDateGroup.setState((startState) => ({
             ...startState,
-            value: state.form.stdate ?? '',
+            value: state.form.startDate ?? '',
             disabled: (state.disabled || state.startDisabled),
             clearButton: state.startClearable,
         }));
@@ -403,7 +403,7 @@ export class DateRangeInput extends Component {
         // End date field
         this.endDateGroup.setState((endState) => ({
             ...endState,
-            value: state.form.enddate ?? '',
+            value: state.form.endDate ?? '',
             disabled: (state.disabled || state.endDisabled),
             clearButton: state.endClearable,
         }));

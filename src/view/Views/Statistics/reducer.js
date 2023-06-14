@@ -66,7 +66,7 @@ const slice = createSlice({
             ...state,
             form: {
                 ...state.form,
-                acc_id: accounts,
+                accounts,
             },
             accountCurrency: account?.curr_id ?? 0,
         };
@@ -78,7 +78,7 @@ const slice = createSlice({
             ...state,
             form: {
                 ...state.form,
-                category_id: categories,
+                categories,
             },
         };
     },

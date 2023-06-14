@@ -27,11 +27,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createAccount', params)
             : App.state.createAccount(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.account.create(reqParams);
+            createRes = await api.account.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -130,10 +129,8 @@ export const update = async (params) => {
         const resExpected = App.state.updateAccount(props);
 
         const item = App.state.accounts.getItem(props.id);
-        let updParams = (item) ? structuredClone(item) : {};
+        const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, props);
-
-        updParams = App.state.prepareChainedRequestData(updParams);
 
         try {
             updateRes = await api.account.update(updParams);
@@ -159,10 +156,9 @@ export const del = async (options) => {
 
     await test(`Delete account (${options})`, async () => {
         const resExpected = App.state.deleteAccounts(options);
-        const reqParams = App.state.prepareChainedRequestData(options);
 
         try {
-            deleteRes = await api.account.del(reqParams);
+            deleteRes = await api.account.del(options);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -182,10 +178,9 @@ export const setPos = async (params) => {
 
     await test(`Set position of account (${formatProps(params)})`, async () => {
         const resExpected = App.state.setAccountPos(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.account.setPos(reqParams);
+            result = await api.account.setPos(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

@@ -24,11 +24,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createPerson', params)
             : App.state.createPerson(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes = null;
         try {
-            createRes = await api.person.create(reqParams);
+            createRes = await api.person.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -126,10 +125,8 @@ export const update = async (params) => {
         const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, params);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            updateRes = await api.person.update(reqParams);
+            updateRes = await api.person.update(updParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -152,10 +149,9 @@ export const del = async (params) => {
 
     await test(`Delete person (${params})`, async () => {
         const resExpected = App.state.deletePersons(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.person.del(reqParams);
+            deleteRes = await api.person.del(params);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -175,10 +171,9 @@ export const setPos = async (params) => {
 
     await test(`Set position of person (${formatProps(params)})`, async () => {
         const resExpected = App.state.setPersonPos(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.person.setPos(reqParams);
+            result = await api.person.setPos(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

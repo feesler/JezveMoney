@@ -774,8 +774,8 @@ export class TransactionsList extends SortableList {
         let groupStart = null;
         const curSum = {};
         let currId = params.curr_id;
-        const accId = asArray(params.acc_id);
-        const categoryId = asArray(params.category_id);
+        const accountId = asArray(params.accounts);
+        const categoryId = asArray(params.categories);
         const categoryGroups = [];
 
         const res = {
@@ -794,11 +794,11 @@ export class TransactionsList extends SortableList {
             }
             categories.push(currId);
         } else if (report === 'account') {
-            if (accId.length === 0) {
+            if (accountId.length === 0) {
                 return res;
             }
 
-            categories.push(...accId);
+            categories.push(...accountId);
         } else if (report === 'category') {
             if (categoryId.length === 0) {
                 const mainCategories = App.state.categories.findByParent();
@@ -839,8 +839,8 @@ export class TransactionsList extends SortableList {
             type: transTypes,
             orderByDate: true,
         };
-        if (accId.length > 0) {
-            itemsFilter.accounts = accId;
+        if (accountId.length > 0) {
+            itemsFilter.accounts = accountId;
         }
         if (categoryId.length > 0) {
             itemsFilter.categories = categoryId;

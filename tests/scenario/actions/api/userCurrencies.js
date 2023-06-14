@@ -25,11 +25,10 @@ export const create = async (params) => {
         const resExpected = (isMultiple)
             ? App.state.createMultiple('createUserCurrency', params)
             : App.state.createUserCurrency(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         let createRes;
         try {
-            createRes = await api.usercurrency.create(reqParams);
+            createRes = await api.usercurrency.create(params);
             assert.deepMeet(createRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -129,10 +128,8 @@ export const update = async (params) => {
         const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, props);
 
-        const reqParams = App.state.prepareChainedRequestData(updParams);
-
         try {
-            updateRes = await api.usercurrency.update(reqParams);
+            updateRes = await api.usercurrency.update(updParams);
             assert.deepMeet(updateRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -155,10 +152,9 @@ export const del = async (params) => {
 
     await test(`Delete user currencies (${params})`, async () => {
         const resExpected = App.state.deleteUserCurrencies(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            deleteRes = await api.usercurrency.del(reqParams);
+            deleteRes = await api.usercurrency.del(params);
             assert.deepMeet(deleteRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {
@@ -178,10 +174,9 @@ export const setPos = async (params) => {
 
     await test(`Set position of user currency (${formatProps(params)})`, async () => {
         const resExpected = App.state.setUserCurrencyPos(params);
-        const reqParams = App.state.prepareChainedRequestData(params);
 
         try {
-            result = await api.usercurrency.setPos(reqParams);
+            result = await api.usercurrency.setPos(params);
             assert.deepMeet(result, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

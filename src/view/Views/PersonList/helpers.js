@@ -5,7 +5,7 @@ export const getExportURL = (selectedIds) => {
     const ids = asArray(selectedIds);
     const res = new URL(`${window.app.baseURL}transactions/export/`);
     ids.forEach((id) => {
-        res.searchParams.append('person_id[]', id);
+        res.searchParams.append('persons[]', id);
     });
     return res;
 };
