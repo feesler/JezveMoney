@@ -16,11 +16,6 @@
                                 <h2><?= __("SETTINGS_MAIN") ?></h2>
                             </header>
                             <div id="mainContainer">
-                                <div id="localeField" class="field form-row horizontal-field">
-                                    <label class="field__title"><?= __("LANGUAGE") ?></label>
-                                    <select id="localeSelect"></select>
-                                </div>
-
                                 <div id="themeSwitchField" class="field form-row horizontal-field">
                                     <span class="field__title"><?= __("DARK_THEME") ?></span>
                                     <label id="themeSwitch" class="switch">

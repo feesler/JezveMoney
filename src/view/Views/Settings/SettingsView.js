@@ -21,7 +21,7 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { DateFormatSelect } from '../../Components/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
+import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
@@ -79,7 +79,7 @@ class SettingsView extends View {
     /** View initialization */
     onStart() {
         this.loadElementsByIds([
-            'localeSelect',
+            'mainContainer',
             'themeSwitch',
             'userCurrenciesHeading',
             'userCurrenciesContainer',
@@ -91,8 +91,12 @@ class SettingsView extends View {
             'regionalTab',
         ]);
 
-        // Locale select
-        this.localeSelect = LocaleSelect.fromElement(this.localeSelect);
+        // Locale select field
+        this.localeField = LocaleSelectField.create({
+            className: 'form-row',
+        });
+
+        this.mainContainer.prepend(this.localeField.elem);
 
         // Theme swtich
         this.themeSwitch = ThemeSwitch.fromElement(this.themeSwitch);
