@@ -40,8 +40,11 @@ export class Header extends Component {
 
         this.navigationContent = document.querySelector('.main-navigation');
 
-        this.navigationMenu = NavigationMenu.create();
-        this.navigationContent.append(this.navigationMenu.elem);
+        const navList = this.navigationContent.querySelector('.nav-list');
+        if (!navList) {
+            this.navigationMenu = NavigationMenu.create();
+            this.navigationContent.append(this.navigationMenu.elem);
+        }
 
         this.navigation = Offcanvas.create({
             content: this.navigationContent,
