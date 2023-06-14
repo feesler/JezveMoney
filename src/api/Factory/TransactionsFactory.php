@@ -31,24 +31,23 @@ class TransactionsFactory
      */
     protected function prepareListRequest(array $request)
     {
-        $defaultParams = [
+        $requestDefaults = [
             "onPage" => 10,
-            "page" => 0
+            "page" => 1,
+            "range" => 1,
         ];
 
-        $res = $this->model->getRequestFilters($request, $defaultParams, true);
+        $res = $this->model->getRequestFilters($request, $requestDefaults, true);
+        $request = array_merge($requestDefaults, $request);
 
         // Order request is available only from API
         if (
-            isset($request["order"]) &&
-            is_string($request["order"]) &&
-            strtolower($request["order"]) == "desc"
+            isset($request["order"])
+            && is_string($request["order"])
+            && strtolower($request["order"]) == "desc"
+            && is_array($res["params"])
         ) {
-            $res["desc"] = true;
-        }
-
-        if (isset($request["onPage"]) && is_numeric($request["onPage"])) {
-            $res["onPage"] = intval($request["onPage"]);
+            $res["params"]["desc"] = true;
         }
 
         return $res;
@@ -74,28 +73,14 @@ class TransactionsFactory
         $res = new \stdClass();
 
         $request = $this->prepareListRequest($data);
+        $params = $request["params"];
 
-        $res->items = $this->getListItems($request);
-        $res->filter = (object)$this->model->getFilterObject($request);
-        $res->order = (isset($request["desc"]) && $request["desc"] === true)
+        $res->items = $this->getListItems($params);
+        $res->filter = $request["filter"];
+        $res->pagination = $request["pagination"];
+        $res->order = (isset($params["desc"]) && $params["desc"] === true)
             ? "desc"
             : "asc";
-
-        $transCount = $this->model->getTransCount($request);
-        $pagesCount = ($request["onPage"] > 0)
-            ? ceil($transCount / $request["onPage"])
-            : 1;
-
-        $currentPage = (isset($request["page"]) ? intval($request["page"]) : 0) + 1;
-        $res->pagination = [
-            "total" => $transCount,
-            "onPage" => $request["onPage"],
-            "pagesCount" => $pagesCount,
-            "page" => $currentPage
-        ];
-        if (isset($request["range"])) {
-            $res->pagination["range"] = intval($request["range"]);
-        }
 
         return $res;
     }

@@ -1630,7 +1630,10 @@ class TransactionModel extends SortableModel
      */
     public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
     {
-        $res = $defaults;
+        $request = array_merge($defaults, $request);
+
+        $filter = [];
+        $pagination = [];
 
         // Type filter
         $typeFilter = [];
@@ -1649,7 +1652,7 @@ class TransactionModel extends SortableModel
                 }
             }
             if (count($typeFilter) > 0) {
-                $res["type"] = $typeFilter;
+                $filter["type"] = $typeFilter;
             }
         }
 
@@ -1665,7 +1668,7 @@ class TransactionModel extends SortableModel
                 }
             }
             if (count($accFilter) > 0) {
-                $res["accounts"] = $accFilter;
+                $filter["accounts"] = $accFilter;
             }
         }
 
@@ -1682,7 +1685,7 @@ class TransactionModel extends SortableModel
                 }
             }
             if (count($personFilter) > 0) {
-                $res["persons"] = $personFilter;
+                $filter["persons"] = $personFilter;
             }
         }
 
@@ -1699,28 +1702,28 @@ class TransactionModel extends SortableModel
                 }
             }
             if (count($categoryFilter) > 0) {
-                $res["categories"] = $categoryFilter;
+                $filter["categories"] = $categoryFilter;
             }
         }
 
         // Search query
         if (isset($request["search"]) && !is_null($request["search"])) {
-            $res["search"] = $request["search"];
+            $filter["search"] = $request["search"];
         }
 
         // Date range filter
         if (isset($request["startDate"]) && !is_null($request["startDate"])) {
-            $res["startDate"] = intval($request["startDate"]);
+            $filter["startDate"] = intval($request["startDate"]);
         }
         if (isset($request["endDate"]) && !is_null($request["endDate"])) {
-            $res["endDate"] = intval($request["endDate"]);
+            $filter["endDate"] = intval($request["endDate"]);
         }
 
         // Page
         if (isset($request["page"])) {
             $page = intval($request["page"]);
             if ($page > 1) {
-                $res["page"] = $page - 1;
+                $pagination["page"] = $page;
             }
         }
 
@@ -1731,7 +1734,7 @@ class TransactionModel extends SortableModel
                 throw new \Error("Invalid page limit");
             }
             if ($onPage > 0) {
-                $res["onPage"] = $onPage;
+                $pagination["onPage"] = $onPage;
             }
         }
 
@@ -1739,74 +1742,31 @@ class TransactionModel extends SortableModel
         if (isset($request["range"])) {
             $range = intval($request["range"]);
             if ($range > 0) {
-                $res["range"] = $range;
+                $pagination["range"] = $range;
             }
         }
 
-        return $res;
-    }
+        $params = array_merge($filter, $pagination);
 
-    /**
-     * Converts filter parameters to filter object
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public function getFilterObject(array $params)
-    {
-        $res = [];
+        $itemsCount = $this->getTransCount($params);
+        $pagination["total"] = $itemsCount;
 
-        // Type
-        if (
-            isset($params["type"]) &&
-            is_array($params["type"]) &&
-            count($params["type"]) > 0
-        ) {
-            $res["type"] = $params["type"];
-        }
+        // Pagination
+        $pagesCount = (isset($pagination["onPage"]) && $pagination["onPage"] > 0)
+            ? ceil($itemsCount / $pagination["onPage"])
+            : 1;
 
-        // Accounts
-        if (
-            isset($params["accounts"]) &&
-            is_array($params["accounts"]) &&
-            count($params["accounts"]) > 0
-        ) {
-            $res["accounts"] = $params["accounts"];
-        }
+        $pagination["pagesCount"] = $pagesCount;
+        $page = $pagination["page"] ?? 1;
+        $pagination["page"] = min($pagesCount, $page);
 
-        // Persons
-        if (
-            isset($params["persons"]) &&
-            is_array($params["persons"]) &&
-            count($params["persons"]) > 0
-        ) {
-            $res["persons"] = $params["persons"];
-        }
+        $params["page"] = $pagination["page"] - 1;
 
-        // Categories
-        if (
-            isset($params["categories"]) &&
-            is_array($params["categories"]) &&
-            count($params["categories"]) > 0
-        ) {
-            $res["categories"] = $params["categories"];
-        }
-
-        // Date range
-        if (isset($params["startDate"])) {
-            $res["startDate"] = $params["startDate"];
-        }
-        if (isset($params["endDate"])) {
-            $res["endDate"] = $params["endDate"];
-        }
-
-        // Search query
-        if (isset($params["search"])) {
-            $res["search"] = $params["search"];
-        }
-
-        return $res;
+        return [
+            "filter" => $filter,
+            "pagination" => $pagination,
+            "params" => $params,
+        ];
     }
 
     /**
