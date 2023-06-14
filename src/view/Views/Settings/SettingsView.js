@@ -22,7 +22,7 @@ import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { DateFormatSelect } from '../../Components/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
+import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 
@@ -80,7 +80,6 @@ class SettingsView extends View {
     onStart() {
         this.loadElementsByIds([
             'mainContainer',
-            'themeSwitch',
             'userCurrenciesHeading',
             'userCurrenciesContainer',
             'dateFormatContainer',
@@ -95,11 +94,12 @@ class SettingsView extends View {
         this.localeField = LocaleSelectField.create({
             className: 'form-row',
         });
+        // Theme switch field
+        this.themeField = ThemeSwitchField.create({
+            className: 'form-row',
+        });
 
-        this.mainContainer.prepend(this.localeField.elem);
-
-        // Theme swtich
-        this.themeSwitch = ThemeSwitch.fromElement(this.themeSwitch);
+        this.mainContainer.append(this.localeField.elem, this.themeField.elem);
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {

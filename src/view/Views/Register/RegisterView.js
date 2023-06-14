@@ -4,9 +4,8 @@ import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { View } from '../../utils/View.js';
-import { Field } from '../../Components/Field/Field.js';
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
+import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
 import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
@@ -44,14 +43,7 @@ class RegisterView extends View {
         ]);
 
         this.localeField = LocaleSelectField.create();
-
-        this.themeSwitch = ThemeSwitch.create();
-        this.themeField = Field.create({
-            className: 'horizontal-field',
-            title: __('DARK_THEME'),
-            content: this.themeSwitch.elem,
-        });
-
+        this.themeField = ThemeSwitchField.create();
         this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });

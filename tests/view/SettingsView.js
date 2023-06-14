@@ -42,7 +42,7 @@ export class SettingsView extends AppView {
     async parseContent() {
         const res = {
             tabs: await TabList.create(this, await query('.tab-list')),
-            localeSelect: await DropDown.createFromChild(this, await query('#localeSelect')),
+            localeSelect: await DropDown.createFromChild(this, await query('#mainContainer .dd__container')),
             createBtn: { elem: await query('#createBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },

@@ -15,15 +15,7 @@
                             <header id="mainHeading" class="heading">
                                 <h2><?= __("SETTINGS_MAIN") ?></h2>
                             </header>
-                            <div id="mainContainer">
-                                <div id="themeSwitchField" class="field form-row horizontal-field">
-                                    <span class="field__title"><?= __("DARK_THEME") ?></span>
-                                    <label id="themeSwitch" class="switch">
-                                        <input type="checkbox" <?= checked($this->userTheme == DARK_THEME) ?>>
-                                        <div class="switch-slider"></div>
-                                    </label>
-                                </div>
-                            </div>
+                            <div id="mainContainer"></div>
                         </section>
 
                         <section id="userCurrenciesTab" class="settings-block">
