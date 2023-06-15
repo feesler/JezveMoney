@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
@@ -171,5 +171,4 @@ class RegisterView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(RegisterView);
+App.createView(RegisterView);

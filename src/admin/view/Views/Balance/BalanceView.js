@@ -1,7 +1,7 @@
 import 'jezvejs/style';
 import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { Application } from '../../../../view/Application/Application.js';
+import { App } from '../../../../view/Application/App.js';
 import '../../../../view/Application/Application.scss';
 import { AdminView } from '../../utils/AdminView/AdminView.js';
 import '../../utils/AdminView/AdminView.scss';
@@ -69,7 +69,7 @@ class AdminBalanceView extends AdminView {
      * Build new location address from current filter
      */
     buildAddress(state) {
-        const res = new URL('admin/balance/', window.app.baseURL);
+        const res = new URL('admin/balance/', App.baseURL);
         const { filter } = state;
 
         Object.keys(filter).forEach((prop) => {
@@ -90,5 +90,4 @@ class AdminBalanceView extends AdminView {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AdminBalanceView);
+App.createView(AdminBalanceView);

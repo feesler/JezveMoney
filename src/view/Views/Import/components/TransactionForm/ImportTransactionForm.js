@@ -7,13 +7,14 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
-import 'jezvejs/style/Input';
 import { Popup } from 'jezvejs/Popup';
+
 import {
     __,
     dateStringToTime,
     parseDate,
 } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { transTypeMap, typeNames, ImportTransaction } from '../../../../Models/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 import { AmountInputField } from '../../../../Components/AmountInputField/AmountInputField.js';
@@ -88,7 +89,7 @@ export class ImportTransactionForm extends Component {
     }
 
     init() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         this.createTypeField();
         this.createAccountField();
@@ -171,7 +172,7 @@ export class ImportTransactionForm extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTransferAccountChanged(account),
         });
-        window.app.initAccountsList(this.transferAccDropDown);
+        App.initAccountsList(this.transferAccDropDown);
 
         this.transferAccountField = Field.create({
             title: __('TR_DEST_ACCOUNT'),
@@ -188,7 +189,7 @@ export class ImportTransactionForm extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: (person) => this.onPersonChanged(person),
         });
-        window.app.initPersonsList(this.personDropDown);
+        App.initPersonsList(this.personDropDown);
 
         this.personField = Field.create({
             title: __('TR_PERSON'),
@@ -232,7 +233,7 @@ export class ImportTransactionForm extends Component {
             className: DATE_FIELD_CLASS,
             name: 'date[]',
             placeholder: __('TR_DATE'),
-            locales: window.app.dateFormatLocale,
+            locales: App.dateFormatLocale,
             validate: true,
             onInput: (e) => this.onDateInput(e),
             onDateSelect: (e) => this.onDateSelect(e),
@@ -388,7 +389,7 @@ export class ImportTransactionForm extends Component {
 
     /** DatePicker select event handler */
     onDateSelect(date) {
-        const dateFmt = window.app.formatInputDate(date);
+        const dateFmt = App.formatInputDate(date);
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -440,7 +441,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = window.app.isValidDateString(transaction.date, validateDateOptions);
+        const date = App.isValidDateString(transaction.date, validateDateOptions);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {
@@ -462,7 +463,7 @@ export class ImportTransactionForm extends Component {
         const { transaction } = this.state;
         return new ImportTransaction({
             ...transaction,
-            date: window.app.formatDate(parseDate(transaction.date)),
+            date: App.formatDate(parseDate(transaction.date)),
         });
     }
 
@@ -524,8 +525,8 @@ export class ImportTransactionForm extends Component {
     }
 
     renderTypeSelect(state, prevState) {
-        const transferDisabled = window.app.model.accounts.length < 2;
-        const debtDisabled = !window.app.model.persons.length;
+        const transferDisabled = App.model.accounts.length < 2;
+        const debtDisabled = !App.model.persons.length;
         const { mainAccount } = state.transaction;
 
         if (mainAccount.id !== prevState?.transaction?.mainAccount?.id) {

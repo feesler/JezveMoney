@@ -1,4 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
+import { App } from '../../Application/App.js';
 
 // Reducers
 const slice = createSlice({
@@ -20,7 +21,7 @@ const slice = createSlice({
             return state;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const parent = categories.getItem(value);
         const parentId = parseInt(value, 10);
         if (parentId !== 0 && !parent) {

@@ -9,7 +9,9 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
+
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { API } from '../../../../../API/index.js';
 import { ImportTemplateError } from '../../../../../Models/Error/ImportTemplateError.js';
 import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../../../Models/ImportTemplate.js';
@@ -50,7 +52,7 @@ export class ImportTemplateManager extends Component {
         this.state = {
             visible: false,
             mainAccount: this.props.mainAccount,
-            templates: window.app.model.templates.data,
+            templates: App.model.templates.data,
             listLoading: false,
             formRequest: null,
             template: null,
@@ -115,7 +117,7 @@ export class ImportTemplateManager extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onAccountChange(account),
         });
-        window.app.initAccountsList(this.accountDropDown);
+        App.initAccountsList(this.accountDropDown);
         this.accountDropDown.setSelection(this.state.mainAccount.id);
 
         setEvents(this.submitUploadedBtn, { click: () => this.onSubmit() });
@@ -193,7 +195,7 @@ export class ImportTemplateManager extends Component {
             filename,
         });
 
-        if (window.app.model.templates.length === 0) {
+        if (App.model.templates.length === 0) {
             this.setCreateTemplateState();
             return;
         }
@@ -235,7 +237,7 @@ export class ImportTemplateManager extends Component {
         if (this.state.mainAccount.id === id) {
             return;
         }
-        const mainAccount = window.app.model.accounts.getItem(id);
+        const mainAccount = App.model.accounts.getItem(id);
         if (!mainAccount) {
             throw new Error('Account not found');
         }
@@ -273,7 +275,7 @@ export class ImportTemplateManager extends Component {
      * @param {number} value - import template id
      */
     setTemplate(value) {
-        const template = window.app.model.templates.getItem(value) ?? null;
+        const template = App.model.templates.getItem(value) ?? null;
 
         if (template?.account_id) {
             this.changeMainAccount(template.account_id);
@@ -390,14 +392,14 @@ export class ImportTemplateManager extends Component {
     }
 
     setListData(templatesData, rulesData) {
-        const { templates } = window.app.model;
+        const { templates } = App.model;
         templates.setData(templatesData);
         this.setState({
             ...this.state,
             templates: templates.data,
         });
 
-        if (window.app.model.templates.length > 0) {
+        if (App.model.templates.length > 0) {
             // Find template with same name as currently selected
             let template = null;
             if (this.state.formRequest) {
@@ -419,7 +421,7 @@ export class ImportTemplateManager extends Component {
         }
 
         if (rulesData) {
-            window.app.model.rules.setData(rulesData);
+            App.model.rules.setData(rulesData);
         }
 
         this.stopListLoading();
@@ -442,7 +444,7 @@ export class ImportTemplateManager extends Component {
             const { templates, rules } = this.getListDataFromResponse(response);
             this.setListData(templates, rules);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -456,7 +458,7 @@ export class ImportTemplateManager extends Component {
             const { templates, rules } = this.getListDataFromResponse(response);
             this.setListData(templates, rules);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.stopListLoading();
         }
     }
@@ -544,13 +546,13 @@ export class ImportTemplateManager extends Component {
         }
         // Account currency
         value = template.getProperty('accountCurrency', data, true);
-        let currency = window.app.model.currency.findByCode(value);
+        let currency = App.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'accountCurrency' };
         }
         // Transaction currency
         value = template.getProperty('transactionCurrency', data, true);
-        currency = window.app.model.currency.findByCode(value);
+        currency = App.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'transactionCurrency' };
         }
@@ -570,7 +572,7 @@ export class ImportTemplateManager extends Component {
 
     /** Find valid template for data */
     findValidTemplate(rawData) {
-        return window.app.model.templates.find((template) => {
+        return App.model.templates.find((template) => {
             const { valid } = this.validateTemplate(template, rawData);
             return valid;
         });
@@ -585,7 +587,7 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
-        const template = window.app.model.templates.getItem(state.selectedTemplateId);
+        const template = App.model.templates.getItem(state.selectedTemplateId);
         this.templateSelect.setState((tplState) => ({
             ...tplState,
             template,
@@ -595,7 +597,7 @@ export class ImportTemplateManager extends Component {
 
     /** Render component */
     render(state, prevState = {}) {
-        const templateAvail = (window.app.model.templates.length > 0);
+        const templateAvail = (App.model.templates.length > 0);
         const isLoadingState = (state.id === LOADING_STATE);
         const isSelectState = (state.id === TPL_SELECT_STATE);
         const isFormState = (state.id === TPL_CREATE_STATE || state.id === TPL_UPDATE_STATE);

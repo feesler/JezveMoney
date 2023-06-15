@@ -7,6 +7,7 @@ import {
 import { Button } from 'jezvejs/Button';
 
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /* CSS classes */
 const MENU_CLASS = 'nav-list';
@@ -53,7 +54,7 @@ export class NavigationMenu extends Component {
     }
 
     renderMenuItem(item) {
-        if (!item.loggedOut && !window.app.isUserLoggedIn()) {
+        if (!item.loggedOut && !App.isUserLoggedIn()) {
             return null;
         }
 
@@ -61,7 +62,7 @@ export class NavigationMenu extends Component {
             return this.renderSeparator();
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
 
         const linkElem = createElement('a', {
             props: {

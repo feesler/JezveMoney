@@ -4,6 +4,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { App } from '../../../../../../view/Application/App.js';
 import './ApiRequest.scss';
 
 /** CSS classes */
@@ -67,7 +68,7 @@ export class ApiRequest extends Component {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const method = (request.options?.method) ? request.options.method : 'GET';
         const body = request.options?.body;
 

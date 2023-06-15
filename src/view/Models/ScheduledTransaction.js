@@ -7,6 +7,7 @@ import {
     shiftDate,
 } from 'jezvejs';
 import { __ } from '../utils/utils.js';
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 const availFields = [
@@ -92,13 +93,13 @@ export class ScheduledTransaction extends ListItem {
         }
 
         const firstDay = getFirstDayOfWeek(new Date(), {
-            locales: window.app.locale,
+            locales: App.locale,
             options: { firstDay: DEFAULT_FIRST_DAY_OF_WEEK },
         });
         const weekdaysFmt = intervalOffsets.map((item) => (
             firstUpperCase(
-                getWeekdayShort(shiftDate(firstDay, item), window.app.locale).substring(0, 3),
-                window.app.locale,
+                getWeekdayShort(shiftDate(firstDay, item), App.locale).substring(0, 3),
+                App.locale,
             )
         ));
 
@@ -114,8 +115,8 @@ export class ScheduledTransaction extends ListItem {
         date.setMonth(Math.floor(offset / 100));
         date.setDate((offset % 100) + 1);
 
-        return window.app.formatDate(date, {
-            locales: window.app.locale,
+        return App.formatDate(date, {
+            locales: App.locale,
             options: { month: 'long', day: 'numeric' },
         });
     }

@@ -1,4 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
+import { App } from '../../Application/App.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 
@@ -114,13 +115,13 @@ const slice = createSlice({
         transactions: data.transactions.items,
         accounts: {
             ...state.accounts,
-            visible: AccountList.create(window.app.model.visibleUserAccounts),
-            hidden: AccountList.create(window.app.model.hiddenUserAccounts),
+            visible: AccountList.create(App.model.visibleUserAccounts),
+            hidden: AccountList.create(App.model.hiddenUserAccounts),
         },
         persons: {
             ...state.persons,
-            visible: PersonList.create(window.app.model.visiblePersons),
-            hidden: PersonList.create(window.app.model.hiddenPersons),
+            visible: PersonList.create(App.model.visiblePersons),
+            hidden: PersonList.create(App.model.hiddenPersons),
         },
         chartData: data.histogram,
         transactionContextItem: null,

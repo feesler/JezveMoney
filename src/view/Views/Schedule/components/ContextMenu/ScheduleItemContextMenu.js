@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 /** Scheduled transactions list context menu component */
 export class ScheduleItemContextMenu extends PopupMenu {
@@ -33,7 +34,7 @@ export class ScheduleItemContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.schedule.getItem(state.contextItem);
+        return App.model.schedule.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {
@@ -61,7 +62,7 @@ export class ScheduleItemContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}schedule/${scheduleItem.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}schedule/update/${scheduleItem.id}`);

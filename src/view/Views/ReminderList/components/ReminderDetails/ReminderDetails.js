@@ -1,4 +1,5 @@
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 import { Transaction } from '../../../../Models/Transaction.js';
 import { Reminder } from '../../../../Models/Reminder.js';
@@ -82,7 +83,7 @@ export class ReminderDetails extends ItemDetails {
     }
 
     getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = window.app.model;
+        const { profile, accounts, persons } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             return null;
@@ -101,7 +102,7 @@ export class ReminderDetails extends ItemDetails {
             return __('NO_CATEGORY');
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(item.category_id);
         if (!category) {
             throw new Error('Invalid category');
@@ -120,7 +121,7 @@ export class ReminderDetails extends ItemDetails {
             throw new Error('Invalid state');
         }
 
-        const { currency } = window.app.model;
+        const { currency } = App.model;
         const showSource = item.src_id !== 0;
         const showDest = item.dest_id !== 0;
         const isDiff = item.src_curr !== item.dest_curr;

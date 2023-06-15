@@ -1,5 +1,8 @@
 import { DropDown } from 'jezvejs/DropDown';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+
 import { IconListItem } from './IconListItem.js';
 import './IconSelect.scss';
 
@@ -21,7 +24,7 @@ export class IconSelect extends DropDown {
     }
 
     initIcons() {
-        const { icons } = window.app.model;
+        const { icons } = App.model;
 
         this.addItem({ id: 0, title: __('icons.noIcon') });
         const items = icons.map((icon) => ({

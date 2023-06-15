@@ -2,7 +2,9 @@ import { enable, Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { ImportTransaction, typeNames } from '../../../../Models/ImportTransaction.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
@@ -59,7 +61,7 @@ export class ImportTransactionItem extends Component {
     }
 
     init() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         const fields = [
             [__('TR_TYPE'), TYPE_FIELD_CLASS],
@@ -126,7 +128,7 @@ export class ImportTransactionItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -197,7 +199,7 @@ export class ImportTransactionItem extends Component {
 
         const { transaction } = state;
         const isDiff = transaction.isDiff();
-        const { userAccounts, persons, currency } = window.app.model;
+        const { userAccounts, persons, currency } = App.model;
         const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
         const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
 
@@ -262,7 +264,7 @@ export class ImportTransactionItem extends Component {
         if (transaction.categoryId === 0) {
             this.categoryField.setContent('');
         } else {
-            const { categories } = window.app.model;
+            const { categories } = App.model;
             const category = categories.getItem(transaction.categoryId);
             if (!category) {
                 throw new Error('invalid category');

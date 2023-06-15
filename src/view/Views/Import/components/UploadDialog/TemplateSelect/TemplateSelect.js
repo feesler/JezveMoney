@@ -6,7 +6,9 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { TemplateSelectContextMenu } from '../TemplateContextMenu/TemplateSelectContextMenu.js';
 import './TemplateSelect.scss';
@@ -59,15 +61,15 @@ export class TemplateSelect extends Component {
         });
         this.toggleExtBtn = ToggleButton.create();
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
+        this.controls = App.createContainer(CONTROLS_CLASS, [
             this.menuButton.elem,
             this.toggleExtBtn.elem,
         ]);
-        this.contentElem = window.app.createContainer(CONTENT_CLASS, [
+        this.contentElem = App.createContainer(CONTENT_CLASS, [
             this.titleElem,
             this.controls,
         ]);
-        this.elem = window.app.createContainer(SELECT_CLASS, [
+        this.elem = App.createContainer(SELECT_CLASS, [
             this.contentElem,
         ]);
 

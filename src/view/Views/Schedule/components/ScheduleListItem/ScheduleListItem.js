@@ -6,7 +6,9 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import {
     EXPENSE,
     INCOME,
@@ -259,7 +261,7 @@ export class ScheduleListItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -292,13 +294,13 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid item type');
         }
 
-        const { profile, accounts } = window.app.model;
+        const { profile, accounts } = App.model;
         const srcAcc = accounts.getItem(item.src_id);
         return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
     }
 
     getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = window.app.model;
+        const { profile, accounts, persons } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             return null;
@@ -316,7 +318,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const accountModel = window.app.model.accounts;
+        const accountModel = App.model.accounts;
         const srcAcc = accountModel.getItem(item.src_id);
         const destAcc = accountModel.getItem(item.dest_id);
 
@@ -340,7 +342,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid type of transaction');
         }
 
-        const personModel = window.app.model.persons;
+        const personModel = App.model.persons;
         const debtType = this.getDebtType(item);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
@@ -363,7 +365,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const srcAmountFmt = currencyModel.formatCurrency(item.src_amount, item.src_curr);
         const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
         const diffCurrency = item.src_curr !== item.dest_curr;
@@ -399,7 +401,7 @@ export class ScheduleListItem extends Component {
             return null;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(item.category_id);
         if (!category) {
             throw new Error('Invalid category');
@@ -429,12 +431,12 @@ export class ScheduleListItem extends Component {
     }
 
     renderDateRange(item) {
-        const start = __('SCHEDULE_ITEM_START', window.app.formatDate(item.start_date));
+        const start = __('SCHEDULE_ITEM_START', App.formatDate(item.start_date));
         if (!item.end_date) {
             return start;
         }
 
-        const end = __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date));
+        const end = __('SCHEDULE_ITEM_END', App.formatDate(item.end_date));
         return `${start} ${end}`;
     }
 
@@ -461,17 +463,17 @@ export class ScheduleListItem extends Component {
 
     renderEndDate(item) {
         return (item.end_date)
-            ? __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date))
+            ? __('SCHEDULE_ITEM_END', App.formatDate(item.end_date))
             : __('SCHED_TR_NO_END_DATE');
     }
 
     renderDetails(state) {
         const { item } = state;
-        const { currency } = window.app.model;
+        const { currency } = App.model;
 
         // Schedule
         // Start date
-        this.startDateField.setContent(window.app.formatDate(item.start_date));
+        this.startDateField.setContent(App.formatDate(item.start_date));
 
         // End date
         this.endDateField.setContent(this.renderEndDate(item));

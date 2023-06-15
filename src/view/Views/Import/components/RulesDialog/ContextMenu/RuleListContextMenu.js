@@ -1,6 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 
 /* CSS classes */
 const UPDATE_BUTTON_CLASS = 'update-btn';
@@ -32,7 +33,7 @@ export class RuleListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.rules.getItem(state.contextItem);
+        return App.model.rules.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {

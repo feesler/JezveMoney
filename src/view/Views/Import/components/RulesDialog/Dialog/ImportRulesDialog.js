@@ -31,6 +31,7 @@ import {
     getAbsoluteIndex,
 } from './reducer.js';
 import './ImportRulesDialog.scss';
+import { App } from '../../../../../Application/App.js';
 
 /** CSS classes */
 const DIALOG_CLASS = 'rules-dialog';
@@ -283,7 +284,7 @@ export class ImportRulesDialog extends Component {
     }
 
     setListData(data) {
-        window.app.model.rules.setData(data);
+        App.model.rules.setData(data);
         this.store.dispatch(actions.listRequestLoaded());
 
         if (isFunction(this.props.onUpdate)) {
@@ -308,7 +309,7 @@ export class ImportRulesDialog extends Component {
             const rules = this.getListDataFromResponse(response);
             this.setListData(rules);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -329,7 +330,7 @@ export class ImportRulesDialog extends Component {
             const rules = this.getListDataFromResponse(response);
             this.setListData(rules);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -343,7 +344,7 @@ export class ImportRulesDialog extends Component {
             const result = await API.importRule.list({ extended: true });
             this.setListData(result.data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();

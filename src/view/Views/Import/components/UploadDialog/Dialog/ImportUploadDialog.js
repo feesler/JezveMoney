@@ -8,7 +8,9 @@ import {
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
+
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import {
     ImportTemplateManager,
@@ -198,7 +200,7 @@ export class ImportUploadDialog extends Component {
 
     /** Initial account select 'change' event handler */
     onAccountChange(selectedAccount) {
-        const account = window.app.model.accounts.getItem(selectedAccount);
+        const account = App.model.accounts.getItem(selectedAccount);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -222,7 +224,7 @@ export class ImportUploadDialog extends Component {
         try {
             this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.state.importedItems = null;
         }
 
@@ -242,7 +244,7 @@ export class ImportUploadDialog extends Component {
     /** Upload error handler */
     onUploadError(message) {
         this.setLoading(false);
-        window.app.createErrorNotification(message);
+        App.createErrorNotification(message);
     }
 
     /**

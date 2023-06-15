@@ -1,5 +1,6 @@
 import { createElement, getClassName, Component } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import './OriginalImportData.scss';
 
 /** CSS classes */
@@ -51,9 +52,9 @@ export class OriginalImportData extends Component {
     }
 
     render() {
-        const template = window.app.model.templates.getItem(this.props.template);
+        const template = App.model.templates.getItem(this.props.template);
         const templateName = (template) ? template.name : '';
-        const dateString = window.app.formatDate(
+        const dateString = App.formatDate(
             new Date(this.props.date),
             { locales: template?.date_locale },
         );
@@ -79,7 +80,7 @@ export class OriginalImportData extends Component {
             ],
         ];
 
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         this.elem = createContainer(CONTAINER_CLASS, [
             createElement('header', { props: { textContent: __('IMPORT_ORIG_DATA') } }),

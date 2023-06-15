@@ -1,7 +1,9 @@
 import { createElement } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { Category } from '../../../../Models/Category.js';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
+import { Category } from '../../../../Models/Category.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
@@ -73,7 +75,7 @@ export class CategoryDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by category */
     getTransactionsListURL(item) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const res = new URL(`${baseURL}transactions/`);
         res.searchParams.set('category_id', item.id);
         return res;
@@ -85,7 +87,7 @@ export class CategoryDetails extends ItemDetails {
     }
 
     renderSubcategories(item) {
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const subcategories = categories.findByParent(item.id);
 
         this.subcategoriesField.setContent(subcategories.length.toString());
@@ -118,7 +120,7 @@ export class CategoryDetails extends ItemDetails {
         this.heading.setTitle(item.name);
 
         // Parent category
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const parent = categories.getItem(item.parent_id);
         const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT');
         this.parentField.setContent(parentTitle);

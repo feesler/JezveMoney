@@ -1,3 +1,4 @@
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 const availFields = [
@@ -52,7 +53,7 @@ export class Reminder extends ListItem {
     static createExtended(props) {
         const reminder = this.create(props);
 
-        const scheduleItem = window.app.model.schedule.getItem(props.schedule_id);
+        const scheduleItem = App.model.schedule.getItem(props.schedule_id);
         if (!scheduleItem) {
             throw new Error('Scheduled transaction not found');
         }

@@ -2,6 +2,7 @@ import { show } from 'jezvejs';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /** Transactions list context menu component */
 export class TransactionListContextMenu extends PopupMenu {
@@ -62,7 +63,7 @@ export class TransactionListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
 
         items.ctxDetailsBtn.show(state.showDetailsItem);

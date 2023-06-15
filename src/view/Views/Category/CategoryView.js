@@ -12,7 +12,7 @@ import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { Category } from '../../Models/Category.js';
@@ -45,8 +45,8 @@ class CategoryView extends View {
             initialState.data = { ...initialState.original };
         }
 
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
     }
@@ -175,7 +175,7 @@ class CategoryView extends View {
             this.store.dispatch(actions.invalidateNameField(__('CATEGORY_INVALID_NAME')));
             this.nameField.focus();
         } else {
-            const category = window.app.model.categories.findByName(name);
+            const category = App.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
                 this.store.dispatch(actions.invalidateNameField(__('CATEGORY_EXISTING_NAME')));
                 this.nameField.focus();
@@ -222,10 +222,10 @@ class CategoryView extends View {
                 await API.category.create(data);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -240,10 +240,10 @@ class CategoryView extends View {
         try {
             await API.category.del({ id: original.id, removeChild });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -283,7 +283,7 @@ class CategoryView extends View {
         }));
 
         // Parent category field
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const isUpdate = state.original.id;
         const minItems = (isUpdate) ? 1 : 0;
 
@@ -304,5 +304,4 @@ class CategoryView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(CategoryView);
+App.createView(CategoryView);

@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { getExportURL } from '../../helpers.js';
 
 /** Persons list context menu component */
@@ -47,7 +48,7 @@ export class PersonListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.persons.getItem(state.contextItem);
+        return App.model.persons.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {
@@ -75,7 +76,7 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}persons/${person.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);

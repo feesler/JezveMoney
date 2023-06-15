@@ -10,7 +10,9 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Switch } from 'jezvejs/Switch';
+
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTemplate.js';
 import { DateFormatSelect } from '../../../../../Components/DateFormatSelect/DateFormatSelect.js';
 import { InputField } from '../../../../../Components/InputField/InputField.js';
@@ -49,7 +51,7 @@ export class ImportTemplateForm extends Component {
 
         this.state = {
             ...this.props,
-            templates: window.app.model.templates.data,
+            templates: App.model.templates.data,
             template: null,
             selectedColumn: null,
             validation: {
@@ -129,7 +131,7 @@ export class ImportTemplateForm extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: (account) => this.onTemplateAccountChange(account),
         });
-        window.app.initAccountsList(this.tplAccountDropDown);
+        App.initAccountsList(this.tplAccountDropDown);
         this.tplAccountField.append(this.tplAccountDropDown.elem);
 
         setEvents(this.firstRowInp, { input: () => this.onFirstRowInput() });
@@ -182,7 +184,7 @@ export class ImportTemplateForm extends Component {
         if (this.state.mainAccount.id === id) {
             return;
         }
-        const mainAccount = window.app.model.accounts.getItem(id);
+        const mainAccount = App.model.accounts.getItem(id);
         if (!mainAccount) {
             throw new Error('Account not found');
         }
@@ -202,7 +204,7 @@ export class ImportTemplateForm extends Component {
      * @param {number} value - import template id
      */
     setTemplate(value) {
-        const template = window.app.model.templates.getItem(value) ?? null;
+        const template = App.model.templates.getItem(value) ?? null;
         if (this.state.template?.id === template?.id) {
             return;
         }
@@ -289,7 +291,7 @@ export class ImportTemplateForm extends Component {
     /** Template default account 'change' event handler */
     onTemplateAccountToggle() {
         const { template } = this.state;
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
 
         let id = 0;
         if (!template.account_id) {
@@ -493,13 +495,13 @@ export class ImportTemplateForm extends Component {
         }
         // Account currency
         value = template.getProperty('accountCurrency', data, true);
-        let currency = window.app.model.currency.findByCode(value);
+        let currency = App.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'accountCurrency' };
         }
         // Transaction currency
         value = template.getProperty('transactionCurrency', data, true);
-        currency = window.app.model.currency.findByCode(value);
+        currency = App.model.currency.findByCode(value);
         if (!currency) {
             return { valid: false, column: 'transactionCurrency' };
         }
@@ -521,7 +523,7 @@ export class ImportTemplateForm extends Component {
     render(state) {
         const { validation } = state;
 
-        const templateAvail = (window.app.model.templates.length > 0);
+        const templateAvail = (App.model.templates.length > 0);
         show(this.cancelTplBtn, templateAvail);
 
         this.columnDropDown.enable(!state.listLoading);
@@ -561,7 +563,7 @@ export class ImportTemplateForm extends Component {
 
         this.firstRowInp.value = state.template.first_row;
         enable(this.decFirstRowBtn, state.template.first_row > 1);
-        window.app.setValidation(this.firstRowField, validation.firstRow);
+        App.setValidation(this.firstRowField, validation.firstRow);
 
         const useTplAccount = state.template.account_id !== 0;
         this.tplAccountSwitch.check(useTplAccount);

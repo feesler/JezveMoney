@@ -3,6 +3,8 @@ import {
     ge,
     onReady,
 } from 'jezvejs';
+
+import { App } from '../Application/App.js';
 import { Header } from '../Components/Header/Header.js';
 
 /**
@@ -19,18 +21,18 @@ export class View {
      * Document ready event handler
      */
     onReady() {
-        window.app.setupLocale();
-        window.app.setupTheme();
-        window.app.updateTimeZone();
+        App.setupLocale();
+        App.setupTheme();
+        App.updateTimeZone();
 
         const headerElem = document.querySelector('.header');
         this.header = (headerElem) ? Header.fromElement(headerElem) : null;
 
         this.onStart();
 
-        const { message } = window.app;
+        const { message } = App;
         if (message) {
-            window.app.createNotification(message.title, message.type);
+            App.createNotification(message.title, message.type);
         }
     }
 

@@ -7,6 +7,7 @@ import {
     getCurrencyPrecision,
     __,
 } from '../utils/utils.js';
+import { App } from '../Application/App.js';
 import {
     EXPENSE,
     INCOME,
@@ -111,7 +112,7 @@ export class ImportTransaction {
             destAmount: (isExpense) ? Math.abs(trAmount) : Math.abs(accAmount),
             srcCurrId: (isExpense) ? data.accountCurrencyId : data.transactionCurrencyId,
             destCurrId: (isExpense) ? data.transactionCurrencyId : data.accountCurrencyId,
-            date: window.app.formatDate(new Date(data.date)),
+            date: App.formatDate(new Date(data.date)),
             categoryId: 0,
             comment: data.comment,
         };
@@ -132,7 +133,7 @@ export class ImportTransaction {
         const { mainAccount } = this;
 
         if (this.date === null) {
-            this.date = window.app.formatDate(new Date());
+            this.date = App.formatDate(new Date());
         }
 
         if (sourceTypes.includes(this.type)) {
@@ -163,7 +164,7 @@ export class ImportTransaction {
 
         if (this.type === 'debt_out' || this.type === 'debt_in') {
             if (!this.personId) {
-                const person = window.app.model.persons.getItemByIndex(0);
+                const person = App.model.persons.getItemByIndex(0);
                 if (!person) {
                     throw new Error('Person not found');
                 }
@@ -334,7 +335,7 @@ export class ImportTransaction {
     }
 
     getTransferAccount(initialId) {
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
 
         let res = userAccounts.getItem(initialId);
         if (!res) {
@@ -443,7 +444,7 @@ export class ImportTransaction {
             }
 
             if (!state.personId) {
-                const person = window.app.model.persons.getItemByIndex(0);
+                const person = App.model.persons.getItemByIndex(0);
                 if (!person) {
                     throw new Error('Person not found');
                 }
@@ -462,7 +463,7 @@ export class ImportTransaction {
 
         state.type = value;
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         if (state.categoryId !== 0) {
             const category = categories.getItem(state.categoryId);
             const realType = transTypeMap[state.type];
@@ -522,7 +523,7 @@ export class ImportTransaction {
 
     /** Set main account */
     setMainAccount(value) {
-        const account = window.app.model.accounts.getItem(value);
+        const account = App.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -569,7 +570,7 @@ export class ImportTransaction {
             }
         } else if (state.type === 'transfer_out' || state.type === 'transfer_in') {
             if (state.sourceAccountId === state.destAccountId) {
-                const { userAccounts } = window.app.model;
+                const { userAccounts } = App.model;
                 const nextAccount = userAccounts.getNextAccount(state.mainAccount.id);
                 if (state.type === 'transfer_out') {
                     state.destAccountId = nextAccount.id;
@@ -595,7 +596,7 @@ export class ImportTransaction {
 
     /** Set transfer account */
     setTransferAccount(value) {
-        const account = window.app.model.accounts.getItem(value);
+        const account = App.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -628,7 +629,7 @@ export class ImportTransaction {
 
     /** Set person */
     setPerson(value) {
-        const person = window.app.model.persons.getItem(value);
+        const person = App.model.persons.getItem(value);
         if (!person) {
             throw new Error('Person not found');
         }
@@ -706,7 +707,7 @@ export class ImportTransaction {
             return this;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(categoryId);
         if (categoryId !== 0 && !category) {
             throw new Error('Invalid category');
@@ -736,7 +737,7 @@ export class ImportTransaction {
 
     /** Return transaction object */
     getData() {
-        const { accounts, persons } = window.app.model;
+        const { accounts, persons } = App.model;
 
         if (!(this.type in transTypeMap)) {
             throw new Error('Invalid transaction type');
@@ -825,7 +826,7 @@ export class ImportTransaction {
         }
 
         if (valid) {
-            valid = window.app.isValidDateString(this.date);
+            valid = App.isValidDateString(this.date);
         }
 
         return valid;

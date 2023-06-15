@@ -1,12 +1,14 @@
 import {
     DAYS_IN_WEEK,
-    fixFloat,
     isDate,
     isObject,
     parseDateString,
     shiftDate,
     shiftMonth,
 } from 'jezvejs';
+
+import { correct, formatValue } from './decimal.js';
+import { App } from '../Application/App.js';
 
 export const MAX_DAYS_IN_MONTH = 31;
 export const MS_IN_SECOND = 1000;
@@ -16,11 +18,6 @@ export const SORT_BY_CREATEDATE_DESC = 2;
 export const SORT_BY_NAME_ASC = 3;
 export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
-
-/* Decimal values precision */
-export const DEFAULT_PRECISION = 2;
-export const EXCHANGE_PRECISION = 4;
-export const MAX_PRECISION = 8;
 
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
@@ -70,8 +67,8 @@ export const parseDate = (str, params = {}) => {
 
     const res = parseDateString(str, {
         ...params,
-        locales: params?.locales ?? window.app.dateFormatLocale,
-        options: params?.options ?? window.app.dateFormatOptions,
+        locales: params?.locales ?? App.dateFormatLocale,
+        options: params?.options ?? App.dateFormatOptions,
     });
 
     return isDate(res) ? res : null;
@@ -137,7 +134,7 @@ export const cutTime = (value) => (
 
 /** Returns formatted date string */
 export const formatDateInputValue = (value) => (
-    (value) ? window.app.formatInputDate(value) : null
+    (value) ? App.formatInputDate(value) : null
 );
 
 /** Returns formatted date range object */
@@ -172,65 +169,6 @@ export const getHalfYearRange = () => {
         endDate: cutDate(now),
     };
 };
-
-/** Convert string to amount value */
-export const amountFix = (value, thSep = ' ') => {
-    if (typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value)) {
-        return value;
-    }
-    if (typeof value !== 'string') {
-        return null;
-    }
-
-    // Trim leading and trailing spaces
-    let res = value.trim();
-    // Cut thousands separator
-    if (thSep.length > 0) {
-        const search = new RegExp(`(\\d)${thSep}(\\d)`, 'g');
-        res = res.replaceAll(search, '$1$2');
-    }
-
-    return parseFloat(fixFloat(res));
-};
-
-/**
- * Correct calculated value
- * @param {string|Number} val - value to correct
- * @param {Number} prec - precision
- */
-export const correct = (val, prec = DEFAULT_PRECISION) => (
-    parseFloat(parseFloat(val).toFixed(prec))
-);
-
-/**
- * Correct calculated exchange rate value
- * @param {string|Number} val - exchange rate value
- */
-export const correctExch = (val) => correct(val, EXCHANGE_PRECISION);
-
-/**
- * Normalize monetary value from string
- * @param {string|Number} val - value to normalize
- * @param {Number} prec - precision of result decimal
- */
-export const normalize = (val, prec = DEFAULT_PRECISION) => correct(fixFloat(val), prec);
-
-/**
- * Normalize exchange rate value from string
- * @param {string|Number} val - exchange rate value
- */
-export const normalizeExch = (val) => Math.abs(normalize(val, EXCHANGE_PRECISION));
-
-/**
- * Check value is valid
- * @param {string|Number} val - value to check
- */
-export const isValidValue = (val) => (
-    typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val)))
-);
-
-/** Format decimal value */
-export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 
 /** Formats token string with specified arguments */
 export const formatTokenString = (value, ...args) => (
@@ -313,7 +251,7 @@ export const formatPersonDebts = (person) => {
         return __('PERSON_NO_DEBTS');
     }
 
-    const { currency } = window.app.model;
+    const { currency } = App.model;
     return debtAccounts.map((account) => (
         currency.formatCurrency(account.balance, account.curr_id)
     ));
@@ -321,7 +259,7 @@ export const formatPersonDebts = (person) => {
 
 /** Returns precision of specified currency */
 export const getCurrencyPrecision = (id) => {
-    const currency = window.app.model.currency.getItem(id);
+    const currency = App.model.currency.getItem(id);
     if (!currency) {
         throw new Error(__('ERR_CURR_NOT_FOUND'));
     }

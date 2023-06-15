@@ -8,7 +8,10 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
-import { MAX_PRECISION, __ } from '../../../../../utils/utils.js';
+
+import { __ } from '../../../../../utils/utils.js';
+import { MAX_PRECISION } from '../../../../../utils/decimal.js';
+import { App } from '../../../../../Application/App.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -110,7 +113,7 @@ export class ImportActionForm extends Component {
             events: { input: () => this.onValueChange() },
         });
         // Form fields container
-        this.fieldsContainer = window.app.createContainer(FIELDS_CLASS, [
+        this.fieldsContainer = App.createContainer(FIELDS_CLASS, [
             this.actionDropDown.elem,
             this.trTypeDropDown.elem,
             this.accountDropDown.elem,
@@ -122,7 +125,7 @@ export class ImportActionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_BLOCK_CLASS], [
+        this.container = App.createContainer([CONTAINER_CLASS, VALIDATION_BLOCK_CLASS], [
             this.fieldsContainer,
             this.validFeedback,
         ]);
@@ -138,11 +141,11 @@ export class ImportActionForm extends Component {
             events: { click: () => this.onDelete() },
         });
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
+        this.controls = App.createContainer(CONTROLS_CLASS, [
             this.delBtn,
         ]);
 
-        this.elem = window.app.createContainer(FORM_CLASS, [
+        this.elem = App.createContainer(FORM_CLASS, [
             this.container,
             this.controls,
         ]);
@@ -200,7 +203,7 @@ export class ImportActionForm extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
-        window.app.initAccountsList(this.accountDropDown);
+        App.initAccountsList(this.accountDropDown);
     }
 
     /** Create person field */
@@ -211,7 +214,7 @@ export class ImportActionForm extends Component {
             noResultsMessage: __('NOT_FOUND'),
             onChange: () => this.onValueChange(),
         });
-        window.app.initPersonsList(this.personDropDown);
+        App.initPersonsList(this.personDropDown);
     }
 
     /** Create category field */
@@ -346,7 +349,7 @@ export class ImportActionForm extends Component {
             throw new Error('Invalid state');
         }
 
-        window.app.setValidation(this.container, state.isValid);
+        App.setValidation(this.container, state.isValid);
         this.validFeedback.textContent = (state.isValid) ? '' : state.message;
 
         const isSelectTarget = ImportAction.isSelectValue(state.actionType);

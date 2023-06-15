@@ -8,6 +8,7 @@ import {
     IMPORT_COND_FIELD_TPL,
 } from '../../../../../Models/ImportCondition.js';
 import './ImportConditionItem.scss';
+import { App } from '../../../../../Application/App.js';
 
 /**
  * ImportConditionItem component
@@ -34,7 +35,7 @@ export class ImportConditionItem extends Component {
         this.operatorLabel = createElement('span', { props: { className: 'cond-item__operator' } });
         this.valueLabel = createElement('span', { props: { className: 'cond-item__value' } });
 
-        this.elem = window.app.createContainer('cond-item', [
+        this.elem = App.createContainer('cond-item', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,
@@ -95,7 +96,7 @@ export class ImportConditionItem extends Component {
             state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
             || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY
         ) {
-            const valueItem = window.app.model.currency.getItem(state.value);
+            const valueItem = App.model.currency.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid currency');
             }
@@ -104,7 +105,7 @@ export class ImportConditionItem extends Component {
         }
 
         if (state.fieldType === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
-            const valueItem = window.app.model.accounts.getItem(state.value);
+            const valueItem = App.model.accounts.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid account');
             }
@@ -113,7 +114,7 @@ export class ImportConditionItem extends Component {
         }
 
         if (state.fieldType === IMPORT_COND_FIELD_TPL) {
-            const valueItem = window.app.model.templates.getItem(state.value);
+            const valueItem = App.model.templates.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid template');
             }
@@ -122,7 +123,7 @@ export class ImportConditionItem extends Component {
         }
 
         if (ImportCondition.isDateField(state.fieldType)) {
-            return window.app.formatDate(state.value);
+            return App.formatDate(state.value);
         }
 
         return state.value;

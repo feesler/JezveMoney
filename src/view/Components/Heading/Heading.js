@@ -4,6 +4,8 @@ import {
     createElement,
     px,
 } from 'jezvejs';
+
+import { App } from '../../Application/App.js';
 import './Heading.scss';
 
 /** CSS classes */
@@ -91,7 +93,7 @@ export class Heading extends Component {
             return;
         }
 
-        const { header } = window.app.view;
+        const { header } = App.view;
         if (isIntersecting) {
             header.showUserMenu(() => this.showInHeader(false));
         } else {
@@ -135,7 +137,7 @@ export class Heading extends Component {
         }
 
         const headerTitle = (state.inHeader) ? state.title : null;
-        window.app.view.header.setTitle(headerTitle);
+        App.view.header.setTitle(headerTitle);
     }
 
     render(state, prevState = {}) {

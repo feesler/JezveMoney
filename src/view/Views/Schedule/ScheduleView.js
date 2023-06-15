@@ -14,7 +14,7 @@ import { Spinner } from 'jezvejs/Spinner';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { listData, __, getSelectedItems } from '../../utils/utils.js';
@@ -70,15 +70,15 @@ class ScheduleView extends View {
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.loadModel(Schedule, 'schedule', window.app.props.schedule);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
 
         const initialState = {
             ...this.props,
-            items: createList(window.app.model.schedule),
+            items: createList(App.model.schedule),
             pagination: {
                 onPage: SHOW_ON_PAGE,
                 page: 1,
@@ -128,7 +128,7 @@ class ScheduleView extends View {
             type: 'link',
             className: 'circle-btn',
             icon: 'plus',
-            url: `${window.app.baseURL}schedule/create/`,
+            url: `${App.baseURL}schedule/create/`,
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
@@ -250,7 +250,7 @@ class ScheduleView extends View {
     }
 
     getItemById(itemId) {
-        return window.app.model.schedule.getItem(itemId);
+        return App.model.schedule.getItem(itemId);
     }
 
     onItemClick(itemId, e) {
@@ -351,7 +351,7 @@ class ScheduleView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -367,7 +367,7 @@ class ScheduleView extends View {
             const { data } = await API.schedule.list(request);
             this.setListData(data, keepState);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -391,7 +391,7 @@ class ScheduleView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.schedule.setData(data);
+        App.model.schedule.setData(data);
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
@@ -407,7 +407,7 @@ class ScheduleView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -500,7 +500,7 @@ class ScheduleView extends View {
             return;
         }
 
-        const { schedule } = window.app.model;
+        const { schedule } = App.model;
         const item = state.detailsItem ?? schedule.getItem(state.detailsId);
         if (!item) {
             throw new Error('Scheduled transaction not found');
@@ -521,7 +521,7 @@ class ScheduleView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         const res = new URL(`${baseURL}schedule/${itemPart}`);
 
@@ -654,5 +654,4 @@ class ScheduleView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(ScheduleView);
+App.createView(ScheduleView);

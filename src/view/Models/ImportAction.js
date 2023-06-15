@@ -1,5 +1,6 @@
 import { isFunction } from 'jezvejs';
 import { __ } from '../utils/utils.js';
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 import { ImportTransaction } from './ImportTransaction.js';
 
@@ -186,7 +187,7 @@ export class ImportAction extends ListItem {
         const lower = value.toLowerCase();
 
         if (this.isAccountValue()) {
-            const account = window.app.model.accounts.getItem(this.value);
+            const account = App.model.accounts.getItem(this.value);
             if (!account) {
                 return false;
             }
@@ -195,7 +196,7 @@ export class ImportAction extends ListItem {
         }
 
         if (this.isPersonValue()) {
-            const person = window.app.model.persons.getItem(this.value);
+            const person = App.model.persons.getItem(this.value);
             if (!person) {
                 return false;
             }
@@ -204,7 +205,7 @@ export class ImportAction extends ListItem {
         }
 
         if (this.isCategoryValue()) {
-            const category = window.app.model.categories.getItem(this.value);
+            const category = App.model.categories.getItem(this.value);
             if (!category) {
                 return false;
             }

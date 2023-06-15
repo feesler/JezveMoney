@@ -2,6 +2,7 @@ import { getClassNames } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { Field } from '../Field/Field.js';
 
 /* CSS classes */
@@ -12,12 +13,12 @@ const FIELD_CLASS = 'horizontal-field';
  */
 export class LocaleSelectField extends Field {
     constructor(props = {}) {
-        const currentLocale = window.app.getCurrrentLocale();
+        const currentLocale = App.getCurrrentLocale();
 
         const localeSelect = DropDown.create({
             ...props,
-            onChange: (locale) => (locale && window.app.setLocale(locale.id)),
-            data: window.app.locales.map((locale) => ({
+            onChange: (locale) => (locale && App.setLocale(locale.id)),
+            data: App.locales.map((locale) => ({
                 id: locale,
                 title: locale,
                 selected: locale === currentLocale,

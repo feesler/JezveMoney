@@ -8,6 +8,8 @@ import {
     setEvents,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+
+import { App } from '../../../../view/Application/App.js';
 import { ConfirmDialog } from '../../../../view/Components/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from '../AdminView/AdminView.js';
 
@@ -102,7 +104,7 @@ export class AdminListView extends AdminView {
      * @param {*} id - item identificator
      */
     selectItem(id) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
 
         this.selectedItem = this.getItem(id);
         if (this.selectedItem) {
@@ -125,7 +127,7 @@ export class AdminListView extends AdminView {
      * Show create new item dialog
      */
     createItem() {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
 
         this.preCreateItem();
         this.itemForm.action = `${baseURL}api/${this.apiController}/create`;
@@ -164,7 +166,7 @@ export class AdminListView extends AdminView {
             title: 'Delete',
             content: popupContent,
             onConfirm: async () => {
-                const reqURL = `${window.app.baseURL}api/${this.apiController}/del`;
+                const reqURL = `${App.baseURL}api/${this.apiController}/del`;
                 const data = this.prepareRequestData({ id: this.selectedItem.id });
 
                 const response = await fetch(reqURL, {
@@ -235,7 +237,7 @@ export class AdminListView extends AdminView {
         }
 
         if (!res) {
-            window.app.createErrorNotification(failMessage);
+            App.createErrorNotification(failMessage);
             return;
         }
 
@@ -252,7 +254,7 @@ export class AdminListView extends AdminView {
      * Request list of items from API
      */
     async requestList() {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
 
         show(this.itemsListElem, false);
 

@@ -12,7 +12,7 @@ import {
 } from 'jezvejs';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import * as apiTypes from '../../../../view/API/types.js';
-import { Application } from '../../../../view/Application/Application.js';
+import { App } from '../../../../view/Application/App.js';
 import '../../../../view/Application/Application.scss';
 import '../../utils/AdminView/AdminView.scss';
 import { AdminView } from '../../utils/AdminView/AdminView.js';
@@ -686,7 +686,7 @@ class AdminApiConsoleView extends AdminView {
      * @param {boolean} isPOST - if set to true POST request method is assumed
      */
     getRequestItem(request, isPOST) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const prefix = `${baseURL}api/`;
 
         if (!isObject(request)) {
@@ -977,5 +977,4 @@ class AdminApiConsoleView extends AdminView {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AdminApiConsoleView);
+App.createView(AdminApiConsoleView);

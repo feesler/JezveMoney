@@ -5,6 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+import { App } from '../../../../Application/App.js';
 import { LoadingIndicator } from '../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import './ProfileDialog.scss';
 
@@ -91,10 +92,10 @@ export class ProfileDialog extends Component {
             this.popup.close();
 
             if (result.msg) {
-                window.app.createSuccessNotification(result.msg);
+                App.createSuccessNotification(result.msg);
             }
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();

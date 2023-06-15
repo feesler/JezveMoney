@@ -1,4 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
+import { App } from '../../Application/App.js';
 import { ImportTransaction } from '../../Models/ImportTransaction.js';
 
 /** Returns page number and relative index of specified absolute index */
@@ -268,7 +269,7 @@ const slice = createSlice({
             mainAccount: state.mainAccount,
             sourceAmount: '',
             destAmount: '',
-            date: window.app.formatInputDate(new Date()),
+            date: App.formatInputDate(new Date()),
         });
 
         return {
@@ -345,7 +346,7 @@ const slice = createSlice({
             return state;
         }
 
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         const mainAccount = userAccounts.getItem(accountId);
         if (!mainAccount) {
             throw new Error(`Account ${accountId} not found`);
@@ -367,7 +368,7 @@ const slice = createSlice({
                         return item;
                     }
 
-                    const { rules } = window.app.model;
+                    const { rules } = App.model;
                     let newItem = item;
 
                     // Restore transaction for case some rules was removed
@@ -390,7 +391,7 @@ const slice = createSlice({
                 return item;
             }
 
-            const { rules } = window.app.model;
+            const { rules } = App.model;
             const enable = !state.rulesEnabled;
             let newItem = item;
             if (newItem.rulesApplied) {

@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { insertBefore, setEvents } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { __, parseCookies, setCookie } from '../../utils/utils.js';
@@ -172,5 +172,4 @@ class LoginView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(LoginView);
+App.createView(LoginView);

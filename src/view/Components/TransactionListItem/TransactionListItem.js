@@ -6,7 +6,9 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import {
     EXPENSE,
     INCOME,
@@ -216,7 +218,7 @@ export class TransactionListItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -249,13 +251,13 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid item type');
         }
 
-        const { profile, accounts } = window.app.model;
+        const { profile, accounts } = App.model;
         const srcAcc = accounts.getItem(item.src_id);
         return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
     }
 
     getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = window.app.model;
+        const { profile, accounts, persons } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             return null;
@@ -273,7 +275,7 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const accountModel = window.app.model.accounts;
+        const accountModel = App.model.accounts;
         const srcAcc = accountModel.getItem(item.src_id);
         const destAcc = accountModel.getItem(item.dest_id);
 
@@ -297,7 +299,7 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid type of transaction');
         }
 
-        const personModel = window.app.model.persons;
+        const personModel = App.model.persons;
         const debtType = this.getDebtType(item);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
@@ -320,7 +322,7 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const srcAmountFmt = currencyModel.formatCurrency(item.src_amount, item.src_curr);
         const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
         const diffCurrency = item.src_curr !== item.dest_curr;
@@ -356,7 +358,7 @@ export class TransactionListItem extends Component {
             return null;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(item.category_id);
         if (!category) {
             throw new Error('Invalid category');
@@ -394,7 +396,7 @@ export class TransactionListItem extends Component {
 
         this.amountElem.textContent = this.formatAmount(item);
 
-        this.dateElem.textContent = window.app.formatDate(item.date);
+        this.dateElem.textContent = App.formatDate(item.date);
         show(this.dateElem, state.showDate);
 
         const categoryTitle = this.getCategoryTitle(state);
@@ -407,7 +409,7 @@ export class TransactionListItem extends Component {
 
     renderDetails(state) {
         const { item } = state;
-        const { currency } = window.app.model;
+        const { currency } = App.model;
 
         // Source
         const showSource = (item.src_id !== 0);
@@ -459,7 +461,7 @@ export class TransactionListItem extends Component {
         this.destResultField.show(showDest);
 
         // Date
-        this.dateField.setContent(window.app.formatDate(item.date));
+        this.dateField.setContent(App.formatDate(item.date));
         this.dateField.show(state.showDate);
 
         // Category field

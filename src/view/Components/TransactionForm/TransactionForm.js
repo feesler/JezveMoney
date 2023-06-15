@@ -19,11 +19,11 @@ import { createStore } from 'jezvejs/Store';
 
 import {
     cutTime,
-    EXCHANGE_PRECISION,
-    normalizeExch,
     __,
     MAX_DAYS_IN_MONTH,
 } from '../../utils/utils.js';
+import { EXCHANGE_PRECISION, normalizeExch } from '../../utils/decimal.js';
+import { App } from '../../Application/App.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
 import {
     EXPENSE,
@@ -96,8 +96,8 @@ export class TransactionForm extends Component {
             ...props,
         });
 
-        const accountModel = window.app.model.accounts;
-        const currencyModel = window.app.model.currency;
+        const accountModel = App.model.accounts;
+        const currencyModel = App.model.currency;
 
         const isScheduleItem = this.props.type === 'scheduleItem';
         const transaction = { ...this.props.transaction };
@@ -146,15 +146,15 @@ export class TransactionForm extends Component {
         };
 
         if (isScheduleItem) {
-            initialState.form.startDate = window.app.formatInputDate(transaction.start_date);
+            initialState.form.startDate = App.formatInputDate(transaction.start_date);
             initialState.form.endDate = (transaction.end_date)
-                ? window.app.formatInputDate(transaction.end_date)
+                ? App.formatInputDate(transaction.end_date)
                 : '';
             initialState.form.intervalStep = transaction.interval_step;
             initialState.form.intervalType = transaction.interval_type;
             initialState.form.intervalOffset = transaction.interval_offset;
         } else {
-            initialState.form.date = window.app.formatInputDate(transaction.date);
+            initialState.form.date = App.formatInputDate(transaction.date);
         }
 
         if (transaction.type === EXPENSE) {
@@ -164,7 +164,7 @@ export class TransactionForm extends Component {
         } else if (transaction.type === TRANSFER) {
             initialState.id = (initialState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
         } else if (transaction.type === DEBT) {
-            initialState.person = window.app.model.persons.getItem(transaction.person_id);
+            initialState.person = App.model.persons.getItem(transaction.person_id);
             const personAccountId = (transaction.debtType)
                 ? transaction.src_id
                 : transaction.dest_id;
@@ -293,7 +293,7 @@ export class TransactionForm extends Component {
             closeButton: true,
             onClose: () => this.toggleEnableAccount(),
         };
-        if (window.app.model.userAccounts.length === 0) {
+        if (App.model.userAccounts.length === 0) {
             debtAccProps.noDataMessage = __('TR_DEBT_NO_ACCOUNTS');
         }
 
@@ -431,7 +431,7 @@ export class TransactionForm extends Component {
                 title: __('TR_DATE'),
                 feedbackMessage: __('TR_INVALID_DATE'),
                 className: 'form-row',
-                locales: window.app.dateFormatLocale,
+                locales: App.dateFormatLocale,
                 validate: true,
                 onInput: (e) => this.onDateInput(e),
                 onDateSelect: (e) => this.onDateSelect(e),
@@ -486,7 +486,7 @@ export class TransactionForm extends Component {
         this.cancelBtn = Button.create({
             id: 'cancelBtn',
             type: 'link',
-            url: window.app.props.nextAddress,
+            url: App.props.nextAddress,
             className: 'cancel-btn',
             title: __('CANCEL'),
         });
@@ -725,7 +725,7 @@ export class TransactionForm extends Component {
                 onItemSelect: (item) => this.onSrcAccountSelect(item),
             });
 
-            window.app.initAccountsList(this.srcDDList);
+            App.initAccountsList(this.srcDDList);
         }
 
         if (transaction.src_id) {
@@ -761,7 +761,7 @@ export class TransactionForm extends Component {
             }
 
             this.destDDList.removeAll();
-            window.app.initAccountsList(this.destDDList, options);
+            App.initAccountsList(this.destDDList, options);
         }
 
         if (transaction.dest_id) {
@@ -785,7 +785,7 @@ export class TransactionForm extends Component {
             onItemSelect: (item) => this.onPersonSelect(item),
         });
 
-        window.app.initPersonsList(this.persDDList);
+        App.initPersonsList(this.persDDList);
     }
 
     /** Initialize DropDown for debt account tile */
@@ -804,7 +804,7 @@ export class TransactionForm extends Component {
             onItemSelect: (item) => this.onDebtAccountSelect(item),
         });
 
-        window.app.initAccountsList(this.accDDList);
+        App.initAccountsList(this.accDDList);
 
         const accountId = (state.account) ? state.account.id : 0;
         if (accountId) {
@@ -1005,7 +1005,7 @@ export class TransactionForm extends Component {
      * @param {Date} date - selected date object
      */
     onDateSelect(date) {
-        this.store.dispatch(actions.dateChange(window.app.formatInputDate(date)));
+        this.store.dispatch(actions.dateChange(App.formatInputDate(date)));
         this.dateRow.datePicker.hide();
         this.notifyChanged();
     }
@@ -1166,14 +1166,14 @@ export class TransactionForm extends Component {
     }
 
     validateDate(state) {
-        const valid = window.app.isValidDateString(state.form.date, validateDateOptions);
+        const valid = App.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateDate());
         }
     }
 
     validateStartDate(state) {
-        const valid = window.app.isValidDateString(state.form.startDate, validateDateOptions);
+        const valid = App.isValidDateString(state.form.startDate, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateStartDate());
         }
@@ -1183,7 +1183,7 @@ export class TransactionForm extends Component {
         const { endDate } = state.form;
         const valid = (
             (endDate.length === 0)
-            || window.app.isValidDateString(endDate, validateDateOptions)
+            || App.isValidDateString(endDate, validateDateOptions)
         );
         if (!valid) {
             this.store.dispatch(actions.invalidateEndDate());
@@ -1636,7 +1636,7 @@ export class TransactionForm extends Component {
 
         show(this.debtAccountContainer.tileBase, !noAccount);
 
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         show(
             this.debtAccountContainer.accountToggler,
             noAccount && userAccounts.length > 0,
@@ -1655,7 +1655,7 @@ export class TransactionForm extends Component {
 
         this.personIdInp.value = state.person.id;
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const personAccountCurr = currencyModel.getItem(state.personAccount.curr_id);
         const personBalance = personAccountCurr.formatValue(state.personAccount.balance);
         this.personTile.setState({
@@ -1756,7 +1756,7 @@ export class TransactionForm extends Component {
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
         this.intervalStepRow.show(isRepeat);
-        window.app.setValidation(this.intervalFieldsGroup, validation.intervalStep);
+        App.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval type field
         this.intervalTypeSelect.setSelection(intervalType);
@@ -1898,7 +1898,7 @@ export class TransactionForm extends Component {
             return;
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
         const destCurrency = currencyModel.getItem(transaction.dest_curr);
 

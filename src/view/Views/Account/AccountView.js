@@ -12,8 +12,9 @@ import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
-import { getCurrencyPrecision, normalize, __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { getCurrencyPrecision, __ } from '../../utils/utils.js';
+import { normalize } from '../../utils/decimal.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
 
@@ -41,10 +42,10 @@ class AccountView extends View {
     constructor(...args) {
         super(...args);
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(IconList, 'icons', App.props.icons);
 
         const initialState = {
             nameChanged: false,
@@ -134,7 +135,7 @@ class AccountView extends View {
             onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
-        window.app.initUserCurrencyList(this.currencySelect);
+        App.initUserCurrencyList(this.currencySelect);
 
         // Initial balance field
         this.initBalanceField = AmountInputField.create({
@@ -238,7 +239,7 @@ class AccountView extends View {
             this.store.dispatch(actions.invalidateNameField(__('accounts.invalidName')));
             this.nameField.focus();
         } else {
-            const account = window.app.model.accounts.findByName(name);
+            const account = App.model.accounts.findByName(name);
             if (account && state.original.id !== account.id) {
                 this.store.dispatch(actions.invalidateNameField(__('accounts.existingName')));
                 this.nameField.focus();
@@ -292,10 +293,10 @@ class AccountView extends View {
                 await API.account.create(account);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -318,10 +319,10 @@ class AccountView extends View {
         try {
             await API.account.del({ id: original.id });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -345,7 +346,7 @@ class AccountView extends View {
             throw new Error('Invalid state');
         }
 
-        const currencyObj = window.app.model.currency.getItem(state.data.curr_id);
+        const currencyObj = App.model.currency.getItem(state.data.curr_id);
         if (!currencyObj) {
             throw new Error(__('ERR_CURR_NOT_FOUND'));
         }
@@ -421,5 +422,4 @@ class AccountView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AccountView);
+App.createView(AccountView);

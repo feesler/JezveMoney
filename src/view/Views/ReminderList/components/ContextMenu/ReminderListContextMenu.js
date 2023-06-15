@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../../../tests/model/Reminder.js';
 
 /** Reminders list context menu component */
@@ -38,7 +39,7 @@ export class ReminderListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.reminders.getItem(state.contextItem);
+        return App.model.reminders.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {
@@ -66,7 +67,7 @@ export class ReminderListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
         items.ctxConfirmBtn.show(reminder.state !== REMINDER_CONFIRMED);
         items.ctxUpdateBtn.show(reminder.state !== REMINDER_CONFIRMED);

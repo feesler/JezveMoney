@@ -1,6 +1,9 @@
 import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
-import { formatDateRange, normalize } from '../../utils/utils.js';
+
+import { normalize } from '../../utils/decimal.js';
+import { formatDateRange } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 const SECTOR_OFFSET = 10;
 
@@ -61,7 +64,7 @@ const slice = createSlice({
 
     changeAccountsFilter: (state, ids) => {
         const accounts = asArray(ids);
-        const account = window.app.model.userAccounts.getItem(accounts[0]);
+        const account = App.model.userAccounts.getItem(accounts[0]);
         return {
             ...state,
             form: {

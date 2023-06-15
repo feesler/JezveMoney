@@ -1,6 +1,6 @@
 import 'jezvejs/style';
 import { ge, createElement, hasFlag } from 'jezvejs';
-import { Application } from '../../../../view/Application/Application.js';
+import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
 import { CURRENCY_SIGN_BEFORE_VALUE, CURRENCY_FORMAT_TRAILING_ZEROS } from '../../../../view/Models/Currency.js';
 import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
@@ -99,5 +99,4 @@ class AdminCurrencyListView extends AdminListView {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AdminCurrencyListView);
+App.createView(AdminCurrencyListView);

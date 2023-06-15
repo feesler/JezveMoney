@@ -1,5 +1,6 @@
 import { createElement, Component } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import './SimilarTransactionInfo.scss';
 
 /* CSS classes */
@@ -19,7 +20,7 @@ export class SimilarTransactionInfo extends Component {
     }
 
     init() {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { id } = this.props;
         const url = `${baseURL}transactions/${id}`;
 

@@ -1,9 +1,10 @@
 import { asArray } from 'jezvejs';
+import { App } from '../../Application/App.js';
 
 /** Returns URL to export transaction of selected persons */
 export const getExportURL = (selectedIds) => {
     const ids = asArray(selectedIds);
-    const res = new URL(`${window.app.baseURL}transactions/export/`);
+    const res = new URL(`${App.baseURL}transactions/export/`);
     ids.forEach((id) => {
         res.searchParams.append('persons[]', id);
     });
@@ -29,5 +30,5 @@ export const getSelectedIds = (state) => {
 
 /** Returns persons sort setting value */
 export const getPersonsSortMode = () => (
-    window.app.model.profile.settings.sort_persons
+    App.model.profile.settings.sort_persons
 );

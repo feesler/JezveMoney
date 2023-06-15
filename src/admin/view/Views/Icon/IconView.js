@@ -1,6 +1,6 @@
 import 'jezvejs/style';
 import { ge, createElement, selectByValue } from 'jezvejs';
-import { Application } from '../../../../view/Application/Application.js';
+import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';
 import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
@@ -68,5 +68,4 @@ class AdminIconListView extends AdminListView {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AdminIconListView);
+App.createView(AdminIconListView);

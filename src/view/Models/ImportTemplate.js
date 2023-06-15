@@ -1,9 +1,8 @@
 import { fixFloat } from 'jezvejs';
-import {
-    amountFix,
-    timestampFromString,
-    __,
-} from '../utils/utils.js';
+
+import { timestampFromString, __ } from '../utils/utils.js';
+import { amountFix } from '../utils/decimal.js';
+import { App } from '../Application/App.js';
 import { ImportTemplateError } from './Error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 
@@ -156,7 +155,7 @@ export class ImportTemplate extends ListItem {
 
     /** Apply import template to specified data row */
     convertRow(data, mainAccount) {
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const res = {
             mainAccount,
             accountAmount: this.getAccountAmount(data),

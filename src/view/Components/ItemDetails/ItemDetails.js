@@ -5,7 +5,10 @@ import {
     asArray,
 } from 'jezvejs';
 import { CloseButton } from 'jezvejs/CloseButton';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+
 import { Field } from '../Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
 import './ItemDetails.scss';
@@ -87,6 +90,6 @@ export class ItemDetails extends Component {
     }
 
     renderDateField(field, time) {
-        field?.setContent(window.app.formatDate(time));
+        field?.setContent(App.formatDate(time));
     }
 }

@@ -1,5 +1,6 @@
 import { createSlice } from 'jezvejs/Store';
 
+import { App } from '../../../../../Application/App.js';
 import { ImportRuleList } from '../../../../../Models/ImportRuleList.js';
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
@@ -59,7 +60,7 @@ export const createList = (items, state) => {
 
 /** Updates rules list state */
 export const updateList = (state) => {
-    const { rules } = window.app.model;
+    const { rules } = App.model;
     const { onPage, page } = state.pagination;
 
     const items = createList(rules.data, state);
@@ -154,7 +155,7 @@ const slice = createSlice({
     }),
 
     updateRule: (state) => {
-        const item = window.app.model.rules.getItem(state.contextItem);
+        const item = App.model.rules.getItem(state.contextItem);
         if (!item) {
             return state;
         }
@@ -165,7 +166,7 @@ const slice = createSlice({
                 (ImportCondition.isDateField(condition.field_id))
                     ? {
                         ...condition,
-                        value: window.app.formatDate(condition.value),
+                        value: App.formatDate(condition.value),
                     }
                     : condition
             )),

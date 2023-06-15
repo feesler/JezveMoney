@@ -9,7 +9,7 @@ import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
@@ -40,7 +40,7 @@ class PersonView extends View {
             initialState.data = { ...initialState.original };
         }
 
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        App.loadModel(PersonList, 'persons', App.props.persons);
 
         this.store = createStore(reducer, { initialState });
     }
@@ -115,7 +115,7 @@ class PersonView extends View {
             this.store.dispatch(actions.invalidateNameField(__('PERSON_INVALID_NAME')));
             this.nameField.focus();
         } else {
-            const person = window.app.model.persons.findByName(name);
+            const person = App.model.persons.findByName(name);
             if (person && state.original.id !== person.id) {
                 this.store.dispatch(actions.invalidateNameField(__('PERSON_EXISTING_NAME')));
                 this.nameField.focus();
@@ -161,10 +161,10 @@ class PersonView extends View {
                 await API.person.create(data);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -179,10 +179,10 @@ class PersonView extends View {
         try {
             await API.person.del({ id: original.id });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -227,5 +227,4 @@ class PersonView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(PersonView);
+App.createView(PersonView);

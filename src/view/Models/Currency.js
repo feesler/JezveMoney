@@ -1,9 +1,7 @@
 import { hasFlag } from 'jezvejs';
-import {
-    normalize,
-    hasToken,
-    __,
-} from '../utils/utils.js';
+import { hasToken, __ } from '../utils/utils.js';
+import { normalize } from '../utils/decimal.js';
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 export const CURRENCY_SIGN_BEFORE_VALUE = 0x01;
@@ -39,7 +37,7 @@ export class Currency extends ListItem {
      */
     formatValue(value) {
         const options = {
-            ...window.app.decimalFormatOptions,
+            ...App.decimalFormatOptions,
         };
 
         const nval = normalize(value, this.precision);
@@ -48,7 +46,7 @@ export class Currency extends ListItem {
             options.maximumFractionDigits = this.precision;
         }
 
-        const fmtVal = window.app.formatNumber(nval, { options });
+        const fmtVal = App.formatNumber(nval, { options });
         return (hasFlag(this.flags, CURRENCY_SIGN_BEFORE_VALUE))
             ? `${this.sign} ${fmtVal}`
             : `${fmtVal} ${this.sign}`;

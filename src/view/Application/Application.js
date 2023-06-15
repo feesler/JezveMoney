@@ -9,6 +9,7 @@ import {
     isValidDateString,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
+
 import { API } from '../API/index.js';
 import {
     parseCookies,
@@ -28,7 +29,21 @@ export const DARK_THEME = 1;
 
 /** Application class */
 export class Application {
+    static instance = null;
+
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new this(window.appProps);
+        }
+
+        return this.instance;
+    }
+
     constructor(props = {}) {
+        if (Application.instance) {
+            throw new Error('Application instance already created');
+        }
+
         this.props = { ...props };
 
         // Setup view properties

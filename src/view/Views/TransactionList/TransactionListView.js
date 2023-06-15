@@ -29,7 +29,7 @@ import {
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
@@ -111,11 +111,11 @@ class TransactionListView extends View {
             renderTime: Date.now(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
     }
@@ -165,7 +165,7 @@ class TransactionListView extends View {
             type: 'link',
             className: 'circle-btn',
             icon: 'plus',
-            url: `${window.app.baseURL}transactions/create/`,
+            url: `${App.baseURL}transactions/create/`,
         });
         this.heading.actionsContainer.append(this.filtersBtn.elem, this.createBtn.elem);
 
@@ -201,22 +201,22 @@ class TransactionListView extends View {
                 className: 'dd_fullwidth',
             });
 
-            window.app.appendAccounts(this.accountDropDown, {
+            App.appendAccounts(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'a',
                 group: __('accounts.listTitle'),
             });
-            window.app.appendAccounts(this.accountDropDown, {
+            App.appendAccounts(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'a',
                 group: __('accounts.hiddenListTitle'),
             });
-            window.app.appendPersons(this.accountDropDown, {
+            App.appendPersons(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'p',
                 group: __('PERSONS'),
             });
-            window.app.appendPersons(this.accountDropDown, {
+            App.appendPersons(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'p',
                 group: __('PERSONS_HIDDEN'),
@@ -380,7 +380,7 @@ class TransactionListView extends View {
 
     /** Returns true if accounts or persons is available */
     isAvailable() {
-        const { accounts, persons } = window.app.model;
+        const { accounts, persons } = App.model;
         return (accounts.length > 0 || persons.length > 0);
     }
 
@@ -544,7 +544,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
+        App.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
     }
 
     /** Returns URL for filter of specified state */
@@ -655,7 +655,7 @@ class TransactionListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -701,7 +701,7 @@ class TransactionListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -837,7 +837,7 @@ class TransactionListView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createErrorNotification(e.message);
+                App.createErrorNotification(e.message);
                 this.store.dispatch(actions.listRequestError());
             }
         }
@@ -850,13 +850,13 @@ class TransactionListView extends View {
     }
 
     toggleGroupByDate() {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         const groupByDate = (settings.tr_group_by_date === 0) ? 1 : 0;
         this.requestGroupByDate(groupByDate);
     }
 
     async requestGroupByDate(groupByDate) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.tr_group_by_date === groupByDate) {
             return;
         }
@@ -871,7 +871,7 @@ class TransactionListView extends View {
 
             this.store.dispatch(actions.toggleGroupByDate());
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -1020,7 +1020,7 @@ class TransactionListView extends View {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const url = (state.detailsId)
             ? new URL(`${baseURL}transactions/${state.detailsId}`)
             : this.getFilterURL(state);
@@ -1167,5 +1167,4 @@ class TransactionListView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(TransactionListView);
+App.createView(TransactionListView);

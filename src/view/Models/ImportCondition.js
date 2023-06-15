@@ -5,6 +5,7 @@ import {
     isDate,
 } from 'jezvejs';
 import { __, getSeconds } from '../utils/utils.js';
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */
@@ -395,7 +396,7 @@ export class ImportCondition extends ListItem {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = window.app.isValidDateString(this.value);
+            res.date = App.isValidDateString(this.value);
         }
 
         // Check empty condition value is used only for string field
@@ -474,7 +475,7 @@ export class ImportCondition extends ListItem {
         const lower = value.toLowerCase();
 
         if (this.isTemplateField()) {
-            const template = window.app.model.templates.getItem(this.value);
+            const template = App.model.templates.getItem(this.value);
             if (!template) {
                 return false;
             }
@@ -483,7 +484,7 @@ export class ImportCondition extends ListItem {
         }
 
         if (this.isAccountField()) {
-            const account = window.app.model.accounts.getItem(this.value);
+            const account = App.model.accounts.getItem(this.value);
             if (!account) {
                 return false;
             }

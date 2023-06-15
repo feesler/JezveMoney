@@ -3,8 +3,10 @@ import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { Field } from '../Field/Field.js';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+import { Field } from '../Field/Field.js';
 
 const defaultProps = {
     value: '',
@@ -88,7 +90,7 @@ export class AmountInputField extends Field {
             enableFilter: true,
         });
 
-        window.app.initUserCurrencyList(res);
+        App.initUserCurrencyList(res);
         if (currId) {
             res.setSelection(currId);
         }
@@ -129,7 +131,7 @@ export class AmountInputField extends Field {
             return;
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const currency = currencyModel.getItem(state.currencyId);
         this.currencySign.textContent = (currency) ? currency.sign : '';
 
@@ -188,7 +190,7 @@ export class AmountInputField extends Field {
 
         this.elem.classList.toggle('validation-block', state.validate);
         if (state.validate) {
-            window.app.setValidation(this.elem, state.valid);
+            App.setValidation(this.elem, state.valid);
             this.feedbackElem.textContent = state.feedbackMessage;
         }
 

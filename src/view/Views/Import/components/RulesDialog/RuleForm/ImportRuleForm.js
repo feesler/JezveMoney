@@ -6,6 +6,9 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { ListContainer } from 'jezvejs/ListContainer';
+
+import { listData, __, dateStringToTime } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
@@ -16,7 +19,6 @@ import {
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
 import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
 import { ImportActionList } from '../../../../../Models/ImportActionList.js';
-import { listData, __, dateStringToTime } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
@@ -159,17 +161,17 @@ export class ImportRuleForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.feedbackContainer = window.app.createContainer(
+        this.feedbackContainer = App.createContainer(
             FEEDBACK_CONTAINER_CLASS,
             this.validFeedback,
         );
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
+        this.controls = App.createContainer(CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
         ]);
 
-        this.elem = window.app.createContainer(FORM_CLASS, [
+        this.elem = App.createContainer(FORM_CLASS, [
             this.idInput,
             this.conditionsCollapse.elem,
             this.actionsCollapse.elem,
@@ -261,7 +263,7 @@ export class ImportRuleForm extends Component {
         // with debt type selected
         const setPersonAction = ImportActionList.findAction(state.items, IMPORT_ACTION_SET_PERSON);
         const showSetPerson = (
-            window.app.model.persons.length > 0
+            App.model.persons.length > 0
             && ImportActionList.hasSetDebt(state.items)
             && (action.action_id !== IMPORT_ACTION_SET_TR_TYPE)
             && (!setPersonAction || setPersonAction === action)
@@ -293,7 +295,7 @@ export class ImportRuleForm extends Component {
 
             if (actionType.id === IMPORT_ACTION_SET_PERSON) {
                 return (
-                    window.app.model.persons.length > 0
+                    App.model.persons.length > 0
                     && state.rule.actions.hasSetDebt()
                 );
             }
@@ -315,7 +317,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportAction.isAccountValue(actionType)) {
-            const item = window.app.model.accounts.getItemByIndex(0);
+            const item = App.model.accounts.getItemByIndex(0);
             if (!item) {
                 throw new Error('No accounts available');
             }
@@ -324,7 +326,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportAction.isPersonValue(actionType)) {
-            const item = window.app.model.persons.getItemByIndex(0);
+            const item = App.model.persons.getItemByIndex(0);
             if (!item) {
                 throw new Error('No persons available');
             }
@@ -382,7 +384,7 @@ export class ImportRuleForm extends Component {
         // Filter available field types
         const availFields = this.fieldTypes.filter((fieldType) => {
             if (ImportCondition.isTemplateField(fieldType.id)) {
-                return window.app.model.templates.length > 0;
+                return App.model.templates.length > 0;
             }
 
             return true;
@@ -400,7 +402,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isAccountField(fieldType)) {
-            const item = window.app.model.accounts.getItemByIndex(0);
+            const item = App.model.accounts.getItemByIndex(0);
             if (!item) {
                 throw new Error('No accounts available');
             }
@@ -409,7 +411,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isTemplateField(fieldType)) {
-            const item = window.app.model.templates.getItemByIndex(0);
+            const item = App.model.templates.getItemByIndex(0);
             if (!item) {
                 throw new Error('No template available');
             }
@@ -418,7 +420,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isCurrencyField(fieldType)) {
-            const item = window.app.model.currency.getItemByIndex(0);
+            const item = App.model.currency.getItemByIndex(0);
             if (!item) {
                 throw new Error('No currency available');
             }
@@ -685,7 +687,7 @@ export class ImportRuleForm extends Component {
             && !('actionIndex' in state.validation)
         );
 
-        window.app.setValidation(this.feedbackContainer, !isInvalid);
+        App.setValidation(this.feedbackContainer, !isInvalid);
         this.validFeedback.textContent = (isInvalid) ? state.validation.message : '';
 
         // Conditions list

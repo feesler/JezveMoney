@@ -1,11 +1,12 @@
 import { asArray } from 'jezvejs';
+import { App } from '../Application/App.js';
 
 /** Strings */
 const MSG_REQUEST_FAIL = 'API request failed';
 
 /** Send API request */
 export const apiRequest = async (method, path, data = null, options = {}) => {
-    const { baseURL } = window.app;
+    const { baseURL } = App;
     const isPOST = method.toLowerCase() === 'post';
     const url = new URL(`${baseURL}api/${path}`);
     const reqOptions = {
