@@ -218,7 +218,7 @@ export class AccountsStory extends TestStory {
 
         const data = [
             [5],
-            [0, 5],
+            [0, 7],
         ];
 
         await App.scenario.runner.runGroup(Actions.show, data);

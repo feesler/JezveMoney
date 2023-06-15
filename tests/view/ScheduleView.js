@@ -1,7 +1,6 @@
 import {
     assert,
     asArray,
-    asyncMap,
     query,
     evaluate,
     navigation,
@@ -13,7 +12,9 @@ import {
     prop,
 } from 'jezve-test';
 import {
-    Button, Paginator,
+    Button,
+    Paginator,
+    PopupMenu,
 } from 'jezvejs-test';
 import { App } from '../Application.js';
 import { AppView } from './AppView.js';
@@ -24,24 +25,7 @@ import { ScheduleList } from './component/Schedule/ScheduleList.js';
 import { __ } from '../model/locale.js';
 import { ScheduledTransactionsList } from '../model/ScheduledTransactionsList.js';
 
-const modeButtons = {
-    list: 'listModeBtn',
-    select: 'selectModeBtn',
-};
-
 const listMenuSelector = '#listMenu';
-const listMenuItems = [
-    'selectModeBtn',
-    'selectAllBtn',
-    'deselectAllBtn',
-    'deleteBtn',
-];
-
-const contextMenuItems = [
-    'ctxDetailsBtn',
-    'ctxUpdateBtn',
-    'ctxDeleteBtn',
-];
 
 /** Scheduled transactions list view class */
 export class ScheduleView extends AppView {
@@ -49,6 +33,14 @@ export class ScheduleView extends AppView {
         super(...args);
 
         this.items = null;
+    }
+
+    get listMenu() {
+        return this.content.listMenu;
+    }
+
+    get contextMenu() {
+        return this.content.contextMenu;
     }
 
     async parseContent() {
@@ -69,22 +61,17 @@ export class ScheduleView extends AppView {
         res.heading.text = await prop(res.heading.elem, 'textContent');
 
         // Main menu
-        res.listMenu = { elem: await query(listMenuSelector) };
-        if (res.listMenu.elem) {
-            await this.parseMenuItems(res, listMenuItems);
-        }
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => {
-            const contextParent = menuEl?.closest('.schedule-item');
-            return (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-        }, res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => {
+                const contextParent = menuEl?.closest('.schedule-item');
+                return (contextParent)
+                    ? parseInt(contextParent.dataset.id, 10)
+                    : null;
+            }, res.contextMenu.elem);
         }
 
         res.modeSelector = await Button.create(this, await query('.mode-selector'));
@@ -110,29 +97,13 @@ export class ScheduleView extends AppView {
         return res;
     }
 
-    async parseMenuItems(cont, ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
-            return cont;
-        }
-
-        const res = cont;
-        await asyncMap(itemIds, async (id) => {
-            res[id] = await Button.create(this, await query(`#${id}`));
-            assert(res[id], `Menu item '${id}' not found`);
-            return res[id];
-        });
-
-        return res;
-    }
-
     buildModel(cont) {
         const res = {
             locale: cont.locale,
-            contextItem: cont.contextMenu.itemId,
+            contextItem: cont.contextMenu?.content?.itemId,
             listMode: (cont.scheduleList) ? cont.scheduleList.listMode : 'list',
-            listMenuVisible: cont.listMenu.visible,
-            contextMenuVisible: cont.contextMenu.visible,
+            listMenuVisible: cont.listMenu?.visible,
+            contextMenuVisible: cont.contextMenu?.visible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
@@ -359,7 +330,6 @@ export class ScheduleView extends AppView {
             createBtn: { visible: listMode },
             listModeBtn: { visible: !listMode },
             menuBtn: { visible: isItemsAvailable },
-            listMenu: { visible: model.listMenuVisible },
         };
 
         if (model.detailsItem) {
@@ -368,31 +338,26 @@ export class ScheduleView extends AppView {
         }
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = {
-                visible: model.listMenuVisible && listMode && isItemsAvailable,
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: { visible: listMode && isItemsAvailable },
+                selectAllBtn: { visible: showSelectItems && selected.length < itemsCount },
+                deselectAllBtn: { visible: showSelectItems && selected.length > 0 },
+                deleteBtn: { visible: showSelectItems && selected.length > 0 },
             };
-            res.selectAllBtn = {
-                visible: showSelectItems && selected.length < itemsCount,
-            };
-            res.deselectAllBtn = {
-                visible: showSelectItems && selected.length > 0,
-            };
-            res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
         }
-
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
 
         if (model.contextMenuVisible) {
             const contextItem = this.items.getItem(model.contextItem);
             assert(contextItem, 'Context item not found');
 
-            res.contextMenu.itemId = model.contextItem;
-
-            res.ctxDetailsBtn = { visible: true };
-            res.ctxUpdateBtn = { visible: true };
-            res.ctxDeleteBtn = { visible: true };
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxDeleteBtn: { visible: true },
+            };
         }
 
         if (isItemsAvailable) {
@@ -517,7 +482,7 @@ export class ScheduleView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.content.listMenu.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
@@ -532,7 +497,7 @@ export class ScheduleView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.content.listMenu.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'List menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
@@ -564,11 +529,11 @@ export class ScheduleView extends AppView {
         this.model.listMode = listMode;
         const expected = this.getExpectedState();
 
-        const buttonName = modeButtons[listMode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        await this.performAction(() => button.click());
+        if (listMode === 'list') {
+            await this.performAction(() => this.content.listModeBtn.click());
+        } else if (listMode === 'select') {
+            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+        }
 
         return this.checkState(expected);
     }
@@ -653,7 +618,7 @@ export class ScheduleView extends AppView {
         this.items = ScheduledTransactionsList.create(this.items.map(selectItem));
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('selectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -669,7 +634,7 @@ export class ScheduleView extends AppView {
         this.items = ScheduledTransactionsList.create(this.items.map(deselectItem));
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deselectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -694,7 +659,7 @@ export class ScheduleView extends AppView {
         if (directNavigate) {
             await goTo(this.getDetailsURL());
         } else {
-            await this.performAction(() => this.content.ctxDetailsBtn.click());
+            await this.performAction(() => this.contextMenu.select('ctxDetailsBtn'));
         }
 
         return App.view.checkState(expected);
@@ -723,7 +688,7 @@ export class ScheduleView extends AppView {
     async goToUpdateItem(num) {
         await this.openContextMenu(num);
 
-        return navigation(() => this.content.ctxUpdateBtn.click());
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
     /** Delete specified transaction from context menu */
@@ -734,7 +699,7 @@ export class ScheduleView extends AppView {
         this.model.contextItem = null;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.ctxDeleteBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxDeleteBtn'));
 
         this.checkState(expected);
 
@@ -755,7 +720,7 @@ export class ScheduleView extends AppView {
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deleteBtn.click());
+        await this.performAction(() => this.listMenu.select('deleteBtn'));
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete item warning popup not appear');

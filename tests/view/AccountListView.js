@@ -7,13 +7,12 @@ import {
     click,
     httpReq,
     asArray,
-    asyncMap,
     goTo,
     baseUrl,
     wait,
     evaluate,
 } from 'jezve-test';
-import { Button } from 'jezvejs-test';
+import { Button, PopupMenu } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/Tiles/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
@@ -27,37 +26,18 @@ import {
     SORT_MANUALLY,
 } from '../common.js';
 
-const modeButtons = {
-    list: 'listModeBtn',
-    select: 'selectModeBtn',
-    sort: 'sortModeBtn',
-};
-
 const listMenuSelector = '#listMenu';
-const listMenuItems = [
-    'selectModeBtn',
-    'sortModeBtn',
-    'sortByNameBtn',
-    'sortByDateBtn',
-    'selectAllBtn',
-    'deselectAllBtn',
-    'exportBtn',
-    'showBtn',
-    'hideBtn',
-    'deleteBtn',
-];
-
-const contextMenuItems = [
-    'ctxDetailsBtn',
-    'ctxUpdateBtn',
-    'ctxExportBtn',
-    'ctxShowBtn',
-    'ctxHideBtn',
-    'ctxDeleteBtn',
-];
 
 /** List of accounts view class */
 export class AccountListView extends AppView {
+    get listMenu() {
+        return this.content.listMenu;
+    }
+
+    get contextMenu() {
+        return this.content.contextMenu;
+    }
+
     async parseContent() {
         const res = {
             addBtn: await Button.create(this, await query('#createBtn')),
@@ -73,21 +53,16 @@ export class AccountListView extends AppView {
         ));
 
         // Main menu
-        res.listMenu = { elem: await query(listMenuSelector) };
-        if (res.listMenu.elem) {
-            await this.parseMenuItems(res, listMenuItems);
-        }
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => (
-            menuEl?.previousElementSibling?.classList.contains('tile')
-                ? parseInt(menuEl.previousElementSibling.dataset.id, 10)
-                : null
-        ), res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => (
+                menuEl?.previousElementSibling?.classList.contains('tile')
+                    ? parseInt(menuEl.previousElementSibling.dataset.id, 10)
+                    : null
+            ), res.contextMenu.elem);
         }
 
         res.tiles = await TilesList.create(this, await query('#contentContainer .tiles:first-child'));
@@ -102,22 +77,6 @@ export class AccountListView extends AppView {
         return res;
     }
 
-    async parseMenuItems(cont, ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
-            return cont;
-        }
-
-        const res = cont;
-        await asyncMap(itemIds, async (id) => {
-            res[id] = await Button.create(this, await query(`#${id}`));
-            assert(res[id], `Menu item '${id}' not found`);
-            return res[id];
-        });
-
-        return res;
-    }
-
     buildModel(cont) {
         const res = {
             locale: cont.locale,
@@ -125,11 +84,11 @@ export class AccountListView extends AppView {
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
-            contextItem: cont.contextMenu.itemId,
+            contextItem: cont.contextMenu?.content?.itemId,
             mode: cont.tiles.listMode,
             sortMode: App.state.getAccountsSortMode(),
-            listMenuVisible: cont.listMenu.visible,
-            contextMenuVisible: cont.contextMenu.visible,
+            listMenuVisible: cont.listMenu?.visible,
+            contextMenuVisible: cont.contextMenu?.visible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
@@ -170,7 +129,11 @@ export class AccountListView extends AppView {
         const totalSelected = visibleSelected.length + hiddenSelected.length;
         const isListMode = model.mode === 'list';
         const isSortMode = model.mode === 'sort';
-        const showSelectItems = model.listMenuVisible && model.mode === 'select';
+        const showSelectItems = (
+            itemsCount > 0
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
         const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
 
         const res = {
@@ -181,7 +144,6 @@ export class AccountListView extends AppView {
             hiddenCounter: { visible: true, value: model.hiddenTiles.length },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
             menuBtn: { visible: itemsCount > 0 && !isSortMode },
-            listMenu: { visible: model.listMenuVisible },
         };
 
         if (model.detailsItem) {
@@ -190,39 +152,37 @@ export class AccountListView extends AppView {
         }
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = { visible: model.listMenuVisible && isListMode && itemsCount > 0 };
-            res.sortModeBtn = { visible: showSortItems };
-            res.sortByNameBtn = { visible: showSortItems };
-            res.sortByDateBtn = { visible: showSortItems };
-            res.selectAllBtn = {
-                visible: showSelectItems && itemsCount > 0 && totalSelected < itemsCount,
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: { visible: isListMode && itemsCount > 0 },
+                sortModeBtn: { visible: showSortItems },
+                sortByNameBtn: { visible: showSortItems },
+                sortByDateBtn: { visible: showSortItems },
+                selectAllBtn: { visible: showSelectItems && totalSelected < itemsCount },
+                deselectAllBtn: { visible: showSelectItems && totalSelected > 0 },
+                exportBtn: { visible: showSelectItems && (totalSelected > 0) },
+                showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
+                deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
+                hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
             };
-            res.deselectAllBtn = {
-                visible: showSelectItems && itemsCount > 0 && totalSelected > 0,
-            };
-            res.exportBtn = { visible: showSelectItems && (totalSelected > 0) };
-            res.showBtn = { visible: showSelectItems && (hiddenSelected.length > 0) };
-            res.deleteBtn = { visible: showSelectItems && (totalSelected > 0) };
-            res.hideBtn = { visible: showSelectItems && (visibleSelected.length > 0) };
         }
-
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
 
         if (model.contextMenuVisible) {
             const ctxAccount = App.state.accounts.getItem(model.contextItem);
             assert(ctxAccount, 'Invalid state');
 
             const isHidden = App.state.accounts.isHidden(ctxAccount);
-            res.contextMenu.itemId = model.contextItem;
 
-            res.ctxDetailsBtn = { visible: true };
-            res.ctxUpdateBtn = { visible: true };
-            res.ctxExportBtn = { visible: true };
-            res.ctxShowBtn = { visible: isHidden };
-            res.ctxHideBtn = { visible: !isHidden };
-            res.ctxDeleteBtn = { visible: true };
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxExportBtn: { visible: true },
+                ctxShowBtn: { visible: isHidden },
+                ctxHideBtn: { visible: !isHidden },
+                ctxDeleteBtn: { visible: true },
+            };
         }
 
         return res;
@@ -272,7 +232,7 @@ export class AccountListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.performAction(() => this.content.ctxDetailsBtn.click());
+            await this.performAction(() => this.contextMenu.select('ctxDetailsBtn'));
         }
 
         await waitForFunction(async () => {
@@ -303,7 +263,7 @@ export class AccountListView extends AppView {
     async goToUpdateAccount(num) {
         await this.openContextMenu(num);
 
-        await navigation(() => this.content.ctxUpdateBtn.click());
+        await navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
     async waitForList(action) {
@@ -366,7 +326,7 @@ export class AccountListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.content.listMenu.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
@@ -381,7 +341,7 @@ export class AccountListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.content.listMenu.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'List menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
@@ -421,14 +381,12 @@ export class AccountListView extends AppView {
 
         const expected = this.getExpectedState();
 
-        const buttonName = modeButtons[listMode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        if (listMode === 'sort') {
-            await this.waitForList(() => this.content[buttonName].click());
-        } else {
-            await this.performAction(() => this.content[buttonName].click());
+        if (listMode === 'list') {
+            await this.performAction(() => this.content.listModeBtn.click());
+        } else if (listMode === 'select') {
+            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+        } else if (listMode === 'sort') {
+            await this.waitForList(() => this.listMenu.select('sortModeBtn'));
         }
 
         return this.checkState(expected);
@@ -463,10 +421,7 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
         Object.assign(expected, expList);
 
-        const button = this.content.sortByNameBtn;
-        assert(button, 'Sort by name button not found');
-
-        await this.waitForList(() => this.content.sortByNameBtn.click());
+        await this.waitForList(() => this.listMenu.select('sortByNameBtn'));
 
         return this.checkState(expected);
     }
@@ -488,10 +443,7 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
         Object.assign(expected, expList);
 
-        const button = this.content.sortByDateBtn;
-        assert(button, 'Sort by date button not found');
-
-        await this.waitForList(() => this.content.sortByDateBtn.click());
+        await this.waitForList(() => this.listMenu.select('sortByDateBtn'));
 
         return this.checkState(expected);
     }
@@ -526,7 +478,7 @@ export class AccountListView extends AppView {
         this.model.hiddenTiles = this.model.hiddenTiles.map(selectItem);
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('selectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -540,7 +492,7 @@ export class AccountListView extends AppView {
         this.onDeselectAll();
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deselectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -553,7 +505,7 @@ export class AccountListView extends AppView {
         this.model.contextItem = null;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.ctxDeleteBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxDeleteBtn'));
 
         this.checkState(expected);
 
@@ -571,7 +523,7 @@ export class AccountListView extends AppView {
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deleteBtn.click());
+        await this.performAction(() => this.listMenu.select('deleteBtn'));
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete account warning popup not appear');
@@ -585,11 +537,9 @@ export class AccountListView extends AppView {
 
         await this.openListMenu();
 
-        if (val) {
-            await this.waitForList(() => this.content.showBtn.click());
-        } else {
-            await this.waitForList(() => this.content.hideBtn.click());
-        }
+        await this.waitForList(() => (
+            this.listMenu.select((val) ? 'showBtn' : 'hideBtn')
+        ));
     }
 
     /** Hide secified accounts and return navigation promise */
@@ -602,7 +552,8 @@ export class AccountListView extends AppView {
         await this.selectAccounts(acc);
         await this.openListMenu();
 
-        const downloadURL = this.content.exportBtn.link;
+        const exportBtn = this.listMenu.findItemById('exportBtn');
+        const downloadURL = exportBtn.link;
         assert(downloadURL, 'Invalid export URL');
 
         const exportResp = await httpReq('GET', downloadURL);

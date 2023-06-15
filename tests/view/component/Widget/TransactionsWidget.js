@@ -2,20 +2,18 @@ import {
     query,
     assert,
     evaluate,
-    asArray,
-    asyncMap,
     navigation,
     wait,
 } from 'jezve-test';
-import { Button } from 'jezvejs-test';
+import { PopupMenu } from 'jezvejs-test';
 import { Widget } from './Widget.js';
 import { TransactionList } from '../TransactionList/TransactionList.js';
 
-const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
-];
-
 export class TransactionsWidget extends Widget {
+    get contextMenu() {
+        return this.content.contextMenu;
+    }
+
     async parseContent() {
         const res = await super.parseContent();
 
@@ -23,16 +21,14 @@ export class TransactionsWidget extends Widget {
         assert(res.transList, 'Invalid transactions widget');
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => {
-            const contextParent = menuEl?.closest('.trans-item');
-            return (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-        }, res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => {
+                const contextParent = menuEl?.closest('.trans-item');
+                return (contextParent)
+                    ? parseInt(contextParent.dataset.id, 10)
+                    : null;
+            }, res.contextMenu.elem);
         }
 
         return res;
@@ -40,22 +36,6 @@ export class TransactionsWidget extends Widget {
 
     get transList() {
         return this.content.transList;
-    }
-
-    async parseMenuItems(cont, ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
-            return cont;
-        }
-
-        const res = cont;
-        await asyncMap(itemIds, async (id) => {
-            res[id] = await Button.create(this, await query(`#${id}`));
-            assert(res[id], `Menu item '${id}' not found`);
-            return res[id];
-        });
-
-        return res;
     }
 
     checkValidIndex(index) {
@@ -77,18 +57,18 @@ export class TransactionsWidget extends Widget {
     async updateByIndex(index) {
         await this.openContextMenu(index);
 
-        return navigation(() => this.content.ctxUpdateBtn.click());
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
     async setCategoryByIndex(index) {
         await this.openContextMenu(index);
 
-        return this.performAction(() => this.content.ctxSetCategoryBtn.click());
+        return this.performAction(() => this.contextMenu.select('ctxSetCategoryBtn'));
     }
 
     async deleteByIndex(index) {
         await this.openContextMenu(index);
 
-        return this.performAction(() => this.content.ctxDeleteBtn.click());
+        return this.performAction(() => this.contextMenu.select('ctxDeleteBtn'));
     }
 }

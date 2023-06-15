@@ -9,34 +9,30 @@ import {
     asArray,
     navigation,
 } from 'jezve-test';
-import { Button, DropDown, TabList } from 'jezvejs-test';
+import {
+    Button,
+    DropDown,
+    TabList,
+    PopupMenu,
+} from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { CurrenciesList } from './component/Currency/CurrenciesList.js';
 
-const modeButtons = {
-    list: 'listModeBtn',
-    select: 'selectModeBtn',
-    sort: 'sortModeBtn',
-};
-
 const listMenuSelector = '#listMenu';
-const listMenuItems = [
-    'selectModeBtn',
-    'sortModeBtn',
-    'selectAllBtn',
-    'deselectAllBtn',
-    'deleteBtn',
-];
-
-const contextMenuItems = [
-    'ctxDeleteBtn',
-];
 
 /** Settings view class */
 export class SettingsView extends AppView {
     get tabs() {
         return this.content.tabs;
+    }
+
+    get listMenu() {
+        return this.content.listMenu;
+    }
+
+    get contextMenu() {
+        return this.content.contextMenu;
     }
 
     async parseContent() {
@@ -56,22 +52,17 @@ export class SettingsView extends AppView {
         res.addCurrencyDropDown = await DropDown.createFromChild(this, res.createBtn.elem);
 
         // Main menu
-        res.listMenu = { elem: await query(listMenuSelector) };
-        if (res.listMenu.elem) {
-            await this.parseMenuItems(res, listMenuItems);
-        }
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => {
-            const contextParent = menuEl?.closest('.currency-item');
-            return (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-        }, res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => {
+                const contextParent = menuEl?.closest('.currency-item');
+                return (contextParent)
+                    ? parseInt(contextParent.dataset.id, 10)
+                    : null;
+            }, res.contextMenu.elem);
         }
 
         // Date format
@@ -119,9 +110,9 @@ export class SettingsView extends AppView {
             locale: cont.locale,
             selectedTab: cont.tabs.selectedId,
             loading: cont.loadingIndicator.visible,
-            contextItem: cont.contextMenu.itemId,
-            listMenuVisible: cont.listMenu.visible,
-            contextMenuVisible: cont.contextMenu.visible,
+            contextItem: cont.contextMenu?.content?.itemId,
+            listMenuVisible: cont.listMenu?.visible,
+            contextMenuVisible: cont.contextMenu?.visible,
             currenciesList: {
                 items: cont.currenciesList.items.map((item) => item.model),
                 mode: cont.currenciesList.mode,
@@ -189,30 +180,31 @@ export class SettingsView extends AppView {
         };
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = {
-                visible: isCurrenciesTab && model.listMenuVisible && isListMode,
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: {
+                    visible: isCurrenciesTab && model.listMenuVisible && isListMode,
+                },
+                sortModeBtn: { visible: isCurrenciesTab && showSortItems },
+                selectAllBtn: {
+                    visible: showSelectItems && selectedCurrenciesCount < currenciesCount,
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && selectedCurrenciesCount > 0,
+                },
+                deleteBtn: { visible: showSelectItems && selectedCurrenciesCount > 0 },
             };
-            res.sortModeBtn = { visible: isCurrenciesTab && showSortItems };
-            res.selectAllBtn = {
-                visible: showSelectItems && selectedCurrenciesCount < currenciesCount,
-            };
-            res.deselectAllBtn = {
-                visible: showSelectItems && selectedCurrenciesCount > 0,
-            };
-            res.deleteBtn = { visible: showSelectItems && selectedCurrenciesCount > 0 };
         }
-
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
 
         if (model.contextMenuVisible) {
             const ctxCurrency = App.state.userCurrencies.getItem(model.contextItem);
             assert(ctxCurrency, 'Invalid state');
 
-            res.contextMenu.itemId = model.contextItem;
-
-            res.ctxDeleteBtn = { visible: isCurrenciesTab };
+            res.contextMenu = {
+                visible: model.contextMenuVisible,
+                itemId: model.contextItem,
+                ctxDeleteBtn: { visible: isCurrenciesTab },
+            };
         }
 
         return res;
@@ -354,7 +346,7 @@ export class SettingsView extends AppView {
     async openCurrenciesListMenu() {
         await this.showUserCurrenciesTab();
 
-        assert(!this.content.listMenu.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
@@ -389,11 +381,13 @@ export class SettingsView extends AppView {
 
         const expected = this.getExpectedState();
 
-        const buttonName = modeButtons[mode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        await this.performAction(() => this.content[buttonName].click());
+        if (mode === 'list') {
+            await this.performAction(() => this.content.listModeBtn.click());
+        } else if (mode === 'select') {
+            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+        } else if (mode === 'sort') {
+            await this.waitForList(() => this.listMenu.select('sortModeBtn'));
+        }
 
         return this.checkState(expected);
     }
@@ -467,7 +461,7 @@ export class SettingsView extends AppView {
         this.onSelectAllCurrencies();
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('selectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -483,7 +477,7 @@ export class SettingsView extends AppView {
         this.onDeselectAllCurrencies();
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deselectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -499,7 +493,7 @@ export class SettingsView extends AppView {
         this.onDeleteCurrencyByIndex(index);
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.ctxDeleteBtn.click());
+        await this.waitForList(() => this.contextMenu.select('ctxDeleteBtn'));
 
         return this.checkState(expected);
     }
@@ -515,7 +509,7 @@ export class SettingsView extends AppView {
         this.onDeleteSelectedCurrencies();
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.deleteBtn.click());
+        await this.waitForList(() => this.listMenu.select('deleteBtn'));
 
         return this.checkState(expected);
     }

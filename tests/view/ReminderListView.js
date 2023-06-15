@@ -1,7 +1,6 @@
 import {
     assert,
     asArray,
-    asyncMap,
     query,
     evaluate,
     navigation,
@@ -13,7 +12,10 @@ import {
     prop,
 } from 'jezve-test';
 import {
-    Button, LinkMenu, Paginator,
+    Button,
+    LinkMenu,
+    Paginator,
+    PopupMenu,
 } from 'jezvejs-test';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
@@ -29,26 +31,7 @@ import {
     Reminder,
 } from '../model/Reminder.js';
 
-const modeButtons = {
-    list: 'listModeBtn',
-    select: 'selectModeBtn',
-};
-
 const listMenuSelector = '#listMenu';
-const listMenuItems = [
-    'selectModeBtn',
-    'selectAllBtn',
-    'deselectAllBtn',
-    'confirmBtn',
-    'cancelBtn',
-];
-
-const contextMenuItems = [
-    'ctxDetailsBtn',
-    'ctxConfirmBtn',
-    'ctxUpdateBtn',
-    'ctxCancelBtn',
-];
 
 /** Scheduled transactions list view class */
 export class ReminderListView extends AppView {
@@ -56,6 +39,14 @@ export class ReminderListView extends AppView {
         super(...args);
 
         this.items = null;
+    }
+
+    get listMenu() {
+        return this.content.listMenu;
+    }
+
+    get contextMenu() {
+        return this.content.contextMenu;
     }
 
     async parseContent() {
@@ -78,22 +69,17 @@ export class ReminderListView extends AppView {
         res.heading.text = await prop(res.heading.elem, 'textContent');
 
         // Main menu
-        res.listMenu = { elem: await query(listMenuSelector) };
-        if (res.listMenu.elem) {
-            await this.parseMenuItems(res, listMenuItems);
-        }
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => {
-            const contextParent = menuEl?.closest('.reminder-item');
-            return (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-        }, res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => {
+                const contextParent = menuEl?.closest('.reminder-item');
+                return (contextParent)
+                    ? parseInt(contextParent.dataset.id, 10)
+                    : null;
+            }, res.contextMenu.elem);
         }
 
         res.stateMenu = await LinkMenu.create(this, await query('#stateMenu'));
@@ -119,30 +105,14 @@ export class ReminderListView extends AppView {
         return res;
     }
 
-    async parseMenuItems(cont, ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
-            return cont;
-        }
-
-        const res = cont;
-        await asyncMap(itemIds, async (id) => {
-            res[id] = await Button.create(this, await query(`#${id}`));
-            assert(res[id], `Menu item '${id}' not found`);
-            return res[id];
-        });
-
-        return res;
-    }
-
     buildModel(cont) {
         const res = {
             locale: cont.locale,
             filter: {},
-            contextItem: cont.contextMenu.itemId,
+            contextItem: cont.contextMenu?.content?.itemId,
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
-            listMenuVisible: cont.listMenu.visible,
-            contextMenuVisible: cont.contextMenu.visible,
+            listMenuVisible: cont.listMenu?.visible,
+            contextMenuVisible: cont.contextMenu?.visible,
             filtersVisible: cont.filtersContainer.visible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
@@ -425,7 +395,6 @@ export class ReminderListView extends AppView {
             },
             listModeBtn: { visible: !listMode },
             menuBtn: { visible: isItemsAvailable },
-            listMenu: { visible: model.listMenuVisible },
         };
 
         if (model.detailsItem) {
@@ -434,37 +403,38 @@ export class ReminderListView extends AppView {
         }
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = {
-                visible: model.listMenuVisible && listMode && isItemsAvailable,
-            };
-            res.selectAllBtn = {
-                visible: showSelectItems && selected.length < itemsCount,
-            };
-            res.deselectAllBtn = {
-                visible: showSelectItems && selected.length > 0,
-            };
-            res.confirmBtn = {
-                visible: showSelectItems && selected.length > 0 && !isConfirmed,
-            };
-            res.cancelBtn = {
-                visible: showSelectItems && selected.length > 0 && !isCancelled,
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: {
+                    visible: listMode && isItemsAvailable,
+                },
+                selectAllBtn: {
+                    visible: showSelectItems && selected.length < itemsCount,
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                },
+                confirmBtn: {
+                    visible: showSelectItems && selected.length > 0 && !isConfirmed,
+                },
+                cancelBtn: {
+                    visible: showSelectItems && selected.length > 0 && !isCancelled,
+                },
             };
         }
-
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
 
         if (model.contextMenuVisible) {
             const contextItem = this.items.getItem(model.contextItem);
             assert(contextItem, 'Context item not found');
 
-            res.contextMenu.itemId = model.contextItem;
-
-            res.ctxDetailsBtn = { visible: true };
-            res.ctxUpdateBtn = { visible: contextItem.state !== REMINDER_CONFIRMED };
-            res.ctxConfirmBtn = { visible: contextItem.state !== REMINDER_CONFIRMED };
-            res.ctxCancelBtn = { visible: contextItem.state !== REMINDER_CANCELLED };
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
+                ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
+                ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
+            };
         }
 
         if (isItemsAvailable) {
@@ -665,7 +635,7 @@ export class ReminderListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.content.listMenu.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'List menu already opened');
 
         await this.closeFilters();
 
@@ -682,7 +652,7 @@ export class ReminderListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.content.listMenu.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'List menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
@@ -714,11 +684,11 @@ export class ReminderListView extends AppView {
         this.model.listMode = listMode;
         const expected = this.getExpectedState();
 
-        const buttonName = modeButtons[listMode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        await this.performAction(() => button.click());
+        if (listMode === 'list') {
+            await this.performAction(() => this.content.listModeBtn.click());
+        } else if (listMode === 'select') {
+            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+        }
 
         return this.checkState(expected);
     }
@@ -804,7 +774,7 @@ export class ReminderListView extends AppView {
         this.items = RemindersList.create(this.items.map(selectItem));
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('selectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -820,7 +790,7 @@ export class ReminderListView extends AppView {
         this.items = RemindersList.create(this.items.map(deselectItem));
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deselectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -845,7 +815,7 @@ export class ReminderListView extends AppView {
         if (directNavigate) {
             await goTo(this.getDetailsURL());
         } else {
-            await this.performAction(() => this.content.ctxDetailsBtn.click());
+            await this.performAction(() => this.contextMenu.select('ctxDetailsBtn'));
         }
 
         return App.view.checkState(expected);
@@ -874,7 +844,7 @@ export class ReminderListView extends AppView {
     async goToUpdateItem(num) {
         await this.openContextMenu(num);
 
-        return navigation(() => this.content.ctxUpdateBtn.click());
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
     /** Confirms specified transaction from context menu */
@@ -890,7 +860,7 @@ export class ReminderListView extends AppView {
         this.model.contextItem = null;
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.ctxConfirmBtn.click());
+        await this.waitForList(() => this.contextMenu.select('ctxConfirmBtn'));
 
         return this.checkState(expected);
     }
@@ -908,7 +878,7 @@ export class ReminderListView extends AppView {
         this.model.contextItem = null;
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.ctxCancelBtn.click());
+        await this.waitForList(() => this.contextMenu.select('ctxCancelBtn'));
 
         return this.checkState(expected);
     }
@@ -929,7 +899,7 @@ export class ReminderListView extends AppView {
         this.model.listMode = 'list';
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.confirmBtn.click());
+        await this.waitForList(() => this.listMenu.select('confirmBtn'));
 
         return this.checkState(expected);
     }
@@ -949,7 +919,7 @@ export class ReminderListView extends AppView {
         this.model.listMode = 'list';
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.cancelBtn.click());
+        await this.waitForList(() => this.listMenu.select('cancelBtn'));
 
         return this.checkState(expected);
     }
