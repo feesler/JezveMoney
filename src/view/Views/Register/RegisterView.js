@@ -1,12 +1,16 @@
 import 'jezvejs/style';
-import { setEvents } from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
+
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
 import { InputField } from '../../Components/InputField/InputField.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './RegisterView.scss';
@@ -39,14 +43,15 @@ class RegisterView extends View {
      */
     onStart() {
         this.loadElementsByIds([
-            'form',
+            'formContainer',
         ]);
 
         this.localeField = LocaleSelectField.create();
         this.themeField = ThemeSwitchField.create();
         this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        // Form title
+        this.titleElem = createElement('h1', { props: { textContent: __('REGISTRATION') } });
 
         // Login field
         this.loginField = InputField.create({
@@ -85,11 +90,32 @@ class RegisterView extends View {
             onInput: (e) => this.onPasswordInput(e),
         });
 
-        this.form.prepend(
-            this.loginField.elem,
-            this.nameField.elem,
-            this.passwordField.elem,
-        );
+        // Form controls
+        this.controls = FormControls.create({
+            submitTitle: __('SUBMIT'),
+            cancelTitle: __('CANCEL'),
+            cancelBtnClass: 'alter-link',
+            cancelURL: `${App.baseURL}login/`,
+        });
+
+        // Registration form
+        this.form = createElement('form', {
+            props: {
+                className: 'register-form',
+                action: `${App.baseURL}register/`,
+                method: 'post',
+            },
+            events: { submit: (e) => this.onSubmit(e) },
+            children: [
+                this.titleElem,
+                this.loginField.elem,
+                this.nameField.elem,
+                this.passwordField.elem,
+                this.controls.elem,
+            ],
+        });
+
+        this.formContainer.append(this.form);
 
         this.subscribeToStore(this.store);
     }

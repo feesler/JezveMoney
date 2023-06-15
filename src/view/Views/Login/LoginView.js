@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { insertBefore, setEvents } from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { createStore } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
@@ -9,6 +9,8 @@ import { __, parseCookies, setCookie } from '../../utils/utils.js';
 import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
 import './LoginView.scss';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { Field } from '../../Components/Field/Field.js';
 
 /**
  * User log in view
@@ -38,12 +40,11 @@ class LoginView extends View {
      */
     onStart() {
         this.loadElementsByIds([
-            'form',
-            'rememberField',
-            'rememberCheck',
+            'formContainer',
         ]);
 
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        // Form title
+        this.titleElem = createElement('h1', { props: { textContent: __('LOG_IN') } });
 
         // Login field
         this.loginField = InputField.create({
@@ -56,7 +57,6 @@ class LoginView extends View {
             feedbackMessage: __('LOG_IN_INVALID_USERNAME'),
             onInput: (e) => this.onLoginInput(e),
         });
-        insertBefore(this.loginField.elem, this.rememberField);
 
         // Password field
         this.passwordField = InputField.create({
@@ -70,11 +70,45 @@ class LoginView extends View {
             feedbackMessage: __('LOG_IN_INVALID_PASSWORD'),
             onInput: (e) => this.onPasswordInput(e),
         });
-        insertBefore(this.passwordField.elem, this.rememberField);
 
-        this.rememberCheck = Checkbox.fromElement(this.rememberCheck, {
+        this.rememberCheck = Checkbox.create({
+            id: 'rememberCheck',
+            label: __('LOG_IN_REMEMBER'),
             onChange: () => this.onToggleRememberCheck(),
         });
+
+        this.rememberField = Field.create({
+            id: 'rememberField',
+            className: 'form-row',
+            content: this.rememberCheck.elem,
+        });
+
+        // Form controls
+        this.controls = FormControls.create({
+            submitTitle: __('LOG_IN_BUTTON'),
+            cancelTitle: __('REGISTRATION'),
+            cancelBtnClass: 'alter-link',
+            cancelURL: `${App.baseURL}register/`,
+        });
+
+        // Log in form
+        this.form = createElement('form', {
+            props: {
+                className: 'login-form',
+                action: `${App.baseURL}login/`,
+                method: 'post',
+            },
+            events: { submit: (e) => this.onSubmit(e) },
+            children: [
+                this.titleElem,
+                this.loginField.elem,
+                this.passwordField.elem,
+                this.rememberField.elem,
+                this.controls.elem,
+            ],
+        });
+
+        this.formContainer.append(this.form);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
