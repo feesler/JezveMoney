@@ -8,7 +8,7 @@
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
-                            <h1><?= __("ACCOUNTS") ?></h1>
+                            <h1><?= __("accounts.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
                         <header id="contentHeader" class="content-header">

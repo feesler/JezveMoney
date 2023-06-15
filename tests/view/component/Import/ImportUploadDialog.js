@@ -10,7 +10,6 @@ import {
     wait,
     waitForFunction,
     isNum,
-    copyObject,
     evaluate,
     asyncMap,
 } from 'jezve-test';
@@ -796,7 +795,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     getExpectedTemplate() {
-        const res = copyObject(this.model.template);
+        const res = structuredClone(this.model.template);
 
         if (res) {
             res.type_id = 0;

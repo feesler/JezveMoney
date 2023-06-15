@@ -1,7 +1,6 @@
 import {
     assert,
     asArray,
-    asyncMap,
     query,
     evaluate,
     navigation,
@@ -9,15 +8,15 @@ import {
     waitForFunction,
     goTo,
     baseUrl,
-    copyObject,
     isVisible,
     wait,
     httpReq,
 } from 'jezve-test';
 import {
+    Button,
     DropDown,
     Paginator,
-    Button,
+    PopupMenu,
 } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
@@ -36,31 +35,7 @@ import {
 import { __ } from '../model/locale.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
 
-const modeButtons = {
-    list: 'listModeBtn',
-    select: 'selectModeBtn',
-    sort: 'sortModeBtn',
-};
-
 const listMenuSelector = '#listMenu';
-const listMenuItems = [
-    'selectModeBtn',
-    'sortModeBtn',
-    'selectAllBtn',
-    'deselectAllBtn',
-    'exportBtn',
-    'setCategoryBtn',
-    'deleteBtn',
-    'groupByDateBtn',
-];
-
-const contextMenuItems = [
-    'ctxDetailsBtn',
-    'ctxUpdateBtn',
-    'ctxSetCategoryBtn',
-    'ctxDeleteBtn',
-];
-
 const categoryDialogSelector = '#selectCategoryDialog';
 
 /** List of transactions view class */
@@ -71,6 +46,14 @@ export class TransactionListView extends AppView {
 
     get categoryDropDown() {
         return this.content.categoryDropDown;
+    }
+
+    get listMenu() {
+        return this.content.listMenu;
+    }
+
+    get contextMenu() {
+        return this.content.contextMenu;
     }
 
     async parseContent() {
@@ -91,22 +74,17 @@ export class TransactionListView extends AppView {
         ));
 
         // Main menu
-        res.listMenu = { elem: await query(listMenuSelector) };
-        if (res.listMenu.elem) {
-            await this.parseMenuItems(res, listMenuItems);
-        }
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
         // Context menu
-        res.contextMenu = { elem: await query('#contextMenu') };
-        res.contextMenu.itemId = await evaluate((menuEl) => {
-            const contextParent = menuEl?.closest('.trans-item');
-            return (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-        }, res.contextMenu.elem);
-
-        if (res.contextMenu.itemId) {
-            await this.parseMenuItems(res, contextMenuItems);
+        res.contextMenu = await PopupMenu.create(this, await query('#contextMenu'));
+        if (res.contextMenu?.elem) {
+            res.contextMenu.content.itemId = await evaluate((menuEl) => {
+                const contextParent = menuEl?.closest('.trans-item');
+                return (contextParent)
+                    ? parseInt(contextParent.dataset.id, 10)
+                    : null;
+            }, res.contextMenu.elem);
         }
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
@@ -162,22 +140,6 @@ export class TransactionListView extends AppView {
         return res;
     }
 
-    async parseMenuItems(cont, ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
-            return cont;
-        }
-
-        const res = cont;
-        await asyncMap(itemIds, async (id) => {
-            res[id] = await Button.create(this, await query(`#${id}`));
-            assert(res[id], `Menu item '${id}' not found`);
-            return res[id];
-        });
-
-        return res;
-    }
-
     getDropDownFilter(dropDown, idPrefix = null) {
         if (!dropDown) {
             return [];
@@ -197,10 +159,10 @@ export class TransactionListView extends AppView {
     buildModel(cont) {
         const res = {
             locale: cont.locale,
-            contextItem: cont.contextMenu.itemId,
+            contextItem: cont.contextMenu?.content?.itemId,
             listMode: (cont.transList) ? cont.transList.listMode : 'list',
-            listMenuVisible: cont.listMenu.visible,
-            contextMenuVisible: cont.contextMenu.visible,
+            listMenuVisible: cont.listMenu?.visible,
+            contextMenuVisible: cont.contextMenu?.visible,
             filtersVisible: cont.filtersContainer.visible,
             groupByDate: App.state.getGroupByDate(),
             data: App.state.transactions.clone(),
@@ -277,7 +239,7 @@ export class TransactionListView extends AppView {
     }
 
     cloneModel(model) {
-        const res = copyObject(model);
+        const res = structuredClone(model);
 
         res.data = model.data.clone();
         res.filtered = model.filtered.clone();
@@ -367,15 +329,15 @@ export class TransactionListView extends AppView {
         }
 
         if (model.filter.accounts.length > 0) {
-            params.acc_id = model.filter.accounts;
+            params.accounts = model.filter.accounts;
         }
 
         if (model.filter.persons.length > 0) {
-            params.person_id = model.filter.persons;
+            params.persons = model.filter.persons;
         }
 
         if (model.filter.categories.length > 0) {
-            params.category_id = model.filter.categories;
+            params.categories = model.filter.categories;
         }
 
         if (model.filter.search.length > 0) {
@@ -383,10 +345,10 @@ export class TransactionListView extends AppView {
         }
 
         if (model.filter.startDate) {
-            params.stdate = model.filter.startDate;
+            params.startDate = model.filter.startDate;
         }
         if (model.filter.endDate) {
-            params.enddate = model.filter.endDate;
+            params.endDate = model.filter.endDate;
         }
 
         if (model.list.page !== 0) {
@@ -570,7 +532,6 @@ export class TransactionListView extends AppView {
             createBtn: { visible: listMode },
             listModeBtn: { visible: !listMode },
             menuBtn: { visible: isItemsAvailable && !sortMode },
-            listMenu: { visible: model.listMenuVisible },
         };
 
         if (model.detailsItem) {
@@ -579,38 +540,39 @@ export class TransactionListView extends AppView {
         }
 
         if (model.listMenuVisible) {
-            res.selectModeBtn = {
-                visible: model.listMenuVisible && listMode && isItemsAvailable,
+            res.listMenu = {
+                visible: model.listMenuVisible,
+                selectModeBtn: {
+                    visible: listMode && isItemsAvailable,
+                },
+                sortModeBtn: {
+                    visible: listMode && model.list.items.length > 1,
+                },
+                selectAllBtn: {
+                    visible: showSelectItems && selected.length < model.list.items.length,
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                },
+                exportBtn: { visible: isItemsAvailable },
+                setCategoryBtn: { visible: showSelectItems && selected.length > 0 },
+                deleteBtn: { visible: showSelectItems && selected.length > 0 },
+                groupByDateBtn: { visible: listMode },
             };
-            res.sortModeBtn = {
-                visible: model.listMenuVisible && listMode && model.list.items.length > 1,
-            };
-            res.selectAllBtn = {
-                visible: showSelectItems && selected.length < model.list.items.length,
-            };
-            res.deselectAllBtn = {
-                visible: showSelectItems && selected.length > 0,
-            };
-            res.exportBtn = { visible: isItemsAvailable };
-            res.setCategoryBtn = { visible: showSelectItems && selected.length > 0 };
-            res.deleteBtn = { visible: showSelectItems && selected.length > 0 };
-            res.groupByDateBtn = { visible: model.listMenuVisible && listMode };
         }
-
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
 
         if (model.contextMenuVisible) {
             const ctxTransaction = model.filtered.getItem(model.contextItem);
             assert(ctxTransaction, 'Invalid state');
 
-            res.contextMenu.itemId = model.contextItem;
-
-            res.ctxDetailsBtn = { visible: true };
-            res.ctxUpdateBtn = { visible: true };
-            res.ctxSetCategoryBtn = { visible: true };
-            res.ctxDeleteBtn = { visible: true };
+            res.contextMenu = {
+                visible: model.contextMenuVisible,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxSetCategoryBtn: { visible: true },
+                ctxDeleteBtn: { visible: true },
+            };
         }
 
         if (isAvailable) {
@@ -680,7 +642,7 @@ export class TransactionListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.content.listMenu.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'List menu already opened');
 
         await this.closeFilters();
 
@@ -697,7 +659,7 @@ export class TransactionListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.content.listMenu.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'List menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
@@ -729,11 +691,13 @@ export class TransactionListView extends AppView {
         this.model.listMode = listMode;
         const expected = this.getExpectedState();
 
-        const buttonName = modeButtons[listMode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        await this.performAction(() => button.click());
+        if (listMode === 'list') {
+            await this.performAction(() => this.content.listModeBtn.click());
+        } else if (listMode === 'select') {
+            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+        } else if (listMode === 'sort') {
+            await this.performAction(() => this.listMenu.select('sortModeBtn'));
+        }
 
         return this.checkState(expected);
     }
@@ -1408,7 +1372,7 @@ export class TransactionListView extends AppView {
         this.model.list.items = this.model.list.items.map(selectItem);
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('selectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -1424,7 +1388,7 @@ export class TransactionListView extends AppView {
         this.model.list.items = this.model.list.items.map(deselectItem);
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deselectAllBtn.click());
+        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
 
         return this.checkState(expected);
     }
@@ -1449,7 +1413,7 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getDetailsURL());
         } else {
-            await this.performAction(() => this.content.ctxDetailsBtn.click());
+            await this.performAction(() => this.contextMenu.select('ctxDetailsBtn'));
         }
 
         return App.view.checkState(expected);
@@ -1478,14 +1442,15 @@ export class TransactionListView extends AppView {
     async goToUpdateTransaction(num) {
         await this.openContextMenu(num);
 
-        return navigation(() => this.content.ctxUpdateBtn.click());
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
     /** Export transactions of specified accounts */
     async exportTransactions() {
         await this.openListMenu();
 
-        const downloadURL = this.content.exportBtn.link;
+        const exportBtn = this.listMenu.findItemById('exportBtn');
+        const downloadURL = exportBtn.link;
         assert(downloadURL, 'Invalid export URL');
 
         const exportResp = await httpReq('GET', downloadURL);
@@ -1526,7 +1491,7 @@ export class TransactionListView extends AppView {
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.ctxSetCategoryBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxSetCategoryBtn'));
         await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
 
         this.checkState(expected);
@@ -1560,7 +1525,7 @@ export class TransactionListView extends AppView {
         };
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.setCategoryBtn.click());
+        await this.performAction(() => this.listMenu.select('setCategoryBtn'));
         await this.performAction(() => wait(categoryDialogSelector, { visible: true }));
 
         this.checkState(expected);
@@ -1580,7 +1545,7 @@ export class TransactionListView extends AppView {
         this.model.contextItem = null;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.ctxDeleteBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxDeleteBtn'));
 
         this.checkState(expected);
 
@@ -1601,7 +1566,7 @@ export class TransactionListView extends AppView {
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deleteBtn.click());
+        await this.performAction(() => this.listMenu.select('deleteBtn'));
         this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
@@ -1622,7 +1587,7 @@ export class TransactionListView extends AppView {
 
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.groupByDateBtn.click());
+        await this.waitForList(() => this.listMenu.select('groupByDateBtn'));
         this.checkState(expected);
 
         return App.state.fetchAndTest();

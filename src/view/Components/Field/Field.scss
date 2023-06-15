@@ -11,6 +11,11 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: normal;
+
+  .checkbox {
+    --checkbox-text: var(--field-title-color);
+    --checkbox-label-size: 0.9rem;
+  }
 }
 
 .field__title {

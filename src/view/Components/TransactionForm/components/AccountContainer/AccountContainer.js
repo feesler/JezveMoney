@@ -77,7 +77,7 @@ export class AccountContainer extends Component {
         if (this.props.accountToggler) {
             this.togglerButton = Button.create({
                 className: TOGGLER_BUTTON_CLASS,
-                title: __('ACCOUNT_SELECT'),
+                title: __('accounts.select'),
                 onClick: (e) => this.onToggleAccount(e),
             });
             this.accountToggler = createElement('div', {

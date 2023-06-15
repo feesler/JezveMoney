@@ -20,6 +20,8 @@ import {
     getWeekRange,
     getMonthRange,
     getHalfYearRange,
+    dateStringToTime,
+    formatDateRange,
 } from '../../utils/utils.js';
 import { Application } from '../../Application/Application.js';
 import { API } from '../../API/index.js';
@@ -78,14 +80,19 @@ class StatisticsView extends View {
             ...this.props,
         };
 
+        const { filter } = this.props;
+
         const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
             selectedColumn: null,
             pieChartInfo: null,
             selectedPieChartItem: null,
-            filter: { ...this.props.filter },
-            form: { ...this.props.filter },
+            filter: { ...filter },
+            form: {
+                ...filter,
+                ...formatDateRange(filter),
+            },
             loading: false,
             renderTime: Date.now(),
         };
@@ -312,14 +319,13 @@ class StatisticsView extends View {
         const state = this.store.getState();
 
         // Select first account if nothing selected on account report type
-        const accounts = asArray(state.form.acc_id);
+        const accounts = asArray(state.form.accounts);
         if (state.form.report === 'account' && accounts.length === 0) {
             const account = window.app.model.userAccounts.getItemByIndex(0);
             this.store.dispatch(actions.changeAccountsFilter([account.id]));
         }
 
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /** Set loading state and render view */
@@ -356,38 +362,46 @@ class StatisticsView extends View {
      */
     onChangeTypeFilter(selected) {
         this.store.dispatch(actions.changeTypeFilter(selected));
-        const state = this.store.getState();
-        this.requestData(state.form);
+        this.requestData(this.getRequestData());
     }
 
     /** Date range filter change handler */
     changeDateFilter(data) {
         const { filter } = this.store.getState();
-        const stdate = filter.stdate ?? null;
-        const enddate = filter.enddate ?? null;
+        const startDate = filter.startDate ?? null;
+        const endDate = filter.endDate ?? null;
+        const timeData = {
+            startDate: dateStringToTime(data.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(data.endDate, { fixShortYear: false }),
+        };
 
-        if (stdate === data.stdate && enddate === data.enddate) {
+        if (startDate === timeData.startDate && endDate === timeData.endDate) {
             return;
         }
 
         this.store.dispatch(actions.changeDateFilter(data));
-        const state = this.store.getState();
-        this.requestData(state.form);
+        this.requestData(this.getRequestData());
     }
 
     showWeekRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getWeekRange());
+
+        const range = getWeekRange();
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showMonthRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getMonthRange());
+
+        const range = getMonthRange();
+        this.changeDateFilter(formatDateRange(range));
     }
 
     showHalfYearRange(e) {
         e.preventDefault();
-        this.changeDateFilter(getHalfYearRange());
+
+        const range = getHalfYearRange();
+        this.changeDateFilter(formatDateRange(range));
     }
 
     /**
@@ -396,8 +410,7 @@ class StatisticsView extends View {
      */
     onSelectReportType(value) {
         this.store.dispatch(actions.changeReportType(value));
-        const state = this.store.getState();
-        this.requestData(state.form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -407,14 +420,13 @@ class StatisticsView extends View {
     onAccountSel(accounts) {
         const ids = asArray(accounts).map((item) => parseInt(item.id, 10));
         const state = this.store.getState();
-        const filterIds = state.form.acc_id ?? [];
+        const filterIds = state.form.accounts ?? [];
         if (isSameSelection(ids, filterIds)) {
             return;
         }
 
         this.store.dispatch(actions.changeAccountsFilter(ids));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -424,14 +436,13 @@ class StatisticsView extends View {
     onCategorySel(categories) {
         const ids = asArray(categories).map((item) => parseInt(item.id, 10));
         const state = this.store.getState();
-        const filterIds = state.form.category_id ?? [];
+        const filterIds = state.form.categories ?? [];
         if (isSameSelection(ids, filterIds)) {
             return;
         }
 
         this.store.dispatch(actions.changeCategoriesFilter(ids));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -444,8 +455,7 @@ class StatisticsView extends View {
         }
 
         this.store.dispatch(actions.changeCurrencyFilter(obj.id));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /**
@@ -454,8 +464,7 @@ class StatisticsView extends View {
      */
     onSelectGroupType(value) {
         this.store.dispatch(actions.changeGroupType(value));
-        const { form } = this.store.getState();
-        this.requestData(form);
+        this.requestData(this.getRequestData());
     }
 
     /** Histogram item 'click' event handler */
@@ -482,6 +491,18 @@ class StatisticsView extends View {
         const url = this.getFilterURL(state);
         const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
         window.history.replaceState({}, pageTitle, url);
+    }
+
+    getRequestData() {
+        const { form } = this.store.getState();
+
+        const res = {
+            ...form,
+            startDate: dateStringToTime(form.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(form.endDate, { fixShortYear: false }),
+        };
+
+        return res;
     }
 
     async requestData(options) {
@@ -582,7 +603,7 @@ class StatisticsView extends View {
         const { report } = filter;
         return (
             report === 'category'
-            || (report === 'account' && filter.acc_id?.length > 1)
+            || (report === 'account' && filter.accounts?.length > 1)
         );
     }
 
@@ -659,7 +680,7 @@ class StatisticsView extends View {
     }
 
     renderAccountsFilter(state) {
-        const ids = state.form?.acc_id ?? [];
+        const ids = state.form?.accounts ?? [];
         const selection = [];
 
         window.app.model.userAccounts.forEach((account) => {
@@ -679,7 +700,7 @@ class StatisticsView extends View {
     }
 
     renderCategoriesFilter(state) {
-        const ids = state.form?.category_id ?? [];
+        const ids = state.form?.categories ?? [];
         this.categoryDropDown.setSelection(ids);
     }
 
@@ -714,27 +735,35 @@ class StatisticsView extends View {
         this.groupTypeMenu.setActive(group);
 
         // Date range filter
-        const dateFilter = {
-            stdate: (state.form.stdate ?? null),
-            enddate: (state.form.enddate ?? null),
-        };
-        this.dateRangeFilter.setData(dateFilter);
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            form: {
+                ...rangeState.form,
+                startDate: state.form.startDate,
+                endDate: state.form.endDate,
+            },
+            filter: {
+                ...rangeState.filter,
+                startDate: dateStringToTime(state.form.startDate),
+                endDate: dateStringToTime(state.form.endDate),
+            },
+        }));
 
         const showRangeSelectors = (group === 'day' || group === 'week');
         const dateFilterURL = this.getFilterURL(state, false);
         const weekRange = getWeekRange();
-        dateFilterURL.searchParams.set('stdate', weekRange.stdate);
-        dateFilterURL.searchParams.set('enddate', weekRange.enddate);
+        dateFilterURL.searchParams.set('startDate', weekRange.startDate);
+        dateFilterURL.searchParams.set('endDate', weekRange.endDate);
         this.weekRangeBtn.show(showRangeSelectors);
         this.weekRangeBtn.setURL(dateFilterURL.toString());
 
         const monthRange = getMonthRange();
-        dateFilterURL.searchParams.set('stdate', monthRange.stdate);
+        dateFilterURL.searchParams.set('startDate', monthRange.startDate);
         this.monthRangeBtn.show(showRangeSelectors);
         this.monthRangeBtn.setURL(dateFilterURL.toString());
 
         const halfYearRange = getHalfYearRange();
-        dateFilterURL.searchParams.set('stdate', halfYearRange.stdate);
+        dateFilterURL.searchParams.set('startDate', halfYearRange.startDate);
         this.halfYearRangeBtn.show(showRangeSelectors);
         this.halfYearRangeBtn.setURL(dateFilterURL.toString());
     }

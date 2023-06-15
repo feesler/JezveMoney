@@ -1,5 +1,4 @@
 import {
-    copyObject,
     assert,
     formatDate,
     asArray,
@@ -9,9 +8,9 @@ import {
     cutDate,
     getWeek,
     dateToSeconds,
-    MS_IN_SECOND,
     secondsToDate,
     MONTHS_IN_YEAR,
+    secondsToTime,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -120,7 +119,7 @@ export class TransactionsList extends SortableList {
                 continue;
             }
 
-            const convTrans = copyObject(trans);
+            const convTrans = structuredClone(trans);
             if (convTrans.type === TRANSFER) {
                 if (itemIds.includes(convTrans.src_id)) {
                     convTrans.type = INCOME;
@@ -464,7 +463,9 @@ export class TransactionsList extends SortableList {
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at setData()
         const isDesc = params.order?.toLowerCase() === 'desc';
-        if (!isDesc) {
+        if (params.orderByDate) {
+            res.data = this.sortItemsByDate(res.data, isDesc);
+        } else if (!isDesc) {
             res.data = res.sortAsc();
         }
 
@@ -490,13 +491,31 @@ export class TransactionsList extends SortableList {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = copyObject(list);
+        const res = structuredClone(list);
 
         if (desc) {
             return res.sort((a, b) => b.pos - a.pos);
         }
 
         return res.sort((a, b) => a.pos - b.pos);
+    }
+
+    sortItemsByDate(list, desc = false) {
+        assert.isArray(list, 'Invalid list specified');
+
+        const res = structuredClone(list);
+
+        if (desc) {
+            return res.sort((a, b) => {
+                const diff = (b.date - a.date);
+                return (diff === 0) ? (b.pos - a.pos) : diff;
+            });
+        }
+
+        return res.sort((a, b) => {
+            const diff = (a.date - b.date);
+            return (diff === 0) ? (a.pos - b.pos) : diff;
+        });
     }
 
     sort() {
@@ -755,8 +774,8 @@ export class TransactionsList extends SortableList {
         let groupStart = null;
         const curSum = {};
         let currId = params.curr_id;
-        const accId = asArray(params.acc_id);
-        const categoryId = asArray(params.category_id);
+        const accountId = asArray(params.accounts);
+        const categoryId = asArray(params.categories);
         const categoryGroups = [];
 
         const res = {
@@ -775,11 +794,11 @@ export class TransactionsList extends SortableList {
             }
             categories.push(currId);
         } else if (report === 'account') {
-            if (accId.length === 0) {
+            if (accountId.length === 0) {
                 return res;
             }
 
-            categories.push(...accId);
+            categories.push(...accountId);
         } else if (report === 'category') {
             if (categoryId.length === 0) {
                 const mainCategories = App.state.categories.findByParent();
@@ -818,9 +837,10 @@ export class TransactionsList extends SortableList {
         const itemsFilter = {
             order: 'asc',
             type: transTypes,
+            orderByDate: true,
         };
-        if (accId.length > 0) {
-            itemsFilter.accounts = accId;
+        if (accountId.length > 0) {
+            itemsFilter.accounts = accountId;
         }
         if (categoryId.length > 0) {
             itemsFilter.categories = categoryId;
@@ -871,7 +891,7 @@ export class TransactionsList extends SortableList {
                 [category] = itemGroup;
             }
 
-            const time = item.date * MS_IN_SECOND;
+            const time = secondsToTime(item.date);
             const dateInfo = this.getDateInfo(time, groupType);
             const amount = (isSource) ? item.src_amount : item.dest_amount;
             curDate = dateInfo;

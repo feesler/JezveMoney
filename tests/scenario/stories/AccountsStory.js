@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/account.js';
+import * as Actions from '../actions/account.js';
 import { App } from '../../Application.js';
 
 export class AccountsStory extends TestStory {
@@ -218,7 +218,7 @@ export class AccountsStory extends TestStory {
 
         const data = [
             [5],
-            [0, 5],
+            [0, 7],
         ];
 
         await App.scenario.runner.runGroup(Actions.show, data);

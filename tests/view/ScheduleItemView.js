@@ -12,6 +12,7 @@ import { DEBT, LIMIT_CHANGE } from '../model/Transaction.js';
 import { AppView } from './AppView.js';
 import { SCHEDULE_ITEM_FORM, TransactionForm } from './component/Transaction/TransactionForm.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import { INTERVAL_NONE } from '../model/ScheduledTransaction.js';
 
 /** Scheduled transaction create/update view class */
 export class ScheduleItemView extends AppView {
@@ -86,7 +87,6 @@ export class ScheduleItemView extends AppView {
             start_date: App.dateStringToSeconds(form.startDate),
             end_date: App.dateStringToSeconds(form.endDate),
             interval_type: parseInt(form.intervalType, 10),
-            interval_step: parseInt(form.intervalStep, 10),
             interval_offset: asArray(form.intervalOffset).map((item) => parseInt(item, 10)),
             type: form.type,
             src_amount: this.getExpectedSourceAmount(form),
@@ -96,6 +96,9 @@ export class ScheduleItemView extends AppView {
             category_id: form.categoryId,
             comment: form.comment,
         };
+        res.interval_step = (res.interval_type !== INTERVAL_NONE)
+            ? parseInt(form.intervalStep, 10)
+            : 0;
 
         if (form.isUpdate) {
             res.id = form.id;

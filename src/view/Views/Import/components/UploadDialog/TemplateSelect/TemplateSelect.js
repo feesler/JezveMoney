@@ -6,9 +6,9 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
+import { TemplateSelectContextMenu } from '../TemplateContextMenu/TemplateSelectContextMenu.js';
 import './TemplateSelect.scss';
 
 /** CSS classes */
@@ -16,8 +16,6 @@ const SELECT_CLASS = 'template-select';
 const CONTENT_CLASS = 'template-select__content';
 const TITLE_CLASS = 'template-select__title';
 const CONTROLS_CLASS = 'template-select__controls';
-const UPDATE_BUTTON_CLASS = 'update-btn';
-const DEL_BUTTON_CLASS = 'delete-btn';
 
 const defaultProps = {
     disabled: false,
@@ -39,6 +37,11 @@ export class TemplateSelect extends Component {
             ...defaultProps,
             ...props,
         });
+
+        this.contextMenuActions = {
+            ctxUpdateTemplateBtn: () => this.onUpdate(),
+            ctxDeleteTemplateBtn: () => this.onDelete(),
+        };
 
         this.state = {
             ...this.props,
@@ -78,28 +81,6 @@ export class TemplateSelect extends Component {
         });
     }
 
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            fixed: false,
-            onClose: () => this.showMenu(false),
-            items: [{
-                icon: 'update',
-                title: __('UPDATE'),
-                className: UPDATE_BUTTON_CLASS,
-                onClick: (e) => this.onUpdate(e),
-            }, {
-                icon: 'del',
-                title: __('DELETE'),
-                className: DEL_BUTTON_CLASS,
-                onClick: (e) => this.onDelete(e),
-            }],
-        });
-    }
-
     /** Returns true if element is allowed to toggle menu list */
     isValidToggleTarget(elem) {
         return (
@@ -127,6 +108,15 @@ export class TemplateSelect extends Component {
         this.setState({ ...this.state, showMenu: !!value });
     }
 
+    onContextMenuClick(item) {
+        this.showMenu(false);
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
+    }
+
     /** Menu button 'click' event handler */
     onToggleMenu(e) {
         e.stopPropagation();
@@ -141,51 +131,40 @@ export class TemplateSelect extends Component {
 
     /** DropDown 'change' event handler */
     onChange(template) {
-        if (!isFunction(this.props.onChange)) {
-            return;
+        if (isFunction(this.props.onChange)) {
+            this.props.onChange(template);
         }
-
-        this.props.onChange(template);
     }
 
     /** Update menu item 'click' event handler */
-    onUpdate(e) {
-        e.stopPropagation();
-        this.showMenu(false);
-
-        if (!isFunction(this.props.onUpdate)) {
-            return;
+    onUpdate() {
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.state.template?.id);
         }
-        this.props.onUpdate(this.state.template?.id);
     }
 
     /** Delete menu item 'click' event handler */
-    onDelete(e) {
-        e.stopPropagation();
-        this.showMenu(false);
-
-        if (!isFunction(this.props.onDelete)) {
-            return;
+    onDelete() {
+        if (isFunction(this.props.onDelete)) {
+            this.props.onDelete(this.state.template?.id);
         }
-
-        this.props.onDelete(this.state.template?.id);
     }
 
     renderContextMenu(state) {
-        if (!state.showMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-        if (!this.menuButton.elem) {
-            this.contextMenu?.detach();
+        if (!state.showMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = TemplateSelectContextMenu.create({
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.showMenu(false),
+            });
         }
 
-        this.contextMenu.attachAndShow(this.menuButton.elem);
+        this.contextMenu.setState({
+            showContextMenu: state.showMenu,
+        });
     }
 
     renderSelect(state, prevState) {

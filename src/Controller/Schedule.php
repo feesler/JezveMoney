@@ -47,14 +47,10 @@ class Schedule extends ListViewController
             "titleString" => __("APP_NAME") . " | " . __("SCHEDULE"),
         ];
 
-        $pagination = [
-            "onPage" => 10,
-            "page" => 1,
-            "pagesCount" => 1,
-            "total" => 0,
-        ];
         $requestDefaults = [
             "onPage" => 10,
+            "page" => 1,
+            "range" => 1,
             "desc" => true
         ];
 
@@ -64,17 +60,6 @@ class Schedule extends ListViewController
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
-        }
-
-        $itemsCount = $this->model->getCount();
-        $pagination["total"] = $itemsCount;
-
-        // Build data for paginator
-        if ($request["onPage"] > 0) {
-            $pageCount = ceil($itemsCount / $request["onPage"]);
-            $pagination["pagesCount"] = $pageCount;
-            $page_num = isset($request["page"]) ? intval($request["page"]) : 0;
-            $pagination["page"] = $page_num + 1;
         }
 
         $detailsId = $this->getRequestedItem();
@@ -87,7 +72,7 @@ class Schedule extends ListViewController
             "categories" => $this->catModel->getData(),
             "schedule" => $this->model->getData(),
             "view" => [
-                "pagination" => $pagination,
+                "pagination" => $request["pagination"],
                 "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
                 "detailsItem" => $this->model->getItem($detailsId),
@@ -158,17 +143,19 @@ class Schedule extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("ERR_TRANS_CREATE");
 
+        $dateInfo = getDateInfo(time(), INTERVAL_MONTH);
+
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
             "category_id" => 0,
             "comment" => "",
-            "start_date" => time(),
+            "start_date" => $dateInfo["time"],
             "end_date" => null,
             "interval_type" => INTERVAL_MONTH,
             "interval_step" => 1,
-            "interval_offset" => 0,
+            "interval_offset" => $dateInfo["info"]["mday"] - 1,
         ];
 
         // Check availability of selected type of transaction

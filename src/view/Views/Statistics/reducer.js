@@ -1,6 +1,6 @@
 import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
-import { normalize } from '../../utils/utils.js';
+import { formatDateRange, normalize } from '../../utils/utils.js';
 
 const SECTOR_OFFSET = 10;
 
@@ -66,7 +66,7 @@ const slice = createSlice({
             ...state,
             form: {
                 ...state.form,
-                acc_id: accounts,
+                accounts,
             },
             accountCurrency: account?.curr_id ?? 0,
         };
@@ -78,7 +78,7 @@ const slice = createSlice({
             ...state,
             form: {
                 ...state.form,
-                category_id: categories,
+                categories,
             },
         };
     },
@@ -195,7 +195,10 @@ const slice = createSlice({
         ...state,
         chartData: { ...data.histogram },
         filter: { ...data.filter },
-        form: { ...data.filter },
+        form: {
+            ...data.filter,
+            ...formatDateRange(data.filter),
+        },
         selectedColumn: null,
         pieChartInfo: null,
         selectedPieChartItem: null,

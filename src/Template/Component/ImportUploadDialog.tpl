@@ -45,12 +45,6 @@
         </section>
 
         <section id="templateForm" class="template-form" hidden>
-            <div id="nameField" class="field form-row validation-block">
-                <label for="tplNameInp" class="field__title"><?= __("TEMPLATE_NAME") ?></label>
-                <input id="tplNameInp" class="input stretch-input" type="text" autocomplete="off">
-                <div class="feedback invalid-feedback"><?= __("TEMPLATE_INVALID_NAME") ?></div>
-            </div>
-
             <div id="firstRowField" class="field form-row first-row-field validation-block">
                 <label for="firstRowInp" class="field__title"><?= __("TEMPLATE_FIRST_ROW") ?></label>
                 <div class="input-group">

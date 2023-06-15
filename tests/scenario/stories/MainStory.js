@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/main.js';
+import * as Actions from '../actions/main.js';
 import { App } from '../../Application.js';
 
 export class MainStory extends TestStory {
@@ -29,9 +29,6 @@ export class MainStory extends TestStory {
         await Actions.toggleHiddenAccounts();
         await Actions.toggleHiddenAccounts();
         await Actions.toggleHiddenAccounts();
-        await Actions.toggleHiddenPersons();
-        await Actions.toggleHiddenPersons();
-        await Actions.toggleHiddenPersons();
     }
 
     async toggleHiddenPersons() {

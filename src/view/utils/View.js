@@ -1,6 +1,5 @@
 import {
     asArray,
-    copyObject,
     ge,
     onReady,
 } from 'jezvejs';
@@ -11,7 +10,7 @@ import { Header } from '../Components/Header/Header.js';
  */
 export class View {
     constructor(props = {}) {
-        this.props = copyObject(props);
+        this.props = structuredClone(props);
 
         onReady(() => this.onReady());
     }

@@ -1,4 +1,3 @@
-import { copyObject } from 'jezve-test';
 import { List } from './List.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
@@ -54,7 +53,7 @@ export class ImportActionList extends List {
     }
 
     sort() {
-        const data = copyObject(this.data);
+        const data = structuredClone(this.data);
         data.sort((a, b) => a.action_id - b.action_id);
         return ImportActionList.create(data);
     }

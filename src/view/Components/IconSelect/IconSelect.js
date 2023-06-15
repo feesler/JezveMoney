@@ -23,11 +23,11 @@ export class IconSelect extends DropDown {
     initIcons() {
         const { icons } = window.app.model;
 
-        this.addItem({ id: 0, title: __('ACCOUNT_NO_ICON') });
+        this.addItem({ id: 0, title: __('icons.noIcon') });
         const items = icons.map((icon) => ({
             id: icon.id,
             file: icon.file,
-            title: __(icon.name),
+            title: __(`icons.${icon.name}`),
         }));
         this.append(items);
     }

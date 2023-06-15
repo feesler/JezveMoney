@@ -1,4 +1,4 @@
-import { assert, copyObject } from 'jezve-test';
+import { assert } from 'jezve-test';
 import { List } from './List.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { TransactionsList } from './TransactionsList.js';
@@ -67,7 +67,7 @@ export class ScheduledTransactionsList extends List {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = copyObject(list);
+        const res = structuredClone(list);
 
         if (desc) {
             return res.sort((a, b) => b.pos - a.pos);

@@ -3,14 +3,14 @@ import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../../../view/Application/Application.js';
 import '../../../../view/Application/Application.scss';
-import { View } from '../../../../view/utils/View.js';
+import { AdminView } from '../../utils/AdminView/AdminView.js';
 import '../../utils/AdminView/AdminView.scss';
 import './BalanceView.scss';
 
 /**
  * Admin balance view
  */
-class AdminBalanceView extends View {
+class AdminBalanceView extends AdminView {
     constructor(...args) {
         super(...args);
 

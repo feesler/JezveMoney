@@ -1,9 +1,12 @@
-.date-range-filter {
+.date-range-input {
+  .row-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+  }
+
   .input-group {
     --ig-hor-padding: 0.5rem;
-
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
   }
 
   .input-group__text {
@@ -25,11 +28,15 @@
     --input-padding: 0 0.2rem 0 0.5rem;
 
     min-width: 0;
+
+    .input-group__input-outer {
+      min-width: 0;
+    }
   }
 }
 
 @media screen and (min-width: 576px) {
-  .date-range-filter {
+  .date-range-input {
     .date-range-part {
       --input-padding: 0 0.5rem;
     }

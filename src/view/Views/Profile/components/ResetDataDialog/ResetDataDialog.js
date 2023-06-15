@@ -39,6 +39,8 @@ export class ResetDataDialog extends ProfileDialog {
             title: __('PROFILE_RESET_DATA'),
             className: DIALOG_CLASS,
         });
+
+        this.reset();
     }
 
     /** Reset dialog state */

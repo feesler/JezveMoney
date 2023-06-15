@@ -13,19 +13,7 @@
             <form id="form" class="login-form" action="<?= BASEURL ?>login/" method="post">
                 <h1><?= __("LOG_IN") ?></h1>
 
-                <div id="login-inp-block" class="field form-row validation-block">
-                    <label for="loginInp" class="field__title"><?= __("LOG_IN_USERNAME") ?></label>
-                    <input id="loginInp" class="input stretch-input" name="login" type="text" autocomplete="off">
-                    <div class="feedback invalid-feedback"><?= __("LOG_IN_INVALID_USERNAME") ?></div>
-                </div>
-
-                <div id="pwd-inp-block" class="field form-row validation-block">
-                    <label for="passwordInp" class="field__title"><?= __("LOG_IN_PASSWORD") ?></label>
-                    <input id="passwordInp" class="input stretch-input" name="password" type="password" autocomplete="off">
-                    <div class="feedback invalid-feedback"><?= __("LOG_IN_INVALID_PASSWORD") ?></div>
-                </div>
-
-                <div class="form-row">
+                <div id="rememberField" class="field form-row">
                     <label id="rememberCheck" class="checkbox">
                         <input type="checkbox" name="remember" checked>
                         <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>

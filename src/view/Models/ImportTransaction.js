@@ -1,5 +1,4 @@
 import {
-    copyObject,
     trimDecimalPlaces,
     fixFloat,
 } from 'jezvejs';
@@ -122,7 +121,7 @@ export class ImportTransaction {
 
     constructor(props) {
         const data = (props instanceof ImportTransaction)
-            ? copyObject(props)
+            ? structuredClone(props)
             : {
                 ...defaultProps,
                 ...props,
@@ -184,7 +183,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             enabled,
         });
     }
@@ -203,7 +202,7 @@ export class ImportTransaction {
             return this;
         }
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             selected,
         });
     }
@@ -217,7 +216,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             selected: !this.selected,
         });
     }
@@ -232,7 +231,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             listMode,
             selected: false,
         });
@@ -249,7 +248,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             collapsed,
         });
     }
@@ -260,7 +259,7 @@ export class ImportTransaction {
             return this;
         }
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             rulesApplied,
         });
     }
@@ -271,7 +270,7 @@ export class ImportTransaction {
             return this;
         }
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             modifiedByUser,
         });
     }
@@ -319,8 +318,8 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
-            similarTransaction: copyObject(transaction),
+            ...structuredClone(this),
+            similarTransaction: structuredClone(transaction),
             enabled: !transaction,
         });
     }
@@ -358,7 +357,7 @@ export class ImportTransaction {
             return this;
         }
 
-        const state = copyObject(this);
+        const state = structuredClone(this);
         const isDiffBefore = this.isDiff();
         if (sourceTypes.includes(value)) {
             state.sourceAccountId = state.mainAccount.id;
@@ -492,7 +491,7 @@ export class ImportTransaction {
         }
 
         const state = trimAmounts({
-            ...copyObject(this),
+            ...structuredClone(this),
             srcCurrId,
         });
 
@@ -514,7 +513,7 @@ export class ImportTransaction {
         }
 
         const state = trimAmounts({
-            ...copyObject(this),
+            ...structuredClone(this),
             destCurrId,
         });
 
@@ -534,7 +533,7 @@ export class ImportTransaction {
 
         const isDiffBefore = this.isDiff();
         const state = {
-            ...copyObject(this),
+            ...structuredClone(this),
             mainAccount: account,
         };
 
@@ -613,7 +612,7 @@ export class ImportTransaction {
         }
 
         const state = {
-            ...copyObject(this),
+            ...structuredClone(this),
         };
         if (state.type === 'transfer_out') {
             state.destAccountId = account.id;
@@ -639,7 +638,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             personId: person.id,
         });
     }
@@ -655,7 +654,7 @@ export class ImportTransaction {
             return this;
         }
 
-        const state = copyObject(this);
+        const state = structuredClone(this);
         state.sourceAmount = value;
         if (state.srcCurrId === state.destCurrId) {
             state.destAmount = state.sourceAmount;
@@ -675,7 +674,7 @@ export class ImportTransaction {
             return this;
         }
 
-        const state = copyObject(this);
+        const state = structuredClone(this);
         state.destAmount = value;
         if (state.srcCurrId === state.destCurrId) {
             state.sourceAmount = state.destAmount;
@@ -695,7 +694,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             date,
         });
     }
@@ -714,7 +713,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             categoryId,
         });
     }
@@ -730,7 +729,7 @@ export class ImportTransaction {
         }
 
         return new ImportTransaction({
-            ...copyObject(this),
+            ...structuredClone(this),
             comment,
         });
     }

@@ -8,7 +8,6 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { Application } from '../../Application/Application.js';
@@ -16,14 +15,13 @@ import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import {
     listData,
-    getSortByDateIcon,
-    getSortByNameIcon,
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
+    getSelectedIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { Category } from '../../Models/Category.js';
@@ -34,12 +32,14 @@ import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/Dele
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
+import { CategoryListContextMenu } from './components/ContextMenu/CategoryListContextMenu.js';
+import { CategoryListMainMenu } from './components/MainMenu/CategoryListMainMenu.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
+import { getCategoriesSortMode } from './helpers.js';
 import './CategoryListView.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
-const CHECK_ITEM_CLASS = 'check-icon-item';
 
 const ANY_TYPE = 0;
 
@@ -49,6 +49,21 @@ const ANY_TYPE = 0;
 class CategoryListView extends View {
     constructor(...args) {
         super(...args);
+
+        this.menuActions = {
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            sortByNameBtn: () => this.toggleSortByName(),
+            sortByDateBtn: () => this.toggleSortByDate(),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            deleteBtn: () => this.confirmDelete(),
+        };
+
+        this.contextMenuActions = {
+            ctxDetailsBtn: () => this.showDetails(),
+            ctxDeleteBtn: () => this.confirmDelete(),
+        };
 
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
         window.app.initCategoriesModel();
@@ -186,96 +201,6 @@ class CategoryListView extends View {
         }
     }
 
-    createMenu() {
-        if (this.menu) {
-            return;
-        }
-
-        this.menu = PopupMenu.create({
-            id: 'listMenu',
-            attachTo: this.menuButton.elem,
-            onClose: () => this.hideMenu(),
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('SELECT'),
-                onClick: () => this.onMenuClick('selectModeBtn'),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('SORT'),
-                onClick: () => this.onMenuClick('sortModeBtn'),
-            }, {
-                id: 'sortByNameBtn',
-                title: __('SORT_BY_NAME'),
-                className: CHECK_ITEM_CLASS,
-                onClick: () => this.onMenuClick('sortByNameBtn'),
-            }, {
-                id: 'sortByDateBtn',
-                title: __('SORT_BY_DATE'),
-                className: CHECK_ITEM_CLASS,
-                onClick: () => this.onMenuClick('sortByDateBtn'),
-            }, {
-                id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
-                onClick: () => this.onMenuClick('selectAllBtn'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
-                onClick: () => this.onMenuClick('deselectAllBtn'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.onMenuClick('deleteBtn'),
-            }],
-        });
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            sortByNameBtn: () => this.toggleSortByName(),
-            sortByDateBtn: () => this.toggleSortByDate(),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            deleteBtn: () => this.confirmDelete(),
-        };
-    }
-
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('OPEN_ITEM'),
-                onClick: (e) => this.showDetails(e),
-            }, {
-                type: 'placeholder',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('UPDATE'),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.confirmDelete(),
-            }],
-        });
-    }
-
     showMenu() {
         this.store.dispatch(actions.showMenu());
     }
@@ -293,6 +218,15 @@ class CategoryListView extends View {
         }
 
         menuAction();
+    }
+
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     getItemById(itemId) {
@@ -368,21 +302,12 @@ class CategoryListView extends View {
         this.store.dispatch(actions.stopLoading());
     }
 
-    getSelectedItems(state) {
-        return state.items.filter((item) => item.selected);
-    }
-
-    getSelectedIds(state) {
-        const selArr = this.getSelectedItems(state);
-        return selArr.map((item) => item.id);
-    }
-
     getContextIds(state) {
         if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
 
-        return this.getSelectedIds(state);
+        return getSelectedIds(state.items);
     }
 
     async deleteItems(removeChild = true) {
@@ -532,12 +457,8 @@ class CategoryListView extends View {
         window.app.createErrorNotification(__('ERR_CATEGORY_CHANGE_POS'));
     }
 
-    getSortMode() {
-        return window.app.model.profile.settings.sort_categories;
-    }
-
     toggleSortByName() {
-        const current = this.getSortMode();
+        const current = getCategoriesSortMode();
         const sortMode = (current === SORT_BY_NAME_ASC)
             ? SORT_BY_NAME_DESC
             : SORT_BY_NAME_ASC;
@@ -546,7 +467,7 @@ class CategoryListView extends View {
     }
 
     toggleSortByDate() {
-        const current = this.getSortMode();
+        const current = getCategoriesSortMode();
         const sortMode = (current === SORT_BY_CREATEDATE_ASC)
             ? SORT_BY_CREATEDATE_DESC
             : SORT_BY_CREATEDATE_ASC;
@@ -601,75 +522,52 @@ class CategoryListView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list' || !state.showContextMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const itemId = state.contextItem;
-        const category = window.app.model.categories.getItem(itemId);
-        if (!category) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const selector = `.category-item[data-id="${itemId}"] .menu-btn`;
-        const menuButton = this.contentContainer.querySelector(selector);
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = CategoryListContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        const { baseURL } = window.app;
-        const { items } = this.contextMenu;
-        items.ctxDetailsBtn.setURL(`${baseURL}categories/${itemId}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${itemId}`);
-
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.contextItem,
+        });
     }
 
     renderMenu(state) {
         const itemsCount = state.items.length;
-        const selArr = this.getSelectedItems(state);
-        const selCount = selArr.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
         const isSortMode = state.listMode === 'sort';
-        const sortMode = this.getSortMode();
 
         this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
-
         this.menuButton.show(itemsCount > 0 && !isSortMode);
 
-        if (!state.showMenu) {
-            this.menu?.hideMenu();
+        if (!state.showMenu && !this.menu) {
             return;
         }
 
         const showFirstTime = !this.menu;
-        this.createMenu();
+        if (!this.menu) {
+            this.menu = CategoryListMainMenu.create({
+                id: 'listMenu',
+                attachTo: this.menuButton.elem,
+                onItemClick: (item) => this.onMenuClick(item),
+                onClose: () => this.hideMenu(),
+            });
+        }
 
-        const { items } = this.menu;
-
-        items.selectModeBtn.show(isListMode && itemsCount > 0);
-        items.sortModeBtn.show(isListMode && itemsCount > 1);
-
-        items.sortByNameBtn.setIcon(getSortByNameIcon(sortMode));
-        items.sortByNameBtn.show(isListMode && itemsCount > 1);
-
-        items.sortByDateBtn.setIcon(getSortByDateIcon(sortMode));
-        items.sortByDateBtn.show(isListMode && itemsCount > 1);
-
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
-
-        items.deleteBtn.show(selCount > 0);
+        this.menu.setState({
+            listMode: state.listMode,
+            showMenu: state.showMenu,
+            items: state.items,
+        });
 
         if (showFirstTime) {
             this.menu.showMenu();
@@ -739,7 +637,7 @@ class CategoryListView extends View {
         this.itemsCount.textContent = itemsCount;
         const isSelectMode = (state.listMode === 'select');
         show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
+        const selected = (isSelectMode) ? getSelectedIds(state.items) : [];
         this.selItemsCount.textContent = selected.length;
 
         const categories = CategoryList.create(state.items);

@@ -1,6 +1,7 @@
 import {
     DEFAULT_FIRST_DAY_OF_WEEK,
     asArray,
+    firstUpperCase,
     getFirstDayOfWeek,
     getWeekdayShort,
     shiftDate,
@@ -95,8 +96,8 @@ export class ScheduledTransaction extends ListItem {
             options: { firstDay: DEFAULT_FIRST_DAY_OF_WEEK },
         });
         const weekdaysFmt = intervalOffsets.map((item) => (
-            getWeekdayShort(
-                shiftDate(firstDay, item),
+            firstUpperCase(
+                getWeekdayShort(shiftDate(firstDay, item), window.app.locale).substring(0, 3),
                 window.app.locale,
             )
         ));
@@ -105,7 +106,7 @@ export class ScheduledTransaction extends ListItem {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', (offset + 1));
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', (parseInt(offset, 10) + 1));
     }
 
     renderYearOffset(offset) {

@@ -10,7 +10,6 @@ import {
 import 'jezvejs/style/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 import { API } from '../../API/index.js';
@@ -36,6 +35,7 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
+import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';
 
@@ -45,6 +45,11 @@ import './MainView.scss';
 class MainView extends View {
     constructor(...args) {
         super(...args);
+
+        this.trContextMenuActions = {
+            ctxSetCategoryBtn: () => this.showCategoryDialog(),
+            ctxDeleteBtn: () => this.confirmDelete(),
+        };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
@@ -167,7 +172,7 @@ class MainView extends View {
             items: [{
                 id: 'accounts',
                 value: 'accounts',
-                title: __('ACCOUNTS'),
+                title: __('accounts.listTitle'),
                 content: [
                     this.visibleAccounts.elem,
                     this.hiddenAccounts.elem,
@@ -221,8 +226,6 @@ class MainView extends View {
             chart.append(this.histogram.elem);
         }
 
-        this.createTransactionContextMenu();
-
         this.subscribeToStore(this.store);
         this.stopLoading();
     }
@@ -243,31 +246,13 @@ class MainView extends View {
         });
     }
 
-    /** Creates context menu for latest transactions list */
-    createTransactionContextMenu() {
-        this.transactionContextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('UPDATE'),
-            }, {
-                id: 'ctxSetCategoryBtn',
-                title: __('SET_CATEGORY'),
-                onClick: () => this.showCategoryDialog(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.confirmDelete(),
-            }],
-        });
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.trContextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     /** Toggle shows/hides hidden accounts */
@@ -573,23 +558,23 @@ class MainView extends View {
             return;
         }
 
-        const itemId = state.transactionContextItem;
-        if (!itemId || !state.showContextMenu) {
-            this.transactionContextMenu.detach();
-            return;
-        }
-        const listItem = this.latestList.getListItemById(itemId);
-        const menuButton = listItem?.elem?.querySelector('.menu-btn');
-        if (!menuButton) {
-            this.transactionContextMenu.detach();
+        if (!state.showContextMenu && !this.transactionContextMenu) {
             return;
         }
 
-        const { baseURL } = window.app;
-        const { items } = this.transactionContextMenu;
-        items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+        if (!this.transactionContextMenu) {
+            this.transactionContextMenu = TransactionListContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
+        }
 
-        this.transactionContextMenu.attachAndShow(menuButton);
+        this.transactionContextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.transactionContextItem,
+            showDetailsItem: false,
+        });
     }
 
     /** Renders transactions widget */

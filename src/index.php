@@ -31,11 +31,16 @@ $router->setAliases([
 
 $router->onStart(function ($controller, $contrStr, $routeParts) {
     // Check correct user authentication for controller
-    $loggedOutControllers = ["user/login", "user/register"];
-    $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
-    $isLogOutCont = in_array($rebuildRoute, $loggedOutControllers);
+    $loggedOutRoutes = ["user/login", "user/register"];
+    $anyStatusRoutes = ["main/about"];
 
-    $controller->checkUser(!$isLogOutCont);
+    $rebuildRoute = $contrStr . (count($routeParts) ? "/" . $routeParts[0] : "");
+
+    $requiredUserStatus = (in_array($rebuildRoute, $anyStatusRoutes))
+        ? null
+        : !in_array($rebuildRoute, $loggedOutRoutes);
+
+    $controller->checkUser($requiredUserStatus);
 });
 
 $router->onBeforeAction(function ($controller, $contrStr, $action) {

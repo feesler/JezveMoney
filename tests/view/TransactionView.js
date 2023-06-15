@@ -4,7 +4,6 @@ import {
     query,
     prop,
     navigation,
-    copyObject,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -61,7 +60,7 @@ export class TransactionView extends AppView {
     createCancelledState(transactionId) {
         this.cancelledState = App.state.clone();
         const origTransaction = this.cancelledState.transactions.getItem(transactionId);
-        const originalAccounts = copyObject(this.cancelledState.accounts.data);
+        const originalAccounts = structuredClone(this.cancelledState.accounts.data);
         const canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
         this.cancelledState.accounts.data = canceled;
     }

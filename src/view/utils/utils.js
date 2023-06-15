@@ -69,6 +69,7 @@ export const parseDate = (str, params = {}) => {
     }
 
     const res = parseDateString(str, {
+        ...params,
         locales: params?.locales ?? window.app.dateFormatLocale,
         options: params?.options ?? window.app.dateFormatOptions,
     });
@@ -99,11 +100,12 @@ export const timestampFromString = (str, params = {}) => {
 
 /** Returns Unix timestamp in seconds for specified date */
 export const getSeconds = (date) => {
-    if (!isDate(date)) {
-        throw new Error('Invalid date');
+    const timestamp = isDate(date) ? date.getTime() : parseInt(date, 10);
+    if (!timestamp) {
+        throw new Error('Invalid value');
     }
 
-    return Math.round(date.getTime() / MS_IN_SECOND);
+    return Math.round(timestamp / MS_IN_SECOND);
 };
 
 /** Convert date string to Unix timestamp in seconds */
@@ -133,12 +135,23 @@ export const cutTime = (value) => (
     cutDate(timeToDate(value))
 );
 
+/** Returns formatted date string */
+export const formatDateInputValue = (value) => (
+    (value) ? window.app.formatInputDate(value) : null
+);
+
+/** Returns formatted date range object */
+export const formatDateRange = (range) => ({
+    startDate: formatDateInputValue(range?.startDate),
+    endDate: formatDateInputValue(range?.endDate),
+});
+
 /** Returns date range object for a last week */
 export const getWeekRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftDate(now, -DAYS_IN_WEEK)),
+        endDate: cutDate(now),
     };
 };
 
@@ -146,8 +159,8 @@ export const getWeekRange = () => {
 export const getMonthRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftMonth(now, -1)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftMonth(now, -1)),
+        endDate: cutDate(now),
     };
 };
 
@@ -155,8 +168,8 @@ export const getMonthRange = () => {
 export const getHalfYearRange = () => {
     const now = new Date();
     return {
-        stdate: getSeconds(shiftMonth(now, -6)),
-        enddate: cutDate(now),
+        startDate: getSeconds(shiftMonth(now, -6)),
+        endDate: cutDate(now),
     };
 };
 
@@ -251,11 +264,19 @@ export const __ = (token, ...args) => {
     if (typeof token !== 'string') {
         throw new Error('Invalid token');
     }
-    if (typeof localeTokens[token] !== 'string') {
-        throw new Error(`Token ${token} not found`);
-    }
 
-    return formatTokenString(localeTokens[token], args);
+    const tokenPath = token.split('.');
+    const path = [];
+    const tokenString = tokenPath.reduce((res, key) => {
+        path.push(key);
+        if (typeof res[key] === 'undefined') {
+            throw new Error(`Token ${path.join('.')} not found`);
+        }
+
+        return res[key];
+    }, localeTokens);
+
+    return formatTokenString(tokenString, args);
 };
 /* eslint-enable no-underscore-dangle */
 
@@ -327,6 +348,16 @@ export const reduceToggleItem = (id) => (item) => (
     (item.id === id)
         ? { ...item, selected: !item.selected }
         : item
+);
+
+/** Returns array of selected items */
+export const getSelectedItems = (list) => (
+    list.filter((item) => item?.selected)
+);
+
+/** Returns array of ids of selected items */
+export const getSelectedIds = (list) => (
+    getSelectedItems(list).map((item) => item.id)
 );
 
 export const getSortByNameIcon = (sortMode) => {

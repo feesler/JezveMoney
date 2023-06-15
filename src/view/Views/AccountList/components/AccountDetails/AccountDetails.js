@@ -21,27 +21,27 @@ export class AccountDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
         this.typeField = Field.create({
-            title: __('ACCOUNT_TYPE'),
+            title: __('accounts.type'),
             className: TYPE_FIELD_CLASS,
         });
 
         this.initBalanceField = Field.create({
-            title: __('ACCOUNT_INITIAL_BALANCE'),
+            title: __('accounts.initialBalance'),
             className: INITIAL_BALANCE_FIELD_CLASS,
         });
 
         this.balanceField = Field.create({
-            title: __('ACCOUNT_CURRENT_BALANCE'),
+            title: __('accounts.currentBalance'),
             className: BALANCE_FIELD_CLASS,
         });
 
         this.initLimitField = Field.create({
-            title: __('ACCOUNT_INITIAL_CREDIT_LIMIT'),
+            title: __('accounts.initialCreditLimit'),
             className: INITIAL_LIMIT_FIELD_CLASS,
         });
 
         this.limitField = Field.create({
-            title: __('ACCOUNT_CREDIT_LIMIT'),
+            title: __('accounts.creditLimit'),
             className: LIMIT_FIELD_CLASS,
         });
 

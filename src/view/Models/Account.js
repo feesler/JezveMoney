@@ -15,12 +15,12 @@ export const ACCOUNT_TYPE_DEPOSIT = 5;
 
 /** Account type names map */
 export const accountTypes = {
-    [ACCOUNT_TYPE_OTHER]: __('ACCOUNT_TYPE_OTHER'),
-    [ACCOUNT_TYPE_CASH]: __('ACCOUNT_TYPE_CASH'),
-    [ACCOUNT_TYPE_DEBIT_CARD]: __('ACCOUNT_TYPE_DEBIT_CARD'),
-    [ACCOUNT_TYPE_CREDIT_CARD]: __('ACCOUNT_TYPE_CREDIT_CARD'),
-    [ACCOUNT_TYPE_CREDIT]: __('ACCOUNT_TYPE_CREDIT'),
-    [ACCOUNT_TYPE_DEPOSIT]: __('ACCOUNT_TYPE_DEPOSIT'),
+    [ACCOUNT_TYPE_OTHER]: __('accounts.types.other'),
+    [ACCOUNT_TYPE_CASH]: __('accounts.types.cash'),
+    [ACCOUNT_TYPE_DEBIT_CARD]: __('accounts.types.debitCard'),
+    [ACCOUNT_TYPE_CREDIT_CARD]: __('accounts.types.creditCard'),
+    [ACCOUNT_TYPE_CREDIT]: __('accounts.types.credit'),
+    [ACCOUNT_TYPE_DEPOSIT]: __('accounts.types.deposit'),
 };
 
 /** Available account fields */

@@ -49,12 +49,6 @@
 
 <div id="changename" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changename/">
-        <div id="name-inp-block" class="field form-row validation-block">
-            <label for="newname" class="field__title"><?= __("PROFILE_NAME_NEW") ?></label>
-            <input id="newname" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($profileInfo["name"]) ?>">
-            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_NAME") ?></div>
-        </div>
-
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>
@@ -63,18 +57,6 @@
 
 <div id="changepass" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changepass/">
-        <div id="old-pwd-inp-block" class="field form-row validation-block">
-            <label for="oldpwd" class="field__title"><?= __("PROFILE_PASSWORD_CURRENT") ?></label>
-            <input id="oldpwd" class="input stretch-input" name="current" type="password" autocomplete="off">
-            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_CURRENT") ?></div>
-        </div>
-
-        <div id="new-pwd-inp-block" class="field form-row validation-block">
-            <label for="newpwd" class="field__title"><?= __("PROFILE_PASSWORD_NEW") ?></label>
-            <input id="newpwd" class="input stretch-input" name="new" type="password" autocomplete="off">
-            <div class="feedback invalid-feedback"><?= __("PROFILE_INVALID_PASS_NEW") ?></div>
-        </div>
-
         <div class="form-controls">
             <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
         </div>

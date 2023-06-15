@@ -1,14 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
-
-// Utils
-export const isSameSelection = (a, b) => (
-    a.length === b.length && a.every((id) => b.includes(id))
-);
-
-export const getSelectedItems = (list) => (
-    list.filter((item) => item?.selected)
-);
+import {
+    formatDateRange,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 
 // Reducers
 const reduceDeselectAllItems = (state) => ({
@@ -111,7 +107,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            acc_id: accounts,
+            accounts,
         },
     }),
 
@@ -119,7 +115,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            person_id: persons,
+            persons,
         },
     }),
 
@@ -127,7 +123,7 @@ const slice = createSlice({
         ...state,
         form: {
             ...state.form,
-            category_id: categories,
+            categories,
         },
     }),
 
@@ -241,7 +237,10 @@ const slice = createSlice({
             )),
             pagination: { ...data.pagination },
             filter: { ...data.filter },
-            form: { ...data.filter },
+            form: {
+                ...data.filter,
+                ...formatDateRange(data.filter),
+            },
             listMode: (data.keepState) ? state.listMode : 'list',
             contextItem: null,
         };

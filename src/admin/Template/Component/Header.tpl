@@ -31,7 +31,6 @@
     </div>
 
     <ul class="nav-list">
-        <li><a class="nav-item__link" href="<?= BASEURL ?>admin/dbinstall/">DB update</a></li>
         <li><a class="nav-item__link" href="<?= BASEURL ?>admin/currency/">Currencies</a></li>
         <li><a class="nav-item__link" href="<?= BASEURL ?>admin/icon/">Icons</a></li>
         <li><a class="nav-item__link" href="<?= BASEURL ?>admin/query/">Queries</a></li>

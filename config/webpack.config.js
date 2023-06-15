@@ -132,10 +132,6 @@ export default {
             import: './src/admin/view/Views/Logs/LogsView.js',
             filename: 'admin/view/js/[name].js',
         },
-        DBInstallView: {
-            import: './src/admin/view/Views/DBInstall/DBInstallView.js',
-            filename: 'admin/view/js/[name].js',
-        },
         QueriesView: {
             import: './src/admin/view/Views/Queries/QueriesView.js',
             filename: 'admin/view/js/[name].js',

@@ -214,54 +214,15 @@ class ApiListController extends ApiController
         }
 
         $request = $this->getRequestData();
-        if (!$request) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
-        }
-
-        $expectedFields = $this->getExpectedFields($request);
-        $default = $this->getDefaultValues($request);
-        $itemData = array_merge($default, $request);
-        checkFields($itemData, $expectedFields, true);
-
-        $this->begin();
-
-        $itemData = $this->preCreate($itemData);
-
-        $item_id = null;
-        try {
-            $item_id = $this->model->create($itemData);
-        } catch (\Error $e) {
-            wlog("Create item error: " . $e->getMessage());
-        }
-        if (!$item_id) {
-            throw new \Error($this->createErrorMsg);
-        }
-
-        $result = $this->postCreate($item_id, $request);
-
-        $this->commit();
-
-        $this->ok($result);
-    }
-
-    /**
-     * Creates multiple items
-     */
-    public function createMultiple()
-    {
-        if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
-        }
-
-        $request = $this->getRequestData();
-        if (!is_array($request)) {
+        $requestData = asArray($request["data"] ?? [$request]);
+        if (!is_array($requestData) || count($requestData) === 0) {
             throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         $items = [];
-        foreach ($request as $item) {
+        foreach ($requestData as $item) {
             if (!is_array($item)) {
                 throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
             }
@@ -276,9 +237,11 @@ class ApiListController extends ApiController
 
         $ids = null;
         try {
-            $ids = $this->model->createMultiple($items);
+            $ids = (count($items) > 1)
+                ? $this->model->createMultiple($items)
+                : $this->model->create($items[0]);
         } catch (\Error $e) {
-            wlog("Create multiple items error: " . $e->getMessage());
+            wlog("Create item error: " . $e->getMessage());
         }
         if (!$ids) {
             throw new \Error($this->createErrorMsg);

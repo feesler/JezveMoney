@@ -1,10 +1,10 @@
 import {
     ge,
-    setEvents,
     isFunction,
 } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
+import { InputField } from '../../../../Components/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
@@ -28,17 +28,29 @@ export class ChangeNameDialog extends ProfileDialog {
 
     init() {
         this.elem = ge('changename');
-        this.nameInp = ge('newname');
-        if (!this.elem || !this.nameInp) {
+        if (!this.elem) {
             throw new Error('Failed to initialize Change name dialog');
         }
-        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
         this.initDialog({
             id: 'chname_popup',
             title: __('PROFILE_CHANGE_NAME'),
             className: DIALOG_CLASS,
         });
+
+        // Name field
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'nameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('PROFILE_NAME_NEW'),
+            validate: true,
+            feedbackMessage: __('PROFILE_INVALID_NAME'),
+            onInput: (e) => this.onNameInput(e),
+        });
+
+        this.form.prepend(this.nameField.elem);
 
         this.reset();
     }
@@ -104,8 +116,10 @@ export class ChangeNameDialog extends ProfileDialog {
 
     /** Render component state */
     renderDialog(state) {
-        this.nameInp.value = state.name;
-
-        window.app.setValidation('name-inp-block', state.validation.name);
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.name,
+            valid: state.validation.name,
+        }));
     }
 }

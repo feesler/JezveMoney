@@ -158,9 +158,9 @@ class Transaction extends ApiSortableListController
         if ($params["report"] === "currency") {
             $params["curr_id"] = $filterObj->curr_id;
         } elseif ($params["report"] === "account") {
-            $params["acc_id"] = $filterObj->acc_id;
+            $params["accounts"] = $filterObj->accounts;
         } elseif ($params["report"] === "category") {
-            $params["category_id"] = $filterObj->category_id;
+            $params["categories"] = $filterObj->categories;
         }
 
         if (isset($filterObj->group)) {
@@ -170,11 +170,11 @@ class Transaction extends ApiSortableListController
             }
         }
 
-        if (isset($filterObj->stdate)) {
-            $params["startDate"] = $filterObj->stdate;
+        if (isset($filterObj->startDate)) {
+            $params["startDate"] = $filterObj->startDate;
         }
-        if (isset($filterObj->enddate)) {
-            $params["endDate"] = $filterObj->enddate;
+        if (isset($filterObj->endDate)) {
+            $params["endDate"] = $filterObj->endDate;
         }
 
         $res->histogram = $this->model->getHistogramSeries($params);

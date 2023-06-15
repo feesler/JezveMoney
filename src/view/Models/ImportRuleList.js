@@ -7,6 +7,18 @@ import { ImportRule } from './ImportRule.js';
  */
 export class ImportRuleList extends List {
     /**
+     * Assign new data to the list
+     * @param {Array} data - array of list items
+     */
+    setData(data) {
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid list props');
+        }
+
+        this.data = data.map((item) => this.createItem(item));
+    }
+
+    /**
      * Create list item from specified object
      * @param {Object} obj
      */

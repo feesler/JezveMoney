@@ -111,6 +111,10 @@ class Main extends TemplateController
         $data["year"] = date("Y");
         $data["version"] = $app->getVersion();
 
+        $data["appProps"] = [
+            "profile" => $this->getProfileData(),
+        ];
+
         $this->initResources("AboutView");
         $this->render($data);
     }

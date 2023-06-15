@@ -43,7 +43,7 @@ export class ProfileView extends AppView {
         res.changeNamePopup = {
             elem: await query('#chname_popup'),
             content: await query('#changename'),
-            newNameInp: await InputRow.create(this, await query('#name-inp-block')),
+            newNameInp: await InputRow.create(this, await query('#nameField')),
         };
 
         if (res.changeNamePopup.elem) {
@@ -54,8 +54,8 @@ export class ProfileView extends AppView {
         res.changePassPopup = {
             elem: await query('#chpass_popup'),
             content: await query('#changepass'),
-            oldPassInp: await InputRow.create(this, await query('#old-pwd-inp-block')),
-            newPassInp: await InputRow.create(this, await query('#new-pwd-inp-block')),
+            oldPassInp: await InputRow.create(this, await query('#oldPassField')),
+            newPassInp: await InputRow.create(this, await query('#newPassField')),
         };
 
         if (res.changePassPopup.elem) {
@@ -120,10 +120,8 @@ export class ProfileView extends AppView {
         assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
         const validInput = (
-            oldPass
-            && oldPass.length > 0
-            && newPass
-            && newPass.length > 0
+            oldPass?.length > 0
+            && newPass?.length > 0
             && oldPass !== newPass
         );
 

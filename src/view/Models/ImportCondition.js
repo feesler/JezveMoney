@@ -1,5 +1,4 @@
 import {
-    copyObject,
     isObject,
     hasFlag,
     fixFloat,
@@ -208,7 +207,7 @@ export class ImportCondition extends ListItem {
 
     /** Return array of available field types */
     static getFieldTypes() {
-        return copyObject(this.fieldTypes);
+        return structuredClone(this.fieldTypes);
     }
 
     /** Search field type by id */
@@ -223,7 +222,7 @@ export class ImportCondition extends ListItem {
             return null;
         }
 
-        return copyObject(res);
+        return structuredClone(res);
     }
 
     /** Return array of operators available for specified type of field */
@@ -233,12 +232,12 @@ export class ImportCondition extends ListItem {
             return null;
         }
 
-        return copyObject(field.operators);
+        return structuredClone(field.operators);
     }
 
     /** Return array of operators */
     static getOperatorTypes() {
-        return copyObject(this.operatorTypes);
+        return structuredClone(this.operatorTypes);
     }
 
     /** Search condition operator by id */
@@ -253,7 +252,7 @@ export class ImportCondition extends ListItem {
             return null;
         }
 
-        return copyObject(res);
+        return structuredClone(res);
     }
 
     /** Check specified value is item operator(equal or not equal) */

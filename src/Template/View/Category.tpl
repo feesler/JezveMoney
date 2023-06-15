@@ -23,13 +23,7 @@
 
                             <hr class="form-separator">
 
-                            <div id="name-inp-block" class="field form-row validation-block">
-                                <label for="nameInp" class="field__title"><?= __("CATEGORY_NAME") ?></label>
-                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($category->name) ?>">
-                                <div id="nameFeedback" class="feedback invalid-feedback"></div>
-                            </div>
-
-                            <div id="type-block" class="field form-row">
+                            <div id="typeField" class="field form-row">
                                 <label for="type" class="field__title"><?= __("CATEGORY_TR_TYPE") ?></label>
                                 <select id="type" name="type"></select>
                             </div>

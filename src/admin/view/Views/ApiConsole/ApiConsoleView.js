@@ -850,14 +850,14 @@ class AdminApiConsoleView extends AdminView {
         if (('type' in frmData) && frmData.type) {
             frmData.type = this.parseIds(frmData.type).id;
         }
-        if ('acc_id' in frmData) {
-            frmData.acc_id = this.parseIds(frmData.acc_id).id;
+        if ('accounts' in frmData) {
+            frmData.accounts = this.parseIds(frmData.accounts).id;
         }
-        if ('person_id' in frmData) {
-            frmData.person_id = this.parseIds(frmData.person_id).id;
+        if ('persons' in frmData) {
+            frmData.persons = this.parseIds(frmData.persons).id;
         }
-        if ('category_id' in frmData) {
-            frmData.category_id = this.parseIds(frmData.category_id).id;
+        if ('categories' in frmData) {
+            frmData.categories = this.parseIds(frmData.categories).id;
         }
 
         this.apiRequest({
@@ -879,11 +879,11 @@ class AdminApiConsoleView extends AdminView {
         if (('type' in frmData) && frmData.type) {
             frmData.type = this.parseIds(frmData.type).id;
         }
-        if ('acc_id' in frmData) {
-            frmData.acc_id = this.parseIds(frmData.acc_id).id;
+        if ('accounts' in frmData) {
+            frmData.accounts = this.parseIds(frmData.accounts).id;
         }
-        if ('category_id' in frmData) {
-            frmData.category_id = this.parseIds(frmData.category_id).id;
+        if ('categories' in frmData) {
+            frmData.categories = this.parseIds(frmData.categories).id;
         }
 
         this.apiRequest({

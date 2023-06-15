@@ -138,9 +138,13 @@ export class ScheduledTransaction {
         return this.availIntervals.includes(interval);
     }
 
-    static isValidIntervalStep(value) {
+    static isValidIntervalStep(value, intervalType) {
         const steps = parseInt(value, 10);
-        return steps >= 0;
+        const type = parseInt(intervalType, 10);
+        return (
+            (type === INTERVAL_NONE && steps === 0)
+            || (type !== INTERVAL_NONE && steps > 0)
+        );
     }
 
     static isValidIntervalOffset(value, intervalType) {
@@ -305,7 +309,8 @@ export class ScheduledTransaction {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', App.view.locale, (offset + 1));
+        const monthDay = parseInt(offset, 10);
+        return __('SCHEDULE_ITEM_MONTH_OFFSET', App.view.locale, (monthDay + 1));
     }
 
     renderYearOffset(offset) {

@@ -4,26 +4,21 @@ import {
     Component,
     createElement,
 } from 'jezvejs';
-import { Button } from 'jezvejs/Button';
-import { CloseButton } from 'jezvejs/CloseButton';
-import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
-import 'jezvejs/style/Input';
-import { InputGroup } from 'jezvejs/InputGroup';
-import {
-    dateStringToTime,
-    parseDate,
-    __,
-} from '../../utils/utils.js';
+import { parseDate, __, timeToDate } from '../../utils/utils.js';
+import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
 import './DateRangeInput.scss';
 
-const CALENDAR_BUTTON_CLASS = 'btn input-group__inner-btn calendar-btn';
 const DATEPICKER_CONTAINER_CLASS = 'calendar';
 const FEEDBACK_CLASS = 'feedback invalid-feedback';
 
+const validateDateOptions = {
+    fixShortYear: false,
+};
+
 const defaultValidation = {
-    stdate: true,
-    enddate: true,
+    startDate: true,
+    endDate: true,
     order: true,
     valid: true,
 };
@@ -33,6 +28,13 @@ const defaultProps = {
     end: null,
     startPlaceholder: null,
     endPlaceholder: null,
+    startClearable: true,
+    endClearable: true,
+    startVisible: true,
+    endVisible: true,
+    disabled: false,
+    startDisabled: false,
+    endDisabled: false,
     onChange: null,
 };
 
@@ -44,15 +46,14 @@ export class DateRangeInput extends Component {
         elem: ['id'],
     };
 
-    constructor(props) {
-        super(props);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
 
         this.state = {
+            ...this.props,
             selectPart: null,
         };
 
@@ -60,74 +61,33 @@ export class DateRangeInput extends Component {
     }
 
     init() {
-        this.startDateInput = DateInput.create({
-            className: 'input input-group__input date-range-part',
-            name: 'stdate',
+        this.startDateGroup = DateInputGroup.create({
+            className: 'input-group__input-outer date-range-part',
+            name: 'startDate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
+            clearButton: this.props.startClearable,
             onInput: (e) => this.onStartDateInput(e),
+            onClear: () => this.onStartDateClear(),
+            onToggleDialog: () => this.showCalendar(true),
         });
 
-        this.startClearBtn = CloseButton.create({
-            className: 'input-group__inner-btn clear-btn',
-            onClick: () => this.onStartDateClear(),
-        });
-
-        this.startDateBtn = Button.create({
-            icon: 'calendar-icon',
-            className: CALENDAR_BUTTON_CLASS,
-            onClick: () => this.showCalendar(true),
-        });
-
-        const startDateOuter = createElement('div', {
-            props: { className: 'input-group__input-outer date-range-part' },
-            children: [
-                this.startDateInput.elem,
-                this.startClearBtn.elem,
-                this.startDateBtn.elem,
-            ],
-        });
-
-        const textElem = createElement('div', {
-            props: {
-                className: 'input-group__text',
-                textContent: '-',
-            },
-        });
-
-        this.endDateInput = DateInput.create({
-            className: 'input input-group__input',
-            name: 'enddate',
+        this.endDateGroup = DateInputGroup.create({
+            className: 'input-group__input-outer date-range-part',
+            name: 'endDate',
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
+            clearButton: this.props.endClearable,
             onInput: (e) => this.onEndDateInput(e),
+            onClear: () => this.onEndDateClear(),
+            onToggleDialog: () => this.showCalendar(false),
         });
 
-        this.endClearBtn = CloseButton.create({
-            className: 'input-group__inner-btn clear-btn',
-            onClick: () => this.onEndDateClear(),
-        });
-
-        this.endDateBtn = Button.create({
-            icon: 'calendar-icon',
-            className: CALENDAR_BUTTON_CLASS,
-            onClick: () => this.showCalendar(false),
-        });
-
-        const endDateOuter = createElement('div', {
-            props: { className: 'input-group__input-outer date-range-part' },
+        const inputsContainer = createElement('div', {
+            props: { className: 'row-container' },
             children: [
-                this.endDateInput.elem,
-                this.endClearBtn.elem,
-                this.endDateBtn.elem,
-            ],
-        });
-
-        this.inputGroup = InputGroup.create({
-            children: [
-                startDateOuter,
-                textElem,
-                endDateOuter,
+                this.startDateGroup.elem,
+                this.endDateGroup.elem,
             ],
         });
 
@@ -148,10 +108,10 @@ export class DateRangeInput extends Component {
         });
 
         this.elem = createElement('form', {
-            props: { className: 'validation-block' },
+            props: { className: 'date-range-input validation-block' },
             events: { submit: (e) => this.onSubmit(e) },
             children: [
-                this.inputGroup.elem,
+                inputsContainer,
                 hiddenInp,
                 this.datePickerWrapper,
                 this.feedbackElem,
@@ -164,28 +124,31 @@ export class DateRangeInput extends Component {
     }
 
     setData(data) {
-        const stdate = (data.stdate)
-            ? window.app.formatInputDate(data.stdate)
+        const startDate = (data.startDate)
+            ? window.app.formatInputDate(data.startDate)
             : null;
-        const enddate = (data.enddate)
-            ? window.app.formatInputDate(data.enddate)
+        const endDate = (data.endDate)
+            ? window.app.formatInputDate(data.endDate)
             : null;
 
         this.setState({
-            form: { stdate, enddate },
-            filter: { stdate, enddate },
+            ...this.state,
+            form: { startDate, endDate },
+            filter: { startDate, endDate },
             validation: { ...defaultValidation },
         });
     }
 
-    notifyChanged(data) {
+    notifyChanged() {
         if (!isFunction(this.props.onChange)) {
             return;
         }
 
+        const { form } = this.state;
+
         this.props.onChange({
-            stdate: dateStringToTime(data.stdate),
-            enddate: dateStringToTime(data.enddate),
+            startDate: form.startDate,
+            endDate: form.endDate,
         });
     }
 
@@ -197,8 +160,13 @@ export class DateRangeInput extends Component {
 
         const { filter } = this.state;
 
-        const limitValue = (rangePart === 'start') ? filter.enddate : filter.stdate;
-        const limitDate = parseDate(limitValue);
+        const limitValue = (rangePart === 'start') ? filter.endate : filter.startDate;
+        if (!limitValue) {
+            return false;
+        }
+        const limitDate = (typeof limitValue === 'string')
+            ? parseDate(limitValue)
+            : timeToDate(limitValue);
         if (!limitDate) {
             return false;
         }
@@ -222,17 +190,17 @@ export class DateRangeInput extends Component {
         };
 
         if (this.state.selectPart === 'start') {
-            if (dateFmt === this.state.form.stdate) {
+            if (dateFmt === this.state.form.startDate) {
                 return;
             }
 
-            form.stdate = dateFmt;
+            form.startDate = dateFmt;
         } else if (this.state.selectPart === 'end') {
-            if (dateFmt === this.state.form.enddate) {
+            if (dateFmt === this.state.form.endDate) {
                 return;
             }
 
-            form.enddate = dateFmt;
+            form.endDate = dateFmt;
         }
 
         this.setState({
@@ -253,11 +221,11 @@ export class DateRangeInput extends Component {
         });
 
         const { filter, form } = this.state;
-        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
+        if (filter.startDate === form.startDate && filter.endDate === form.endDate) {
             return;
         }
 
-        this.notifyChanged(form);
+        this.notifyChanged();
     }
 
     /** Date range form 'submit' event handler */
@@ -266,7 +234,7 @@ export class DateRangeInput extends Component {
 
         const validation = this.validateDateRange();
         if (validation.valid) {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         } else {
             this.setState({ ...this.state, validation });
         }
@@ -277,10 +245,12 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                stdate: e.target.value,
+                startDate: e.target.value,
             },
             validation: { ...defaultValidation },
         });
+
+        this.notifyChanged();
     }
 
     onEndDateInput(e) {
@@ -288,28 +258,30 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                enddate: e.target.value,
+                endDate: e.target.value,
             },
             validation: { ...defaultValidation },
         });
+
+        this.notifyChanged();
     }
 
     validateDateRange(state = this.state) {
         const validation = { ...defaultValidation };
-        const startDate = parseDate(state.form.stdate);
-        const endDate = parseDate(state.form.enddate);
-        if (!startDate) {
-            validation.stdate = false;
+        const startDate = parseDate(state.form.startDate, validateDateOptions);
+        const endDate = parseDate(state.form.endDate, validateDateOptions);
+        if (!startDate && !state.startClearable) {
+            validation.startDate = false;
         }
-        if (!endDate) {
-            validation.enddate = false;
+        if (!endDate && !state.endClearable) {
+            validation.endDate = false;
         }
-        if (startDate > endDate) {
+        if (startDate && endDate && startDate > endDate) {
             validation.order = false;
         }
         validation.valid = (
-            validation.stdate
-            && validation.enddate
+            validation.startDate
+            && validation.endDate
             && validation.order
         );
 
@@ -351,7 +323,7 @@ export class DateRangeInput extends Component {
      * Clear start date of range
      */
     onStartDateClear() {
-        if (!this.state.form.stdate) {
+        if (!this.state.form.startDate) {
             return;
         }
 
@@ -359,7 +331,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                stdate: null,
+                startDate: null,
             },
             validation: { ...defaultValidation },
         });
@@ -367,7 +339,7 @@ export class DateRangeInput extends Component {
         if (this.datePicker) {
             this.datePicker.hide();
         } else {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         }
     }
 
@@ -375,7 +347,7 @@ export class DateRangeInput extends Component {
      * Clear end date of range
      */
     onEndDateClear() {
-        if (!this.state.form.enddate) {
+        if (!this.state.form.endDate) {
             return;
         }
 
@@ -383,7 +355,7 @@ export class DateRangeInput extends Component {
             ...this.state,
             form: {
                 ...this.state.form,
-                enddate: null,
+                endDate: null,
             },
             validation: { ...defaultValidation },
         });
@@ -391,7 +363,7 @@ export class DateRangeInput extends Component {
         if (this.datePicker) {
             this.datePicker.hide();
         } else {
-            this.notifyChanged(this.state.form);
+            this.notifyChanged();
         }
     }
 
@@ -403,9 +375,9 @@ export class DateRangeInput extends Component {
         let value = null;
         const { selectPart } = state;
         if (selectPart === 'start') {
-            value = state.filter.stdate;
+            value = state.filter.startDate;
         } else if (selectPart === 'end') {
-            value = state.filter.enddate;
+            value = state.filter.endDate;
         } else {
             return;
         }
@@ -419,11 +391,23 @@ export class DateRangeInput extends Component {
     }
 
     render(state, prevState = {}) {
-        this.startDateInput.value = state.form.stdate ?? '';
-        this.endDateInput.value = state.form.enddate ?? '';
+        // Start date field
+        this.startDateGroup.setState((startState) => ({
+            ...startState,
+            value: state.form.startDate ?? '',
+            disabled: (state.disabled || state.startDisabled),
+            clearButton: state.startClearable,
+        }));
+        this.startDateGroup.show(state.startVisible);
 
-        this.startClearBtn.show(!!state.form.stdate);
-        this.endClearBtn.show(!!state.form.enddate);
+        // End date field
+        this.endDateGroup.setState((endState) => ({
+            ...endState,
+            value: state.form.endDate ?? '',
+            disabled: (state.disabled || state.endDisabled),
+            clearButton: state.endClearable,
+        }));
+        this.endDateGroup.show(state.endVisible);
 
         window.app.setValidation(this.elem, state.validation.valid);
 

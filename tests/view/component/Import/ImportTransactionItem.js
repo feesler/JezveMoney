@@ -3,7 +3,6 @@ import {
     query,
     click,
     assert,
-    copyObject,
     evaluate,
 } from 'jezve-test';
 import {
@@ -341,7 +340,7 @@ export class ImportTransactionItem extends TestComponent {
     restoreOriginal() {
         assert(this.model.original, 'Original data not found');
 
-        const res = copyObject(this.model);
+        const res = structuredClone(this.model);
 
         res.mainAccount = App.state.accounts.findByName(res.original.mainAccount);
         assert(res.mainAccount, `Account ${res.original.mainAccount} not found`);
@@ -395,7 +394,7 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     onToggleEnable(model = this.model) {
-        const res = copyObject(model);
+        const res = structuredClone(model);
 
         res.enabled = !res.enabled;
         res.srcCurrency = App.currency.getItem(res.srcCurrId);

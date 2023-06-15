@@ -1,7 +1,6 @@
 import {
     isObject,
     isInt,
-    copyObject,
     assert,
     asArray,
 } from 'jezve-test';
@@ -89,7 +88,7 @@ function copyFields(fields, expFields) {
     const res = {};
     expFields.forEach((f) => {
         if (f in fields) {
-            res[f] = copyObject(fields[f]);
+            res[f] = structuredClone(fields[f]);
         }
     });
 
@@ -97,6 +96,22 @@ function copyFields(fields, expFields) {
 }
 
 export class AppState {
+    static dataRequestMap = {
+        currency: 'getCurrencies',
+        icons: 'getIcons',
+        accounts: 'getAccounts',
+        persons: 'getPersons',
+        transactions: 'getTransactions',
+        schedule: 'getScheduledTransactions',
+        reminders: 'getReminders',
+        statistics: 'getStatistics',
+        categories: 'getCategories',
+        importtemplates: 'getImportTemplates',
+        importrules: 'getImportRules',
+        userCurrencies: 'getUserCurrencies',
+        profile: 'getProfile',
+    };
+
     constructor() {
         this.accounts = null;
         this.userAccountsCache = null;
@@ -119,7 +134,7 @@ export class AppState {
     }
 
     setState(state) {
-        this.profile = copyObject(state.profile);
+        this.profile = structuredClone(state.profile);
 
         if (!this.accounts) {
             this.accounts = AccountsList.create();
@@ -208,7 +223,7 @@ export class AppState {
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
         res.userCurrencies = this.userCurrencies.clone();
-        res.profile = copyObject(this.profile);
+        res.profile = structuredClone(this.profile);
 
         return res;
     }
@@ -262,11 +277,34 @@ export class AppState {
         return true;
     }
 
+    createMultiple(method, params) {
+        assert.isFunction(this[method], 'Invalid method');
+
+        if (!Array.isArray(params?.data)) {
+            return false;
+        }
+
+        const ids = [];
+        const origState = this.clone();
+
+        for (const item of params.data) {
+            const resExpected = this[method](item);
+            if (!resExpected) {
+                this.setState(origState);
+                return false;
+            }
+
+            ids.push(resExpected.id);
+        }
+
+        return this.returnState(params.returnState, { ids });
+    }
+
     /**
      * Profile
      */
     setUserProfile(profile) {
-        this.profile = copyObject(profile);
+        this.profile = structuredClone(profile);
         if (this.profile.password) {
             delete this.profile.password;
         }
@@ -333,7 +371,13 @@ export class AppState {
     }
 
     changeName(name) {
+        if (name.length === 0 || name === this.profile.name) {
+            return false;
+        }
+
         this.profile.name = name;
+
+        return {};
     }
 
     deleteProfile() {
@@ -450,7 +494,7 @@ export class AppState {
 
     getImportTemplates() {
         const res = {
-            data: copyObject(this.templates.data),
+            data: structuredClone(this.templates.data),
         };
 
         return res;
@@ -481,7 +525,7 @@ export class AppState {
     }
 
     getProfile() {
-        return copyObject(this.profile);
+        return structuredClone(this.profile);
     }
 
     getTransactions(options = {}) {
@@ -499,10 +543,10 @@ export class AppState {
         const { onPage } = request;
         const isDesc = request.order?.toLowerCase() === 'desc';
 
-        if ('page' in request || 'range' in request || 'onPage' in request) {
+        if (onPage > 0) {
             const targetPage = request.page ?? 1;
             const targetRange = request.range ?? 1;
-            items = items.getPage(targetPage, request.onPage, targetRange, isDesc);
+            items = items.getPage(targetPage, onPage, targetRange, isDesc);
         }
 
         if (!isDesc) {
@@ -516,7 +560,7 @@ export class AppState {
             pagination: {
                 total: filtered.length,
                 onPage,
-                pagesCount: Math.ceil(filtered.length / onPage),
+                pagesCount: (onPage > 0) ? Math.ceil(filtered.length / onPage) : 1,
                 page: request.page ?? 1,
             },
         };
@@ -547,7 +591,7 @@ export class AppState {
 
     getScheduledTransactions() {
         return {
-            data: copyObject(this.schedule.data),
+            data: structuredClone(this.schedule.data),
         };
     }
 
@@ -559,45 +603,19 @@ export class AppState {
     getState(request) {
         const res = {};
 
-        if (request.currency) {
-            res.currency = this.getCurrency(App.currency);
-        }
-        if (request.icons) {
-            res.icons = this.getIcons(App.icons);
-        }
-        if (request.accounts) {
-            res.accounts = this.getAccounts(request.accounts);
-        }
-        if (request.persons) {
-            res.persons = this.getPersons(request.persons);
-        }
-        if (request.transactions) {
-            res.transactions = this.getTransactions(request.transactions);
-        }
-        if (request.schedule) {
-            res.schedule = this.getScheduledTransactions(request.schedule);
-        }
-        if (request.reminders) {
-            res.reminders = this.getReminders(request.reminders);
-        }
-        if (request.statistics) {
-            res.statistics = this.getStatistics(request.statistics);
-        }
-        if (request.categories) {
-            res.categories = this.getCategories(request.categories);
-        }
-        if (request.importtemplates) {
-            res.categories = this.getImportTemplates(request.importtemplates);
-        }
-        if (request.importrules) {
-            res.importrules = this.getImportRules(request.importrules);
-        }
-        if (request.userCurrencies) {
-            res.userCurrencies = this.getUserCurrencies(request.userCurrencies);
-        }
-        if (request.profile) {
-            res.profile = this.getProfile();
-        }
+        const requestParams = Object.entries(AppState.dataRequestMap);
+        requestParams.forEach(([param, method]) => {
+            if (request[param]) {
+                const [methodName, defaults] = asArray(method);
+
+                const requestData = {
+                    ...(defaults ?? {}),
+                    ...request[param],
+                };
+
+                res[param] = this[methodName](requestData);
+            }
+        });
 
         return res;
     }
@@ -610,20 +628,6 @@ export class AppState {
         }
 
         return res;
-    }
-
-    prepareChainedRequestData(request) {
-        if (!request?.returnState?.transactions) {
-            return request;
-        }
-
-        return {
-            ...request,
-            returnState: {
-                ...request.returnState,
-                transactions: this.getTransactionsListRequest(request.returnState.transactions),
-            },
-        };
     }
 
     isValidSettings(settings) {
@@ -646,7 +650,7 @@ export class AppState {
         const data = copyFields(params, availSettings);
         Object.assign(this.profile.settings, data);
 
-        return true;
+        return {};
     }
 
     /**
@@ -695,7 +699,7 @@ export class AppState {
         }
 
         // Prepare expected item object
-        const expectedItem = copyObject(original);
+        const expectedItem = structuredClone(original);
         const data = copyFields(params, UserCurrency.availProps);
         Object.assign(expectedItem, data);
 
@@ -823,7 +827,7 @@ export class AppState {
         }
 
         // Prepare expected account object
-        const expAccount = copyObject(origAcc);
+        const expAccount = structuredClone(origAcc);
         const data = copyFields(params, Account.availProps);
         data.owner_id = this.profile.owner_id;
         Object.assign(expAccount, data);
@@ -1084,7 +1088,7 @@ export class AppState {
             return false;
         }
 
-        const expPerson = copyObject(origPerson);
+        const expPerson = structuredClone(origPerson);
         const data = copyFields(params, Person.availProps);
         Object.assign(expPerson, data);
 
@@ -1191,7 +1195,7 @@ export class AppState {
             (item) => item.owner_id === pId && item.curr_id === currId,
         );
 
-        return copyObject(accObj);
+        return structuredClone(accObj);
     }
 
     /**
@@ -1360,7 +1364,7 @@ export class AppState {
             return false;
         }
 
-        const expItem = copyObject(origItem);
+        const expItem = structuredClone(origItem);
         const data = copyFields(params, Category.availProps);
         Object.assign(expItem, data);
 
@@ -1648,7 +1652,7 @@ export class AppState {
             return transaction;
         }
 
-        const res = copyObject(transaction);
+        const res = structuredClone(transaction);
         if (transaction.type !== DEBT) {
             return res;
         }
@@ -1669,47 +1673,6 @@ export class AppState {
 
         delete res.src_id;
         delete res.dest_id;
-
-        return res;
-    }
-
-    /** Prepares transaction list request parameters */
-    getTransactionsListRequest(params) {
-        const res = {};
-
-        if ('order' in params) {
-            res.order = params.order;
-        }
-        if ('type' in params) {
-            res.type = params.type;
-        }
-        if ('accounts' in params) {
-            res.acc_id = params.accounts;
-        }
-        if ('persons' in params) {
-            res.person_id = params.persons;
-        }
-        if ('categories' in params) {
-            res.category_id = params.categories;
-        }
-        if ('startDate' in params) {
-            res.stdate = params.startDate;
-        }
-        if ('endDate' in params) {
-            res.enddate = params.endDate;
-        }
-        if ('search' in params) {
-            res.search = params.search;
-        }
-        if ('onPage' in params) {
-            res.count = params.onPage;
-        }
-        if ('page' in params) {
-            res.page = params.page;
-        }
-        if ('range' in params) {
-            res.range = params.range;
-        }
 
         return res;
     }
@@ -2072,7 +2035,9 @@ export class AppState {
             return false;
         }
 
-        if (!ScheduledTransaction.isValidIntervalStep(params.interval_step)) {
+        if (
+            !ScheduledTransaction.isValidIntervalStep(params.interval_step, params.interval_type)
+        ) {
             return false;
         }
 
@@ -2167,7 +2132,7 @@ export class AppState {
             return false;
         }
 
-        const itemData = copyObject(origItem);
+        const itemData = structuredClone(origItem);
         const data = copyFields(params, ScheduledTransaction.availProps);
         Object.assign(itemData, data);
 
@@ -2332,7 +2297,7 @@ export class AppState {
             return false;
         }
 
-        const expItem = copyObject(origItem);
+        const expItem = structuredClone(origItem);
         const data = copyFields(params, Reminder.availProps);
         Object.assign(expItem, data);
 
@@ -2399,6 +2364,15 @@ export class AppState {
     }
 
     cancelReminder(params) {
+        const origItem = this.reminders.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        if (origItem.transaction_id !== 0) {
+            this.deleteTransactions({ id: origItem.transaction_id });
+        }
+
         return this.updateReminder({
             id: params.id,
             state: REMINDER_CANCELLED,
@@ -2480,7 +2454,7 @@ export class AppState {
         }
 
         const origItem = this.templates.getItem(request.id) ?? { columns: {} };
-        const res = copyObject(origItem);
+        const res = structuredClone(origItem);
         const data = copyFields(request, ImportTemplate.availProps);
         Object.assign(res, data);
 
@@ -2521,14 +2495,18 @@ export class AppState {
         return this.returnState(params.returnState, { id: item.id });
     }
 
+    createTemplateFromRequest(params) {
+        return this.createTemplate(this.templateFromRequest(params));
+    }
+
     getUpdateTemplateRequest(params) {
         const origItem = this.templates.getItem(params.id) ?? { columns: {} };
 
-        const expTemplate = copyObject(origItem);
+        const expTemplate = structuredClone(origItem);
         const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 
-        const res = copyObject(expTemplate);
+        const res = structuredClone(expTemplate);
         delete res.columns;
 
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
@@ -2550,7 +2528,7 @@ export class AppState {
             return false;
         }
 
-        const expTemplate = copyObject(origItem);
+        const expTemplate = structuredClone(origItem);
         const data = copyFields(params, ImportTemplate.availProps);
         Object.assign(expTemplate, data);
 

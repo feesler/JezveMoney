@@ -2,7 +2,6 @@ import {
     setBlock,
     assert,
     TestStory,
-    copyObject,
 } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
@@ -27,11 +26,10 @@ import {
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../model/ImportAction.js';
 import { api } from '../../../model/api.js';
-import * as Actions from '../../../actions/import/index.js';
-import * as apiActions from '../../../actions/api/importrule.js';
-import { testLocales } from '../../../actions/locale.js';
+import * as Actions from '../../actions/import/index.js';
+import { testLocales } from '../../actions/locale.js';
 import { App } from '../../../Application.js';
-import { testDateLocales, testDecimalLocales } from '../../../actions/settings.js';
+import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
 
 export class ImportRulesStory extends TestStory {
     async beforeRun() {
@@ -277,6 +275,7 @@ export class ImportRulesStory extends TestStory {
                 { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
             ],
         });
+        await Actions.submitRule();
 
         setBlock('Submit Date condition with invalid value', 2);
         await Actions.updateRuleCondition({
@@ -286,6 +285,10 @@ export class ImportRulesStory extends TestStory {
         await Actions.submitRule();
 
         setBlock('Submit rule without guard condition for `Set account` action', 2);
+        await Actions.updateRuleCondition({
+            pos: 0,
+            action: { action: 'inputValue', data: App.datesFmt.now },
+        });
         await Actions.deleteRuleAction(0);
         await Actions.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
@@ -490,12 +493,13 @@ export class ImportRulesStory extends TestStory {
         setBlock('Import rules pagination', 1);
 
         const data = [];
-        const RULES_TO_CREATE = 25;
+        const RULES_TO_CREATE = 45;
         const ruleBase = {
             conditions: [{
                 field_id: IMPORT_COND_FIELD_COMMENT,
                 operator: IMPORT_COND_OP_EQUAL,
                 value: '',
+                flags: 0,
             }],
             actions: [{
                 action_id: IMPORT_ACTION_SET_COMMENT,
@@ -504,20 +508,38 @@ export class ImportRulesStory extends TestStory {
         };
 
         for (let i = 1; i <= RULES_TO_CREATE; i += 1) {
-            const rule = copyObject(ruleBase);
+            const rule = structuredClone(ruleBase);
             rule.conditions[0].value = `Cond ${i}`;
             rule.actions[0].value = `Act ${i}`;
             data.push(rule);
         }
 
         // Create rules via API
-        const ruleIds = await App.scenario.runner.runGroup(apiActions.create, data);
+        const ruleIds = [];
+        for (const item of data) {
+            const createRes = await api.importrule.create(item);
+            assert(createRes?.id, 'Failed to create import rule');
+            ruleIds.push(createRes.id);
+        }
+        await App.state.fetch();
+
         // Refresh page
         await App.view.navigateToImport();
         // Iterate rules list pages
         await Actions.iterateRulesList();
+
+        await Actions.goToFirstRulesPage();
+        await Actions.goToNextRulesPage();
+        await Actions.goToPrevRulesPage();
+        await Actions.showMoreRules();
+        await Actions.goToFirstRulesPage();
+        await Actions.goToLastRulesPage();
+        await Actions.goToPrevRulesPage();
+        await Actions.showMoreRules();
+
         // Remove previously created rules via API
-        await apiActions.del({ id: ruleIds });
+        await api.importrule.del({ id: ruleIds });
+        await App.state.fetch();
         // Refresh page
         await App.view.navigateToImport();
     }

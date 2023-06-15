@@ -2,12 +2,10 @@ import 'jezvejs/style';
 import {
     asArray,
     isFunction,
-    show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
-import { PopupMenu } from 'jezvejs/PopupMenu';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
@@ -23,8 +21,10 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { DateFormatSelect } from '../../Components/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { LocaleSelect } from '../../Components/LocaleSelect/LocaleSelect.js';
-import { ThemeSwitch } from '../../Components/ThemeSwitch/ThemeSwitch.js';
+import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
+import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
+import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
+import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
@@ -41,6 +41,18 @@ const SELECT_MODE_CLASS = 'currencies-list_select';
 class SettingsView extends View {
     constructor(...args) {
         super(...args);
+
+        this.menuActions = {
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            deleteBtn: () => this.deleteItems(),
+        };
+
+        this.contextMenuActions = {
+            ctxDeleteBtn: () => this.deleteItems(),
+        };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
@@ -67,8 +79,7 @@ class SettingsView extends View {
     /** View initialization */
     onStart() {
         this.loadElementsByIds([
-            'localeSelect',
-            'themeSwitch',
+            'mainContainer',
             'userCurrenciesHeading',
             'userCurrenciesContainer',
             'dateFormatContainer',
@@ -79,11 +90,16 @@ class SettingsView extends View {
             'regionalTab',
         ]);
 
-        // Locale select
-        this.localeSelect = LocaleSelect.fromElement(this.localeSelect);
+        // Locale select field
+        this.localeField = LocaleSelectField.create({
+            className: 'form-row',
+        });
+        // Theme switch field
+        this.themeField = ThemeSwitchField.create({
+            className: 'form-row',
+        });
 
-        // Theme swtich
-        this.themeSwitch = ThemeSwitch.fromElement(this.themeSwitch);
+        this.mainContainer.append(this.localeField.elem, this.themeField.elem);
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
@@ -192,72 +208,6 @@ class SettingsView extends View {
         this.subscribeToStore(this.store);
     }
 
-    createMenu() {
-        if (this.menu) {
-            return;
-        }
-
-        this.menu = PopupMenu.create({
-            id: 'listMenu',
-            attachTo: this.menuButton.elem,
-            onClose: () => this.hideMenu(),
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('SELECT'),
-                onClick: () => this.onMenuClick('selectModeBtn'),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('SORT'),
-                onClick: () => this.onMenuClick('sortModeBtn'),
-            }, {
-                id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
-                onClick: () => this.onMenuClick('selectAllBtn'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
-                onClick: () => this.onMenuClick('deselectAllBtn'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.onMenuClick('deleteBtn'),
-            }],
-        });
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            deleteBtn: () => this.deleteItems(),
-        };
-    }
-
-    createContextMenu() {
-        if (this.contextMenu) {
-            return;
-        }
-
-        this.contextMenu = PopupMenu.create({
-            id: 'contextMenu',
-            fixed: false,
-            onItemClick: () => this.hideContextMenu(),
-            onClose: () => this.hideContextMenu(),
-            items: [{
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('DELETE'),
-                onClick: () => this.deleteItems(),
-            }],
-        });
-    }
-
     showMenu() {
         this.store.dispatch(actions.showMenu());
     }
@@ -270,11 +220,18 @@ class SettingsView extends View {
         this.menu.hideMenu();
 
         const menuAction = this.menuActions[item];
-        if (!isFunction(menuAction)) {
-            return;
+        if (isFunction(menuAction)) {
+            menuAction();
         }
+    }
 
-        menuAction();
+    onContextMenuClick(item) {
+        this.hideContextMenu();
+
+        const menuAction = this.contextMenuActions[item];
+        if (isFunction(menuAction)) {
+            menuAction();
+        }
     }
 
     showContextMenu(itemId) {
@@ -524,63 +481,52 @@ class SettingsView extends View {
     }
 
     renderContextMenu(state) {
-        if (state.listMode !== 'list' || !state.showContextMenu) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const itemId = state.contextItem;
-        const currency = window.app.model.userCurrencies.getItem(itemId);
-        if (!currency) {
-            this.contextMenu?.detach();
-            return;
-        }
-
-        const selector = `.currency-item[data-id="${itemId}"] .menu-btn`;
-        const menuButton = this.list.elem.querySelector(selector);
-        if (!menuButton) {
-            this.contextMenu?.detach();
+        if (!state.showContextMenu && !this.contextMenu) {
             return;
         }
 
         if (!this.contextMenu) {
-            this.createContextMenu();
+            this.contextMenu = CurrencyListContextMenu.create({
+                id: 'contextMenu',
+                onItemClick: (item) => this.onContextMenuClick(item),
+                onClose: () => this.hideContextMenu(),
+            });
         }
 
-        this.contextMenu.attachAndShow(menuButton);
+        this.contextMenu.setState({
+            showContextMenu: state.showContextMenu,
+            contextItem: state.contextItem,
+        });
     }
 
     renderMenu(state) {
         const itemsCount = state.userCurrencies.length;
-        const selArr = this.getSelectedItems(state);
-        const selCount = selArr.length;
         const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
         const isSortMode = state.listMode === 'sort';
 
         this.createBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
-
         this.menuButton.show(itemsCount > 0 && !isSortMode);
 
-        if (!state.showMenu) {
-            this.menu?.hideMenu();
+        if (!state.showMenu && !this.menu) {
             return;
         }
 
         const showFirstTime = !this.menu;
-        this.createMenu();
+        if (!this.menu) {
+            this.menu = CurrencyListMainMenu.create({
+                id: 'listMenu',
+                attachTo: this.menuButton.elem,
+                onItemClick: (item) => this.onMenuClick(item),
+                onClose: () => this.hideMenu(),
+            });
+        }
 
-        const { items } = this.menu;
-
-        items.selectModeBtn.show(isListMode && itemsCount > 0);
-        items.sortModeBtn.show(isListMode && itemsCount > 1);
-
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
-
-        items.deleteBtn.show(selCount > 0);
+        this.menu.setState({
+            listMode: state.listMode,
+            showMenu: state.showMenu,
+            items: state.userCurrencies,
+        });
 
         if (showFirstTime) {
             this.menu.showMenu();

@@ -1,66 +1,66 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { EXPENSE, INCOME } from '../../../model/Transaction.js';
-import * as Actions from '../../../actions/api/category.js';
+import * as Actions from '../../actions/api/category.js';
 
 const create = async () => {
     setBlock('Create categories', 2);
 
-    const data = [{
-        name: 'Food',
-        parent_id: 0,
-        type: EXPENSE,
-    }, {
-        name: 'Investments',
-        parent_id: 0,
-        type: INCOME,
-    }, {
-        name: 'Taxes',
-        parent_id: 0,
-        type: 0,
-    }, {
-        name: 'Transpost',
-        parent_id: 0,
-        type: EXPENSE,
-    }, {
-        name: 'Shop',
-        parent_id: 0,
-        type: EXPENSE,
-    }];
+    const data = {
+        FOOD_CATEGORY: {
+            name: 'Food',
+            parent_id: 0,
+            type: EXPENSE,
+        },
+        INVEST_CATEGORY: {
+            name: 'Investments',
+            parent_id: 0,
+            type: INCOME,
+        },
+        TAXES_CATEGORY: {
+            name: 'Taxes',
+            parent_id: 0,
+            type: 0,
+        },
+        TRANSPORT_CATEGORY: {
+            name: 'Transpost',
+            parent_id: 0,
+            type: EXPENSE,
+        },
+        SHOP_CATEGORY: {
+            name: 'Shop',
+            parent_id: 0,
+            type: EXPENSE,
+        },
+    };
 
-    [
-        App.scenario.FOOD_CATEGORY,
-        App.scenario.INVEST_CATEGORY,
-        App.scenario.TAXES_CATEGORY,
-        App.scenario.TRANSPORT_CATEGORY,
-        App.scenario.SHOP_CATEGORY,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
     setBlock('Create categories with chained request', 2);
 
-    const data = [{
-        name: 'Services chained',
-        parent_id: 0,
-        type: EXPENSE,
-        returnState: {
-            categories: {},
+    const data = {
+        SCV_CHAINED_CATEGORY: {
+            name: 'Services chained',
+            parent_id: 0,
+            type: EXPENSE,
+            returnState: {
+                categories: {},
+            },
         },
-    }, {
-        name: 'Beauty chained',
-        parent_id: 0,
-        type: EXPENSE,
-        returnState: {
-            accounts: { visibility: 'visible' },
-            categories: {},
+        BEAUTY_CHAINED_CATEGORY: {
+            name: 'Beauty chained',
+            parent_id: 0,
+            type: EXPENSE,
+            returnState: {
+                accounts: { visibility: 'visible' },
+                categories: {},
+            },
         },
-    }];
+    };
 
-    [
-        App.scenario.SCV_CHAINED_CATEGORY,
-        App.scenario.BEAUTY_CHAINED_CATEGORY,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -94,30 +94,54 @@ const createInvalid = async () => {
 const createMultiple = async () => {
     setBlock('Create multiple categories', 2);
 
-    const data = [{
-        name: 'Cafe',
-        parent_id: App.scenario.FOOD_CATEGORY,
-        type: EXPENSE,
-    }, {
-        name: 'Bike rent',
-        parent_id: App.scenario.TRANSPORT_CATEGORY,
-        type: EXPENSE,
-    }, {
-        name: 'Learning',
-        parent_id: 0,
-        type: EXPENSE,
-    }, {
-        name: 'Other',
-        parent_id: 0,
-        type: 0,
-    }];
+    const data = {
+        CAFE_CATEGORY: {
+            name: 'Cafe',
+            parent_id: App.scenario.FOOD_CATEGORY,
+            type: EXPENSE,
+        },
+        BIKE_CATEGORY: {
+            name: 'Bike rent',
+            parent_id: App.scenario.TRANSPORT_CATEGORY,
+            type: EXPENSE,
+        },
+        LEARN_CATEGORY: {
+            name: 'Learning',
+            parent_id: 0,
+            type: EXPENSE,
+        },
+        OTHER_CATEGORY: {
+            name: 'Other',
+            parent_id: 0,
+            type: 0,
+        },
+    };
 
-    [
-        App.scenario.CAFE_CATEGORY,
-        App.scenario.BIKE_CATEGORY,
-        App.scenario.LEARN_CATEGORY,
-        App.scenario.OTHER_CATEGORY,
-    ] = await Actions.createMultiple(data);
+    await App.scenario.createMultiple(Actions, data);
+};
+
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple categories with chained request', 2);
+
+    const data = {
+        data: {
+            MULTI_CHAINED_CATEGORY_1: {
+                name: 'Multi chained 1',
+                parent_id: 0,
+                type: EXPENSE,
+            },
+            MULTI_CHAINED_CATEGORY_2: {
+                name: 'Multi chained 2',
+                parent_id: 0,
+                type: EXPENSE,
+            },
+        },
+        returnState: {
+            categories: {},
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
 };
 
 const createMultipleInvalid = async () => {
@@ -125,23 +149,29 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            name: '',
-            parent_id: 0,
-            type: 0,
-        }, {
-            name: 'Invalid category 1',
-            parent_id: 0,
-        }],
-        [{
-            name: 'Invalid category 2',
-            parent_id: 0,
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                name: '',
+                parent_id: 0,
+                type: 0,
+            }, {
+                name: 'Invalid category 1',
+                parent_id: 0,
+            }],
+        },
+        {
+            data: [{
+                name: 'Invalid category 2',
+                parent_id: 0,
+            }, null],
+        },
     ];
 
-    await App.scenario.runner.runGroup(Actions.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const read = async () => {
@@ -341,6 +371,7 @@ export const apiCategoriesTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

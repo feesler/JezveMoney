@@ -25,14 +25,14 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
+import { AmountInputField } from '../../Components/AmountInputField/AmountInputField.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
+import { InputField } from '../../Components/InputField/InputField.js';
 
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
 import '../../Application/Application.scss';
 import './AccountView.scss';
-import { AmountInputField } from '../../Components/AmountInputField/AmountInputField.js';
 
 /**
  * Create/update account view
@@ -84,14 +84,12 @@ class AccountView extends View {
             'tileField',
             'iconField',
             'currencyField',
-            'nameInp',
-            'nameFeedback',
             'submitBtn',
             'cancelBtn',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('ACCOUNT_UPDATE') : __('ACCOUNT_CREATE'),
+            title: (isUpdate) ? __('accounts.update') : __('accounts.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -117,6 +115,19 @@ class AccountView extends View {
         });
         this.iconField.append(this.iconSelect.elem);
 
+        // Name field
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'nameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('accounts.name'),
+            validate: true,
+            onInput: (e) => this.onNameInput(e),
+        });
+        insertAfter(this.nameField.elem, this.iconField);
+
+        // Currency field
         this.currencySelect = DropDown.create({
             elem: 'currency',
             enableFilter: true,
@@ -128,8 +139,8 @@ class AccountView extends View {
         // Initial balance field
         this.initBalanceField = AmountInputField.create({
             id: 'initBalanceField',
-            title: __('ACCOUNT_INITIAL_BALANCE'),
-            feedbackMessage: __('ACCOUNT_INVALID_BALANCE'),
+            title: __('accounts.initialBalance'),
+            feedbackMessage: __('accounts.invalidBalance'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onInitBalanceInput(e),
@@ -139,8 +150,8 @@ class AccountView extends View {
         // Initial credit limit field
         this.initLimitField = AmountInputField.create({
             id: 'initLimitField',
-            title: __('ACCOUNT_INITIAL_CREDIT_LIMIT'),
-            feedbackMessage: __('ACCOUNT_INVALID_LIMIT'),
+            title: __('accounts.initialCreditLimit'),
+            feedbackMessage: __('accounts.invalidLimit'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onLimitInput(e),
@@ -148,7 +159,6 @@ class AccountView extends View {
         insertAfter(this.initLimitField.elem, this.initBalanceField.elem);
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
         this.spinner = Spinner.create({ className: 'request-spinner' });
         this.spinner.hide();
@@ -209,8 +219,8 @@ class AccountView extends View {
     }
 
     /** Account name input event handler */
-    onNameInput() {
-        const { value } = this.nameInp;
+    onNameInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeName(value));
     }
 
@@ -225,13 +235,13 @@ class AccountView extends View {
 
         const { name, initbalance, initlimit } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_INVALID_NAME')));
-            this.nameInp.focus();
+            this.store.dispatch(actions.invalidateNameField(__('accounts.invalidName')));
+            this.nameField.focus();
         } else {
             const account = window.app.model.accounts.findByName(name);
             if (account && state.original.id !== account.id) {
-                this.store.dispatch(actions.invalidateNameField(__('ACCOUNT_EXISTING_NAME')));
-                this.nameInp.focus();
+                this.store.dispatch(actions.invalidateNameField(__('accounts.existingName')));
+                this.nameField.focus();
             }
         }
 
@@ -324,8 +334,8 @@ class AccountView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('ACCOUNT_DELETE'),
-            content: __('MSG_ACCOUNT_DELETE'),
+            title: __('accounts.delete'),
+            content: __('accounts.deleteMessage'),
             onConfirm: () => this.deleteAccount(),
         });
     }
@@ -345,7 +355,7 @@ class AccountView extends View {
             + state.data.fInitBalance - state.original.initbalance;
 
         const name = (!state.original.id && !state.nameChanged)
-            ? __('ACCOUNT_NAME_NEW')
+            ? __('accounts.nameNew')
             : state.data.name;
 
         this.tile.setState((tileState) => ({
@@ -362,12 +372,15 @@ class AccountView extends View {
         this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted);
 
-        // Name input
-        window.app.setValidation('name-inp-block', (state.validation.name === true));
-        this.nameFeedback.textContent = (state.validation.name === true)
-            ? ''
-            : state.validation.name;
-        enable(this.nameInp, !state.submitStarted);
+        // Name field
+        const isValidName = (state.validation.name === true);
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.data.name,
+            valid: isValidName,
+            feedbackMessage: (isValidName) ? '' : state.validation.name,
+            disabled: state.submitStarted,
+        }));
 
         // Initial balance field
         this.initBalanceField.setState((balanceState) => ({

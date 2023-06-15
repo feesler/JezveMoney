@@ -7,11 +7,11 @@ import {
     TRANSFER,
     DEBT,
 } from '../../../model/Transaction.js';
-import * as accountActions from '../../../actions/api/account.js';
-import * as personActions from '../../../actions/api/person.js';
-import * as categoryActions from '../../../actions/api/category.js';
-import * as transactionActions from '../../../actions/api/transaction.js';
-import * as scheduleActions from '../../../actions/api/schedule.js';
+import * as accountActions from '../../actions/api/account.js';
+import * as personActions from '../../actions/api/person.js';
+import * as categoryActions from '../../actions/api/category.js';
+import * as transactionActions from '../../actions/api/transaction.js';
+import * as scheduleActions from '../../actions/api/schedule.js';
 import { INTERVAL_DAY } from '../../../model/ScheduledTransaction.js';
 
 const prepareTests = async () => {

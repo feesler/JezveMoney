@@ -9,7 +9,6 @@ $router = new Core\Router();
 $router->setNamespace("JezveMoney\\App\\Admin\\Controller");
 $router->setRoutes([
     "main" => "Main",
-    "dbinstall" => "DBInstall",
     "balance" => "Balance",
     "currency" => "Currency",
     "icon" => "Icon",
@@ -18,6 +17,10 @@ $router->setRoutes([
     "tests" => "Tests",
     "apiconsole" => "ApiConsole",
     "user" => "User"
+]);
+
+$router->setAliases([
+    "update" => "main/update",
 ]);
 
 $router->setActionsMap([

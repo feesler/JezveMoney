@@ -4,6 +4,7 @@ import {
     enable,
     insertAfter,
     setEvents,
+    insertBefore,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
@@ -19,6 +20,7 @@ import { CategoryList } from '../../Models/CategoryList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { InputField } from '../../Components/InputField/InputField.js';
 import { actions, reducer } from './reducer.js';
 import '../../Components/Field/Field.scss';
 import './CategoryView.scss';
@@ -58,9 +60,8 @@ class CategoryView extends View {
         this.loadElementsByIds([
             'heading',
             'categoryForm',
-            'nameInp',
-            'nameFeedback',
             'parentCategoryField',
+            'typeField',
             'submitBtn',
             'cancelBtn',
         ]);
@@ -71,7 +72,18 @@ class CategoryView extends View {
         });
 
         setEvents(this.categoryForm, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
+
+        // Name field
+        this.nameField = InputField.create({
+            id: 'nameField',
+            inputId: 'nameInp',
+            className: 'form-row',
+            name: 'name',
+            title: __('CATEGORY_NAME'),
+            validate: true,
+            onInput: (e) => this.onNameInput(e),
+        });
+        insertBefore(this.nameField.elem, this.typeField);
 
         this.createParentCategorySelect();
         this.createTransactionTypeSelect();
@@ -126,8 +138,8 @@ class CategoryView extends View {
     }
 
     /** Name input event handler */
-    onNameInput() {
-        const { value } = this.nameInp;
+    onNameInput(e) {
+        const { value } = e.target;
         this.store.dispatch(actions.changeName(value));
     }
 
@@ -161,12 +173,12 @@ class CategoryView extends View {
         const { name } = state.data;
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('CATEGORY_INVALID_NAME')));
-            this.nameInp.focus();
+            this.nameField.focus();
         } else {
             const category = window.app.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
                 this.store.dispatch(actions.invalidateNameField(__('CATEGORY_EXISTING_NAME')));
-                this.nameInp.focus();
+                this.nameField.focus();
             }
         }
 
@@ -260,13 +272,15 @@ class CategoryView extends View {
             this.deleteBtn.enable(!state.submitStarted);
         }
 
-        // Name input
-        window.app.setValidation('name-inp-block', (state.validation.name === true));
-        this.nameFeedback.textContent = (state.validation.name === true)
-            ? ''
-            : state.validation.name;
-        this.nameInp.value = state.data.name;
-        enable(this.nameInp, !state.submitStarted);
+        // Name field
+        const isValidName = (state.validation.name === true);
+        this.nameField.setState((nameState) => ({
+            ...nameState,
+            value: state.data.name,
+            valid: isValidName,
+            feedbackMessage: (isValidName) ? '' : state.validation.name,
+            disabled: state.submitStarted,
+        }));
 
         // Parent category field
         const { categories } = window.app.model;

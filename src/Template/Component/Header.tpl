@@ -33,48 +33,6 @@
             </a>
         </div>
     </div>
-
-    <ul class="nav-list">
-        <?php if ($this->user_id != 0) {        ?>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>accounts/"><?= __("ACCOUNTS") ?></a>
-                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
-                    <?= useIcon("plus-light", "btn__icon") ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>persons/"><?= __("PERSONS") ?></a>
-                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>persons/create/">
-                    <?= useIcon("plus-light", "btn__icon") ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>categories/"><?= __("CATEGORIES") ?></a>
-                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>categories/create/">
-                    <?= useIcon("plus-light", "btn__icon") ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>transactions/"><?= __("TRANSACTIONS") ?></a>
-                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
-                    <?= useIcon("plus-light", "btn__icon") ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>schedule/"><?= __("SCHEDULE") ?></a>
-                <a class="btn nav-item__icon-btn" href="<?= BASEURL ?>schedule/create/">
-                    <?= useIcon("plus-light", "btn__icon") ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-item__link" href="<?= BASEURL ?>reminders/"><?= __("REMINDERS") ?></a>
-            </li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/"><?= __("STATISTICS") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/"><?= __("IMPORT") ?></a></li>
-            <li class="nav-separator"></li>
-        <?php    }        ?>
-        <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>about/"><?= __("ABOUT") ?></a></li>
-    </ul>
 </nav>
 
 <nav class="user-navigation-content" hidden>

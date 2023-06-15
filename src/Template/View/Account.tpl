@@ -20,22 +20,16 @@
                             <div id="tileField" class="form-row"></div>
 
                             <div id="typeField" class="field form-row">
-                                <label for="type" class="field__title"><?= __("ACCOUNT_TYPE") ?></label>
+                                <label for="type" class="field__title"><?= __("accounts.type") ?></label>
                                 <select id="type" name="type"></select>
                             </div>
 
                             <div id="iconField" class="field form-row">
-                                <label class="field__title"><?= __("ACCOUNT_ICON") ?></label>
-                            </div>
-
-                            <div id="name-inp-block" class="field validation-block form-row">
-                                <label for="nameInp" class="field__title"><?= __("ACCOUNT_NAME") ?></label>
-                                <input id="nameInp" class="input stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
-                                <div id="nameFeedback" class="feedback invalid-feedback"></div>
+                                <label class="field__title"><?= __("accounts.icon") ?></label>
                             </div>
 
                             <div id="currencyField" class="field form-row">
-                                <label for="currency" class="field__title"><?= __("ACCOUNT_CURRENCY") ?></label>
+                                <label for="currency" class="field__title"><?= __("accounts.currency") ?></label>
                                 <select id="currency" name="curr_id"></select>
                             </div>
 

@@ -1,4 +1,4 @@
-import { copyObject, assert, asArray } from 'jezve-test';
+import { assert, asArray } from 'jezve-test';
 
 export class List {
     static create(props) {
@@ -130,7 +130,7 @@ export class List {
 
     /** Convert object to list item */
     createItem(obj) {
-        return copyObject(obj);
+        return structuredClone(obj);
     }
 
     /**

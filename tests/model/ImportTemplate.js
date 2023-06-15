@@ -1,4 +1,4 @@
-import { assert, copyObject, isDate } from 'jezve-test';
+import { assert, isDate } from 'jezve-test';
 import { fixFloat, fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
@@ -45,7 +45,7 @@ export class ImportTemplate {
         this.account_id = data.account_id;
         this.first_row = data.first_row;
         this.date_locale = data.date_locale;
-        this.columns = copyObject(data.columns);
+        this.columns = structuredClone(data.columns);
     }
 
     /** Fix amount value from raw data */

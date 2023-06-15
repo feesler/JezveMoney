@@ -53,19 +53,13 @@ class Transactions extends ListViewController
             "clearAllURL" => $baseUrl
         ];
 
-        $pagination = [
-            "onPage" => 10,
+        $requestDefaults = [
             "page" => 1,
-            "pagesCount" => 1,
-            "total" => 0,
-        ];
-        $trParamsDefault = [
+            "range" => 1,
             "onPage" => 10,
-            "desc" => true
         ];
 
-        $trParams = $this->model->getRequestFilters($_GET, $trParamsDefault);
-        $filterObj = $this->model->getFilterObject($trParams);
+        $request = $this->model->getRequestFilters($_GET, $requestDefaults);
 
         // Obtain requested view mode
         $showDetails = false;
@@ -73,18 +67,10 @@ class Transactions extends ListViewController
             $showDetails = true;
         }
 
-        $transactions = $this->model->getData($trParams);
+        $params = $request["params"];
+        $params["desc"] = true;
 
-        $transCount = $this->model->getTransCount($trParams);
-        $pagination["total"] = $transCount;
-
-        // Build data for paginator
-        if ($trParams["onPage"] > 0) {
-            $pageCount = ceil($transCount / $trParams["onPage"]);
-            $pagination["pagesCount"] = $pageCount;
-            $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
-            $pagination["page"] = $page_num + 1;
-        }
+        $transactions = $this->model->getData($params);
 
         $detailsId = $this->getRequestedItem();
 
@@ -96,8 +82,8 @@ class Transactions extends ListViewController
             "categories" => $this->catModel->getData(),
             "view" => [
                 "items" => $transactions,
-                "filter" => (object)$filterObj,
-                "pagination" => $pagination,
+                "filter" => $request["filter"],
+                "pagination" => $request["pagination"],
                 "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
                 "detailsItem" => $this->model->getItem($detailsId),
@@ -429,7 +415,13 @@ class Transactions extends ListViewController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $trParams = $this->model->getRequestFilters($_GET);
+        $requestDefaults = [
+            "onPage" => 0,
+            "page" => 1,
+            "range" => 1,
+        ];
+
+        $request = $this->model->getRequestFilters($_GET, $requestDefaults, true);
 
         $writerType = "Csv";
         $exportFileName = "Exported_" . date("d.m.Y") . "." . strtolower($writerType);
@@ -463,7 +455,7 @@ class Transactions extends ListViewController
         }
 
         // Request transactions data and write to sheet
-        $transactionsList = $this->model->getData($trParams);
+        $transactionsList = $this->model->getData($request["params"]);
         foreach ($transactionsList as $transaction) {
             $row_ind++;
 

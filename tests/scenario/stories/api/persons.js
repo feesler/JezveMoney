@@ -1,42 +1,42 @@
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/person.js';
+import * as Actions from '../../actions/api/person.js';
 
 const create = async () => {
     setBlock('Create persons', 2);
 
-    const data = [{
-        name: 'Person X',
-    }, {
-        name: 'Y',
-    }];
+    const data = {
+        PERSON_X: {
+            name: 'Person X',
+        },
+        PERSON_Y: {
+            name: 'Y',
+        },
+    };
 
-    [
-        App.scenario.PERSON_X,
-        App.scenario.PERSON_Y,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createWithChainedRequest = async () => {
     setBlock('Create persons with chained request', 2);
 
-    const data = [{
-        name: 'Person Z',
-        returnState: {
-            persons: { visibility: 'visible' },
+    const data = {
+        PERSON_CHAINED_Z: {
+            name: 'Person Z',
+            returnState: {
+                persons: { visibility: 'visible' },
+            },
         },
-    }, {
-        name: 'AA',
-        returnState: {
-            persons: { visibility: 'all' },
-            accounts: { visibility: 'all' },
+        PERSON_CHAINED_AA: {
+            name: 'AA',
+            returnState: {
+                persons: { visibility: 'all' },
+                accounts: { visibility: 'all' },
+            },
         },
-    }];
+    };
 
-    [
-        App.scenario.PERSON_CHAINED_Z,
-        App.scenario.PERSON_CHAINED_AA,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -62,15 +62,39 @@ const createInvalid = async () => {
 const createMultiple = async () => {
     setBlock('Create multiple persons', 2);
 
-    const data = [{
-        name: 'Person 1',
-    }, {
-        name: 'Person 2',
-    }, {
-        name: 'Person 3',
-    }];
+    const data = {
+        PERSON_1: {
+            name: 'Person 1',
+        },
+        PERSON_2: {
+            name: 'Person 2',
+        },
+        PERSON_3: {
+            name: 'Person 3',
+        },
+    };
 
-    await Actions.createMultiple(data);
+    await App.scenario.createMultiple(Actions, data);
+};
+
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple persons with chained request', 2);
+
+    const data = {
+        data: {
+            PERSON_MULTI_CHAINED_1: {
+                name: 'Person multi chained 1',
+            },
+            PERSON_MULTI_CHAINED_2: {
+                name: 'Person multi chained 2',
+            },
+        },
+        returnState: {
+            persons: { visibility: 'all' },
+        },
+    };
+
+    await App.scenario.createMultiple(Actions, data);
 };
 
 const createMultipleInvalid = async () => {
@@ -78,19 +102,25 @@ const createMultipleInvalid = async () => {
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            name: '',
-        }, {
-            name: 'Person 2',
-        }],
-        [{
-            name: 'Person 4',
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                name: '',
+            }, {
+                name: 'Person 2',
+            }],
+        },
+        {
+            data: [{
+                name: 'Person 4',
+            }, null],
+        },
     ];
 
-    await App.scenario.runner.runGroup(Actions.createMultiple, data);
+    await App.scenario.runner.runGroup(Actions.create, data);
 };
 
 const read = async () => {
@@ -250,6 +280,7 @@ export const apiPersonsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

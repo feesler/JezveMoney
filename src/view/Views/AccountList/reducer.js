@@ -96,6 +96,7 @@ const slice = createSlice({
             ...state,
             listMode,
             contextItem: null,
+            showContextMenu: false,
         };
 
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;

@@ -1,4 +1,4 @@
-import { asArray, assert, copyObject } from 'jezve-test';
+import { asArray, assert } from 'jezve-test';
 import { List } from './List.js';
 import { REMINDER_SCHEDULED, Reminder } from './Reminder.js';
 import { App } from '../Application.js';
@@ -132,7 +132,7 @@ export class RemindersList extends List {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = copyObject(list);
+        const res = structuredClone(list);
 
         if (desc) {
             return res.sort((a, b) => b.date - a.date);
@@ -158,7 +158,7 @@ export class RemindersList extends List {
 
         this.data = this.data.map((item) => (
             (ids.includes(item.transaction_id))
-                ? Reminder.create({
+                ? this.createItem({
                     ...item,
                     state: REMINDER_SCHEDULED,
                     transaction_id: 0,

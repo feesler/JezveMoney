@@ -1630,7 +1630,10 @@ class TransactionModel extends SortableModel
      */
     public function getRequestFilters(array $request, array $defaults = [], bool $throw = false)
     {
-        $res = $defaults;
+        $request = array_merge($defaults, $request);
+
+        $filter = [];
+        $pagination = [];
 
         // Type filter
         $typeFilter = [];
@@ -1649,78 +1652,78 @@ class TransactionModel extends SortableModel
                 }
             }
             if (count($typeFilter) > 0) {
-                $res["type"] = $typeFilter;
+                $filter["type"] = $typeFilter;
             }
         }
 
         // Accounts filter
         $accFilter = [];
-        if (isset($request["acc_id"])) {
-            $accountsReq = asArray($request["acc_id"]);
-            foreach ($accountsReq as $acc_id) {
-                if ($this->accModel->isExist($acc_id)) {
-                    $accFilter[] = intval($acc_id);
+        if (isset($request["accounts"])) {
+            $accountsReq = asArray($request["accounts"]);
+            foreach ($accountsReq as $accountId) {
+                if ($this->accModel->isExist($accountId)) {
+                    $accFilter[] = intval($accountId);
                 } elseif ($throw) {
-                    throw new \Error("Invalid account '$acc_id'");
+                    throw new \Error("Invalid account '$accountId'");
                 }
             }
             if (count($accFilter) > 0) {
-                $res["accounts"] = $accFilter;
+                $filter["accounts"] = $accFilter;
             }
         }
 
         // Persons filter
         $personModel = PersonModel::getInstance();
         $personFilter = [];
-        if (isset($request["person_id"])) {
-            $personsReq = asArray($request["person_id"]);
-            foreach ($personsReq as $person_id) {
-                if ($personModel->isExist($person_id)) {
-                    $personFilter[] = intval($person_id);
+        if (isset($request["persons"])) {
+            $personsReq = asArray($request["persons"]);
+            foreach ($personsReq as $personId) {
+                if ($personModel->isExist($personId)) {
+                    $personFilter[] = intval($personId);
                 } elseif ($throw) {
-                    throw new \Error("Invalid person '$person_id'");
+                    throw new \Error("Invalid person '$personId'");
                 }
             }
             if (count($personFilter) > 0) {
-                $res["persons"] = $personFilter;
+                $filter["persons"] = $personFilter;
             }
         }
 
         // Categories filter
         $categoryFilter = [];
-        if (isset($request["category_id"])) {
-            $categoriesReq = asArray($request["category_id"]);
-            foreach ($categoriesReq as $category_id) {
-                $category_id = intval($category_id);
-                if ($category_id === NO_CATEGORY || $this->catModel->isExist($category_id)) {
+        if (isset($request["categories"])) {
+            $categoriesReq = asArray($request["categories"]);
+            foreach ($categoriesReq as $categoryId) {
+                $category_id = intval($categoryId);
+                if ($category_id === NO_CATEGORY || $this->catModel->isExist($categoryId)) {
                     $categoryFilter[] = $category_id;
                 } elseif ($throw) {
-                    throw new \Error("Invalid category '$category_id'");
+                    throw new \Error("Invalid category '$categoryId'");
                 }
             }
             if (count($categoryFilter) > 0) {
-                $res["categories"] = $categoryFilter;
+                $filter["categories"] = $categoryFilter;
             }
         }
 
         // Search query
         if (isset($request["search"]) && !is_null($request["search"])) {
-            $res["search"] = $request["search"];
+            $filter["search"] = $request["search"];
         }
 
         // Date range filter
-        if (isset($request["stdate"]) && !is_null($request["stdate"])) {
-            $res["startDate"] = intval($request["stdate"]);
+        if (isset($request["startDate"]) && !is_null($request["startDate"])) {
+            $filter["startDate"] = intval($request["startDate"]);
         }
-        if (isset($request["enddate"]) && !is_null($request["enddate"])) {
-            $res["endDate"] = intval($request["enddate"]);
+        if (isset($request["endDate"]) && !is_null($request["endDate"])) {
+            $filter["endDate"] = intval($request["endDate"]);
         }
 
         // Page
         if (isset($request["page"])) {
             $page = intval($request["page"]);
             if ($page > 1) {
-                $res["page"] = $page - 1;
+                $pagination["page"] = $page;
             }
         }
 
@@ -1731,7 +1734,7 @@ class TransactionModel extends SortableModel
                 throw new \Error("Invalid page limit");
             }
             if ($onPage > 0) {
-                $res["onPage"] = $onPage;
+                $pagination["onPage"] = $onPage;
             }
         }
 
@@ -1739,74 +1742,31 @@ class TransactionModel extends SortableModel
         if (isset($request["range"])) {
             $range = intval($request["range"]);
             if ($range > 0) {
-                $res["range"] = $range;
+                $pagination["range"] = $range;
             }
         }
 
-        return $res;
-    }
+        $params = array_merge($filter, $pagination);
 
-    /**
-     * Converts filter parameters to filter object
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public function getFilterObject(array $params)
-    {
-        $res = [];
+        $itemsCount = $this->getTransCount($params);
+        $pagination["total"] = $itemsCount;
 
-        // Type
-        if (
-            isset($params["type"]) &&
-            is_array($params["type"]) &&
-            count($params["type"]) > 0
-        ) {
-            $res["type"] = $params["type"];
-        }
+        // Pagination
+        $pagesCount = (isset($pagination["onPage"]) && $pagination["onPage"] > 0)
+            ? ceil($itemsCount / $pagination["onPage"])
+            : 1;
 
-        // Accounts
-        if (
-            isset($params["accounts"]) &&
-            is_array($params["accounts"]) &&
-            count($params["accounts"]) > 0
-        ) {
-            $res["acc_id"] = $params["accounts"];
-        }
+        $pagination["pagesCount"] = $pagesCount;
+        $page = $pagination["page"] ?? 1;
+        $pagination["page"] = min($pagesCount, $page);
 
-        // Persons
-        if (
-            isset($params["persons"]) &&
-            is_array($params["persons"]) &&
-            count($params["persons"]) > 0
-        ) {
-            $res["person_id"] = $params["persons"];
-        }
+        $params["page"] = $pagination["page"] - 1;
 
-        // Categories
-        if (
-            isset($params["categories"]) &&
-            is_array($params["categories"]) &&
-            count($params["categories"]) > 0
-        ) {
-            $res["category_id"] = $params["categories"];
-        }
-
-        // Date range
-        if (isset($params["startDate"])) {
-            $res["stdate"] = $params["startDate"];
-        }
-        if (isset($params["endDate"])) {
-            $res["enddate"] = $params["endDate"];
-        }
-
-        // Search query
-        if (isset($params["search"])) {
-            $res["search"] = $params["search"];
-        }
-
-        return $res;
+        return [
+            "filter" => $filter,
+            "pagination" => $pagination,
+            "params" => $params,
+        ];
     }
 
     /**
@@ -2107,8 +2067,8 @@ class TransactionModel extends SortableModel
             $res->curr_id = $curr_id;
         } elseif ($reportType === "account") {
             $accountsFilter = [];
-            if (isset($request["acc_id"])) {
-                $accountsReq = asArray($request["acc_id"]);
+            if (isset($request["accounts"])) {
+                $accountsReq = asArray($request["accounts"]);
                 foreach ($accountsReq as $acc_id) {
                     if (!$this->accModel->isExist($acc_id)) {
                         throw new \Error("Invalid account '$acc_id'");
@@ -2117,11 +2077,11 @@ class TransactionModel extends SortableModel
                     $accountsFilter[] = intval($acc_id);
                 }
             }
-            $res->acc_id = $accountsFilter;
+            $res->accounts = $accountsFilter;
         } elseif ($reportType === "category") {
             $categoriesFilter = [];
-            if (isset($request["category_id"])) {
-                $categoriesReq = asArray($request["category_id"]);
+            if (isset($request["categories"])) {
+                $categoriesReq = asArray($request["categories"]);
                 foreach ($categoriesReq as $category_id) {
                     $category_id = intval($category_id);
                     if ($category_id !== NO_CATEGORY && !$this->catModel->isExist($category_id)) {
@@ -2131,7 +2091,7 @@ class TransactionModel extends SortableModel
                     $categoriesFilter[] = $category_id;
                 }
             }
-            $res->category_id = $categoriesFilter;
+            $res->categories = $categoriesFilter;
         }
 
         // Group type
@@ -2145,11 +2105,11 @@ class TransactionModel extends SortableModel
         }
 
         // Date range
-        if (isset($request["stdate"])) {
-            $res->stdate = $request["stdate"];
+        if (isset($request["startDate"])) {
+            $res->startDate = $request["startDate"];
         }
-        if (isset($request["enddate"])) {
-            $res->enddate = $request["enddate"];
+        if (isset($request["endDate"])) {
+            $res->endDate = $request["endDate"];
         }
 
         return $res;
@@ -2182,18 +2142,18 @@ class TransactionModel extends SortableModel
 
             $dataCategories = asArray($params["curr_id"]);
         } elseif ($reportType == "account") {
-            if (!isset($params["acc_id"])) {
+            if (!isset($params["accounts"])) {
                 return $res;
             }
 
-            $accounts = asArray($params["acc_id"]);
+            $accounts = asArray($params["accounts"]);
             if (count($accounts) === 0) {
                 return $res;
             }
             $dataCategories = $accounts;
         } elseif ($reportType == "category") {
-            if (isset($params["category_id"])) {
-                $categories = asArray($params["category_id"]);
+            if (isset($params["categories"])) {
+                $categories = asArray($params["categories"]);
             }
             if (count($categories) === 0) {
                 $mainCategories = $this->catModel->getData([

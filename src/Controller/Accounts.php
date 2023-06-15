@@ -31,7 +31,7 @@ class Accounts extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("ACCOUNTS"),
+            "titleString" => __("APP_NAME") . " | " . __("accounts.listTitle"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -63,8 +63,8 @@ class Accounts extends ListViewController
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => __("ACCOUNT_CREATE"),
-            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_CREATE"),
+            "headString" => __("accounts.create"),
+            "titleString" => __("APP_NAME") . " | " . __("accounts.create"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -134,8 +134,8 @@ class Accounts extends ListViewController
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => __("ACCOUNT_UPDATE"),
-            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_UPDATE"),
+            "headString" => __("accounts.update"),
+            "titleString" => __("APP_NAME") . " | " . __("accounts.update"),
         ];
 
         $currMod = CurrencyModel::getInstance();

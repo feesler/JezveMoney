@@ -1,4 +1,3 @@
-import { copyObject } from 'jezvejs';
 import { List } from './List.js';
 import {
     ImportAction,
@@ -49,7 +48,7 @@ export class ImportActionList extends List {
 
     /** Returns sorted array of actions */
     static sort(actions) {
-        const data = copyObject(actions);
+        const data = structuredClone(actions);
         data.sort((a, b) => a.action_id - b.action_id);
         return data;
     }

@@ -22,9 +22,9 @@ import {
 import { createImportRules } from './data/rules.js';
 import { createImportTemplates } from './data/templates.js';
 
-import * as ApiTests from '../actions/api/index.js';
-import * as ProfileTests from '../actions/profile.js';
-import { putFile, removeFile } from '../actions/import/index.js';
+import * as ApiTests from './actions/api/index.js';
+import * as ProfileTests from './actions/profile.js';
+import { putFile, removeFile } from './actions/import/index.js';
 
 import { UnitTestsStory } from './stories/UnitTestsStory.js';
 import { SecurityStory } from './stories/SecurityStory.js';
@@ -85,18 +85,21 @@ export class Scenario {
         this.runner = new Runner();
     }
 
+    assignKeys(keys, values) {
+        assert.isArray(keys, 'Invalid keys');
+        assert.isArray(values, 'Invalid values');
+        assert(keys.length === values.length, 'Invalid count of values');
+
+        keys.forEach((key, index) => {
+            assert(values[index], `Invalid value for '${key}'`);
+            this[key] = values[index];
+        });
+    }
+
     setupCurrencies() {
-        [
-            this.RUB,
-            this.USD,
-            this.EUR,
-            this.PLN,
-            this.KRW,
-            this.CNY,
-            this.JPY,
-            this.SEK,
-            this.BTC,
-        ] = App.currency.getItemsByCodes(['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK', 'BTC']);
+        const data = ['RUB', 'USD', 'EUR', 'PLN', 'KRW', 'CNY', 'JPY', 'SEK', 'BTC'];
+        const values = App.currency.getItemsByCodes(data);
+        this.assignKeys(data, values);
     }
 
     async run() {
@@ -159,6 +162,48 @@ export class Scenario {
 
             await this.runStory(story);
         }
+    }
+
+    /** Creates multiple items using API request and save result ids as fields of instance */
+    async createMultiple(controller, params) {
+        const isAPI = (typeof controller === 'string');
+        const action = (isAPI) ? api[controller] : controller;
+        assert.isFunction(action?.create, 'Invalid action');
+
+        const source = (params?.data) ? params : { data: params };
+        const { data, ...rest } = source;
+
+        const values = Object.values(data);
+        const request = { data: values, ...rest };
+        const keys = Object.keys(data);
+
+        const createRes = await action.create(request);
+        const result = (isAPI) ? createRes?.ids : createRes;
+        this.assignKeys(keys, result);
+    }
+
+    /** Creates multiple items using API request and save result ids as fields of instance */
+    async extractAndCreateMultiple(action, params) {
+        assert.isFunction(action?.extractAndCreateMultiple, 'Invalid action');
+
+        const source = (params?.data) ? params : { data: params };
+        const { data, ...rest } = source;
+
+        const values = Object.values(data);
+        const request = { data: values, ...rest };
+        const keys = Object.keys(data);
+
+        const result = await action.extractAndCreateMultiple(request);
+        this.assignKeys(keys, result);
+    }
+
+    /** Creates multiple items using action and save result ids as fields of instance */
+    async createOneByOne(action, data) {
+        const request = Object.values(data);
+        const keys = Object.keys(data);
+
+        const createRes = await this.runner.runGroup(action, request);
+        this.assignKeys(keys, createRes);
     }
 
     /** Register test user and set 'Tester' access */

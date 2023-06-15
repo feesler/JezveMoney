@@ -1132,34 +1132,21 @@ const slice = createSlice({
         },
     }),
 
-    startDateChange: (state, value) => ({
+    scheduleRangeChange: (state, range) => ({
         ...state,
         transaction: {
             ...state.transaction,
-            start_date: dateStringToTime(value),
+            start_date: dateStringToTime(range.startDate),
+            end_date: (range.endDate) ? dateStringToTime(range.endDate) : null,
         },
         form: {
             ...state.form,
-            startDate: value,
+            startDate: range.startDate,
+            endDate: range.endDate ?? '',
         },
         validation: {
             ...state.validation,
             startDate: true,
-        },
-    }),
-
-    endDateChange: (state, value) => ({
-        ...state,
-        transaction: {
-            ...state.transaction,
-            end_date: (value) ? dateStringToTime(value) : null,
-        },
-        form: {
-            ...state.form,
-            endDate: value ?? '',
-        },
-        validation: {
-            ...state.validation,
             endDate: true,
         },
     }),
@@ -1183,6 +1170,9 @@ const slice = createSlice({
         if (type === INTERVAL_NONE) {
             newState.form.endDate = '';
             newState.transaction.end_date = null;
+            newState.transaction.interval_step = 0;
+        } else if (state.transaction.interval_step === 0) {
+            newState.transaction.interval_step = parseInt(state.form.intervalStep, 10);
         }
 
         return newState;
@@ -1199,6 +1189,10 @@ const slice = createSlice({
             transaction: {
                 ...state.transaction,
                 interval_step: step,
+            },
+            validation: {
+                ...state.validation,
+                intervalStep: true,
             },
         };
 
@@ -1299,6 +1293,14 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             endDate: false,
+        },
+    }),
+
+    invalidateIntervalStep: (state) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            intervalStep: false,
         },
     }),
 

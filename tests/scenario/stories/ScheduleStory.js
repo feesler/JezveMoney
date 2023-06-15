@@ -1,5 +1,5 @@
 import { setBlock, TestStory } from 'jezve-test';
-import * as Actions from '../../actions/schedule.js';
+import * as Actions from '../actions/schedule.js';
 import { App } from '../../Application.js';
 import {
     DEBT,
@@ -38,6 +38,7 @@ export class ScheduleStory extends TestStory {
 
         await Actions.securityTests();
 
+        await this.validation();
         await this.create();
         await this.list();
         await this.update();
@@ -51,6 +52,25 @@ export class ScheduleStory extends TestStory {
         await this.select();
         await this.details();
         await this.pagination();
+    }
+
+    async validation() {
+        setBlock('Scheduled transaction form validation', 1);
+
+        await Actions.createAndSubmit('Invalid interval step', [
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputIntervalStep', data: '' },
+        ]);
+
+        await Actions.createAndSubmit('Invalid interval step', [
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputIntervalStep', data: '0' },
+        ]);
+
+        await Actions.createAndSubmit('Invalid start date', [
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputStartDate', data: '' },
+        ]);
     }
 
     async create() {

@@ -4,7 +4,6 @@ import {
     show,
     addChilds,
     createElement,
-    setProps,
     Component,
     getLongMonthName,
     MONTHS_COUNT,
@@ -13,7 +12,6 @@ import {
 import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
-import { Input } from 'jezvejs/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Spinner } from 'jezvejs/Spinner';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
@@ -47,6 +45,8 @@ import { AccountTile } from '../AccountTile/AccountTile.js';
 import { AmountInputField } from '../AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../CategorySelect/CategorySelect.js';
 import { DateInputField } from '../DateInputField/DateInputField.js';
+import { InputField } from '../InputField/InputField.js';
+import { DateRangeInput } from '../DateRangeInput/DateRangeInput.js';
 import { Field } from '../Field/Field.js';
 import { Tile } from '../Tile/Tile.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
@@ -62,16 +62,13 @@ import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
 
-const inputProps = {
-    autocomplete: 'off',
-    autocapitalize: 'none',
-    autocorrect: 'off',
-    spellcheck: false,
-};
-
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
 const HIDE_BOTH = 2;
+
+const validateDateOptions = {
+    fixShortYear: false,
+};
 
 const hiddenInputIds = [
     'typeInp',
@@ -136,6 +133,7 @@ export class TransactionForm extends Component {
                 date: true,
                 startDate: true,
                 endDate: true,
+                intervalStep: true,
             },
             srcAccount: accountModel.getItem(transaction.src_id),
             destAccount: accountModel.getItem(transaction.dest_id),
@@ -460,34 +458,21 @@ export class TransactionForm extends Component {
         });
 
         // Comment field
-        this.commentInput = Input.create({
-            id: 'commentInput',
-            name: 'comment',
-            className: 'stretch-input',
-            onInput: (e) => this.onCommentInput(e),
-        });
-        setProps(this.commentInput.elem, inputProps);
-
-        this.commentRow = Field.create({
+        this.commentRow = InputField.create({
             id: 'commentRow',
-            htmlFor: 'commentInput',
+            inputId: 'commentInput',
+            name: 'comment',
             title: __('TR_COMMENT'),
             className: 'form-row',
-            content: this.commentInput.elem,
+            onInput: (e) => this.onCommentInput(e),
         });
 
         children.push(this.categoryRow.elem, this.commentRow.elem);
 
         // Schedule fields
         if (this.props.type === 'scheduleItem') {
-            this.createScheduleFields();
-            children.push(
-                this.startDateRow.elem,
-                this.endDateRow.elem,
-                this.intervalStepRow.elem,
-                this.intervalTypeRow.elem,
-                this.intervalOffsetRow.elem,
-            );
+            const fields = this.createScheduleFields();
+            children.push(...fields);
         }
 
         // Controls
@@ -573,47 +558,46 @@ export class TransactionForm extends Component {
 
     /** Creates schedule fields */
     createScheduleFields() {
-        // Start date field
-        this.startDateRow = DateInputField.create({
-            id: 'startDateRow',
-            title: __('SCHED_TR_START_DATE'),
-            feedbackMessage: __('TR_INVALID_DATE'),
-            className: 'form-row',
-            locales: window.app.dateFormatLocale,
-            validate: true,
-            onInput: (e) => this.onStartDateInput(e),
-            onDateSelect: (e) => this.onStartDateSelect(e),
+        // Date range field
+        this.dateRangeInput = DateRangeInput.create({
+            id: 'dateRangeInput',
+            startPlaceholder: __('DATE_RANGE_FROM'),
+            endPlaceholder: __('DATE_RANGE_TO'),
+            startClearable: false,
+            onChange: (range) => this.onScheduleRangeChange(range),
         });
 
-        // End date field
-        this.endDateRow = DateInputField.create({
-            id: 'endDateRow',
-            title: __('SCHED_TR_END_DATE'),
-            feedbackMessage: __('TR_INVALID_DATE'),
+        this.dateRangeField = Field.create({
+            id: 'dateRangeField',
+            htmlFor: 'dateRangeInput',
+            title: __('FILTER_DATE_RANGE'),
             className: 'form-row',
-            locales: window.app.dateFormatLocale,
-            validate: true,
-            clearButton: true,
-            onInput: (e) => this.onEndDateInput(e),
-            onDateSelect: (e) => this.onEndDateSelect(e),
-            onClear: (e) => this.onEndDateClear(e),
+            content: this.dateRangeInput.elem,
         });
 
         // Interval step field
-        this.intervalStepInput = Input.create({
+        this.intervalStepInput = DecimalInput.create({
             id: 'intervalStepInput',
             name: 'interval_step',
-            className: 'stretch-input',
+            className: 'input stretch-input',
+            digits: 0,
+            allowNegative: false,
             onInput: (e) => this.onIntervalStepChanged(e),
         });
-        setProps(this.intervalStepInput.elem, inputProps);
 
         this.intervalStepRow = Field.create({
             id: 'intervalStepRow',
             htmlFor: 'intervalStepInput',
             title: __('SCHED_TR_INTERVAL_STEP'),
-            className: 'form-row',
+            className: 'interval-step-field',
             content: this.intervalStepInput.elem,
+        });
+
+        this.intervalFeedbackElem = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('SCHED_TR_INVALID_INTERVAL_STEP'),
+            },
         });
 
         // Interval type field
@@ -635,11 +619,28 @@ export class TransactionForm extends Component {
             id: 'intervalTypeRow',
             htmlFor: 'intervalTypeSelect',
             title: __('SCHED_TR_INTERVAL'),
-            className: 'form-row',
+            className: 'interval-type-field',
             content: this.intervalTypeSelect.elem,
         });
 
+        const intervalFields = createElement('div', {
+            props: { className: 'form-fields-row' },
+            children: [
+                this.intervalTypeRow.elem,
+                this.intervalStepRow.elem,
+            ],
+        });
+
+        this.intervalFieldsGroup = createElement('div', {
+            props: { className: 'form-row validation-block interval-fields' },
+            children: [
+                intervalFields,
+                this.intervalFeedbackElem,
+            ],
+        });
+
         // Interval offset
+        // Week day field
         this.weekDaySelect = WeekDaySelect.create({
             id: 'weekDaySelect',
             type: 'buttons',
@@ -647,6 +648,15 @@ export class TransactionForm extends Component {
             onChange: (offset) => this.onWeekdayOffsetChanged(offset),
         });
 
+        this.weekDayField = Field.create({
+            id: 'weekDayField',
+            htmlFor: 'weekDaySelect',
+            title: __('SCHED_TR_OFFSET_WEEK_DAYS'),
+            className: 'form-row week-day-field',
+            content: this.weekDaySelect.elem,
+        });
+
+        // Month day / year day field
         this.monthDaySelect = DropDown.create({
             id: 'monthDaySelect',
             className: 'month-day-select',
@@ -667,17 +677,23 @@ export class TransactionForm extends Component {
             })),
         });
 
-        this.intervalOffsetRow = Field.create({
-            id: 'intervalOffsetRow',
-            htmlFor: 'intervalOffsetInput',
-            title: __('SCHED_TR_OFFSET'),
-            className: 'form-row interval-offset-field',
+        this.daySelectField = Field.create({
+            id: 'daySelectField',
+            htmlFor: 'monthDaySelect',
+            title: __('SCHED_TR_OFFSET_MONTH_DAY'),
+            className: 'form-row horizontal-field day-select-field',
             content: [
-                this.weekDaySelect.elem,
                 this.monthDaySelect.elem,
                 this.monthSelect.elem,
             ],
         });
+
+        return [
+            this.dateRangeField.elem,
+            this.intervalFieldsGroup,
+            this.weekDayField.elem,
+            this.daySelectField.elem,
+        ];
     }
 
     /** Returns hidden input element */
@@ -703,7 +719,7 @@ export class TransactionForm extends Component {
                 elem: this.sourceTile.elem,
                 listAttach: true,
                 enableFilter: true,
-                placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+                placeholder: __('accounts.typeToFilter'),
                 useSingleSelectionAsPlaceholder: false,
                 noResultsMessage: __('NOT_FOUND'),
                 onItemSelect: (item) => this.onSrcAccountSelect(item),
@@ -731,7 +747,7 @@ export class TransactionForm extends Component {
                 elem: this.destTile.elem,
                 listAttach: true,
                 enableFilter: true,
-                placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+                placeholder: __('accounts.typeToFilter'),
                 useSingleSelectionAsPlaceholder: false,
                 noResultsMessage: __('NOT_FOUND'),
                 onItemSelect: (item) => this.onDestAccountSelect(item),
@@ -782,7 +798,7 @@ export class TransactionForm extends Component {
             elem: this.debtAccountTile.elem,
             listAttach: true,
             enableFilter: true,
-            placeholder: __('ACCOUNT_TYPE_TO_FILTER'),
+            placeholder: __('accounts.typeToFilter'),
             useSingleSelectionAsPlaceholder: false,
             noResultsMessage: __('NOT_FOUND'),
             onItemSelect: (item) => this.onDebtAccountSelect(item),
@@ -1005,42 +1021,11 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    onStartDateInput(e) {
-        this.store.dispatch(actions.startDateChange(e.target.value));
-        this.notifyChanged();
-    }
-
     /**
-     * Start date select callback
-     * @param {Date} date - selected date object
+     * Schedule date range change callback
      */
-    onStartDateSelect(date) {
-        this.store.dispatch(actions.startDateChange(window.app.formatInputDate(date)));
-        this.startDateRow.datePicker.hide();
-        this.notifyChanged();
-    }
-
-    onEndDateInput(e) {
-        this.store.dispatch(actions.endDateChange(e.target.value));
-        this.notifyChanged();
-    }
-
-    /**
-     * End date select callback
-     * @param {Date} date - selected date object
-     */
-    onEndDateSelect(date) {
-        this.store.dispatch(actions.endDateChange(window.app.formatInputDate(date)));
-        this.endDateRow.datePicker.hide();
-        this.notifyChanged();
-    }
-
-    /**
-     * End date clear callback
-     */
-    onEndDateClear() {
-        this.store.dispatch(actions.endDateChange(null));
-        this.endDateRow.datePicker.hide();
+    onScheduleRangeChange(range) {
+        this.store.dispatch(actions.scheduleRangeChange(range));
         this.notifyChanged();
     }
 
@@ -1136,17 +1121,21 @@ export class TransactionForm extends Component {
         } else if (isScheduleItem) {
             this.validateStartDate(state);
             this.validateEndDate(state);
+            this.validateIntervalStep(state);
         }
 
         const { validation } = this.store.getState();
-        const valid = (
+        let valid = (
             validation.destAmount
             && validation.sourceAmount
-            && (
-                (isTransaction && validation.date)
-                || (isScheduleItem && validation.startDate && validation.endDate)
-            )
         );
+
+        if (isTransaction) {
+            valid = valid && validation.date;
+        } else if (isScheduleItem) {
+            valid = valid && validation.startDate && validation.endDate && validation.intervalStep;
+        }
+
         if (valid) {
             this.submitTransaction();
         }
@@ -1177,14 +1166,14 @@ export class TransactionForm extends Component {
     }
 
     validateDate(state) {
-        const valid = window.app.isValidDateString(state.form.date);
+        const valid = window.app.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateDate());
         }
     }
 
     validateStartDate(state) {
-        const valid = window.app.isValidDateString(state.form.startDate);
+        const valid = window.app.isValidDateString(state.form.startDate, validateDateOptions);
         if (!valid) {
             this.store.dispatch(actions.invalidateStartDate());
         }
@@ -1192,9 +1181,24 @@ export class TransactionForm extends Component {
 
     validateEndDate(state) {
         const { endDate } = state.form;
-        const valid = (endDate.length === 0 || window.app.isValidDateString(endDate));
+        const valid = (
+            (endDate.length === 0)
+            || window.app.isValidDateString(endDate, validateDateOptions)
+        );
         if (!valid) {
             this.store.dispatch(actions.invalidateEndDate());
+        }
+    }
+
+    validateIntervalStep(state) {
+        const { transaction } = state;
+
+        const valid = (
+            (transaction.interval_type === INTERVAL_NONE)
+            || (transaction.interval_step > 0)
+        );
+        if (!valid) {
+            this.store.dispatch(actions.invalidateIntervalStep());
         }
     }
 
@@ -1707,76 +1711,89 @@ export class TransactionForm extends Component {
         this.destAmountRow.enableSelect(false);
     }
 
-    renderScheduleFields(state) {
+    renderScheduleFields(state, prevState) {
         if (state?.type !== 'scheduleItem') {
             return;
         }
 
-        const { transaction, form } = state;
+        const { transaction, form, validation } = state;
+        const { intervalType } = form;
+        const isRepeat = (intervalType !== INTERVAL_NONE);
 
-        // Start date field
-        this.startDateRow.setState((fieldState) => ({
-            ...fieldState,
-            value: form.startDate,
-            date: transaction.start_date,
-            disabled: state.submitStarted,
-            valid: state.validation.startDate,
-        }));
-
-        // End date field
-        this.endDateRow.setState((fieldState) => ({
-            ...fieldState,
-            value: form.endDate,
-            date: transaction.end_date,
-            disabled: state.submitStarted,
-            valid: state.validation.endDate,
-        }));
+        // Date range field
+        if (
+            (form.startDate !== prevState?.form?.startDate)
+            || (form.endDate !== prevState?.form?.endDate)
+            || (validation.startDate !== prevState?.validation?.startDate)
+            || (validation.endDate !== prevState?.validation?.endDate)
+            || (intervalType !== prevState?.form?.intervalType)
+            || (state.submitStarted !== prevState?.submitStarted)
+        ) {
+            this.dateRangeInput.setState((rangeState) => ({
+                ...rangeState,
+                form: {
+                    ...rangeState.form,
+                    startDate: form.startDate,
+                    endDate: form.endDate,
+                },
+                filter: {
+                    ...rangeState.filter,
+                    startDate: transaction.start_date,
+                    endDate: transaction.end_date,
+                },
+                validation: {
+                    ...state.validation,
+                    startDate: validation.startDate,
+                    endDate: validation.endDate,
+                    valid: (validation.startDate && validation.endDate),
+                },
+                disabled: state.submitStarted,
+                endVisible: isRepeat,
+            }));
+        }
 
         // Interval step field
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
+        this.intervalStepRow.show(isRepeat);
+        window.app.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval type field
-        this.intervalTypeSelect.setSelection(form.intervalType);
+        this.intervalTypeSelect.setSelection(intervalType);
         this.intervalTypeSelect.enable(!state.submitStarted);
 
         // Interval offset field
-        if (form.intervalType === INTERVAL_NONE) {
-            this.endDateRow.hide();
-            this.intervalStepRow.hide();
-            this.intervalOffsetRow.hide();
-        } else if (form.intervalType === INTERVAL_DAY) {
-            this.intervalOffsetRow.hide();
-        } else if (form.intervalType === INTERVAL_WEEK) {
-            this.weekDaySelect.setSelection(transaction.interval_offset);
-            this.weekDaySelect.show();
-            this.monthDaySelect.hide();
-            this.monthSelect.hide();
-            this.intervalOffsetRow.show();
-        } else if (form.intervalType === INTERVAL_MONTH) {
-            this.weekDaySelect.hide();
-            this.monthDaySelect.setSelection(transaction.interval_offset);
-            this.monthDaySelect.show();
-            this.monthSelect.hide();
-            this.intervalOffsetRow.show();
-        } else if (form.intervalType === INTERVAL_YEAR) {
-            this.weekDaySelect.hide();
+        // Week day field
+        const isWeekInterval = (intervalType === INTERVAL_WEEK);
 
+        this.weekDaySelect.enable(!state.submitStarted);
+        this.weekDayField.show(isWeekInterval);
+        if (isWeekInterval) {
+            this.weekDaySelect.setSelection(transaction.interval_offset);
+        }
+
+        // Month / year day select field
+        const isMonthInterval = (intervalType === INTERVAL_MONTH);
+        const isYearInterval = (intervalType === INTERVAL_YEAR);
+
+        this.monthDaySelect.enable(!state.submitStarted);
+        this.monthSelect.enable(!state.submitStarted);
+
+        if (isMonthInterval) {
+            this.monthDaySelect.setSelection(transaction.interval_offset);
+            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_MONTH_DAY'));
+        } else if (isYearInterval) {
             const monthIndex = Math.floor(transaction.interval_offset / 100);
             const dayIndex = (transaction.interval_offset % 100);
 
             this.monthDaySelect.setSelection(dayIndex);
-            this.monthDaySelect.show();
-
             this.monthSelect.setSelection(monthIndex);
-            this.monthSelect.show();
 
-            this.intervalOffsetRow.show();
+            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_YEAR_DAY'));
         }
 
-        this.weekDaySelect.enable(!state.submitStarted);
-        this.monthDaySelect.enable(!state.submitStarted);
-        this.monthSelect.enable(!state.submitStarted);
+        this.daySelectField.show(isMonthInterval || isYearInterval);
+        this.monthSelect.show(isYearInterval);
     }
 
     render(state, prevState = {}) {
@@ -1854,11 +1871,11 @@ export class TransactionForm extends Component {
         }
 
         if (isScheduleItem) {
-            this.startDateRow.show(state.isAvailable);
-            this.endDateRow.show(state.isAvailable);
+            this.dateRangeField.show(state.isAvailable);
             this.intervalStepRow.show(state.isAvailable);
             this.intervalTypeRow.show(state.isAvailable);
-            this.intervalOffsetRow.show(state.isAvailable);
+            this.weekDayField.show(state.isAvailable);
+            this.daySelectField.show(state.isAvailable);
         } else {
             this.dateRow.show(state.isAvailable);
         }
@@ -1866,10 +1883,18 @@ export class TransactionForm extends Component {
         this.commentRow.show(state.isAvailable);
         show(this.submitControls, state.isAvailable);
 
+        // Date field
+        if (!isScheduleItem) {
+            this.dateRow.setState((dateState) => ({
+                ...dateState,
+                value: state.form.date,
+                date: transaction.date,
+                disabled: state.submitStarted,
+                valid: state.validation.date,
+            }));
+        }
+
         if (!state.isAvailable) {
-            if (!isScheduleItem) {
-                this.dateRow.input.value = state.form.date;
-            }
             return;
         }
 
@@ -1997,29 +2022,21 @@ export class TransactionForm extends Component {
             currencyId: transaction.dest_curr,
         }));
 
-        // Date field
-        if (!isScheduleItem) {
-            this.dateRow.setState((dateState) => ({
-                ...dateState,
-                value: state.form.date,
-                date: transaction.date,
-                disabled: state.submitStarted,
-                valid: state.validation.date,
-            }));
-        }
-
         // Category field
         this.categorySelect.setType(transaction.type);
         this.categorySelect.setSelection(transaction.category_id);
         this.categorySelect.enable(!state.submitStarted);
 
         // Comment field
-        this.commentInput.value = state.form.comment;
-        this.commentInput.enable(!state.submitStarted);
+        this.commentRow.setState((commentState) => ({
+            ...commentState,
+            value: state.form.comment,
+            disabled: state.submitStarted,
+        }));
 
         // Schedule fields
         if (isScheduleItem) {
-            this.renderScheduleFields(state);
+            this.renderScheduleFields(state, prevState);
         }
 
         // Controls

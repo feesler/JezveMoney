@@ -4,7 +4,6 @@ import {
     prop,
     navigation,
     click,
-    copyObject,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -48,7 +47,7 @@ export class AccountView extends AppView {
 
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
-        res.name = await InputRow.create(this, await query('#name-inp-block'));
+        res.name = await InputRow.create(this, await query('#nameField'));
         assert(res.name, 'Account name input not found');
 
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
@@ -163,7 +162,7 @@ export class AccountView extends AppView {
     }
 
     setExpectedAccount(account) {
-        this.origAccount = copyObject(account);
+        this.origAccount = structuredClone(account);
 
         this.setModelType(account.type);
         this.model.name = account.name.toString();
@@ -219,7 +218,7 @@ export class AccountView extends AppView {
         const accTile = Tile.renderAccount(account);
 
         if (!model.nameTyped && !model.isUpdate) {
-            accTile.title = __('ACCOUNT_NAME_NEW', this.locale);
+            accTile.title = __('accounts.nameNew', this.locale);
         }
 
         accTile.visible = true;
@@ -244,7 +243,7 @@ export class AccountView extends AppView {
                 visible: true,
             },
             iconDropDown: {
-                textValue: __(model.tileIcon.name, this.locale),
+                textValue: __(`icons.${model.tileIcon.name}`, this.locale),
                 visible: true,
             },
         };

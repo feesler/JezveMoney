@@ -1,7 +1,7 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { LIMIT_CHANGE } from '../../../model/Transaction.js';
-import * as Actions from '../../../actions/transaction.js';
+import * as Actions from '../../actions/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();

@@ -119,6 +119,12 @@
   transform: rotate(180deg);
 }
 
+/* Rule item header */
+.rule-item.collapsible__expanded > .collapsible-header {
+  box-shadow: 0 2px 5px -2px #00000088;
+  z-index: 2;
+}
+
 /* Rule item content */
 .rule-item.collapsible__expanded > .collapsible-content {
   height: auto;

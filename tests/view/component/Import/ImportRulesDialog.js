@@ -1,5 +1,4 @@
 import {
-    copyObject,
     TestComponent,
     assert,
     hasFlag,
@@ -75,7 +74,8 @@ export class ImportRulesDialog extends TestComponent {
             (item) => ImportRuleItem.create(this.parent, item),
         );
 
-        res.paginator = await Paginator.create(res.rulesList.elem, await query('.paginator'));
+        res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
+        res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
 
         const ruleFormElem = await query(this.elem, '.rule-form');
         if (ruleFormElem) {
@@ -95,13 +95,14 @@ export class ImportRulesDialog extends TestComponent {
         res.loading = cont.loadingIndicator.visible;
         res.renderTime = cont.rulesList.renderTime;
         res.filter = cont.searchField.value;
-        res.rules = cont.items.map((item) => copyObject(item.model));
+        res.rules = cont.items.map((item) => structuredClone(item.model));
 
         res.contextMenuVisible = cont.contextMenu.visible;
 
         res.pagination = {
-            page: (cont.paginator) ? cont.paginator.active : 1,
-            pages: (cont.paginator) ? cont.paginator.pages : 1,
+            page: cont.paginator?.active ?? 1,
+            pages: cont.paginator?.pages ?? 1,
+            range: Math.max(Math.ceil(cont.items.length / ITEMS_ON_PAGE), 1),
         };
 
         const importRulesTok = __('IMPORT_RULES', App.view.locale);
@@ -113,7 +114,7 @@ export class ImportRulesDialog extends TestComponent {
             const isUpdate = (cont.header.title === updateRuleTok);
             res.state = (isUpdate) ? 'update' : 'create';
             if (cont.ruleForm) {
-                res.rule = copyObject(cont.ruleForm.model);
+                res.rule = structuredClone(cont.ruleForm.model);
                 res.ruleItem = cont.ruleForm.getExpectedRule();
             }
         }
@@ -121,7 +122,7 @@ export class ImportRulesDialog extends TestComponent {
         return res;
     }
 
-    getExpectedState(model) {
+    getExpectedState(model = this.model) {
         const isForm = this.isFormState(model);
         const isList = this.isListState(model);
         const res = {
@@ -141,20 +142,27 @@ export class ImportRulesDialog extends TestComponent {
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
                 : App.state.rules.data;
 
+            const pageNum = this.currentPage(model);
+
             const pagesCount = Math.ceil(filteredRules.length / ITEMS_ON_PAGE);
             const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
-            const lastItem = firstItem + ITEMS_ON_PAGE;
+            const lastItem = firstItem + ITEMS_ON_PAGE * model.pagination.range;
             const pageItems = filteredRules.slice(firstItem, lastItem);
+            const hasItems = pageItems.length > 0;
 
             res.items = pageItems.map((rule) => ImportRuleItem.render(rule));
 
             if (pagesCount > 1) {
                 res.paginator = {
                     visible: true,
-                    active: model.pagination.page,
+                    active: pageNum,
                     pages: pagesCount,
                 };
             }
+
+            res.showMoreBtn = {
+                visible: hasItems && pageNum < model.pagination.pages,
+            };
         } else if (isForm) {
             const titleToken = (model.state === 'create')
                 ? 'IMPORT_RULE_CREATE'
@@ -165,6 +173,10 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         return res;
+    }
+
+    currentPage(model = this.model) {
+        return model.pagination.page + model.pagination.range - 1;
     }
 
     getState(model = this.model) {
@@ -209,31 +221,69 @@ export class ImportRulesDialog extends TestComponent {
         await click(this.content.closeBtn);
     }
 
-    async goToFirstPage() {
+    onPageChanged(page) {
         assert(this.isListState(), 'Invalid state');
+        assert(page >= 1 && page <= this.model.pagination.pages, `Invalid page: ${page}`);
 
+        this.model.pagination.page = page;
+        this.model.pagination.range = 1;
+        return this.getExpectedState();
+    }
+
+    async goToFirstPage() {
         if (this.isFirstPage()) {
             return true;
         }
 
-        this.model.pagination.page = 1;
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.onPageChanged(1);
 
         await this.performAction(() => this.content.paginator.goToFirstPage());
 
-        return this.checkState();
+        return this.checkState(expected);
+    }
+
+    async goToLastPage() {
+        if (this.isLastPage()) {
+            return true;
+        }
+
+        const expected = this.onPageChanged(this.model.pagination.pages);
+
+        await this.performAction(() => this.content.paginator.goToLastPage());
+
+        return this.checkState(expected);
+    }
+
+    async goToPrevPage() {
+        assert(!this.isFirstPage(), 'Can\'t go to previous page');
+
+        const expected = this.onPageChanged(this.currentPage() - 1);
+
+        await this.performAction(() => this.content.paginator.goToPrevPage());
+
+        return this.checkState(expected);
     }
 
     async goToNextPage() {
-        assert(this.isListState(), 'Invalid state');
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
-        this.model.pagination.page += 1;
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.onPageChanged(this.currentPage() + 1);
 
         await this.performAction(() => this.content.paginator.goToNextPage());
 
-        return this.checkState();
+        return this.checkState(expected);
+    }
+
+    async showMore() {
+        assert(this.isListState(), 'Invalid state');
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        this.model.pagination.range += 1;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.showMoreBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async iteratePages() {
@@ -257,7 +307,7 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         this.model.filter = strValue;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.searchField.input(strValue));
 
@@ -272,7 +322,7 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         this.model.filter = '';
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.searchField.clear());
 
@@ -287,7 +337,7 @@ export class ImportRulesDialog extends TestComponent {
             conditions: [],
             actions: [],
         };
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await click(this.content.header.createBtn);
         await waitForFunction(async () => {
@@ -305,7 +355,7 @@ export class ImportRulesDialog extends TestComponent {
         assert(this.isListState(), 'Invalid state');
 
         this.model.contextMenuVisible = true;
-        let expected = this.getExpectedState(this.model);
+        let expected = this.getExpectedState();
 
         await this.performAction(() => this.content.items[ind].openMenu());
 
@@ -337,7 +387,7 @@ export class ImportRulesDialog extends TestComponent {
             actions: ruleActions,
         };
         this.model.contextMenuVisible = false;
-        expected = this.getExpectedState(this.model);
+        expected = this.getExpectedState();
 
         await this.performAction(() => this.content.updateBtn.click());
 
@@ -356,14 +406,14 @@ export class ImportRulesDialog extends TestComponent {
         assert.arrayIndex(this.content.items, ind);
 
         this.model.contextMenuVisible = true;
-        let expected = this.getExpectedState(this.model);
+        let expected = this.getExpectedState();
 
         await this.performAction(() => this.content.items[ind].openMenu());
 
         this.checkState(expected);
 
         this.model.contextMenuVisible = false;
-        expected = this.getExpectedState(this.model);
+        expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deleteBtn.click());
         await this.performAction(() => wait(this.content.ruleDeletePopupId, { visible: true }));
@@ -376,7 +426,7 @@ export class ImportRulesDialog extends TestComponent {
 
         const id = App.state.rules.indexToId(ind);
         App.state.deleteRules({ id });
-        expected = this.getExpectedState(this.model);
+        expected = this.getExpectedState();
 
         await this.content.delete_warning.clickOk();
         await wait(this.content.ruleDeletePopupId, { hidden: true });
@@ -438,7 +488,7 @@ export class ImportRulesDialog extends TestComponent {
                 invalidAction.feedbackVisible = true;
             }
         }
-        const expected = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         const prevTime = this.model.renderTime;
 
@@ -465,7 +515,7 @@ export class ImportRulesDialog extends TestComponent {
         assert(this.isFormState(), 'Invalid state');
 
         this.model.state = 'list';
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.content.ruleForm.cancel();
         await waitForFunction(async () => {

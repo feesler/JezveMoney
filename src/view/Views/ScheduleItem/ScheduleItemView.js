@@ -20,7 +20,6 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { TransactionForm } from '../../Components/TransactionForm/TransactionForm.js';
 
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
 import './ScheduleItemView.scss';
 
 /**

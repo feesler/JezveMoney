@@ -144,10 +144,10 @@ abstract class TemplateController extends Controller
     /**
      * Checks user status required for page access
      *
-     * @param bool $loggedIn logged in flag
+     * @param bool|null $loggedIn logged in flag, if null - available regardless of status
      * @param bool $adminOnly admin access flag
      */
-    public function checkUser(bool $loggedIn = true, bool $adminOnly = false)
+    public function checkUser(?bool $loggedIn = true, bool $adminOnly = false)
     {
         $this->uMod = UserModel::getInstance();
         // Check session and cookies
@@ -167,13 +167,13 @@ abstract class TemplateController extends Controller
             $this->owner_id = 0;
         }
 
-        if ($loggedIn) {      // user should be logged in to access
+        if ($loggedIn === true) {      // user should be logged in to access
             if (!$this->user_id) {
                 setLocation(BASEURL . "login/");
             } elseif ($adminOnly && !$this->uMod->isAdmin($this->user_id)) {
                 setLocation(BASEURL);
             }
-        } else { // user should be logged out ot access
+        } elseif ($loggedIn === false) { // user should be logged out ot access
             if ($this->user_id != 0) {
                 setLocation(BASEURL);
             }
@@ -185,10 +185,14 @@ abstract class TemplateController extends Controller
     /**
      * Returns profile data for view
      *
-     * @return array
+     * @return array|null
      */
     public function getProfileData()
     {
+        if (!$this->user_id) {
+            return null;
+        }
+
         return [
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,

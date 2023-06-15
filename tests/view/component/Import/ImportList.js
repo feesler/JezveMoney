@@ -3,7 +3,6 @@ import {
     assert,
     query,
     queryAll,
-    copyObject,
     asyncMap,
     evaluate,
 } from 'jezve-test';
@@ -139,7 +138,7 @@ export class ImportList extends TestComponent {
     getItemData(item) {
         assert(item, 'Invalid item');
 
-        const res = copyObject(item.data);
+        const res = structuredClone(item.data);
 
         return res;
     }

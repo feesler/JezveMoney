@@ -7,7 +7,7 @@ import {
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
-import * as Actions from '../../../actions/api/transaction.js';
+import * as Actions from '../../actions/api/transaction.js';
 import { dateToSeconds, formatProps } from '../../../common.js';
 
 const create = async () => {
@@ -31,156 +31,154 @@ const create = async () => {
     const weekDate1 = new Date(2022, 11, 30);
     const weekDate2 = new Date(2023, 0, 1);
 
-    const data = [{
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 100,
-        comment: '11',
-    }, {
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 7608,
-        dest_amount: 100,
-        dest_curr: EUR,
-        comment: '22',
-        category_id: FOOD_CATEGORY,
-    }, {
-        type: EXPENSE,
-        src_id: ACC_USD,
-        src_amount: 1,
-        date: App.datesSec.yesterday,
-        category_id: FOOD_CATEGORY,
-    }, {
-        type: INCOME,
-        dest_id: ACC_RUB,
-        dest_amount: 1000.50,
-        comment: 'lalala',
-    }, {
-        type: INCOME,
-        dest_id: ACC_USD,
-        src_amount: 6500,
-        dest_amount: 100,
-        src_curr: RUB,
-        comment: 'la',
-    }, {
-        type: TRANSFER,
-        src_id: ACC_RUB,
-        dest_id: CASH_RUB,
-        src_amount: 500,
-        dest_amount: 500,
-    }, {
-        type: TRANSFER,
-        src_id: ACC_RUB,
-        dest_id: ACC_USD,
-        src_amount: 6500,
-        dest_amount: 100,
-    }, {
-        type: DEBT,
-        op: 1,
-        person_id: PERSON_X,
-        acc_id: 0,
-        src_amount: 500,
-        src_curr: RUB,
-        comment: 'к кк',
-    }, {
-        type: DEBT,
-        op: 2,
-        person_id: PERSON_Y,
-        acc_id: 0,
-        dest_amount: 1000,
-        dest_curr: USD,
-        comment: 'к',
-    }, {
-        type: DEBT,
-        op: 1,
-        person_id: PERSON_X,
-        acc_id: 0,
-        src_amount: 500,
-        src_curr: RUB,
-        comment: 'ппп',
-    }, {
-        type: DEBT,
-        op: 2,
-        person_id: PERSON_Y,
-        acc_id: 0,
-        dest_amount: 1000,
-        dest_curr: USD,
-        category_id: FOOD_CATEGORY,
-    }, {
-        type: DEBT,
-        op: 1,
-        person_id: PERSON_X,
-        acc_id: ACC_RUB,
-        src_amount: 100,
-        src_curr: RUB,
-    }, {
-        type: DEBT,
-        op: 1,
-        person_id: PERSON_X,
-        acc_id: ACC_RUB,
-        src_amount: 100,
-        src_curr: USD,
-        dest_amount: 6500,
-        dest_curr: RUB,
-    }, {
-        type: DEBT,
-        op: 2,
-        person_id: PERSON_X,
-        acc_id: ACC_USD,
-        src_amount: 100,
-        src_curr: USD,
-        dest_amount: 91,
-        dest_curr: EUR,
-    }, {
-        type: LIMIT_CHANGE,
-        src_id: 0,
-        dest_id: ACCOUNT_3,
-        src_amount: 100,
-        dest_amount: 100,
-        src_curr: USD,
-        dest_curr: USD,
-    }, {
-        type: LIMIT_CHANGE,
-        src_id: BTC_CREDIT,
-        dest_id: 0,
-        src_amount: 0.01,
-        dest_amount: 0.01,
-        src_curr: BTC,
-        dest_curr: BTC,
-    }, {
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 123,
-        date: dateToSeconds(weekDate1),
-    }, {
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 456,
-        date: dateToSeconds(weekDate2),
-    }];
+    const data = {
+        TR_EXPENSE_1: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 100,
+            comment: '11',
+        },
+        TR_EXPENSE_2: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 7608,
+            dest_amount: 100,
+            dest_curr: EUR,
+            comment: '22',
+            category_id: FOOD_CATEGORY,
+        },
+        TR_EXPENSE_3: {
+            type: EXPENSE,
+            src_id: ACC_USD,
+            src_amount: 1,
+            date: App.datesSec.yesterday,
+            category_id: FOOD_CATEGORY,
+        },
+        TR_EXPENSE_4: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 123,
+            date: dateToSeconds(weekDate1),
+        },
+        TR_EXPENSE_5: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 456,
+            date: dateToSeconds(weekDate2),
+        },
+        TR_INCOME_1: {
+            type: INCOME,
+            dest_id: ACC_RUB,
+            dest_amount: 1000.50,
+            comment: 'lalala',
+        },
+        TR_INCOME_2: {
+            type: INCOME,
+            dest_id: ACC_USD,
+            src_amount: 6500,
+            dest_amount: 100,
+            src_curr: RUB,
+            comment: 'la',
+        },
+        TR_TRANSFER_1: {
+            type: TRANSFER,
+            src_id: ACC_RUB,
+            dest_id: CASH_RUB,
+            src_amount: 500,
+            dest_amount: 500,
+        },
+        TR_TRANSFER_2: {
+            type: TRANSFER,
+            src_id: ACC_RUB,
+            dest_id: ACC_USD,
+            src_amount: 6500,
+            dest_amount: 100,
+        },
+        TR_DEBT_1: {
+            type: DEBT,
+            op: 1,
+            person_id: PERSON_X,
+            acc_id: 0,
+            src_amount: 500,
+            src_curr: RUB,
+            comment: 'к кк',
+        },
+        TR_DEBT_2: {
+            type: DEBT,
+            op: 2,
+            person_id: PERSON_Y,
+            acc_id: 0,
+            dest_amount: 1000,
+            dest_curr: USD,
+            comment: 'к',
+        },
+        TR_DEBT_3: {
+            type: DEBT,
+            op: 1,
+            person_id: PERSON_X,
+            acc_id: 0,
+            src_amount: 500,
+            src_curr: RUB,
+            comment: 'ппп',
+        },
+        TR_DEBT_4: {
+            type: DEBT,
+            op: 2,
+            person_id: PERSON_Y,
+            acc_id: 0,
+            dest_amount: 1000,
+            dest_curr: USD,
+            category_id: FOOD_CATEGORY,
+        },
+        TR_DEBT_5: {
+            type: DEBT,
+            op: 1,
+            person_id: PERSON_X,
+            acc_id: ACC_RUB,
+            src_amount: 100,
+            src_curr: RUB,
+        },
+        TR_DEBT_6: {
+            type: DEBT,
+            op: 1,
+            person_id: PERSON_X,
+            acc_id: ACC_RUB,
+            src_amount: 100,
+            src_curr: USD,
+            dest_amount: 6500,
+            dest_curr: RUB,
+        },
+        TR_DEBT_7: {
+            type: DEBT,
+            op: 2,
+            person_id: PERSON_X,
+            acc_id: ACC_USD,
+            src_amount: 100,
+            src_curr: USD,
+            dest_amount: 91,
+            dest_curr: EUR,
+        },
+        TR_LIMIT_1: {
+            type: LIMIT_CHANGE,
+            src_id: 0,
+            dest_id: ACCOUNT_3,
+            src_amount: 100,
+            dest_amount: 100,
+            src_curr: USD,
+            dest_curr: USD,
+        },
+        TR_LIMIT_2: {
+            type: LIMIT_CHANGE,
+            src_id: BTC_CREDIT,
+            dest_id: 0,
+            src_amount: 0.01,
+            dest_amount: 0.01,
+            src_curr: BTC,
+            dest_curr: BTC,
+        },
+    };
 
-    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
-    // Double check all transactions created
-    res.forEach((item) => assert(item, 'Failed to create transaction'));
-
-    [
-        App.scenario.TR_EXPENSE_1,
-        App.scenario.TR_EXPENSE_2,
-        App.scenario.TR_EXPENSE_3,
-        App.scenario.TR_INCOME_1,
-        App.scenario.TR_INCOME_2,
-        App.scenario.TR_TRANSFER_1,
-        App.scenario.TR_TRANSFER_2,
-        App.scenario.TR_DEBT_1,
-        App.scenario.TR_DEBT_2,
-        App.scenario.TR_DEBT_3,
-        App.scenario.TR_DEBT_4,
-        App.scenario.TR_DEBT_5,
-        App.scenario.TR_DEBT_6,
-        App.scenario.TR_DEBT_7,
-        App.scenario.TR_LIMIT_1,
-        App.scenario.TR_LIMIT_2,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.extractAndCreate, data);
 };
 
 const createWithChainedRequest = async () => {
@@ -188,36 +186,32 @@ const createWithChainedRequest = async () => {
 
     const { EUR, ACC_RUB } = App.scenario;
 
-    const data = [{
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 10,
-        comment: 'Chained',
-        returnState: {
-            transactions: {},
-        },
-    }, {
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 4588,
-        dest_amount: 50,
-        dest_curr: EUR,
-        comment: 'Chained 2',
-        returnState: {
-            transactions: {
-                type: EXPENSE,
+    const data = {
+        TR_EXPENSE_CHAINED_1: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 10,
+            comment: 'Chained',
+            returnState: {
+                transactions: {},
             },
         },
-    }];
+        TR_EXPENSE_CHAINED_2: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 4588,
+            dest_amount: 50,
+            dest_curr: EUR,
+            comment: 'Chained 2',
+            returnState: {
+                transactions: {
+                    type: EXPENSE,
+                },
+            },
+        },
+    };
 
-    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
-    // Double check all transactions created
-    res.forEach((item) => assert(item, 'Failed to create transaction'));
-
-    [
-        App.scenario.TR_EXPENSE_CHAINED_1,
-        App.scenario.TR_EXPENSE_CHAINED_2,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.extractAndCreate, data);
 };
 
 const createInvalid = async () => {
@@ -449,27 +443,75 @@ const createMultiple = async () => {
     await Actions.extractAndCreateMultiple(data);
 };
 
+const createMultipleWithChainedRequest = async () => {
+    setBlock('Create multiple transactions with chained request', 2);
+
+    const {
+        RUB,
+        EUR,
+        ACC_RUB,
+        ACC_USD,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = {
+        data: {
+            TR_MULTI_CHAINED_1: {
+                type: EXPENSE,
+                src_id: ACC_RUB,
+                src_amount: 7608,
+                dest_amount: 100,
+                dest_curr: EUR,
+                date: App.datesSec.yesterday,
+                comment: 'multiple chained expense',
+                category_id: FOOD_CATEGORY,
+            },
+            TR_MULTI_CHAINED_2: {
+                type: INCOME,
+                dest_id: ACC_USD,
+                src_amount: 6500,
+                dest_amount: 100,
+                src_curr: RUB,
+                comment: 'multiple chained income',
+            },
+        },
+        returnState: {
+            transactions: {
+                type: [EXPENSE, INCOME],
+            },
+        },
+    };
+
+    await App.scenario.extractAndCreateMultiple(Actions, data);
+};
+
 const createMultipleInvalid = async () => {
     setBlock('Create multiple transactions with invalid data', 2);
 
     const data = [
         null,
-        [null],
-        [null, null],
-        [{
-            type: EXPENSE,
-            src_id: 0,
-            src_amount: 100,
-        }, {
-            type: EXPENSE,
-            src_id: App.scenario.ACC_RUB,
-            src_amount: 100,
-        }],
-        [{
-            type: EXPENSE,
-            src_id: App.scenario.ACC_RUB,
-            src_amount: 100,
-        }, null],
+        {},
+        { data: null },
+        { data: [null] },
+        { data: [null, null] },
+        {
+            data: [{
+                type: EXPENSE,
+                src_id: 0,
+                src_amount: 100,
+            }, {
+                type: EXPENSE,
+                src_id: App.scenario.ACC_RUB,
+                src_amount: 100,
+            }],
+        },
+        {
+            data: [{
+                type: EXPENSE,
+                src_id: App.scenario.ACC_RUB,
+                src_amount: 100,
+            }, null],
+        },
     ];
 
     await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
@@ -483,21 +525,17 @@ const confirmReminders = async () => {
         REMINDER_EXPENSE_1_3,
     } = App.scenario;
 
-    const data = [{
-        type: EXPENSE,
-        src_id: ACC_RUB,
-        src_amount: 100,
-        comment: 'Confirm reminder',
-        reminder_id: REMINDER_EXPENSE_1_3,
-    }];
+    const data = {
+        TR_EXPENSE_REMINDER_1: {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 100,
+            comment: 'Confirm reminder',
+            reminder_id: REMINDER_EXPENSE_1_3,
+        },
+    };
 
-    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
-    // Double check all transactions created
-    res.forEach((item) => assert(item, 'Failed to create transaction'));
-
-    [
-        App.scenario.TR_EXPENSE_REMINDER_1,
-    ] = res;
+    await App.scenario.createOneByOne(Actions.extractAndCreate, data);
 };
 
 const update = async () => {
@@ -904,8 +942,8 @@ const statistics = async () => {
 
     const data = [
         {},
-        { report: 'account', acc_id: ACC_RUB },
-        { report: 'account', acc_id: ACC_RUB, type: INCOME },
+        { report: 'account', accounts: ACC_RUB },
+        { report: 'account', accounts: ACC_RUB, type: INCOME },
         { report: 'currency', curr_id: RUB },
         { report: 'currency', curr_id: RUB, group: 'day' },
         { report: 'currency', curr_id: RUB, group: 'week' },
@@ -913,54 +951,54 @@ const statistics = async () => {
             report: 'currency',
             curr_id: RUB,
             group: 'week',
-            stdate: App.datesSec.monthAgo,
+            startDate: App.datesSec.monthAgo,
         },
         {
             report: 'currency',
             curr_id: RUB,
             group: 'week',
-            enddate: App.datesSec.now,
+            endDate: App.datesSec.now,
         },
         {
             report: 'currency',
             curr_id: RUB,
             group: 'week',
-            stdate: App.datesSec.monthAgo,
-            enddate: App.datesSec.now,
+            startDate: App.datesSec.monthAgo,
+            endDate: App.datesSec.now,
         },
         {
             report: 'account',
-            acc_id: ACC_RUB,
+            accounts: ACC_RUB,
             group: 'week',
             type: EXPENSE,
         },
         {
             report: 'account',
-            acc_id: ACC_RUB,
+            accounts: ACC_RUB,
             group: 'month',
             type: EXPENSE,
         },
         {
             report: 'account',
-            acc_id: ACC_RUB,
+            accounts: ACC_RUB,
             group: 'year',
             type: EXPENSE,
         },
         {
             report: 'category',
-            category_id: 0,
+            categories: 0,
             group: 'day',
             type: EXPENSE,
         },
         {
             report: 'category',
-            category_id: FOOD_CATEGORY,
+            categories: FOOD_CATEGORY,
             group: 'day',
             type: EXPENSE,
         },
         {
             report: 'category',
-            category_id: [FOOD_CATEGORY, BIKE_CATEGORY],
+            categories: [FOOD_CATEGORY, BIKE_CATEGORY],
             group: 'day',
             type: EXPENSE,
         },
@@ -980,6 +1018,7 @@ export const apiTransactionsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },
 

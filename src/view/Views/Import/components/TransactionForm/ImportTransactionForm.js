@@ -19,6 +19,7 @@ import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 import { AmountInputField } from '../../../../Components/AmountInputField/AmountInputField.js';
 import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
 import { DateInputField } from '../../../../Components/DateInputField/DateInputField.js';
+import { InputField } from '../../../../Components/InputField/InputField.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
@@ -28,7 +29,6 @@ import './ImportTransactionForm.scss';
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
-const DEFAULT_INPUT_CLASS = 'input stretch-input';
 /* Fields */
 const TYPE_FIELD_CLASS = 'form-row type-field';
 const ACCOUNT_FIELD_CLASS = 'form-row account-field';
@@ -42,6 +42,10 @@ const COMMENT_FIELD_CLASS = 'form-row comment-field';
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
 const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
+
+const validateDateOptions = {
+    fixShortYear: false,
+};
 
 const defaultProps = {
     isUpdate: false,
@@ -251,20 +255,14 @@ export class ImportTransactionForm extends Component {
     }
 
     createCommentField() {
-        this.commInp = createElement('input', {
-            props: {
-                className: DEFAULT_INPUT_CLASS,
-                type: 'text',
-                name: 'comment[]',
-                placeholder: __('TR_COMMENT'),
-                autocomplete: 'off',
-            },
-            events: { input: () => this.onCommentInput() },
-        });
-        this.commentField = Field.create({
-            title: __('TR_COMMENT'),
-            content: this.commInp,
+        this.commentField = InputField.create({
+            id: 'commentField',
+            inputId: 'commInp',
             className: COMMENT_FIELD_CLASS,
+            name: 'name',
+            title: __('TR_COMMENT'),
+            placeholder: __('TR_COMMENT'),
+            onInput: (e) => this.onCommentInput(e),
         });
     }
 
@@ -412,8 +410,8 @@ export class ImportTransactionForm extends Component {
     }
 
     /** Comment field 'input' event handler */
-    onCommentInput() {
-        const { value } = this.commInp;
+    onCommentInput(e) {
+        const { value } = e.target;
         const { transaction } = this.state;
         this.setState({
             ...this.state,
@@ -442,7 +440,7 @@ export class ImportTransactionForm extends Component {
             ? transaction.validateDestAmount()
             : true;
 
-        const date = window.app.isValidDateString(transaction.date);
+        const date = window.app.isValidDateString(transaction.date, validateDateOptions);
         const valid = (sourceAmount && destAmount && date);
 
         if (!valid) {
@@ -657,8 +655,11 @@ export class ImportTransactionForm extends Component {
         this.categorySelect.setSelection(transaction.categoryId);
 
         // Commend field
-        enable(this.commInp, transaction.enabled);
-        this.commInp.value = transaction.comment;
+        this.commentField.setState((commentState) => ({
+            ...commentState,
+            value: transaction.comment,
+            disabled: !transaction.enabled,
+        }));
     }
 
     /** Render component */
