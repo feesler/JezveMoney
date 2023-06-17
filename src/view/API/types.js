@@ -285,6 +285,7 @@ export const isTemplate = (obj) => verifyObject(obj, {
     account_id: isInt,
     type_id: isInt,
     first_row: isInt,
+    date_locale: isString,
     columns: isTemplateColumns,
 }, {
     user_id: isInt,

@@ -83,5 +83,6 @@ export class FormControls extends Component {
             url: state.cancelURL,
             disabled: state.disabled,
         }));
+        this.cancelBtn.show(state.cancelTitle);
     }
 }

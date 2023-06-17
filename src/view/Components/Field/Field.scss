@@ -11,11 +11,6 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: normal;
-
-  .checkbox {
-    --checkbox-text: var(--field-title-color);
-    --checkbox-label-size: 0.9rem;
-  }
 }
 
 .field__title {
@@ -27,4 +22,10 @@
 
 .field__content {
   font-size: var(--field-content-font-size);
+}
+
+.checkbox.checkbox-field,
+.field .checkbox {
+  --checkbox-text: var(--dimmed-text-color);
+  --checkbox-label-size: 0.9rem;
 }

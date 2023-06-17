@@ -76,7 +76,7 @@ class TransactionsFactory
         $params = $request["params"];
 
         $res->items = $this->getListItems($params);
-        $res->filter = $request["filter"];
+        $res->filter = (object)$request["filter"];
         $res->pagination = $request["pagination"];
         $res->order = (isset($params["desc"]) && $params["desc"] === true)
             ? "desc"

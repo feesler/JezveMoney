@@ -1,33 +1,68 @@
 import 'jezvejs/style';
-import 'jezvejs/style/Checkbox';
-import 'jezvejs/style/Radio';
 import {
     ge,
-    enable,
-    setEvents,
     isObject,
     isFunction,
     removeChilds,
     show,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { Offcanvas } from 'jezvejs/Offcanvas';
+
 import * as apiTypes from '../../../../view/API/types.js';
 import { App } from '../../../../view/Application/App.js';
 import '../../../../view/Application/Application.scss';
 import '../../utils/AdminView/AdminView.scss';
 import { AdminView } from '../../utils/AdminView/AdminView.js';
+
+import { Heading } from '../../../../view/Components/Heading/Heading.js';
+import { InputField } from '../../../../view/Components/InputField/InputField.js';
+
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
+import { ControllersMenu } from './components/ControllersMenu/ControllersMenu.js';
+
+import { ApiRequestForm } from './components/Forms/Common/ApiRequestForm/ApiRequestForm.js';
+import { ItemIdsForm } from './components/Forms/Common/ItemIdsForm/ItemIdsForm.js';
+import { SetPositionForm } from './components/Forms/Common/SetPositionForm/SetPositionForm.js';
+
+import { AccountForm } from './components/Forms/Accounts/AccountForm.js';
+import { AccountsListForm } from './components/Forms/Accounts/AccountsListForm.js';
+import { PersonsListForm } from './components/Forms/Persons/PersonsListForm.js';
+import { PersonForm } from './components/Forms/Persons/PersonForm.js';
+import { CategoriesListForm } from './components/Forms/Categories/CategoriesListForm.js';
+import { CategoryForm } from './components/Forms/Categories/CategoryForm.js';
+import { TransactionForm } from './components/Forms/Transactions/TransactionForm.js';
+import { TransactionsListForm } from './components/Forms/Transactions/TransactionsListForm.js';
+import { SetTransactionCategoryForm } from './components/Forms/Transactions/SetTransactionCategoryForm.js';
+import { StatisticsForm } from './components/Forms/Transactions/StatisticsForm.js';
+import { ScheduledTransactionForm } from './components/Forms/Schedule/ScheduledTransactionForm.js';
+import { RemindersListForm } from './components/Forms/Reminders/RemindersListForm.js';
+import { ImportTemplateForm } from './components/Forms/ImportTemplates/ImportTemplateForm.js';
+import { ImportRuleForm } from './components/Forms/ImportRules/ImportRuleForm.js';
+import { ImportConditionForm } from './components/Forms/ImportConditions/ImportConditionForm.js';
+import { ImportActionForm } from './components/Forms/ImportActions/ImportActionForm.js';
+import { CurrencyForm } from './components/Forms/Currencies/CurrencyForm.js';
+import { IconForm } from './components/Forms/Icons/IconForm.js';
+import { UserCurrencyForm } from './components/Forms/UserCurrencies/UserCurrencyForm.js';
+
 import './ApiConsoleView.scss';
+
+const defaultProps = {
+    activeController: 'account',
+    activeMethod: 'listAccForm',
+};
 
 /**
  * Admin currecny list view
  */
 class AdminApiConsoleView extends AdminView {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
-        this.activeController = null;
-        this.activeFormLink = null;
         this.activeForm = null;
 
         this.defaultSubmitHandler = (e) => this.onFormSubmit(e);
@@ -39,34 +74,40 @@ class AdminApiConsoleView extends AdminView {
     onStart(...args) {
         super.onStart(...args);
 
-        const apiMenuContainer = ge('apiMenu');
+        this.loadElementsByIds([
+            'heading',
+            'formsContainer',
+            'apiMenu',
+            'apiMenuContent',
+            'apiMenuControls',
+            'resultsHeading',
+            'resultsContainer',
+        ]);
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: 'API console',
+        });
+
         this.apiMenu = Offcanvas.create({
-            content: apiMenuContainer,
+            content: this.apiMenu,
             className: 'navigation methods-menu',
         });
 
-        this.toggleMethodsBtn = ge('toggleMethodsBtn');
-        setEvents(this.toggleMethodsBtn, { click: () => this.toggleMethodsMenu() });
-        this.closeMethodsBtn = apiMenuContainer.querySelector('.close-btn');
-        setEvents(this.closeMethodsBtn, { click: () => this.hideMethodsMenu() });
+        // Show API menu button
+        const toggleMethodsBtn = Button.create({
+            className: 'action-button methods-toggle-btn',
+            title: 'Methods',
+            onClick: () => this.toggleMethodsMenu(),
+        });
+        this.heading.actionsContainer.append(toggleMethodsBtn.elem);
 
-        this.controllersList = ge('controllersList');
-        if (!this.controllersList) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(this.controllersList, { click: (e) => this.onContrClick(e) });
-
-        this.activeForm = document.querySelector('.request-data-form.active');
-        this.activeController = document.querySelector('#controllersList > li.active');
-        this.activeFormLink = document.querySelector('#controllersList > li.active > .sub-menu-list > li.active');
-
-        this.resultsContainer = ge('results');
-        this.clearResultsBtn = ge('clearResultsBtn');
-        if (!this.resultsContainer || !this.clearResultsBtn) {
-            throw new Error('Fail to init view');
-        }
-
-        setEvents(this.clearResultsBtn, { click: () => this.clearResults() });
+        // Hide API menu button
+        const closeMethodsBtn = Button.create({
+            icon: 'back',
+            className: 'back-btn',
+            onClick: () => this.hideMethodsMenu(),
+        });
+        this.apiMenuControls.prepend(closeMethodsBtn.elem);
 
         this.initCommonForms();
         this.initAccountForms();
@@ -84,388 +125,1008 @@ class AdminApiConsoleView extends AdminView {
         this.initUserForms();
         this.initUserCurrencyForms();
         this.initProfileForms();
-    }
 
-    /** Initialization of checkboxes of specified form */
-    initCheckboxes(form) {
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
-    }
+        // API controllers menu
+        this.controllersList = ControllersMenu.create({
+            id: 'controllersList',
+            activeController: this.props.activeController,
+            activeMethod: this.props.activeMethod,
+            onMethodSelect: (formId) => this.activateView(formId),
+        });
+        this.apiMenuContent.append(this.controllersList.elem);
 
-    /** Initialization of create/update form */
-    initForm(selector, handler = null) {
-        const form = document.querySelector(selector);
-        if (!form) {
-            throw new Error('Failed to initialize form');
-        }
+        this.activateView(this.props.activeMethod);
 
-        setEvents(form, { submit: handler ?? this.defaultSubmitHandler });
-        this.initCheckboxes(form);
-    }
-
-    /** Initialization of delete form */
-    initIdsForm(selector) {
-        this.initForm(selector, (e) => this.onDeleteItemsSubmit(e));
+        // Clear results button
+        this.clearResultsBtn = Button.create({
+            title: 'Clear',
+            disabled: true,
+            className: 'link-btn',
+            onClick: () => this.clearResults(),
+        });
+        this.resultsHeading.append(this.clearResultsBtn.elem);
     }
 
     /** Initialization of forms for State API controller */
     initCommonForms() {
-        this.initForm('#readStateForm > form');
-        this.initForm('#mainStateForm > form');
-        this.initForm('#dbVersionForm > form');
+        const readStateForm = ApiRequestForm.create({
+            id: 'readStateForm',
+            title: 'Read state',
+            action: this.getRequestURL('state'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const mainStateForm = ApiRequestForm.create({
+            id: 'mainStateForm',
+            title: 'Read main state',
+            action: this.getRequestURL('state/main'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const dbVersionForm = ApiRequestForm.create({
+            id: 'dbVersionForm',
+            title: 'Read DB version',
+            action: this.getRequestURL('state/version'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            readStateForm.elem,
+            mainStateForm.elem,
+            dbVersionForm.elem,
+        );
+    }
+
+    getRequestURL(apiMethod) {
+        return `${App.baseURL}api/${apiMethod}`;
     }
 
     /** Initialization of forms for Account API controller */
     initAccountForms() {
-        this.initForm('#listAccForm > form', this.getVerifyHandler(apiTypes.isAccountsArray));
+        const listForm = AccountsListForm.create({
+            id: 'listAccForm',
+            onSubmit: this.getVerifyHandler(apiTypes.isAccountsArray),
+        });
 
-        const readaccbtn = ge('readaccbtn');
-        if (!readaccbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readaccbtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'readaccid', 'account/', apiTypes.isAccountsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readAccForm',
+            title: 'Read accounts by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'account/', apiTypes.isAccountsArray)
             ),
         });
 
-        this.initForm('#createAccForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateAccForm > form');
-        this.initIdsForm('#showAccForm > form');
-        this.initIdsForm('#hideAccForm > form');
-        this.initIdsForm('#delAccForm > form');
-        this.initForm('#setAccPosForm > form');
+        const createForm = AccountForm.create({
+            id: 'createAccForm',
+            title: 'Create account',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = AccountForm.create({
+            id: 'updateAccForm',
+            title: 'Update account',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const showForm = ItemIdsForm.create({
+            id: 'showAccForm',
+            title: 'Show accounts',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('account/show'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const hideForm = ItemIdsForm.create({
+            id: 'hideAccForm',
+            title: 'Hide accounts',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('account/hide'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delAccForm',
+            title: 'Delete accounts',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('account/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const setPosForm = SetPositionForm.create({
+            id: 'setAccPosForm',
+            title: 'Set position of account',
+            returnStateField: true,
+            action: this.getRequestURL('account/setpos'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            showForm.elem,
+            hideForm.elem,
+            delForm.elem,
+            setPosForm.elem,
+        );
     }
 
     /** Initialization of forms for Person API controller */
     initPersonForms() {
-        this.initForm('#listPersonsForm > form', this.getVerifyHandler(apiTypes.isPersonsArray));
+        const listForm = PersonsListForm.create({
+            id: 'listPersonsForm',
+            onSubmit: this.getVerifyHandler(apiTypes.isPersonsArray),
+        });
 
-        const readpersonbtn = ge('readpersonbtn');
-        if (!readpersonbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readpersonbtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'read_person_id', 'person/', apiTypes.isPersonsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readPersonForm',
+            title: 'Read persons by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'person/', apiTypes.isPersonsArray)
             ),
         });
 
-        this.initForm('#createPersonForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updatePersonForm > form');
-        this.initIdsForm('#showPersonForm > form');
-        this.initIdsForm('#hidePersonForm > form');
-        this.initIdsForm('#delPersonForm > form');
-        this.initForm('#setPersonPosForm > form');
+        const createForm = PersonForm.create({
+            id: 'createPersonForm',
+            title: 'Create person',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = PersonForm.create({
+            id: 'updatePersonForm',
+            title: 'Update person',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const showForm = ItemIdsForm.create({
+            id: 'showPersonForm',
+            title: 'Show persons',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('person/show'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const hideForm = ItemIdsForm.create({
+            id: 'hidePersonForm',
+            title: 'Hide persons',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('person/hide'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delPersonForm',
+            title: 'Delete persons',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('person/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const setPosForm = SetPositionForm.create({
+            id: 'setPersonPosForm',
+            title: 'Set position of person',
+            returnStateField: true,
+            action: this.getRequestURL('person/setpos'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            showForm.elem,
+            hideForm.elem,
+            delForm.elem,
+            setPosForm.elem,
+        );
     }
 
     /** Initialization of forms for Category API controller */
     initCategoryForms() {
-        this.initForm(
-            '#listCategoriesForm > form',
-            this.getVerifyHandler(apiTypes.isCategoriesArray),
-        );
+        const listForm = CategoriesListForm.create({
+            id: 'listCategoriesForm',
+            onSubmit: this.getVerifyHandler(apiTypes.isCategoriesArray),
+        });
 
-        const readCategoryBtn = ge('readCategoryBtn');
-        if (!readCategoryBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readCategoryBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'read_category_id', 'category/', apiTypes.isCategoriesArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readCategoryForm',
+            title: 'Read categories by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'category/', apiTypes.isCategoriesArray)
             ),
         });
 
-        this.initForm('#createCategoryForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateCategoryForm > form');
-        this.initForm('#delCategoryForm > form', (e) => this.onDeleteCategoriesSubmit(e));
-        this.initForm('#setCategoryPosForm > form');
+        const createForm = CategoryForm.create({
+            id: 'createCategoryForm',
+            title: 'Create category',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = CategoryForm.create({
+            id: 'updateCategoryForm',
+            title: 'Update category',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delCategoryForm',
+            title: 'Delete categories',
+            method: 'post',
+            additionalFields: [
+                Checkbox.create({
+                    label: 'Delete child categories',
+                    name: 'removeChild',
+                    className: 'checkbox-field form-row',
+                }).elem,
+            ],
+            returnStateField: true,
+            action: this.getRequestURL('category/delete'),
+            onSubmit: (e) => this.onDeleteCategoriesSubmit(e),
+        });
+
+        const setPosForm = SetPositionForm.create({
+            id: 'setCategoryPosForm',
+            title: 'Set position of category',
+            additionalFields: [
+                InputField.create({
+                    title: 'Parent category',
+                    name: 'parent_id',
+                    className: 'form-row',
+                }).elem,
+            ],
+            returnStateField: true,
+            action: this.getRequestURL('category/setpos'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+            setPosForm.elem,
+        );
     }
 
     /** Initialization of forms for Transaction API controller */
     initTransactionForms() {
-        this.initForm('#listTrForm > form', (e) => this.onListTransactionSubmit(e));
+        const listForm = TransactionsListForm.create({
+            id: 'listTrForm',
+            onSubmit: (e) => this.onListTransactionSubmit(e),
+        });
 
-        // Read transactions by ids form
-        const readtransbtn = ge('readtransbtn');
-        if (!readtransbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readtransbtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'read_trans_id', 'transaction/', apiTypes.isTransactionsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readTrForm',
+            title: 'Read transactions by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'transaction/', apiTypes.isTransactionsArray)
             ),
         });
 
-        this.initForm('#createTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#createDebtForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateTrForm > form');
-        this.initForm('#updateDebtForm > form');
-        this.initIdsForm('#delTrForm > form');
-        this.initForm('#setTrCategoryForm > form', (e) => this.onSetCategorySubmit(e));
-        this.initForm('#setTrPosForm > form');
-        this.initForm('#statisticsForm > form', (e) => this.onStatisticsSubmit(e));
-
-        const statisticsFilter = ge('statistics-filter');
-        setEvents(statisticsFilter, {
-            change: () => {
-                const { value } = statisticsFilter;
-                enable('statistics_curr', (value === 'currency'));
-                enable('statistics_acc', (value === 'account'));
-                enable('statistics_cat', (value === 'category'));
-            },
+        const createForm = TransactionForm.create({
+            id: 'createTrForm',
+            title: 'Create transaction',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
+
+        const createDebtForm = TransactionForm.create({
+            id: 'createDebtForm',
+            title: 'Create debt',
+            isDebt: true,
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = TransactionForm.create({
+            id: 'updateTrForm',
+            title: 'Update transaction',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const updateDebtForm = TransactionForm.create({
+            id: 'updateDebtForm',
+            title: 'Update debt',
+            isUpdate: true,
+            isDebt: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delTrForm',
+            title: 'Delete transactions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('transaction/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const setCategoryForm = SetTransactionCategoryForm.create({
+            id: 'setTrCategoryForm',
+            onSubmit: (e) => this.onSetCategorySubmit(e),
+        });
+
+        const setPosForm = SetPositionForm.create({
+            id: 'setTrPosForm',
+            title: 'Set position of transaction',
+            returnStateField: true,
+            action: this.getRequestURL('transaction/setpos'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const statisticsForm = StatisticsForm.create({
+            id: 'statisticsForm',
+            onSubmit: (e) => this.onStatisticsSubmit(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            createDebtForm.elem,
+            updateForm.elem,
+            updateDebtForm.elem,
+            delForm.elem,
+            setPosForm.elem,
+            setCategoryForm.elem,
+            statisticsForm.elem,
+        );
     }
 
     /** Initialization of forms for Scheduled Transaction API controller */
     initScheduledTransactionForms() {
-        this.initForm(
-            '#listScheduledTrForm > form',
-            this.getVerifyHandler(apiTypes.isScheduledTransactionsArray),
-        );
+        const listForm = ApiRequestForm.create({
+            id: 'listScheduledTrForm',
+            action: this.getRequestURL('schedule/list'),
+            onSubmit: this.getVerifyHandler(apiTypes.isScheduledTransactionsArray),
+        });
 
-        // Read scheduled transactions by ids form
-        const readtransbtn = ge('readScheduledTransBtn');
-        if (!readtransbtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readtransbtn, {
-            click: (e) => this.onReadItemsSubmit(
-                e,
-                'read_scheduled_trans_id',
-                'schedule/',
-                apiTypes.isScheduledTransactionsArray,
+        const readForm = ItemIdsForm.create({
+            id: 'readScheduledTrForm',
+            title: 'Read scheduled transactions by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'schedule/', apiTypes.isScheduledTransactionsArray)
             ),
         });
 
-        this.initForm('#createScheduledTrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateScheduledTrForm > form');
-        this.initIdsForm('#delScheduledTrForm > form');
+        const createForm = ScheduledTransactionForm.create({
+            id: 'createScheduledTrForm',
+            title: 'Create scheduled transaction',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const createDebtForm = ScheduledTransactionForm.create({
+            id: 'createScheduledDebtForm',
+            title: 'Create scheduled debt',
+            isDebt: true,
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = ScheduledTransactionForm.create({
+            id: 'updateScheduledTrForm',
+            title: 'Update scheduled transaction',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const updateDebtForm = ScheduledTransactionForm.create({
+            id: 'updateScheduledDebtForm',
+            title: 'Update scheduled debt',
+            isUpdate: true,
+            isDebt: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delScheduledTrForm',
+            title: 'Delete scheduled transactions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('schedule/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            createDebtForm.elem,
+            updateForm.elem,
+            updateDebtForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Reminder API controller */
     initRemindersForms() {
-        this.initForm(
-            '#listReminderForm > form',
-            this.getVerifyHandler(apiTypes.isRemindersArray),
-        );
+        const listForm = RemindersListForm.create({
+            id: 'listReminderForm',
+            title: 'List reminders',
+            onSubmit: this.getVerifyHandler(apiTypes.isRemindersArray),
+        });
 
-        // Read reminders by ids form
-        const readRemindersBtn = ge('readRemindersBtn');
-        if (!readRemindersBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readRemindersBtn, {
-            click: (e) => this.onReadItemsSubmit(
-                e,
-                'read_reminder_id',
-                'reminder/',
-                apiTypes.isRemindersArray,
+        const readForm = ItemIdsForm.create({
+            id: 'readReminderForm',
+            title: 'Read reminders by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'reminder/', apiTypes.isRemindersArray)
             ),
         });
 
-        this.initForm('#confirmReminderForm > form');
-        this.initForm('#cancelReminderForm > form');
+        const confirmForm = ApiRequestForm.create({
+            id: 'confirmReminderForm',
+            title: 'Confirm reminder',
+            method: 'post',
+            action: this.getRequestURL('reminder/confirm/'),
+            inputFields: [
+                { title: 'Id', name: 'id' },
+            ],
+            optionalFields: [
+                { title: 'Transaction id', name: 'transaction_id' },
+            ],
+            returnStateField: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const cancelForm = ApiRequestForm.create({
+            id: 'cancelReminderForm',
+            title: 'Cancel reminder',
+            method: 'post',
+            action: this.getRequestURL('reminder/cancel/'),
+            inputFields: [
+                { title: 'Id', name: 'id' },
+            ],
+            returnStateField: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            confirmForm.elem,
+            cancelForm.elem,
+        );
     }
 
     /** Initialization of forms for Import template API controller */
     initTemplateForms() {
-        this.initForm('#listTplForm > form', this.getVerifyHandler(apiTypes.isTemplatesArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listTplForm',
+            title: 'List import templates',
+            action: this.getRequestURL('importtpl/list/'),
+            onSubmit: this.getVerifyHandler(apiTypes.isTemplatesArray),
+        });
 
-        const readBtn = ge('readtplbtn');
-        if (!readBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'readtplid', 'importtpl/', apiTypes.isTemplatesArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readTplForm',
+            title: 'Read templates by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'importtpl/', apiTypes.isTemplatesArray)
             ),
         });
 
-        this.initForm('#createTplForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateTplForm > form');
-        this.initIdsForm('#delTplForm > form');
+        const createForm = ImportTemplateForm.create({
+            id: 'createTplForm',
+            title: 'Create import template',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = ImportTemplateForm.create({
+            id: 'updateTplForm',
+            title: 'Update import template',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delTplForm',
+            title: 'Delete import templates',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('importtpl/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Import rules API controller */
     initRuleForms() {
-        this.initForm('#listRuleForm > form', this.getVerifyHandler(apiTypes.isImportRulesArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listRuleForm',
+            title: 'List import rules',
+            action: this.getRequestURL('importrule/list/'),
+            additionalFields: [
+                Checkbox.create({
+                    label: 'List for all users',
+                    name: 'full',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Return extended objects',
+                    name: 'extended',
+                    className: 'checkbox-field form-row',
+                }).elem,
+            ],
+            onSubmit: this.getVerifyHandler(apiTypes.isImportRulesArray),
+        });
 
-        const readBtn = ge('readrulebtn');
-        if (!readBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'readruleid', 'importrule/', apiTypes.isImportRulesArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readRuleForm',
+            title: 'Read import rules by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'importrule/', apiTypes.isImportRulesArray)
             ),
         });
 
-        this.initForm('#createRuleForm > form', (e) => this.onRuleFormSubmit(e, apiTypes.isCreateResult));
-        this.initForm('#updateRuleForm > form', (e) => this.onRuleFormSubmit(e));
-        this.initIdsForm('#delRuleForm > form');
+        const createForm = ImportRuleForm.create({
+            id: 'createRuleForm',
+            title: 'Create import rule',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = ImportRuleForm.create({
+            id: 'updateRuleForm',
+            title: 'Update import rule',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delRuleForm',
+            title: 'Delete import rules',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('importrule/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Import conditions API controller */
     initConditionForms() {
-        this.initForm('#listCondForm > form', this.getVerifyHandler(apiTypes.isConditionsArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listCondForm',
+            title: 'List import conditions',
+            action: this.getRequestURL('importcond/list/'),
+            optionalFields: [
+                { title: 'Import rule id', name: 'rule' },
+            ],
+            additionalFields: [
+                Checkbox.create({
+                    label: 'List for all users',
+                    name: 'full',
+                    className: 'checkbox-field form-row',
+                }).elem,
+            ],
+            onSubmit: this.getVerifyHandler(apiTypes.isConditionsArray),
+        });
 
-        const readBtn = ge('readcondbtn');
-        if (!readBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'readcondid', 'importcond/', apiTypes.isConditionsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readCondForm',
+            title: 'Read import conditions by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'importcond/', apiTypes.isConditionsArray)
             ),
         });
 
-        this.initForm('#createCondForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateCondForm > form');
-        this.initIdsForm('#delCondForm > form');
+        const createForm = ImportConditionForm.create({
+            id: 'createCondForm',
+            title: 'Create import condition',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = ImportConditionForm.create({
+            id: 'updateCondForm',
+            title: 'Update import condition',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delCondForm',
+            title: 'Delete import conditions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('importcond/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Import actions API controller */
     initActionForms() {
-        this.initForm('#listActForm > form', this.getVerifyHandler(apiTypes.isActionsArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listActForm',
+            title: 'List import actions',
+            action: this.getRequestURL('importaction/list/'),
+            optionalFields: [
+                { title: 'Import rule id', name: 'rule' },
+            ],
+            additionalFields: [
+                Checkbox.create({
+                    label: 'List for all users',
+                    name: 'full',
+                    className: 'checkbox-field form-row',
+                }).elem,
+            ],
+            onSubmit: this.getVerifyHandler(apiTypes.isActionsArray),
+        });
 
-        const readBtn = ge('readactbtn');
-        if (!readBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'readactid', 'importaction/', apiTypes.isActionsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readActForm',
+            title: 'Read import actions by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'importaction/', apiTypes.isActionsArray)
             ),
         });
 
-        this.initForm('#createActForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateActForm > form');
-        this.initIdsForm('#delActForm > form');
+        const createForm = ImportActionForm.create({
+            id: 'createActForm',
+            title: 'Create import action',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = ImportActionForm.create({
+            id: 'updateActForm',
+            title: 'Update import action',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delActForm',
+            title: 'Delete import actions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('importaction/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Currency API controller */
     initCurrencyForms() {
-        this.initForm('#listCurrForm > form', this.getVerifyHandler(apiTypes.isCurrenciesArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listCurrForm',
+            title: 'List currencies',
+            action: this.getRequestURL('currency/list/'),
+            onSubmit: this.getVerifyHandler(apiTypes.isCurrenciesArray),
+        });
 
-        const readCurrBtn = ge('readcurrbtn');
-        if (!readCurrBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readCurrBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'read_curr_id', 'currency/', apiTypes.isCurrenciesArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readCurrForm',
+            title: 'Read currencies by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'currency/', apiTypes.isCurrenciesArray)
             ),
         });
 
-        this.initForm('#createCurrForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateCurrForm > form');
-        this.initIdsForm('#delCurrForm > form');
+        const createForm = CurrencyForm.create({
+            id: 'createCurrForm',
+            title: 'Create currency',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = CurrencyForm.create({
+            id: 'updateCurrForm',
+            title: 'Update currency',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delCurrForm',
+            title: 'Delete currencies',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('currency/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for Icon API controller */
     initIconForms() {
-        this.initForm('#listIconForm > form', this.getVerifyHandler(apiTypes.isIconsArray));
+        const listForm = ApiRequestForm.create({
+            id: 'listIconForm',
+            title: 'List icons',
+            action: this.getRequestURL('icon/list/'),
+            onSubmit: this.getVerifyHandler(apiTypes.isIconsArray),
+        });
 
-        const readIconBtn = ge('read_icon_btn');
-        if (!readIconBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readIconBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(e, 'read_icon_id', 'icon/', apiTypes.isIconsArray)
+        const readForm = ItemIdsForm.create({
+            id: 'readIconForm',
+            title: 'Read icons by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'icon/', apiTypes.isIconsArray)
             ),
         });
 
-        this.initForm('#createIconForm > form', this.getVerifyHandler(apiTypes.isCreateResult));
-        this.initForm('#updateIconForm > form');
-        this.initIdsForm('#delIconForm > form');
+        const createForm = IconForm.create({
+            id: 'createIconForm',
+            title: 'Create icon',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = IconForm.create({
+            id: 'updateIconForm',
+            title: 'Update icon',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delIconForm',
+            title: 'Delete icons',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('icon/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+        );
     }
 
     /** Initialization of forms for User API controller */
     initUserForms() {
-        const loginForm = document.querySelector('#loginForm > form');
-        if (!loginForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(loginForm, { submit: (e) => this.onFormSubmit(e) });
+        const loginForm = ApiRequestForm.create({
+            id: 'loginForm',
+            title: 'Login',
+            action: this.getRequestURL('login/'),
+            method: 'post',
+            inputFields: [
+                { title: 'Login', name: 'login' },
+                { title: 'Password', name: 'password' },
+            ],
+            onSubmit: this.defaultSubmitHandler,
+        });
 
-        const logoutForm = document.querySelector('#logoutForm > form');
-        if (!logoutForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(logoutForm, { submit: (e) => this.onFormSubmit(e) });
+        const logoutForm = ApiRequestForm.create({
+            id: 'logoutForm',
+            title: 'Log out',
+            action: this.getRequestURL('logout'),
+            method: 'post',
+            onSubmit: this.defaultSubmitHandler,
+        });
 
-        const registerForm = document.querySelector('#registerForm > form');
-        if (!registerForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(registerForm, { submit: (e) => this.onFormSubmit(e) });
+        const registerForm = ApiRequestForm.create({
+            id: 'registerForm',
+            title: 'Registration',
+            action: this.getRequestURL('register/'),
+            method: 'post',
+            inputFields: [
+                { title: 'Login', name: 'login' },
+                { title: 'Password', name: 'password' },
+                { title: 'Name', name: 'name' },
+            ],
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            loginForm.elem,
+            logoutForm.elem,
+            registerForm.elem,
+        );
     }
 
     /** Initialization of forms for User Currencies API controller */
     initUserCurrencyForms() {
-        this.initForm(
-            '#listUserCurrencyForm > form',
-            this.getVerifyHandler(apiTypes.isUserCurrenciesArray),
-        );
+        const listForm = ApiRequestForm.create({
+            id: 'listUserCurrencyForm',
+            title: 'List currencies',
+            action: this.getRequestURL('usercurrency/list/'),
+            optionalFields: [
+                { title: 'Currency id', name: 'curr_id' },
+            ],
+            onSubmit: this.getVerifyHandler(apiTypes.isUserCurrenciesArray),
+        });
 
-        const readBtn = ge('readUserCurrencyBtn');
-        if (!readBtn) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readBtn, {
-            click: (e) => (
-                this.onReadItemsSubmit(
-                    e,
-                    'read_user_currency_id',
-                    'usercurrency/',
-                    apiTypes.isUserCurrenciesArray,
-                )
+        const readForm = ItemIdsForm.create({
+            id: 'readUserCurrencyForm',
+            title: 'Read user currencies by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'usercurrency/', apiTypes.isUserCurrenciesArray)
             ),
         });
 
-        this.initForm(
-            '#createUserCurrencyForm > form',
-            this.getVerifyHandler(apiTypes.isCreateResult),
+        const createForm = UserCurrencyForm.create({
+            id: 'createUserCurrencyForm',
+            title: 'Create user currency',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        const updateForm = UserCurrencyForm.create({
+            id: 'updateUserCurrencyForm',
+            title: 'Update user currency',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        const delForm = ItemIdsForm.create({
+            id: 'delUserCurrencyForm',
+            title: 'Delete user currencies',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('usercurrency/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
+        const setPosForm = SetPositionForm.create({
+            id: 'setUserCurrencyPosForm',
+            title: 'Set position of user currency',
+            returnStateField: true,
+            action: this.getRequestURL('usercurrency/setpos'),
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            listForm.elem,
+            readForm.elem,
+            createForm.elem,
+            updateForm.elem,
+            delForm.elem,
+            setPosForm.elem,
         );
-        this.initForm('#updateUserCurrencyForm > form');
-        this.initIdsForm('#delUserCurrencyForm > form');
-        this.initForm('#setUserCurrencyPosForm > form');
     }
 
     /** Initialization of forms for Profile API controller */
     initProfileForms() {
-        const readProfileForm = document.querySelector('#readProfileForm > form');
-        if (!readProfileForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(readProfileForm, { submit: this.getVerifyHandler(apiTypes.isProfile) });
+        const readForm = ApiRequestForm.create({
+            id: 'readProfileForm',
+            title: 'Read profile',
+            action: this.getRequestURL('profile/read'),
+            onSubmit: this.getVerifyHandler(apiTypes.isProfile),
+        });
 
-        const changeNameForm = document.querySelector('#changeNameForm > form');
-        if (!changeNameForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(changeNameForm, { submit: (e) => this.onFormSubmit(e) });
+        const changeNameForm = ApiRequestForm.create({
+            id: 'changeNameForm',
+            title: 'Change name',
+            action: this.getRequestURL('profile/changename'),
+            method: 'post',
+            inputFields: [
+                { title: 'Name', name: 'name' },
+            ],
+            onSubmit: this.defaultSubmitHandler,
+        });
 
-        const changePwdForm = document.querySelector('#changePwdForm > form');
-        if (!changePwdForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(changePwdForm, { submit: (e) => this.onFormSubmit(e) });
+        const changePwdForm = ApiRequestForm.create({
+            id: 'changePwdForm',
+            title: 'Change password',
+            action: this.getRequestURL('profile/changepass'),
+            method: 'post',
+            inputFields: [
+                { title: 'Current password', name: 'current' },
+                { title: 'New password', name: 'new' },
+            ],
+            onSubmit: this.defaultSubmitHandler,
+        });
 
-        const updateSettingsForm = document.querySelector('#updateSettingsForm > form');
-        if (!updateSettingsForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(updateSettingsForm, { submit: (e) => this.onUpdateSettingsSubmit(e) });
+        const updateSettingsForm = ApiRequestForm.create({
+            id: 'updateSettingsForm',
+            title: 'Update settings',
+            action: this.getRequestURL('profile/updateSettings'),
+            method: 'post',
+            inputFields: [
+                { title: 'Setting name', name: 'name' },
+                { title: 'New value', name: 'value' },
+            ],
+            onSubmit: (e) => this.onUpdateSettingsSubmit(e),
+        });
 
-        const resetForm = document.querySelector('#resetForm > form');
-        if (!resetForm) {
-            throw new Error('Fail to init view');
-        }
-        setEvents(resetForm, { submit: (e) => this.onFormSubmit(e) });
-        this.initCheckboxes(resetForm);
+        const resetForm = ApiRequestForm.create({
+            id: 'resetForm',
+            title: 'Reset data',
+            action: this.getRequestURL('profile/reset'),
+            method: 'post',
+            additionalFields: [
+                Checkbox.create({
+                    label: 'Currencies',
+                    name: 'currencies',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Accounts',
+                    name: 'accounts',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Persons',
+                    name: 'persons',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Categories',
+                    name: 'categories',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Transactions',
+                    name: 'transactions',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Keep current balance of accounts',
+                    name: 'keepbalance',
+                    className: 'checkbox-field form-row suboption',
+                }).elem,
+                Checkbox.create({
+                    label: 'Scheduled transactions',
+                    name: 'schedule',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Import templates',
+                    name: 'importtpl',
+                    className: 'checkbox-field form-row',
+                }).elem,
+                Checkbox.create({
+                    label: 'Import rules',
+                    name: 'importrules',
+                    className: 'checkbox-field form-row',
+                }).elem,
+            ],
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.formsContainer.append(
+            readForm.elem,
+            changeNameForm.elem,
+            changePwdForm.elem,
+            updateSettingsForm.elem,
+            resetForm.elem,
+        );
     }
 
     /**
@@ -495,44 +1156,6 @@ class AdminApiConsoleView extends AdminView {
         }
     }
 
-    /**
-     * Activate specified menu item, expand sub menu if available
-     * and collapse submenus of other items
-     * @param {Element} menuElem - menu item element to activate
-     */
-    activateMenu(menuElem) {
-        if (!menuElem || !menuElem.parentNode) {
-            return;
-        }
-
-        if (menuElem.tagName === 'BUTTON') {
-            if (this.activeController) {
-                this.activeController.classList.remove('active');
-            }
-            if (menuElem.parentNode) {
-                menuElem.parentNode.classList.add('active');
-            }
-            this.activeController = menuElem.parentNode;
-        } else if (menuElem.tagName === 'LI'
-            && menuElem.parentNode
-            && menuElem.parentNode.classList.contains('sub-menu-list')) {
-            if (this.activeFormLink) {
-                this.activeFormLink.classList.remove('active');
-            }
-            this.activeFormLink = menuElem;
-            this.activeFormLink.classList.add('active');
-
-            const parentElem = menuElem.parentNode.parentNode;
-            if (parentElem && !parentElem.classList.contains('active')) {
-                if (this.activeController) {
-                    this.activeController.classList.remove('active');
-                }
-                parentElem.classList.add('active');
-                this.activeController = parentElem;
-            }
-        }
-    }
-
     /** Show API methods menu */
     toggleMethodsMenu() {
         this.apiMenu.toggle();
@@ -544,22 +1167,11 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /**
-     * Controller title click event handler
-     * @param {Event} e - click event object
-     */
-    onContrClick(e) {
-        const targetEl = e.target;
-
-        this.activateMenu(targetEl);
-        this.activateView(targetEl.dataset.target);
-    }
-
-    /**
      * Clear all items from request log container
      */
     clearResults() {
         removeChilds(this.resultsContainer);
-        enable(this.clearResultsBtn, false);
+        this.clearResultsBtn.enable(false);
     }
 
     /**
@@ -576,7 +1188,7 @@ class AdminApiConsoleView extends AdminView {
             return;
         }
 
-        if (typeof frmData.returnState === 'string') {
+        if (frmData.returnState?.length > 0) {
             frmData.returnState = JSON.parse(frmData.returnState);
         }
 
@@ -746,7 +1358,7 @@ class AdminApiConsoleView extends AdminView {
         const reqContainer = ApiRequest.create({ request: requestItem });
 
         this.resultsContainer.append(reqContainer.elem);
-        enable(this.clearResultsBtn);
+        this.clearResultsBtn.enable();
 
         try {
             const response = await fetch(requestItem.url, requestItem.options);
@@ -773,13 +1385,13 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Send read items request */
-    onReadItemsSubmit(e, inputId, method, verifyFunc) {
+    onReadItemsSubmit(e, method, verifyFunc) {
         if (typeof method !== 'string') {
             throw new Error('Invalid parameters');
         }
 
         e.preventDefault();
-        const itemsInp = ge(inputId);
+        const itemsInp = e.target.elements.id;
         if (!itemsInp) {
             return;
         }
@@ -792,7 +1404,7 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Send delete items request */
-    onDeleteItemsSubmit(e, verifyCallback) {
+    onSubmitItemIds(e, verifyCallback) {
         e.preventDefault();
 
         const formEl = e.target;
@@ -821,10 +1433,9 @@ class AdminApiConsoleView extends AdminView {
     onUpdateSettingsSubmit(e) {
         e.preventDefault();
 
-        const nameInput = ge('upd_settings_name');
-        const valueInput = ge('upd_settings_value');
+        const frmData = this.getFormData(e.target);
+        const { name, value } = frmData;
 
-        const name = nameInput.value;
         if (name.length === 0) {
             return;
         }
@@ -833,7 +1444,7 @@ class AdminApiConsoleView extends AdminView {
             httpMethod: 'POST',
             method: 'profile/updateSettings',
             data: {
-                [name]: valueInput.value,
+                [name]: value,
             },
         });
     }
