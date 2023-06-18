@@ -13,7 +13,7 @@ export class TransactionListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 id: 'separator1',
@@ -22,16 +22,16 @@ export class TransactionListContextMenu extends PopupMenu {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxSetCategoryBtn',
-                title: __('SET_CATEGORY'),
+                title: __('transactions.setCategoryMenu'),
             }, {
                 type: 'separator',
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 

@@ -11,59 +11,59 @@ export class ImportListMainMenu extends PopupMenu {
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',
-                title: __('IMPORT_ITEM_CREATE'),
+                title: __('import.itemCreate'),
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: __('SELECT'),
+                title: __('actions.select'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: __('SORT'),
+                title: __('actions.sort'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
+                title: __('actions.selectAll'),
             }, {
                 id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
+                title: __('actions.deselectAll'),
             }, {
                 id: 'enableSelectedBtn',
-                title: __('ENABLE_SELECTED'),
+                title: __('actions.enableSelected'),
             }, {
                 id: 'disableSelectedBtn',
-                title: __('DISABLE_SELECTED'),
+                title: __('actions.disableSelected'),
             }, {
                 id: 'deleteSelectedBtn',
                 icon: 'del',
-                title: __('DELETE_SELECTED'),
+                title: __('actions.deleteSelected'),
             }, {
                 id: 'deleteAllBtn',
                 icon: 'del',
-                title: __('DELETE_ALL'),
+                title: __('actions.deleteAll'),
             }, {
                 id: 'separator3',
                 type: 'separator',
             }, {
                 id: 'rulesCheck',
                 type: 'checkbox',
-                label: __('IMPORT_RULES_ENABLE'),
+                label: __('import.rules.enable'),
                 checked: true,
             }, {
                 id: 'rulesBtn',
-                title: __('IMPORT_RULES_UPDATE'),
+                title: __('import.rules.openDialog'),
             }, {
                 id: 'separator4',
                 type: 'separator',
             }, {
                 id: 'similarCheck',
                 type: 'checkbox',
-                label: __('IMPORT_CHECK_SIMILAR'),
+                label: __('import.checkSimilar'),
                 checked: true,
             }],
         });

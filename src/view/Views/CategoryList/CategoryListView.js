@@ -114,7 +114,7 @@ class CategoryListView extends View {
             treeSort: true,
             childContainerSelector: '.category-item__children',
             listMode: 'list',
-            noItemsMessage: __('CATEGORIES_NO_DATA'),
+            noItemsMessage: __('categories.noDate'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };
@@ -130,7 +130,7 @@ class CategoryListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('CATEGORIES'),
+            title: __('categories.listTitle'),
         });
 
         this.createBtn = Button.create({
@@ -178,7 +178,7 @@ class CategoryListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -454,7 +454,7 @@ class CategoryListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        App.createErrorNotification(__('ERR_CATEGORY_CHANGE_POS'));
+        App.createErrorNotification(__('categories.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -514,8 +514,8 @@ class CategoryListView extends View {
         const multiple = (ids.length > 1);
         DeleteCategoryDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? __('CATEGORY_DELETE_MULTIPLE') : __('CATEGORY_DELETE'),
-            content: (multiple) ? __('MSG_CATEGORY_DELETE_MULTIPLE') : __('MSG_CATEGORY_DELETE'),
+            title: (multiple) ? __('categories.deleteMultiple') : __('categories.delete'),
+            content: (multiple) ? __('categories.deleteMultipleMessage') : __('categories.deleteMessage'),
             showChildrenCheckbox,
             onConfirm: (opt) => this.deleteItems(opt),
         });
@@ -619,7 +619,7 @@ class CategoryListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('CATEGORIES')}`;
+        const pageTitle = `${__('appName')} | ${__('categories.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

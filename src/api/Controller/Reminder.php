@@ -28,9 +28,9 @@ class Reminder extends ApiListController
         parent::initAPI();
 
         $this->model = ReminderModel::getInstance();
-        $this->createErrorMsg = __("ERR_REMINDER_CREATE");
-        $this->updateErrorMsg = __("ERR_REMINDER_UPDATE");
-        $this->deleteErrorMsg = __("ERR_REMINDER_DELETE");
+        $this->createErrorMsg = __("reminders.errors.create");
+        $this->updateErrorMsg = __("reminders.errors.update");
+        $this->deleteErrorMsg = __("reminders.errors.delete");
     }
 
     /**
@@ -66,17 +66,17 @@ class Reminder extends ApiListController
     public function confirm()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+            throw new \Error(__("errors.invalidRequestData"));
         }
 
         $reqData = copyFields($request, ["transaction_id"]);
         if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+            throw new \Error(__("errors.invalidRequestData"));
         }
 
         $this->begin();
@@ -95,12 +95,12 @@ class Reminder extends ApiListController
     public function cancel()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || count($ids) === 0) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();

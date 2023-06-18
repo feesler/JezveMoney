@@ -120,7 +120,7 @@ export class ImportConditionForm extends Component {
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
-            label: __('CONDITION_COMPARE_PROPERTY'),
+            label: __('import.conditions.compareWithProperty'),
             onChange: () => this.onFieldValueChecked(),
         });
 
@@ -211,7 +211,7 @@ export class ImportConditionForm extends Component {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: () => this.onValueChange(),
         });
         App.initAccountsList(this.accountDropDown);
@@ -226,7 +226,7 @@ export class ImportConditionForm extends Component {
         this.templateDropDown = DropDown.create({
             className: TEMPLATE_FIELD_CLASS,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: () => this.onValueChange(),
         });
         this.templateDropDown.append(templateItems);

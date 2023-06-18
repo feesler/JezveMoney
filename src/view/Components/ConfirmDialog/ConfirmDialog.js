@@ -6,8 +6,8 @@ import { __ } from '../../utils/utils.js';
 const defaultProps = {
     destroyOnResult: true,
     title: null,
-    confirmButtonTitle: __('OK'),
-    cancelButtonTitle: __('CANCEL'),
+    confirmButtonTitle: __('dialog.confirm'),
+    cancelButtonTitle: __('dialog.reject'),
     content: null,
 };
 

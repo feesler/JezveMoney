@@ -105,7 +105,7 @@ export class ImportTransactionForm extends Component {
             props: {
                 className: SUBMIT_BUTTON_CLASS,
                 type: 'submit',
-                textContent: __('SAVE'),
+                textContent: __('actions.save'),
             },
         });
         // Cancel button
@@ -113,7 +113,7 @@ export class ImportTransactionForm extends Component {
             props: {
                 className: CANCEL_BUTTON_CLASS,
                 type: 'button',
-                textContent: __('CANCEL'),
+                textContent: __('actions.cancel'),
             },
             events: { click: () => this.cancel() },
         });
@@ -158,7 +158,7 @@ export class ImportTransactionForm extends Component {
         });
 
         this.trTypeField = Field.create({
-            title: __('TR_TYPE'),
+            title: __('transactions.type'),
             content: this.typeDropDown.elem,
             className: TYPE_FIELD_CLASS,
         });
@@ -169,13 +169,13 @@ export class ImportTransactionForm extends Component {
         this.transferAccDropDown = DropDown.create({
             disabled: true,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (account) => this.onTransferAccountChanged(account),
         });
         App.initAccountsList(this.transferAccDropDown);
 
         this.transferAccountField = Field.create({
-            title: __('TR_DEST_ACCOUNT'),
+            title: __('transactions.destAccount'),
             content: this.transferAccDropDown.elem,
             className: ACCOUNT_FIELD_CLASS,
         });
@@ -186,13 +186,13 @@ export class ImportTransactionForm extends Component {
         this.personDropDown = DropDown.create({
             disabled: true,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (person) => this.onPersonChanged(person),
         });
         App.initPersonsList(this.personDropDown);
 
         this.personField = Field.create({
-            title: __('TR_PERSON'),
+            title: __('transactions.person'),
             content: this.personDropDown.elem,
             className: PERSON_FIELD_CLASS,
         });
@@ -201,9 +201,9 @@ export class ImportTransactionForm extends Component {
     /** Create source amount field */
     createSourceAmountField() {
         this.srcAmountField = AmountInputField.create({
-            title: __('TR_AMOUNT'),
-            feedbackMessage: __('TR_INVALID_AMOUNT'),
-            placeholder: __('TR_AMOUNT'),
+            title: __('transactions.amount'),
+            feedbackMessage: __('transactions.invalidAmount'),
+            placeholder: __('transactions.amount'),
             validate: true,
             className: SRC_AMOUNT_FIELD_CLASS,
             onInput: (e) => this.onSrcAmountInput(e),
@@ -214,9 +214,9 @@ export class ImportTransactionForm extends Component {
     /** Create destination amount field */
     createDestAmountField() {
         this.destAmountField = AmountInputField.create({
-            title: __('TR_DEST_AMOUNT'),
-            feedbackMessage: __('TR_INVALID_AMOUNT'),
-            placeholder: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
+            feedbackMessage: __('transactions.invalidAmount'),
+            placeholder: __('transactions.destAmount'),
             validate: true,
             className: DEST_AMOUNT_FIELD_CLASS,
             onInput: (e) => this.onDestAmountInput(e),
@@ -228,11 +228,11 @@ export class ImportTransactionForm extends Component {
     /** Create date field */
     createDateField() {
         this.dateField = DateInputField.create({
-            title: __('TR_DATE'),
-            feedbackMessage: __('TR_INVALID_DATE'),
+            title: __('transactions.date'),
+            feedbackMessage: __('transactions.invalidDate'),
             className: DATE_FIELD_CLASS,
             name: 'date[]',
-            placeholder: __('TR_DATE'),
+            placeholder: __('transactions.date'),
             locales: App.dateFormatLocale,
             validate: true,
             onInput: (e) => this.onDateInput(e),
@@ -244,12 +244,12 @@ export class ImportTransactionForm extends Component {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categorySelect.elem,
             className: CATEGORY_FIELD_CLASS,
         });
@@ -261,8 +261,8 @@ export class ImportTransactionForm extends Component {
             inputId: 'commInp',
             className: COMMENT_FIELD_CLASS,
             name: 'name',
-            title: __('TR_COMMENT'),
-            placeholder: __('TR_COMMENT'),
+            title: __('transactions.comment'),
+            placeholder: __('transactions.comment'),
             onInput: (e) => this.onCommentInput(e),
         });
     }
@@ -577,8 +577,8 @@ export class ImportTransactionForm extends Component {
         // Source amount field
         const showSrcAmount = ((!isExpense && !isLimit) || isDiff);
         const srcAmountLabel = (!isExpense && !isDiff)
-            ? __('TR_AMOUNT')
-            : __('TR_SRC_AMOUNT');
+            ? __('transactions.amount')
+            : __('transactions.sourceAmount');
 
         this.srcAmountField.show(showSrcAmount);
         this.srcAmountField.setState((srcAmountState) => ({
@@ -595,8 +595,8 @@ export class ImportTransactionForm extends Component {
         // Destination amount field
         const showDestAmount = (isExpense || isLimit || isDiff);
         const destAmountLabel = ((isExpense || isLimit) && !isDiff)
-            ? __('TR_AMOUNT')
-            : __('TR_DEST_AMOUNT');
+            ? __('transactions.amount')
+            : __('transactions.destAmount');
 
         this.destAmountField.show(showDestAmount);
         this.destAmountField.setState((destAmountState) => ({
@@ -628,8 +628,8 @@ export class ImportTransactionForm extends Component {
             }
 
             const accountLabel = (transaction.type === 'transfer_in')
-                ? __('TR_SRC_ACCOUNT')
-                : __('TR_DEST_ACCOUNT');
+                ? __('transactions.sourceAccount')
+                : __('transactions.destAccount');
             this.transferAccountField.setTitle(accountLabel);
         }
         this.transferAccountField.show(isTransfer);
@@ -669,7 +669,7 @@ export class ImportTransactionForm extends Component {
             throw new Error('Invalid state');
         }
 
-        const title = (state.isUpdate) ? __('TR_UPDATE') : __('TR_CREATE');
+        const title = (state.isUpdate) ? __('transactions.update') : __('transactions.create');
         this.popup.setTitle(title);
 
         this.renderForm(state, prevState);

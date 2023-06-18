@@ -91,7 +91,7 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportConditionForm,
             className: CONDITIONS_LIST_CLASS,
             itemSelector: ImportConditionForm.selector,
-            noItemsMessage: __('IMPORT_CONDITIONS_NO_DATA'),
+            noItemsMessage: __('import.conditions.noData'),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (
@@ -105,7 +105,7 @@ export class ImportRuleForm extends Component {
         this.conditionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
             header: [
-                createElement('label', { props: { textContent: __('IMPORT_CONDITIONS') } }),
+                createElement('label', { props: { textContent: __('import.conditions.title') } }),
                 this.createCondBtn.elem,
                 this.toggleCondBtn.elem,
             ],
@@ -127,7 +127,7 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportActionForm,
             className: ACTIONS_LIST_CLASS,
             itemSelector: ImportActionForm.selector,
-            noItemsMessage: __('IMPORT_ACTIONS_NO_DATA'),
+            noItemsMessage: __('import.actions.noData'),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (
@@ -141,7 +141,7 @@ export class ImportRuleForm extends Component {
         this.actionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
             header: [
-                createElement('label', { props: { textContent: __('IMPORT_ACTIONS') } }),
+                createElement('label', { props: { textContent: __('import.actions.title') } }),
                 this.createActionBtn.elem,
                 this.toggleActionsBtn.elem,
             ],
@@ -151,11 +151,11 @@ export class ImportRuleForm extends Component {
 
         // Controls
         this.saveBtn = createElement('button', {
-            props: { className: SUBMIT_BTN_CLASS, type: 'button', textContent: __('SUBMIT') },
+            props: { className: SUBMIT_BTN_CLASS, type: 'button', textContent: __('actions.submit') },
             events: { click: () => this.onSubmit() },
         });
         this.cancelBtn = createElement('button', {
-            props: { className: CANCEL_BTN_CLASS, type: 'button', textContent: __('CANCEL') },
+            props: { className: CANCEL_BTN_CLASS, type: 'button', textContent: __('actions.cancel') },
             events: { click: () => this.onCancel() },
         });
 

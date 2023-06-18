@@ -1,7 +1,7 @@
 <header class="header">
     <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
         <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-        <span class="header-logo__title"><?= __("APP_NAME") ?></span>
+        <span class="header-logo__title"><?= __("appName") ?></span>
     </a>
     <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
@@ -29,7 +29,7 @@
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>">
                 <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-                <span class="header-logo__title"><?= __("APP_NAME") ?></span>
+                <span class="header-logo__title"><?= __("appName") ?></span>
             </a>
         </div>
     </div>
@@ -48,12 +48,12 @@
 
     <?php if ($this->user_id != 0) {        ?>
         <ul class="nav-list">
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="4"><?= __("PROFILE") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>settings/" tabindex="5"><?= __("SETTINGS") ?></a></li>
-            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6"><?= __("LOGOUT") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="4"><?= __("profile.title") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>settings/" tabindex="5"><?= __("settings.title") ?></a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6"><?= __("actions.logout") ?></a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7"><?= __("ADMIN_PANEL") ?></a></li>
+                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7"><?= __("adminPanel") ?></a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>

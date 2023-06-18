@@ -444,14 +444,14 @@ class ImportConditionModel extends CachedTable
     public static function getFieldNames()
     {
         return [
-            IMPORT_COND_FIELD_MAIN_ACCOUNT => __("CONDITION_MAIN_ACCOUNT"),
-            IMPORT_COND_FIELD_TPL => __("CONDITION_TEMPLATE"),
-            IMPORT_COND_FIELD_TR_AMOUNT => __("CONDITION_TR_AMOUNT"),
-            IMPORT_COND_FIELD_TR_CURRENCY => __("CONDITION_TR_CURRENCY"),
-            IMPORT_COND_FIELD_ACC_AMOUNT => __("CONDITION_ACCOUNT_AMOUNT"),
-            IMPORT_COND_FIELD_ACC_CURRENCY => __("CONDITION_ACCOUNT_CURRENCY"),
-            IMPORT_COND_FIELD_COMMENT => __("CONDITION_COMMENT"),
-            IMPORT_COND_FIELD_DATE => __("CONDITION_DATE"),
+            IMPORT_COND_FIELD_MAIN_ACCOUNT => __("import.conditions.fields.mainAccount"),
+            IMPORT_COND_FIELD_TPL => __("import.conditions.fields.template"),
+            IMPORT_COND_FIELD_TR_AMOUNT => __("import.conditions.fields.transactionAmount"),
+            IMPORT_COND_FIELD_TR_CURRENCY => __("import.conditions.fields.transactionCurrency"),
+            IMPORT_COND_FIELD_ACC_AMOUNT => __("import.conditions.fields.accountAmount"),
+            IMPORT_COND_FIELD_ACC_CURRENCY => __("import.conditions.fields.accountCurrency"),
+            IMPORT_COND_FIELD_COMMENT => __("import.conditions.fields.comment"),
+            IMPORT_COND_FIELD_DATE => __("import.conditions.fields.date"),
         ];
     }
 
@@ -490,11 +490,11 @@ class ImportConditionModel extends CachedTable
     public static function getOperatorNames()
     {
         return [
-            IMPORT_COND_OP_STRING_INCLUDES => __("OPERATOR_INCLUDES"),
-            IMPORT_COND_OP_EQUAL => __("OPERATOR_EQUAL"),
-            IMPORT_COND_OP_NOT_EQUAL => __("OPERATOR_NOT_EQUAL"),
-            IMPORT_COND_OP_LESS => __("OPERATOR_LESS"),
-            IMPORT_COND_OP_GREATER => __("OPERATOR_GREATER"),
+            IMPORT_COND_OP_STRING_INCLUDES => __("import.conditions.operators.includes"),
+            IMPORT_COND_OP_EQUAL => __("import.conditions.operators.equal"),
+            IMPORT_COND_OP_NOT_EQUAL => __("import.conditions.operators.notEqual"),
+            IMPORT_COND_OP_LESS => __("import.conditions.operators.less"),
+            IMPORT_COND_OP_GREATER => __("import.conditions.operators.greater"),
         ];
     }
 

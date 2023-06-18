@@ -182,7 +182,7 @@ class MainView extends View {
             }, {
                 id: 'persons',
                 value: 'persons',
-                title: __('PERSONS'),
+                title: __('persons.listTitle'),
                 content: [
                     this.visiblePersons.elem,
                     this.hiddenPersons.elem,
@@ -209,7 +209,7 @@ class MainView extends View {
                 items: this.props.transactions,
                 listMode: 'list',
                 showControls: true,
-                noItemsMessage: __('MAIN_TR_NO_DATA'),
+                noItemsMessage: __('main.noTransactions'),
                 onItemClick: (id, e) => this.onTransactionClick(id, e),
             });
             this.transactionsWidget.append(this.latestList.elem);
@@ -241,7 +241,7 @@ class MainView extends View {
             props: {
                 className: 'btn link-btn',
                 type: 'button',
-                textContent: __('SHOW_ALL'),
+                textContent: __('actions.showAll'),
             },
             events,
         });
@@ -402,8 +402,8 @@ class MainView extends View {
         const multi = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
-            content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
+            title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
+            content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -411,7 +411,7 @@ class MainView extends View {
     /** Returns accounts 'No data' container */
     renderAccountsNoData() {
         return this.renderNoDataGroup(
-            __('MAIN_ACCOUNTS_NO_DATA'),
+            __('main.noAccounts'),
             `${App.baseURL}accounts/create/`,
         );
     }
@@ -419,7 +419,7 @@ class MainView extends View {
     /** Returns persons 'No data' container */
     renderPersonsNoData() {
         return this.renderNoDataGroup(
-            __('PERSONS_NO_DATA'),
+            __('persons.noData'),
             `${App.baseURL}persons/create/`,
         );
     }
@@ -439,7 +439,7 @@ class MainView extends View {
                     props: {
                         className: 'btn link-btn',
                         href: createURL,
-                        textContent: __('CREATE'),
+                        textContent: __('actions.create'),
                     },
                 }),
             ],
@@ -467,8 +467,8 @@ class MainView extends View {
 
         show(this.toggleAccountsBtn, hiddenAvailable);
         this.toggleAccountsBtn.textContent = (state.accounts.showHidden)
-            ? __('SHOW_VISIBLE')
-            : __('SHOW_ALL');
+            ? __('actions.showVisible')
+            : __('actions.showAll');
 
         this.hiddenAccounts.setState((listState) => ({
             ...listState,
@@ -539,8 +539,8 @@ class MainView extends View {
 
         show(this.togglePersonsBtn, hiddenAvailable);
         this.togglePersonsBtn.textContent = (state.persons.showHidden)
-            ? __('SHOW_VISIBLE')
-            : __('SHOW_ALL');
+            ? __('actions.showVisible')
+            : __('actions.showAll');
 
         this.hiddenPersons.setState((listState) => ({
             ...listState,

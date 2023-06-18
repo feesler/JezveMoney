@@ -5,7 +5,7 @@
         <header class="logo-container">
             <div class="login-logo row-container">
                 <span class="logo"><?= svgIcon("logo_u", "logo-icon") ?></span>
-                <span class="title"><?= __("APP_NAME") ?></span>
+                <span class="title"><?= __("appName") ?></span>
             </div>
         </header>
 

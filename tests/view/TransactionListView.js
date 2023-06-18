@@ -604,8 +604,8 @@ export class TransactionListView extends AppView {
             };
 
             res.modeSelector.title = (model.detailsMode)
-                ? __('TR_LIST_SHOW_MAIN', model.locale)
-                : __('TR_LIST_SHOW_DETAILS', model.locale);
+                ? __('transactions.showMain', model.locale)
+                : __('transactions.showDetails', model.locale);
         }
 
         // Set category dialog

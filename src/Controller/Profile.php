@@ -24,26 +24,26 @@ class Profile extends TemplateController
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            throw new \Error(__("ERR_USER_NOT_FOUND"));
+            throw new \Error(__("profile.errors.userNotFound"));
         }
 
         $data["user_login"] = $uObj->login;
 
         $pObj = $this->personMod->getItem($uObj->owner_id);
         if (!$pObj) {
-            throw new \Error(__("ERR_PERSON_NOT_FOUND"));
+            throw new \Error(__("persons.errors.notFound"));
         }
 
         $profileInfo = $this->getProfileData();
         $data["profileInfo"] = $profileInfo;
 
-        $titleString = __("APP_NAME") . " | " . __("PROFILE");
+        $titleString = __("appName") . " | " . __("profile.title");
         if ($this->action == "name") {
-            $titleString .= " | " . __("PROFILE_CHANGE_NAME");
+            $titleString .= " | " . __("profile.changeName");
         } elseif ($this->action == "changePass") {
-            $titleString .= " | " . __("PROFILE_CHANGE_PASS");
+            $titleString .= " | " . __("profile.changePassword");
         } elseif ($this->action == "reset") {
-            $titleString .= " | " . __("PROFILE_RESET_DATA");
+            $titleString .= " | " . __("profile.resetData");
         }
         $data["titleString"] = $titleString;
 

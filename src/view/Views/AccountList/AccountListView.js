@@ -154,7 +154,7 @@ class AccountListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -431,7 +431,7 @@ class AccountListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        App.createErrorNotification(__('ERR_ACCOUNT_CHANGE_POS'));
+        App.createErrorNotification(__('accounts.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -591,7 +591,7 @@ class AccountListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('accounts.listTitle')}`;
+        const pageTitle = `${__('appName')} | ${__('accounts.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

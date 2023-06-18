@@ -21,7 +21,7 @@ class AdminUserListView extends AdminListView {
 
         this.apiController = 'user';
         this.statePath = 'users';
-        this.deleteConfirmMessage = __('MSG_USER_DELETE');
+        this.deleteConfirmMessage = __('users.deleteMessage');
     }
 
     /**

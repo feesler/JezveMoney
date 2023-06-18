@@ -61,29 +61,29 @@ export class OriginalImportData extends Component {
 
         const dataTable = [
             [
-                [__('IMPORT_MAIN_ACCOUNT'), this.props.origAccount.name],
-                [__('TEMPLATE'), templateName],
+                [__('import.mainAccount'), this.props.origAccount.name],
+                [__('import.templates.title'), templateName],
             ],
             [
-                [__('COLUMN_TR_AMOUNT'), this.props.transactionAmount],
-                [__('COLUMN_TR_CURRENCY'), this.props.transactionCurrency],
+                [__('import.templates.columns.transactionAmount'), this.props.transactionAmount],
+                [__('import.templates.columns.transactionCurrency'), this.props.transactionCurrency],
             ],
             [
-                [__('COLUMN_ACCOUNT_AMOUNT'), this.props.accountAmount],
-                [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
+                [__('import.templates.columns.accountAmount'), this.props.accountAmount],
+                [__('import.templates.columns.accountCurrency'), this.props.accountCurrency],
             ],
             [
-                [__('COLUMN_DATE'), dateString],
+                [__('import.templates.columns.date'), dateString],
             ],
             [
-                [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],
+                [__('import.templates.columns.comment'), this.props.comment, COMMENT_COLUMN_CLASS],
             ],
         ];
 
         const { createContainer } = App;
 
         this.elem = createContainer(CONTAINER_CLASS, [
-            createElement('header', { props: { textContent: __('IMPORT_ORIG_DATA') } }),
+            createElement('header', { props: { textContent: __('import.originalData') } }),
             createContainer(
                 TABLE_CLASS,
                 dataTable.map((group) => createContainer(

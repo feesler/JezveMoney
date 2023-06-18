@@ -44,13 +44,13 @@ export const transTypeMap = {
 };
 
 export const typeNames = {
-    expense: __('TR_EXPENSE'),
-    income: __('TR_INCOME'),
-    transfer_out: __('TR_TRANSFER_OUT'),
-    transfer_in: __('TR_TRANSFER_IN'),
-    debt_out: __('TR_DEBT_OUT'),
-    debt_in: __('TR_DEBT_IN'),
-    limit: __('TR_LIMIT_CHANGE'),
+    expense: __('transactions.types.expense'),
+    income: __('transactions.types.income'),
+    transfer_out: __('transactions.types.transferOut'),
+    transfer_in: __('transactions.types.transferIn'),
+    debt_out: __('transactions.types.debtOut'),
+    debt_in: __('transactions.types.debtIn'),
+    limit: __('transactions.types.creditLimit'),
 };
 
 const defaultProps = {

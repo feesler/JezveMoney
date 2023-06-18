@@ -22,7 +22,7 @@ export class ChangePasswordDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'chpass_popup',
-            title: __('PROFILE_CHANGE_PASS'),
+            title: __('profile.changePassword'),
             className: DIALOG_CLASS,
         });
 
@@ -33,9 +33,9 @@ export class ChangePasswordDialog extends ProfileDialog {
             className: 'form-row',
             name: 'current',
             type: 'password',
-            title: __('PROFILE_PASSWORD_CURRENT'),
+            title: __('profile.currentPassword'),
             validate: true,
-            feedbackMessage: __('PROFILE_INVALID_PASS_CURRENT'),
+            feedbackMessage: __('profile.invalidCurrentPassword'),
             onInput: (e) => this.onOldPasswordInput(e),
         });
 
@@ -46,9 +46,9 @@ export class ChangePasswordDialog extends ProfileDialog {
             className: 'form-row',
             name: 'new',
             type: 'password',
-            title: __('PROFILE_PASSWORD_NEW'),
+            title: __('profile.newPassword'),
             validate: true,
-            feedbackMessage: __('PROFILE_INVALID_PASS_NEW'),
+            feedbackMessage: __('profile.invalidNewPassword'),
             onInput: (e) => this.onNewPasswordInput(e),
         });
 

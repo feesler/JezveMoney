@@ -108,7 +108,7 @@ class PersonListView extends View {
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
-            noItemsMessage: __('PERSONS_NO_DATA'),
+            noItemsMessage: __('persons.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };
@@ -126,7 +126,7 @@ class PersonListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('PERSONS'),
+            title: __('persons.listTitle'),
         });
 
         this.createBtn = Button.create({
@@ -153,7 +153,7 @@ class PersonListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -430,7 +430,7 @@ class PersonListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        App.createErrorNotification(__('ERR_PERSON_CHANGE_POS'));
+        App.createErrorNotification(__('persons.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -484,8 +484,8 @@ class PersonListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? __('PERSON_DELETE_MULTIPLE') : __('PERSON_DELETE'),
-            content: (multiple) ? __('MSG_PERSON_DELETE_MULTIPLE') : __('MSG_PERSON_DELETE'),
+            title: (multiple) ? __('persons.deleteMultiple') : __('persons.delete'),
+            content: (multiple) ? __('persons.deleteMultipleMessage') : __('persons.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -588,7 +588,7 @@ class PersonListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('PERSONS')}`;
+        const pageTitle = `${__('appName')} | ${__('persons.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

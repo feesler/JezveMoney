@@ -61,7 +61,7 @@ export class DateInputField extends Field {
             this.feedbackElem = createElement('div', {
                 props: {
                     className: 'feedback invalid-feedback',
-                    textContent: __('TR_INVALID_DATE'),
+                    textContent: __('transactions.invalidDate'),
                 },
             });
 

@@ -81,12 +81,12 @@ export class ImportRuleItem extends Component {
         ]);
 
         this.conditionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: __('IMPORT_CONDITIONS') },
+            props: { className: 'rule-item__header', textContent: __('import.conditions.title') },
         });
         this.conditionsContainer = App.createContainer('rule-item__conditions');
 
         this.actionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: __('IMPORT_ACTIONS') },
+            props: { className: 'rule-item__header', textContent: __('import.actions.title') },
         });
         this.actionsContainer = App.createContainer('rule-item__actions');
 
@@ -186,9 +186,9 @@ export class ImportRuleItem extends Component {
         this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
         this.valueLabel.textContent = firstCondition.valueLabel.textContent;
 
-        const actionsTitle = __('IMPORT_RULE_INFO_ACTIONS', state.actions.length);
+        const actionsTitle = __('import.rules.actionsInfo', state.actions.length);
         if (conditionItems.length > 1) {
-            const conditionsTitle = __('IMPORT_RULE_INFO_CONDITIONS', conditionItems.length - 1);
+            const conditionsTitle = __('import.rules.conditionsInfo', conditionItems.length - 1);
             this.infoLabel.textContent = `${conditionsTitle} ${actionsTitle}`;
         } else {
             this.infoLabel.textContent = actionsTitle;

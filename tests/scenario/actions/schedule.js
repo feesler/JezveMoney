@@ -440,7 +440,7 @@ export const securityTests = async () => {
         App.view.expectedState = {
             notification: {
                 success: false,
-                message: __('ERR_SCHED_TRANS_UPDATE', App.view.locale),
+                message: __('schedule.errors.update', App.view.locale),
             },
         };
         App.view.checkState();

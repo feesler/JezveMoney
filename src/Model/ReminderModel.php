@@ -448,7 +448,7 @@ class ReminderModel extends CachedTable
     {
         $ids = asArray($ids);
         if (count($ids) > 1 && isset($request["transaction_id"])) {
-            throw new \Error(__("ERR_CONFIRM_MULTIPLE_REMINDERS_WITH_TRANSACTION"));
+            throw new \Error(__("reminders.errors.sameTransaction"));
         }
 
         foreach ($ids as $item_id) {

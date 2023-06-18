@@ -80,7 +80,7 @@ class TransactionView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('TR_UPDATE') : __('TR_CREATE'),
+            title: (isUpdate) ? __('transactions.update') : __('transactions.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -89,7 +89,7 @@ class TransactionView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -169,8 +169,8 @@ class TransactionView extends View {
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('TR_DELETE'),
-            content: __('MSG_TRANS_DELETE'),
+            title: __('transactions.delete'),
+            content: __('transactions.deleteMessage'),
             onConfirm: () => this.deleteTransaction(),
         });
     }
@@ -202,8 +202,8 @@ class TransactionView extends View {
         }
 
         const title = (state.isUpdate)
-            ? `${__('APP_NAME')} | ${__('TR_UPDATE')}`
-            : `${__('APP_NAME')} | ${__('TR_CREATE')}`;
+            ? `${__('appName')} | ${__('transactions.update')}`
+            : `${__('appName')} | ${__('transactions.create')}`;
 
         window.history.replaceState({}, title, url);
     }

@@ -47,19 +47,19 @@ export class AccountDetails extends ItemDetails {
         });
 
         this.visibilityField = Field.create({
-            title: __('ITEM_VISIBILITY'),
+            title: __('item.visibility'),
             className: VISIBILITY_FIELD_CLASS,
         });
 
         this.transactionsField = Field.create({
-            title: __('ITEM_TRANSACTIONS_COUNT'),
+            title: __('item.transactionsCount'),
             className: TR_COUNT_FIELD_CLASS,
         });
 
         this.transactionsLink = createElement('a', {
             props: {
                 className: 'transactions-link',
-                textContent: __('ITEM_GO_TO_TRANSACTIONS'),
+                textContent: __('item.goToTransactions'),
             },
         });
 
@@ -128,12 +128,12 @@ export class AccountDetails extends ItemDetails {
         }
 
         // Visibility
-        const visibililty = item.isVisible() ? __('ITEM_VISIBLE') : __('ITEM_HIDDEN');
+        const visibililty = item.isVisible() ? __('item.visible') : __('item.hidden');
         this.visibilityField.setContent(visibililty);
 
         // Transactions count
         const trCountLoaded = (typeof item.transactionsCount === 'number');
-        const trCount = (trCountLoaded) ? item.transactionsCount.toString() : __('LOADING');
+        const trCount = (trCountLoaded) ? item.transactionsCount.toString() : __('loading');
         this.transactionsField.setContent(trCount);
 
         // Navigate to transactions list link

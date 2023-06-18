@@ -17,7 +17,7 @@ class AdminCurrencyListView extends AdminListView {
 
         this.apiController = 'currency';
         this.statePath = 'currency';
-        this.deleteConfirmMessage = __('MSG_CURRENCY_DELETE');
+        this.deleteConfirmMessage = __('currencies.deleteMessage');
     }
 
     /**

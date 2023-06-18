@@ -41,53 +41,53 @@ export class ScheduleItemDetails extends ItemDetails {
     getContent() {
         // Schedule
         this.startDateField = Field.create({
-            title: __('SCHED_TR_START_DATE'),
+            title: __('schedule.startDate'),
             className: START_DATE_FIELD_CLASS,
         });
 
         this.endDateField = Field.create({
-            title: __('SCHED_TR_END_DATE'),
+            title: __('schedule.endDate'),
             className: END_DATE_FIELD_CLASS,
         });
 
         this.intervalField = Field.create({
-            title: __('SCHED_TR_INTERVAL'),
+            title: __('schedule.repeat'),
             className: INTERVAL_FIELD_CLASS,
         });
 
         this.offsetField = Field.create({
-            title: __('SCHED_TR_OFFSET'),
+            title: __('schedule.intervalOffset'),
             className: OFFSET_FIELD_CLASS,
         });
 
         // Main content
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: SOURCE_FIELD_CLASS,
         });
 
         this.destinationField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: DEST_FIELD_CLASS,
         });
 
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: SRC_AMOUNT_FIELD_CLASS,
         });
 
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: DEST_AMOUNT_FIELD_CLASS,
         });
 
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             className: CATEGORY_FIELD_CLASS,
         });
 
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             className: COMMENT_FIELD_CLASS,
         });
 
@@ -122,7 +122,7 @@ export class ScheduleItemDetails extends ItemDetails {
     getCategoryTitle(state) {
         const { item } = state;
         if (item.category_id === 0) {
-            return __('NO_CATEGORY');
+            return __('categories.noCategory');
         }
 
         const { categories } = App.model;
@@ -136,8 +136,8 @@ export class ScheduleItemDetails extends ItemDetails {
 
     renderEndDate(item) {
         return (item.end_date)
-            ? __('SCHEDULE_ITEM_END', App.formatDate(item.end_date))
-            : __('SCHED_TR_NO_END_DATE');
+            ? __('schedule.item.end', App.formatDate(item.end_date))
+            : __('schedule.noEndDate');
     }
 
     /**

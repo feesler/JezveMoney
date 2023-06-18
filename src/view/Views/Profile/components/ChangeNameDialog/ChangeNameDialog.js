@@ -35,7 +35,7 @@ export class ChangeNameDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'chname_popup',
-            title: __('PROFILE_CHANGE_NAME'),
+            title: __('profile.changeName'),
             className: DIALOG_CLASS,
         });
 
@@ -45,9 +45,9 @@ export class ChangeNameDialog extends ProfileDialog {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('PROFILE_NAME_NEW'),
+            title: __('profile.newName'),
             validate: true,
-            feedbackMessage: __('PROFILE_INVALID_NAME'),
+            feedbackMessage: __('profile.invalidName'),
             onInput: (e) => this.onNameInput(e),
         });
 

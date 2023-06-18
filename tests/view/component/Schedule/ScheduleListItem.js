@@ -135,22 +135,22 @@ export class ScheduleListItem extends TestComponent {
 
     static renderDateRange(item) {
         const startDateFmt = App.secondsToDateString(item.start_date);
-        const start = __('SCHEDULE_ITEM_START', App.view.locale, startDateFmt);
+        const start = __('schedule.item.start', App.view.locale, startDateFmt);
         if (!item.end_date) {
             return start;
         }
 
         const endDateFmt = App.secondsToDateString(item.end_date);
-        const end = __('SCHEDULE_ITEM_END', App.view.locale, endDateFmt);
+        const end = __('schedule.item.end', App.view.locale, endDateFmt);
         return `${start} ${end}`;
     }
 
     static renderEndDate(item) {
         if (!item.end_date) {
-            return __('SCHED_TR_NO_END_DATE', App.view.locale);
+            return __('schedule.noEndDate', App.view.locale);
         }
 
-        return __('SCHEDULE_ITEM_END', App.view.locale, App.secondsToDateString(item.end_date));
+        return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));
     }
 
     static render(item, state, options = {}) {

@@ -7,20 +7,20 @@
             <div class="content">
                 <div class="content_wrap column-container">
                     <header class="heading">
-                        <h1><?= __("SETTINGS") ?></h1>
+                        <h1><?= __("settings.title") ?></h1>
                     </header>
 
                     <main id="tabsContainer">
                         <section id="mainTab" class="settings-block">
                             <header id="mainHeading" class="heading">
-                                <h2><?= __("SETTINGS_MAIN") ?></h2>
+                                <h2><?= __("settings.main") ?></h2>
                             </header>
                             <div id="mainContainer"></div>
                         </section>
 
                         <section id="userCurrenciesTab" class="settings-block">
                             <header id="userCurrenciesHeading" class="heading">
-                                <h2><?= __("SETTINGS_CURRENCIES") ?></h2>
+                                <h2><?= __("settings.currencies.title") ?></h2>
                                 <div class="heading-actions"></div>
                             </header>
                             <div id="userCurrenciesContainer">
@@ -29,12 +29,12 @@
 
                         <section id="regionalTab" class="settings-block">
                             <header id="dateFormatHeading" class="heading">
-                                <h2><?= __("SETTINGS_DATE_FORMAT") ?></h2>
+                                <h2><?= __("settings.dateFormat") ?></h2>
                                 <div class="heading-actions"></div>
                             </header>
                             <div id="dateFormatContainer"></div>
                             <header id="decimalFormatHeading" class="heading">
-                                <h2><?= __("SETTINGS_DECIMAL_FORMAT") ?></h2>
+                                <h2><?= __("settings.numberFormat") ?></h2>
                                 <div class="heading-actions"></div>
                             </header>
                             <div id="decimalFormatContainer"></div>

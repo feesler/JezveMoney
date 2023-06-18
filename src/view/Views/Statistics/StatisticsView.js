@@ -139,7 +139,7 @@ class StatisticsView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('STATISTICS'),
+            title: __('statistics.title'),
         });
 
         // Filters
@@ -173,9 +173,9 @@ class StatisticsView extends View {
             id: 'reportMenu',
             itemParam: 'report',
             items: [
-                { value: 'category', title: __('STAT_REPORT_CATEGORIES') },
-                { value: 'account', title: __('STAT_REPORT_ACCOUNTS') },
-                { value: 'currency', title: __('STAT_REPORT_CURRENCIES') },
+                { value: 'category', title: __('statistics.reports.categories') },
+                { value: 'account', title: __('statistics.reports.accounts') },
+                { value: 'currency', title: __('statistics.reports.currencies') },
             ],
             onChange: (value) => this.onSelectReportType(value),
         });
@@ -194,9 +194,9 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (obj) => this.onAccountSel(obj),
             onChange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
@@ -207,9 +207,9 @@ class StatisticsView extends View {
         this.categoryDropDown = CategorySelect.create({
             elem: 'category_id',
             multiple: true,
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (obj) => this.onCategorySel(obj),
             onChange: (obj) => this.onCategorySel(obj),
             className: 'dd_fullwidth',
@@ -230,24 +230,24 @@ class StatisticsView extends View {
 
         // Date range filter
         this.dateRangeFilterTitle = createElement('span', {
-            props: { textContent: __('FILTER_DATE_RANGE') },
+            props: { textContent: __('filters.dateRange') },
         });
 
         this.weekRangeBtn = DateRangeSelector.create({
             rangeType: 'week',
-            title: __('DATE_RANGE_FOR_WEEK'),
+            title: __('dateRange.forWeek'),
             onClick: (e) => this.showWeekRange(e),
         });
 
         this.monthRangeBtn = DateRangeSelector.create({
             rangeType: 'month',
-            title: __('DATE_RANGE_FOR_MONTH'),
+            title: __('dateRange.forMonth'),
             onClick: (e) => this.showMonthRange(e),
         });
 
         this.halfYearRangeBtn = DateRangeSelector.create({
             rangeType: 'halfyear',
-            title: __('DATE_RANGE_FOR_HALF_YEAR'),
+            title: __('dateRange.forHalfYear'),
             onClick: (e) => this.showHalfYearRange(e),
         });
 
@@ -263,8 +263,8 @@ class StatisticsView extends View {
 
         this.dateRangeFilter = DateRangeInput.create({
             id: 'dateFrm',
-            startPlaceholder: __('DATE_RANGE_FROM'),
-            endPlaceholder: __('DATE_RANGE_TO'),
+            startPlaceholder: __('dateRange.from'),
+            endPlaceholder: __('dateRange.to'),
             onChange: (data) => this.changeDateFilter(data),
         });
 
@@ -489,7 +489,7 @@ class StatisticsView extends View {
 
     replaceHistory(state) {
         const url = this.getFilterURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
+        const pageTitle = `${__('appName')} | ${__('statistics.title')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -623,7 +623,7 @@ class StatisticsView extends View {
 
         if (state.filter.report === 'category') {
             if (categoryId === 0) {
-                return __('NO_CATEGORY');
+                return __('categories.noCategory');
             }
 
             const category = App.model.categories.getItem(categoryId);

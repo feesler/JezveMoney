@@ -23,9 +23,9 @@ class UserCurrency extends ApiSortableListController
         parent::initAPI();
 
         $this->model = UserCurrencyModel::getInstance();
-        $this->createErrorMsg = __("ERR_USER_CURRENCY_CREATE");
-        $this->updateErrorMsg = __("ERR_USER_CURRENCY_UPDATE");
-        $this->deleteErrorMsg = __("ERR_USER_CURRENCY_DELETE");
-        $this->changePosErrorMsg = __("ERR_USER_CURRENCY_CHANGE_POS");
+        $this->createErrorMsg = __("userCurrencies.errors.create");
+        $this->updateErrorMsg = __("userCurrencies.errors.update");
+        $this->deleteErrorMsg = __("userCurrencies.errors.delete");
+        $this->changePosErrorMsg = __("userCurrencies.errors.changePos");
     }
 }

@@ -12,24 +12,24 @@ export class ReminderListMainMenu extends PopupMenu {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: __('SELECT'),
+                title: __('actions.select'),
             }, {
                 id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
+                title: __('actions.selectAll'),
             }, {
                 id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
+                title: __('actions.deselectAll'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'confirmBtn',
                 icon: 'check',
-                title: __('REMINDER_CONFIRM'),
+                title: __('reminders.confirm'),
             }, {
                 id: 'cancelBtn',
                 icon: 'del',
-                title: __('REMINDER_CANCEL'),
+                title: __('reminders.cancel'),
             }],
         });
 

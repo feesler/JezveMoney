@@ -75,10 +75,10 @@ export class ScheduleItemDetails extends TestComponent {
 
     static renderEndDate(item) {
         if (!item.end_date) {
-            return __('SCHED_TR_NO_END_DATE', App.view.locale);
+            return __('schedule.noEndDate', App.view.locale);
         }
 
-        return __('SCHEDULE_ITEM_END', App.view.locale, App.secondsToDateString(item.end_date));
+        return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));
     }
 
     static render(item, state) {
@@ -94,7 +94,7 @@ export class ScheduleItemDetails extends TestComponent {
         const category = state.categories.getItem(item.category_id);
         const categoryTitle = (category)
             ? category.name
-            : __('NO_CATEGORY', App.view.locale);
+            : __('categories.noCategory', App.view.locale);
 
         const res = {
             title: {

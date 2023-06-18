@@ -28,7 +28,7 @@ export class Category extends ListItem {
 
     /** Return title string for specified transaction type */
     static getTypeTitle(value) {
-        return (value !== 0) ? Transaction.getTypeTitle(value) : __('TR_ANY');
+        return (value !== 0) ? Transaction.getTypeTitle(value) : __('transactions.types.any');
     }
 
     static getAvailTypes() {

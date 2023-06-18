@@ -7,11 +7,11 @@
             <div class="content">
                 <div class="content_wrap">
                     <header class="heading">
-                        <h1><?= __("ABOUT") ?></h1>
+                        <h1><?= __("about.title") ?></h1>
                     </header>
                     <main>
-                        <div><?= __("APP_NAME") ?>, 2012-<?= e($year) ?></div>
-                        <div><?= __("ABOUT_VERSION") ?>: <?= e($version) ?></div>
+                        <div><?= __("appName") ?>, 2012-<?= e($year) ?></div>
+                        <div><?= __("about.version") ?>: <?= e($version) ?></div>
                     </main>
                 </div>
             </div>

@@ -71,7 +71,7 @@ export class AmountInputField extends Field {
             this.feedbackElem = createElement('div', {
                 props: {
                     className: 'feedback invalid-feedback',
-                    textContent: __('TR_INVALID_AMOUNT'),
+                    textContent: __('transactions.invalidAmount'),
                 },
             });
 

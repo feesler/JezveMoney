@@ -64,14 +64,14 @@ export class ImportTransactionItem extends Component {
         const { createContainer } = App;
 
         const fields = [
-            [__('TR_TYPE'), TYPE_FIELD_CLASS],
-            [__('TR_ACCOUNT'), ACCOUNT_FIELD_CLASS],
-            [__('TR_PERSON'), PERSON_FIELD_CLASS],
-            [__('TR_AMOUNT'), SRC_AMOUNT_FIELD_CLASS],
-            [__('TR_DEST_AMOUNT'), DEST_AMOUNT_FIELD_CLASS],
-            [__('TR_DATE'), DATE_FIELD_CLASS],
-            [__('TR_CATEGORY'), CATEGORY_FIELD_CLASS],
-            [__('TR_COMMENT'), COMMENT_FIELD_CLASS],
+            [__('transactions.type'), TYPE_FIELD_CLASS],
+            [__('transactions.debtAccount'), ACCOUNT_FIELD_CLASS],
+            [__('transactions.person'), PERSON_FIELD_CLASS],
+            [__('transactions.amount'), SRC_AMOUNT_FIELD_CLASS],
+            [__('transactions.destAmount'), DEST_AMOUNT_FIELD_CLASS],
+            [__('transactions.date'), DATE_FIELD_CLASS],
+            [__('transactions.category'), CATEGORY_FIELD_CLASS],
+            [__('transactions.comment'), COMMENT_FIELD_CLASS],
         ];
 
         [
@@ -228,8 +228,8 @@ export class ImportTransactionItem extends Component {
             this.accountField.setContent(account.name);
 
             const accountTitle = (isTransferOut)
-                ? __('TR_DEST_ACCOUNT')
-                : __('TR_SRC_ACCOUNT');
+                ? __('transactions.destAccount')
+                : __('transactions.sourceAccount');
             this.accountField.setTitle(accountTitle);
         }
         // Person field
@@ -240,7 +240,7 @@ export class ImportTransactionItem extends Component {
         }
 
         // Amount fields
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
         this.srcAmountField.setContent(srcAmount);

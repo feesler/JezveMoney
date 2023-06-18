@@ -16,11 +16,11 @@ export const availTransTypes = {
 };
 
 const transTitles = {
-    [EXPENSE]: __('TR_EXPENSE'),
-    [INCOME]: __('TR_INCOME'),
-    [TRANSFER]: __('TR_TRANSFER'),
-    [DEBT]: __('TR_DEBT'),
-    [LIMIT_CHANGE]: __('TR_LIMIT_CHANGE'),
+    [EXPENSE]: __('transactions.types.expense'),
+    [INCOME]: __('transactions.types.income'),
+    [TRANSFER]: __('transactions.types.transfer'),
+    [DEBT]: __('transactions.types.debt'),
+    [LIMIT_CHANGE]: __('transactions.types.creditLimit'),
 };
 
 export class Transaction {

@@ -17,9 +17,9 @@ import '../../Application/Application.scss';
 import './ProfileView.scss';
 
 const titleMap = {
-    name: __('PROFILE_CHANGE_NAME'),
-    password: __('PROFILE_CHANGE_PASS'),
-    reset: __('PROFILE_RESET_DATA'),
+    name: __('profile.changeName'),
+    password: __('profile.changePassword'),
+    reset: __('profile.resetData'),
 };
 
 /**
@@ -101,14 +101,14 @@ class ProfileView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('PROFILE_DELETE'),
-            content: __('MSG_PROFILE_DELETE'),
+            title: __('profile.delete'),
+            content: __('profile.deleteMessage'),
             onConfirm: () => this.requestDeleteProfile(),
         });
     }
 
     getViewTitle(state) {
-        const viewTitle = `${__('APP_NAME')} | ${__('PROFILE')}`;
+        const viewTitle = `${__('appName')} | ${__('profile.title')}`;
         const { action } = state;
         if (!action || !titleMap[action]) {
             return viewTitle;

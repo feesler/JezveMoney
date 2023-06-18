@@ -11,22 +11,22 @@ export class ImportListContextMenu extends PopupMenu {
             fixed: false,
             items: [{
                 id: 'ctxRestoreBtn',
-                title: __('IMPORT_ITEM_RESTORE'),
+                title: __('import.itemRestore'),
                 className: 'warning-item',
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'ctxEnableBtn',
-                title: __('DISABLE'),
+                title: __('actions.disable'),
             }, {
                 id: 'ctxUpdateBtn',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 
@@ -83,7 +83,7 @@ export class ImportListContextMenu extends PopupMenu {
         items.ctxRestoreBtn.show(itemRestoreAvail);
         show(items.separator1, itemRestoreAvail);
 
-        const title = (item.enabled) ? __('DISABLE') : __('ENABLE');
+        const title = (item.enabled) ? __('actions.disable') : __('actions.enable');
         items.ctxEnableBtn.setTitle(title);
 
         this.attachAndShow(menuButton);

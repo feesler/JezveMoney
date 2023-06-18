@@ -266,35 +266,35 @@ export class TransactionForm extends Component {
 
         this.sourceContainer = AccountContainer.create({
             id: 'sourceContainer',
-            title: __('TR_SRC_ACCOUNT'),
+            title: __('transactions.sourceAccount'),
         });
         this.sourceTile = AccountTile.create({ id: 'sourceTile' });
         this.sourceContainer.tileBase.prepend(this.sourceTile.elem);
 
         this.destContainer = AccountContainer.create({
             id: 'destContainer',
-            title: __('TR_DEST_ACCOUNT'),
+            title: __('transactions.destAccount'),
         });
         this.destTile = AccountTile.create({ id: 'destTile' });
         this.destContainer.tileBase.prepend(this.destTile.elem);
 
         this.personContainer = AccountContainer.create({
             id: 'personContainer',
-            title: __('TR_PERSON'),
+            title: __('transactions.person'),
         });
         this.personTile = Tile.create({ id: 'personTile' });
         this.personContainer.tileBase.prepend(this.personTile.elem);
 
         const debtAccProps = {
             id: 'debtAccountContainer',
-            title: __('TR_PERSON'),
+            title: __('transactions.person'),
             accountToggler: true,
             onToggleAccount: () => this.toggleEnableAccount(),
             closeButton: true,
             onClose: () => this.toggleEnableAccount(),
         };
         if (App.model.userAccounts.length === 0) {
-            debtAccProps.noDataMessage = __('TR_DEBT_NO_ACCOUNTS');
+            debtAccProps.noDataMessage = __('transactions.debtNoAccounts');
         }
 
         this.debtAccountContainer = AccountContainer.create(debtAccProps);
@@ -323,21 +323,21 @@ export class TransactionForm extends Component {
 
         this.srcResBalanceInfo = TileInfoItem.create({
             id: 'srcResBalanceInfo',
-            label: __('TR_RESULT'),
+            label: __('transactions.result'),
             onClick: () => this.store.dispatch(actions.sourceResultClick()),
         });
         this.sourceContainer.infoBlock.append(this.srcResBalanceInfo.elem);
 
         this.destResBalanceInfo = TileInfoItem.create({
             id: 'destResBalanceInfo',
-            label: __('TR_RESULT'),
+            label: __('transactions.result'),
             onClick: () => this.store.dispatch(actions.destResultClick()),
         });
         this.destContainer.infoBlock.append(this.destResBalanceInfo.elem);
 
         this.exchangeInfo = TileInfoItem.create({
             id: 'exchangeInfo',
-            label: __('TR_EXCHANGE_RATE'),
+            label: __('transactions.exchangeRate'),
             onClick: () => this.store.dispatch(actions.exchangeClick()),
         });
         this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
@@ -345,8 +345,8 @@ export class TransactionForm extends Component {
         // Source amount field
         this.srcAmountRow = AmountInputField.create({
             id: 'srcAmountRow',
-            title: __('TR_SRC_AMOUNT'),
-            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            title: __('transactions.sourceAmount'),
+            feedbackMessage: __('transactions.invalidAmount'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onSourceAmountInput(e),
@@ -356,8 +356,8 @@ export class TransactionForm extends Component {
         // Destination amount field
         this.destAmountRow = AmountInputField.create({
             id: 'destAmountRow',
-            title: __('TR_DEST_AMOUNT'),
-            feedbackMessage: __('TR_INVALID_AMOUNT'),
+            title: __('transactions.destAmount'),
+            feedbackMessage: __('transactions.invalidAmount'),
             validate: true,
             className: 'form-row',
             onInput: (e) => this.onDestAmountInput(e),
@@ -367,7 +367,7 @@ export class TransactionForm extends Component {
         // Source result field
         this.srcResBalanceRow = AmountInputField.create({
             id: 'srcResBalanceRow',
-            title: __('TR_RESULT'),
+            title: __('transactions.result'),
             className: 'form-row',
             onInput: (e) => this.onSourceResultInput(e),
         });
@@ -376,7 +376,7 @@ export class TransactionForm extends Component {
         // Destination result field
         this.destResBalanceRow = AmountInputField.create({
             id: 'destResBalanceRow',
-            title: __('TR_RESULT'),
+            title: __('transactions.result'),
             className: 'form-row',
             onInput: (e) => this.onDestResultInput(e),
         });
@@ -401,7 +401,7 @@ export class TransactionForm extends Component {
         this.exchangeRow = Field.create({
             id: 'exchangeRow',
             htmlFor: 'exchangeInput',
-            title: __('TR_EXCHANGE_RATE'),
+            title: __('transactions.exchangeRate'),
             className: 'form-row',
             content: [
                 InputGroup.create({
@@ -428,8 +428,8 @@ export class TransactionForm extends Component {
         if (this.props.type === 'transaction') {
             this.dateRow = DateInputField.create({
                 id: 'dateRow',
-                title: __('TR_DATE'),
-                feedbackMessage: __('TR_INVALID_DATE'),
+                title: __('transactions.date'),
+                feedbackMessage: __('transactions.invalidDate'),
                 className: 'form-row',
                 locales: App.dateFormatLocale,
                 validate: true,
@@ -445,14 +445,14 @@ export class TransactionForm extends Component {
             name: 'category_id',
             className: 'dd_fullwidth',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (category) => this.onCategoryChanged(category),
         });
 
         this.categoryRow = Field.create({
             id: 'categoryRow',
             htmlFor: 'categorySelect',
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             className: 'form-row',
             content: this.categorySelect.elem,
         });
@@ -462,7 +462,7 @@ export class TransactionForm extends Component {
             id: 'commentRow',
             inputId: 'commentInput',
             name: 'comment',
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             className: 'form-row',
             onInput: (e) => this.onCommentInput(e),
         });
@@ -480,7 +480,7 @@ export class TransactionForm extends Component {
             id: 'submitBtn',
             type: 'submit',
             className: 'submit-btn',
-            title: __('SUBMIT'),
+            title: __('actions.submit'),
         });
 
         this.cancelBtn = Button.create({
@@ -488,7 +488,7 @@ export class TransactionForm extends Component {
             type: 'link',
             url: App.props.nextAddress,
             className: 'cancel-btn',
-            title: __('CANCEL'),
+            title: __('actions.cancel'),
         });
 
         this.spinner = Spinner.create({ className: 'request-spinner' });
@@ -561,8 +561,8 @@ export class TransactionForm extends Component {
         // Date range field
         this.dateRangeInput = DateRangeInput.create({
             id: 'dateRangeInput',
-            startPlaceholder: __('DATE_RANGE_FROM'),
-            endPlaceholder: __('DATE_RANGE_TO'),
+            startPlaceholder: __('dateRange.from'),
+            endPlaceholder: __('dateRange.to'),
             startClearable: false,
             onChange: (range) => this.onScheduleRangeChange(range),
         });
@@ -570,7 +570,7 @@ export class TransactionForm extends Component {
         this.dateRangeField = Field.create({
             id: 'dateRangeField',
             htmlFor: 'dateRangeInput',
-            title: __('FILTER_DATE_RANGE'),
+            title: __('filters.dateRange'),
             className: 'form-row',
             content: this.dateRangeInput.elem,
         });
@@ -588,7 +588,7 @@ export class TransactionForm extends Component {
         this.intervalStepRow = Field.create({
             id: 'intervalStepRow',
             htmlFor: 'intervalStepInput',
-            title: __('SCHED_TR_INTERVAL_STEP'),
+            title: __('schedule.intervalStep'),
             className: 'interval-step-field',
             content: this.intervalStepInput.elem,
         });
@@ -596,7 +596,7 @@ export class TransactionForm extends Component {
         this.intervalFeedbackElem = createElement('div', {
             props: {
                 className: 'feedback invalid-feedback',
-                textContent: __('SCHED_TR_INVALID_INTERVAL_STEP'),
+                textContent: __('schedule.invalidIntervalStep'),
             },
         });
 
@@ -607,18 +607,18 @@ export class TransactionForm extends Component {
             className: 'dd_fullwidth interval-type-select',
             onChange: (type) => this.onIntervalTypeChanged(type),
             data: [
-                { id: INTERVAL_NONE, title: __('SCHED_TR_INTERVAL_NONE') },
-                { id: INTERVAL_DAY, title: __('SCHED_TR_INTERVAL_DAY') },
-                { id: INTERVAL_WEEK, title: __('SCHED_TR_INTERVAL_WEEK') },
-                { id: INTERVAL_MONTH, title: __('SCHED_TR_INTERVAL_MONTH') },
-                { id: INTERVAL_YEAR, title: __('SCHED_TR_INTERVAL_YEAR') },
+                { id: INTERVAL_NONE, title: __('schedule.intervals.none') },
+                { id: INTERVAL_DAY, title: __('schedule.intervals.day') },
+                { id: INTERVAL_WEEK, title: __('schedule.intervals.week') },
+                { id: INTERVAL_MONTH, title: __('schedule.intervals.month') },
+                { id: INTERVAL_YEAR, title: __('schedule.intervals.year') },
             ],
         });
 
         this.intervalTypeRow = Field.create({
             id: 'intervalTypeRow',
             htmlFor: 'intervalTypeSelect',
-            title: __('SCHED_TR_INTERVAL'),
+            title: __('schedule.repeat'),
             className: 'interval-type-field',
             content: this.intervalTypeSelect.elem,
         });
@@ -651,7 +651,7 @@ export class TransactionForm extends Component {
         this.weekDayField = Field.create({
             id: 'weekDayField',
             htmlFor: 'weekDaySelect',
-            title: __('SCHED_TR_OFFSET_WEEK_DAYS'),
+            title: __('schedule.offsetWeekDays'),
             className: 'form-row week-day-field',
             content: this.weekDaySelect.elem,
         });
@@ -680,7 +680,7 @@ export class TransactionForm extends Component {
         this.daySelectField = Field.create({
             id: 'daySelectField',
             htmlFor: 'monthDaySelect',
-            title: __('SCHED_TR_OFFSET_MONTH_DAY'),
+            title: __('schedule.offsetMonthDay'),
             className: 'form-row horizontal-field day-select-field',
             content: [
                 this.monthDaySelect.elem,
@@ -721,7 +721,7 @@ export class TransactionForm extends Component {
                 enableFilter: true,
                 placeholder: __('accounts.typeToFilter'),
                 useSingleSelectionAsPlaceholder: false,
-                noResultsMessage: __('NOT_FOUND'),
+                noResultsMessage: __('notFound'),
                 onItemSelect: (item) => this.onSrcAccountSelect(item),
             });
 
@@ -749,7 +749,7 @@ export class TransactionForm extends Component {
                 enableFilter: true,
                 placeholder: __('accounts.typeToFilter'),
                 useSingleSelectionAsPlaceholder: false,
-                noResultsMessage: __('NOT_FOUND'),
+                noResultsMessage: __('notFound'),
                 onItemSelect: (item) => this.onDestAccountSelect(item),
             });
         }
@@ -779,9 +779,9 @@ export class TransactionForm extends Component {
             elem: this.personTile.elem,
             listAttach: true,
             enableFilter: true,
-            placeholder: __('PERSON_TYPE_TO_FILTER'),
+            placeholder: __('persons.typeToFilter'),
             useSingleSelectionAsPlaceholder: false,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (item) => this.onPersonSelect(item),
         });
 
@@ -800,7 +800,7 @@ export class TransactionForm extends Component {
             enableFilter: true,
             placeholder: __('accounts.typeToFilter'),
             useSingleSelectionAsPlaceholder: false,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (item) => this.onDebtAccountSelect(item),
         });
 
@@ -1331,8 +1331,8 @@ export class TransactionForm extends Component {
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(__('TR_RESULT'));
-            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+            this.srcResBalanceRow.setTitle(__('transactions.result'));
+            this.destResBalanceRow.setTitle(__('transactions.result'));
         }
 
         this.srcAmountRow.enableSelect(false);
@@ -1382,8 +1382,8 @@ export class TransactionForm extends Component {
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(__('TR_RESULT'));
-            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+            this.srcResBalanceRow.setTitle(__('transactions.result'));
+            this.destResBalanceRow.setTitle(__('transactions.result'));
         }
 
         this.srcAmountRow.enableSelect(true);
@@ -1462,8 +1462,8 @@ export class TransactionForm extends Component {
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_SOURCE')})`);
-            this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${__('TR_DESTINATION')})`);
+            this.srcResBalanceRow.setTitle(`${__('transactions.result')} (${__('transactions.source')})`);
+            this.destResBalanceRow.setTitle(`${__('transactions.result')} (${__('transactions.destination')})`);
         }
 
         this.srcAmountRow.enableSelect(false);
@@ -1625,9 +1625,9 @@ export class TransactionForm extends Component {
         ]);
 
         if (noAccount) {
-            this.debtAccountContainer.setTitle(__('TR_NO_ACCOUNT'));
+            this.debtAccountContainer.setTitle(__('transactions.noAccount'));
         } else {
-            const title = (debtType) ? __('TR_DEST_ACCOUNT') : __('TR_SRC_ACCOUNT');
+            const title = (debtType) ? __('transactions.destAccount') : __('transactions.sourceAccount');
             this.debtAccountContainer.setTitle(title);
         }
 
@@ -1644,10 +1644,10 @@ export class TransactionForm extends Component {
         this.debtAccountContainer.togglerButton.enable(!state.submitStarted);
 
         if (isTransaction) {
-            const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
-            const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
-            this.srcResBalanceRow.setTitle(`${__('TR_RESULT')} (${srcResultTarget})`);
-            this.destResBalanceRow.setTitle(`${__('TR_RESULT')} (${destResultTarget})`);
+            const srcResultTarget = __((debtType) ? 'transactions.person' : 'transactions.debtAccount');
+            const destResultTarget = __((debtType) ? 'transactions.debtAccount' : 'transactions.person');
+            this.srcResBalanceRow.setTitle(`${__('transactions.result')} (${srcResultTarget})`);
+            this.destResBalanceRow.setTitle(`${__('transactions.result')} (${destResultTarget})`);
         }
 
         this.srcAmountRow.enableSelect(debtType);
@@ -1704,7 +1704,7 @@ export class TransactionForm extends Component {
         ]);
 
         if (isTransaction) {
-            this.destResBalanceRow.setTitle(__('TR_RESULT'));
+            this.destResBalanceRow.setTitle(__('transactions.result'));
         }
 
         this.srcAmountRow.enableSelect(false);
@@ -1781,7 +1781,7 @@ export class TransactionForm extends Component {
 
         if (isMonthInterval) {
             this.monthDaySelect.setSelection(transaction.interval_offset);
-            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_MONTH_DAY'));
+            this.daySelectField.setTitle(__('schedule.offsetMonthDay'));
         } else if (isYearInterval) {
             const monthIndex = Math.floor(transaction.interval_offset / 100);
             const dayIndex = (transaction.interval_offset % 100);
@@ -1789,7 +1789,7 @@ export class TransactionForm extends Component {
             this.monthDaySelect.setSelection(dayIndex);
             this.monthSelect.setSelection(monthIndex);
 
-            this.daySelectField.setTitle(__('SCHED_TR_OFFSET_YEAR_DAY'));
+            this.daySelectField.setTitle(__('schedule.offsetYearDay'));
         }
 
         this.daySelectField.show(isMonthInterval || isYearInterval);
@@ -1807,11 +1807,11 @@ export class TransactionForm extends Component {
         if (!state.isAvailable) {
             let message;
             if (transaction.type === EXPENSE || transaction.type === INCOME) {
-                message = __('TR_NO_ACCOUNTS');
+                message = __('transactions.noAccounts');
             } else if (transaction.type === TRANSFER) {
-                message = __('TR_TRANSFER_NO_ACCOUNTS');
+                message = __('transactions.transferNoAccounts');
             } else if (transaction.type === DEBT) {
-                message = __('TR_DEBT_NO_PERSONS');
+                message = __('transactions.debtNoPersons');
             }
 
             this.notAvailMsg.textContent = message;
@@ -1906,10 +1906,10 @@ export class TransactionForm extends Component {
         let destAmountLbl;
         if (transaction.type === LIMIT_CHANGE) {
             sourceAmountLbl = '';
-            destAmountLbl = __('TR_LIMIT_DELTA');
+            destAmountLbl = __('transactions.limitDelta');
         } else {
-            sourceAmountLbl = (state.isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
-            destAmountLbl = (state.isDiff) ? __('TR_DEST_AMOUNT') : __('TR_AMOUNT');
+            sourceAmountLbl = (state.isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
+            destAmountLbl = (state.isDiff) ? __('transactions.destAmount') : __('transactions.amount');
         }
 
         // Tile info items

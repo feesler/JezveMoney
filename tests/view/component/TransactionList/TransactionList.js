@@ -110,7 +110,7 @@ export class TransactionList extends TestComponent {
         assert.isArray(transactions, 'Invalid data');
 
         const res = {
-            title: __('TRANSACTIONS', App.view.locale),
+            title: __('transactions.listTitle', App.view.locale),
             transList: this.render(transactions, state),
         };
 

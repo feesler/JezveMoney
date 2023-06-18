@@ -130,7 +130,7 @@ class ImportView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('IMPORT'),
+            title: __('import.listTitle'),
         });
 
         this.uploadBtn = Button.create({
@@ -146,7 +146,7 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (account) => this.onMainAccChange(account),
             className: 'dd_ellipsis',
         });
@@ -155,7 +155,7 @@ class ImportView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
@@ -180,7 +180,7 @@ class ImportView extends View {
             props: {
                 className: 'btn show-more-btn',
                 type: 'button',
-                textContent: __('SHOW_MORE'),
+                textContent: __('actions.showMore'),
             },
             events: { click: (e) => this.showMore(e) },
         });
@@ -616,7 +616,7 @@ class ImportView extends View {
 
         this.removeAllItems();
         this.submitProgress.hide();
-        App.createSuccessNotification(__('MSG_IMPORT_SUCCESS'));
+        App.createSuccessNotification(__('import.successMessage'));
     }
 
     /** Apply rules to imported items */

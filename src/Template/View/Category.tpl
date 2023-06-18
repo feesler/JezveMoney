@@ -17,20 +17,20 @@
                                 <input id="categoryId" name="id" type="hidden" value="<?= e($category->id) ?>">
                             <?php    }    ?>
                             <div id="parentCategoryField" class="field form-row">
-                                <label for="parent" class="field__title"><?= __("CATEGORY_PARENT") ?></label>
+                                <label for="parent" class="field__title"><?= __("categories.parent") ?></label>
                                 <select id="parent" name="parent_id"></select>
                             </div>
 
                             <hr class="form-separator">
 
                             <div id="typeField" class="field form-row">
-                                <label for="type" class="field__title"><?= __("CATEGORY_TR_TYPE") ?></label>
+                                <label for="type" class="field__title"><?= __("categories.transactionType") ?></label>
                                 <select id="type" name="type"></select>
                             </div>
 
                             <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
+                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("actions.cancel") ?></a>
                             </div>
                         </form>
                     </main>

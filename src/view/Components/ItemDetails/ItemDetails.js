@@ -54,12 +54,12 @@ export class ItemDetails extends Component {
         });
 
         this.createDateField = Field.create({
-            title: __('CREATE_DATE'),
+            title: __('item.createDate'),
             className: CREATE_DATE_FIELD_CLASS,
         });
 
         this.updateDateField = Field.create({
-            title: __('UPDATE_DATE'),
+            title: __('item.updateDate'),
             className: UPDATE_DATE_FIELD_CLASS,
         });
 

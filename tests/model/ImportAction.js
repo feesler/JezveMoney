@@ -89,13 +89,13 @@ export class ImportAction {
     }
 
     static actionTypes = [
-        { id: IMPORT_ACTION_SET_TR_TYPE, titleToken: 'ACTION_SET_TR_TYPE' },
-        { id: IMPORT_ACTION_SET_ACCOUNT, titleToken: 'ACTION_SET_ACCOUNT' },
-        { id: IMPORT_ACTION_SET_PERSON, titleToken: 'ACTION_SET_PERSON' },
-        { id: IMPORT_ACTION_SET_SRC_AMOUNT, titleToken: 'ACTION_SET_SRC_AMOUNT' },
-        { id: IMPORT_ACTION_SET_DEST_AMOUNT, titleToken: 'ACTION_SET_DEST_AMOUNT' },
-        { id: IMPORT_ACTION_SET_COMMENT, titleToken: 'ACTION_SET_COMMENT' },
-        { id: IMPORT_ACTION_SET_CATEGORY, titleToken: 'ACTION_SET_CATEGORY' },
+        { id: IMPORT_ACTION_SET_TR_TYPE, titleToken: 'import.actions.types.setTransactionType' },
+        { id: IMPORT_ACTION_SET_ACCOUNT, titleToken: 'import.actions.types.setAccount' },
+        { id: IMPORT_ACTION_SET_PERSON, titleToken: 'import.actions.types.setPerson' },
+        { id: IMPORT_ACTION_SET_SRC_AMOUNT, titleToken: 'import.actions.types.setSourceAmount' },
+        { id: IMPORT_ACTION_SET_DEST_AMOUNT, titleToken: 'import.actions.types.setDestAmount' },
+        { id: IMPORT_ACTION_SET_COMMENT, titleToken: 'import.actions.types.setComment' },
+        { id: IMPORT_ACTION_SET_CATEGORY, titleToken: 'import.actions.types.setCategory' },
     ];
 
     static actionsMap = {

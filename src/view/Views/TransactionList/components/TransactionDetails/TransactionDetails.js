@@ -22,47 +22,47 @@ export class TransactionDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: SOURCE_FIELD_CLASS,
         });
 
         this.destinationField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: DEST_FIELD_CLASS,
         });
 
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: SRC_AMOUNT_FIELD_CLASS,
         });
 
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: DEST_AMOUNT_FIELD_CLASS,
         });
 
         this.srcResultField = Field.create({
-            title: __('TR_SRC_RESULT'),
+            title: __('transactions.sourceResult'),
             className: SRC_RESULT_FIELD_CLASS,
         });
 
         this.destResultField = Field.create({
-            title: __('TR_DEST_RESULT'),
+            title: __('transactions.destResult'),
             className: DEST_RESULT_FIELD_CLASS,
         });
 
         this.dateField = Field.create({
-            title: __('TR_DATE'),
+            title: __('transactions.date'),
             className: DATE_FIELD_CLASS,
         });
 
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             className: CATEGORY_FIELD_CLASS,
         });
 
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             className: COMMENT_FIELD_CLASS,
         });
 
@@ -96,7 +96,7 @@ export class TransactionDetails extends ItemDetails {
     getCategoryTitle(state) {
         const { item } = state;
         if (item.category_id === 0) {
-            return __('NO_CATEGORY');
+            return __('categories.noCategory');
         }
 
         const { categories } = App.model;

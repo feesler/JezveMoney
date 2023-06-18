@@ -36,7 +36,7 @@ export class ResetDataDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'reset_popup',
-            title: __('PROFILE_RESET_DATA'),
+            title: __('profile.resetData'),
             className: DIALOG_CLASS,
         });
 

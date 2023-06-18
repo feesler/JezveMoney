@@ -36,7 +36,7 @@ class ApiListController extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $res = [];
@@ -210,13 +210,13 @@ class ApiListController extends ApiController
     public function create()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
         $requestData = asArray($request["data"] ?? [$request]);
         if (!is_array($requestData) || count($requestData) === 0) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+            throw new \Error(__("errors.invalidRequestData"));
         }
 
         $this->begin();
@@ -224,7 +224,7 @@ class ApiListController extends ApiController
         $items = [];
         foreach ($requestData as $item) {
             if (!is_array($item)) {
-                throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+                throw new \Error(__("errors.invalidRequestData"));
             }
 
             $expectedFields = $this->getExpectedFields($item);
@@ -283,18 +283,18 @@ class ApiListController extends ApiController
     public function update()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+            throw new \Error(__("errors.invalidRequestData"));
         }
 
         $expectedFields = $this->getExpectedFields($request);
         $reqData = copyFields($request, $expectedFields);
         if ($reqData === false) {
-            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
+            throw new \Error(__("errors.invalidRequestData"));
         }
 
         $this->begin();
@@ -335,12 +335,12 @@ class ApiListController extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();

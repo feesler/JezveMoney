@@ -44,7 +44,7 @@ class Schedule extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "Schedule.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("SCHEDULE"),
+            "titleString" => __("appName") . " | " . __("schedule.listTitle"),
         ];
 
         $requestDefaults = [
@@ -115,7 +115,7 @@ class Schedule extends ListViewController
             $res = TransactionModel::stringToType($request["type"]);
         }
         if (!$res) {
-            $this->fail(__("ERR_TRANSACTION_TYPE"));
+            $this->fail(__("transactions.errors.invalidType"));
         }
 
         return $res;
@@ -128,20 +128,20 @@ class Schedule extends ListViewController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "ScheduleItem.tpl");
         $data = [
-            "headString" => __("SCHED_TRANS_CREATE"),
-            "titleString" => __("APP_NAME") . " | " . __("SCHED_TRANS_CREATE"),
+            "headString" => __("schedule.create"),
+            "titleString" => __("appName") . " | " . __("schedule.create"),
         ];
 
 
         $userAccounts = $this->accModel->getUserAccounts();
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = __("ERR_TRANS_CREATE");
+        $defMsg = __("transactions.errors.create");
 
         $dateInfo = getDateInfo(time(), INTERVAL_MONTH);
 
@@ -206,7 +206,7 @@ class Schedule extends ListViewController
         if ($person_id) {
             $person = $this->personMod->getItem($person_id);
             if (!$person) {
-                $this->fail(__("ERR_PERSON_NOT_FOUND"));
+                $this->fail(__("persons.errors.notFound"));
             }
         }
 
@@ -302,23 +302,23 @@ class Schedule extends ListViewController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "ScheduleItem.tpl");
         $data = [
-            "headString" => __("SCHED_TRANS_UPDATE"),
-            "titleString" => __("APP_NAME") . " | " . __("SCHED_TRANS_UPDATE"),
+            "headString" => __("schedule.update"),
+            "titleString" => __("appName") . " | " . __("schedule.update"),
         ];
 
         $itemId = intval($this->actionParam);
         if (!$itemId) {
-            $this->fail(__("ERR_SCHED_TRANS_UPDATE"));
+            $this->fail(__("schedule.errors.update"));
         }
 
         $item = $this->model->getItem($itemId);
         if (!$item) {
-            $this->fail(__("ERR_SCHED_TRANS_UPDATE"));
+            $this->fail(__("schedule.errors.update"));
         }
         $tr = (array)$item;
 
@@ -334,7 +334,7 @@ class Schedule extends ListViewController
             $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
             $person = $this->personMod->getItem($person_id);
             if (!$person) {
-                throw new \Error(__("ERR_PERSON_NOT_FOUND"));
+                throw new \Error(__("persons.errors.notFound"));
             }
 
             $debtAcc = $debtType ? $dest : $src;

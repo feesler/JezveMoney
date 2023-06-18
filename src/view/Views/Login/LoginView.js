@@ -44,7 +44,7 @@ class LoginView extends View {
         ]);
 
         // Form title
-        this.titleElem = createElement('h1', { props: { textContent: __('LOG_IN') } });
+        this.titleElem = createElement('h1', { props: { textContent: __('login.title') } });
 
         // Login field
         this.loginField = InputField.create({
@@ -52,9 +52,9 @@ class LoginView extends View {
             inputId: 'loginInp',
             className: 'form-row',
             name: 'login',
-            title: __('LOG_IN_USERNAME'),
+            title: __('login.userName'),
             validate: true,
-            feedbackMessage: __('LOG_IN_INVALID_USERNAME'),
+            feedbackMessage: __('login.invalidUserName'),
             onInput: (e) => this.onLoginInput(e),
         });
 
@@ -65,15 +65,15 @@ class LoginView extends View {
             className: 'form-row',
             name: 'password',
             type: 'password',
-            title: __('LOG_IN_PASSWORD'),
+            title: __('login.password'),
             validate: true,
-            feedbackMessage: __('LOG_IN_INVALID_PASSWORD'),
+            feedbackMessage: __('login.invalidPassword'),
             onInput: (e) => this.onPasswordInput(e),
         });
 
         this.rememberCheck = Checkbox.create({
             id: 'rememberCheck',
-            label: __('LOG_IN_REMEMBER'),
+            label: __('login.remember'),
             onChange: () => this.onToggleRememberCheck(),
         });
 
@@ -85,8 +85,8 @@ class LoginView extends View {
 
         // Form controls
         this.controls = FormControls.create({
-            submitTitle: __('LOG_IN_BUTTON'),
-            cancelTitle: __('REGISTRATION'),
+            submitTitle: __('login.submitButton'),
+            cancelTitle: __('registration.title'),
             cancelBtnClass: 'alter-link',
             cancelURL: `${App.baseURL}register/`,
         });

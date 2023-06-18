@@ -18,7 +18,7 @@ export class Category {
 
     /** Return title string for specified transaction type */
     static typeToString(value, locale = 'en') {
-        return (value !== 0) ? Transaction.typeToString(value, locale) : __('TR_ANY', locale);
+        return (value !== 0) ? Transaction.typeToString(value, locale) : __('transactions.types.any', locale);
     }
 
     constructor(data) {

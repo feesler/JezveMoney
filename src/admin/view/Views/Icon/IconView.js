@@ -15,7 +15,7 @@ class AdminIconListView extends AdminListView {
 
         this.apiController = 'icon';
         this.statePath = 'icons';
-        this.deleteConfirmMessage = __('MSG_ICON_DELETE');
+        this.deleteConfirmMessage = __('icons.deleteMessage');
     }
 
     /**

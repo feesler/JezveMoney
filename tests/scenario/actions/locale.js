@@ -15,7 +15,7 @@ import { TransactionListView } from '../../view/TransactionListView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 
 const translateExceptions = [
-    'APP_NAME',
+    'appName',
 ];
 
 /**

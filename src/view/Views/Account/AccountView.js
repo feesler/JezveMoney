@@ -170,7 +170,7 @@ class AccountView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -348,7 +348,7 @@ class AccountView extends View {
 
         const currencyObj = App.model.currency.getItem(state.data.curr_id);
         if (!currencyObj) {
-            throw new Error(__('ERR_CURR_NOT_FOUND'));
+            throw new Error(__('currencies.errors.notFound'));
         }
 
         // Render account tile

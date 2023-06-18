@@ -27,10 +27,10 @@ class Category extends ApiSortableListController
 
         $this->model = CategoryModel::getInstance();
         $this->transModel = TransactionModel::getInstance();
-        $this->createErrorMsg = __("ERR_CATEGORY_CREATE");
-        $this->updateErrorMsg = __("ERR_CATEGORY_UPDATE");
-        $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
-        $this->changePosErrorMsg = __("ERR_CATEGORY_CHANGE_POS");
+        $this->createErrorMsg = __("categories.errors.create");
+        $this->updateErrorMsg = __("categories.errors.update");
+        $this->deleteErrorMsg = __("categories.errors.delete");
+        $this->changePosErrorMsg = __("categories.errors.changePos");
     }
 
     /**

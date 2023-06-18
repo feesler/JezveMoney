@@ -96,14 +96,14 @@ const stringOperators = [
 
 /** List of available field types */
 const fieldTypes = [
-    { id: ConditionFields.mainAccount, titleToken: 'IMPORT_MAIN_ACCOUNT', operators: itemOperators },
-    { id: ConditionFields.template, titleToken: 'TEMPLATE', operators: itemOperators },
-    { id: ConditionFields.transactionAmount, titleToken: 'COLUMN_TR_AMOUNT', operators: numOperators },
-    { id: ConditionFields.transactionCurrency, titleToken: 'COLUMN_TR_CURRENCY', operators: itemOperators },
-    { id: ConditionFields.accountAmount, titleToken: 'COLUMN_ACCOUNT_AMOUNT', operators: numOperators },
-    { id: ConditionFields.accountCurrency, titleToken: 'COLUMN_ACCOUNT_CURRENCY', operators: itemOperators },
-    { id: ConditionFields.comment, titleToken: 'COLUMN_COMMENT', operators: stringOperators },
-    { id: ConditionFields.date, titleToken: 'COLUMN_DATE', operators: numOperators },
+    { id: ConditionFields.mainAccount, titleToken: 'import.mainAccount', operators: itemOperators },
+    { id: ConditionFields.template, titleToken: 'import.templates.title', operators: itemOperators },
+    { id: ConditionFields.transactionAmount, titleToken: 'import.templates.columns.transactionAmount', operators: numOperators },
+    { id: ConditionFields.transactionCurrency, titleToken: 'import.templates.columns.transactionCurrency', operators: itemOperators },
+    { id: ConditionFields.accountAmount, titleToken: 'import.templates.columns.accountAmount', operators: numOperators },
+    { id: ConditionFields.accountCurrency, titleToken: 'import.templates.columns.accountCurrency', operators: itemOperators },
+    { id: ConditionFields.comment, titleToken: 'import.templates.columns.comment', operators: stringOperators },
+    { id: ConditionFields.date, titleToken: 'import.templates.columns.date', operators: numOperators },
 ];
 
 /** Field type to name map */
@@ -144,11 +144,11 @@ const operatorNames = {
 
 /** List of available condition operator types */
 const operatorTypes = [
-    { id: ConditionOperators.includes, titleToken: 'OP_INLINE_INCLUDES' },
-    { id: ConditionOperators.is, titleToken: 'OP_INLINE_EQUAL' },
-    { id: ConditionOperators.isNot, titleToken: 'OP_INLINE_NOT_EQUAL' },
-    { id: ConditionOperators.less, titleToken: 'OP_INLINE_LESS' },
-    { id: ConditionOperators.greater, titleToken: 'OP_INLINE_GREATER' },
+    { id: ConditionOperators.includes, titleToken: 'import.conditions.opInline.includes' },
+    { id: ConditionOperators.is, titleToken: 'import.conditions.opInline.equal' },
+    { id: ConditionOperators.isNot, titleToken: 'import.conditions.opInline.notEqual' },
+    { id: ConditionOperators.less, titleToken: 'import.conditions.opInline.less' },
+    { id: ConditionOperators.greater, titleToken: 'import.conditions.opInline.greater' },
 ];
 
 /** Search condition field type by id */

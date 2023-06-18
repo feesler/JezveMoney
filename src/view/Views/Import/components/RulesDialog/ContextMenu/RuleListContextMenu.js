@@ -16,12 +16,12 @@ export class RuleListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxUpdateRuleBtn',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
                 className: UPDATE_BUTTON_CLASS,
             }, {
                 id: 'ctxDeleteRuleBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 className: DEL_BUTTON_CLASS,
             }],
         });

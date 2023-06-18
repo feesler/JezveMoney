@@ -14,8 +14,8 @@
                     <main>
                         <form id="personForm" method="post" action="<?= e(BASEURL . "persons/" . $this->action) ?>/">
                             <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("CANCEL") ?></a>
+                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("actions.cancel") ?></a>
                             </div>
                             <?php if ($this->action == "update") {        ?>
                                 <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">

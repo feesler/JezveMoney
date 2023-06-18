@@ -18,7 +18,7 @@ const defaultProps = {
     placeholderClass: ITEM_PLACEHOLDER_CLASS,
     sortModeClass: SORT_MODE_CLASS,
     sortGroup: 'transactions',
-    noItemsMessage: __('TRANSACTIONS_NO_DATA'),
+    noItemsMessage: __('transactions.noData'),
     mode: 'classic',
     showControls: true,
     showDate: true,

@@ -1616,7 +1616,7 @@ export class ImportView extends AppView {
             success: resExpected,
         };
         if (resExpected) {
-            expected.notification.message = __('MSG_IMPORT_SUCCESS', this.locale);
+            expected.notification.message = __('import.successMessage', this.locale);
         }
 
         this.checkState(expected);

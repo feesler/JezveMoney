@@ -12,7 +12,7 @@ const LIST_ICON = 'mode-list';
 const getContentState = (state) => ({
     ...state,
     icon: (state.details) ? LIST_ICON : DETAILS_ICON,
-    title: (state.details) ? __('TR_LIST_SHOW_MAIN') : __('TR_LIST_SHOW_DETAILS'),
+    title: (state.details) ? __('transactions.showMain') : __('transactions.showDetails'),
 });
 
 const defaultProps = {

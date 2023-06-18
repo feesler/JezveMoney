@@ -185,15 +185,8 @@ export const formatTokenString = (value, ...args) => (
     })
 );
 
-/** Returns true if specified token is exists */
-export const hasToken = (token) => (
-    (typeof token === 'string')
-    && (typeof window.localeTokens[token] === 'string')
-);
-
-/* eslint-disable no-underscore-dangle */
-/** Returns locale string for specified token */
-export const __ = (token, ...args) => {
+/** Returns not formatted token string for specified path */
+const getTokenString = (token) => {
     const { localeTokens } = window;
 
     if (!isObject(localeTokens)) {
@@ -205,7 +198,8 @@ export const __ = (token, ...args) => {
 
     const tokenPath = token.split('.');
     const path = [];
-    const tokenString = tokenPath.reduce((res, key) => {
+
+    return tokenPath.reduce((res, key) => {
         path.push(key);
         if (typeof res[key] === 'undefined') {
             throw new Error(`Token ${path.join('.')} not found`);
@@ -213,8 +207,22 @@ export const __ = (token, ...args) => {
 
         return res[key];
     }, localeTokens);
+};
 
-    return formatTokenString(tokenString, args);
+/** Returns true if specified token is exists */
+export const hasToken = (token) => (
+    typeof getTokenString(token) === 'string'
+);
+
+/* eslint-disable no-underscore-dangle */
+/** Returns locale string for specified token */
+export const __ = (token, ...args) => {
+    const tokenString = getTokenString(token);
+    if (typeof tokenString !== 'string') {
+        throw new Error('Invalid token string');
+    }
+
+    return formatTokenString(tokenString, ...args);
 };
 /* eslint-enable no-underscore-dangle */
 
@@ -224,16 +232,16 @@ export const formatNumberShort = (value) => {
     let size = '';
     if (value >= 1e12) {
         val = correct(value / 1e12, 2);
-        size = __('NUMBER_SIZE_T');
+        size = __('numberSizes.T');
     } else if (value >= 1e9) {
         val = correct(value / 1e9, 2);
-        size = __('NUMBER_SIZE_B');
+        size = __('numberSizes.B');
     } else if (value >= 1e6) {
         val = correct(value / 1e6, 2);
-        size = __('NUMBER_SIZE_M');
+        size = __('numberSizes.M');
     } else if (value >= 1e3) {
         val = correct(value / 1e3, 2);
-        size = __('NUMBER_SIZE_K');
+        size = __('numberSizes.K');
     }
 
     const fmtValue = formatValue(val);
@@ -248,7 +256,7 @@ export const formatPersonDebts = (person) => {
 
     const debtAccounts = person.accounts.filter((account) => account.balance !== 0);
     if (debtAccounts.length === 0) {
-        return __('PERSON_NO_DEBTS');
+        return __('persons.noDebts');
     }
 
     const { currency } = App.model;
@@ -261,7 +269,7 @@ export const formatPersonDebts = (person) => {
 export const getCurrencyPrecision = (id) => {
     const currency = App.model.currency.getItem(id);
     if (!currency) {
-        throw new Error(__('ERR_CURR_NOT_FOUND'));
+        throw new Error(__('currencies.errors.notFound'));
     }
 
     return currency.precision;

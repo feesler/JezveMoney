@@ -116,11 +116,11 @@ export class TransactionListItem extends Component {
     initDetails() {
         // Accounts
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -129,11 +129,11 @@ export class TransactionListItem extends Component {
         });
         // Amount
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
@@ -142,11 +142,11 @@ export class TransactionListItem extends Component {
         });
         // Result balance
         this.srcResultField = Field.create({
-            title: __('TR_SRC_RESULT'),
+            title: __('transactions.sourceResult'),
             className: RESULT_FIELD_CLASS,
         });
         this.destResultField = Field.create({
-            title: __('TR_DEST_RESULT'),
+            title: __('transactions.destResult'),
             className: RESULT_FIELD_CLASS,
         });
         const resultsGroup = createElement('div', {
@@ -161,21 +161,21 @@ export class TransactionListItem extends Component {
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
-            title: __('TR_DATE'),
+            title: __('transactions.date'),
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
@@ -429,7 +429,7 @@ export class TransactionListItem extends Component {
 
         // Amount
         const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         if (isDiff) {
             const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);
@@ -444,7 +444,7 @@ export class TransactionListItem extends Component {
 
         // Source result
         if (showSource) {
-            const srcResultLabel = (showDest) ? __('TR_SRC_RESULT') : __('TR_RESULT');
+            const srcResultLabel = (showDest) ? __('transactions.sourceResult') : __('transactions.result');
             this.srcResultField.setTitle(srcResultLabel);
             const srcResult = currency.formatCurrency(item.src_result, item.src_curr);
             this.srcResultField.setContent(srcResult);
@@ -453,7 +453,7 @@ export class TransactionListItem extends Component {
 
         // Destination result
         if (showDest) {
-            const destResultLabel = (showSource) ? __('TR_DEST_RESULT') : __('TR_RESULT');
+            const destResultLabel = (showSource) ? __('transactions.destResult') : __('transactions.result');
             this.destResultField.setTitle(destResultLabel);
             const destResult = currency.formatCurrency(item.dest_result, item.dest_curr);
             this.destResultField.setContent(destResult);

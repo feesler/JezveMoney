@@ -103,7 +103,7 @@ class SettingsView extends View {
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
-            title: __('SETTINGS_CURRENCIES'),
+            title: __('settings.currencies.title'),
         });
 
         this.createBtn = Button.create({
@@ -115,7 +115,7 @@ class SettingsView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
 
@@ -155,7 +155,7 @@ class SettingsView extends View {
             sortModeClass: 'currencies-list_sort',
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('USER_CURRENCIES_NO_DATA'),
+            noItemsMessage: __('settings.currencies.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         });
@@ -189,17 +189,17 @@ class SettingsView extends View {
             items: [{
                 id: 'main',
                 value: 'main',
-                title: __('SETTINGS_MAIN'),
+                title: __('settings.main'),
                 content: this.mainTab,
             }, {
                 id: 'currencies',
                 value: 'currencies',
-                title: __('SETTINGS_CURRENCIES'),
+                title: __('settings.currencies.title'),
                 content: this.userCurrenciesTab,
             }, {
                 id: 'regional',
                 value: 'regional',
-                title: __('SETTINGS_REGIONAL'),
+                title: __('settings.regional'),
                 content: this.regionalTab,
             }],
         });
@@ -398,7 +398,7 @@ class SettingsView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        App.createErrorNotification(__('ERR_USER_CURRENCY_CHANGE_POS'));
+        App.createErrorNotification(__('userCurrencies.errors.changePos'));
     }
 
     async deleteItems() {

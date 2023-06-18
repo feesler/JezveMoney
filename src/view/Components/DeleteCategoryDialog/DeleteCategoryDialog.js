@@ -37,7 +37,7 @@ export class DeleteCategoryDialog extends Component {
         });
 
         this.deleteChildredCheck = Checkbox.create({
-            label: __('CATEGORY_DELETE_CHILDREN'),
+            label: __('categories.deleteChildren'),
             onChange: () => this.onToggleDeleteChild(),
         });
 

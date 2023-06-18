@@ -36,20 +36,20 @@ export class SetCategoryDialog extends Component {
         this.categorySelect = CategorySelect.create({
             className: 'dd_fullwidth',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (category) => this.onChangeCategory(category),
         });
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categorySelect.elem,
             className: 'form-row',
         });
 
         this.dialog = ConfirmDialog.create({
             id: 'selectCategoryDialog',
-            title: __('TR_SET_CATEGORY'),
+            title: __('transactions.setCategory'),
             content: this.categoryField.elem,
-            confirmButtonTitle: __('SAVE'),
+            confirmButtonTitle: __('actions.save'),
             className: 'category-dialog',
             destroyOnResult: false,
             onConfirm: () => this.onSubmit(),

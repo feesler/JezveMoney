@@ -78,7 +78,7 @@ export class TemplateSelect extends Component {
             listAttach: true,
             enableFilter: true,
             isValidToggleTarget: (elem) => this.isValidToggleTarget(elem),
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (tpl) => this.onChange(tpl),
         });
     }

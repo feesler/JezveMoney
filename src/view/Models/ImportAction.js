@@ -31,13 +31,13 @@ const actionHandlers = {
 export class ImportAction extends ListItem {
     /** List of available action types */
     static actionTypes = [
-        { id: IMPORT_ACTION_SET_TR_TYPE, title: __('ACTION_SET_TR_TYPE') },
-        { id: IMPORT_ACTION_SET_ACCOUNT, title: __('ACTION_SET_ACCOUNT') },
-        { id: IMPORT_ACTION_SET_PERSON, title: __('ACTION_SET_PERSON') },
-        { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: __('ACTION_SET_SRC_AMOUNT') },
-        { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: __('ACTION_SET_DEST_AMOUNT') },
-        { id: IMPORT_ACTION_SET_COMMENT, title: __('ACTION_SET_COMMENT') },
-        { id: IMPORT_ACTION_SET_CATEGORY, title: __('ACTION_SET_CATEGORY') },
+        { id: IMPORT_ACTION_SET_TR_TYPE, title: __('import.actions.types.setTransactionType') },
+        { id: IMPORT_ACTION_SET_ACCOUNT, title: __('import.actions.types.setAccount') },
+        { id: IMPORT_ACTION_SET_PERSON, title: __('import.actions.types.setPerson') },
+        { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: __('import.actions.types.setSourceAmount') },
+        { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: __('import.actions.types.setDestAmount') },
+        { id: IMPORT_ACTION_SET_COMMENT, title: __('import.actions.types.setComment') },
+        { id: IMPORT_ACTION_SET_CATEGORY, title: __('import.actions.types.setCategory') },
     ];
 
     /** List of action types requires select value from list */
@@ -56,13 +56,13 @@ export class ImportAction extends ListItem {
 
     /** List of available transaction types */
     static transactionTypes = [
-        { id: 'expense', title: __('TR_EXPENSE') },
-        { id: 'income', title: __('TR_INCOME') },
-        { id: 'transfer_out', title: __('TR_TRANSFER_OUT') },
-        { id: 'transfer_in', title: __('TR_TRANSFER_IN') },
-        { id: 'debt_out', title: __('TR_DEBT_OUT') },
-        { id: 'debt_in', title: __('TR_DEBT_IN') },
-        { id: 'limit', title: __('TR_LIMIT_CHANGE') },
+        { id: 'expense', title: __('transactions.types.expense') },
+        { id: 'income', title: __('transactions.types.income') },
+        { id: 'transfer_out', title: __('transactions.types.transferOut') },
+        { id: 'transfer_in', title: __('transactions.types.transferIn') },
+        { id: 'debt_out', title: __('transactions.types.debtOut') },
+        { id: 'debt_in', title: __('transactions.types.debtIn') },
+        { id: 'limit', title: __('transactions.types.creditLimit') },
     ];
 
     /** Return array of available action types */

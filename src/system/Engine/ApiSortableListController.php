@@ -27,7 +27,7 @@ class ApiSortableListController extends ApiListController
     public function setPos()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();

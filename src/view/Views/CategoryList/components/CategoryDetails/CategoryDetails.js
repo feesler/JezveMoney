@@ -23,17 +23,17 @@ export class CategoryDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
         this.parentField = Field.create({
-            title: __('CATEGORY_PARENT'),
+            title: __('categories.parent'),
             className: PARENT_FIELD_CLASS,
         });
 
         this.typeField = Field.create({
-            title: __('CATEGORY_TR_TYPE'),
+            title: __('categories.transactionType'),
             className: TYPE_FIELD_CLASS,
         });
 
         this.subcategoriesField = Field.create({
-            title: __('CATEGORY_SUBCATEGORIES_COUNT'),
+            title: __('categories.childCount'),
             className: SUBCATEGORIES_FIELD_CLASS,
         });
 
@@ -41,7 +41,7 @@ export class CategoryDetails extends ItemDetails {
             props: {
                 className: 'btn link-btn',
                 type: 'button',
-                textContent: __('SHOW'),
+                textContent: __('actions.show'),
             },
         });
 
@@ -52,14 +52,14 @@ export class CategoryDetails extends ItemDetails {
         });
 
         this.transactionsField = Field.create({
-            title: __('ITEM_TRANSACTIONS_COUNT'),
+            title: __('item.transactionsCount'),
             className: TR_COUNT_FIELD_CLASS,
         });
 
         this.transactionsLink = createElement('a', {
             props: {
                 className: 'transactions-link',
-                textContent: __('ITEM_GO_TO_TRANSACTIONS'),
+                textContent: __('item.goToTransactions'),
             },
         });
 
@@ -82,7 +82,7 @@ export class CategoryDetails extends ItemDetails {
     }
 
     onToggleSubcategories(expanded) {
-        const title = (expanded) ? __('HIDE_SUBCATEGORIES') : __('SHOW_SUBCATEGORIES');
+        const title = (expanded) ? __('categories.hideChildren') : __('categories.showChildren');
         this.toggleSubcategoriesBtn.textContent = title;
     }
 
@@ -122,7 +122,7 @@ export class CategoryDetails extends ItemDetails {
         // Parent category
         const { categories } = App.model;
         const parent = categories.getItem(item.parent_id);
-        const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT');
+        const parentTitle = (parent) ? parent.name : __('categories.noParent');
         this.parentField.setContent(parentTitle);
 
         // Transaction type
@@ -133,7 +133,7 @@ export class CategoryDetails extends ItemDetails {
 
         // Transactions count
         const trCountLoaded = (typeof item.transactionsCount === 'number');
-        const trCount = (trCountLoaded) ? item.transactionsCount.toString() : __('LOADING');
+        const trCount = (trCountLoaded) ? item.transactionsCount.toString() : __('loading');
         this.transactionsField.setContent(trCount);
 
         // Navigate to transactions list link

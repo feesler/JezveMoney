@@ -41,7 +41,7 @@ export class CategorySelect extends DropDown {
 
         this.removeAll();
 
-        const noCategoryTitle = (parentCategorySelect) ? 'CATEGORY_NO_PARENT' : 'NO_CATEGORY';
+        const noCategoryTitle = (parentCategorySelect) ? 'categories.noParent' : 'categories.noCategory';
         this.addItem({ id: 0, title: __(noCategoryTitle) });
 
         const excludeIds = asArray(this.state.exclude).map((id) => parseInt(id, 10));

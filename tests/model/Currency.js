@@ -20,8 +20,9 @@ export class Currency {
      * Returns formatted name of currency
      */
     formatName(locale = 'en') {
-        return hasToken(this.name)
-            ? `${this.code} – ${__(this.name, locale)}`
+        const token = `currencies.byCode.${this.code}`;
+        return hasToken(token)
+            ? `${this.code} – ${__(token, locale)}`
             : this.code;
     }
 

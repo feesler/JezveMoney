@@ -49,10 +49,10 @@ class Transaction extends ApiSortableListController
         parent::initAPI();
 
         $this->model = TransactionModel::getInstance();
-        $this->createErrorMsg = __("ERR_TRANS_CREATE");
-        $this->updateErrorMsg = __("ERR_TRANS_UPDATE");
-        $this->deleteErrorMsg = __("ERR_TRANS_DELETE");
-        $this->changePosErrorMsg = __("ERR_TRANS_CHANGE_POS");
+        $this->createErrorMsg = __("transactions.errors.create");
+        $this->updateErrorMsg = __("transactions.errors.update");
+        $this->deleteErrorMsg = __("transactions.errors.delete");
+        $this->changePosErrorMsg = __("transactions.errors.changePos");
     }
 
     /**
@@ -121,7 +121,7 @@ class Transaction extends ApiSortableListController
         $requiredFields = ["id", "category_id"];
 
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
@@ -130,7 +130,7 @@ class Transaction extends ApiSortableListController
         $this->begin();
 
         if (!$this->model->setCategory($reqData["id"], $reqData["category_id"])) {
-            throw new \Error(__("ERR_TRANS_SET_CATEGORY"));
+            throw new \Error(__("transactions.errors.setCategory"));
         }
 
         $result = $this->getStateResult($request);

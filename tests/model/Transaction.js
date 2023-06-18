@@ -52,11 +52,11 @@ export class Transaction {
     /** Return string for specified type of transaction */
     static typeToString(type, locale = 'en') {
         const typesMap = {
-            [EXPENSE]: 'TR_EXPENSE',
-            [INCOME]: 'TR_INCOME',
-            [TRANSFER]: 'TR_TRANSFER',
-            [DEBT]: 'TR_DEBT',
-            [LIMIT_CHANGE]: 'TR_LIMIT_CHANGE',
+            [EXPENSE]: 'transactions.types.expense',
+            [INCOME]: 'transactions.types.income',
+            [TRANSFER]: 'transactions.types.transfer',
+            [DEBT]: 'transactions.types.debt',
+            [LIMIT_CHANGE]: 'transactions.types.creditLimit',
         };
 
         assert(type && (type in typesMap), `Unknown transaction type ${type}`);

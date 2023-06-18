@@ -45,11 +45,11 @@ class Statistics extends TemplateController
 
             $accCurr = ($account) ? $account->curr_id : $currMod->getIdByPos(0);
             if (!$accCurr) {
-                throw new \Error(__("ERR_NO_CURRENCIES"));
+                throw new \Error(__("currencies.errors.noCurrencies"));
             }
         }
 
-        $data["titleString"] = __("APP_NAME") . " | " . __("STATISTICS");
+        $data["titleString"] = __("appName") . " | " . __("statistics.title");
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),

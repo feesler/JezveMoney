@@ -67,7 +67,7 @@ class CategoryView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('CATEGORY_UPDATE') : __('CATEGORY_CREATE'),
+            title: (isUpdate) ? __('categories.update') : __('categories.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -79,7 +79,7 @@ class CategoryView extends View {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('CATEGORY_NAME'),
+            title: __('categories.name'),
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
@@ -97,7 +97,7 @@ class CategoryView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -117,7 +117,7 @@ class CategoryView extends View {
             parentCategorySelect: true,
             exclude: original.id,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (o) => this.onParentSelect(o),
         });
     }
@@ -172,12 +172,12 @@ class CategoryView extends View {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('CATEGORY_INVALID_NAME')));
+            this.store.dispatch(actions.invalidateNameField(__('categories.invalidName')));
             this.nameField.focus();
         } else {
             const category = App.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
-                this.store.dispatch(actions.invalidateNameField(__('CATEGORY_EXISTING_NAME')));
+                this.store.dispatch(actions.invalidateNameField(__('categories.existingName')));
                 this.nameField.focus();
             }
         }
@@ -256,8 +256,8 @@ class CategoryView extends View {
 
         DeleteCategoryDialog.create({
             id: 'delete_warning',
-            title: __('CATEGORY_DELETE'),
-            content: __('MSG_CATEGORY_DELETE'),
+            title: __('categories.delete'),
+            content: __('categories.deleteMessage'),
             showChildrenCheckbox: (data.parent_id === 0),
             onConfirm: (opt) => this.deleteCategory(opt),
         });

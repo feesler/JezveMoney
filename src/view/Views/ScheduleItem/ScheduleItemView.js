@@ -65,7 +65,7 @@ class ScheduleItemView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('SCHED_TRANS_UPDATE') : __('SCHED_TRANS_CREATE'),
+            title: (isUpdate) ? __('schedule.update') : __('schedule.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -87,7 +87,7 @@ class ScheduleItemView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -158,8 +158,8 @@ class ScheduleItemView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('SCHED_TRANS_DELETE'),
-            content: __('MSG_SCHED_TRANS_DELETE'),
+            title: __('schedule.delete'),
+            content: __('schedule.deleteMessage'),
             onConfirm: () => this.deleteScheduleItem(),
         });
     }

@@ -85,7 +85,7 @@ export class ImportFileUploader extends Component {
     onImportSuccess(data) {
         try {
             if (!Array.isArray(data)) {
-                throw new Error(__('ERR_UPLOAD'));
+                throw new Error(__('import.uploadError'));
             }
 
             if (isFunction(this.props.onUploaded)) {

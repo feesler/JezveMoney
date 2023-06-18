@@ -143,7 +143,7 @@ class TransactionListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('TRANSACTIONS'),
+            title: __('transactions.listTitle'),
         });
 
         // Transaction details
@@ -193,9 +193,9 @@ class TransactionListView extends View {
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
-                placeholder: __('TYPE_TO_FILTER'),
+                placeholder: __('typeToFilter'),
                 enableFilter: true,
-                noResultsMessage: __('NOT_FOUND'),
+                noResultsMessage: __('notFound'),
                 onItemSelect: (obj) => this.onAccountChange(obj),
                 onChange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
@@ -214,12 +214,12 @@ class TransactionListView extends View {
             App.appendPersons(this.accountDropDown, {
                 visible: true,
                 idPrefix: 'p',
-                group: __('PERSONS'),
+                group: __('persons.listTitle'),
             });
             App.appendPersons(this.accountDropDown, {
                 visible: false,
                 idPrefix: 'p',
-                group: __('PERSONS_HIDDEN'),
+                group: __('persons.hiddenListTitle'),
             });
         }
 
@@ -229,9 +229,9 @@ class TransactionListView extends View {
         } else {
             this.categoriesDropDown = CategorySelect.create({
                 elem: 'category_id',
-                placeholder: __('TYPE_TO_FILTER'),
+                placeholder: __('typeToFilter'),
                 enableFilter: true,
-                noResultsMessage: __('NOT_FOUND'),
+                noResultsMessage: __('notFound'),
                 onItemSelect: (obj) => this.onCategoryChange(obj),
                 onChange: (obj) => this.onCategoryChange(obj),
                 className: 'dd_fullwidth',
@@ -240,24 +240,24 @@ class TransactionListView extends View {
 
         // Date range filter
         this.dateRangeFilterTitle = createElement('span', {
-            props: { textContent: __('FILTER_DATE_RANGE') },
+            props: { textContent: __('filters.dateRange') },
         });
 
         this.weekRangeBtn = DateRangeSelector.create({
             rangeType: 'week',
-            title: __('DATE_RANGE_FOR_WEEK'),
+            title: __('dateRange.forWeek'),
             onClick: (e) => this.showWeekRange(e),
         });
 
         this.monthRangeBtn = DateRangeSelector.create({
             rangeType: 'month',
-            title: __('DATE_RANGE_FOR_MONTH'),
+            title: __('dateRange.forMonth'),
             onClick: (e) => this.showMonthRange(e),
         });
 
         this.halfYearRangeBtn = DateRangeSelector.create({
             rangeType: 'halfyear',
-            title: __('DATE_RANGE_FOR_HALF_YEAR'),
+            title: __('dateRange.forHalfYear'),
             onClick: (e) => this.showHalfYearRange(e),
         });
 
@@ -273,15 +273,15 @@ class TransactionListView extends View {
 
         this.dateRangeFilter = DateRangeInput.create({
             id: 'dateFrm',
-            startPlaceholder: __('DATE_RANGE_FROM'),
-            endPlaceholder: __('DATE_RANGE_TO'),
+            startPlaceholder: __('dateRange.from'),
+            endPlaceholder: __('dateRange.to'),
             onChange: (data) => this.changeDateFilter(data),
         });
         this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
 
         // Search input
         this.searchInput = SearchInput.create({
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);
@@ -316,7 +316,7 @@ class TransactionListView extends View {
         this.spinner.hide();
         this.showMoreBtn = Button.create({
             className: 'show-more-btn',
-            title: __('SHOW_MORE'),
+            title: __('actions.showMore'),
             onClick: (e) => this.showMore(e),
         });
         listFooter.append(this.showMoreBtn.elem, this.spinner.elem);
@@ -333,7 +333,7 @@ class TransactionListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -544,7 +544,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        App.createErrorNotification(__('ERR_TRANS_CHANGE_POS'));
+        App.createErrorNotification(__('transactions.errors.changePos'));
     }
 
     /** Returns URL for filter of specified state */
@@ -674,8 +674,8 @@ class TransactionListView extends View {
         const multi = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
-            content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
+            title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
+            content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -1025,7 +1025,7 @@ class TransactionListView extends View {
             ? new URL(`${baseURL}transactions/${state.detailsId}`)
             : this.getFilterURL(state);
 
-        const pageTitle = `${__('APP_NAME')} | ${__('TRANSACTIONS')}`;
+        const pageTitle = `${__('appName')} | ${__('transactions.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

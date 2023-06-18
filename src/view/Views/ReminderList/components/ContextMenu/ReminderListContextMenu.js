@@ -12,23 +12,23 @@ export class ReminderListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 type: 'separator',
             }, {
                 id: 'ctxConfirmBtn',
                 icon: 'check',
-                title: __('REMINDER_CONFIRM'),
+                title: __('reminders.confirm'),
             }, {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('REMINDER_UPDATE'),
+                title: __('reminders.update'),
             }, {
                 id: 'ctxCancelBtn',
                 icon: 'del',
-                title: __('REMINDER_CANCEL'),
+                title: __('reminders.cancel'),
             }],
         });
 

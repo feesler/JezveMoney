@@ -107,7 +107,7 @@ class ReminderListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('REMINDERS'),
+            title: __('reminders.listTitle'),
         });
 
         // Filters
@@ -164,14 +164,14 @@ class ReminderListView extends View {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'reminder-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('REMINDERS_LIST_NO_DATA'),
+            noItemsMessage: __('reminders.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
 
@@ -205,7 +205,7 @@ class ReminderListView extends View {
         this.spinner.hide();
         this.showMoreBtn = Button.create({
             className: 'show-more-btn',
-            title: __('SHOW_MORE'),
+            title: __('actions.showMore'),
             onClick: (e) => this.showMore(e),
         });
 
@@ -585,7 +585,7 @@ class ReminderListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('REMINDERS')}`;
+        const pageTitle = `${__('appName')} | ${__('reminders.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

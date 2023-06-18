@@ -22,7 +22,7 @@ export class ThemeSwitchField extends Field {
         super({
             ...props,
             className: getClassNames(FIELD_CLASS, props.className),
-            title: __('DARK_THEME'),
+            title: __('settings.darkTheme'),
             content: themeSwitch.elem,
         });
     }

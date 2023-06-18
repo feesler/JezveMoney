@@ -123,11 +123,11 @@ export class ReminderListItem extends Component {
     initDetails() {
         // Accounts
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -136,11 +136,11 @@ export class ReminderListItem extends Component {
         });
         // Amount
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
@@ -150,14 +150,14 @@ export class ReminderListItem extends Component {
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
-            title: __('TR_DATE'),
+            title: __('transactions.date'),
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
@@ -173,7 +173,7 @@ export class ReminderListItem extends Component {
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
@@ -376,12 +376,12 @@ export class ReminderListItem extends Component {
     }
 
     renderDateRange(item) {
-        const start = __('SCHEDULE_ITEM_START', App.formatDate(item.start_date));
+        const start = __('schedule.item.start', App.formatDate(item.start_date));
         if (!item.end_date) {
             return start;
         }
 
-        const end = __('SCHEDULE_ITEM_END', App.formatDate(item.end_date));
+        const end = __('schedule.item.end', App.formatDate(item.end_date));
         return `${start} ${end}`;
     }
 
@@ -426,7 +426,7 @@ export class ReminderListItem extends Component {
 
         // Amount
         const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         if (isDiff) {
             const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);

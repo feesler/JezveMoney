@@ -11,7 +11,7 @@ export class CurrencyListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 

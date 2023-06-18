@@ -26,8 +26,9 @@ export class Currency extends ListItem {
      * Returns formatted name of currency
      */
     formatName() {
-        return hasToken(this.name)
-            ? `${this.code} – ${__(this.name)}`
+        const token = `currencies.byCode.${this.code}`;
+        return hasToken(token)
+            ? `${this.code} – ${__(token)}`
             : this.code;
     }
 

@@ -28,7 +28,7 @@ export class LocaleSelectField extends Field {
         super({
             ...props,
             className: getClassNames(FIELD_CLASS, props.className),
-            title: __('LANGUAGE'),
+            title: __('settings.language'),
             content: localeSelect.elem,
         });
     }

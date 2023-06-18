@@ -24,7 +24,7 @@ class Main extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "Main.tpl");
         $data = [
-            "titleString" => __("APP_NAME")
+            "titleString" => __("appName")
         ];
 
         $accMod = AccountModel::getInstance();
@@ -103,7 +103,7 @@ class Main extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "About.tpl");
         $data = [
-            "titleString" => __("APP_NAME")
+            "titleString" => __("appName")
         ];
 
         $app = Application::getInstance();

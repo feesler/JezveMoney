@@ -78,53 +78,53 @@ export class ImportCondition extends ListItem {
     static fieldTypes = [
         {
             id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
-            title: __('CONDITION_MAIN_ACCOUNT'),
+            title: __('import.conditions.fields.mainAccount'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TPL,
-            title: __('CONDITION_TEMPLATE'),
+            title: __('import.conditions.fields.template'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_AMOUNT,
-            title: __('CONDITION_TR_AMOUNT'),
+            title: __('import.conditions.fields.transactionAmount'),
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_CURRENCY,
-            title: __('CONDITION_TR_CURRENCY'),
+            title: __('import.conditions.fields.transactionCurrency'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_AMOUNT,
-            title: __('CONDITION_ACCOUNT_AMOUNT'),
+            title: __('import.conditions.fields.accountAmount'),
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_CURRENCY,
-            title: __('CONDITION_ACCOUNT_CURRENCY'),
+            title: __('import.conditions.fields.accountCurrency'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_COMMENT,
-            title: __('CONDITION_COMMENT'),
+            title: __('import.conditions.fields.comment'),
             operators: ImportCondition.stringOperators,
         },
         {
             id: IMPORT_COND_FIELD_DATE,
-            title: __('CONDITION_DATE'),
+            title: __('import.conditions.fields.date'),
             operators: ImportCondition.numOperators,
         },
     ];
 
     /** List of available condition operator types */
     static operatorTypes = [
-        { id: IMPORT_COND_OP_STRING_INCLUDES, title: __('OP_INLINE_INCLUDES') },
-        { id: IMPORT_COND_OP_EQUAL, title: __('OP_INLINE_EQUAL') },
-        { id: IMPORT_COND_OP_NOT_EQUAL, title: __('OP_INLINE_NOT_EQUAL') },
-        { id: IMPORT_COND_OP_LESS, title: __('OP_INLINE_LESS') },
-        { id: IMPORT_COND_OP_GREATER, title: __('OP_INLINE_GREATER') },
+        { id: IMPORT_COND_OP_STRING_INCLUDES, title: __('import.conditions.opInline.includes') },
+        { id: IMPORT_COND_OP_EQUAL, title: __('import.conditions.opInline.equal') },
+        { id: IMPORT_COND_OP_NOT_EQUAL, title: __('import.conditions.opInline.notEqual') },
+        { id: IMPORT_COND_OP_LESS, title: __('import.conditions.opInline.less') },
+        { id: IMPORT_COND_OP_GREATER, title: __('import.conditions.opInline.greater') },
     ];
 
     /** Field type to data property name map */

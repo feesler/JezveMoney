@@ -79,10 +79,10 @@ export class PersonDetails extends TestComponent {
         const debtAccounts = this.filterPersonDebts(item.accounts);
         const debtValue = (debtAccounts.length)
             ? debtAccounts.join('\n')
-            : __('PERSON_NO_DEBTS', App.view.locale);
+            : __('persons.noDebts', App.view.locale);
 
         const hidden = state.accounts.isHidden(item);
-        const visibilityToken = (hidden) ? 'ITEM_HIDDEN' : 'ITEM_VISIBLE';
+        const visibilityToken = (hidden) ? 'item.hidden' : 'item.visible';
 
         const itemTransactions = state.transactions.applyFilter({
             persons: item.id,

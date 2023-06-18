@@ -12,7 +12,7 @@ export class PersonListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 type: 'separator',
@@ -20,24 +20,24 @@ export class PersonListContextMenu extends PopupMenu {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxExportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('TR_EXPORT_CSV'),
+                title: __('transactions.exportToCsv'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
-                title: __('SHOW'),
+                title: __('actions.show'),
             }, {
                 id: 'ctxHideBtn',
                 icon: 'hide',
-                title: __('HIDE'),
+                title: __('actions.hide'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 

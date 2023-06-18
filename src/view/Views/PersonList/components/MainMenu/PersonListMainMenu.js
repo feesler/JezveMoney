@@ -18,23 +18,23 @@ export class PersonListMainMenu extends PopupMenu {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: __('SELECT'),
+                title: __('actions.select'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: __('SORT'),
+                title: __('actions.sort'),
             }, {
                 id: 'sortByNameBtn',
-                title: __('SORT_BY_NAME'),
+                title: __('actions.sortByName'),
             }, {
                 id: 'sortByDateBtn',
-                title: __('SORT_BY_DATE'),
+                title: __('actions.sortByDate'),
             }, {
                 id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
+                title: __('actions.selectAll'),
             }, {
                 id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
+                title: __('actions.deselectAll'),
             }, {
                 id: 'separator2',
                 type: 'separator',
@@ -42,19 +42,19 @@ export class PersonListMainMenu extends PopupMenu {
                 id: 'exportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('TR_EXPORT_CSV'),
+                title: __('transactions.exportToCsv'),
             }, {
                 id: 'showBtn',
                 icon: 'show',
-                title: __('SHOW'),
+                title: __('actions.show'),
             }, {
                 id: 'hideBtn',
                 icon: 'hide',
-                title: __('HIDE'),
+                title: __('actions.hide'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 

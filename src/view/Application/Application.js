@@ -468,7 +468,7 @@ export class Application {
             otherCurrencies.push({ ...currency, name: currency.formatName() });
         });
 
-        this.appendListItems(ddlist, otherCurrencies, { group: __('OTHER_CURRENCIES') });
+        this.appendListItems(ddlist, otherCurrencies, { group: __('settings.currencies.other') });
     }
 
     appendListItems(ddlist, items, options = {}) {
@@ -530,12 +530,12 @@ export class Application {
     /** Initialize acconts DropDown */
     initAccountsList(ddlist, options = {}) {
         this.appendAccounts(ddlist, { ...options, visible: true });
-        this.appendAccounts(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
+        this.appendAccounts(ddlist, { ...options, visible: false, group: __('list.hiddenItemsCounter') });
     }
 
     /** Initialize persons DropDown */
     initPersonsList(ddlist, options = {}) {
         this.appendPersons(ddlist, { ...options, visible: true });
-        this.appendPersons(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
+        this.appendPersons(ddlist, { ...options, visible: false, group: __('list.hiddenItemsCounter') });
     }
 }

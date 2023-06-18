@@ -105,7 +105,7 @@ export class DateRangeInput extends Component {
         this.feedbackElem = createElement('div', {
             props: {
                 className: FEEDBACK_CLASS,
-                textContent: __('FILTER_INVALID_DATE_RANGE'),
+                textContent: __('dateRange.invalidRange'),
             },
         });
 

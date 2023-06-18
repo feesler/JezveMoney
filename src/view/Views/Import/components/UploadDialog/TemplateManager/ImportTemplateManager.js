@@ -114,7 +114,7 @@ export class ImportTemplateManager extends Component {
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (account) => this.onAccountChange(account),
         });
         App.initAccountsList(this.accountDropDown);
@@ -346,8 +346,8 @@ export class ImportTemplateManager extends Component {
     onDeleteTemplate() {
         ConfirmDialog.create({
             id: 'tpl_delete_warning',
-            title: __('TEMPLATE_DELETE'),
-            content: __('MSG_TEMPLATE_DELETE'),
+            title: __('import.templates.delete'),
+            content: __('import.templates.deleteMessage'),
             onConfirm: () => this.requestDeleteTemplate(this.state.template.id),
         });
     }
@@ -642,7 +642,7 @@ export class ImportTemplateManager extends Component {
         if (state.id === LOADING_STATE) {
             this.setTemplateFeedback();
         } else if (state.id === TPL_SELECT_STATE) {
-            const message = (validation.valid) ? __('TEMPLATE_VALID') : __('MSG_TPL_NOT_MATCH');
+            const message = (validation.valid) ? __('import.templates.valid') : __('import.templates.notMatches');
             this.setTemplateFeedback(message, validation.valid);
         }
 

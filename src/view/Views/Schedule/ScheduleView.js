@@ -113,7 +113,7 @@ class ScheduleView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('SCHEDULE'),
+            title: __('schedule.listTitle'),
         });
 
         // Scheduled transaction details
@@ -153,14 +153,14 @@ class ScheduleView extends View {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'schedule-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('SCHEDULE_NO_DATA'),
+            noItemsMessage: __('schedule.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -192,7 +192,7 @@ class ScheduleView extends View {
         this.spinner.hide();
         this.showMoreBtn = Button.create({
             className: 'show-more-btn',
-            title: __('SHOW_MORE'),
+            title: __('actions.showMore'),
             onClick: (e) => this.showMore(e),
         });
 
@@ -421,11 +421,11 @@ class ScheduleView extends View {
 
         const multiple = (ids.length > 1);
         const title = (multiple)
-            ? __('SCHED_TRANS_DELETE_MULTIPLE')
-            : __('SCHED_TRANS_DELETE');
+            ? __('schedule.deleteMultiple')
+            : __('schedule.delete');
         const content = (multiple)
-            ? __('MSG_SCHED_TRANS_DELETE_MULTIPLE')
-            : __('MSG_SCHED_TRANS_DELETE');
+            ? __('schedule.deleteMultipleMessage')
+            : __('schedule.deleteMessage');
 
         ConfirmDialog.create({
             id: 'delete_warning',
@@ -557,7 +557,7 @@ class ScheduleView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('SCHEDULE')}`;
+        const pageTitle = `${__('appName')} | ${__('schedule.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 

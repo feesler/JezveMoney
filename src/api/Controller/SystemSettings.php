@@ -40,7 +40,7 @@ class SystemSettings extends ApiController
     public function update()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $expectedFields = ["name", "value"];
@@ -49,7 +49,7 @@ class SystemSettings extends ApiController
 
         $res = Settings::setValue($request["name"], $request["value"]);
         if (!$res) {
-            throw new \Error(__("ERR_SETTINGS_UPDATE"));
+            throw new \Error(__("settings.errors.update"));
         }
 
         $this->ok();
@@ -61,7 +61,7 @@ class SystemSettings extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $expectedFields = ["name"];
@@ -70,7 +70,7 @@ class SystemSettings extends ApiController
 
         $res = Settings::del($request["name"]);
         if (!$res) {
-            throw new \Error(__("ERR_SETTINGS_UPDATE"));
+            throw new \Error(__("settings.errors.update"));
         }
 
         $this->ok();

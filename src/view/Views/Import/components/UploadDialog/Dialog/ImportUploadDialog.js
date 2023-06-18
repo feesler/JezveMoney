@@ -85,7 +85,7 @@ export class ImportUploadDialog extends Component {
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
-            title: __('IMPORT_UPLOAD'),
+            title: __('import.upload'),
             content: this.elem,
             closeButton: true,
             onClose: () => this.onClose(),
@@ -306,7 +306,7 @@ export class ImportUploadDialog extends Component {
         }
 
         if (state.id === UPLOAD_STATE) {
-            this.popup.setTitle(__('IMPORT_UPLOAD'));
+            this.popup.setTitle(__('import.upload'));
             return;
         }
         if (state.id !== CONVERT_STATE) {
@@ -321,11 +321,11 @@ export class ImportUploadDialog extends Component {
 
         let title;
         if (state.convertState === TPL_SELECT_STATE) {
-            title = __('IMPORT_CONVERT');
+            title = __('import.convert');
         } else if (state.convertState === TPL_CREATE_STATE) {
-            title = __('TEMPLATE_CREATE');
+            title = __('import.templates.create');
         } else if (state.convertState === TPL_UPDATE_STATE) {
-            title = __('TEMPLATE_UPDATE');
+            title = __('import.templates.update');
         }
 
         const titleElem = createElement('div', {

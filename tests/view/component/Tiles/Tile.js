@@ -87,7 +87,7 @@ export class Tile extends TestComponent {
             const debtAccounts = Tile.filterPersonDebts(person.accounts);
             res.subtitle = (debtAccounts.length)
                 ? debtAccounts.join('\n')
-                : __('PERSON_NO_DEBTS', App.view.locale);
+                : __('persons.noDebts', App.view.locale);
         } else {
             res.subtitle = '';
         }

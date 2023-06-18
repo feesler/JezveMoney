@@ -67,7 +67,7 @@ export class ImportRulesDialog extends Component {
 
     init() {
         // Header title
-        this.titleElem = createElement('label', { props: { textContent: __('IMPORT_RULES') } });
+        this.titleElem = createElement('label', { props: { textContent: __('import.rules.listTitle') } });
 
         // Create new rule button
         this.createRuleBtn = Button.create({
@@ -88,7 +88,7 @@ export class ImportRulesDialog extends Component {
 
         // Search input
         this.searchInput = SearchInput.create({
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             onChange: (value) => this.onSearchInputChange(value),
         });
 
@@ -109,7 +109,7 @@ export class ImportRulesDialog extends Component {
         // 'Show more' button
         this.showMoreBtn = Button.create({
             className: 'show-more-btn',
-            title: __('SHOW_MORE'),
+            title: __('actions.showMore'),
             onClick: () => this.showMore(),
         });
 
@@ -264,8 +264,8 @@ export class ImportRulesDialog extends Component {
 
         ConfirmDialog.create({
             id: 'rule_delete_warning',
-            title: __('IMPORT_RULE_DELETE'),
-            content: __('MSG_RULE_DELETE'),
+            title: __('import.rules.delete'),
+            content: __('import.rules.deleteMessage'),
             onConfirm: () => this.deleteRule(contextItem),
         });
     }
@@ -377,7 +377,7 @@ export class ImportRulesDialog extends Component {
         this.rulesList.setState((listState) => ({
             ...listState,
             items,
-            noItemsMessage: (state.filter !== '') ? __('IMPORT_RULES_NOT_FOUND') : __('IMPORT_RULES_NO_DATA'),
+            noItemsMessage: (state.filter !== '') ? __('import.rules.notFound') : __('import.rules.noData'),
             renderTime: state.renderTime,
         }));
 
@@ -439,13 +439,13 @@ export class ImportRulesDialog extends Component {
         }
 
         if (state.id === LIST_STATE) {
-            this.titleElem.textContent = __('IMPORT_RULES');
+            this.titleElem.textContent = __('import.rules.listTitle');
 
             this.renderList(state);
         } else if (state.id === CREATE_STATE || state.id === UPDATE_STATE) {
             this.titleElem.textContent = (state.id === CREATE_STATE)
-                ? __('IMPORT_RULE_CREATE')
-                : __('IMPORT_RULE_UPDATE');
+                ? __('import.rules.create')
+                : __('import.rules.update');
 
             this.renderForm(state);
         }

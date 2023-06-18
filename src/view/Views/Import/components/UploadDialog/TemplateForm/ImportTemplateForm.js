@@ -60,12 +60,12 @@ export class ImportTemplateForm extends Component {
         };
 
         this.columnFeedback = {
-            accountAmount: __('MSG_TPL_ACCOUNT_AMOUNT'),
-            accountCurrency: __('MSG_TPL_ACCOUNT_CURRENCY'),
-            transactionAmount: __('MSG_TPL_TR_AMOUNT'),
-            transactionCurrency: __('MSG_TPL_TR_CURRENCY'),
-            date: __('MSG_TPL_DATE'),
-            comment: __('MSG_TPL_COMMENT'),
+            accountAmount: __('import.templates.accountAmountMessage'),
+            accountCurrency: __('import.templates.accountCurrencyMessage'),
+            transactionAmount: __('import.templates.transactionAmountMessage'),
+            transactionCurrency: __('import.templates.transactionCurrencyMessage'),
+            date: __('import.templates.dateMessage'),
+            comment: __('import.templates.commentMessage'),
         };
 
         this.init();
@@ -102,9 +102,9 @@ export class ImportTemplateForm extends Component {
             inputId: 'tplNameInp',
             className: 'form-row',
             name: 'name',
-            title: __('TEMPLATE_NAME'),
+            title: __('import.templates.name'),
             validate: true,
-            feedbackMessage: __('TEMPLATE_INVALID_NAME'),
+            feedbackMessage: __('import.templates.invalidName'),
             onInput: (e) => this.onTemplateNameInput(e),
         });
         this.templateForm.prepend(this.nameField.elem);
@@ -128,7 +128,7 @@ export class ImportTemplateForm extends Component {
         this.tplAccountDropDown = DropDown.create({
             className: 'dd_fullwidth',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (account) => this.onTemplateAccountChange(account),
         });
         App.initAccountsList(this.tplAccountDropDown);
@@ -580,7 +580,7 @@ export class ImportTemplateForm extends Component {
             const message = this.columnFeedback[validation.column];
             this.setFormFeedback(message, false);
         } else {
-            this.setFormFeedback(__('TEMPLATE_VALID'), true);
+            this.setFormFeedback(__('import.templates.valid'), true);
         }
 
         this.columnDropDown.setSelection(state.selectedColumn);

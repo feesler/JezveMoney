@@ -105,8 +105,8 @@ export class ImportRulesDialog extends TestComponent {
             range: Math.max(Math.ceil(cont.items.length / ITEMS_ON_PAGE), 1),
         };
 
-        const importRulesTok = __('IMPORT_RULES', App.view.locale);
-        const updateRuleTok = __('IMPORT_RULE_UPDATE', App.view.locale);
+        const importRulesTok = __('import.rules.listTitle', App.view.locale);
+        const updateRuleTok = __('import.rules.update', App.view.locale);
         const isListState = cont.rulesList.visible && cont.header.title === importRulesTok;
         if (isListState) {
             res.state = 'list';
@@ -136,7 +136,7 @@ export class ImportRulesDialog extends TestComponent {
         };
 
         if (isList) {
-            res.header.title = __('IMPORT_RULES', App.view.locale);
+            res.header.title = __('import.rules.listTitle', App.view.locale);
 
             const filteredRules = (model.filter !== '')
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
@@ -165,8 +165,8 @@ export class ImportRulesDialog extends TestComponent {
             };
         } else if (isForm) {
             const titleToken = (model.state === 'create')
-                ? 'IMPORT_RULE_CREATE'
-                : 'IMPORT_RULE_UPDATE';
+                ? 'import.rules.create'
+                : 'import.rules.update';
             res.header.title = __(titleToken, App.view.locale);
 
             res.ruleForm = ImportRuleForm.getExpectedState(model.rule);

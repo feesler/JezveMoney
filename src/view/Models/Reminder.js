@@ -34,9 +34,9 @@ export const REMINDER_CANCELLED = 3;
  */
 export class Reminder extends ListItem {
     static stateTypes = [
-        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'REMINDER_STATE_SCHEDULED' },
-        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'REMINDER_STATE_CONFIRMED' },
-        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'REMINDER_STATE_CANCELLED' },
+        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'reminders.state.scheduled' },
+        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'reminders.state.submitted' },
+        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'reminders.state.cancelled' },
     ];
 
     static getStateName(stateType) {

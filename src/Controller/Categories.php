@@ -28,7 +28,7 @@ class Categories extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "CategoryList.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("CATEGORIES"),
+            "titleString" => __("appName") . " | " . __("categories.listTitle"),
         ];
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -63,13 +63,13 @@ class Categories extends ListViewController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => __("CATEGORY_CREATE"),
-            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_CREATE"),
+            "headString" => __("categories.create"),
+            "titleString" => __("appName") . " | " . __("categories.create"),
         ];
 
         $category = new \stdClass();
@@ -100,23 +100,23 @@ class Categories extends ListViewController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => __("CATEGORY_UPDATE"),
-            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_UPDATE"),
+            "headString" => __("categories.update"),
+            "titleString" => __("appName") . " | " . __("categories.update"),
         ];
 
         $itemId = intval($this->actionParam);
         if (!$itemId) {
-            $this->fail(__("ERR_CATEGORY_UPDATE"));
+            $this->fail(__("categories.errors.update"));
         }
 
         $category = $this->model->getItem($itemId);
         if (!$category) {
-            $this->fail(__("ERR_CATEGORY_UPDATE"));
+            $this->fail(__("categories.errors.update"));
         }
         $data["category"] = $category;
 
