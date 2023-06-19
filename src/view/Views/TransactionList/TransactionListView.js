@@ -20,6 +20,7 @@ import {
     cutDate,
     dateStringToTime,
     formatDateRange,
+    getApplicationURL,
     getHalfYearRange,
     getMonthRange,
     getSelectedItems,
@@ -53,7 +54,6 @@ import { TransactionListContextMenu } from '../../Components/TransactionListCont
 import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';
 import { reducer, actions } from './reducer.js';
 import {
-    getBaseFilterURL,
     getTransactionsGroupByDate,
     isSameSelection,
 } from './helpers.js';
@@ -549,17 +549,18 @@ class TransactionListView extends View {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state, keepPage = true) {
-        const res = getBaseFilterURL('transactions/', state.filter);
+        const params = {
+            ...state.filter,
+        };
 
         if (keepPage) {
-            res.searchParams.set('page', state.pagination.page);
+            params.page = state.pagination.page;
         }
-
         if (state.mode === 'details') {
-            res.searchParams.set('mode', 'details');
+            params.mode = 'details';
         }
 
-        return res;
+        return getApplicationURL('transactions/', params);
     }
 
     /**
@@ -1020,9 +1021,8 @@ class TransactionListView extends View {
             return;
         }
 
-        const { baseURL } = App;
         const url = (state.detailsId)
-            ? new URL(`${baseURL}transactions/${state.detailsId}`)
+            ? getApplicationURL(`transactions/${state.detailsId}`)
             : this.getFilterURL(state);
 
         const pageTitle = `${__('appName')} | ${__('transactions.listTitle')}`;

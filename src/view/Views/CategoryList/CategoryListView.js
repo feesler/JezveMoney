@@ -22,6 +22,7 @@ import {
     SORT_MANUALLY,
     __,
     getSelectedIds,
+    getApplicationURL,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { Category } from '../../Models/Category.js';
@@ -608,9 +609,8 @@ class CategoryListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return new URL(`${baseURL}categories/${itemPart}`);
+        return getApplicationURL(`categories/${itemPart}`);
     }
 
     renderHistory(state, prevState) {

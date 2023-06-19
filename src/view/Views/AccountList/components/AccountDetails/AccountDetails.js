@@ -1,5 +1,5 @@
 import { createElement } from 'jezvejs';
-import { __ } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
@@ -77,10 +77,7 @@ export class AccountDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by account */
     getTransactionsListURL(item) {
-        const { baseURL } = App;
-        const res = new URL(`${baseURL}transactions/`);
-        res.searchParams.set('acc_id', item.id);
-        return res;
+        return getApplicationURL('transactions/', { accounts: [item.id] });
     }
 
     /**

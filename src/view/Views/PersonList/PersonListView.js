@@ -17,6 +17,7 @@ import {
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
+    getApplicationURL,
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
@@ -577,9 +578,8 @@ class PersonListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return new URL(`${baseURL}persons/${itemPart}`);
+        return getApplicationURL(`persons/${itemPart}`);
     }
 
     renderHistory(state, prevState) {

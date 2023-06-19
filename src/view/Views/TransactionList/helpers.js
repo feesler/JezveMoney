@@ -1,4 +1,5 @@
 import { App } from '../../Application/App.js';
+import { getApplicationURL } from '../../utils/utils.js';
 
 /** Returns true if specified arrays contains same set of values */
 export const isSameSelection = (a, b) => (
@@ -10,24 +11,7 @@ export const getTransactionsGroupByDate = () => (
     App.model.profile.settings.tr_group_by_date
 );
 
-/** Returns transaction list view URL */
-export const getBaseFilterURL = (path, filter) => {
-    const res = new URL(`${App.baseURL}${path}`);
-
-    Object.keys(filter).forEach((prop) => {
-        const value = filter[prop];
-        if (Array.isArray(value)) {
-            const arrProp = `${prop}[]`;
-            value.forEach((item) => res.searchParams.append(arrProp, item));
-        } else {
-            res.searchParams.set(prop, value);
-        }
-    });
-
-    return res;
-};
-
 /** Returns export transactions URL */
 export const getExportURL = (state) => (
-    getBaseFilterURL('transactions/export/', state.filter)
+    getApplicationURL('transactions/export/', state.filter)
 );

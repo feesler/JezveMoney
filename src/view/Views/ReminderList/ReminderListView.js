@@ -17,7 +17,12 @@ import { createStore } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
-import { listData, __, getSelectedIds } from '../../utils/utils.js';
+import {
+    listData,
+    __,
+    getSelectedIds,
+    getApplicationURL,
+} from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -540,24 +545,23 @@ class ReminderListView extends View {
 
     /** Returns URL for specified state */
     getURL(state, keepPage = true) {
-        const { baseURL } = App;
         const { filter } = state;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        const res = new URL(`${baseURL}reminders/${itemPart}`);
+        const params = {};
 
         if (filter.state !== REMINDER_SCHEDULED) {
-            res.searchParams.set('state', Reminder.getStateName(filter.state));
+            params.state = Reminder.getStateName(filter.state);
         }
 
         if (keepPage) {
-            res.searchParams.set('page', state.pagination.page);
+            params.page = state.pagination.page;
         }
 
         if (state.mode === 'details') {
-            res.searchParams.set('mode', 'details');
+            params.mode = 'details';
         }
 
-        return res;
+        return getApplicationURL(`reminders/${itemPart}`, params);
     }
 
     /** Returns absolute index for relative index on current page */

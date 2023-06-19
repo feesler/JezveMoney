@@ -22,6 +22,7 @@ import {
     dateStringToTime,
     formatDateRange,
     formatNumberShort,
+    getApplicationURL,
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
@@ -340,21 +341,7 @@ class StatisticsView extends View {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state) {
-        const { baseURL } = App;
-        const { filter } = state;
-        const res = new URL(`${baseURL}statistics/`);
-
-        Object.keys(filter).forEach((prop) => {
-            const value = filter[prop];
-            if (Array.isArray(value)) {
-                const arrProp = `${prop}[]`;
-                value.forEach((item) => res.searchParams.append(arrProp, item));
-            } else {
-                res.searchParams.set(prop, value);
-            }
-        });
-
-        return res;
+        return getApplicationURL('statistics/', { ...state.filter });
     }
 
     /**

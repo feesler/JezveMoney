@@ -17,7 +17,12 @@ import { createStore } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
-import { listData, __, getSelectedItems } from '../../utils/utils.js';
+import {
+    listData,
+    __,
+    getSelectedItems,
+    getApplicationURL,
+} from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -521,15 +526,14 @@ class ScheduleView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        const res = new URL(`${baseURL}schedule/${itemPart}`);
+        const params = {};
 
         if (state.mode === 'details') {
-            res.searchParams.set('mode', 'details');
+            params.mode = 'details';
         }
 
-        return res;
+        return getApplicationURL(`schedule/${itemPart}`, params);
     }
 
     /** Returns absolute index for relative index on current page */
