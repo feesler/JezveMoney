@@ -8,7 +8,7 @@ import { __ } from '../../utils/utils.js';
 import './LoadingIndicator.scss';
 
 const defaultProps = {
-    title: __('LOADING'),
+    title: __('loading'),
     visible: false,
     fixed: true,
     blockScroll: true,

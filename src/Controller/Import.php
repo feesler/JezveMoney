@@ -49,11 +49,11 @@ class Import extends TemplateController
         $importAvailable = count($accounts) > 0;
 
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("IMPORT"),
+            "titleString" => __("appName") . " | " . __("import.listTitle"),
             "accounts" => $accounts,
             "testerUser" => $this->uMod->isTester($this->user_id),
             "importAvailable" => $importAvailable,
-            "importNotAvailableMessage" => __("IMPORT_NO_ACCOUNTS_MSG"),
+            "importNotAvailableMessage" => __("import.noAccountsMessage"),
             "importTemplates" => $this->templateModel->getData(),
             "tplColumnTypes" => $this->templateModel->getColumnTypes(),
             "importRules" => $this->ruleModel->getData(["extended" => true]),

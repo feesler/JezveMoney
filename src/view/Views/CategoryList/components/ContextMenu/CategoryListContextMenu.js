@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 /** Categories list context menu component */
 export class CategoryListContextMenu extends PopupMenu {
@@ -10,7 +11,7 @@ export class CategoryListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 type: 'separator',
@@ -18,11 +19,11 @@ export class CategoryListContextMenu extends PopupMenu {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 
@@ -33,7 +34,7 @@ export class CategoryListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.categories.getItem(state.contextItem);
+        return App.model.categories.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {
@@ -62,7 +63,7 @@ export class CategoryListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}categories/${category.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${category.id}`);

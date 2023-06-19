@@ -19,9 +19,9 @@ class User extends ApiListController
         parent::initAPI();
 
         $this->model = $this->uMod;
-        $this->createErrorMsg = __("ERR_USER_CREATE");
-        $this->updateErrorMsg = __("ERR_USER_UPDATE");
-        $this->deleteErrorMsg = __("ERR_USER_DELETE");
+        $this->createErrorMsg = __("users.errors.create");
+        $this->updateErrorMsg = __("users.errors.update");
+        $this->deleteErrorMsg = __("users.errors.delete");
     }
 
 
@@ -33,13 +33,13 @@ class User extends ApiListController
         $requiredFields = ["login", "password"];
 
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields, true);
         if (!$this->uMod->login($reqData)) {
-            throw new \Error(__("ERR_LOGIN_FAIL"));
+            throw new \Error(__("login.errorMessage"));
         }
 
         $this->ok();
@@ -51,7 +51,7 @@ class User extends ApiListController
     public function logout()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $this->uMod->logout();
@@ -65,7 +65,7 @@ class User extends ApiListController
     public function register()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         if ($this->user_id != 0) {
@@ -85,7 +85,7 @@ class User extends ApiListController
             wlog("Create user error: " . $e->getMessage());
         }
         if (!$user_id) {
-            throw new \Error(__("ERR_REGISTER_FAIL"));
+            throw new \Error(__("registration.errorMessage"));
         }
 
         $this->commit();
@@ -140,10 +140,10 @@ class User extends ApiListController
         $this->checkAdminAccess();
 
         $requiredFields = ["id", "password"];
-        $defMsg = __("ERR_PROFILE_PASSWORD");
+        $defMsg = __("profile.errors.changePassword");
 
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $request = $this->getRequestData();
@@ -168,7 +168,7 @@ class User extends ApiListController
 
         $this->commit();
 
-        $this->setMessage(__("MSG_PROFILE_PASSWORD"));
+        $this->setMessage(__("profile.passwordChangedMessage"));
         $this->ok();
     }
 

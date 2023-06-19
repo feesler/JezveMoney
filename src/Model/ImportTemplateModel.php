@@ -276,27 +276,27 @@ class ImportTemplateModel extends CachedTable
     {
         return [
             "accountAmount" => [
-                "title" => __("COLUMN_ACCOUNT_AMOUNT"),
+                "title" => __("import.templates.columns.accountAmount"),
                 "name" => "account_amount_col",
             ],
             "accountCurrency" => [
-                "title" => __("COLUMN_ACCOUNT_CURRENCY"),
+                "title" => __("import.templates.columns.accountCurrency"),
                 "name" => "account_curr_col",
             ],
             "transactionAmount" => [
-                "title" => __("COLUMN_TR_AMOUNT"),
+                "title" => __("import.templates.columns.transactionAmount"),
                 "name" => "trans_amount_col",
             ],
             "transactionCurrency" => [
-                "title" => __("COLUMN_TR_CURRENCY"),
+                "title" => __("import.templates.columns.transactionCurrency"),
                 "name" => "trans_curr_col",
             ],
             "date" => [
-                "title" => __("COLUMN_DATE"),
+                "title" => __("import.templates.columns.date"),
                 "name" => "date_col",
             ],
             "comment" => [
-                "title" => __("COLUMN_COMMENT"),
+                "title" => __("import.templates.columns.comment"),
                 "name" => "comment_col",
             ]
         ];

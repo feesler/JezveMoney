@@ -35,14 +35,14 @@ export class TransactionTypeMenu extends LinkMenu {
         this.setClassNames();
 
         const items = [
-            { title: __('SHOW_ALL'), hidden: !this.props.showAll },
-            { value: EXPENSE, title: __('TR_EXPENSE') },
-            { value: INCOME, title: __('TR_INCOME') },
-            { value: TRANSFER, title: __('TR_TRANSFER') },
-            { value: DEBT, title: __('TR_DEBT') },
+            { title: __('actions.showAll'), hidden: !this.props.showAll },
+            { value: EXPENSE, title: __('transactions.types.expense') },
+            { value: INCOME, title: __('transactions.types.income') },
+            { value: TRANSFER, title: __('transactions.types.transfer') },
+            { value: DEBT, title: __('transactions.types.debt') },
             {
                 value: LIMIT_CHANGE,
-                title: __('TR_LIMIT_CHANGE'),
+                title: __('transactions.types.creditLimit'),
                 hidden: !this.props.showChangeLimit,
             },
         ];

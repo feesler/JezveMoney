@@ -31,7 +31,7 @@ class Accounts extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("accounts.listTitle"),
+            "titleString" => __("appName") . " | " . __("accounts.listTitle"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -58,13 +58,13 @@ class Accounts extends ListViewController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => __("accounts.create"),
-            "titleString" => __("APP_NAME") . " | " . __("accounts.create"),
+            "titleString" => __("appName") . " | " . __("accounts.create"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -86,7 +86,7 @@ class Accounts extends ListViewController
 
         $currObj = $currMod->getItem($accInfo->curr_id);
         if (!$currObj) {
-            throw new \Error(__("ERR_CURR_NOT_FOUND"));
+            throw new \Error(__("currencies.errors.notFound"));
         }
 
         $accInfo->sign = $currObj->sign;
@@ -129,13 +129,13 @@ class Accounts extends ListViewController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => __("accounts.update"),
-            "titleString" => __("APP_NAME") . " | " . __("accounts.update"),
+            "titleString" => __("appName") . " | " . __("accounts.update"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -150,7 +150,7 @@ class Accounts extends ListViewController
 
         $accInfo = $this->model->getItem($acc_id);
         if (!$accInfo) {
-            $this->fail(__("ERR_ACCOUNT_UPDATE"));
+            $this->fail(__("accounts.errors.update"));
         }
 
         $currObj = $currMod->getItem($accInfo->curr_id);

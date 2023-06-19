@@ -7,6 +7,7 @@ import {
 import { Button } from 'jezvejs/Button';
 
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /* CSS classes */
 const MENU_CLASS = 'nav-list';
@@ -17,15 +18,15 @@ const SEPARATOR_CLASS = 'nav-separator';
 
 const menuItems = [
     { url: 'accounts/', titleToken: 'accounts.listTitle', createButton: 'accounts/create/' },
-    { url: 'persons/', titleToken: 'PERSONS', createButton: 'persons/create/' },
-    { url: 'categories/', titleToken: 'CATEGORIES', createButton: 'categories/create/' },
-    { url: 'transactions/', titleToken: 'TRANSACTIONS', createButton: 'transactions/create/' },
-    { url: 'schedule/', titleToken: 'SCHEDULE', createButton: 'schedule/create/' },
-    { url: 'reminders/', titleToken: 'REMINDERS' },
-    { url: 'statistics/', titleToken: 'STATISTICS' },
-    { url: 'import/', titleToken: 'IMPORT' },
+    { url: 'persons/', titleToken: 'persons.listTitle', createButton: 'persons/create/' },
+    { url: 'categories/', titleToken: 'categories.listTitle', createButton: 'categories/create/' },
+    { url: 'transactions/', titleToken: 'transactions.listTitle', createButton: 'transactions/create/' },
+    { url: 'schedule/', titleToken: 'schedule.listTitle', createButton: 'schedule/create/' },
+    { url: 'reminders/', titleToken: 'reminders.listTitle' },
+    { url: 'statistics/', titleToken: 'statistics.title' },
+    { url: 'import/', titleToken: 'import.listTitle' },
     { type: 'separator' },
-    { url: 'about/', titleToken: 'ABOUT', loggedOut: true },
+    { url: 'about/', titleToken: 'about.title', loggedOut: true },
 ];
 
 /**
@@ -53,7 +54,7 @@ export class NavigationMenu extends Component {
     }
 
     renderMenuItem(item) {
-        if (!item.loggedOut && !window.app.isUserLoggedIn()) {
+        if (!item.loggedOut && !App.isUserLoggedIn()) {
             return null;
         }
 
@@ -61,7 +62,7 @@ export class NavigationMenu extends Component {
             return this.renderSeparator();
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
 
         const linkElem = createElement('a', {
             props: {

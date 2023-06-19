@@ -1,9 +1,8 @@
 import { fixFloat } from 'jezvejs';
-import {
-    amountFix,
-    timestampFromString,
-    __,
-} from '../utils/utils.js';
+
+import { timestampFromString, __ } from '../utils/utils.js';
+import { amountFix } from '../utils/decimal.js';
+import { App } from '../Application/App.js';
 import { ImportTemplateError } from './Error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 
@@ -39,12 +38,12 @@ export class ImportTemplate extends ListItem {
      */
     getColumnsByIndex(index) {
         const tplColumns = {
-            accountAmount: { title: __('COLUMN_ACCOUNT_AMOUNT') },
-            accountCurrency: { title: __('COLUMN_ACCOUNT_CURRENCY') },
-            transactionAmount: { title: __('COLUMN_TR_AMOUNT') },
-            transactionCurrency: { title: __('COLUMN_TR_CURRENCY') },
-            date: { title: __('COLUMN_DATE') },
-            comment: { title: __('COLUMN_COMMENT') },
+            accountAmount: { title: __('import.templates.columns.accountAmount') },
+            accountCurrency: { title: __('import.templates.columns.accountCurrency') },
+            transactionAmount: { title: __('import.templates.columns.transactionAmount') },
+            transactionCurrency: { title: __('import.templates.columns.transactionCurrency') },
+            date: { title: __('import.templates.columns.date') },
+            comment: { title: __('import.templates.columns.comment') },
         };
 
         const res = Object.keys(tplColumns)
@@ -156,7 +155,7 @@ export class ImportTemplate extends ListItem {
 
     /** Apply import template to specified data row */
     convertRow(data, mainAccount) {
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const res = {
             mainAccount,
             accountAmount: this.getAccountAmount(data),
@@ -173,7 +172,7 @@ export class ImportTemplate extends ListItem {
 
         // Check account currency is same as at main account
         if (res.accountCurrencyId !== mainAccount.curr_id) {
-            throw new ImportTemplateError(__('ERR_CONVERT_ACCOUNT_CURRENCY'), 'accountCurrency');
+            throw new ImportTemplateError(__('import.errors.invalidAccountCurrency'), 'accountCurrency');
         }
 
         const trCurrency = currencyModel.findByCode(res.transactionCurrency);
@@ -181,12 +180,12 @@ export class ImportTemplate extends ListItem {
 
         const amount = parseFloat(fixFloat(res.accountAmount));
         if (Number.isNaN(amount) || amount === 0) {
-            throw new ImportTemplateError(__('ERR_CONVERT_ACCOUNT_AMOUNT'), 'accountAmount');
+            throw new ImportTemplateError(__('import.errors.invalidAccountAmount'), 'accountAmount');
         }
 
         const trAmount = parseFloat(fixFloat(res.transactionAmount));
         if (Number.isNaN(trAmount) || trAmount === 0) {
-            throw new ImportTemplateError(__('ERR_CONVERT_TR_AMOUNT'), 'accountAmount');
+            throw new ImportTemplateError(__('import.errors.invalidTransactionAmount'), 'accountAmount');
         }
 
         return res;

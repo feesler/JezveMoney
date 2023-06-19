@@ -13,17 +13,17 @@ import { Button } from 'jezvejs/Button';
 import { PieChart } from 'jezvejs/PieChart';
 import { createStore } from 'jezvejs/Store';
 
+import { normalize } from '../../utils/decimal.js';
 import {
-    formatNumberShort,
-    normalize,
     __,
     getWeekRange,
     getMonthRange,
     getHalfYearRange,
     dateStringToTime,
     formatDateRange,
+    formatNumberShort,
 } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
 
@@ -97,12 +97,12 @@ class StatisticsView extends View {
             renderTime: Date.now(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.checkUserAccountModels();
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.checkUserAccountModels();
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
     }
@@ -139,7 +139,7 @@ class StatisticsView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('STATISTICS'),
+            title: __('statistics.title'),
         });
 
         // Filters
@@ -173,9 +173,9 @@ class StatisticsView extends View {
             id: 'reportMenu',
             itemParam: 'report',
             items: [
-                { value: 'category', title: __('STAT_REPORT_CATEGORIES') },
-                { value: 'account', title: __('STAT_REPORT_ACCOUNTS') },
-                { value: 'currency', title: __('STAT_REPORT_CURRENCIES') },
+                { value: 'category', title: __('statistics.reports.categories') },
+                { value: 'account', title: __('statistics.reports.accounts') },
+                { value: 'currency', title: __('statistics.reports.currencies') },
             ],
             onChange: (value) => this.onSelectReportType(value),
         });
@@ -188,28 +188,28 @@ class StatisticsView extends View {
             onItemSelect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });
-        window.app.initUserCurrencyList(this.currencyDropDown);
+        App.initUserCurrencyList(this.currencyDropDown);
 
         // Accounts filter
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (obj) => this.onAccountSel(obj),
             onChange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
         });
-        window.app.initAccountsList(this.accountDropDown);
+        App.initAccountsList(this.accountDropDown);
 
         // Categories filter
         this.categoryDropDown = CategorySelect.create({
             elem: 'category_id',
             multiple: true,
-            placeholder: __('TYPE_TO_FILTER'),
+            placeholder: __('typeToFilter'),
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onItemSelect: (obj) => this.onCategorySel(obj),
             onChange: (obj) => this.onCategorySel(obj),
             className: 'dd_fullwidth',
@@ -230,24 +230,24 @@ class StatisticsView extends View {
 
         // Date range filter
         this.dateRangeFilterTitle = createElement('span', {
-            props: { textContent: __('FILTER_DATE_RANGE') },
+            props: { textContent: __('filters.dateRange') },
         });
 
         this.weekRangeBtn = DateRangeSelector.create({
             rangeType: 'week',
-            title: __('DATE_RANGE_FOR_WEEK'),
+            title: __('dateRange.forWeek'),
             onClick: (e) => this.showWeekRange(e),
         });
 
         this.monthRangeBtn = DateRangeSelector.create({
             rangeType: 'month',
-            title: __('DATE_RANGE_FOR_MONTH'),
+            title: __('dateRange.forMonth'),
             onClick: (e) => this.showMonthRange(e),
         });
 
         this.halfYearRangeBtn = DateRangeSelector.create({
             rangeType: 'halfyear',
-            title: __('DATE_RANGE_FOR_HALF_YEAR'),
+            title: __('dateRange.forHalfYear'),
             onClick: (e) => this.showHalfYearRange(e),
         });
 
@@ -263,8 +263,8 @@ class StatisticsView extends View {
 
         this.dateRangeFilter = DateRangeInput.create({
             id: 'dateFrm',
-            startPlaceholder: __('DATE_RANGE_FROM'),
-            endPlaceholder: __('DATE_RANGE_TO'),
+            startPlaceholder: __('dateRange.from'),
+            endPlaceholder: __('dateRange.to'),
             onChange: (data) => this.changeDateFilter(data),
         });
 
@@ -321,7 +321,7 @@ class StatisticsView extends View {
         // Select first account if nothing selected on account report type
         const accounts = asArray(state.form.accounts);
         if (state.form.report === 'account' && accounts.length === 0) {
-            const account = window.app.model.userAccounts.getItemByIndex(0);
+            const account = App.model.userAccounts.getItemByIndex(0);
             this.store.dispatch(actions.changeAccountsFilter([account.id]));
         }
 
@@ -340,7 +340,7 @@ class StatisticsView extends View {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { filter } = state;
         const res = new URL(`${baseURL}statistics/`);
 
@@ -489,7 +489,7 @@ class StatisticsView extends View {
 
     replaceHistory(state) {
         const url = this.getFilterURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
+        const pageTitle = `${__('appName')} | ${__('statistics.title')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -521,7 +521,7 @@ class StatisticsView extends View {
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
-                window.app.createErrorNotification(e.message);
+                App.createErrorNotification(e.message);
                 this.store.dispatch(actions.dataRequestError());
             }
         }
@@ -534,7 +534,7 @@ class StatisticsView extends View {
 
     formatValue(value) {
         const state = this.store.getState();
-        return window.app.model.currency.formatCurrency(
+        return App.model.currency.formatCurrency(
             value,
             state.accountCurrency,
         );
@@ -617,16 +617,16 @@ class StatisticsView extends View {
         }
 
         if (state.filter.report === 'account') {
-            const account = window.app.model.userAccounts.getItem(categoryId);
+            const account = App.model.userAccounts.getItem(categoryId);
             return account.name;
         }
 
         if (state.filter.report === 'category') {
             if (categoryId === 0) {
-                return __('NO_CATEGORY');
+                return __('categories.noCategory');
             }
 
-            const category = window.app.model.categories.getItem(categoryId);
+            const category = App.model.categories.getItem(categoryId);
             return category.name;
         }
 
@@ -659,19 +659,19 @@ class StatisticsView extends View {
         const { group } = state.form;
 
         if (group === 'day' || group === 'week') {
-            return window.app.formatDate(value);
+            return App.formatDate(value);
         }
 
         if (group === 'month') {
-            return window.app.formatDate(value, {
-                locales: window.app.dateFormatLocale,
+            return App.formatDate(value, {
+                locales: App.dateFormatLocale,
                 options: { year: 'numeric', month: '2-digit' },
             });
         }
 
         if (group === 'year') {
-            return window.app.formatDate(value, {
-                locales: window.app.dateFormatLocale,
+            return App.formatDate(value, {
+                locales: App.dateFormatLocale,
                 options: { year: 'numeric' },
             });
         }
@@ -683,7 +683,7 @@ class StatisticsView extends View {
         const ids = state.form?.accounts ?? [];
         const selection = [];
 
-        window.app.model.userAccounts.forEach((account) => {
+        App.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
                 || ids.length === 0
@@ -863,5 +863,4 @@ class StatisticsView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(StatisticsView);
+App.createView(StatisticsView);

@@ -45,7 +45,7 @@ class Reminders extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "ReminderList.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("REMINDERS"),
+            "titleString" => __("appName") . " | " . __("reminders.listTitle"),
         ];
 
         $requestDefaults = [

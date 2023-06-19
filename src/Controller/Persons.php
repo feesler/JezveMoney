@@ -28,7 +28,7 @@ class Persons extends ListViewController
     {
         $this->template = new Template(VIEW_TPL_PATH . "PersonList.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("PERSONS"),
+            "titleString" => __("appName") . " | " . __("persons.listTitle"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -67,13 +67,13 @@ class Persons extends ListViewController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
-            "headString" => __("PERSON_CREATE"),
-            "titleString" => __("APP_NAME") . " | " . __("PERSON_CREATE"),
+            "headString" => __("persons.create"),
+            "titleString" => __("appName") . " | " . __("persons.create"),
         ];
 
         $personsData = $this->model->getData(["visibility" => "all"]);
@@ -104,23 +104,23 @@ class Persons extends ListViewController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
-            "headString" => __("PERSON_UPDATE"),
-            "titleString" => __("APP_NAME") . " | " . __("PERSON_UPDATE"),
+            "headString" => __("persons.update"),
+            "titleString" => __("appName") . " | " . __("persons.update"),
         ];
 
         $p_id = intval($this->actionParam);
         if (!$p_id) {
-            $this->fail(__("ERR_PERSON_UPDATE"));
+            $this->fail(__("persons.errors.update"));
         }
 
         $pInfo = $this->model->getItem($p_id);
         if (!$pInfo) {
-            $this->fail(__("ERR_PERSON_UPDATE"));
+            $this->fail(__("persons.errors.update"));
         }
         $data["pInfo"] = $pInfo;
 

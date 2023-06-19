@@ -61,9 +61,9 @@ class ScheduledTransaction extends ApiListController
         $this->model = ScheduledTransactionModel::getInstance();
         TransactionModel::getInstance();
 
-        $this->createErrorMsg = __("ERR_SCHED_TRANS_CREATE");
-        $this->updateErrorMsg = __("ERR_SCHED_TRANS_UPDATE");
-        $this->deleteErrorMsg = __("ERR_SCHED_TRANS_DELETE");
+        $this->createErrorMsg = __("schedule.errors.create");
+        $this->updateErrorMsg = __("schedule.errors.update");
+        $this->deleteErrorMsg = __("schedule.errors.delete");
     }
 
     /**

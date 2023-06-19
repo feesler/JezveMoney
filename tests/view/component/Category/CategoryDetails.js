@@ -71,7 +71,7 @@ export class CategoryDetails extends TestComponent {
 
     static render(item, state) {
         const parent = state.categories.getItem(item.parent_id);
-        const parentTitle = (parent) ? parent.name : __('CATEGORY_NO_PARENT', App.view.locale);
+        const parentTitle = (parent) ? parent.name : __('categories.noParent', App.view.locale);
         const subcategories = state.categories.findByParent(item.id);
         const itemTransactions = state.transactions.applyFilter({
             categories: item.id,

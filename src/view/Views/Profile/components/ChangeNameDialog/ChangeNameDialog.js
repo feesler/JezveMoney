@@ -3,6 +3,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { API } from '../../../../API/index.js';
 import { InputField } from '../../../../Components/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
@@ -34,7 +35,7 @@ export class ChangeNameDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'chname_popup',
-            title: __('PROFILE_CHANGE_NAME'),
+            title: __('profile.changeName'),
             className: DIALOG_CLASS,
         });
 
@@ -44,9 +45,9 @@ export class ChangeNameDialog extends ProfileDialog {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('PROFILE_NAME_NEW'),
+            title: __('profile.newName'),
             validate: true,
-            feedbackMessage: __('PROFILE_INVALID_NAME'),
+            feedbackMessage: __('profile.invalidName'),
             onInput: (e) => this.onNameInput(e),
         });
 
@@ -60,7 +61,7 @@ export class ChangeNameDialog extends ProfileDialog {
         super.reset();
 
         this.setState({
-            name: window.app.model.profile.name,
+            name: App.model.profile.name,
             validation: {
                 name: true,
             },
@@ -106,7 +107,7 @@ export class ChangeNameDialog extends ProfileDialog {
     }
 
     async handleFormRequest() {
-        if (this.state.name === window.app.model.profile.name) {
+        if (this.state.name === App.model.profile.name) {
             this.popup.close();
             return;
         }

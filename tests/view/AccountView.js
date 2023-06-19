@@ -243,7 +243,7 @@ export class AccountView extends AppView {
                 visible: true,
             },
             iconDropDown: {
-                textValue: __(`icons.${model.tileIcon.name}`, this.locale),
+                textValue: __(`icons.byName.${model.tileIcon.name}`, this.locale),
                 visible: true,
             },
         };

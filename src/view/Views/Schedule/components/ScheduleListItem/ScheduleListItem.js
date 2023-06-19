@@ -6,7 +6,9 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import {
     EXPENSE,
     INCOME,
@@ -137,28 +139,28 @@ export class ScheduleListItem extends Component {
         // Start date
         this.startDateElem = createElement('div', { props: { className: START_DATE_CLASS } });
         this.startDateField = Field.create({
-            title: __('SCHED_TR_START_DATE'),
+            title: __('schedule.startDate'),
             content: this.startDateElem,
             className: START_DATE_FIELD_CLASS,
         });
         // End date
         this.endDateElem = createElement('div', { props: { className: END_DATE_CLASS } });
         this.endDateField = Field.create({
-            title: __('SCHED_TR_END_DATE'),
+            title: __('schedule.endDate'),
             content: this.endDateElem,
             className: END_DATE_FIELD_CLASS,
         });
         // Interval
         this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
         this.intervalField = Field.create({
-            title: __('SCHED_TR_INTERVAL'),
+            title: __('schedule.repeat'),
             content: this.intervalElem,
             className: INTERVAL_FIELD_CLASS,
         });
         // Interval offset
         this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
         this.offsetField = Field.create({
-            title: __('SCHED_TR_OFFSET'),
+            title: __('schedule.intervalOffset'),
             content: this.offsetElem,
             className: OFFSET_FIELD_CLASS,
         });
@@ -176,11 +178,11 @@ export class ScheduleListItem extends Component {
         // Main content
         // Accounts
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -189,11 +191,11 @@ export class ScheduleListItem extends Component {
         });
         // Amount
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
@@ -204,14 +206,14 @@ export class ScheduleListItem extends Component {
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
@@ -259,7 +261,7 @@ export class ScheduleListItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -292,13 +294,13 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid item type');
         }
 
-        const { profile, accounts } = window.app.model;
+        const { profile, accounts } = App.model;
         const srcAcc = accounts.getItem(item.src_id);
         return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
     }
 
     getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = window.app.model;
+        const { profile, accounts, persons } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             return null;
@@ -316,7 +318,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const accountModel = window.app.model.accounts;
+        const accountModel = App.model.accounts;
         const srcAcc = accountModel.getItem(item.src_id);
         const destAcc = accountModel.getItem(item.dest_id);
 
@@ -340,7 +342,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid type of transaction');
         }
 
-        const personModel = window.app.model.persons;
+        const personModel = App.model.persons;
         const debtType = this.getDebtType(item);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
@@ -363,7 +365,7 @@ export class ScheduleListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const srcAmountFmt = currencyModel.formatCurrency(item.src_amount, item.src_curr);
         const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
         const diffCurrency = item.src_curr !== item.dest_curr;
@@ -399,7 +401,7 @@ export class ScheduleListItem extends Component {
             return null;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(item.category_id);
         if (!category) {
             throw new Error('Invalid category');
@@ -429,12 +431,12 @@ export class ScheduleListItem extends Component {
     }
 
     renderDateRange(item) {
-        const start = __('SCHEDULE_ITEM_START', window.app.formatDate(item.start_date));
+        const start = __('schedule.item.start', App.formatDate(item.start_date));
         if (!item.end_date) {
             return start;
         }
 
-        const end = __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date));
+        const end = __('schedule.item.end', App.formatDate(item.end_date));
         return `${start} ${end}`;
     }
 
@@ -461,17 +463,17 @@ export class ScheduleListItem extends Component {
 
     renderEndDate(item) {
         return (item.end_date)
-            ? __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date))
-            : __('SCHED_TR_NO_END_DATE');
+            ? __('schedule.item.end', App.formatDate(item.end_date))
+            : __('schedule.noEndDate');
     }
 
     renderDetails(state) {
         const { item } = state;
-        const { currency } = window.app.model;
+        const { currency } = App.model;
 
         // Schedule
         // Start date
-        this.startDateField.setContent(window.app.formatDate(item.start_date));
+        this.startDateField.setContent(App.formatDate(item.start_date));
 
         // End date
         this.endDateField.setContent(this.renderEndDate(item));
@@ -501,7 +503,7 @@ export class ScheduleListItem extends Component {
 
         // Amount
         const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         if (isDiff) {
             const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);

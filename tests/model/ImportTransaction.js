@@ -20,13 +20,13 @@ export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
 export class ImportTransaction {
     /** List of available transaction types */
     static availTypes = [
-        { id: 'expense', titleToken: 'TR_EXPENSE' },
-        { id: 'income', titleToken: 'TR_INCOME' },
-        { id: 'transfer_out', titleToken: 'TR_TRANSFER_OUT' },
-        { id: 'transfer_in', titleToken: 'TR_TRANSFER_IN' },
-        { id: 'debt_out', titleToken: 'TR_DEBT_OUT' },
-        { id: 'debt_in', titleToken: 'TR_DEBT_IN' },
-        { id: 'limit', titleToken: 'TR_LIMIT_CHANGE' },
+        { id: 'expense', titleToken: 'transactions.types.expense' },
+        { id: 'income', titleToken: 'transactions.types.income' },
+        { id: 'transfer_out', titleToken: 'transactions.types.transferOut' },
+        { id: 'transfer_in', titleToken: 'transactions.types.transferIn' },
+        { id: 'debt_out', titleToken: 'transactions.types.debtOut' },
+        { id: 'debt_in', titleToken: 'transactions.types.debtIn' },
+        { id: 'limit', titleToken: 'transactions.types.creditLimit' },
     ];
 
     /** Map transaction types from import to normal */

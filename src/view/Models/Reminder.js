@@ -1,3 +1,4 @@
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 const availFields = [
@@ -33,9 +34,9 @@ export const REMINDER_CANCELLED = 3;
  */
 export class Reminder extends ListItem {
     static stateTypes = [
-        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'REMINDER_STATE_SCHEDULED' },
-        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'REMINDER_STATE_CONFIRMED' },
-        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'REMINDER_STATE_CANCELLED' },
+        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'reminders.state.scheduled' },
+        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'reminders.state.submitted' },
+        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'reminders.state.cancelled' },
     ];
 
     static getStateName(stateType) {
@@ -52,7 +53,7 @@ export class Reminder extends ListItem {
     static createExtended(props) {
         const reminder = this.create(props);
 
-        const scheduleItem = window.app.model.schedule.getItem(props.schedule_id);
+        const scheduleItem = App.model.schedule.getItem(props.schedule_id);
         if (!scheduleItem) {
             throw new Error('Scheduled transaction not found');
         }

@@ -9,7 +9,7 @@
                 <div class="content_wrap admin_cont_wrap">
                     <section id="mainTab" class="settings-block">
                         <header id="mainHeading" class="heading">
-                            <h2><?= __("SETTINGS_MAIN") ?></h2>
+                            <h2><?= __("settings.main") ?></h2>
                         </header>
                         <div id="mainContainer">
                             <div id="enableLogsField" class="field form-row horizontal-field">

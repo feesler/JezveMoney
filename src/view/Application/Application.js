@@ -9,6 +9,7 @@ import {
     isValidDateString,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
+
 import { API } from '../API/index.js';
 import {
     parseCookies,
@@ -28,7 +29,21 @@ export const DARK_THEME = 1;
 
 /** Application class */
 export class Application {
+    static instance = null;
+
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new this(window.appProps);
+        }
+
+        return this.instance;
+    }
+
     constructor(props = {}) {
+        if (Application.instance) {
+            throw new Error('Application instance already created');
+        }
+
         this.props = { ...props };
 
         // Setup view properties
@@ -453,7 +468,7 @@ export class Application {
             otherCurrencies.push({ ...currency, name: currency.formatName() });
         });
 
-        this.appendListItems(ddlist, otherCurrencies, { group: __('OTHER_CURRENCIES') });
+        this.appendListItems(ddlist, otherCurrencies, { group: __('settings.currencies.other') });
     }
 
     appendListItems(ddlist, items, options = {}) {
@@ -515,12 +530,12 @@ export class Application {
     /** Initialize acconts DropDown */
     initAccountsList(ddlist, options = {}) {
         this.appendAccounts(ddlist, { ...options, visible: true });
-        this.appendAccounts(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
+        this.appendAccounts(ddlist, { ...options, visible: false, group: __('list.hiddenItemsCounter') });
     }
 
     /** Initialize persons DropDown */
     initPersonsList(ddlist, options = {}) {
         this.appendPersons(ddlist, { ...options, visible: true });
-        this.appendPersons(ddlist, { ...options, visible: false, group: __('LIST_HIDDEN') });
+        this.appendPersons(ddlist, { ...options, visible: false, group: __('list.hiddenItemsCounter') });
     }
 }

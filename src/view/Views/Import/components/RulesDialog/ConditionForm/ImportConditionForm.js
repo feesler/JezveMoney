@@ -9,11 +9,14 @@ import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
+
+import { __ } from '../../../../../utils/utils.js';
+import { MAX_PRECISION } from '../../../../../utils/decimal.js';
+import { App } from '../../../../../Application/App.js';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../../Models/ImportCondition.js';
-import { MAX_PRECISION, __ } from '../../../../../utils/utils.js';
 import './ImportConditionForm.scss';
 
 /** CSS classes */
@@ -117,11 +120,11 @@ export class ImportConditionForm extends Component {
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
-            label: __('CONDITION_COMPARE_PROPERTY'),
+            label: __('import.conditions.compareWithProperty'),
             onChange: () => this.onFieldValueChecked(),
         });
 
-        this.fields = window.app.createContainer(COND_FIELDS_CLASS, [
+        this.fields = App.createContainer(COND_FIELDS_CLASS, [
             this.propertyDropDown.elem,
             this.operatorDropDown.elem,
             this.accountDropDown.elem,
@@ -134,7 +137,7 @@ export class ImportConditionForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        this.container = window.app.createContainer([CONTAINER_CLASS, VALIDATION_CLASS], [
+        this.container = App.createContainer([CONTAINER_CLASS, VALIDATION_CLASS], [
             this.fields,
             this.fieldValueCheck.elem,
             this.validFeedback,
@@ -150,9 +153,9 @@ export class ImportConditionForm extends Component {
             children: delIcon.elem,
             events: { click: () => this.onDelete() },
         });
-        this.controls = window.app.createContainer(CONTROLS_CLASS, this.delBtn);
+        this.controls = App.createContainer(CONTROLS_CLASS, this.delBtn);
 
-        this.elem = window.app.createContainer(FORM_CLASS, [
+        this.elem = App.createContainer(FORM_CLASS, [
             this.container,
             this.controls,
         ]);
@@ -208,22 +211,22 @@ export class ImportConditionForm extends Component {
         this.accountDropDown = DropDown.create({
             className: ACCOUNT_FIELD_CLASS,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: () => this.onValueChange(),
         });
-        window.app.initAccountsList(this.accountDropDown);
+        App.initAccountsList(this.accountDropDown);
     }
 
     /** Create template field */
     createTemplateField() {
-        const templateItems = window.app.model.templates.map(
+        const templateItems = App.model.templates.map(
             (template) => ({ id: template.id, title: template.name }),
         );
 
         this.templateDropDown = DropDown.create({
             className: TEMPLATE_FIELD_CLASS,
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: () => this.onValueChange(),
         });
         this.templateDropDown.append(templateItems);
@@ -239,7 +242,7 @@ export class ImportConditionForm extends Component {
             enableFilter: true,
             onChange: () => this.onValueChange(),
         });
-        window.app.initUserCurrencyList(this.currencyDropDown);
+        App.initUserCurrencyList(this.currencyDropDown);
     }
 
     /** Create value property field */
@@ -518,7 +521,7 @@ export class ImportConditionForm extends Component {
             throw new Error('Invalid state');
         }
 
-        window.app.setValidation(this.container, state.isValid);
+        App.setValidation(this.container, state.isValid);
         this.validFeedback.textContent = (state.isValid) ? '' : state.message;
 
         this.renderProperty(state);

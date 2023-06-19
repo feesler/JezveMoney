@@ -15,7 +15,7 @@ const defaultProps = {
     itemSelector: '.import-item',
     itemSortSelector: '.import-item.import-item_sort',
     className: LIST_CLASS,
-    noItemsMessage: __('IMPORT_NO_DATA'),
+    noItemsMessage: __('import.noData'),
     onSort: null,
 };
 

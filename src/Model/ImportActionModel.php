@@ -483,13 +483,13 @@ class ImportActionModel extends CachedTable
     public static function getActionNames()
     {
         return [
-            IMPORT_ACTION_SET_TR_TYPE => __("ACTION_SET_TR_TYPE"),
-            IMPORT_ACTION_SET_ACCOUNT => __("ACTION_SET_ACCOUNT"),
-            IMPORT_ACTION_SET_PERSON => __("ACTION_SET_PERSON"),
-            IMPORT_ACTION_SET_SRC_AMOUNT => __("ACTION_SET_SRC_AMOUNT"),
-            IMPORT_ACTION_SET_DEST_AMOUNT => __("ACTION_SET_DEST_AMOUNT"),
-            IMPORT_ACTION_SET_COMMENT => __("ACTION_SET_COMMENT"),
-            IMPORT_ACTION_SET_CATEGORY => __("ACTION_SET_CATEGORY"),
+            IMPORT_ACTION_SET_TR_TYPE => __("import.actions.types.setTransactionType"),
+            IMPORT_ACTION_SET_ACCOUNT => __("import.actions.types.setAccount"),
+            IMPORT_ACTION_SET_PERSON => __("import.actions.types.setPerson"),
+            IMPORT_ACTION_SET_SRC_AMOUNT => __("import.actions.types.setSourceAmount"),
+            IMPORT_ACTION_SET_DEST_AMOUNT => __("import.actions.types.setDestAmount"),
+            IMPORT_ACTION_SET_COMMENT => __("import.actions.types.setComment"),
+            IMPORT_ACTION_SET_CATEGORY => __("import.actions.types.setCategory"),
         ];
     }
 

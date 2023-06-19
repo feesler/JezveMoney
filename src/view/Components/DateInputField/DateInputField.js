@@ -1,8 +1,10 @@
 import { createElement } from 'jezvejs';
 import { DatePicker } from 'jezvejs/DatePicker';
+
+import { __, timeToDate } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { Field } from '../Field/Field.js';
 import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
-import { __, timeToDate } from '../../utils/utils.js';
 
 const defaultProps = {
     locales: [],
@@ -59,7 +61,7 @@ export class DateInputField extends Field {
             this.feedbackElem = createElement('div', {
                 props: {
                     className: 'feedback invalid-feedback',
-                    textContent: __('TR_INVALID_DATE'),
+                    textContent: __('transactions.invalidDate'),
                 },
             });
 
@@ -76,7 +78,7 @@ export class DateInputField extends Field {
 
         this.datePicker = DatePicker.create({
             relparent: this.container,
-            locales: window.app.getCurrrentLocale(),
+            locales: App.getCurrrentLocale(),
             onDateSelect: this.props.onDateSelect,
         });
         this.datePickerWrapper.append(this.datePicker.elem);
@@ -112,7 +114,7 @@ export class DateInputField extends Field {
 
         this.elem.classList.toggle('validation-block', state.validate);
         if (state.validate) {
-            window.app.setValidation(this.elem, state.valid);
+            App.setValidation(this.elem, state.valid);
             this.feedbackElem.textContent = state.feedbackMessage;
         }
 

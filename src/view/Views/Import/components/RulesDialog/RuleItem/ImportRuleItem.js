@@ -7,10 +7,12 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
+
+import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
 import { ImportActionList } from '../../../../../Models/ImportActionList.js';
-import { __ } from '../../../../../utils/utils.js';
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
@@ -58,35 +60,35 @@ export class ImportRuleItem extends Component {
             onClick: (e) => this.onToggle(e),
         });
 
-        this.topRow = window.app.createContainer('rule-item__main-top', [
+        this.topRow = App.createContainer('rule-item__main-top', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,
         ]);
-        this.bottomRow = window.app.createContainer('rule-item__main-bottom', [
+        this.bottomRow = App.createContainer('rule-item__main-bottom', [
             this.infoLabel,
         ]);
 
-        this.infoContainer = window.app.createContainer('rule-item__main-info', [
+        this.infoContainer = App.createContainer('rule-item__main-info', [
             this.topRow,
             this.bottomRow,
         ]);
 
         this.menuButton = MenuButton.create();
-        this.controls = window.app.createContainer('rule-item__main-controls', [
+        this.controls = App.createContainer('rule-item__main-controls', [
             this.menuButton.elem,
             this.toggleExtBtn.elem,
         ]);
 
         this.conditionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: __('IMPORT_CONDITIONS') },
+            props: { className: 'rule-item__header', textContent: __('import.conditions.title') },
         });
-        this.conditionsContainer = window.app.createContainer('rule-item__conditions');
+        this.conditionsContainer = App.createContainer('rule-item__conditions');
 
         this.actionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: __('IMPORT_ACTIONS') },
+            props: { className: 'rule-item__header', textContent: __('import.actions.title') },
         });
-        this.actionsContainer = window.app.createContainer('rule-item__actions');
+        this.actionsContainer = App.createContainer('rule-item__actions');
 
         this.collapse = Collapsible.create({
             toggleOnClick: false,
@@ -184,9 +186,9 @@ export class ImportRuleItem extends Component {
         this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
         this.valueLabel.textContent = firstCondition.valueLabel.textContent;
 
-        const actionsTitle = __('IMPORT_RULE_INFO_ACTIONS', state.actions.length);
+        const actionsTitle = __('import.rules.actionsInfo', state.actions.length);
         if (conditionItems.length > 1) {
-            const conditionsTitle = __('IMPORT_RULE_INFO_CONDITIONS', conditionItems.length - 1);
+            const conditionsTitle = __('import.rules.conditionsInfo', conditionItems.length - 1);
             this.infoLabel.textContent = `${conditionsTitle} ${actionsTitle}`;
         } else {
             this.infoLabel.textContent = actionsTitle;

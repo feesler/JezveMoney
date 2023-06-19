@@ -18,7 +18,7 @@ import {
     SORT_MANUALLY,
     __,
 } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
@@ -61,12 +61,12 @@ class PersonListView extends View {
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.checkPersonModels();
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.checkPersonModels();
 
-        const { visiblePersons, hiddenPersons } = window.app.model;
-        const { settings } = window.app.model.profile;
+        const { visiblePersons, hiddenPersons } = App.model;
+        const { settings } = App.model.profile;
         const sortMode = settings.sort_persons;
 
         const initialState = {
@@ -108,7 +108,7 @@ class PersonListView extends View {
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
-            noItemsMessage: __('PERSONS_NO_DATA'),
+            noItemsMessage: __('persons.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };
@@ -126,7 +126,7 @@ class PersonListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('PERSONS'),
+            title: __('persons.listTitle'),
         });
 
         this.createBtn = Button.create({
@@ -134,7 +134,7 @@ class PersonListView extends View {
             type: 'link',
             className: 'circle-btn',
             icon: 'plus',
-            url: `${window.app.baseURL}persons/create/`,
+            url: `${App.baseURL}persons/create/`,
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
@@ -153,7 +153,7 @@ class PersonListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -297,7 +297,7 @@ class PersonListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -322,7 +322,7 @@ class PersonListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -338,7 +338,7 @@ class PersonListView extends View {
             const { data } = await API.person.list(request);
             this.setListData(data, keepState);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -362,9 +362,9 @@ class PersonListView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.persons.setData(data);
-        window.app.model.visiblePersons = null;
-        window.app.checkPersonModels();
+        App.model.persons.setData(data);
+        App.model.visiblePersons = null;
+        App.checkPersonModels();
 
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
@@ -381,12 +381,12 @@ class PersonListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
     onSort(info) {
-        const { persons } = window.app.model;
+        const { persons } = App.model;
         const item = persons.getItem(info.itemId);
         const prevItem = persons.getItem(info.prevId);
         const nextItem = persons.getItem(info.nextId);
@@ -430,7 +430,7 @@ class PersonListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createErrorNotification(__('ERR_PERSON_CHANGE_POS'));
+        App.createErrorNotification(__('persons.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -452,7 +452,7 @@ class PersonListView extends View {
     }
 
     async requestSortMode(sortMode) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.sort_persons === sortMode) {
             return;
         }
@@ -467,7 +467,7 @@ class PersonListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -484,8 +484,8 @@ class PersonListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? __('PERSON_DELETE_MULTIPLE') : __('PERSON_DELETE'),
-            content: (multiple) ? __('MSG_PERSON_DELETE_MULTIPLE') : __('MSG_PERSON_DELETE'),
+            title: (multiple) ? __('persons.deleteMultiple') : __('persons.delete'),
+            content: (multiple) ? __('persons.deleteMultipleMessage') : __('persons.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -556,7 +556,7 @@ class PersonListView extends View {
             return;
         }
 
-        const { persons } = window.app.model;
+        const { persons } = App.model;
         const item = state.detailsItem ?? persons.getItem(state.detailsId);
         if (!item) {
             throw new Error('Person not found');
@@ -577,7 +577,7 @@ class PersonListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         return new URL(`${baseURL}persons/${itemPart}`);
     }
@@ -588,7 +588,7 @@ class PersonListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('PERSONS')}`;
+        const pageTitle = `${__('appName')} | ${__('persons.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -644,5 +644,4 @@ class PersonListView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(PersonListView);
+App.createView(PersonListView);

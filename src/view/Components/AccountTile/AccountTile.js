@@ -1,4 +1,5 @@
 import { Component } from 'jezvejs';
+import { App } from '../../Application/App.js';
 import { Tile } from '../Tile/Tile.js';
 
 /**
@@ -32,7 +33,7 @@ export class AccountTile extends Component {
     }
 
     render(state) {
-        const { currency, icons } = window.app.model;
+        const { currency, icons } = App.model;
         const { account } = state;
 
         const fmtBalance = (account)

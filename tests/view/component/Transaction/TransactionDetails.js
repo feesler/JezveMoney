@@ -85,7 +85,7 @@ export class TransactionDetails extends TestComponent {
         const category = state.categories.getItem(item.category_id);
         const categoryTitle = (category)
             ? category.name
-            : __('NO_CATEGORY', App.view.locale);
+            : __('categories.noCategory', App.view.locale);
 
         const res = {
             title: {

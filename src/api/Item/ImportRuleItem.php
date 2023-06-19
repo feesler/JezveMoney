@@ -2,6 +2,10 @@
 
 namespace JezveMoney\App\Item;
 
+use JezveMoney\App\Model\ImportActionModel;
+use JezveMoney\App\Model\ImportConditionModel;
+use JezveMoney\App\Model\UserModel;
+
 class ImportRuleItem
 {
     public $id = 0;
@@ -31,6 +35,47 @@ class ImportRuleItem
         $res->flags = intval($row["flags"]);
         $res->createdate = strtotime($row["createdate"]);
         $res->updatedate = strtotime($row["updatedate"]);
+
+        return $res;
+    }
+
+    /**
+     * Returns import rules object for client
+     *
+     * @param mixed $item
+     * @param array $params array of options:
+     *     - 'extended' => (bool) - return extenden rule object, default is false
+     *
+     * @return \stdClass
+     */
+    public static function getUserData(mixed $item, array $params = [])
+    {
+        if (!is_array($item) && !is_object($item)) {
+            throw new \Error("Invalid item");
+        }
+
+        $item = (object)$item;
+
+        $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
+        $addExtended = isset($params["extended"]) && $params["extended"] == true;
+
+        $res = new \stdClass();
+        $res->id = $item->id;
+        $res->flags = $item->flags;
+        $res->createdate = $item->createdate;
+        $res->updatedate = $item->updatedate;
+
+        if ($requestAll) {
+            $res->user_id = $item->user_id;
+        }
+
+        if ($addExtended) {
+            $condModel = ImportConditionModel::getInstance();
+            $res->conditions = $condModel->getRuleConditions($res->id);
+
+            $actionModel = ImportActionModel::getInstance();
+            $res->actions = $actionModel->getRuleActions($res->id);
+        }
 
         return $res;
     }

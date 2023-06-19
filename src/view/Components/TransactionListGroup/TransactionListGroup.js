@@ -1,6 +1,7 @@
 import { Component, createElement, isFunction } from 'jezvejs';
 import { TransactionList } from '../TransactionList/TransactionList.js';
 import './TransactionListGroup.scss';
+import { App } from '../../Application/App.js';
 
 /* CSS classes */
 const GROUP_CLASS = 'trans-group';
@@ -64,7 +65,7 @@ export class TransactionListGroup extends Component {
     }
 
     render(state) {
-        this.title.textContent = window.app.formatDate(state.item.date);
+        this.title.textContent = App.formatDate(state.item.date);
 
         // Render list
         this.list.setState((listState) => ({

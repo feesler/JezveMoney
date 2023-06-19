@@ -24,7 +24,7 @@ class Settings extends TemplateController
 
         $profileInfo = $this->getProfileData();
 
-        $titleString = __("APP_NAME") . " | " . __("SETTINGS");
+        $titleString = __("appName") . " | " . __("settings.title");
         $data["titleString"] = $titleString;
 
         $currModel = CurrencyModel::getInstance();

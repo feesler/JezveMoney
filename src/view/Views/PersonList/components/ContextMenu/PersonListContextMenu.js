@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { getExportURL } from '../../helpers.js';
 
 /** Persons list context menu component */
@@ -11,7 +12,7 @@ export class PersonListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 type: 'separator',
@@ -19,24 +20,24 @@ export class PersonListContextMenu extends PopupMenu {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxExportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('TR_EXPORT_CSV'),
+                title: __('transactions.exportToCsv'),
             }, {
                 id: 'ctxShowBtn',
                 icon: 'show',
-                title: __('SHOW'),
+                title: __('actions.show'),
             }, {
                 id: 'ctxHideBtn',
                 icon: 'hide',
-                title: __('HIDE'),
+                title: __('actions.hide'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 
@@ -47,7 +48,7 @@ export class PersonListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.persons.getItem(state.contextItem);
+        return App.model.persons.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {
@@ -75,7 +76,7 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}persons/${person.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);

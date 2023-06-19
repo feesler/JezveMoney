@@ -8,7 +8,7 @@
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
-                            <h1><?= __("SCHEDULE") ?></h1>
+                            <h1><?= __("schedule.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
 
@@ -16,11 +16,11 @@
                             <header class="list-header">
                                 <div class="counters">
                                     <div id="itemsCounter" class="counter">
-                                        <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
+                                        <span class="counter__title"><?= __("list.itemsCounter") ?></span>
                                         <span id="itemsCount" class="counter__value"></span>
                                     </div>
                                     <div id="selectedCounter" class="counter" hidden>
-                                        <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
+                                        <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
                                         <span id="selItemsCount" class="counter__value"></span>
                                     </div>
                                 </div>

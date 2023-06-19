@@ -1,6 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
-
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 /** User currencies list context menu component */
 export class CurrencyListContextMenu extends PopupMenu {
@@ -11,7 +11,7 @@ export class CurrencyListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 
@@ -22,7 +22,7 @@ export class CurrencyListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return window.app.model.userCurrencies.getItem(state.contextItem);
+        return App.model.userCurrencies.getItem(state.contextItem);
     }
 
     getHostElement(itemId) {

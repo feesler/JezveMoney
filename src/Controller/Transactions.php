@@ -49,7 +49,7 @@ class Transactions extends ListViewController
         $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
         $baseUrl = BASEURL . "transactions/";
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("TRANSACTIONS"),
+            "titleString" => __("appName") . " | " . __("transactions.listTitle"),
             "clearAllURL" => $baseUrl
         ];
 
@@ -126,7 +126,7 @@ class Transactions extends ListViewController
             $res = TransactionModel::stringToType($request["type"]);
         }
         if (!$res) {
-            $this->fail(__("ERR_TRANSACTION_TYPE"));
+            $this->fail(__("transactions.errors.invalidType"));
         }
 
         return $res;
@@ -139,20 +139,20 @@ class Transactions extends ListViewController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "create",
-            "headString" => __("TR_CREATE"),
-            "titleString" => __("APP_NAME") . " | " . __("TR_CREATE"),
+            "headString" => __("transactions.create"),
+            "titleString" => __("appName") . " | " . __("transactions.create"),
         ];
 
         $userAccounts = $this->accModel->getUserAccounts();
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = __("ERR_TRANS_CREATE");
+        $defMsg = __("transactions.errors.create");
 
         if (isset($_GET["reminder_id"])) {
             $reminderModel = ReminderModel::getInstance();
@@ -219,7 +219,7 @@ class Transactions extends ListViewController
         if ($person_id) {
             $person = $this->personMod->getItem($person_id);
             if (!$person) {
-                $this->fail(__("ERR_PERSON_NOT_FOUND"));
+                $this->fail(__("persons.errors.notFound"));
             }
         }
 
@@ -315,18 +315,18 @@ class Transactions extends ListViewController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(__("ERR_INVALID_REQUEST"));
+            $this->fail(__("errors.invalidRequest"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "update",
-            "headString" => __("TR_UPDATE"),
-            "titleString" => __("APP_NAME") . " | " . __("TR_UPDATE"),
+            "headString" => __("transactions.update"),
+            "titleString" => __("appName") . " | " . __("transactions.update"),
         ];
 
         $iconModel = IconModel::getInstance();
-        $defMsg = __("ERR_TRANS_UPDATE");
+        $defMsg = __("transactions.errors.update");
 
         $trans_id = intval($this->actionParam);
         if (!$trans_id) {
@@ -354,7 +354,7 @@ class Transactions extends ListViewController
             $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
             $person = $this->personMod->getItem($person_id);
             if (!$person) {
-                throw new \Error(__("ERR_PERSON_NOT_FOUND"));
+                throw new \Error(__("persons.errors.notFound"));
             }
 
             $debtAcc = $debtType ? $dest : $src;
@@ -436,13 +436,13 @@ class Transactions extends ListViewController
 
         $columns = [
             "id" => "ID",
-            "type" => __("TR_TYPE"),
-            "src_amount" => __("TR_SRC_AMOUNT"),
-            "dest_amount" => __("TR_DEST_AMOUNT"),
-            "src_result" => __("TR_SRC_RESULT"),
-            "dest_result" => __("TR_DEST_RESULT"),
-            "date" => __("TR_DATE"),
-            "comment" => __("TR_COMMENT"),
+            "type" => __("transactions.type"),
+            "src_amount" => __("transactions.sourceAmount"),
+            "dest_amount" => __("transactions.destAmount"),
+            "src_result" => __("transactions.sourceResult"),
+            "dest_result" => __("transactions.destResult"),
+            "date" => __("transactions.date"),
+            "comment" => __("transactions.comment"),
         ];
 
         $colStr = [];

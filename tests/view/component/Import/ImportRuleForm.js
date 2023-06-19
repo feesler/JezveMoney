@@ -168,9 +168,9 @@ export class ImportRuleForm extends TestComponent {
         );
 
         accordionItems.forEach((item) => {
-            if (item.content.title === __('IMPORT_CONDITIONS', App.view.locale)) {
+            if (item.content.title === __('import.conditions.title', App.view.locale)) {
                 res.conditionsList = item;
-            } else if (item.content.title === __('IMPORT_ACTIONS', App.view.locale)) {
+            } else if (item.content.title === __('import.actions.title', App.view.locale)) {
                 res.actionsList = item;
             } else {
                 throw new Error(`Unknown container: '${item.content.title}'`);

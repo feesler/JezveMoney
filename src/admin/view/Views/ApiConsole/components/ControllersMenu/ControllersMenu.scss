@@ -1,0 +1,51 @@
+/* Menu lists */
+.menu-list {
+  padding: 12px;
+}
+
+.menu-list > li {
+  padding: 5px 0;
+  list-style-type: none;
+}
+
+.menu-list > li > button {
+  font-size: 18px;
+  white-space: nowrap;
+  background: none;
+  cursor: pointer;
+  color: var(--main-text-color);
+}
+
+.menu-list > li.active > button {
+  font-weight: bold;
+}
+
+.menu-list .sub-menu-list {
+  padding: 0 0 0 10px;
+  display: none;
+  list-style-image: none;
+}
+
+.menu-list > li.active .sub-menu-list {
+  display: block;
+}
+
+.menu-list .sub-menu-list > li {
+  list-style-image: none;
+  list-style-type: none;
+  cursor: pointer;
+  padding: 5px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.menu-list > li.active .sub-menu-list > li.active {
+  font-style: italic;
+}
+
+@media (hover: hover) {
+  .menu-list .sub-menu-list > li:hover {
+    text-decoration: underline;
+    color: var(--text-color-3);
+  }
+}

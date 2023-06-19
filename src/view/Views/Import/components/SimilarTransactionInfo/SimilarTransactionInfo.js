@@ -1,5 +1,6 @@
 import { createElement, Component } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import './SimilarTransactionInfo.scss';
 
 /* CSS classes */
@@ -19,7 +20,7 @@ export class SimilarTransactionInfo extends Component {
     }
 
     init() {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { id } = this.props;
         const url = `${baseURL}transactions/${id}`;
 
@@ -29,7 +30,7 @@ export class SimilarTransactionInfo extends Component {
                 createElement('div', {
                     props: {
                         className: SIMILAR_TITLE_CLASS,
-                        textContent: __('IMPORT_SIMILAR_FOUND'),
+                        textContent: __('import.similarFound'),
                     },
                 }),
                 createElement('a', {
@@ -37,7 +38,7 @@ export class SimilarTransactionInfo extends Component {
                         className: SIMILAR_LINK_CLASS,
                         href: url,
                         target: '_blank',
-                        textContent: __('IMPORT_SIMILAR_OPEN'),
+                        textContent: __('import.openSimilar'),
                     },
                 }),
             ],

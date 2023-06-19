@@ -1,6 +1,7 @@
 import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 const defaultProps = {
     transactionType: null, // filter categories by type, null - show all
@@ -35,12 +36,12 @@ export class CategorySelect extends DropDown {
     }
 
     initCategories() {
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const { transactionType, parentCategorySelect } = this.state;
 
         this.removeAll();
 
-        const noCategoryTitle = (parentCategorySelect) ? 'CATEGORY_NO_PARENT' : 'NO_CATEGORY';
+        const noCategoryTitle = (parentCategorySelect) ? 'categories.noParent' : 'categories.noCategory';
         this.addItem({ id: 0, title: __(noCategoryTitle) });
 
         const excludeIds = asArray(this.state.exclude).map((id) => parseInt(id, 10));

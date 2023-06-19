@@ -9,7 +9,7 @@ import {
     TRANSFER,
     Transaction,
 } from '../../Models/Transaction.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
 import { AccountList } from '../../Models/AccountList.js';
@@ -37,15 +37,15 @@ class TransactionView extends View {
             throw new Error('Invalid Transaction view properties');
         }
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(IconList, 'icons', App.props.icons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
 
-        const accountModel = window.app.model.accounts;
+        const accountModel = App.model.accounts;
 
         this.mode = this.props.mode;
         if (!availModes.includes(this.mode)) {
@@ -55,8 +55,8 @@ class TransactionView extends View {
             accountModel.cancelTransaction(this.props.transaction);
         }
 
-        window.app.checkUserAccountModels();
-        window.app.checkPersonModels();
+        App.checkUserAccountModels();
+        App.checkPersonModels();
 
         const initialState = {
             transaction: this.props.transaction,
@@ -80,7 +80,7 @@ class TransactionView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('TR_UPDATE') : __('TR_CREATE'),
+            title: (isUpdate) ? __('transactions.update') : __('transactions.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -89,7 +89,7 @@ class TransactionView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -138,10 +138,10 @@ class TransactionView extends View {
                 await API.transaction.create(request);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -156,10 +156,10 @@ class TransactionView extends View {
         try {
             await API.transaction.del({ id: state.transaction.id });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -169,14 +169,14 @@ class TransactionView extends View {
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('TR_DELETE'),
-            content: __('MSG_TRANS_DELETE'),
+            title: __('transactions.delete'),
+            content: __('transactions.deleteMessage'),
             onConfirm: () => this.deleteTransaction(),
         });
     }
 
     replaceHistory(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { transaction } = state;
         const baseAddress = (state.isUpdate)
             ? `${baseURL}transactions/update/${transaction.id}`
@@ -202,8 +202,8 @@ class TransactionView extends View {
         }
 
         const title = (state.isUpdate)
-            ? `${__('APP_NAME')} | ${__('TR_UPDATE')}`
-            : `${__('APP_NAME')} | ${__('TR_CREATE')}`;
+            ? `${__('appName')} | ${__('transactions.update')}`
+            : `${__('appName')} | ${__('transactions.create')}`;
 
         window.history.replaceState({}, title, url);
     }
@@ -239,5 +239,4 @@ class TransactionView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(TransactionView);
+App.createView(TransactionView);

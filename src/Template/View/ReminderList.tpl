@@ -8,14 +8,14 @@
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
-                            <h1><?= __("REMINDERS") ?></h1>
+                            <h1><?= __("reminders.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
 
                         <header id="contentHeader" class="content-header">
                             <aside id="filtersContainer" class="filters-container">
                                 <header class="filters-heading">
-                                    <span class="filters-heading__title"><?= __("FILTERS") ?></span>
+                                    <span class="filters-heading__title"><?= __("filters.title") ?></span>
                                 </header>
 
                                 <hr class="filters-separator">
@@ -23,7 +23,7 @@
                                 <div class="filters-list">
                                     <div class="filters-row">
                                         <section id="stateFilter" class="filter-item trans-type-filter">
-                                            <header class="filter-item__title"><?= __("FILTER_STATE") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.reminderState") ?></header>
                                         </section>
                                     </div>
                                 </div>
@@ -32,11 +32,11 @@
                             <header class="list-header">
                                 <div class="counters">
                                     <div id="itemsCounter" class="counter">
-                                        <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
+                                        <span class="counter__title"><?= __("list.itemsCounter") ?></span>
                                         <span id="itemsCount" class="counter__value"></span>
                                     </div>
                                     <div id="selectedCounter" class="counter" hidden>
-                                        <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
+                                        <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
                                         <span id="selItemsCount" class="counter__value"></span>
                                     </div>
                                 </div>

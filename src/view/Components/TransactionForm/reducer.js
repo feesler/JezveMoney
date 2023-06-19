@@ -1,11 +1,13 @@
 import { asArray, isObject } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
+
+import { dateStringToTime } from '../../utils/utils.js';
 import {
     normalize,
     normalizeExch,
     isValidValue,
-    dateStringToTime,
-} from '../../utils/utils.js';
+} from '../../utils/decimal.js';
+import { App } from '../../Application/App.js';
 import {
     EXPENSE,
     INCOME,
@@ -40,7 +42,7 @@ export const calculateSourceResult = (state) => {
         if (result.transaction.debtType) {
             sourceResult = normalize(result.personAccount.balance - sourceAmount, precision);
         } else {
-            const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
+            const lastAcc = App.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
             sourceResult = normalize(accBalance - sourceAmount, precision);
         }
@@ -73,7 +75,7 @@ export const calculateDestResult = (state) => {
         destResult = normalize(result.destAccount.balance + destAmount, precision);
     } else if (transaction.noAccount) {
         if (transaction.debtType) {
-            const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
+            const lastAcc = App.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
             destResult = normalize(accBalance + destAmount, precision);
         } else {
@@ -114,8 +116,8 @@ const setStateDestAmount = (state, amount) => {
 };
 
 const setStateNextSourceAccount = (state, accountId) => {
-    const { userAccounts } = window.app.model;
-    const currencyModel = window.app.model.currency;
+    const { userAccounts } = App.model;
+    const currencyModel = App.model.currency;
     const result = state;
 
     const srcAccount = userAccounts.getNextAccount(accountId);
@@ -129,8 +131,8 @@ const setStateNextSourceAccount = (state, accountId) => {
 };
 
 const setStateNextDestAccount = (state, accountId) => {
-    const { userAccounts } = window.app.model;
-    const currencyModel = window.app.model.currency;
+    const { userAccounts } = App.model;
+    const currencyModel = App.model.currency;
     const result = state;
 
     const destAccount = userAccounts.getNextAccount(accountId);
@@ -205,7 +207,7 @@ export const updateStateExchange = (state) => {
 
 /** Search for person account in specified currency. Returns empty account object if not found */
 const getPersonAccount = (personId, currencyId) => {
-    const account = window.app.model.accounts.getPersonAccount(
+    const account = App.model.accounts.getPersonAccount(
         personId,
         currencyId,
     );
@@ -405,8 +407,8 @@ const slice = createSlice({
             return state;
         }
 
-        const srcAccount = window.app.model.accounts.getItem(accountId);
-        const srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+        const srcAccount = App.model.accounts.getItem(accountId);
+        const srcCurrency = App.model.currency.getItem(srcAccount.curr_id);
 
         const newState = {
             ...state,
@@ -490,8 +492,8 @@ const slice = createSlice({
             return state;
         }
 
-        const destAccount = window.app.model.accounts.getItem(accountId);
-        const destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
+        const destAccount = App.model.accounts.getItem(accountId);
+        const destCurrency = App.model.currency.getItem(destAccount.curr_id);
 
         const newState = {
             ...state,
@@ -583,7 +585,7 @@ const slice = createSlice({
             return state;
         }
 
-        const { accounts, currency } = window.app.model;
+        const { accounts, currency } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             throw new Error('Invalid account');
@@ -647,7 +649,7 @@ const slice = createSlice({
             return state;
         }
 
-        const person = window.app.model.persons.getItem(personId);
+        const person = App.model.persons.getItem(personId);
         if (!person) {
             throw new Error('Invalid person');
         }
@@ -688,7 +690,7 @@ const slice = createSlice({
             return state;
         }
 
-        const srcCurrency = window.app.model.currency.getItem(currencyId);
+        const srcCurrency = App.model.currency.getItem(currencyId);
         if (!srcCurrency) {
             throw new Error('Invalid currency');
         }
@@ -752,7 +754,7 @@ const slice = createSlice({
             return state;
         }
 
-        const destCurrency = window.app.model.currency.getItem(currencyId);
+        const destCurrency = App.model.currency.getItem(currencyId);
 
         const transaction = {
             ...state.transaction,
@@ -855,7 +857,7 @@ const slice = createSlice({
             }
             newState.isDiff = false;
         } else {
-            const { userAccounts } = window.app.model;
+            const { userAccounts } = App.model;
             const account = (transaction.lastAcc_id)
                 ? userAccounts.getItem(transaction.lastAcc_id)
                 : userAccounts.getItemByIndex(0);
@@ -888,7 +890,7 @@ const slice = createSlice({
             });
         }
 
-        const { currency } = window.app.model;
+        const { currency } = App.model;
         newState.srcCurrency = currency.getItem(transaction.src_curr);
         newState.destCurrency = currency.getItem(transaction.dest_curr);
 
@@ -1305,9 +1307,9 @@ const slice = createSlice({
     }),
 
     typeChange: (state, type) => {
-        const accountModel = window.app.model.accounts;
-        const currencyModel = window.app.model.currency;
-        const { userAccounts, persons } = window.app.model;
+        const accountModel = App.model.accounts;
+        const currencyModel = App.model.currency;
+        const { userAccounts, persons } = App.model;
 
         if (state.transaction.type === type) {
             return state;
@@ -1692,7 +1694,7 @@ const slice = createSlice({
             delete transaction.lastAcc_id;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         if (transaction.category_id !== 0) {
             const category = categories.getItem(transaction.category_id);
             if (category.type !== 0 && category.type !== transaction.type) {

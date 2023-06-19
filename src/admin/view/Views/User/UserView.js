@@ -6,7 +6,7 @@ import {
     enable,
     setEvents,
 } from 'jezvejs';
-import { Application } from '../../../../view/Application/Application.js';
+import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';
 import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
@@ -21,7 +21,7 @@ class AdminUserListView extends AdminListView {
 
         this.apiController = 'user';
         this.statePath = 'users';
-        this.deleteConfirmMessage = __('MSG_USER_DELETE');
+        this.deleteConfirmMessage = __('users.deleteMessage');
     }
 
     /**
@@ -135,7 +135,7 @@ class AdminUserListView extends AdminListView {
         enable(this.testerRadio, false);
         enable(this.defaultRadio, false);
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         this.itemForm.action = `${baseURL}api/${this.apiController}/changePassword`;
 
         this.dialogPopup.show();
@@ -177,5 +177,4 @@ class AdminUserListView extends AdminListView {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AdminUserListView);
+App.createView(AdminUserListView);

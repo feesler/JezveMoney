@@ -156,7 +156,6 @@ class ImportRuleModel extends CachedTable
     public function getData(array $params = [])
     {
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
-        $addExtended = isset($params["extended"]) && $params["extended"] == true;
 
         $itemsData = [];
         if ($requestAll) {
@@ -177,12 +176,7 @@ class ImportRuleModel extends CachedTable
 
         $res = [];
         foreach ($itemsData as $item) {
-            $itemObj = clone $item;
-            if ($addExtended) {
-                $itemObj->conditions = $this->condModel->getRuleConditions($item->id);
-                $itemObj->actions = $this->actionModel->getRuleActions($item->id);
-            }
-            $res[] = $itemObj;
+            $res[] = ImportRuleItem::getUserData($item, $params);
         }
 
         return $res;

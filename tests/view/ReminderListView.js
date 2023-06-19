@@ -445,8 +445,8 @@ export class ReminderListView extends AppView {
             };
 
             res.modeSelector.title = (model.detailsMode)
-                ? __('TR_LIST_SHOW_MAIN', this.locale)
-                : __('TR_LIST_SHOW_DETAILS', this.locale);
+                ? __('transactions.showMain', this.locale)
+                : __('transactions.showDetails', this.locale);
         }
 
         return res;

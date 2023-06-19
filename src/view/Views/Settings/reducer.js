@@ -1,9 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
 import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /** Prepare data from currencies list model for list component */
 export const createItemsFromModel = () => {
-    const { userCurrencies } = window.app.model;
+    const { userCurrencies } = App.model;
     const items = userCurrencies.map((item) => ({ ...item }));
     return items;
 };

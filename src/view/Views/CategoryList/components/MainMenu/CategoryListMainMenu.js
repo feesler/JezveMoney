@@ -20,32 +20,32 @@ export class CategoryListMainMenu extends PopupMenu {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: __('SELECT'),
+                title: __('actions.select'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: __('SORT'),
+                title: __('actions.sort'),
             }, {
                 id: 'sortByNameBtn',
-                title: __('SORT_BY_NAME'),
+                title: __('actions.sortByName'),
                 className: CHECK_ITEM_CLASS,
             }, {
                 id: 'sortByDateBtn',
-                title: __('SORT_BY_DATE'),
+                title: __('actions.sortByDate'),
                 className: CHECK_ITEM_CLASS,
             }, {
                 id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
+                title: __('actions.selectAll'),
             }, {
                 id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
+                title: __('actions.deselectAll'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 

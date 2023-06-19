@@ -5,7 +5,10 @@ import {
     asArray,
 } from 'jezvejs';
 import { CloseButton } from 'jezvejs/CloseButton';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+
 import { Field } from '../Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
 import './ItemDetails.scss';
@@ -51,12 +54,12 @@ export class ItemDetails extends Component {
         });
 
         this.createDateField = Field.create({
-            title: __('CREATE_DATE'),
+            title: __('item.createDate'),
             className: CREATE_DATE_FIELD_CLASS,
         });
 
         this.updateDateField = Field.create({
-            title: __('UPDATE_DATE'),
+            title: __('item.updateDate'),
             className: UPDATE_DATE_FIELD_CLASS,
         });
 
@@ -87,6 +90,6 @@ export class ItemDetails extends Component {
     }
 
     renderDateField(field, time) {
-        field?.setContent(window.app.formatDate(time));
+        field?.setContent(App.formatDate(time));
     }
 }

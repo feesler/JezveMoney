@@ -71,7 +71,7 @@ export class AccountDetails extends TestComponent {
         assert(currency, `Currency not found: ${item.curr_id}`);
 
         const hidden = state.accounts.isHidden(item);
-        const visibilityToken = (hidden) ? 'ITEM_HIDDEN' : 'ITEM_VISIBLE';
+        const visibilityToken = (hidden) ? 'item.hidden' : 'item.visible';
 
         const itemTransactions = state.transactions.applyFilter({
             accounts: item.id,

@@ -14,7 +14,7 @@ import { Spinner } from 'jezvejs/Spinner';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { listData, __, getSelectedIds } from '../../utils/utils.js';
@@ -70,12 +70,12 @@ class ReminderListView extends View {
             ctxCancelBtn: () => this.cancelReminder(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.loadModel(Schedule, 'schedule', window.app.props.schedule);
-        window.app.loadModel(ReminderList, 'reminders', window.app.props.reminders);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
+        App.loadModel(ReminderList, 'reminders', App.props.reminders);
 
         const initialState = updateList({
             ...this.props,
@@ -107,7 +107,7 @@ class ReminderListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('REMINDERS'),
+            title: __('reminders.listTitle'),
         });
 
         // Filters
@@ -164,14 +164,14 @@ class ReminderListView extends View {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'reminder-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('REMINDERS_LIST_NO_DATA'),
+            noItemsMessage: __('reminders.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
 
@@ -205,7 +205,7 @@ class ReminderListView extends View {
         this.spinner.hide();
         this.showMoreBtn = Button.create({
             className: 'show-more-btn',
-            title: __('SHOW_MORE'),
+            title: __('actions.showMore'),
             onClick: (e) => this.showMore(e),
         });
 
@@ -271,7 +271,7 @@ class ReminderListView extends View {
     }
 
     getItemById(itemId) {
-        return window.app.model.reminders.getItem(itemId);
+        return App.model.reminders.getItem(itemId);
     }
 
     onItemClick(itemId, e) {
@@ -358,7 +358,7 @@ class ReminderListView extends View {
             const { data } = await API.reminder.list(request);
             this.setListData(data, keepState);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -382,7 +382,7 @@ class ReminderListView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.reminders.setData(data);
+        App.model.reminders.setData(data);
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
@@ -398,7 +398,7 @@ class ReminderListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -422,7 +422,7 @@ class ReminderListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -448,7 +448,7 @@ class ReminderListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -519,7 +519,7 @@ class ReminderListView extends View {
             return;
         }
 
-        const { reminders } = window.app.model;
+        const { reminders } = App.model;
         const item = state.detailsItem ?? reminders.getItem(state.detailsId);
         if (!item) {
             throw new Error('Reminder not found');
@@ -540,7 +540,7 @@ class ReminderListView extends View {
 
     /** Returns URL for specified state */
     getURL(state, keepPage = true) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { filter } = state;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         const res = new URL(`${baseURL}reminders/${itemPart}`);
@@ -585,7 +585,7 @@ class ReminderListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('REMINDERS')}`;
+        const pageTitle = `${__('appName')} | ${__('reminders.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -697,5 +697,4 @@ class ReminderListView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(ReminderListView);
+App.createView(ReminderListView);

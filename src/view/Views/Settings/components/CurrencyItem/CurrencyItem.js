@@ -5,6 +5,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
+import { App } from '../../../../Application/App.js';
 import './CurrencyItem.scss';
 
 /** CSS classes */
@@ -123,7 +124,7 @@ export class CurrencyItem extends Component {
     renderContent(state) {
         const { item } = state;
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const currency = currencyModel.getItem(item.curr_id);
         if (!currency) {
             return;

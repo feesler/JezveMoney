@@ -1,7 +1,8 @@
 import { createSlice } from 'jezvejs/Store';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { Person } from '../../Models/Person.js';
 import { PersonList } from '../../Models/PersonList.js';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 export const createList = (items, sortMode) => {
     const res = PersonList.create(items);
@@ -60,7 +61,7 @@ const slice = createSlice({
     ),
 
     toggleSelectItem: (state, itemId) => {
-        const person = window.app.model.persons.getItem(itemId);
+        const person = App.model.persons.getItem(itemId);
         if (!person) {
             return state;
         }
@@ -129,8 +130,8 @@ const slice = createSlice({
     listRequestLoaded: (state, keepState) => ({
         ...state,
         items: {
-            visible: createList(window.app.model.visiblePersons, state.sortMode),
-            hidden: createList(window.app.model.hiddenPersons, state.sortMode),
+            visible: createList(App.model.visiblePersons, state.sortMode),
+            hidden: createList(App.model.hiddenPersons, state.sortMode),
         },
         listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,

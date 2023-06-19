@@ -4,7 +4,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 
@@ -33,15 +33,15 @@ class ScheduleItemView extends View {
             throw new Error('Invalid schedule transaction view properties');
         }
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
-        window.app.checkUserAccountModels();
-        window.app.checkPersonModels();
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(IconList, 'icons', App.props.icons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
+        App.checkUserAccountModels();
+        App.checkPersonModels();
 
         const initialState = {
             scheduleItem: this.props.scheduleItem,
@@ -65,7 +65,7 @@ class ScheduleItemView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('SCHED_TRANS_UPDATE') : __('SCHED_TRANS_CREATE'),
+            title: (isUpdate) ? __('schedule.update') : __('schedule.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -87,7 +87,7 @@ class ScheduleItemView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -124,10 +124,10 @@ class ScheduleItemView extends View {
                 await API.schedule.create(request);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -142,10 +142,10 @@ class ScheduleItemView extends View {
         try {
             await API.schedule.del({ id: scheduleItem.id });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -158,8 +158,8 @@ class ScheduleItemView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('SCHED_TRANS_DELETE'),
-            content: __('MSG_SCHED_TRANS_DELETE'),
+            title: __('schedule.delete'),
+            content: __('schedule.deleteMessage'),
             onConfirm: () => this.deleteScheduleItem(),
         });
     }
@@ -189,5 +189,4 @@ class ScheduleItemView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(ScheduleItemView);
+App.createView(ScheduleItemView);

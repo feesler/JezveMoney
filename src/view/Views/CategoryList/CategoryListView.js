@@ -10,7 +10,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import {
@@ -65,10 +65,10 @@ class CategoryListView extends View {
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
 
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         const sortMode = settings.sort_categories;
 
         const initialState = {
@@ -114,7 +114,7 @@ class CategoryListView extends View {
             treeSort: true,
             childContainerSelector: '.category-item__children',
             listMode: 'list',
-            noItemsMessage: __('CATEGORIES_NO_DATA'),
+            noItemsMessage: __('categories.noDate'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };
@@ -130,7 +130,7 @@ class CategoryListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('CATEGORIES'),
+            title: __('categories.listTitle'),
         });
 
         this.createBtn = Button.create({
@@ -138,7 +138,7 @@ class CategoryListView extends View {
             type: 'link',
             className: 'circle-btn',
             icon: 'plus',
-            url: `${window.app.baseURL}categories/create/`,
+            url: `${App.baseURL}categories/create/`,
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
@@ -178,7 +178,7 @@ class CategoryListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -230,7 +230,7 @@ class CategoryListView extends View {
     }
 
     getItemById(itemId) {
-        return window.app.model.categories.getItem(itemId);
+        return App.model.categories.getItem(itemId);
     }
 
     onItemClick(itemId, e) {
@@ -329,7 +329,7 @@ class CategoryListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -345,7 +345,7 @@ class CategoryListView extends View {
             const { data } = await API.category.list(request);
             this.setListData(data, keepState);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -369,7 +369,7 @@ class CategoryListView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.categories.setData(data);
+        App.model.categories.setData(data);
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
@@ -385,7 +385,7 @@ class CategoryListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -395,7 +395,7 @@ class CategoryListView extends View {
      * @returns
      */
     getLastCategoryPos(categoryId) {
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(categoryId);
         const children = categories.findByParent(categoryId);
         return children.reduce((current, item) => Math.max(current, item.pos), category?.pos ?? 0);
@@ -409,7 +409,7 @@ class CategoryListView extends View {
      * @param {number} nextId - identifier of next item
      */
     async sendChangePosRequest(itemId, parentId, prevId, nextId) {
-        const { categories } = window.app.model;
+        const { categories } = App.model;
 
         const item = categories.getItem(itemId);
         const parent = categories.getItem(parentId);
@@ -454,7 +454,7 @@ class CategoryListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createErrorNotification(__('ERR_CATEGORY_CHANGE_POS'));
+        App.createErrorNotification(__('categories.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -476,7 +476,7 @@ class CategoryListView extends View {
     }
 
     async requestSortMode(sortMode) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.sort_categories === sortMode) {
             return;
         }
@@ -491,7 +491,7 @@ class CategoryListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -505,7 +505,7 @@ class CategoryListView extends View {
             return;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const showChildrenCheckbox = ids.some((id) => {
             const category = categories.getItem(id);
             return category?.parent_id === 0;
@@ -514,8 +514,8 @@ class CategoryListView extends View {
         const multiple = (ids.length > 1);
         DeleteCategoryDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? __('CATEGORY_DELETE_MULTIPLE') : __('CATEGORY_DELETE'),
-            content: (multiple) ? __('MSG_CATEGORY_DELETE_MULTIPLE') : __('MSG_CATEGORY_DELETE'),
+            title: (multiple) ? __('categories.deleteMultiple') : __('categories.delete'),
+            content: (multiple) ? __('categories.deleteMultipleMessage') : __('categories.deleteMessage'),
             showChildrenCheckbox,
             onConfirm: (opt) => this.deleteItems(opt),
         });
@@ -587,7 +587,7 @@ class CategoryListView extends View {
             return;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const item = state.detailsItem ?? categories.getItem(state.detailsId);
         if (!item) {
             throw new Error('Category not found');
@@ -608,7 +608,7 @@ class CategoryListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         return new URL(`${baseURL}categories/${itemPart}`);
     }
@@ -619,7 +619,7 @@ class CategoryListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('CATEGORIES')}`;
+        const pageTitle = `${__('appName')} | ${__('categories.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -687,5 +687,4 @@ class CategoryListView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(CategoryListView);
+App.createView(CategoryListView);

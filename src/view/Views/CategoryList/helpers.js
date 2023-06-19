@@ -1,4 +1,6 @@
+import { App } from '../../Application/App.js';
+
 /** Returns accounts sort setting value */
 export const getCategoriesSortMode = () => (
-    window.app.model.profile.settings.sort_categories
+    App.model.profile.settings.sort_categories
 );

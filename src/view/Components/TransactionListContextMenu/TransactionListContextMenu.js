@@ -2,6 +2,7 @@ import { show } from 'jezvejs';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /** Transactions list context menu component */
 export class TransactionListContextMenu extends PopupMenu {
@@ -12,7 +13,7 @@ export class TransactionListContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxDetailsBtn',
                 type: 'link',
-                title: __('OPEN_ITEM'),
+                title: __('actions.openItem'),
                 onClick: (e) => e?.preventDefault(),
             }, {
                 id: 'separator1',
@@ -21,16 +22,16 @@ export class TransactionListContextMenu extends PopupMenu {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
             }, {
                 id: 'ctxSetCategoryBtn',
-                title: __('SET_CATEGORY'),
+                title: __('transactions.setCategoryMenu'),
             }, {
                 type: 'separator',
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }],
         });
 
@@ -62,7 +63,7 @@ export class TransactionListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const { items } = this;
 
         items.ctxDetailsBtn.show(state.showDetailsItem);

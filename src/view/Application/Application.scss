@@ -504,6 +504,9 @@ svg * {
 
 .alter-link,
 .alter-link:visited {
+  --btn-hover-title-color: var(--accent-hover-color);
+  --btn-title-color: var(--accent-color);
+
   text-decoration: none;
   border: 0 none;
   padding: 0 24px;

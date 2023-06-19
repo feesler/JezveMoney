@@ -7,6 +7,7 @@ import {
     shiftDate,
 } from 'jezvejs';
 import { __ } from '../utils/utils.js';
+import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';
 
 const availFields = [
@@ -38,26 +39,26 @@ export const INTERVAL_YEAR = 4;
 
 /* Schedule interval type tokens */
 const intervalTokens = {
-    [INTERVAL_DAY]: 'SCHEDULE_ITEM_EVERY_DAY',
-    [INTERVAL_WEEK]: 'SCHEDULE_ITEM_EVERY_WEEK',
-    [INTERVAL_MONTH]: 'SCHEDULE_ITEM_EVERY_MONTH',
-    [INTERVAL_YEAR]: 'SCHEDULE_ITEM_EVERY_YEAR',
+    [INTERVAL_DAY]: 'schedule.item.everyDay',
+    [INTERVAL_WEEK]: 'schedule.item.everyWeek',
+    [INTERVAL_MONTH]: 'schedule.item.everyMonth',
+    [INTERVAL_YEAR]: 'schedule.item.everyYear',
 };
 const stepIntervalTokens = {
-    [INTERVAL_DAY]: 'SCHEDULE_ITEM_EVERY_N_DAY',
-    [INTERVAL_WEEK]: 'SCHEDULE_ITEM_EVERY_N_WEEK',
-    [INTERVAL_MONTH]: 'SCHEDULE_ITEM_EVERY_N_MONTH',
-    [INTERVAL_YEAR]: 'SCHEDULE_ITEM_EVERY_N_YEAR',
+    [INTERVAL_DAY]: 'schedule.item.everyNDay',
+    [INTERVAL_WEEK]: 'schedule.item.everyNWeek',
+    [INTERVAL_MONTH]: 'schedule.item.everyNMonth',
+    [INTERVAL_YEAR]: 'schedule.item.everyNYear',
 };
 /* Schedule interval offset tokens */
 const weekOffsetTokens = [
-    'SCHEDULE_ITEM_ON_SUNDAYS',
-    'SCHEDULE_ITEM_ON_MONDAYS',
-    'SCHEDULE_ITEM_ON_TUESDAYS',
-    'SCHEDULE_ITEM_ON_WEDNESDAYS',
-    'SCHEDULE_ITEM_ON_THURSDAYS',
-    'SCHEDULE_ITEM_ON_FRIDAYS',
-    'SCHEDULE_ITEM_ON_SATURDAYS',
+    'schedule.item.onSundays',
+    'schedule.item.onMondays',
+    'schedule.item.onTuesdays',
+    'schedule.item.onWednesdays',
+    'schedule.item.onThursdays',
+    'schedule.item.onFridays',
+    'schedule.item.onSaturdays',
 ];
 
 /**
@@ -92,13 +93,13 @@ export class ScheduledTransaction extends ListItem {
         }
 
         const firstDay = getFirstDayOfWeek(new Date(), {
-            locales: window.app.locale,
+            locales: App.locale,
             options: { firstDay: DEFAULT_FIRST_DAY_OF_WEEK },
         });
         const weekdaysFmt = intervalOffsets.map((item) => (
             firstUpperCase(
-                getWeekdayShort(shiftDate(firstDay, item), window.app.locale).substring(0, 3),
-                window.app.locale,
+                getWeekdayShort(shiftDate(firstDay, item), App.locale).substring(0, 3),
+                App.locale,
             )
         ));
 
@@ -106,7 +107,7 @@ export class ScheduledTransaction extends ListItem {
     }
 
     renderMonthOffset(offset) {
-        return __('SCHEDULE_ITEM_MONTH_OFFSET', (parseInt(offset, 10) + 1));
+        return __('schedule.item.monthOffset', (parseInt(offset, 10) + 1));
     }
 
     renderYearOffset(offset) {
@@ -114,8 +115,8 @@ export class ScheduledTransaction extends ListItem {
         date.setMonth(Math.floor(offset / 100));
         date.setDate((offset % 100) + 1);
 
-        return window.app.formatDate(date, {
-            locales: window.app.locale,
+        return App.formatDate(date, {
+            locales: App.locale,
             options: { month: 'long', day: 'numeric' },
         });
     }

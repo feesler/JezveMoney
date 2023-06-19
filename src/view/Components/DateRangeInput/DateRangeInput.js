@@ -5,7 +5,9 @@ import {
     createElement,
 } from 'jezvejs';
 import { DatePicker } from 'jezvejs/DatePicker';
+
 import { parseDate, __, timeToDate } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
 import './DateRangeInput.scss';
 
@@ -64,7 +66,7 @@ export class DateRangeInput extends Component {
         this.startDateGroup = DateInputGroup.create({
             className: 'input-group__input-outer date-range-part',
             name: 'startDate',
-            locales: window.app.dateFormatLocale,
+            locales: App.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
             clearButton: this.props.startClearable,
             onInput: (e) => this.onStartDateInput(e),
@@ -75,7 +77,7 @@ export class DateRangeInput extends Component {
         this.endDateGroup = DateInputGroup.create({
             className: 'input-group__input-outer date-range-part',
             name: 'endDate',
-            locales: window.app.dateFormatLocale,
+            locales: App.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
             clearButton: this.props.endClearable,
             onInput: (e) => this.onEndDateInput(e),
@@ -103,7 +105,7 @@ export class DateRangeInput extends Component {
         this.feedbackElem = createElement('div', {
             props: {
                 className: FEEDBACK_CLASS,
-                textContent: __('FILTER_INVALID_DATE_RANGE'),
+                textContent: __('dateRange.invalidRange'),
             },
         });
 
@@ -125,10 +127,10 @@ export class DateRangeInput extends Component {
 
     setData(data) {
         const startDate = (data.startDate)
-            ? window.app.formatInputDate(data.startDate)
+            ? App.formatInputDate(data.startDate)
             : null;
         const endDate = (data.endDate)
-            ? window.app.formatInputDate(data.endDate)
+            ? App.formatInputDate(data.endDate)
             : null;
 
         this.setState({
@@ -184,7 +186,7 @@ export class DateRangeInput extends Component {
             return;
         }
 
-        const dateFmt = window.app.formatInputDate(date);
+        const dateFmt = App.formatInputDate(date);
         const form = {
             ...this.state.form,
         };
@@ -295,7 +297,7 @@ export class DateRangeInput extends Component {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.getCurrrentLocale(),
+                locales: App.getCurrrentLocale(),
                 disabledDateFilter: (...args) => this.isDisabledDate(...args),
                 onDateSelect: (date) => this.onDateSelect(date),
                 onHide: () => this.onDatePickerHide(),
@@ -409,7 +411,7 @@ export class DateRangeInput extends Component {
         }));
         this.endDateGroup.show(state.endVisible);
 
-        window.app.setValidation(this.elem, state.validation.valid);
+        App.setValidation(this.elem, state.validation.valid);
 
         this.setDatePickerSelection(state);
         if (this.datePicker && state.selectPart !== prevState?.selectPart) {

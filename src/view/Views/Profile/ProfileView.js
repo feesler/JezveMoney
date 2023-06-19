@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -17,9 +17,9 @@ import '../../Application/Application.scss';
 import './ProfileView.scss';
 
 const titleMap = {
-    name: __('PROFILE_CHANGE_NAME'),
-    password: __('PROFILE_CHANGE_PASS'),
-    reset: __('PROFILE_RESET_DATA'),
+    name: __('profile.changeName'),
+    password: __('profile.changePassword'),
+    reset: __('profile.resetData'),
 };
 
 /**
@@ -29,7 +29,7 @@ class ProfileView extends View {
     constructor(...args) {
         super(...args);
 
-        const { profile } = window.app.model;
+        const { profile } = App.model;
         const initialState = {
             ...this.props,
             userName: profile.name,
@@ -74,7 +74,7 @@ class ProfileView extends View {
     }
 
     onNameChanged(value) {
-        window.app.model.profile.name = value;
+        App.model.profile.name = value;
         this.header.setUserName(value);
         this.store.dispatch(actions.changeUserName(value));
     }
@@ -85,9 +85,9 @@ class ProfileView extends View {
 
         try {
             await API.profile.del();
-            window.location = `${window.app.baseURL}login/`;
+            window.location = `${App.baseURL}login/`;
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.deleteLoading.hide();
         }
     }
@@ -101,14 +101,14 @@ class ProfileView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('PROFILE_DELETE'),
-            content: __('MSG_PROFILE_DELETE'),
+            title: __('profile.delete'),
+            content: __('profile.deleteMessage'),
             onConfirm: () => this.requestDeleteProfile(),
         });
     }
 
     getViewTitle(state) {
-        const viewTitle = `${__('APP_NAME')} | ${__('PROFILE')}`;
+        const viewTitle = `${__('appName')} | ${__('profile.title')}`;
         const { action } = state;
         if (!action || !titleMap[action]) {
             return viewTitle;
@@ -118,7 +118,7 @@ class ProfileView extends View {
     }
 
     replaceHistory(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const action = (state.action) ? `${state.action}/` : '';
         const url = `${baseURL}profile/${action}`;
 
@@ -172,5 +172,4 @@ class ProfileView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(ProfileView);
+App.createView(ProfileView);

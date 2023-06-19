@@ -1,12 +1,16 @@
 import 'jezvejs/style';
-import { setEvents } from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
+
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
 import { InputField } from '../../Components/InputField/InputField.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './RegisterView.scss';
@@ -39,14 +43,15 @@ class RegisterView extends View {
      */
     onStart() {
         this.loadElementsByIds([
-            'form',
+            'formContainer',
         ]);
 
         this.localeField = LocaleSelectField.create();
         this.themeField = ThemeSwitchField.create();
         this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        // Form title
+        this.titleElem = createElement('h1', { props: { textContent: __('registration.title') } });
 
         // Login field
         this.loginField = InputField.create({
@@ -54,9 +59,9 @@ class RegisterView extends View {
             inputId: 'loginInp',
             className: 'form-row',
             name: 'login',
-            title: __('REG_ACCOUNT_NAME'),
+            title: __('registration.accountName'),
             validate: true,
-            feedbackMessage: __('REG_INVALID_ACCOUNT_NAME'),
+            feedbackMessage: __('registration.invalidAccountName'),
             onInput: (e) => this.onLoginInput(e),
         });
 
@@ -66,9 +71,9 @@ class RegisterView extends View {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('REG_USER_NAME'),
+            title: __('registration.userName'),
             validate: true,
-            feedbackMessage: __('REG_INVALID_USER_NAME'),
+            feedbackMessage: __('registration.invalidUserName'),
             onInput: (e) => this.onNameInput(e),
         });
 
@@ -79,17 +84,38 @@ class RegisterView extends View {
             className: 'form-row',
             name: 'password',
             type: 'password',
-            title: __('REG_PASSWORD'),
+            title: __('registration.password'),
             validate: true,
-            feedbackMessage: __('REG_INVALID_PASSWORD'),
+            feedbackMessage: __('registration.invalidPassword'),
             onInput: (e) => this.onPasswordInput(e),
         });
 
-        this.form.prepend(
-            this.loginField.elem,
-            this.nameField.elem,
-            this.passwordField.elem,
-        );
+        // Form controls
+        this.controls = FormControls.create({
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelBtnClass: 'alter-link',
+            cancelURL: `${App.baseURL}login/`,
+        });
+
+        // Registration form
+        this.form = createElement('form', {
+            props: {
+                className: 'register-form',
+                action: `${App.baseURL}register/`,
+                method: 'post',
+            },
+            events: { submit: (e) => this.onSubmit(e) },
+            children: [
+                this.titleElem,
+                this.loginField.elem,
+                this.nameField.elem,
+                this.passwordField.elem,
+                this.controls.elem,
+            ],
+        });
+
+        this.formContainer.append(this.form);
 
         this.subscribeToStore(this.store);
     }
@@ -171,5 +197,4 @@ class RegisterView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(RegisterView);
+App.createView(RegisterView);

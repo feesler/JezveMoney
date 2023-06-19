@@ -13,7 +13,7 @@ import { TabList } from 'jezvejs/TabList';
 import { __ } from '../../utils/utils.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
 
@@ -54,10 +54,10 @@ class SettingsView extends View {
             ctxDeleteBtn: () => this.deleteItems(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
 
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
 
         const initialState = {
             ...this.props,
@@ -103,7 +103,7 @@ class SettingsView extends View {
 
         // User currencies
         this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
-            title: __('SETTINGS_CURRENCIES'),
+            title: __('settings.currencies.title'),
         });
 
         this.createBtn = Button.create({
@@ -115,7 +115,7 @@ class SettingsView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
 
@@ -137,7 +137,7 @@ class SettingsView extends View {
             onItemSelect: (sel) => this.onCurrencySelect(sel),
         });
 
-        window.app.initCurrencyList(this.currencySelect);
+        App.initCurrencyList(this.currencySelect);
 
         this.list = SortableListContainer.create({
             ItemComponent: CurrencyItem,
@@ -155,7 +155,7 @@ class SettingsView extends View {
             sortModeClass: 'currencies-list_sort',
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('USER_CURRENCIES_NO_DATA'),
+            noItemsMessage: __('settings.currencies.noData'),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         });
@@ -189,17 +189,17 @@ class SettingsView extends View {
             items: [{
                 id: 'main',
                 value: 'main',
-                title: __('SETTINGS_MAIN'),
+                title: __('settings.main'),
                 content: this.mainTab,
             }, {
                 id: 'currencies',
                 value: 'currencies',
-                title: __('SETTINGS_CURRENCIES'),
+                title: __('settings.currencies.title'),
                 content: this.userCurrenciesTab,
             }, {
                 id: 'regional',
                 value: 'regional',
-                title: __('SETTINGS_REGIONAL'),
+                title: __('settings.regional'),
                 content: this.regionalTab,
             }],
         });
@@ -313,7 +313,7 @@ class SettingsView extends View {
     }
 
     onSort(info) {
-        const { userCurrencies } = window.app.model;
+        const { userCurrencies } = App.model;
         const item = userCurrencies.getItem(info.itemId);
         const prevItem = userCurrencies.getItem(info.prevId);
         const nextItem = userCurrencies.getItem(info.nextId);
@@ -349,7 +349,7 @@ class SettingsView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.userCurrencies.setData(data);
+        App.model.userCurrencies.setData(data);
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
 
@@ -398,7 +398,7 @@ class SettingsView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createErrorNotification(__('ERR_USER_CURRENCY_CHANGE_POS'));
+        App.createErrorNotification(__('userCurrencies.errors.changePos'));
     }
 
     async deleteItems() {
@@ -420,7 +420,7 @@ class SettingsView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -431,7 +431,7 @@ class SettingsView extends View {
     }
 
     async requestDateLocale(locale) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.date_locale === locale) {
             return;
         }
@@ -446,7 +446,7 @@ class SettingsView extends View {
 
             this.store.dispatch(actions.changeDateLocale(locale));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -458,7 +458,7 @@ class SettingsView extends View {
     }
 
     async requestDecimalLocale(locale) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.decimal_locale === locale) {
             return;
         }
@@ -473,7 +473,7 @@ class SettingsView extends View {
 
             this.store.dispatch(actions.changeDecimalLocale(locale));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -600,5 +600,4 @@ class SettingsView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(SettingsView);
+App.createView(SettingsView);

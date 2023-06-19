@@ -2,7 +2,9 @@ import { enable, Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { ImportTransaction, typeNames } from '../../../../Models/ImportTransaction.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
@@ -59,17 +61,17 @@ export class ImportTransactionItem extends Component {
     }
 
     init() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         const fields = [
-            [__('TR_TYPE'), TYPE_FIELD_CLASS],
-            [__('TR_ACCOUNT'), ACCOUNT_FIELD_CLASS],
-            [__('TR_PERSON'), PERSON_FIELD_CLASS],
-            [__('TR_AMOUNT'), SRC_AMOUNT_FIELD_CLASS],
-            [__('TR_DEST_AMOUNT'), DEST_AMOUNT_FIELD_CLASS],
-            [__('TR_DATE'), DATE_FIELD_CLASS],
-            [__('TR_CATEGORY'), CATEGORY_FIELD_CLASS],
-            [__('TR_COMMENT'), COMMENT_FIELD_CLASS],
+            [__('transactions.type'), TYPE_FIELD_CLASS],
+            [__('transactions.debtAccount'), ACCOUNT_FIELD_CLASS],
+            [__('transactions.person'), PERSON_FIELD_CLASS],
+            [__('transactions.amount'), SRC_AMOUNT_FIELD_CLASS],
+            [__('transactions.destAmount'), DEST_AMOUNT_FIELD_CLASS],
+            [__('transactions.date'), DATE_FIELD_CLASS],
+            [__('transactions.category'), CATEGORY_FIELD_CLASS],
+            [__('transactions.comment'), COMMENT_FIELD_CLASS],
         ];
 
         [
@@ -126,7 +128,7 @@ export class ImportTransactionItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -197,7 +199,7 @@ export class ImportTransactionItem extends Component {
 
         const { transaction } = state;
         const isDiff = transaction.isDiff();
-        const { userAccounts, persons, currency } = window.app.model;
+        const { userAccounts, persons, currency } = App.model;
         const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
         const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
 
@@ -226,8 +228,8 @@ export class ImportTransactionItem extends Component {
             this.accountField.setContent(account.name);
 
             const accountTitle = (isTransferOut)
-                ? __('TR_DEST_ACCOUNT')
-                : __('TR_SRC_ACCOUNT');
+                ? __('transactions.destAccount')
+                : __('transactions.sourceAccount');
             this.accountField.setTitle(accountTitle);
         }
         // Person field
@@ -238,7 +240,7 @@ export class ImportTransactionItem extends Component {
         }
 
         // Amount fields
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
         this.srcAmountField.setContent(srcAmount);
@@ -262,7 +264,7 @@ export class ImportTransactionItem extends Component {
         if (transaction.categoryId === 0) {
             this.categoryField.setContent('');
         } else {
-            const { categories } = window.app.model;
+            const { categories } = App.model;
             const category = categories.getItem(transaction.categoryId);
             if (!category) {
                 throw new Error('invalid category');

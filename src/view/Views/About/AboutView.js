@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
@@ -13,7 +13,7 @@ class AboutView extends View {
      * View initialization
      */
     onStart() {
-        if (window.app.isUserLoggedIn()) {
+        if (App.isUserLoggedIn()) {
             return;
         }
 
@@ -23,5 +23,4 @@ class AboutView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AboutView);
+App.createView(AboutView);

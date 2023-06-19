@@ -26,10 +26,10 @@ class Person extends ApiSortableListController
 
         $this->model = PersonModel::getInstance();
         $this->transModel = TransactionModel::getInstance();
-        $this->createErrorMsg = __("ERR_PERSON_CREATE");
-        $this->updateErrorMsg = __("ERR_PERSON_UPDATE");
-        $this->deleteErrorMsg = __("ERR_PERSON_DELETE");
-        $this->changePosErrorMsg = __("ERR_PERSON_CHANGE_POS");
+        $this->createErrorMsg = __("persons.errors.create");
+        $this->updateErrorMsg = __("persons.errors.update");
+        $this->deleteErrorMsg = __("persons.errors.delete");
+        $this->changePosErrorMsg = __("persons.errors.changePos");
     }
 
     /**
@@ -60,18 +60,18 @@ class Person extends ApiSortableListController
     public function show()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();
 
         if (!$this->model->show($ids)) {
-            throw new \Error(__("ERR_PERSON_SHOW"));
+            throw new \Error(__("persons.errors.show"));
         }
 
         $request = $this->getRequestData();
@@ -88,18 +88,18 @@ class Person extends ApiSortableListController
     public function hide()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();
 
         if (!$this->model->hide($ids)) {
-            throw new \Error(__("ERR_PERSON_HIDE"));
+            throw new \Error(__("persons.errors.hide"));
         }
 
         $request = $this->getRequestData();

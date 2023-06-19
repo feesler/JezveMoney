@@ -97,7 +97,7 @@ export const changeCurrency = async (value) => {
 
 export const changeIcon = async (value) => {
     const icon = App.icons.getItem(value);
-    const name = (icon) ? __(`icons.${icon.name}`, 'en') : `(${value})`;
+    const name = (icon) ? __(`icons.byName.${icon.name}`, 'en') : `(${value})`;
 
     await test(`Change icon to '${name}'`, () => App.view.changeIcon(value));
 };
@@ -323,7 +323,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, AccountListView, 'Invalid view');
 
         App.view.expectedState = {
-            notification: { success: false, message: __('ERR_ACCOUNT_UPDATE', App.view.locale) },
+            notification: { success: false, message: __('accounts.errors.update', App.view.locale) },
         };
         App.view.checkState();
         await App.view.closeNotification();

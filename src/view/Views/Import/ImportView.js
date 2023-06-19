@@ -14,7 +14,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { createStore } from 'jezvejs/Store';
 
 import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
 
@@ -79,17 +79,17 @@ class ImportView extends View {
             ctxDeleteBtn: () => this.onRemoveItem(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(UserCurrencyList, 'userCurrencies', window.app.props.userCurrencies);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.checkUserAccountModels();
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
-        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
-        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.checkUserAccountModels();
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
+        App.loadModel(ImportRuleList, 'rules', App.props.rules);
+        App.loadModel(ImportTemplateList, 'templates', App.props.templates);
 
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         const mainAccount = userAccounts.getItemByIndex(0);
         const initialState = {
             items: [],
@@ -115,7 +115,7 @@ class ImportView extends View {
      * View initialization
      */
     onStart() {
-        if (window.app.model.accounts.length === 0) {
+        if (App.model.accounts.length === 0) {
             return;
         }
 
@@ -130,7 +130,7 @@ class ImportView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: __('IMPORT'),
+            title: __('import.listTitle'),
         });
 
         this.uploadBtn = Button.create({
@@ -146,16 +146,16 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             enableFilter: true,
-            noResultsMessage: __('NOT_FOUND'),
+            noResultsMessage: __('notFound'),
             onChange: (account) => this.onMainAccChange(account),
             className: 'dd_ellipsis',
         });
-        window.app.initAccountsList(this.accountDropDown);
+        App.initAccountsList(this.accountDropDown);
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
@@ -180,7 +180,7 @@ class ImportView extends View {
             props: {
                 className: 'btn show-more-btn',
                 type: 'button',
-                textContent: __('SHOW_MORE'),
+                textContent: __('actions.showMore'),
             },
             events: { click: (e) => this.showMore(e) },
         });
@@ -598,7 +598,7 @@ class ImportView extends View {
             this.onSubmitResult();
         } catch (e) {
             this.submitProgress.hide();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -616,7 +616,7 @@ class ImportView extends View {
 
         this.removeAllItems();
         this.submitProgress.hide();
-        window.app.createSuccessNotification(__('MSG_IMPORT_SUCCESS'));
+        App.createSuccessNotification(__('import.successMessage'));
     }
 
     /** Apply rules to imported items */
@@ -851,5 +851,4 @@ class ImportView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(ImportView);
+App.createView(ImportView);

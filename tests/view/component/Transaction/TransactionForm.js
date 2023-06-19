@@ -279,14 +279,14 @@ export class TransactionForm extends TestComponent {
         if (isAvailable) {
             if (model.type === LIMIT_CHANGE) {
                 res.srcAmountRow.label = '';
-                res.destAmountRow.label = __('TR_LIMIT_DELTA', locale);
+                res.destAmountRow.label = __('transactions.limitDelta', locale);
             } else {
-                res.srcAmountRow.label = (isDiffCurr) ? __('TR_SRC_AMOUNT', locale) : __('TR_AMOUNT', locale);
-                res.destAmountRow.label = (isDiffCurr) ? __('TR_DEST_AMOUNT', locale) : __('TR_AMOUNT', locale);
+                res.srcAmountRow.label = (isDiffCurr) ? __('transactions.sourceAmount', locale) : __('transactions.amount', locale);
+                res.destAmountRow.label = (isDiffCurr) ? __('transactions.destAmount', locale) : __('transactions.amount', locale);
             }
         }
 
-        const resultBalanceTok = __('TR_RESULT', locale);
+        const resultBalanceTok = __('transactions.result', locale);
 
         if (isExpense) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
@@ -395,8 +395,8 @@ export class TransactionForm extends TestComponent {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
             if (isAvailable && isTransactionForm) {
-                res.srcResBalanceRow.label = `${resultBalanceTok} (${__('TR_SOURCE', locale)})`;
-                res.destResBalanceRow.label = `${resultBalanceTok} (${__('TR_DESTINATION', locale)})`;
+                res.srcResBalanceRow.label = `${resultBalanceTok} (${__('transactions.source', locale)})`;
+                res.destResBalanceRow.label = `${resultBalanceTok} (${__('transactions.destination', locale)})`;
             }
 
             if (isScheduleItemForm) {
@@ -485,8 +485,8 @@ export class TransactionForm extends TestComponent {
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
             if (isAvailable && isTransactionForm) {
-                const personTok = __('TR_PERSON', locale);
-                const accountTok = __('TR_ACCOUNT', locale);
+                const personTok = __('transactions.person', locale);
+                const accountTok = __('transactions.debtAccount', locale);
 
                 res.srcResBalanceRow.label = (debtType)
                     ? `${resultBalanceTok} (${personTok})`

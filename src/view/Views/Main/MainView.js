@@ -12,17 +12,18 @@ import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
+
 import { API } from '../../API/index.js';
+import { normalize } from '../../utils/decimal.js';
 import {
-    formatPersonDebts,
     formatNumberShort,
+    formatPersonDebts,
     getCurrencyPrecision,
     listData,
-    normalize,
     __,
 } from '../../utils/utils.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -51,25 +52,25 @@ class MainView extends View {
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.checkUserAccountModels();
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.checkPersonModels();
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.initCategoriesModel();
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.checkUserAccountModels();
+        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.checkPersonModels();
+        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.initCategoriesModel();
+        App.loadModel(IconList, 'icons', App.props.icons);
 
         const initialState = {
             transactions: [...this.props.transactions],
             accounts: {
-                visible: AccountList.create(window.app.model.visibleUserAccounts),
-                hidden: AccountList.create(window.app.model.hiddenUserAccounts),
+                visible: AccountList.create(App.model.visibleUserAccounts),
+                hidden: AccountList.create(App.model.hiddenUserAccounts),
                 showHidden: false,
             },
             persons: {
-                visible: PersonList.create(window.app.model.visiblePersons),
-                hidden: PersonList.create(window.app.model.hiddenPersons),
+                visible: PersonList.create(App.model.visiblePersons),
+                hidden: PersonList.create(App.model.hiddenPersons),
                 showHidden: false,
             },
             chartData: this.props.chartData,
@@ -91,7 +92,7 @@ class MainView extends View {
      * View initialization
      */
     onStart() {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const state = this.store.getState();
 
         this.loadElementsByIds([
@@ -181,7 +182,7 @@ class MainView extends View {
             }, {
                 id: 'persons',
                 value: 'persons',
-                title: __('PERSONS'),
+                title: __('persons.listTitle'),
                 content: [
                     this.visiblePersons.elem,
                     this.hiddenPersons.elem,
@@ -208,7 +209,7 @@ class MainView extends View {
                 items: this.props.transactions,
                 listMode: 'list',
                 showControls: true,
-                noItemsMessage: __('MAIN_TR_NO_DATA'),
+                noItemsMessage: __('main.noTransactions'),
                 onItemClick: (id, e) => this.onTransactionClick(id, e),
             });
             this.transactionsWidget.append(this.latestList.elem);
@@ -220,7 +221,7 @@ class MainView extends View {
             this.histogram = Histogram.create({
                 data: this.props.chartData,
                 height: 200,
-                renderXAxisLabel: (value) => window.app.formatDate(value),
+                renderXAxisLabel: (value) => App.formatDate(value),
                 renderYAxisLabel: (value) => formatNumberShort(value),
             });
             chart.append(this.histogram.elem);
@@ -240,7 +241,7 @@ class MainView extends View {
             props: {
                 className: 'btn link-btn',
                 type: 'button',
-                textContent: __('SHOW_ALL'),
+                textContent: __('actions.showAll'),
             },
             events,
         });
@@ -336,7 +337,7 @@ class MainView extends View {
             await API.transaction.setCategory({ id: ids, category_id: categoryId });
             this.requestState();
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -360,7 +361,7 @@ class MainView extends View {
             await API.transaction.del({ id: ids });
             this.requestState();
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.stopLoading();
             this.setRenderTime();
         }
@@ -374,17 +375,17 @@ class MainView extends View {
             const result = await API.state.main();
             const { accounts, persons } = result.data;
 
-            window.app.model.accounts.setData(accounts.data);
-            window.app.model.userAccounts = null;
-            window.app.checkUserAccountModels();
+            App.model.accounts.setData(accounts.data);
+            App.model.userAccounts = null;
+            App.checkUserAccountModels();
 
-            window.app.model.persons.setData(persons.data);
-            window.app.model.visiblePersons = null;
-            window.app.checkPersonModels();
+            App.model.persons.setData(persons.data);
+            App.model.visiblePersons = null;
+            App.checkPersonModels();
 
             this.store.dispatch(actions.listRequestLoaded(result.data));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -401,8 +402,8 @@ class MainView extends View {
         const multi = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? __('TR_DELETE_MULTIPLE') : __('TR_DELETE'),
-            content: (multi) ? __('MSG_TRANS_DELETE_MULTIPLE') : __('MSG_TRANS_DELETE'),
+            title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
+            content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
             onConfirm: () => this.deleteItems(),
         });
     }
@@ -410,16 +411,16 @@ class MainView extends View {
     /** Returns accounts 'No data' container */
     renderAccountsNoData() {
         return this.renderNoDataGroup(
-            __('MAIN_ACCOUNTS_NO_DATA'),
-            `${window.app.baseURL}accounts/create/`,
+            __('main.noAccounts'),
+            `${App.baseURL}accounts/create/`,
         );
     }
 
     /** Returns persons 'No data' container */
     renderPersonsNoData() {
         return this.renderNoDataGroup(
-            __('PERSONS_NO_DATA'),
-            `${window.app.baseURL}persons/create/`,
+            __('persons.noData'),
+            `${App.baseURL}persons/create/`,
         );
     }
 
@@ -438,7 +439,7 @@ class MainView extends View {
                     props: {
                         className: 'btn link-btn',
                         href: createURL,
-                        textContent: __('CREATE'),
+                        textContent: __('actions.create'),
                     },
                 }),
             ],
@@ -466,8 +467,8 @@ class MainView extends View {
 
         show(this.toggleAccountsBtn, hiddenAvailable);
         this.toggleAccountsBtn.textContent = (state.accounts.showHidden)
-            ? __('SHOW_VISIBLE')
-            : __('SHOW_ALL');
+            ? __('actions.showVisible')
+            : __('actions.showAll');
 
         this.hiddenAccounts.setState((listState) => ({
             ...listState,
@@ -479,7 +480,7 @@ class MainView extends View {
 
     /** Renders list item of totals widget */
     renderTotalsListItem(item) {
-        const { currency } = window.app.model;
+        const { currency } = App.model;
         return createElement('li', {
             props: {
                 className: 'total-list__item',
@@ -490,7 +491,7 @@ class MainView extends View {
 
     /** Renders totals widget */
     renderTotalsWidget() {
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         const noAccounts = userAccounts.length === 0;
 
         show(this.totalWidget, !noAccounts);
@@ -538,8 +539,8 @@ class MainView extends View {
 
         show(this.togglePersonsBtn, hiddenAvailable);
         this.togglePersonsBtn.textContent = (state.persons.showHidden)
-            ? __('SHOW_VISIBLE')
-            : __('SHOW_ALL');
+            ? __('actions.showVisible')
+            : __('actions.showAll');
 
         this.hiddenPersons.setState((listState) => ({
             ...listState,
@@ -646,5 +647,4 @@ class MainView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(MainView);
+App.createView(MainView);

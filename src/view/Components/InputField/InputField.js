@@ -1,5 +1,7 @@
 import { createElement, getClassNames, setProps } from 'jezvejs';
 import { Input } from 'jezvejs/Input';
+
+import { App } from '../../Application/App.js';
 import { Field } from '../Field/Field.js';
 import './InputField.scss';
 
@@ -105,7 +107,7 @@ export class InputField extends Field {
 
         this.elem.classList.toggle('validation-block', state.validate);
         if (state.validate) {
-            window.app.setValidation(this.elem, state.valid);
+            App.setValidation(this.elem, state.valid);
             this.feedbackElem.textContent = state.feedbackMessage;
         }
 

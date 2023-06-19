@@ -23,10 +23,10 @@ class Account extends ApiSortableListController
 
         $this->model = AccountModel::getInstance();
         $this->transModel = TransactionModel::getInstance();
-        $this->createErrorMsg = __("ERR_ACCOUNT_CREATE");
-        $this->updateErrorMsg = __("ERR_ACCOUNT_UPDATE");
-        $this->deleteErrorMsg = __("ERR_ACCOUNT_DELETE");
-        $this->changePosErrorMsg = __("ERR_ACCOUNT_CHANGE_POS");
+        $this->createErrorMsg = __("accounts.errors.create");
+        $this->updateErrorMsg = __("accounts.errors.update");
+        $this->deleteErrorMsg = __("accounts.errors.delete");
+        $this->changePosErrorMsg = __("accounts.errors.changePos");
     }
 
     /**
@@ -89,18 +89,18 @@ class Account extends ApiSortableListController
     public function show()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();
 
         if (!$this->model->show($ids)) {
-            throw new \Error(__("ERR_ACCOUNT_SHOW"));
+            throw new \Error(__("accounts.errors.show"));
         }
 
         $request = $this->getRequestData();
@@ -117,18 +117,18 @@ class Account extends ApiSortableListController
     public function hide()
     {
         if (!$this->isPOST()) {
-            throw new \Error(__("ERR_INVALID_REQUEST"));
+            throw new \Error(__("errors.invalidRequest"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("ERR_NO_IDS"));
+            throw new \Error(__("errors.noIds"));
         }
 
         $this->begin();
 
         if (!$this->model->hide($ids)) {
-            throw new \Error(__("ERR_ACCOUNT_HIDE"));
+            throw new \Error(__("accounts.errors.hide"));
         }
 
         $request = $this->getRequestData();

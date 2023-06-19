@@ -75,5 +75,5 @@ export const __ = (token, locale = 'en', ...args) => {
     const tokenString = getTokenString(token, locale);
     assert.isString(tokenString, `Token '${token}' not found`);
 
-    return formatTokenString(tokenString, args);
+    return formatTokenString(tokenString, ...args);
 };

@@ -1,7 +1,8 @@
 import { createSlice } from 'jezvejs/Store';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { Schedule } from '../../Models/Schedule.js';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 export const createList = (items) => {
     const res = Schedule.create(items);
@@ -15,7 +16,7 @@ const reduceDeselectAll = (state) => ({
 });
 
 export const updateList = (state) => {
-    const { schedule } = window.app.model;
+    const { schedule } = App.model;
     const result = state;
     const { pagination } = result;
 
@@ -73,7 +74,7 @@ const slice = createSlice({
     ),
 
     toggleSelectItem: (state, itemId) => {
-        const item = window.app.model.schedule.getItem(itemId);
+        const item = App.model.schedule.getItem(itemId);
         if (!item) {
             return state;
         }
@@ -149,7 +150,7 @@ const slice = createSlice({
 
     listRequestLoaded: (state, keepState) => ({
         ...state,
-        items: createList(window.app.model.schedule),
+        items: createList(App.model.schedule),
         listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
     }),

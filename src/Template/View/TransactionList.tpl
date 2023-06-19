@@ -8,14 +8,14 @@
                 <div class="content_wrap list-view__content">
                     <main>
                         <header id="heading" class="heading">
-                            <h1><?= __("TRANSACTIONS") ?></h1>
+                            <h1><?= __("transactions.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
 
                         <header id="contentHeader" class="content-header">
                             <aside id="filtersContainer" class="filters-container">
                                 <header class="filters-heading">
-                                    <span class="filters-heading__title"><?= __("FILTERS") ?></span>
+                                    <span class="filters-heading__title"><?= __("filters.title") ?></span>
                                 </header>
 
                                 <hr class="filters-separator">
@@ -23,20 +23,20 @@
                                 <div class="filters-list">
                                     <div class="filters-row">
                                         <section id="typeFilter" class="filter-item trans-type-filter">
-                                            <header class="filter-item__title"><?= __("FILTER_TYPE") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.transactionType") ?></header>
                                         </section>
 
                                         <hr class="filters-separator">
 
                                         <section id="accountsFilter" class="filter-item">
-                                            <header class="filter-item__title"><?= __("FILTER_ACCOUNTS_PERSONS") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.accountsAndPersons") ?></header>
                                             <select id="acc_id" name="acc_id" multiple></select>
                                         </section>
 
                                         <hr class="filters-separator">
 
                                         <section id="categoriesFilter" class="filter-item">
-                                            <header class="filter-item__title"><?= __("FILTER_CATEGORIES") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.categories") ?></header>
                                             <select id="category_id" name="category_id" multiple></select>
                                         </section>
                                     </div>
@@ -49,15 +49,15 @@
                                         <hr class="filters-separator">
 
                                         <section id="searchFilter" class="filter-item">
-                                            <header class="filter-item__title"><?= __("FILTER_SEARCH") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.search") ?></header>
                                         </section>
                                     </div>
                                 </div>
 
                                 <div class="form-controls filters-controls">
-                                    <button id="applyFiltersBtn" class="btn submit-btn" type="button"><?= __("APPLY") ?></button>
+                                    <button id="applyFiltersBtn" class="btn submit-btn" type="button"><?= __("actions.apply") ?></button>
                                     <a id="clearFiltersBtn" class="clear-all-btn" href="<?= e($clearAllURL) ?>">
-                                        <span><?= __("CLEAR_ALL") ?></span>
+                                        <span><?= __("actions.clearAll") ?></span>
                                     </a>
                                 </div>
                             </aside>
@@ -65,11 +65,11 @@
                             <header class="list-header">
                                 <div class="counters">
                                     <div id="itemsCounter" class="counter">
-                                        <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
+                                        <span class="counter__title"><?= __("list.itemsCounter") ?></span>
                                         <span id="itemsCount" class="counter__value"></span>
                                     </div>
                                     <div id="selectedCounter" class="counter" hidden>
-                                        <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
+                                        <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
                                         <span id="selItemsCount" class="counter__value"></span>
                                     </div>
                                 </div>

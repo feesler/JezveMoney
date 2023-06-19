@@ -12,20 +12,20 @@ export class TransactionListMainMenu extends PopupMenu {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: __('SELECT'),
+                title: __('actions.select'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: __('SORT'),
+                title: __('actions.sort'),
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
-                title: __('SELECT_ALL'),
+                title: __('actions.selectAll'),
             }, {
                 id: 'deselectAllBtn',
-                title: __('DESELECT_ALL'),
+                title: __('actions.deselectAll'),
             }, {
                 id: 'separator2',
                 type: 'separator',
@@ -33,20 +33,20 @@ export class TransactionListMainMenu extends PopupMenu {
                 id: 'exportBtn',
                 type: 'link',
                 icon: 'export',
-                title: __('TR_EXPORT_CSV'),
+                title: __('transactions.exportToCsv'),
             }, {
                 id: 'setCategoryBtn',
-                title: __('SET_CATEGORY'),
+                title: __('transactions.setCategoryMenu'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
             }, {
                 id: 'separator3',
                 type: 'separator',
             }, {
                 id: 'groupByDateBtn',
-                title: __('TR_LIST_GROUP_BY_DATE'),
+                title: __('transactions.groupByDate'),
             }],
         });
 

@@ -6,18 +6,7 @@
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <main class="form-container">
-                        <div class="register-form">
-                            <h1><?= __("REGISTRATION") ?></h1>
-
-                            <form id="form" action="<?= BASEURL ?>register/" method="post">
-                                <div class="form-controls">
-                                    <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
-                                    <a class="alter-link" href="<?= BASEURL ?>login/"><?= __("CANCEL") ?></a>
-                                </div>
-                            </form>
-                        </div>
-                    </main>
+                    <main id="formContainer" class="form-container"></main>
                 </div>
             </div>
         </div>

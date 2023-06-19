@@ -9,7 +9,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import {
@@ -62,13 +62,13 @@ class AccountListView extends View {
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.checkUserAccountModels();
-        window.app.loadModel(IconList, 'icons', window.app.props.icons);
+        App.loadModel(CurrencyList, 'currency', App.props.currency);
+        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.checkUserAccountModels();
+        App.loadModel(IconList, 'icons', App.props.icons);
 
-        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
-        const { settings } = window.app.model.profile;
+        const { visibleUserAccounts, hiddenUserAccounts } = App.model;
+        const { settings } = App.model.profile;
         const sortMode = settings.sort_accounts;
 
         const initialState = {
@@ -135,7 +135,7 @@ class AccountListView extends View {
             type: 'link',
             className: 'circle-btn',
             icon: 'plus',
-            url: `${window.app.baseURL}accounts/create/`,
+            url: `${App.baseURL}accounts/create/`,
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
@@ -154,7 +154,7 @@ class AccountListView extends View {
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
-            title: __('DONE'),
+            title: __('actions.done'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
@@ -298,7 +298,7 @@ class AccountListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -323,7 +323,7 @@ class AccountListView extends View {
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -339,7 +339,7 @@ class AccountListView extends View {
             const { data } = await API.account.list(request);
             this.setListData(data, keepState);
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -363,9 +363,9 @@ class AccountListView extends View {
     }
 
     setListData(data, keepState = false) {
-        window.app.model.accounts.setData(data);
-        window.app.model.userAccounts = null;
-        window.app.checkUserAccountModels();
+        App.model.accounts.setData(data);
+        App.model.userAccounts = null;
+        App.checkUserAccountModels();
 
         this.store.dispatch(actions.listRequestLoaded(keepState));
     }
@@ -382,12 +382,12 @@ class AccountListView extends View {
 
             this.store.dispatch(actions.itemDetailsLoaded(item));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
     onSort(info) {
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         const item = userAccounts.getItem(info.itemId);
         const prevItem = userAccounts.getItem(info.prevId);
         const nextItem = userAccounts.getItem(info.nextId);
@@ -431,7 +431,7 @@ class AccountListView extends View {
     cancelPosChange() {
         this.render(this.store.getState());
 
-        window.app.createErrorNotification(__('ERR_ACCOUNT_CHANGE_POS'));
+        App.createErrorNotification(__('accounts.errors.changePos'));
     }
 
     toggleSortByName() {
@@ -453,7 +453,7 @@ class AccountListView extends View {
     }
 
     async requestSortMode(sortMode) {
-        const { settings } = window.app.model.profile;
+        const { settings } = App.model.profile;
         if (settings.sort_accounts === sortMode) {
             return;
         }
@@ -468,7 +468,7 @@ class AccountListView extends View {
 
             this.store.dispatch(actions.changeSortMode(sortMode));
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
@@ -559,7 +559,7 @@ class AccountListView extends View {
             return;
         }
 
-        const { userAccounts } = window.app.model;
+        const { userAccounts } = App.model;
         const item = state.detailsItem ?? userAccounts.getItem(state.detailsId);
         if (!item) {
             throw new Error('Account not found');
@@ -580,7 +580,7 @@ class AccountListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = window.app;
+        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
         return new URL(`${baseURL}accounts/${itemPart}`);
     }
@@ -591,7 +591,7 @@ class AccountListView extends View {
         }
 
         const url = this.getURL(state);
-        const pageTitle = `${__('APP_NAME')} | ${__('accounts.listTitle')}`;
+        const pageTitle = `${__('appName')} | ${__('accounts.listTitle')}`;
         window.history.replaceState({}, pageTitle, url);
     }
 
@@ -647,5 +647,4 @@ class AccountListView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(AccountListView);
+App.createView(AccountListView);

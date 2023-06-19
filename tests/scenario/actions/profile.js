@@ -79,7 +79,7 @@ export const register = async ({ login, name, password }) => {
 
     if (validInput) {
         App.view.expectedState = {
-            notification: { success: true, message: __('MSG_REGISTER', App.view.locale) },
+            notification: { success: true, message: __('registration.registeredMessage', App.view.locale) },
         };
 
         await test('User registration', () => App.view.checkState());
@@ -105,7 +105,7 @@ export const resetData = async (options = {}) => {
     await App.view.resetData(options);
 
     App.view.expectedState = {
-        notification: { success: true, message: __('MSG_PROFILE_RESET', App.view.locale) },
+        notification: { success: true, message: __('profile.resetMessage', App.view.locale) },
     };
     await test('Reset data', () => App.view.checkState());
 
@@ -136,7 +136,7 @@ export const changeName = async (newName) => {
             if (nameChanged) {
                 App.view.expectedState.notification = {
                     success: true,
-                    message: __('MSG_PROFILE_NAME', App.view.locale),
+                    message: __('profile.nameChangedMessage', App.view.locale),
                 };
             }
 
@@ -164,7 +164,7 @@ export const changePass = async ({ oldPassword, newPassword }) => {
         await App.view.changePassword(oldPassword, newPassword);
         if (validInput) {
             App.view.expectedState = {
-                notification: { success: true, message: __('MSG_PROFILE_PASSWORD', App.view.locale) },
+                notification: { success: true, message: __('profile.passwordChangedMessage', App.view.locale) },
             };
 
             App.view.checkState();
@@ -187,7 +187,7 @@ export const deleteProfile = async () => {
 
     await App.view.deleteProfile();
     App.view.expectedState = {
-        notification: { success: true, message: __('MSG_PROFILE_DELETED', App.view.locale) },
+        notification: { success: true, message: __('profile.deletedMessage', App.view.locale) },
     };
     await test('Delete profile', () => App.view.checkState());
 

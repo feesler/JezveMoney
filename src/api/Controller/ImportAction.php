@@ -24,9 +24,9 @@ class ImportAction extends ApiListController
         parent::initAPI();
 
         $this->model = ImportActionModel::getInstance();
-        $this->createErrorMsg = __("ERR_IMPORT_ACT_CREATE");
-        $this->updateErrorMsg = __("ERR_IMPORT_ACT_UPDATE");
-        $this->deleteErrorMsg = __("ERR_IMPORT_ACT_DELETE");
+        $this->createErrorMsg = __("import.actions.errors.create");
+        $this->updateErrorMsg = __("import.actions.errors.update");
+        $this->deleteErrorMsg = __("import.actions.errors.delete");
     }
 
     /**

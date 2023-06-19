@@ -8,7 +8,9 @@ import {
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
+
 import { __ } from '../../../../../utils/utils.js';
+import { App } from '../../../../../Application/App.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import {
     ImportTemplateManager,
@@ -83,7 +85,7 @@ export class ImportUploadDialog extends Component {
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
-            title: __('IMPORT_UPLOAD'),
+            title: __('import.upload'),
             content: this.elem,
             closeButton: true,
             onClose: () => this.onClose(),
@@ -198,7 +200,7 @@ export class ImportUploadDialog extends Component {
 
     /** Initial account select 'change' event handler */
     onAccountChange(selectedAccount) {
-        const account = window.app.model.accounts.getItem(selectedAccount);
+        const account = App.model.accounts.getItem(selectedAccount);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -222,7 +224,7 @@ export class ImportUploadDialog extends Component {
         try {
             this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
             this.state.importedItems = null;
         }
 
@@ -242,7 +244,7 @@ export class ImportUploadDialog extends Component {
     /** Upload error handler */
     onUploadError(message) {
         this.setLoading(false);
-        window.app.createErrorNotification(message);
+        App.createErrorNotification(message);
     }
 
     /**
@@ -304,7 +306,7 @@ export class ImportUploadDialog extends Component {
         }
 
         if (state.id === UPLOAD_STATE) {
-            this.popup.setTitle(__('IMPORT_UPLOAD'));
+            this.popup.setTitle(__('import.upload'));
             return;
         }
         if (state.id !== CONVERT_STATE) {
@@ -319,11 +321,11 @@ export class ImportUploadDialog extends Component {
 
         let title;
         if (state.convertState === TPL_SELECT_STATE) {
-            title = __('IMPORT_CONVERT');
+            title = __('import.convert');
         } else if (state.convertState === TPL_CREATE_STATE) {
-            title = __('TEMPLATE_CREATE');
+            title = __('import.templates.create');
         } else if (state.convertState === TPL_UPDATE_STATE) {
-            title = __('TEMPLATE_UPDATE');
+            title = __('import.templates.update');
         }
 
         const titleElem = createElement('div', {

@@ -273,7 +273,7 @@ export const securityTests = async () => {
         assert(!(App.view instanceof CategoryView), 'Invalid view');
 
         const expected = {
-            notification: { success: false, message: __('ERR_CATEGORY_UPDATE', App.view.locale) },
+            notification: { success: false, message: __('categories.errors.update', App.view.locale) },
         };
         App.view.checkState(expected);
         await App.view.closeNotification();

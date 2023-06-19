@@ -1,8 +1,9 @@
 import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
+import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { ReminderList } from '../../Models/ReminderList.js';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 
 export const createList = (items, state) => {
     const stateFilter = asArray(state?.filter?.state);
@@ -21,7 +22,7 @@ const reduceDeselectAll = (state) => ({
 });
 
 export const updateList = (state) => {
-    const { reminders } = window.app.model;
+    const { reminders } = App.model;
     const result = state;
     const { pagination } = result;
 
@@ -79,7 +80,7 @@ const slice = createSlice({
     ),
 
     toggleSelectItem: (state, itemId) => {
-        const item = window.app.model.reminders.getItem(itemId);
+        const item = App.model.reminders.getItem(itemId);
         if (!item) {
             return state;
         }
@@ -163,7 +164,7 @@ const slice = createSlice({
 
     listRequestLoaded: (state, keepState) => ({
         ...state,
-        items: createList(window.app.model.reminders, state),
+        items: createList(App.model.reminders, state),
         listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
     }),

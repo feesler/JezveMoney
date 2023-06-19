@@ -17,6 +17,7 @@ import {
 import { Reminder } from '../../../../Models/Reminder.js';
 import { Field } from '../../../../Components/Field/Field.js';
 import './ReminderListItem.scss';
+import { App } from '../../../../Application/App.js';
 
 /** CSS classes */
 const ITEM_CLASS = 'reminder-item';
@@ -122,11 +123,11 @@ export class ReminderListItem extends Component {
     initDetails() {
         // Accounts
         this.sourceField = Field.create({
-            title: __('TR_SOURCE'),
+            title: __('transactions.source'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: __('TR_DESTINATION'),
+            title: __('transactions.destination'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -135,11 +136,11 @@ export class ReminderListItem extends Component {
         });
         // Amount
         this.srcAmountField = Field.create({
-            title: __('TR_SRC_AMOUNT'),
+            title: __('transactions.sourceAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField = Field.create({
-            title: __('TR_DEST_AMOUNT'),
+            title: __('transactions.destAmount'),
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
@@ -149,14 +150,14 @@ export class ReminderListItem extends Component {
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
-            title: __('TR_DATE'),
+            title: __('transactions.date'),
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: __('TR_CATEGORY'),
+            title: __('transactions.category'),
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
@@ -172,7 +173,7 @@ export class ReminderListItem extends Component {
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
-            title: __('TR_COMMENT'),
+            title: __('transactions.comment'),
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
@@ -205,7 +206,7 @@ export class ReminderListItem extends Component {
     }
 
     createSelectControls() {
-        const { createContainer } = window.app;
+        const { createContainer } = App;
 
         if (this.selectControls) {
             return;
@@ -238,13 +239,13 @@ export class ReminderListItem extends Component {
             throw new Error('Invalid item type');
         }
 
-        const { profile, accounts } = window.app.model;
+        const { profile, accounts } = App.model;
         const srcAcc = accounts.getItem(item.src_id);
         return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
     }
 
     getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = window.app.model;
+        const { profile, accounts, persons } = App.model;
         const account = accounts.getItem(accountId);
         if (!account) {
             return null;
@@ -262,7 +263,7 @@ export class ReminderListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const accountModel = window.app.model.accounts;
+        const accountModel = App.model.accounts;
         const srcAcc = accountModel.getItem(item.src_id);
         const destAcc = accountModel.getItem(item.dest_id);
 
@@ -286,7 +287,7 @@ export class ReminderListItem extends Component {
             throw new Error('Invalid type of transaction');
         }
 
-        const personModel = window.app.model.persons;
+        const personModel = App.model.persons;
         const debtType = this.getDebtType(item);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
@@ -309,7 +310,7 @@ export class ReminderListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const currencyModel = window.app.model.currency;
+        const currencyModel = App.model.currency;
         const srcAmountFmt = currencyModel.formatCurrency(item.src_amount, item.src_curr);
         const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
         const diffCurrency = item.src_curr !== item.dest_curr;
@@ -345,7 +346,7 @@ export class ReminderListItem extends Component {
             return null;
         }
 
-        const { categories } = window.app.model;
+        const { categories } = App.model;
         const category = categories.getItem(item.category_id);
         if (!category) {
             throw new Error('Invalid category');
@@ -375,12 +376,12 @@ export class ReminderListItem extends Component {
     }
 
     renderDateRange(item) {
-        const start = __('SCHEDULE_ITEM_START', window.app.formatDate(item.start_date));
+        const start = __('schedule.item.start', App.formatDate(item.start_date));
         if (!item.end_date) {
             return start;
         }
 
-        const end = __('SCHEDULE_ITEM_END', window.app.formatDate(item.end_date));
+        const end = __('schedule.item.end', App.formatDate(item.end_date));
         return `${start} ${end}`;
     }
 
@@ -393,7 +394,7 @@ export class ReminderListItem extends Component {
 
         this.amountElem.textContent = this.formatAmount(item);
 
-        this.dateElem.textContent = window.app.formatDate(item.date);
+        this.dateElem.textContent = App.formatDate(item.date);
 
         const categoryTitle = this.getCategoryTitle(state);
         show(this.categoryElem, !!categoryTitle);
@@ -405,7 +406,7 @@ export class ReminderListItem extends Component {
 
     renderDetails(state) {
         const { item } = state;
-        const { currency } = window.app.model;
+        const { currency } = App.model;
 
         // Source
         const showSource = (item.src_id !== 0);
@@ -425,7 +426,7 @@ export class ReminderListItem extends Component {
 
         // Amount
         const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         if (isDiff) {
             const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);
@@ -439,7 +440,7 @@ export class ReminderListItem extends Component {
         this.destAmountField.show(isDiff);
 
         // Date
-        this.dateField.setContent(window.app.formatDate(item.date));
+        this.dateField.setContent(App.formatDate(item.date));
 
         // Category field
         const categoryTitle = this.getCategoryTitle(state);

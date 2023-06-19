@@ -46,7 +46,7 @@ class User extends TemplateController
 
         $this->template = new Template(VIEW_TPL_PATH . "Login.tpl");
         $data = [
-            "titleString" => __("APP_NAME") . " | " . __("LOG_IN"),
+            "titleString" => __("appName") . " | " . __("login.title"),
         ];
 
         $this->initResources("LoginView");
@@ -76,7 +76,7 @@ class User extends TemplateController
             wlog("Login user error: " . $e->getMessage());
         }
         if (!$result) {
-            $this->fail(__("ERR_LOGIN_FAIL"));
+            $this->fail(__("login.errorMessage"));
         }
 
         setLocation(BASEURL);
@@ -104,7 +104,7 @@ class User extends TemplateController
 
         $this->template = new Template(VIEW_TPL_PATH . "Register.tpl");
         $data = [
-            "titleString" =>  __("APP_NAME") . " | " . __("REGISTRATION"),
+            "titleString" =>  __("appName") . " | " . __("registration.title"),
         ];
 
         $this->initResources("RegisterView");
@@ -133,12 +133,12 @@ class User extends TemplateController
             wlog("Create user error: " . $e->getMessage());
         }
         if (!$user_id) {
-            throw new \Error(__("ERR_REGISTER_FAIL"));
+            throw new \Error(__("registration.errorMessage"));
         }
 
         $this->commit();
 
-        Message::setSuccess(__("MSG_REGISTER"));
+        Message::setSuccess(__("registration.registeredMessage"));
         setLocation(BASEURL);
     }
 }

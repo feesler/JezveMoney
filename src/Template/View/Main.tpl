@@ -13,7 +13,7 @@
                         <?php if ($accountsCount > 0) {    ?>
                             <section id="totalWidget" class="widget total-widget">
                                 <header class="widget_title">
-                                    <span><?= __("TOTAL") ?></span>
+                                    <span><?= __("main.total") ?></span>
                                 </header>
                             </section>
                         <?php    }    ?>
@@ -22,7 +22,7 @@
                             <section id="transactionsWidget" class="widget transactions-widget">
                                 <header class="widget_title">
                                     <a class="widget_title-link" href="<?= BASEURL ?>transactions/">
-                                        <span><?= __("TRANSACTIONS") ?></span>
+                                        <span><?= __("transactions.listTitle") ?></span>
                                         <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                                     </a>
                                 </header>
@@ -33,13 +33,13 @@
                             <section class="widget statistics-widget">
                                 <header class="widget_title">
                                     <a class="widget_title-link" href="<?= BASEURL ?>statistics/">
-                                        <span><?= __("STATISTICS") ?></span>
+                                        <span><?= __("statistics.title") ?></span>
                                         <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                                     </a>
                                 </header>
                                 <div id="chart" class="widget_charts">
                                     <?php if ($transactionsCount === 0) {    ?>
-                                        <span class="nodata-message"><?= __("STAT_NO_DATA") ?></span>
+                                        <span class="nodata-message"><?= __("statistics.noData") ?></span>
                                     <?php    }        ?>
                                 </div>
                             </section>

@@ -15,13 +15,13 @@ export class TemplateSelectContextMenu extends PopupMenu {
             items: [{
                 id: 'ctxUpdateTemplateBtn',
                 icon: 'update',
-                title: __('UPDATE'),
+                title: __('actions.update'),
                 className: UPDATE_BUTTON_CLASS,
                 onClick: (e) => e?.stopPropagation(),
             }, {
                 id: 'ctxDeleteTemplateBtn',
                 icon: 'del',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 className: DEL_BUTTON_CLASS,
                 onClick: (e) => e?.stopPropagation(),
             }],

@@ -1,4 +1,6 @@
 import { createElement, Component } from 'jezvejs';
+
+import { App } from '../../../../../Application/App.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -32,7 +34,7 @@ export class ImportActionItem extends Component {
         this.actionTypeLabel = createElement('span', { props: { className: 'action-item__type' } });
         this.valueLabel = createElement('span', { props: { className: 'action-item__value' } });
 
-        this.elem = window.app.createContainer('action-item', [
+        this.elem = App.createContainer('action-item', [
             this.actionTypeLabel,
             this.valueLabel,
         ]);
@@ -89,14 +91,14 @@ export class ImportActionItem extends Component {
 
             value = item.title;
         } else if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
-            const item = window.app.model.accounts.getItem(state.value);
+            const item = App.model.accounts.getItem(state.value);
             if (!item) {
                 throw new Error('Account not found');
             }
 
             value = item.name;
         } else if (state.actionType === IMPORT_ACTION_SET_PERSON) {
-            const item = window.app.model.persons.getItem(state.value);
+            const item = App.model.persons.getItem(state.value);
             if (!item) {
                 throw new Error('Person not found');
             }
@@ -104,7 +106,7 @@ export class ImportActionItem extends Component {
             value = item.name;
         } else if (state.actionType === IMPORT_ACTION_SET_CATEGORY) {
             const categoryId = parseInt(state.value, 10);
-            const item = window.app.model.categories.getItem(state.value);
+            const item = App.model.categories.getItem(state.value);
             if (categoryId !== 0 && !item) {
                 throw new Error('Category not found');
             }

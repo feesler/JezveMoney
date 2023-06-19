@@ -9,7 +9,7 @@ import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
-import { Application } from '../../Application/Application.js';
+import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
@@ -40,7 +40,7 @@ class PersonView extends View {
             initialState.data = { ...initialState.original };
         }
 
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        App.loadModel(PersonList, 'persons', App.props.persons);
 
         this.store = createStore(reducer, { initialState });
     }
@@ -59,7 +59,7 @@ class PersonView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('PERSON_UPDATE') : __('PERSON_CREATE'),
+            title: (isUpdate) ? __('persons.update') : __('persons.create'),
             showInHeaderOnScroll: false,
         });
 
@@ -70,7 +70,7 @@ class PersonView extends View {
             inputId: 'nameInp',
             className: 'form-row',
             name: 'name',
-            title: __('PERSON_NAME'),
+            title: __('persons.name'),
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
@@ -85,7 +85,7 @@ class PersonView extends View {
             this.deleteBtn = Button.create({
                 id: 'deleteBtn',
                 className: 'warning-btn',
-                title: __('DELETE'),
+                title: __('actions.delete'),
                 icon: 'del',
                 onClick: () => this.confirmDelete(),
             });
@@ -112,12 +112,12 @@ class PersonView extends View {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('PERSON_INVALID_NAME')));
+            this.store.dispatch(actions.invalidateNameField(__('persons.invalidName')));
             this.nameField.focus();
         } else {
-            const person = window.app.model.persons.findByName(name);
+            const person = App.model.persons.findByName(name);
             if (person && state.original.id !== person.id) {
-                this.store.dispatch(actions.invalidateNameField(__('PERSON_EXISTING_NAME')));
+                this.store.dispatch(actions.invalidateNameField(__('persons.existingName')));
                 this.nameField.focus();
             }
         }
@@ -161,10 +161,10 @@ class PersonView extends View {
                 await API.person.create(data);
             }
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -179,10 +179,10 @@ class PersonView extends View {
         try {
             await API.person.del({ id: original.id });
 
-            window.app.navigateNext();
+            App.navigateNext();
         } catch (e) {
             this.cancelSubmit();
-            window.app.createErrorNotification(e.message);
+            App.createErrorNotification(e.message);
         }
     }
 
@@ -195,8 +195,8 @@ class PersonView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: __('PERSON_DELETE'),
-            content: __('MSG_PERSON_DELETE'),
+            title: __('persons.delete'),
+            content: __('persons.deleteMessage'),
             onConfirm: () => this.deletePerson(),
         });
     }
@@ -227,5 +227,4 @@ class PersonView extends View {
     }
 }
 
-window.app = new Application(window.appProps);
-window.app.createView(PersonView);
+App.createView(PersonView);
