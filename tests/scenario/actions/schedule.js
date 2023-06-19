@@ -60,6 +60,14 @@ export const runAction = async ({ action, data }) => {
         testDescr = 'Clear schedule end date';
     }
 
+    if (action === 'toggleEnableRepeat') {
+        const { repeatEnabled } = App.view.formModel;
+
+        testDescr = (repeatEnabled)
+            ? 'Disable transaction repeat'
+            : 'Enable transaction repeat';
+    }
+
     if (action === 'changeIntervalType') {
         const intervalType = parseInt(data, 10);
         const type = ScheduledTransaction.intervalTypes[intervalType];

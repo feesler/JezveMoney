@@ -12,7 +12,7 @@ import {
     TestComponent,
     asArray,
 } from 'jezve-test';
-import { DropDown, LinkMenu } from 'jezvejs-test';
+import { DropDown, LinkMenu, Switch } from 'jezvejs-test';
 import {
     correct,
     correctExch,
@@ -162,30 +162,36 @@ export class TransactionForm extends TestComponent {
                     isInvalid: model.dateInvalidated,
                 };
             } else if (isScheduleItemForm) {
-                const isRepeat = model.intervalType !== INTERVAL_NONE;
+                const { repeatEnabled } = model;
 
                 res.dateRangeInput = {
                     visible: true,
                     startInputGroup: { visible: true },
-                    endInputGroup: { visible: isRepeat },
+                    endInputGroup: { visible: repeatEnabled },
                     value: {
                         startDate: App.reformatDate(model.startDate),
                         endDate: App.reformatDate(model.endDate),
                     },
                     invalidated: model.dateRangeInvalidated,
                 };
+
+                res.repeatSwitch = {
+                    visible: true,
+                    checked: repeatEnabled,
+                };
+
                 res.intervalStepRow = {
-                    visible: isRepeat,
+                    visible: repeatEnabled,
                     value: model.intervalStep,
                     isInvalid: model.intervalStepInvalidated,
                 };
                 res.intervalTypeSelect = {
-                    visible: true,
+                    visible: repeatEnabled,
                     value: model.intervalType.toString(),
                 };
 
                 res.weekDayOffsetSelect = {
-                    visible: model.intervalType === INTERVAL_WEEK,
+                    visible: repeatEnabled && model.intervalType === INTERVAL_WEEK,
                 };
                 if (res.weekDayOffsetSelect.visible) {
                     const offset = asArray(model.intervalOffset).map((item) => item?.toString());
@@ -195,10 +201,10 @@ export class TransactionForm extends TestComponent {
                 const dayOffsetIntervals = [INTERVAL_MONTH, INTERVAL_YEAR];
 
                 res.monthDayOffsetSelect = {
-                    visible: dayOffsetIntervals.includes(model.intervalType),
+                    visible: repeatEnabled && dayOffsetIntervals.includes(model.intervalType),
                 };
                 res.monthOffsetSelect = {
-                    visible: model.intervalType === INTERVAL_YEAR,
+                    visible: repeatEnabled && model.intervalType === INTERVAL_YEAR,
                 };
 
                 if (model.intervalType === INTERVAL_MONTH) {
@@ -815,12 +821,16 @@ export class TransactionForm extends TestComponent {
             res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
         } else if (this.isScheduleItemForm()) {
             res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
+
+            res.repeatSwitch = await Switch.create(this, await query(this.elem, '#repeatSwitch'));
+
             res.intervalStepRow = await InputRow.create(this, await query('#intervalStepRow'));
             const intervalTypeSel = await query('.interval-type-select');
             res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
 
             res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
             res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
+
             res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
         }
 
@@ -1112,12 +1122,15 @@ export class TransactionForm extends TestComponent {
             res.date = cont.datePicker.value;
             res.dateInvalidated = cont.datePicker.isInvalid;
         } else if (this.isScheduleItemForm()) {
+            res.repeatEnabled = cont.repeatSwitch.checked;
+
             res.startDate = cont.dateRangeInput.value.startDate;
             res.endDate = cont.dateRangeInput.value.endDate;
             res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
 
             res.intervalStep = cont.intervalStepRow.value;
             res.intervalStepInvalidated = cont.intervalStepRow.isInvalid;
+
             res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
 
             if (res.intervalType === INTERVAL_DAY) {
@@ -2003,15 +2016,23 @@ export class TransactionForm extends TestComponent {
         return this.checkState();
     }
 
+    async toggleEnableRepeat() {
+        this.model.repeatEnabled = !this.model.repeatEnabled;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.repeatSwitch.toggle());
+
+        return this.checkState();
+    }
+
     async changeIntervalType(val) {
         const type = parseInt(val, 10);
+        assert(type !== INTERVAL_NONE && ScheduledTransaction.isValidIntervalType(type), 'Invalid interval type');
+
         const typeName = ScheduledTransaction.intervalTypes[type];
         assert.notEqual(this.model.intervalType, type, `Interval type is already '${typeName}'`);
 
         this.model.intervalType = type;
-        if (type === INTERVAL_NONE) {
-            this.model.endDate = '';
-        }
 
         this.model.intervalOffset = 0;
         this.expectedState = this.getExpectedState();

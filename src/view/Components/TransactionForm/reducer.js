@@ -1153,6 +1153,31 @@ const slice = createSlice({
         },
     }),
 
+    enableRepeat: (state, value) => {
+        const isRepeatEnabled = state.transaction.interval_type !== INTERVAL_NONE;
+        if (value === isRepeatEnabled) {
+            return state;
+        }
+
+        const intervalType = (value) ? state.form.intervalType : INTERVAL_NONE;
+        const intervalOffset = (value) ? state.form.intervalOffset : [];
+        const intervalStep = (value) ? state.form.intervalStep : 0;
+        const endDate = (value && state.form.endDate)
+            ? dateStringToTime(state.form.endDate)
+            : null;
+
+        return {
+            ...state,
+            transaction: {
+                ...state.transaction,
+                end_date: endDate,
+                interval_type: intervalType,
+                interval_offset: intervalOffset,
+                interval_step: intervalStep,
+            },
+        };
+    },
+
     intervalTypeChange: (state, value) => {
         const type = parseInt(value, 10);
         const newState = {

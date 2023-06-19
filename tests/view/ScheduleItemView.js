@@ -83,11 +83,26 @@ export class ScheduleItemView extends AppView {
 
     getExpectedScheduledTransaction() {
         const { form } = this.model;
+        const { repeatEnabled } = form;
+
+        const intervalType = (repeatEnabled)
+            ? parseInt(form.intervalType, 10)
+            : INTERVAL_NONE;
+
+        const intervalStep = (repeatEnabled)
+            ? parseInt(form.intervalStep, 10)
+            : 0;
+
+        const intervalOffsets = (repeatEnabled)
+            ? asArray(form.intervalOffset).map((item) => parseInt(item, 10))
+            : [];
+
         const res = {
             start_date: App.dateStringToSeconds(form.startDate),
             end_date: App.dateStringToSeconds(form.endDate),
-            interval_type: parseInt(form.intervalType, 10),
-            interval_offset: asArray(form.intervalOffset).map((item) => parseInt(item, 10)),
+            interval_type: intervalType,
+            interval_step: intervalStep,
+            interval_offset: intervalOffsets,
             type: form.type,
             src_amount: this.getExpectedSourceAmount(form),
             dest_amount: this.getExpectedDestAmount(form),
@@ -96,9 +111,6 @@ export class ScheduleItemView extends AppView {
             category_id: form.categoryId,
             comment: form.comment,
         };
-        res.interval_step = (res.interval_type !== INTERVAL_NONE)
-            ? parseInt(form.intervalStep, 10)
-            : 0;
 
         if (form.isUpdate) {
             res.id = form.id;
@@ -175,6 +187,10 @@ export class ScheduleItemView extends AppView {
 
     async clearEndDate(val) {
         return this.form.clearEndDate(val);
+    }
+
+    async toggleEnableRepeat() {
+        return this.form.toggleEnableRepeat();
     }
 
     async changeIntervalType(val) {
