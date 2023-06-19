@@ -1,7 +1,8 @@
 import { createElement } from 'jezvejs';
-import { __, formatPersonDebts } from '../../../../utils/utils.js';
-import { App } from '../../../../Application/App.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { __, formatPersonDebts, getApplicationURL } from '../../../../utils/utils.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
@@ -57,10 +58,7 @@ export class PersonDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by person */
     getTransactionsListURL(item) {
-        const { baseURL } = App;
-        const res = new URL(`${baseURL}transactions/`);
-        res.searchParams.set('person_id', item.id);
-        return res;
+        return getApplicationURL('transactions/', { persons: [item.id] });
     }
 
     /**

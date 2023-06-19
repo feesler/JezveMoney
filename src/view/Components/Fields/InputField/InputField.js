@@ -1,7 +1,7 @@
 import { createElement, getClassNames, setProps } from 'jezvejs';
 import { Input } from 'jezvejs/Input';
 
-import { App } from '../../Application/App.js';
+import { App } from '../../../Application/App.js';
 import { Field } from '../Field/Field.js';
 import './InputField.scss';
 

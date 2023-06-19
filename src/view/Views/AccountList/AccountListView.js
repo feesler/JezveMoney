@@ -20,6 +20,7 @@ import {
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
     __,
+    getApplicationURL,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -580,9 +581,8 @@ class AccountListView extends View {
 
     /** Returns URL for specified state */
     getURL(state) {
-        const { baseURL } = App;
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return new URL(`${baseURL}accounts/${itemPart}`);
+        return getApplicationURL(`accounts/${itemPart}`);
     }
 
     renderHistory(state, prevState) {

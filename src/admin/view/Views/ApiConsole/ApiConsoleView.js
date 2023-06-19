@@ -17,7 +17,7 @@ import '../../utils/AdminView/AdminView.scss';
 import { AdminView } from '../../utils/AdminView/AdminView.js';
 
 import { Heading } from '../../../../view/Components/Heading/Heading.js';
-import { InputField } from '../../../../view/Components/InputField/InputField.js';
+import { InputField } from '../../../../view/Components/Fields/InputField/InputField.js';
 
 import { ApiRequest } from './components/ApiRequest/ApiRequest.js';
 import { ControllersMenu } from './components/ControllersMenu/ControllersMenu.js';

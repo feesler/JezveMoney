@@ -1,13 +1,13 @@
 import { createElement } from 'jezvejs';
 import { LinkMenu } from 'jezvejs/LinkMenu';
-import { __ } from '../../utils/utils.js';
+import { __ } from '../../../utils/utils.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
     LIMIT_CHANGE,
-} from '../../Models/Transaction.js';
+} from '../../../Models/Transaction.js';
 
 const CONTAINER_CLASS = 'link-menu trtype-menu';
 

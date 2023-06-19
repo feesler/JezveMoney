@@ -1,5 +1,5 @@
 import { Checkbox } from 'jezvejs/Checkbox';
-import { InputField } from '../../../../../../../view/Components/InputField/InputField.js';
+import { InputField } from '../../../../../../../view/Components/Fields/InputField/InputField.js';
 
 const defaultProps = {
     disabled: true,

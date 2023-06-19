@@ -15,16 +15,20 @@ import {
     parseDate,
 } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
 import { transTypeMap, typeNames, ImportTransaction } from '../../../../Models/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
-import { AmountInputField } from '../../../../Components/AmountInputField/AmountInputField.js';
-import { CategorySelect } from '../../../../Components/CategorySelect/CategorySelect.js';
-import { DateInputField } from '../../../../Components/DateInputField/DateInputField.js';
-import { InputField } from '../../../../Components/InputField/InputField.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
+import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
+import { AmountInputField } from '../../../../Components/Fields/AmountInputField/AmountInputField.js';
+import { DateInputField } from '../../../../Components/Fields/DateInputField/DateInputField.js';
+import { CategorySelect } from '../../../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
+
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
-import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
+
 import './ImportTransactionForm.scss';
 
 /** CSS classes */

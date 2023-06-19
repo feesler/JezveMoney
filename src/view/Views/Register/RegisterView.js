@@ -6,9 +6,9 @@ import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 
-import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
-import { InputField } from '../../Components/InputField/InputField.js';
+import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
+import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
+import { InputField } from '../../Components/Fields/InputField/InputField.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';

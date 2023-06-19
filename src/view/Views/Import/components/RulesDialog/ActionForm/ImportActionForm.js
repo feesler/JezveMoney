@@ -12,6 +12,7 @@ import { Icon } from 'jezvejs/Icon';
 import { __ } from '../../../../../utils/utils.js';
 import { MAX_PRECISION } from '../../../../../utils/decimal.js';
 import { App } from '../../../../../Application/App.js';
+
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -19,7 +20,9 @@ import {
     IMPORT_ACTION_SET_PERSON,
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../../../Models/ImportAction.js';
-import { CategorySelect } from '../../../../../Components/CategorySelect/CategorySelect.js';
+
+import { CategorySelect } from '../../../../../Components/Inputs/CategorySelect/CategorySelect.js';
+
 import './ImportActionForm.scss';
 
 /** CSS classes */

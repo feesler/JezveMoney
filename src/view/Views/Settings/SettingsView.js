@@ -11,24 +11,24 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 import { __ } from '../../utils/utils.js';
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
 
+import { CurrencyList } from '../../Models/CurrencyList.js';
+import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
-import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
-import { DateFormatSelect } from '../../Components/DateFormatSelect/DateFormatSelect.js';
+import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
+import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
+import { DateFormatSelect } from '../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { LocaleSelectField } from '../../Components/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitchField } from '../../Components/ThemeSwitchField/ThemeSwitchField.js';
-import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
+
+import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
+import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
-import '../../Components/Heading/Heading.scss';
-import '../../Components/Field/Field.scss';
 import '../../Application/Application.scss';
 import './SettingsView.scss';
 

@@ -22,6 +22,7 @@ import {
     dateStringToTime,
     formatDateRange,
     formatNumberShort,
+    getApplicationURL,
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
@@ -34,10 +35,10 @@ import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { DateRangeSelector } from '../../Components/Inputs/Date/DateRangeSelector/DateRangeSelector.js';
+import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 
@@ -340,21 +341,7 @@ class StatisticsView extends View {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state) {
-        const { baseURL } = App;
-        const { filter } = state;
-        const res = new URL(`${baseURL}statistics/`);
-
-        Object.keys(filter).forEach((prop) => {
-            const value = filter[prop];
-            if (Array.isArray(value)) {
-                const arrProp = `${prop}[]`;
-                value.forEach((item) => res.searchParams.append(arrProp, item));
-            } else {
-                res.searchParams.set(prop, value);
-            }
-        });
-
-        return res;
+        return getApplicationURL('statistics/', { ...state.filter });
     }
 
     /**

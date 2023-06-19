@@ -9,6 +9,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
+
 import {
     EXPENSE,
     INCOME,
@@ -16,7 +17,9 @@ import {
     DEBT,
     LIMIT_CHANGE,
 } from '../../Models/Transaction.js';
-import { Field } from '../Field/Field.js';
+
+import { Field } from '../Fields/Field/Field.js';
+
 import './TransactionListItem.scss';
 
 /** CSS classes */

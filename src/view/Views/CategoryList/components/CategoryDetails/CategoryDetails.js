@@ -1,10 +1,12 @@
 import { createElement } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 
-import { __ } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
 import { Category } from '../../../../Models/Category.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
@@ -75,10 +77,7 @@ export class CategoryDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by category */
     getTransactionsListURL(item) {
-        const { baseURL } = App;
-        const res = new URL(`${baseURL}transactions/`);
-        res.searchParams.set('category_id', item.id);
-        return res;
+        return getApplicationURL('transactions/', { categories: [item.id] });
     }
 
     onToggleSubcategories(expanded) {

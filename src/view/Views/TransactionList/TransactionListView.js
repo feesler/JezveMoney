@@ -15,33 +15,37 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
+
 import {
     __,
     cutDate,
     dateStringToTime,
     formatDateRange,
+    getApplicationURL,
     getHalfYearRange,
     getMonthRange,
     getSelectedItems,
     getWeekRange,
     timeToDate,
 } from '../../utils/utils.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { API } from '../../API/index.js';
 import { View } from '../../utils/View.js';
+
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
+
+import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { DateRangeSelector } from '../../Components/Inputs/Date/DateRangeSelector/DateRangeSelector.js';
+import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
+import { SearchInput } from '../../Components/Inputs/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
@@ -51,9 +55,9 @@ import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategor
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
 import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';
+
 import { reducer, actions } from './reducer.js';
 import {
-    getBaseFilterURL,
     getTransactionsGroupByDate,
     isSameSelection,
 } from './helpers.js';
@@ -549,17 +553,18 @@ class TransactionListView extends View {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state, keepPage = true) {
-        const res = getBaseFilterURL('transactions/', state.filter);
+        const params = {
+            ...state.filter,
+        };
 
         if (keepPage) {
-            res.searchParams.set('page', state.pagination.page);
+            params.page = state.pagination.page;
         }
-
         if (state.mode === 'details') {
-            res.searchParams.set('mode', 'details');
+            params.mode = 'details';
         }
 
-        return res;
+        return getApplicationURL('transactions/', params);
     }
 
     /**
@@ -1020,9 +1025,8 @@ class TransactionListView extends View {
             return;
         }
 
-        const { baseURL } = App;
         const url = (state.detailsId)
-            ? new URL(`${baseURL}transactions/${state.detailsId}`)
+            ? getApplicationURL(`transactions/${state.detailsId}`)
             : this.getFilterURL(state);
 
         const pageTitle = `${__('appName')} | ${__('transactions.listTitle')}`;

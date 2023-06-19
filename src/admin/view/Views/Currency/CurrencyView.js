@@ -1,10 +1,13 @@
 import 'jezvejs/style';
 import { ge, createElement, hasFlag } from 'jezvejs';
+
 import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
-import { CURRENCY_SIGN_BEFORE_VALUE, CURRENCY_FORMAT_TRAILING_ZEROS } from '../../../../view/Models/Currency.js';
 import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
-import '../../../../view/Components/Field/Field.scss';
+
+import { CURRENCY_SIGN_BEFORE_VALUE, CURRENCY_FORMAT_TRAILING_ZEROS } from '../../../../view/Models/Currency.js';
+
+import '../../../../view/Components/Fields/Field/Field.scss';
 import '../../../../view/Application/Application.scss';
 import '../../utils/AdminView/AdminView.scss';
 

@@ -19,6 +19,22 @@ export const SORT_BY_NAME_ASC = 3;
 export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
 
+/** Returns URL instance for specified path and search params */
+export const getApplicationURL = (path, params = {}) => {
+    const res = new URL(`${App.baseURL}${path}`);
+
+    Object.entries(params ?? {}).forEach(([prop, value]) => {
+        if (Array.isArray(value)) {
+            const arrProp = `${prop}[]`;
+            value.forEach((item) => res.searchParams.append(arrProp, item));
+        } else {
+            res.searchParams.set(prop, value);
+        }
+    });
+
+    return res;
+};
+
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
     const entries = document.cookie.split(';');
