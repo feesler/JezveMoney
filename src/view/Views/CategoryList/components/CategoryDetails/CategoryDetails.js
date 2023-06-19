@@ -3,8 +3,10 @@ import { Collapsible } from 'jezvejs/Collapsible';
 
 import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
 import { Category } from '../../../../Models/Category.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
 /** CSS classes */

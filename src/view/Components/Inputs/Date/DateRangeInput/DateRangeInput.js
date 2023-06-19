@@ -6,8 +6,8 @@ import {
 } from 'jezvejs';
 import { DatePicker } from 'jezvejs/DatePicker';
 
-import { parseDate, __, timeToDate } from '../../utils/utils.js';
-import { App } from '../../Application/App.js';
+import { parseDate, __, timeToDate } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
 import './DateRangeInput.scss';
 

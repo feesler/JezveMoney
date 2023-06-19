@@ -1,9 +1,9 @@
 import { getClassNames } from 'jezvejs';
 import { Switch } from 'jezvejs/Switch';
 
-import { __ } from '../../utils/utils.js';
-import { DARK_THEME } from '../../Application/Application.js';
-import { App } from '../../Application/App.js';
+import { __ } from '../../../utils/utils.js';
+import { DARK_THEME } from '../../../Application/Application.js';
+import { App } from '../../../Application/App.js';
 import { Field } from '../Field/Field.js';
 
 /* CSS classes */

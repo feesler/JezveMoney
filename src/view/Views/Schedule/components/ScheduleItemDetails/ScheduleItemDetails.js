@@ -4,7 +4,7 @@ import { App } from '../../../../Application/App.js';
 import { Transaction } from '../../../../Models/Transaction.js';
 import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
 
-import { Field } from '../../../../Components/Field/Field.js';
+import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
 /** CSS classes */

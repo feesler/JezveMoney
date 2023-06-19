@@ -5,11 +5,14 @@ import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
 import { ImportTransaction, typeNames } from '../../../../Models/ImportTransaction.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
+
 import './ImportTransactionItem.scss';
 
 /** CSS classes */

@@ -1,8 +1,9 @@
 import { createElement, Component, asArray } from 'jezvejs';
-import { OptionalInputField } from '../../../Fields/OptionalInputField/OptionalInputField.js';
+
+import { InputField } from '../../../../../../../../view/Components/Fields/InputField/InputField.js';
 import { FormControls } from '../../../../../../../../view/Components/FormControls/FormControls.js';
+import { OptionalInputField } from '../../../Fields/OptionalInputField/OptionalInputField.js';
 import { ReturnStateField } from '../../../Fields/ReturnStateField/ReturnStateField.js';
-import { InputField } from '../../../../../../../../view/Components/InputField/InputField.js';
 
 /* CSS classes */
 const CONTAINER_CLASS = 'request-data-form';

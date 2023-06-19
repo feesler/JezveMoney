@@ -35,10 +35,10 @@ import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
-import { DateRangeSelector } from '../../Components/DateRangeSelector/DateRangeSelector.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { DateRangeSelector } from '../../Components/Inputs/Date/DateRangeSelector/DateRangeSelector.js';
+import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 

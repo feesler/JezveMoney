@@ -8,15 +8,19 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
+
 import { PersonList } from '../../Models/PersonList.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { InputField } from '../../Components/InputField/InputField.js';
+import { InputField } from '../../Components/Fields/InputField/InputField.js';
+
 import { actions, reducer } from './reducer.js';
 import './PersonView.scss';
 

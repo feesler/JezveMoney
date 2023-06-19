@@ -9,8 +9,9 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 
-import { Field } from '../Field/Field.js';
+import { Field } from '../Fields/Field/Field.js';
 import { Heading } from '../Heading/Heading.js';
+
 import './ItemDetails.scss';
 
 /** CSS classes */

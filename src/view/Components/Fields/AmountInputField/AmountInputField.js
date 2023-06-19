@@ -4,8 +4,8 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
 
-import { __ } from '../../utils/utils.js';
-import { App } from '../../Application/App.js';
+import { __ } from '../../../utils/utils.js';
+import { App } from '../../../Application/App.js';
 import { Field } from '../Field/Field.js';
 
 const defaultProps = {

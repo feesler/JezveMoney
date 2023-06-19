@@ -2,10 +2,13 @@ import {
     isFunction,
     Component,
 } from 'jezvejs';
-import { CategorySelect } from '../CategorySelect/CategorySelect.js';
-import { Field } from '../Field/Field.js';
-import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+
 import { __ } from '../../utils/utils.js';
+
+import { Field } from '../Fields/Field/Field.js';
+import { CategorySelect } from '../Inputs/CategorySelect/CategorySelect.js';
+import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+
 import './SetCategoryDialog.scss';
 
 const defaultProps = {

@@ -1,18 +1,21 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { View } from '../../utils/View.js';
 import { API } from '../../API/index.js';
+
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ChangeNameDialog } from './components/ChangeNameDialog/ChangeNameDialog.js';
 import { ChangePasswordDialog } from './components/ChangePasswordDialog/ChangePasswordDialog.js';
 import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js';
+
 import { actions, reducer } from './reducer.js';
 import '../../Components/Heading/Heading.scss';
-import '../../Components/Field/Field.scss';
+import '../../Components/Fields/Field/Field.scss';
 import '../../Application/Application.scss';
 import './ProfileView.scss';
 

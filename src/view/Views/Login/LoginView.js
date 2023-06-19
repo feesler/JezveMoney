@@ -2,15 +2,18 @@ import 'jezvejs/style';
 import { createElement } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { createStore } from 'jezvejs/Store';
+
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
 import { __, parseCookies, setCookie } from '../../utils/utils.js';
-import { InputField } from '../../Components/InputField/InputField.js';
+
+import { Field } from '../../Components/Fields/Field/Field.js';
+import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+
 import { actions, reducer } from './reducer.js';
 import './LoginView.scss';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
-import { Field } from '../../Components/Field/Field.js';
 
 /**
  * User log in view

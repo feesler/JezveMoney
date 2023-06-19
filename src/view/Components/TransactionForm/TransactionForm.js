@@ -24,6 +24,7 @@ import {
 } from '../../utils/utils.js';
 import { EXCHANGE_PRECISION, normalizeExch } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
+
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
 import {
     EXPENSE,
@@ -40,17 +41,19 @@ import {
     INTERVAL_YEAR,
 } from '../../Models/ScheduledTransaction.js';
 
-import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
-import { AccountTile } from '../AccountTile/AccountTile.js';
-import { AmountInputField } from '../AmountInputField/AmountInputField.js';
-import { CategorySelect } from '../CategorySelect/CategorySelect.js';
-import { DateInputField } from '../DateInputField/DateInputField.js';
-import { InputField } from '../InputField/InputField.js';
-import { DateRangeInput } from '../DateRangeInput/DateRangeInput.js';
-import { Field } from '../Field/Field.js';
+import { Field } from '../Fields/Field/Field.js';
+import { InputField } from '../Fields/InputField/InputField.js';
+import { AmountInputField } from '../Fields/AmountInputField/AmountInputField.js';
+import { DateInputField } from '../Fields/DateInputField/DateInputField.js';
+import { DateRangeInput } from '../Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu/TransactionTypeMenu.js';
+import { CategorySelect } from '../Inputs/CategorySelect/CategorySelect.js';
 import { Tile } from '../Tile/Tile.js';
+import { AccountTile } from '../AccountTile/AccountTile.js';
+
+import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
-import { TransactionTypeMenu } from '../TransactionTypeMenu/TransactionTypeMenu.js';
+
 import {
     actions,
     reducer,

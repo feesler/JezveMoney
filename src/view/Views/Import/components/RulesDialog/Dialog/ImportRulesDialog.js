@@ -16,7 +16,7 @@ import { API } from '../../../../../API/index.js';
 
 import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
-import { SearchInput } from '../../../../../Components/SearchInput/SearchInput.js';
+import { SearchInput } from '../../../../../Components/Inputs/SearchInput/SearchInput.js';
 import { RuleListContextMenu } from '../ContextMenu/RuleListContextMenu.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';

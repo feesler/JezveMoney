@@ -1,5 +1,6 @@
 import { asArray, createElement } from 'jezvejs';
-import { InputField } from '../../../../../../../../view/Components/InputField/InputField.js';
+
+import { InputField } from '../../../../../../../../view/Components/Fields/InputField/InputField.js';
 import { ReturnStateField } from '../../../Fields/ReturnStateField/ReturnStateField.js';
 import { ApiRequestForm } from '../ApiRequestForm/ApiRequestForm.js';
 

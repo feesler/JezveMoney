@@ -1,10 +1,10 @@
 import { createElement } from 'jezvejs';
 import { DatePicker } from 'jezvejs/DatePicker';
 
-import { __, timeToDate } from '../../utils/utils.js';
-import { App } from '../../Application/App.js';
+import { __, timeToDate } from '../../../utils/utils.js';
+import { App } from '../../../Application/App.js';
 import { Field } from '../Field/Field.js';
-import { DateInputGroup } from '../DateInputGroup/DateInputGroup.js';
+import { DateInputGroup } from '../../Inputs/Date/DateInputGroup/DateInputGroup.js';
 
 const defaultProps = {
     locales: [],

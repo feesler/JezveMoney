@@ -26,10 +26,10 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { AmountInputField } from '../../Components/AmountInputField/AmountInputField.js';
+import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { AmountInputField } from '../../Components/Fields/AmountInputField/AmountInputField.js';
+import { IconSelect } from '../../Components/Inputs/IconSelect/IconSelect.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconSelect } from '../../Components/IconSelect/IconSelect.js';
-import { InputField } from '../../Components/InputField/InputField.js';
 
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';

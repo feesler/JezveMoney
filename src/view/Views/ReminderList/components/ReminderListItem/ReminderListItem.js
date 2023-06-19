@@ -6,7 +6,10 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
+
 import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
+
 import {
     EXPENSE,
     INCOME,
@@ -15,9 +18,10 @@ import {
     LIMIT_CHANGE,
 } from '../../../../Models/Transaction.js';
 import { Reminder } from '../../../../Models/Reminder.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
+
 import './ReminderListItem.scss';
-import { App } from '../../../../Application/App.js';
 
 /** CSS classes */
 const ITEM_CLASS = 'reminder-item';

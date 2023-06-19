@@ -17,7 +17,9 @@ import {
     LIMIT_CHANGE,
 } from '../../../../Models/Transaction.js';
 import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
-import { Field } from '../../../../Components/Field/Field.js';
+
+import { Field } from '../../../../Components/Fields/Field/Field.js';
+
 import './ScheduleListItem.scss';
 
 /** CSS classes */

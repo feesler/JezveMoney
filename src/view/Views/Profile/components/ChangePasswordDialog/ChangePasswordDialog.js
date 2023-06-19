@@ -1,7 +1,7 @@
 import { ge } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
-import { InputField } from '../../../../Components/InputField/InputField.js';
+import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /** CSS classes */

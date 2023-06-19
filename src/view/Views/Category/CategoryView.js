@@ -10,19 +10,22 @@ import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { View } from '../../utils/View.js';
+
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
-import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
+import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { InputField } from '../../Components/Fields/InputField/InputField.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { InputField } from '../../Components/InputField/InputField.js';
+
 import { actions, reducer } from './reducer.js';
-import '../../Components/Field/Field.scss';
 import './CategoryView.scss';
 
 /**

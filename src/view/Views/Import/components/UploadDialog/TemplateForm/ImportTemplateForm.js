@@ -13,10 +13,13 @@ import { Switch } from 'jezvejs/Switch';
 
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
+
 import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTemplate.js';
-import { DateFormatSelect } from '../../../../../Components/DateFormatSelect/DateFormatSelect.js';
-import { InputField } from '../../../../../Components/InputField/InputField.js';
+
+import { DateFormatSelect } from '../../../../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
+import { InputField } from '../../../../../Components/Fields/InputField/InputField.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
+
 import './ImportTemplateForm.scss';
 
 /** CSS classes */
