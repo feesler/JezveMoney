@@ -46,6 +46,7 @@ import {
     INTERVAL_WEEK,
     INTERVAL_YEAR,
     ScheduledTransaction,
+    getIntervalOffset,
 } from '../../../model/ScheduledTransaction.js';
 import { DatePickerFilter } from '../DatePickerFilter.js';
 
@@ -2040,8 +2041,7 @@ export class TransactionForm extends TestComponent {
         assert.notEqual(this.model.intervalType, type, `Interval type is already '${typeName}'`);
 
         this.model.intervalType = type;
-
-        this.model.intervalOffset = 0;
+        this.model.intervalOffset = getIntervalOffset(App.dates.now, type);
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.intervalTypeSelect.setSelection(val));

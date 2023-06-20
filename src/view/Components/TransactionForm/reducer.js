@@ -1,4 +1,4 @@
-import { asArray, isObject } from 'jezvejs';
+import { asArray, isObject, shiftDate } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 
 import { dateStringToTime } from '../../utils/utils.js';
@@ -17,9 +17,31 @@ import {
 } from '../../Models/Transaction.js';
 import * as STATE from './stateId.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../Models/Account.js';
-import { INTERVAL_NONE } from '../../Models/ScheduledTransaction.js';
+import {
+    INTERVAL_NONE,
+    INTERVAL_WEEK,
+    INTERVAL_MONTH,
+    INTERVAL_YEAR,
+} from '../../Models/ScheduledTransaction.js';
 
 // Tools
+
+/** Returns interval offset for specified date */
+const getIntervalOffset = (date, type) => {
+    const utcDate = shiftDate(date, 0);
+
+    if (type === INTERVAL_WEEK) {
+        return utcDate.getDay();
+    }
+    if (type === INTERVAL_MONTH) {
+        return utcDate.getDate() - 1;
+    }
+    if (type === INTERVAL_YEAR) {
+        return (utcDate.getMonth() * 100) + utcDate.getDate() - 1;
+    }
+
+    return 0;
+};
 
 /** Calculate source result balance */
 export const calculateSourceResult = (state) => {
@@ -1181,26 +1203,24 @@ const slice = createSlice({
     },
 
     intervalTypeChange: (state, value) => {
-        const type = parseInt(value, 10);
+        const intervalType = parseInt(value, 10);
+        const intervalOffset = getIntervalOffset(new Date(), intervalType);
+
         const newState = {
             ...state,
             form: {
                 ...state.form,
-                intervalType: type,
-                intervalOffset: 0,
+                intervalType,
+                intervalOffset,
             },
             transaction: {
                 ...state.transaction,
-                interval_type: type,
-                interval_offset: 0,
+                interval_type: intervalType,
+                interval_offset: intervalOffset,
             },
         };
 
-        if (type === INTERVAL_NONE) {
-            newState.form.endDate = '';
-            newState.transaction.end_date = null;
-            newState.transaction.interval_step = 0;
-        } else if (state.transaction.interval_step === 0) {
+        if (state.transaction.interval_step === 0) {
             newState.transaction.interval_step = parseInt(state.form.intervalStep, 10);
         }
 
