@@ -70,14 +70,16 @@
 .weekday-select,
 .weekday-select[multiple] {
   --wds-item-size: 2rem;
-  --link-menu-border-width: 1px;
-  --link-menu-border-color: var(--accent-color);
+  --link-menu-border-width: 0;
   --link-menu-color: var(--accent-color);
+  --link-menu-bg: var(--alt-bg-color);
+  --link-menu-active-bg: var(--accent-active-color);
+  --link-menu-active-color: #ffffff;
   --link-menu-selected-color: #ffffff;
   --link-menu-selected-bg: var(--accent-color);
   --link-menu-hover-color: #ffffff;
   --link-menu-hover-bg: var(--accent-color);
-  --link-menu-disabled-border-color: var(--link-menu-disabled-color);
+  --link-menu-disabled-bg: var(--link-menu-disabled-color);
 
   justify-content: space-between;
 
