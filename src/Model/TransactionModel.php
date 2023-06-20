@@ -68,6 +68,8 @@ class TransactionModel extends SortableModel
     protected $affectedTransactions = null;
     protected $balanceChanges = null;
     protected $confirmReminders = null;
+    protected $requestedItems = null;
+    protected $scheduleIds = null;
     protected $removedItems = null;
     protected $originalTrans = null;
 
@@ -357,6 +359,20 @@ class TransactionModel extends SortableModel
         $res["category_id"] = $params["category_id"];
         $res["comment"] = $params["comment"];
 
+        $scheduleParams = [
+            "start_date",
+            "end_date",
+            "interval_type",
+            "interval_step",
+            "interval_offset",
+        ];
+
+        foreach ($scheduleParams as $paramName) {
+            if (array_key_exists($paramName, $params)) {
+                $res[$paramName] = $params[$paramName];
+            }
+        }
+
         return $res;
     }
 
@@ -497,6 +513,13 @@ class TransactionModel extends SortableModel
         $reminderId = (isset($params["reminder_id"])) ? intval($params["reminder_id"]) : 0;
         $this->confirmReminders[] = $reminderId;
 
+        if (is_null($this->requestedItems)) {
+            $this->requestedItems = [];
+        }
+
+        $intervalType = isset($params["interval_type"]) ? intval($params["interval_type"]) : 0;
+        $this->requestedItems[] = ($intervalType === 0) ? null : $params;
+
         $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
         $res["src_result"] = ($res["src_id"] != 0)
@@ -527,8 +550,10 @@ class TransactionModel extends SortableModel
         // Commit balance changes for affected accounts
         $this->accModel->updateBalances($this->balanceChanges);
         $this->balanceChanges = null;
+        $this->scheduleIds = [];
 
         $reminderModel = ReminderModel::getInstance();
+        $scheduleModel = ScheduledTransactionModel::getInstance();
 
         foreach ($items as $item_id) {
             $trObj = $this->getItem($item_id);
@@ -536,12 +561,24 @@ class TransactionModel extends SortableModel
                 return false;
             }
 
+            $reminderId = 0;
             if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
                 $reminderId = array_shift($this->confirmReminders);
                 if ($reminderId !== 0) {
                     $reminderModel->confirm($reminderId, [
                         "transaction_id" => $item_id,
                     ]);
+                }
+            }
+
+            if (is_array($this->requestedItems) && count($this->requestedItems) > 0) {
+                $scheduleItemParams = array_shift($this->requestedItems);
+                $scheduleId = (!is_null($scheduleItemParams) && $reminderId === 0)
+                    ? $scheduleModel->create($scheduleItemParams)
+                    : 0;
+
+                if ($scheduleId !== 0) {
+                    $this->scheduleIds[] = $scheduleId;
                 }
             }
 
@@ -553,10 +590,21 @@ class TransactionModel extends SortableModel
         }
 
         $this->confirmReminders = null;
+        $this->requestedItems = null;
 
         $this->commitAffected();
 
         return true;
+    }
+
+    /**
+     * Returns array of created scheduled transaction ids
+     *
+     * @return array
+     */
+    public function getScheduledTransactionIds()
+    {
+        return $this->scheduleIds;
     }
 
     /**

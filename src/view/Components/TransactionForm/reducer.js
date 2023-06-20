@@ -1154,7 +1154,8 @@ const slice = createSlice({
     }),
 
     enableRepeat: (state, value) => {
-        const isRepeatEnabled = state.transaction.interval_type !== INTERVAL_NONE;
+        const trIntervalType = state.transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeatEnabled = trIntervalType !== INTERVAL_NONE;
         if (value === isRepeatEnabled) {
             return state;
         }
@@ -1170,6 +1171,7 @@ const slice = createSlice({
             ...state,
             transaction: {
                 ...state.transaction,
+                start_date: dateStringToTime(state.form.startDate),
                 end_date: endDate,
                 interval_type: intervalType,
                 interval_offset: intervalOffset,

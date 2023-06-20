@@ -21,7 +21,12 @@ class Transaction extends ApiSortableListController
         "dest_curr",
         "date",
         "category_id",
-        "comment"
+        "comment",
+        "start_date",
+        "end_date",
+        "interval_type",
+        "interval_step",
+        "interval_offset",
     ];
     protected $debtRequiredFields = [
         "type",
@@ -34,11 +39,21 @@ class Transaction extends ApiSortableListController
         "dest_curr",
         "date",
         "category_id",
-        "comment"
+        "comment",
+        "start_date",
+        "end_date",
+        "interval_type",
+        "interval_step",
+        "interval_offset",
     ];
     protected $defaultValues = [
         "category_id" => 0,
         "comment" => "",
+        "start_date" => null,
+        "end_date" => null,
+        "interval_type" => 0,
+        "interval_step" => 0,
+        "interval_offset" => [],
     ];
 
     /**
@@ -99,6 +114,30 @@ class Transaction extends ApiSortableListController
         } else {
             return $request;
         }
+    }
+
+    /**
+     * Performs controller-specific actions after new item successfully created
+     *
+     * @param int|int[]|null $item_id id or array of created item ids
+     * @param array $request create request data
+     *
+     * @return mixed
+     */
+    protected function postCreate(mixed $item_id, array $request)
+    {
+        $result = parent::postCreate($item_id, $request);
+
+        $scheduleResult = $this->model->getScheduledTransactionIds();
+        if (is_array($scheduleResult) && count($scheduleResult) > 0) {
+            if (is_array($item_id)) {
+                $result["schedule_ids"] = $scheduleResult;
+            } else {
+                $result["schedule_id"] = $scheduleResult[0];
+            }
+        }
+
+        return $result;
     }
 
     /**

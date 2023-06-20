@@ -65,6 +65,11 @@ const create = async () => {
             src_id: ACC_RUB,
             src_amount: 456,
             date: dateToSeconds(weekDate2),
+            interval_type: 3,
+            interval_step: 1,
+            interval_offset: 0,
+            start_date: dateToSeconds(weekDate2),
+            end_date: null,
         },
         TR_INCOME_1: {
             type: INCOME,
@@ -441,6 +446,97 @@ const createMultiple = async () => {
     });
 
     await Actions.extractAndCreateMultiple(data);
+};
+
+const createMultipleWithSchedule = async () => {
+    setBlock('Create multiple transactions with schedule', 2);
+
+    const {
+        RUB,
+        EUR,
+        ACC_RUB,
+        CASH_RUB,
+        ACC_USD,
+        PERSON_X,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = [{
+        data: [{
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 7608,
+            dest_amount: 100,
+            dest_curr: EUR,
+            date: App.datesSec.yesterday,
+            comment: 'multiple expense + schedule',
+            category_id: FOOD_CATEGORY,
+            interval_type: 3,
+            interval_step: 1,
+            interval_offset: 5,
+            start_date: App.datesSec.monthAgo,
+            end_date: null,
+        }, {
+            type: INCOME,
+            dest_id: ACC_USD,
+            src_amount: 6500,
+            dest_amount: 100,
+            src_curr: RUB,
+            comment: 'multiple income + schedule',
+            interval_type: 2,
+            interval_step: 1,
+            interval_offset: [1, 2],
+            start_date: App.datesSec.weekAgo,
+            end_date: null,
+        }, {
+            type: TRANSFER,
+            src_id: ACC_RUB,
+            dest_id: CASH_RUB,
+            src_amount: 500,
+            dest_amount: 500,
+            comment: 'multiple transfer + schedule',
+            interval_type: 1,
+            interval_step: 1,
+            interval_offset: 0,
+            start_date: App.datesSec.weekAgo,
+            end_date: App.datesSec.weekAfter,
+        }, {
+            type: DEBT,
+            op: 1,
+            person_id: PERSON_X,
+            acc_id: 0,
+            src_amount: 500,
+            src_curr: RUB,
+            comment: 'multiple debt + schedule',
+            interval_type: 2,
+            interval_step: 1,
+            interval_offset: 5,
+            start_date: App.datesSec.weekAgo,
+            end_date: null,
+        }],
+    }, {
+        data: [{
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 5000,
+            date: App.datesSec.monthAgo,
+            comment: 'multiple expense + no schedule',
+        }, {
+            type: INCOME,
+            dest_id: ACC_USD,
+            src_amount: 6500,
+            dest_amount: 100,
+            src_curr: RUB,
+            comment: 'multiple income + schedule',
+            interval_type: 3,
+            interval_step: 1,
+            interval_offset: 0,
+            start_date: App.datesSec.monthAgo,
+            end_date: null,
+        }],
+    }];
+
+    await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
 };
 
 const createMultipleWithChainedRequest = async () => {
@@ -1018,6 +1114,7 @@ export const apiTransactionsTests = {
         await createWithChainedRequest();
         await createInvalid();
         await createMultiple();
+        await createMultipleWithSchedule();
         await createMultipleWithChainedRequest();
         await createMultipleInvalid();
     },

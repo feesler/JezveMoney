@@ -161,7 +161,9 @@ export class TransactionForm extends TestComponent {
                     value: App.reformatDate(model.date),
                     isInvalid: model.dateInvalidated,
                 };
-            } else if (isScheduleItemForm) {
+            }
+
+            if (isScheduleItemForm || model.repeatEnabled) {
                 const { repeatEnabled } = model;
 
                 res.dateRangeInput = {
@@ -819,20 +821,20 @@ export class TransactionForm extends TestComponent {
 
         if (this.isTransactionForm()) {
             res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
-        } else if (this.isScheduleItemForm()) {
-            res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
-
-            res.repeatSwitch = await Switch.create(this, await query(this.elem, '#repeatSwitch'));
-
-            res.intervalStepRow = await InputRow.create(this, await query('#intervalStepRow'));
-            const intervalTypeSel = await query('.interval-type-select');
-            res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
-
-            res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
-            res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
-
-            res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
         }
+
+        res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
+
+        res.repeatSwitch = await Switch.create(this, await query(this.elem, '#repeatSwitch'));
+
+        res.intervalStepRow = await InputRow.create(this, await query('#intervalStepRow'));
+        const intervalTypeSel = await query('.interval-type-select');
+        res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
+
+        res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
+        res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
+
+        res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
 
         res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
@@ -1121,30 +1123,31 @@ export class TransactionForm extends TestComponent {
         if (this.isTransactionForm()) {
             res.date = cont.datePicker.value;
             res.dateInvalidated = cont.datePicker.isInvalid;
-        } else if (this.isScheduleItemForm()) {
-            res.repeatEnabled = cont.repeatSwitch.checked;
+        }
 
-            res.startDate = cont.dateRangeInput.value.startDate;
-            res.endDate = cont.dateRangeInput.value.endDate;
-            res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
+        // Schedule
+        res.repeatEnabled = cont.repeatSwitch.checked;
 
-            res.intervalStep = cont.intervalStepRow.value;
-            res.intervalStepInvalidated = cont.intervalStepRow.isInvalid;
+        res.startDate = cont.dateRangeInput.value.startDate;
+        res.endDate = cont.dateRangeInput.value.endDate;
+        res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
 
-            res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
+        res.intervalStep = cont.intervalStepRow.value;
+        res.intervalStepInvalidated = cont.intervalStepRow.isInvalid;
 
-            if (res.intervalType === INTERVAL_DAY) {
-                res.intervalOffset = 0;
-            } else if (res.intervalType === INTERVAL_WEEK) {
-                res.intervalOffset = cont.weekDayOffsetSelect.value;
-            } else if (res.intervalType === INTERVAL_MONTH) {
-                const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
-                res.intervalOffset = offset;
-            } else if (res.intervalType === INTERVAL_YEAR) {
-                const dayIndex = parseInt(cont.monthDayOffsetSelect.value, 10);
-                const monthIndex = parseInt(cont.monthOffsetSelect.value, 10);
-                res.intervalOffset = (monthIndex * 100) + dayIndex;
-            }
+        res.intervalType = parseInt(cont.intervalTypeSelect.value, 10);
+
+        if (res.intervalType === INTERVAL_DAY) {
+            res.intervalOffset = 0;
+        } else if (res.intervalType === INTERVAL_WEEK) {
+            res.intervalOffset = cont.weekDayOffsetSelect.value;
+        } else if (res.intervalType === INTERVAL_MONTH) {
+            const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
+            res.intervalOffset = offset;
+        } else if (res.intervalType === INTERVAL_YEAR) {
+            const dayIndex = parseInt(cont.monthDayOffsetSelect.value, 10);
+            const monthIndex = parseInt(cont.monthOffsetSelect.value, 10);
+            res.intervalOffset = (monthIndex * 100) + dayIndex;
         }
 
         res.categoryId = parseInt(cont.categorySelect.value, 10);
@@ -1186,7 +1189,9 @@ export class TransactionForm extends TestComponent {
             if (!this.isValidDate(this.model.date)) {
                 return false;
             }
-        } else if (this.isScheduleItemForm()) {
+        }
+
+        if (this.isScheduleItemForm() || this.model.repeatEnabled) {
             if (!this.isValidDate(this.model.startDate)) {
                 return false;
             }
@@ -1927,7 +1932,9 @@ export class TransactionForm extends TestComponent {
             this.model.dateInvalidated = !dateValid;
 
             isValid = isValid && dateValid;
-        } else if (this.isScheduleItemForm()) {
+        }
+
+        if (this.isScheduleItemForm() || this.model.repeatEnabled) {
             const { startDate, endDate, intervalStep } = this.model;
 
             const startDateValid = this.isValidDate(startDate);
@@ -2321,6 +2328,11 @@ export class TransactionForm extends TestComponent {
             );
         }
 
+        assert(
+            this.model.type !== LIMIT_CHANGE,
+            'Invalid state: can\'t input source amount at Credit limit transaction type',
+        );
+
         const { precision } = this.model.srcCurr;
         const cutVal = trimToDigitsLimit(val, precision);
         this.model.srcAmount = cutVal;
@@ -2427,15 +2439,20 @@ export class TransactionForm extends TestComponent {
     }
 
     async clickSrcResultBalance() {
-        assert(this.model.type !== INCOME, 'Unexpected action: can\'t click by source result balance');
+        const { type } = this.model;
 
-        if (this.model.type === EXPENSE) {
+        assert(
+            type !== INCOME && type !== LIMIT_CHANGE,
+            'Unexpected action: can\'t click by source result balance',
+        );
+
+        if (type === EXPENSE) {
             this.stateTransition(this.model, {
                 0: 1, // Transition 2
                 2: 4, // Transition 6
                 3: 4, // Transition 18
             });
-        } else if (this.model.type === TRANSFER) {
+        } else if (type === TRANSFER) {
             this.stateTransition(this.model, {
                 0: 1, // Transition 1
                 2: 1, // Transition 10
@@ -2443,7 +2460,7 @@ export class TransactionForm extends TestComponent {
                 5: 6, // Transition 19
                 7: 8, // Transition 22
             });
-        } else if (this.model.type === DEBT) {
+        } else if (type === DEBT) {
             this.stateTransition(this.model, {
                 0: 1, // Transition 1
                 2: 1, // Transition 4

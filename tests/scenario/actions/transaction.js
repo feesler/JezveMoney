@@ -23,6 +23,7 @@ import { generateId } from '../../common.js';
 import { __ } from '../../model/locale.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountsList.js';
 import { TransactionList } from '../../view/component/TransactionList/TransactionList.js';
+import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 
 export const decimalInputTestStrings = [
     '-',
@@ -49,6 +50,58 @@ export const runAction = async ({ action, data }) => {
     assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
     assert(App.view.isActionAvailable(action), 'Invalid action specified');
+
+    if (action === 'inputStartDate') {
+        testDescr = `Input schedule start date '${data}'`;
+    }
+
+    if (action === 'selectStartDate') {
+        testDescr = `Select schedule start date '${formatDate(data, { locales: App.view.locale })}'`;
+    }
+
+    if (action === 'inputEndDate') {
+        testDescr = `Input schedule end date '${data}'`;
+    }
+
+    if (action === 'selectEndDate') {
+        testDescr = `Select schedule end date '${formatDate(data, { locales: App.view.locale })}'`;
+    }
+
+    if (action === 'clearEndDate') {
+        testDescr = 'Clear schedule end date';
+    }
+
+    if (action === 'toggleEnableRepeat') {
+        const { repeatEnabled } = App.view.formModel;
+
+        testDescr = (repeatEnabled)
+            ? 'Disable transaction repeat'
+            : 'Enable transaction repeat';
+    }
+
+    if (action === 'changeIntervalType') {
+        const intervalType = parseInt(data, 10);
+        const type = ScheduledTransaction.intervalTypes[intervalType];
+        assert(type, `Invalid interval type: ${data}`);
+
+        testDescr = `Change schedule interval to '${type}'`;
+    }
+
+    if (action === 'inputIntervalStep') {
+        testDescr = `Input schedule interval step '${data}'`;
+    }
+
+    if (action === 'selectWeekDayOffset') {
+        testDescr = `Select schedule interval week day offset '${data}'`;
+    }
+
+    if (action === 'selectMonthDayOffset') {
+        testDescr = `Select schedule interval month day offset '${data}'`;
+    }
+
+    if (action === 'selectMonthOffset') {
+        testDescr = `Select schedule interval month offset '${data}'`;
+    }
 
     if (action === 'changeSrcAccount') {
         const userAccounts = App.state.getUserAccounts();

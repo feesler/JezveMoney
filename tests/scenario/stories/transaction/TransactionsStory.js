@@ -18,6 +18,7 @@ import * as creditLimitActions from './creditLimit.js';
 import * as accountActions from '../../actions/account.js';
 import { testLocales } from '../../actions/locale.js';
 import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
+import { INTERVAL_DAY, INTERVAL_WEEK } from '../../../model/ScheduledTransaction.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
@@ -130,6 +131,13 @@ export class TransactionsStory extends TestStory {
             { action: 'selectDate', data: App.dates.monthAgo },
         ]);
 
+        // Check create transaction with schedule
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '1000' },
+            { action: 'toggleEnableRepeat' },
+            { action: 'selectDate', data: App.dates.weekAgo },
+        ]);
+
         // Check create transaction with hidden account
         await Actions.createFromAccountAndSubmit(0, [
             { action: 'changeSrcAccount', data: HIDDEN_ACC },
@@ -217,6 +225,17 @@ export class TransactionsStory extends TestStory {
             { action: 'changeDestAccount', data: CARD_RUB },
             { action: 'inputSrcAmount', data: '99.99' },
             { action: 'selectDate', data: App.dates.monthAgo },
+        ]);
+
+        // Check create transaction with schedule
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '10000' },
+            { action: 'toggleEnableRepeat' },
+            { action: 'selectDate', data: App.dates.monthAgo },
+            { action: 'selectEndDate', data: App.dates.yearAfter },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekDayOffset', data: 4 },
         ]);
 
         // Check create transaction with hidden account
@@ -319,6 +338,16 @@ export class TransactionsStory extends TestStory {
             { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '10' },
             { action: 'inputDestAmount', data: '9.50' },
+        ]);
+
+        // Check create transaction with schedule
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'inputSrcAmount', data: '1000' },
+            { action: 'toggleEnableRepeat' },
+            { action: 'selectDate', data: App.dates.weekAgo },
+            { action: 'selectEndDate', data: App.dates.weekAfter },
+            { action: 'changeIntervalType', data: INTERVAL_DAY },
         ]);
 
         // Check create transaction with hidden account
@@ -458,6 +487,14 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '22.75' },
         ]);
 
+        // Check create transaction with schedule
+        await Actions.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '1000' },
+            { action: 'toggleEnableRepeat' },
+            { action: 'selectDate', data: App.dates.monthAgo },
+            { action: 'selectStartDate', data: App.dates.monthAgo },
+        ]);
+
         // Check create transaction with hidden person
         await Actions.createFromPersonAndSubmit(0, [
             { action: 'changePerson', data: HIDDEN_PERSON },
@@ -529,6 +566,13 @@ export class TransactionsStory extends TestStory {
         await Actions.createFromAccountAndSubmit(index, [
             { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'inputDestAmount', data: '-5000' },
+        ]);
+
+        // Check create transaction with schedule
+        await Actions.createFromAccountAndSubmit(index, [
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
+            { action: 'inputDestAmount', data: '1000' },
+            { action: 'toggleEnableRepeat' },
         ]);
     }
 
@@ -731,13 +775,13 @@ export class TransactionsStory extends TestStory {
 
         const { MARIA } = App.scenario;
 
-        await Actions.updateFromMainViewAndSubmit(2, [
+        await Actions.updateFromMainViewAndSubmit(3, [
             { action: 'changePerson', data: MARIA },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
         await Actions.updateFromMainViewAndSubmit(4, [
-            { action: 'inputSrcAmount', data: '555' },
+            { action: 'inputDestAmount', data: '555' },
             { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
         ]);
     }

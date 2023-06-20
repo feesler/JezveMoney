@@ -159,6 +159,12 @@ export class TransactionForm extends Component {
             initialState.form.intervalOffset = transaction.interval_offset;
         } else {
             initialState.form.date = App.formatInputDate(transaction.date);
+
+            initialState.form.startDate = App.formatInputDate(transaction.date);
+            initialState.form.endDate = '';
+            initialState.form.intervalStep = 1;
+            initialState.form.intervalType = INTERVAL_MONTH;
+            initialState.form.intervalOffset = 0;
         }
 
         if (transaction.type === EXPENSE) {
@@ -474,10 +480,8 @@ export class TransactionForm extends Component {
         children.push(this.categoryRow.elem, this.commentRow.elem);
 
         // Schedule fields
-        if (this.props.type === 'scheduleItem') {
-            const fields = this.createScheduleFields();
-            children.push(...fields);
-        }
+        const scheduleFields = this.createScheduleFields();
+        children.push(...scheduleFields);
 
         // Controls
         this.submitBtn = Button.create({
@@ -1258,7 +1262,10 @@ export class TransactionForm extends Component {
 
         if (type === 'transaction') {
             res.date = transaction.date;
-        } else if (type === 'scheduleItem') {
+        }
+
+        const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
+        if (type === 'scheduleItem' || trIntervalType !== INTERVAL_NONE) {
             res.start_date = transaction.start_date;
             res.end_date = transaction.end_date;
             res.interval_type = transaction.interval_type;
@@ -1735,13 +1742,11 @@ export class TransactionForm extends Component {
     }
 
     renderScheduleFields(state, prevState) {
-        if (state?.type !== 'scheduleItem') {
-            return;
-        }
-
+        const isScheduleItem = (state.type === 'scheduleItem');
         const { transaction, form, validation } = state;
         const { intervalType, intervalOffset } = form;
-        const isRepeat = (transaction.interval_type !== INTERVAL_NONE);
+        const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = trIntervalType !== INTERVAL_NONE;
 
         // Date range field
         if (
@@ -1773,11 +1778,9 @@ export class TransactionForm extends Component {
                 disabled: state.submitStarted,
                 endVisible: isRepeat,
             }));
-        }
 
-        // Repeat transaction switch field
-        this.repeatSwitch.check(isRepeat);
-        this.repeatSwitch.enable(!state.submitStarted);
+            this.dateRangeInput.show(isScheduleItem || isRepeat);
+        }
 
         // Interval type and step fields group
         show(this.intervalFieldsGroup, isRepeat);
@@ -1796,7 +1799,7 @@ export class TransactionForm extends Component {
         const isWeekInterval = (intervalType === INTERVAL_WEEK);
 
         this.weekDaySelect.enable(!state.submitStarted);
-        this.weekDayField.show(isWeekInterval);
+        this.weekDayField.show(isRepeat && isWeekInterval);
         if (isWeekInterval) {
             this.weekDaySelect.setSelection(intervalOffset);
         }
@@ -2063,10 +2066,14 @@ export class TransactionForm extends Component {
             disabled: state.submitStarted,
         }));
 
+        // 'Repeat transaction' Switch field
+        const intervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = (intervalType !== INTERVAL_NONE);
+        this.repeatSwitch.check(isRepeat);
+        this.repeatSwitch.enable(!state.submitStarted);
+
         // Schedule fields
-        if (isScheduleItem) {
-            this.renderScheduleFields(state, prevState);
-        }
+        this.renderScheduleFields(state, prevState);
 
         // Controls
         this.submitBtn.enable(!state.submitStarted);

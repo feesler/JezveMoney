@@ -4,6 +4,7 @@ import {
     query,
     prop,
     navigation,
+    asArray,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -110,6 +111,16 @@ export class TransactionView extends AppView {
             res.id = this.model.id;
         }
         const { form } = this.model;
+        const { repeatEnabled } = form;
+
+        if (repeatEnabled && !this.model.reminderId) {
+            res.start_date = App.dateStringToSeconds(form.startDate);
+            res.end_date = App.dateStringToSeconds(form.endDate);
+            res.interval_type = parseInt(form.intervalType, 10);
+            res.interval_step = parseInt(form.intervalStep, 10);
+            res.interval_offset = asArray(form.intervalOffset)
+                .map((item) => parseInt(item, 10));
+        }
 
         res.type = form.type;
         if (res.type === DEBT) {
@@ -178,6 +189,50 @@ export class TransactionView extends AppView {
 
     async cancel() {
         return this.form.cancel();
+    }
+
+    async inputStartDate(val) {
+        return this.form.inputStartDate(val);
+    }
+
+    async selectStartDate(val) {
+        return this.form.selectStartDate(val);
+    }
+
+    async inputEndDate(val) {
+        return this.form.inputEndDate(val);
+    }
+
+    async selectEndDate(val) {
+        return this.form.selectEndDate(val);
+    }
+
+    async clearEndDate(val) {
+        return this.form.clearEndDate(val);
+    }
+
+    async toggleEnableRepeat() {
+        return this.form.toggleEnableRepeat();
+    }
+
+    async changeIntervalType(val) {
+        return this.form.changeIntervalType(val);
+    }
+
+    async inputIntervalStep(val) {
+        return this.form.inputIntervalStep(val);
+    }
+
+    async selectWeekDayOffset(val) {
+        return this.form.selectWeekDayOffset(val);
+    }
+
+    async selectMonthDayOffset(val) {
+        return this.form.selectMonthDayOffset(val);
+    }
+
+    async selectMonthOffset(val) {
+        return this.form.selectMonthOffset(val);
     }
 
     async changeSrcAccount(val) {

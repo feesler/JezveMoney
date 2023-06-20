@@ -30,7 +30,7 @@ export const create = async (params) => {
 
     await test(descr, async () => {
         const resExpected = (isMultiple)
-            ? App.state.createMultiple('createTransaction', params)
+            ? App.state.createMultipleTransactions(params)
             : App.state.createTransaction(params);
 
         let createRes;
