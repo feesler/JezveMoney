@@ -1,9 +1,6 @@
 import {
     TestComponent,
-    queryAll,
-    prop,
-    click,
-    asyncMap,
+    evaluate,
 } from 'jezve-test';
 
 const navLinksMap = {
@@ -24,58 +21,73 @@ export class Navigation extends TestComponent {
             return {};
         }
 
-        const res = {};
+        const res = await evaluate((el, linksMap) => {
+            const content = {};
 
-        const navElems = await queryAll(this.elem, '.nav-item__link');
-        const navLinks = await asyncMap(navElems, async (elem) => ({
-            elem,
-            href: await prop(elem, 'href'),
-        }));
-        navLinks.forEach((link) => {
-            for (const name in navLinksMap) {
-                if (link.href.endsWith(navLinksMap[name])) {
-                    res[name] = link;
-                    break;
+            const menuItems = el.querySelectorAll('.nav-item__link');
+            menuItems.forEach((itemEl) => {
+                const menuItem = {
+                    url: itemEl.href,
+                    title: itemEl.textContent.trim(),
+                    visible: itemEl && !itemEl.hidden,
+                };
+
+                for (const name in linksMap) {
+                    if (itemEl.href.includes(linksMap[name])) {
+                        content[name] = menuItem;
+                        break;
+                    }
                 }
-            }
-        });
+            });
+
+            return content;
+        }, this.elem, navLinksMap);
 
         return res;
     }
 
+    async clickByMenuItem(menuPath) {
+        const itemPath = navLinksMap[menuPath];
+
+        return evaluate((el, path) => {
+            const itemEl = el.querySelector(`.nav-item__link[href*="${path}"]`);
+            return itemEl?.click();
+        }, this.elem, itemPath);
+    }
+
     async goToAccounts() {
-        await click(this.content.accountsLink.elem);
+        return this.clickByMenuItem('accountsLink');
     }
 
     async goToPersons() {
-        await click(this.content.personsLink.elem);
+        return this.clickByMenuItem('personsLink');
     }
 
     async goToCategories() {
-        await click(this.content.categoriesLink.elem);
+        return this.clickByMenuItem('categoriesLink');
     }
 
     async goToTransactions() {
-        await click(this.content.transactionsLink.elem);
+        return this.clickByMenuItem('transactionsLink');
     }
 
     async goToSchedule() {
-        await click(this.content.scheduleLink.elem);
+        return this.clickByMenuItem('scheduleLink');
     }
 
     async goToReminders() {
-        await click(this.content.remindersLink.elem);
+        return this.clickByMenuItem('remindersLink');
     }
 
     async goToStatistics() {
-        await click(this.content.statisticsLink.elem);
+        return this.clickByMenuItem('statisticsLink');
     }
 
     async goToImport() {
-        await click(this.content.importLink.elem);
+        return this.clickByMenuItem('importLink');
     }
 
     async goToAbout() {
-        await click(this.content.aboutLink.elem);
+        return this.clickByMenuItem('aboutLink');
     }
 }
