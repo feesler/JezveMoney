@@ -2,68 +2,61 @@ import {
     TestComponent,
     assert,
     query,
-    prop,
-    hasAttr,
-    hasClass,
     input,
     click,
-    closest,
+    evaluate,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 
 export class InputRow extends TestComponent {
     async parseContent() {
-        const res = {
-            labelEl: await query(this.elem, 'label'),
-        };
+        const valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
+        assert(valueInput, 'Input element not found');
 
-        assert(res.labelEl, 'Label element not found');
-        res.label = await prop(res.labelEl, 'textContent');
-
-        const datePickerContainer = await query(this.elem, '.calendar');
         const btn = await query(this.elem, '.input-group__btn');
-        if (datePickerContainer) {
+
+        const res = await evaluate((el, inputEl, btnEl) => {
+            const datePickerContainer = el.querySelector('.calendar');
+            const isDatePicker = !!datePickerContainer;
+            const isCurrActive = !!(!isDatePicker && btnEl && !btnEl?.disabled);
+
+            const btnTitleElem = (btnEl)
+                ? btnEl.querySelector('.input-group__btn-title')
+                : el.querySelector('.input-group__text-title');
+            const currSignElem = (btnTitleElem ?? btnEl);
+            const currSign = currSignElem?.textContent;
+
+            const validationElem = el.closest('.validation-block');
+            const validationEnabled = !!validationElem;
+            const isInvalid = validationElem?.classList?.contains('invalid-block');
+            const feedBackElem = validationElem?.querySelector('.invalid-feedback');
+            const feedbackText = feedBackElem?.textContent;
+
+            return {
+                label: el.querySelector('label')?.textContent,
+                value: inputEl.value,
+                validationEnabled,
+                isInvalid,
+                feedbackText,
+                isDatePicker,
+                isCurrActive,
+                currSign,
+            };
+        }, this.elem, valueInput, btn);
+
+        res.valueInput = valueInput;
+
+        if (res.isDatePicker) {
             res.datePickerBtn = btn;
         } else {
             res.currElem = btn;
-            if (res.currElem) {
-                const disabled = await hasAttr(res.currElem, 'disabled');
-                res.isCurrActive = !disabled;
-                if (res.isCurrActive) {
-                    const ddElem = await query(res.currElem, '.dd__container_attached');
-                    res.currDropDown = await DropDown.create(this.parent, ddElem);
-                    if (res.currDropDown) {
-                        assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
-                    }
+            if (res.isCurrActive) {
+                const ddElem = await query(res.currElem, '.dd__container_attached');
+                res.currDropDown = await DropDown.create(this.parent, ddElem);
+                if (res.currDropDown) {
+                    assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
                 }
-
-                res.currSignElem = await query(res.currElem, '.input-group__btn-title');
-            } else {
-                res.isCurrActive = false;
-                res.currElem = await query(this.elem, '.input-group__text');
-                res.currSignElem = await query(this.elem, '.input-group__text-title');
             }
-            res.currSignElem = res.currSignElem ?? res.currElem;
-            res.currSign = await prop(res.currSignElem, 'textContent');
-        }
-
-        const hiddenInpElem = await query(this.elem, 'input[type="hidden"]');
-        if (hiddenInpElem) {
-            res.hiddenValue = await prop(hiddenInpElem, 'value');
-        }
-
-        res.valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
-        res.value = await prop(res.valueInput, 'value');
-
-        const validationElem = await closest(this.elem, '.validation-block');
-        res.validationEnabled = !!validationElem;
-        if (res.validationEnabled) {
-            res.isInvalid = await hasClass(validationElem, 'invalid-block');
-            res.feedBackElem = await query(validationElem, '.invalid-feedback');
-            assert(res.feedBackElem, 'Validation feedback element not found');
-            res.feedbackText = await prop(res.feedBackElem, 'textContent');
-        } else {
-            res.isInvalid = false;
         }
 
         return res;
@@ -82,20 +75,23 @@ export class InputRow extends TestComponent {
     }
 
     async input(val) {
+        assert(this.content.valueInput, 'Input element not found');
         return input(this.content.valueInput, val.toString());
     }
 
     async selectCurr(currencyId) {
         assert(currencyId, 'Invalid currency id');
+        assert(
+            this.content.isCurrActive && this.content.currDropDown,
+            'Currency DropDown not available',
+        );
 
-        if (this.content.isCurrActive && this.content.currDropDown) {
-            await this.content.currDropDown.setSelection(currencyId);
-        }
+        return this.content.currDropDown.setSelection(currencyId);
     }
 
     async clickButton() {
         assert(this.content.isCurrActive, 'Input group button not active');
 
-        await click(this.content.currElem);
+        return click(this.content.currElem);
     }
 }
