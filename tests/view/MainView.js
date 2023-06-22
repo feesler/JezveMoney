@@ -13,7 +13,7 @@ import { Widget } from './component/Widget/Widget.js';
 import { SummaryWidget } from './component/Widget/SummaryWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { SetCategoryDialog } from './component/SetCategoryDialog.js';
+import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
 
 /** Main view class */
 export class MainView extends AppView {

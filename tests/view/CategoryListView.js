@@ -15,10 +15,10 @@ import {
 } from 'jezve-test';
 import { Button, PopupMenu } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
+import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
-import { CategoryItem } from './component/CategoryItem.js';
+import { CategoryItem } from './component/Category/CategoryItem.js';
 import { Transaction } from '../model/Transaction.js';
 import { CategoryDetails } from './component/Category/CategoryDetails.js';
 import { Category } from '../model/Category.js';

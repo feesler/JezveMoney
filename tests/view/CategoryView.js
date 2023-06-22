@@ -7,8 +7,8 @@ import {
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { InputRow } from './component/InputRow.js';
-import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
+import { InputRow } from './component/Fields/InputRow.js';
+import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Transaction } from '../model/Transaction.js';
 

@@ -21,12 +21,12 @@ import {
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
-import { SearchInput } from './component/SearchInput.js';
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
+import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
+import { SearchInput } from './component/Fields/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { Counter } from './component/Counter.js';
-import { SetCategoryDialog } from './component/SetCategoryDialog.js';
+import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
 import {
     dateToSeconds,
     secondsToDate,

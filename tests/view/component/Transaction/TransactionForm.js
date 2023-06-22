@@ -23,10 +23,10 @@ import {
     EXCHANGE_PRECISION,
     dateStringToSeconds,
 } from '../../../common.js';
-import { TransactionTypeMenu } from '../LinkMenu/TransactionTypeMenu.js';
-import { InputRow } from '../InputRow.js';
+import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu.js';
+import { InputRow } from '../Fields/InputRow.js';
 import { WarningPopup } from '../WarningPopup.js';
-import { DatePickerRow } from '../DatePickerRow.js';
+import { DatePickerRow } from '../Fields/DatePickerRow.js';
 import { TileInfoItem } from '../Tiles/TileInfoItem.js';
 import { TileBlock } from '../Tiles/TileBlock.js';
 import {
@@ -48,7 +48,7 @@ import {
     ScheduledTransaction,
     getIntervalOffset,
 } from '../../../model/ScheduledTransaction.js';
-import { DatePickerFilter } from '../DatePickerFilter.js';
+import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';

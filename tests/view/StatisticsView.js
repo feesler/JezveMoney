@@ -12,8 +12,8 @@ import {
 import { DropDown, LinkMenu, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { Transaction } from '../model/Transaction.js';
-import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
+import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
 import { App } from '../Application.js';
 import { dateToSeconds, shiftMonth } from '../common.js';
 

@@ -12,7 +12,7 @@ import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { InputRow } from './component/InputRow.js';
+import { InputRow } from './component/Fields/InputRow.js';
 
 // Profile view class
 export class ProfileView extends AppView {

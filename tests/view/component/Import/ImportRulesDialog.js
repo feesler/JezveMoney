@@ -17,7 +17,7 @@ import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
-import { SearchInput } from '../SearchInput.js';
+import { SearchInput } from '../Fields/SearchInput.js';
 import { __ } from '../../../model/locale.js';
 
 const ITEMS_ON_PAGE = 20;

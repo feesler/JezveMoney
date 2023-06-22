@@ -7,7 +7,7 @@ import {
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
-import { InputRow } from './component/InputRow.js';
+import { InputRow } from './component/Fields/InputRow.js';
 
 /** Registration view class */
 export class RegisterView extends AppView {
