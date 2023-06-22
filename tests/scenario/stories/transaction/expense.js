@@ -1,6 +1,5 @@
-import { test, setBlock } from 'jezve-test';
+import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { EXPENSE } from '../../../model/Transaction.js';
 import * as Actions from '../../actions/transaction.js';
 
 export const stateLoop = async () => {
@@ -18,18 +17,10 @@ export const stateLoop = async () => {
         ACC_BTC,
     } = App.scenario;
 
-    // Navigate to create expense view
-    await App.goToMainView();
-    await App.view.goToNewTransactionByAccount(0);
-    await App.view.changeTransactionType(EXPENSE);
-
-    // State 0
     setBlock('Expense loop', 2);
-    await test('Initial state of new expense view', () => {
-        App.view.model.state = 0;
-        const expected = App.view.getExpectedState();
-        return App.view.checkState(expected);
-    });
+
+    // Navigate to create expense view
+    await Actions.createFromAccount(0);
 
     // Input destination amount
     await Actions.runGroup('inputDestAmount', Actions.decimalInputTestStrings);

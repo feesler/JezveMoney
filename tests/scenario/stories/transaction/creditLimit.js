@@ -8,16 +8,18 @@ export const stateLoop = async () => {
 
     const { CREDIT_CARD, BTC_CREDIT } = App.scenario;
 
-    // Navigate to create income view
-    await App.goToMainView();
+    setBlock('Credit limit loop', 2);
 
+    // Navigate to create income view
     const sortedAccounts = App.state.getSortedUserAccounts();
     const index = sortedAccounts.getIndexById(CREDIT_CARD);
-    await App.view.goToNewTransactionByAccount(index);
-    await App.view.changeTransactionType(LIMIT_CHANGE);
+
+    await Actions.createFromAccount(index);
+    await Actions.runActions([
+        { action: 'changeTransactionType', data: LIMIT_CHANGE },
+    ]);
 
     // State 1
-    setBlock('Credit limit loop', 2);
     await test('Initial state of new credit limit view', () => {
         App.view.model.state = 1;
         const expected = App.view.getExpectedState();

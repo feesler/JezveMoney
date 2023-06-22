@@ -1817,6 +1817,11 @@ const slice = createSlice({
         return newState;
     },
 
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
+
     startSubmit: (state) => (
         (state.submitStarted)
             ? state

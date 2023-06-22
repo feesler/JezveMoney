@@ -95,6 +95,7 @@ class ScheduleItemView extends View {
         }
 
         this.subscribeToStore(this.store);
+        this.form.setRenderTime();
     }
 
     startSubmit() {

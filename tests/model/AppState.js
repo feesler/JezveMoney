@@ -1860,6 +1860,12 @@ export class AppState {
         return this.returnState(params.returnState);
     }
 
+    createCancelled(params) {
+        const res = this.clone();
+        res.deleteTransactions(params);
+        return res;
+    }
+
     setTransactionCategory(params) {
         const ids = asArray(params?.id);
         if (ids.length === 0) {

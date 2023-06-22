@@ -147,6 +147,7 @@ export class TransactionForm extends Component {
             isUpdate: this.props.mode === 'update',
             isAvailable: this.props.isAvailable,
             submitStarted: false,
+            renderTime: null,
         };
 
         if (isScheduleItem) {
@@ -225,6 +226,7 @@ export class TransactionForm extends Component {
                 transaction.dest_id = transaction.src_id;
                 transaction.src_id = 0;
                 transaction.dest_curr = transaction.src_curr;
+                transaction.src_amount = -transaction.src_amount;
                 transaction.dest_amount = transaction.src_amount;
             }
         }
@@ -908,6 +910,11 @@ export class TransactionForm extends Component {
             this.exchangeInfo,
             options,
         );
+    }
+
+    /** Updates form render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
     }
 
     /**
@@ -1828,13 +1835,17 @@ export class TransactionForm extends Component {
         this.monthSelect.show(isRepeat && isYearInterval);
     }
 
+    renderTime(state) {
+        this.elem.dataset.time = state?.renderTime ?? '';
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
 
         const { transaction } = state;
-        const isScheduleItem = (state.type === 'scheduleItem');
+        const isTransaction = (state.type === 'transaction');
 
         if (!state.isAvailable) {
             let message;
@@ -1902,21 +1913,9 @@ export class TransactionForm extends Component {
             this.exchangeRow.hide();
         }
 
-        if (isScheduleItem) {
-            this.dateRangeField.show(state.isAvailable);
-            this.intervalStepRow.show(state.isAvailable);
-            this.intervalTypeRow.show(state.isAvailable);
-            this.weekDayField.show(state.isAvailable);
-            this.daySelectField.show(state.isAvailable);
-        } else {
-            this.dateRow.show(state.isAvailable);
-        }
-        this.categoryRow.show(state.isAvailable);
-        this.commentRow.show(state.isAvailable);
-        show(this.submitControls, state.isAvailable);
-
         // Date field
-        if (!isScheduleItem) {
+        if (isTransaction) {
+            this.dateRow.show(state.isAvailable);
             this.dateRow.setState((dateState) => ({
                 ...dateState,
                 value: state.form.date,
@@ -1925,8 +1924,20 @@ export class TransactionForm extends Component {
                 valid: state.validation.date,
             }));
         }
+        this.categoryRow.show(state.isAvailable);
+        this.commentRow.show(state.isAvailable);
+
+        this.repeatSwitchField.show(state.isAvailable);
+        this.dateRangeField.show(state.isAvailable);
+        this.intervalStepRow.show(state.isAvailable);
+        this.intervalTypeRow.show(state.isAvailable);
+        this.weekDayField.show(state.isAvailable);
+        this.daySelectField.show(state.isAvailable);
+
+        show(this.submitControls, state.isAvailable);
 
         if (!state.isAvailable) {
+            this.renderTime(state);
             return;
         }
 
@@ -2084,5 +2095,7 @@ export class TransactionForm extends Component {
         }
 
         this.spinner.show(state.submitStarted);
+
+        this.renderTime(state);
     }
 }

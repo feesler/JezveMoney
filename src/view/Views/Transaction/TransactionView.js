@@ -109,6 +109,7 @@ class TransactionView extends View {
         this.transactionContainer.append(this.form.elem);
 
         this.subscribeToStore(this.store);
+        this.form.setRenderTime();
     }
 
     startSubmit() {

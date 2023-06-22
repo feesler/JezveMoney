@@ -16,6 +16,12 @@ import { INTERVAL_NONE } from '../model/ScheduledTransaction.js';
 
 /** Scheduled transaction create/update view class */
 export class ScheduleItemView extends AppView {
+    constructor(...args) {
+        super(...args);
+
+        this.loaded = false;
+    }
+
     get form() {
         return this.content.form;
     }
@@ -44,6 +50,10 @@ export class ScheduleItemView extends AppView {
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.form = await TransactionForm.create(this, await query('#form'), SCHEDULE_ITEM_FORM);
+        if (!this.loaded) {
+            await res.form.waitForLoad();
+            this.loaded = true;
+        }
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 

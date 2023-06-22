@@ -11,6 +11,7 @@ import {
     TestComponent,
     asArray,
     evaluate,
+    waitForFunction,
 } from 'jezve-test';
 import { DropDown, LinkMenu, Switch } from 'jezvejs-test';
 import {
@@ -22,6 +23,7 @@ import {
     trimToDigitsLimit,
     EXCHANGE_PRECISION,
     dateStringToSeconds,
+    secondsToTime,
 } from '../../../common.js';
 import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu.js';
 import { InputRow } from '../Fields/InputRow.js';
@@ -82,9 +84,277 @@ const inputRowSelectors = [
 
 /** Create or update transaction form class */
 export class TransactionForm extends TestComponent {
-    static getExpectedState(model) {
-        const state = parseInt(model.state, 10);
-        assert(!Number.isNaN(state), 'Invalid state specified');
+    static getInitialState(options = {}, state = App.state) {
+        const availActions = ['create', 'update'];
+        const {
+            id = 0,
+            action = 'create',
+            formType = TRANSACTION_FORM,
+            type = EXPENSE,
+            fromAccount = 0,
+            fromPerson = 0,
+        } = options;
+
+        assert(availActions.includes(action), 'Invalid action');
+
+        const model = {
+            formType,
+            type,
+            isUpdate: action === 'update',
+            srcAmountInvalidated: false,
+            destAmountInvalidated: false,
+            dateInvalidated: false,
+            useBackExchange: false,
+            repeatEnabled: false,
+            startDate: '',
+            endDate: '',
+            dateRangeInvalidated: false,
+            intervalStep: '',
+            intervalStepInvalidated: false,
+            intervalType: 0,
+            intervalOffset: 0,
+        };
+
+        const userAccounts = state.getUserAccounts();
+
+        if (action === 'create') {
+            if (type === EXPENSE || type === INCOME) {
+                model.isAvailable = userAccounts.length > 0;
+            } else if (type === TRANSFER) {
+                model.isAvailable = userAccounts.length > 1;
+            } else if (type === DEBT) {
+                model.isAvailable = state.persons.length > 0;
+            }
+
+            if (fromAccount) {
+                const account = state.accounts.getItem(fromAccount);
+                assert(account, 'Account not found');
+
+                model.src_curr_id = account.curr_id;
+                model.dest_curr_id = account.curr_id;
+
+                if (type === EXPENSE) {
+                    model.srcAccount = account;
+                    model.destAccount = null;
+                } else if (type === INCOME) {
+                    model.srcAccount = null;
+                    model.destAccount = account;
+                } else if (type === TRANSFER) {
+                    model.srcAccount = account;
+
+                    const nextAccountId = state.getNextAccount(fromAccount);
+                    assert(nextAccountId, 'Next account not found');
+
+                    model.destAccount = state.accounts.getItem(nextAccountId);
+                    model.dest_curr_id = model.destAccount.curr_id;
+                }
+            } else if (fromPerson) {
+                model.person = state.persons.getItem(fromPerson);
+                assert(model.person, 'Person not found');
+
+                model.type = DEBT;
+                model.debtType = true;
+                model.noAccount = userAccounts.length === 0;
+
+                if (model.noAccount) {
+                    model.account = null;
+
+                    const personAccounts = state.getPersonAccounts(model.person.id);
+                    if (personAccounts.length > 0) {
+                        model.personAccount = personAccounts.getItemByIndex(0);
+                    } else {
+                        const firstCurrency = App.currency.getItemByIndex(0);
+                        model.personAccount = TransactionForm.getPersonAccount(
+                            model.person.id,
+                            firstCurrency.id,
+                            state,
+                        );
+                    }
+                } else {
+                    model.account = userAccounts.getItemByIndex(0);
+                    assert(model.account, 'Account not found');
+
+                    model.personAccount = TransactionForm.getPersonAccount(
+                        model.person.id,
+                        model.account.curr_id,
+                        state,
+                    );
+                }
+
+                model.srcAccount = model.personAccount;
+                model.destAccount = model.account;
+
+                model.src_curr_id = model.personAccount.curr_id;
+                model.dest_curr_id = model.personAccount.curr_id;
+            }
+
+            model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
+            model.srcCurr = App.currency.getItem(model.src_curr_id);
+            model.destCurr = App.currency.getItem(model.dest_curr_id);
+
+            model.fSrcAmount = 0;
+            model.srcAmount = '';
+
+            model.fDestAmount = 0;
+            model.destAmount = '';
+
+            model.fSrcResBal = model.srcAccount?.balance ?? '';
+            model.fDestResBal = model.destAccount?.balance ?? '';
+
+            model.categoryId = 0;
+            model.date = App.datesFmt.now;
+            model.comment = '';
+        } else if (model.isUpdate) {
+            const appState = state.createCancelled({ id });
+
+            const transaction = state.transactions.getItem(id);
+            assert(transaction, 'Transaction not found');
+
+            model.isAvailable = true;
+            model.type = transaction.type;
+
+            model.fSrcAmount = transaction.src_amount;
+            model.fDestAmount = transaction.dest_amount;
+
+            let srcAccountAfter = state.accounts.getItem(transaction.src_id);
+            let destAccountAfter = state.accounts.getItem(transaction.dest_id);
+
+            model.srcAccount = appState.accounts.getItem(transaction.src_id);
+            model.destAccount = appState.accounts.getItem(transaction.dest_id);
+
+            model.src_curr_id = transaction.src_curr;
+            model.dest_curr_id = transaction.dest_curr;
+
+            model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
+            model.srcCurr = App.currency.getItem(model.src_curr_id);
+            model.destCurr = App.currency.getItem(model.dest_curr_id);
+
+            model.categoryId = transaction.category_id;
+            model.date = App.reformatDate(secondsToTime(transaction.date));
+            model.comment = transaction.comment;
+
+            if (model.type === DEBT) {
+                model.debtType = (
+                    !!model.srcAccount
+                    && model.srcAccount.owner_id !== state.profile.owner_id
+                );
+
+                const personId = (model.debtType)
+                    ? model.srcAccount.owner_id
+                    : model.destAccount.owner_id;
+                const personCurrId = (model.debtType)
+                    ? model.src_curr_id
+                    : model.dest_curr_id;
+
+                model.person = appState.persons.getItem(personId);
+                assert(model.person, 'Person not found');
+
+                model.noAccount = (model.debtType)
+                    ? !model.destAccount
+                    : !model.srcAccount;
+
+                model.personAccount = TransactionForm.getPersonAccount(
+                    model.person.id,
+                    personCurrId,
+                    appState,
+                );
+
+                if (model.noAccount) {
+                    if (model.debtType) {
+                        destAccountAfter = structuredClone(state.getFirstAccount());
+                        if (destAccountAfter) {
+                            destAccountAfter.balance = normalize(
+                                destAccountAfter.balance + model.fDestAmount,
+                                model.destCurr.precision,
+                            );
+                        }
+                    } else {
+                        srcAccountAfter = structuredClone(state.getFirstAccount());
+                        if (srcAccountAfter) {
+                            srcAccountAfter.balance = normalize(
+                                srcAccountAfter.balance - model.fSrcAmount,
+                                model.srcCurr.precision,
+                            );
+                        }
+                    }
+                } else {
+                    model.account = (model.debtType)
+                        ? model.destAccount
+                        : model.srcAccount;
+                }
+            } else if (model.type === LIMIT_CHANGE) {
+                if (model.srcAccount) {
+                    model.destAccount = model.srcAccount;
+                    model.srcAccount = null;
+                    model.destCurr = model.srcCurr;
+
+                    srcAccountAfter = null;
+                    destAccountAfter = state.accounts.getItem(model.destAccount.id);
+
+                    model.dest_curr_id = model.src_curr_id;
+                    model.dest_curr = model.src_curr;
+                    model.fSrcAmount = -model.fSrcAmount;
+                    model.fDestAmount = model.fSrcAmount;
+                }
+            }
+
+            model.srcAmount = model.fSrcAmount.toString();
+            model.destAmount = model.fDestAmount.toString();
+
+            model.fSrcResBal = srcAccountAfter?.balance ?? '';
+            model.fDestResBal = destAccountAfter?.balance ?? '';
+        }
+
+        model.srcResBal = model.fSrcResBal.toString();
+        model.destResBal = model.fDestResBal.toString();
+
+        if (model.isAvailable) {
+            model.exchSign = `${model.destCurr.sign}/${model.srcCurr.sign}`;
+            model.backExchSign = `${model.srcCurr.sign}/${model.destCurr.sign}`;
+
+            model.fExchRate = TransactionForm.calcExchange(model);
+            model.exchRate = model.fExchRate.toString();
+
+            model.fBackExchRate = TransactionForm.calcBackExchange(model);
+            model.backExchRate = model.fBackExchRate.toString();
+
+            model.fmtExch = `${model.fExchRate} ${model.exchSign}`;
+
+            if (model.type === EXPENSE || model.type === INCOME) {
+                model.state = (model.isDiffCurr) ? 2 : 0;
+            }
+
+            if (model.type === TRANSFER) {
+                model.state = (model.isDiffCurr) ? 3 : 0;
+            }
+
+            if (model.type === DEBT) {
+                const { debtType, noAccount } = model;
+
+                if (model.isDiffCurr) {
+                    model.state = (debtType) ? 10 : 16;
+                } else if (debtType) {
+                    model.state = (noAccount) ? 6 : 0;
+                } else {
+                    model.state = (noAccount) ? 7 : 3;
+                }
+            }
+
+            if (model.type === LIMIT_CHANGE) {
+                model.state = 0;
+            }
+        } else {
+            model.state = -1;
+        }
+
+        return this.getExpectedState(model, state);
+    }
+
+    static getExpectedState(model, state) {
+        const stateId = parseInt(model.state, 10);
+        assert(!Number.isNaN(stateId), 'Invalid state id');
+
+        assert(state, 'Invalid state');
 
         const isTransactionForm = (model.formType === TRANSACTION_FORM);
         const isScheduleItemForm = (model.formType === SCHEDULE_ITEM_FORM);
@@ -232,7 +502,7 @@ export class TransactionForm extends TestComponent {
                 }
             }
 
-            const visibleCategories = App.view.appState()
+            const visibleCategories = state
                 .getCategoriesForType(model.type)
                 .map((item) => ({ id: item.id.toString() }));
 
@@ -309,7 +579,7 @@ export class TransactionForm extends TestComponent {
         const resultBalanceTok = __('transactions.result', locale);
 
         if (isExpense) {
-            assert(state >= -1 && state <= 4, 'Invalid state specified');
+            assert(stateId >= -1 && stateId <= 4, 'Invalid state specified');
 
             if (isAvailable && isTransactionForm) {
                 res.srcResBalanceRow.label = resultBalanceTok;
@@ -321,38 +591,38 @@ export class TransactionForm extends TestComponent {
             }
             this.hideInputRow(res, 'destResBalance');
 
-            if (state === -1) {
+            if (stateId === -1) {
                 this.hideInputRow(res, 'srcAmount');
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'srcResBalance');
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 0) {
+            } else if (stateId === 0) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                 }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1 && isTransactionForm) {
+            } else if (stateId === 1 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 2) {
+            } else if (stateId === 2) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 3) {
+            } else if (stateId === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 4 && isTransactionForm) {
+            } else if (stateId === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -361,7 +631,7 @@ export class TransactionForm extends TestComponent {
         }
 
         if (isIncome) {
-            assert(state >= -1 && state <= 4, 'Invalid state specified');
+            assert(stateId >= -1 && stateId <= 4, 'Invalid state specified');
 
             if (isAvailable && isTransactionForm) {
                 res.destResBalanceRow.label = resultBalanceTok;
@@ -372,38 +642,38 @@ export class TransactionForm extends TestComponent {
                 this.hideInputRow(res, 'destResBalance');
             }
 
-            if (state === -1) {
+            if (stateId === -1) {
                 this.hideInputRow(res, 'srcAmount');
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'destResBalance');
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 0) {
+            } else if (stateId === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
                 if (isTransactionForm) {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1 && isTransactionForm) {
+            } else if (stateId === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'destResBalance', true);
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 2) {
+            } else if (stateId === 2) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 3) {
+            } else if (stateId === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 4 && isTransactionForm) {
+            } else if (stateId === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'destResBalance', true);
@@ -412,7 +682,7 @@ export class TransactionForm extends TestComponent {
         }
 
         if (isTransfer) {
-            assert(state >= -1 && state <= 8, 'Invalid state specified');
+            assert(stateId >= -1 && stateId <= 8, 'Invalid state specified');
 
             if (isAvailable && isTransactionForm) {
                 res.srcResBalanceRow.label = `${resultBalanceTok} (${__('transactions.source', locale)})`;
@@ -424,13 +694,13 @@ export class TransactionForm extends TestComponent {
                 this.hideInputRow(res, 'destResBalance');
             }
 
-            if (state === -1) {
+            if (stateId === -1) {
                 this.hideInputRow(res, 'srcAmount');
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'srcResBalance');
                 this.hideInputRow(res, 'destResBalance');
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 0) {
+            } else if (stateId === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
                 if (isTransactionForm) {
@@ -438,19 +708,19 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 1 && isTransactionForm) {
+            } else if (stateId === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 2 && isTransactionForm) {
+            } else if (stateId === 2 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.hideInputRow(res, 'exchange');
-            } else if (state === 3) {
+            } else if (stateId === 3) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
@@ -458,25 +728,25 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 4 && isTransactionForm) {
+            } else if (stateId === 4 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 5 && isTransactionForm) {
+            } else if (stateId === 5 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 6 && isTransactionForm) {
+            } else if (stateId === 6 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 7) {
+            } else if (stateId === 7) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 if (isTransactionForm) {
@@ -484,7 +754,7 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 8 && isTransactionForm) {
+            } else if (stateId === 8 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -494,10 +764,10 @@ export class TransactionForm extends TestComponent {
         }
 
         if (isDebt) {
-            assert(state >= -1 && state <= 21, 'Invalid state specified');
+            assert(stateId >= -1 && stateId <= 21, 'Invalid state specified');
 
             const { debtType, noAccount } = model;
-            const userAccounts = App.view.appState().getUserAccounts();
+            const userAccounts = state.getUserAccounts();
             const accountsAvailable = userAccounts.length > 0;
 
             res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
@@ -550,7 +820,7 @@ export class TransactionForm extends TestComponent {
                 }
             }
 
-            if (state < 10) {
+            if (stateId < 10) {
                 this.hideInputRow(res, 'exchange');
             }
 
@@ -559,70 +829,70 @@ export class TransactionForm extends TestComponent {
                 this.hideInputRow(res, 'destResBalance');
             }
 
-            if (state === -1) {
+            if (stateId === -1) {
                 this.hideInputRow(res, 'srcAmount');
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'srcResBalance');
                 this.hideInputRow(res, 'destResBalance');
-            } else if (state === 0) {
+            } else if (stateId === 0) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                     this.showInputRow(res, 'destResBalance', false);
                 }
-            } else if (state === 1 && isTransactionForm) {
+            } else if (stateId === 1 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 2 && isTransactionForm) {
+            } else if (stateId === 2 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 3) {
+            } else if (stateId === 3) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                     this.showInputRow(res, 'destResBalance', false);
                 }
-            } else if (state === 4 && isTransactionForm) {
+            } else if (stateId === 4 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 5 && isTransactionForm) {
+            } else if (stateId === 5 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
-            } else if (state === 6) {
+            } else if (stateId === 6) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.hideInputRow(res, 'destAmount');
                 if (isTransactionForm) {
                     this.showInputRow(res, 'srcResBalance', false);
                 }
                 this.hideInputRow(res, 'destResBalance');
-            } else if (state === 7) {
+            } else if (stateId === 7) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', true);
                 this.hideInputRow(res, 'srcResBalance');
                 if (isTransactionForm) {
                     this.showInputRow(res, 'destResBalance', false);
                 }
-            } else if (state === 8 && isTransactionForm) {
+            } else if (stateId === 8 && isTransactionForm) {
                 this.hideInputRow(res, 'srcAmount');
                 this.showInputRow(res, 'destAmount', false);
                 this.hideInputRow(res, 'srcResBalance');
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 9 && isTransactionForm) {
+            } else if (stateId === 9 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.hideInputRow(res, 'destAmount');
                 this.showInputRow(res, 'srcResBalance', true);
                 this.hideInputRow(res, 'destResBalance');
-            } else if (state === 10 || state === 16) {
+            } else if (stateId === 10 || stateId === 16) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
@@ -630,13 +900,13 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 11 && isTransactionForm) {
+            } else if (stateId === 11 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 12) {
+            } else if (stateId === 12) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 if (isTransactionForm) {
@@ -644,25 +914,25 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 13 && isTransactionForm) {
+            } else if (stateId === 13 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', false);
                 this.showInputRow(res, 'exchange', true);
-            } else if ((state === 14 || state === 20) && isTransactionForm) {
+            } else if ((stateId === 14 || stateId === 20) && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', true);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if ((state === 15 || state === 17) && isTransactionForm) {
+            } else if ((stateId === 15 || stateId === 17) && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', true);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', false);
-            } else if (state === 18) {
+            } else if (stateId === 18) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
@@ -670,13 +940,13 @@ export class TransactionForm extends TestComponent {
                     this.showInputRow(res, 'destResBalance', false);
                 }
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 19 && isTransactionForm) {
+            } else if (stateId === 19 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'srcResBalance', false);
                 this.showInputRow(res, 'destResBalance', true);
                 this.showInputRow(res, 'exchange', true);
-            } else if (state === 21 && isTransactionForm) {
+            } else if (stateId === 21 && isTransactionForm) {
                 this.showInputRow(res, 'srcAmount', false);
                 this.showInputRow(res, 'destAmount', true);
                 this.showInputRow(res, 'srcResBalance', true);
@@ -693,13 +963,13 @@ export class TransactionForm extends TestComponent {
                 this.hideInputRow(res, 'destResBalance');
             }
 
-            if (state === -1) {
+            if (stateId === -1) {
                 this.hideInputRow(res, 'destAmount');
                 this.hideInputRow(res, 'destResBalance');
-            } else if (state === 0 && isTransactionForm) {
+            } else if (stateId === 0 && isTransactionForm) {
                 this.showInputRow(res, 'destAmount', false);
                 this.showInputRow(res, 'destResBalance', true);
-            } else if (state === 1) {
+            } else if (stateId === 1) {
                 this.showInputRow(res, 'destAmount', true);
                 if (isTransactionForm) {
                     this.showInputRow(res, 'destResBalance', false);
@@ -734,6 +1004,39 @@ export class TransactionForm extends TestComponent {
         return res;
     }
 
+    static calcExchange(model) {
+        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
+            return 1;
+        }
+
+        return correctExch(Math.abs(model.fDestAmount / model.fSrcAmount));
+    }
+
+    static calcBackExchange(model) {
+        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
+            return 1;
+        }
+
+        return correctExch(Math.abs(model.fSrcAmount / model.fDestAmount));
+    }
+
+    static getPersonAccount(personId, currencyId, state) {
+        const currency = App.currency.getItem(currencyId);
+        if (!currency) {
+            return null;
+        }
+
+        const personAccount = state.getPersonAccount(personId, currencyId);
+        if (personAccount) {
+            return personAccount;
+        }
+
+        return {
+            balance: 0,
+            curr_id: currencyId,
+        };
+    }
+
     constructor(parent, elem, formType = TRANSACTION_FORM) {
         super(parent, elem);
         this.formType = formType;
@@ -751,6 +1054,7 @@ export class TransactionForm extends TestComponent {
         const res = {};
 
         [
+            res.renderTime,
             res.notAvailMsg,
             res.id,
             res.personId,
@@ -760,17 +1064,18 @@ export class TransactionForm extends TestComponent {
             res.debtAccountId,
             res.srcId,
             res.destId,
-        ] = await evaluate((inputs) => {
+        ] = await evaluate((el, inputs) => {
             const notAvailMsg = document.getElementById('notAvailMsg');
 
             return [
+                el.dataset.time,
                 {
                     visible: notAvailMsg && !notAvailMsg.hidden,
                     message: notAvailMsg.textContent,
                 },
                 ...inputs.map((id) => (parseInt(document.getElementById(id)?.value, 10))),
             ];
-        }, hiddenInputs);
+        }, this.elem, hiddenInputs);
 
         res.isUpdate = (await url()).includes('/update/');
         if (res.isUpdate) {
@@ -869,6 +1174,7 @@ export class TransactionForm extends TestComponent {
     buildModel(cont) {
         const res = this.model;
 
+        res.renderTime = cont.renderTime;
         res.formType = this.formType;
 
         res.type = cont.typeMenu.value;
@@ -1265,7 +1571,7 @@ export class TransactionForm extends TestComponent {
     }
 
     getExpectedState(model = this.model) {
-        return TransactionForm.getExpectedState(model);
+        return TransactionForm.getExpectedState(model, this.appState());
     }
 
     stateTransition(model, stateMap, throwOnNotFound = true) {
@@ -1419,19 +1725,11 @@ export class TransactionForm extends TestComponent {
     }
 
     calcExchange(model = this.model) {
-        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
-            return 1;
-        }
-
-        return correctExch(Math.abs(this.model.fDestAmount / this.model.fSrcAmount));
+        return TransactionForm.calcExchange(model);
     }
 
     calcBackExchange(model = this.model) {
-        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
-            return 1;
-        }
-
-        return correctExch(Math.abs(this.model.fSrcAmount / this.model.fDestAmount));
+        return TransactionForm.calcBackExchange(model);
     }
 
     calcExchByAmounts() {
@@ -1485,24 +1783,20 @@ export class TransactionForm extends TestComponent {
     }
 
     getPersonAccount(personId, currencyId) {
-        const currency = App.currency.getItem(currencyId);
-        if (!currency) {
-            return null;
-        }
-
-        const personAccount = this.appState().getPersonAccount(personId, currencyId);
-        if (personAccount) {
-            return personAccount;
-        }
-
-        return {
-            balance: 0,
-            curr_id: currencyId,
-        };
+        return TransactionForm.getPersonAccount(personId, currencyId, this.appState());
     }
 
     getFirstCurrency() {
         return App.currency.getItemByIndex(0);
+    }
+
+    async waitForLoad() {
+        await waitForFunction(async () => {
+            await this.parse();
+            return !!this.model.renderTime;
+        });
+
+        await this.parse();
     }
 
     async changeTransactionType(type) {

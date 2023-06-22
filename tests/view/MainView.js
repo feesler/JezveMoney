@@ -17,6 +17,10 @@ import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog
 
 /** Main view class */
 export class MainView extends AppView {
+    get transactionsWidget() {
+        return this.content.transactionsWidget;
+    }
+
     async parseContent() {
         const res = {
             summaryWidget: await SummaryWidget.create(

@@ -249,20 +249,26 @@ export const runGroup = async (action, data) => {
 export const createFromAccount = async (index) => {
     await test(`Initial state of create transaction view requested from account [${index}]`, async () => {
         await App.goToMainView();
+
+        const [fromAccount] = App.state.getSortedAccountsByIndexes(index, true);
+        const expected = TransactionView.getInitialState({ fromAccount });
+
         await App.view.goToNewTransactionByAccount(index);
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 
 export const createFromPerson = async (index) => {
     await test(`Initial state of create transaction view requested from person [${index}]`, async () => {
         await App.goToMainView();
+
+        const [fromPerson] = App.state.getSortedPersonsByIndexes(index, true);
+        const expected = TransactionView.getInitialState({ fromPerson });
+
         await App.view.goToNewTransactionByPerson(index);
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 
@@ -303,31 +309,19 @@ export const update = async (type, pos) => {
     await test(`Initial state of update ${Transaction.typeToString(type)} view [${index}]`, async () => {
         await App.view.navigateToTransactions();
         await App.view.filterByType(type);
+
+        const transactions = App.view.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+
+        const expected = TransactionView.getInitialState({
+            action: 'update',
+            id: item.id,
+        });
+
         await App.view.goToUpdateTransaction(pos);
 
-        const origTransaction = App.view.getExpectedTransaction();
-        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
-        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.formModel.state = (isDiff) ? 2 : 0;
-        }
-
-        if (origTransaction.type === TRANSFER) {
-            App.view.formModel.state = (isDiff) ? 3 : 0;
-        }
-
-        if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
-
-            if (isDiffCurr) {
-                App.view.formModel.state = (debtType) ? 10 : 16;
-            } else if (debtType) {
-                App.view.formModel.state = (noAccount) ? 6 : 0;
-            } else {
-                App.view.formModel.state = (noAccount) ? 7 : 3;
-            }
-        }
-
-        const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
 };
@@ -338,31 +332,19 @@ export const updateFromMainView = async (pos) => {
 
     await test(`Initial state of update transaction [${index}] view`, async () => {
         await App.goToMainView();
+
+        const transactions = App.view.transactionsWidget.transList.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+
+        const expected = TransactionView.getInitialState({
+            action: 'update',
+            id: item.id,
+        });
+
         await App.view.goToUpdateTransactionByIndex(pos);
 
-        const origTransaction = App.view.getExpectedTransaction();
-        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
-        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.formModel.state = (isDiff) ? 2 : 0;
-        }
-
-        if (origTransaction.type === TRANSFER) {
-            App.view.formModel.state = (isDiff) ? 3 : 0;
-        }
-
-        if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
-
-            if (isDiffCurr) {
-                App.view.formModel.state = (debtType) ? 10 : 16;
-            } else if (debtType) {
-                App.view.formModel.state = (noAccount) ? 6 : 0;
-            } else {
-                App.view.formModel.state = (noAccount) ? 7 : 3;
-            }
-        }
-
-        const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
 };
