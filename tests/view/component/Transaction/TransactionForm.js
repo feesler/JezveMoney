@@ -2,7 +2,6 @@ import {
     assert,
     url,
     query,
-    prop,
     navigation,
     click,
     asyncMap,
@@ -11,6 +10,7 @@ import {
     isValidDateString,
     TestComponent,
     asArray,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, LinkMenu, Switch } from 'jezvejs-test';
 import {
@@ -52,6 +52,17 @@ import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';
+
+const hiddenInputs = [
+    'idInp',
+    'personIdInp',
+    'srcCurrInp',
+    'destCurrInp',
+    'debtOperationInp',
+    'debtAccountInp',
+    'srcIdInp',
+    'destIdInp',
+];
 
 const infoItemSelectors = [
     '#srcAmountInfo',
@@ -739,42 +750,46 @@ export class TransactionForm extends TestComponent {
     async parseContent() {
         const res = {};
 
+        [
+            res.notAvailMsg,
+            res.id,
+            res.personId,
+            res.srcCurrId,
+            res.destCurrId,
+            res.debtOperation,
+            res.debtAccountId,
+            res.srcId,
+            res.destId,
+        ] = await evaluate((inputs) => {
+            const notAvailMsg = document.getElementById('notAvailMsg');
+
+            return [
+                {
+                    visible: notAvailMsg && !notAvailMsg.hidden,
+                    message: notAvailMsg.textContent,
+                },
+                ...inputs.map((id) => (parseInt(document.getElementById(id)?.value, 10))),
+            ];
+        }, hiddenInputs);
+
         res.isUpdate = (await url()).includes('/update/');
-
         if (res.isUpdate) {
-            const hiddenEl = await query('#idInp');
-            assert(hiddenEl, 'Transaction id field not found');
-
-            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
             assert(res.id, 'Wrong transaction id');
         }
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
 
-        res.notAvailMsg = { elem: await query('#notAvailMsg') };
-        assert(res.notAvailMsg.elem, 'No available transaction message element not found');
-        res.notAvailMsg.message = await prop(res.notAvailMsg.elem, 'textContent');
-
         res.personContainer = await TileBlock.create(this, await query('#personContainer'));
         if (res.personContainer) {
-            const personIdInp = await query('#personIdInp');
-            res.personContainer.content.id = parseInt(await prop(personIdInp, 'value'), 10);
+            res.personContainer.content.id = res.personId;
         }
-
-        const srcCurrInp = await query('#srcCurrInp');
-        res.srcCurrId = parseInt(await prop(srcCurrInp, 'value'), 10);
-
-        const destCurrInp = await query('#destCurrInp');
-        res.destCurrId = parseInt(await prop(destCurrInp, 'value'), 10);
-
-        const debtOperationInp = await query('#debtOperationInp');
-        res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
 
         const accountBlock = await query('#debtAccountContainer');
         res.debtAccountContainer = await TileBlock.create(this, accountBlock);
-        const debtAccountInp = await query('#debtAccountInp');
-        res.debtAccountContainer.content.id = parseInt(await prop(debtAccountInp, 'value'), 10);
+        if (res.debtAccountContainer) {
+            res.debtAccountContainer.content.id = res.debtAccountId;
+        }
 
         res.selaccount = { elem: await query(accountBlock, '.account-toggler .btn') };
         assert(res.selaccount.elem, 'Select account button not found');
@@ -788,13 +803,11 @@ export class TransactionForm extends TestComponent {
 
         res.sourceContainer = await TileBlock.create(this, await query('#sourceContainer'));
         if (res.sourceContainer) {
-            const srcIdInp = await query('#srcIdInp');
-            res.sourceContainer.content.id = parseInt(await prop(srcIdInp, 'value'), 10);
+            res.sourceContainer.content.id = res.srcId;
         }
         res.destContainer = await TileBlock.create(this, await query('#destContainer'));
         if (res.destContainer) {
-            const destIdInp = await query('#destIdInp');
-            res.destContainer.content.id = parseInt(await prop(destIdInp, 'value'), 10);
+            res.destContainer.content.id = res.destId;
         }
 
         [
