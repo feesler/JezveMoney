@@ -64,7 +64,7 @@ export class DateRangeInput extends Component {
 
     init() {
         this.startDateGroup = DateInputGroup.create({
-            className: 'input-group__input-outer date-range-part',
+            className: 'date-range-part',
             name: 'startDate',
             locales: App.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
@@ -75,7 +75,7 @@ export class DateRangeInput extends Component {
         });
 
         this.endDateGroup = DateInputGroup.create({
-            className: 'input-group__input-outer date-range-part',
+            className: 'date-range-part',
             name: 'endDate',
             locales: App.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
