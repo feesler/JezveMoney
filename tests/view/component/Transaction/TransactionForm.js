@@ -126,8 +126,10 @@ export class TransactionForm extends TestComponent {
                 model.isAvailable = state.persons.length > 0;
             }
 
-            if (fromAccount) {
-                const account = state.accounts.getItem(fromAccount);
+            if (fromAccount || !fromPerson) {
+                const account = (fromAccount)
+                    ? state.accounts.getItem(fromAccount)
+                    : state.getFirstAccount();
                 assert(account, 'Account not found');
 
                 model.src_curr_id = account.curr_id;
@@ -202,12 +204,26 @@ export class TransactionForm extends TestComponent {
             model.fDestResBal = model.destAccount?.balance ?? '';
 
             model.categoryId = 0;
-            model.date = App.datesFmt.now;
             model.comment = '';
-        } else if (model.isUpdate) {
-            const appState = state.createCancelled({ id });
 
-            const transaction = state.transactions.getItem(id);
+            if (formType === TRANSACTION_FORM) {
+                model.date = App.datesFmt.now;
+            } else if (formType === SCHEDULE_ITEM_FORM) {
+                model.repeatEnabled = true;
+                model.startDate = App.datesFmt.now;
+                model.endDate = '';
+                model.intervalStep = '1';
+                model.intervalType = INTERVAL_MONTH;
+                model.intervalOffset = App.dates.now.getDate() - 1;
+            }
+        } else if (model.isUpdate) {
+            const appState = (formType === TRANSACTION_FORM)
+                ? state.createCancelled({ id })
+                : state;
+
+            const transaction = (formType === SCHEDULE_ITEM_FORM)
+                ? state.schedule.getItem(id)
+                : state.transactions.getItem(id);
             assert(transaction, 'Transaction not found');
 
             model.isAvailable = true;
@@ -230,7 +246,9 @@ export class TransactionForm extends TestComponent {
             model.destCurr = App.currency.getItem(model.dest_curr_id);
 
             model.categoryId = transaction.category_id;
-            model.date = App.reformatDate(secondsToTime(transaction.date));
+            if (formType === TRANSACTION_FORM) {
+                model.date = App.reformatDate(secondsToTime(transaction.date));
+            }
             model.comment = transaction.comment;
 
             if (model.type === DEBT) {
@@ -303,6 +321,17 @@ export class TransactionForm extends TestComponent {
 
             model.fSrcResBal = srcAccountAfter?.balance ?? '';
             model.fDestResBal = destAccountAfter?.balance ?? '';
+
+            if (formType === SCHEDULE_ITEM_FORM) {
+                model.repeatEnabled = transaction.interval_type !== INTERVAL_NONE;
+                model.startDate = App.reformatDate(secondsToTime(transaction.start_date));
+                model.endDate = (transaction.end_date)
+                    ? App.reformatDate(secondsToTime(transaction.end_date))
+                    : '';
+                model.intervalStep = transaction.interval_step;
+                model.intervalType = transaction.interval_type;
+                model.intervalOffset = transaction.interval_offset;
+            }
         }
 
         model.srcResBal = model.fSrcResBal.toString();
@@ -466,7 +495,7 @@ export class TransactionForm extends TestComponent {
 
                 res.intervalStepRow = {
                     visible: repeatEnabled,
-                    value: model.intervalStep,
+                    value: model.intervalStep.toString(),
                     isInvalid: model.intervalStepInvalidated,
                 };
                 res.intervalTypeSelect = {
@@ -543,7 +572,7 @@ export class TransactionForm extends TestComponent {
             }
         }
 
-        if ((isExpense || isTransfer || isDebt) && isAvailable) {
+        if ((isExpense || isTransfer || isDebt) && isAvailable && isTransactionForm) {
             res.srcResBalanceRow.value = model.srcResBal.toString();
             res.srcResBalanceRow.isCurrActive = false;
 
@@ -554,13 +583,16 @@ export class TransactionForm extends TestComponent {
 
         if (model.type !== EXPENSE && isAvailable) {
             res.srcAmountInfo.value = (model.srcCurr) ? model.srcCurr.format(model.fSrcAmount) : '';
-            res.destResBalanceRow.value = model.destResBal.toString();
 
-            res.destResBalanceRow.isCurrActive = false;
+            if (isTransactionForm) {
+                res.destResBalanceRow.value = model.destResBal.toString();
 
-            res.destResBalanceInfo.value = (model.destCurr)
-                ? model.destCurr.format(model.fDestResBal)
-                : '';
+                res.destResBalanceRow.isCurrActive = false;
+
+                res.destResBalanceInfo.value = (model.destCurr)
+                    ? model.destCurr.format(model.fDestResBal)
+                    : '';
+            }
         }
         if (model.type !== DEBT && isAvailable) {
             res.destAmountInfo.value = (model.destCurr) ? model.destCurr.format(model.fDestAmount) : '';

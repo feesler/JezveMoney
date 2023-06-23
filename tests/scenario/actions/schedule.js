@@ -238,10 +238,12 @@ export const runGroup = async (action, data) => {
 export const create = async () => {
     await test('Initial state of create scheduled transaction view', async () => {
         await checkNavigation();
+
+        const expected = ScheduleItemView.getInitialState();
+
         await App.view.goToCreateNewItem();
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 
@@ -281,31 +283,15 @@ export const update = async (pos) => {
 
     await test(`Initial state of update scheduled transaction view [${index}]`, async () => {
         await checkNavigation();
+
+        const id = App.state.schedule.indexesToIds(index);
+        const expected = ScheduleItemView.getInitialState({
+            action: 'update',
+            id,
+        });
+
         await App.view.goToUpdateItem(pos);
 
-        const origItem = App.view.getExpectedScheduledTransaction();
-        const isDiff = (origItem.src_curr !== origItem.dest_curr);
-        if (origItem.type === EXPENSE || origItem.type === INCOME) {
-            App.view.formModel.state = (isDiff) ? 2 : 0;
-        }
-
-        if (origItem.type === TRANSFER) {
-            App.view.formModel.state = (isDiff) ? 3 : 0;
-        }
-
-        if (origItem.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
-
-            if (isDiffCurr) {
-                App.view.formModel.state = (debtType) ? 10 : 16;
-            } else if (debtType) {
-                App.view.formModel.state = (noAccount) ? 6 : 0;
-            } else {
-                App.view.formModel.state = (noAccount) ? 7 : 3;
-            }
-        }
-
-        const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
 };

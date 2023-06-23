@@ -16,6 +16,21 @@ import { INTERVAL_NONE } from '../model/ScheduledTransaction.js';
 
 /** Scheduled transaction create/update view class */
 export class ScheduleItemView extends AppView {
+    static getInitialState(options, state = App.state) {
+        const res = {
+            form: TransactionForm.getInitialState(
+                { ...options, formType: SCHEDULE_ITEM_FORM },
+                state,
+            ),
+        };
+
+        if (options?.action === 'update') {
+            res.deleteBtn = { visible: true };
+        }
+
+        return res;
+    }
+
     constructor(...args) {
         super(...args);
 
