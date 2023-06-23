@@ -1786,7 +1786,7 @@ export class TransactionForm extends Component {
                 endVisible: isRepeat,
             }));
 
-            this.dateRangeInput.show(isScheduleItem || isRepeat);
+            this.dateRangeField.show(isScheduleItem || isRepeat);
         }
 
         // Interval type and step fields group
@@ -1924,17 +1924,20 @@ export class TransactionForm extends Component {
                 valid: state.validation.date,
             }));
         }
-        this.categoryRow.show(state.isAvailable);
-        this.commentRow.show(state.isAvailable);
 
-        this.repeatSwitchField.show(state.isAvailable);
-        this.dateRangeField.show(state.isAvailable);
-        this.intervalStepRow.show(state.isAvailable);
-        this.intervalTypeRow.show(state.isAvailable);
-        this.weekDayField.show(state.isAvailable);
-        this.daySelectField.show(state.isAvailable);
+        if (state.isAvailable !== prevState?.isAvailable) {
+            this.categoryRow.show(state.isAvailable);
+            this.commentRow.show(state.isAvailable);
 
-        show(this.submitControls, state.isAvailable);
+            this.repeatSwitchField.show(state.isAvailable);
+            this.dateRangeField.show(state.isAvailable);
+            this.intervalStepRow.show(state.isAvailable);
+            this.intervalTypeRow.show(state.isAvailable);
+            this.weekDayField.show(state.isAvailable);
+            this.daySelectField.show(state.isAvailable);
+
+            show(this.submitControls, state.isAvailable);
+        }
 
         if (!state.isAvailable) {
             this.renderTime(state);
