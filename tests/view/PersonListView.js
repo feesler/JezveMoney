@@ -30,6 +30,113 @@ const listMenuSelector = '#listMenu';
 
 /** List of persons view class */
 export class PersonListView extends AppView {
+    static getExpectedState(model, state = App.state) {
+        const sortMode = state.getPersonsSortMode();
+        const itemsCount = state.persons.length;
+        const visibleSelected = this.getSelectedItems(model);
+        const hiddenSelected = this.getHiddenSelectedItems(model);
+        const totalSelected = visibleSelected.length + hiddenSelected.length;
+        const isListMode = model.mode === 'list';
+        const isSortMode = model.mode === 'sort';
+        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
+
+        const showSelectItems = (
+            itemsCount > 0
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
+
+        const visiblePersons = state.persons.getVisible(true);
+        const hiddenPersons = state.persons.getHidden(true);
+
+        const tiles = TilesList.renderPersons(state.persons, false, sortMode);
+        const hiddenTiles = TilesList.renderHiddenPersons(state.persons, false, sortMode);
+
+        const res = {
+            addBtn: { visible: isListMode },
+            listModeBtn: { visible: !isListMode },
+            loadingIndicator: { visible: model.loading },
+            totalCounter: { visible: true, value: itemsCount },
+            hiddenCounter: { visible: true, value: hiddenPersons.length },
+            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
+            menuBtn: { visible: itemsCount > 0 && !isSortMode },
+            tiles,
+            hiddenTiles,
+        };
+
+        res.tiles.visible = true;
+        res.tiles.noDataMsg = {
+            visible: visiblePersons.length === 0,
+        };
+        res.hiddenTiles.visible = hiddenPersons.length > 0;
+
+        if (model.detailsItem) {
+            res.itemInfo = PersonDetails.render(model.detailsItem, state);
+            res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: { visible: isListMode && itemsCount > 0 },
+                sortModeBtn: { visible: showSortItems },
+                sortByNameBtn: { visible: showSortItems },
+                sortByDateBtn: { visible: showSortItems },
+                selectAllBtn: { visible: showSelectItems && totalSelected < itemsCount },
+                deselectAllBtn: { visible: showSelectItems && totalSelected > 0 },
+                exportBtn: { visible: showSelectItems && (totalSelected > 0) },
+                showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
+                deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
+                hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
+            };
+        }
+
+        if (model.contextMenuVisible) {
+            const ctxPerson = state.persons.getItem(model.contextItem);
+            assert(ctxPerson, 'Invalid state');
+
+            const isHidden = state.persons.isHidden(ctxPerson);
+
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxExportBtn: { visible: true },
+                ctxShowBtn: { visible: isHidden },
+                ctxHideBtn: { visible: !isHidden },
+                ctxDeleteBtn: { visible: true },
+            };
+        }
+
+        return res;
+    }
+
+    static getSelectedItems(model) {
+        return model?.tiles?.filter((item) => item.isActive) ?? [];
+    }
+
+    static getHiddenSelectedItems(model) {
+        return model?.hiddenTiles?.filter((item) => item.isActive) ?? [];
+    }
+
+    static getInitialState(options = {}, state = App.state) {
+        const {
+            detailsItem = null,
+        } = options;
+
+        const model = {
+            locale: App.view.locale,
+            mode: 'list',
+            loading: false,
+            listMenuVisible: false,
+            contextMenuVisible: false,
+            detailsItem,
+        };
+
+        return this.getExpectedState(model, state);
+    }
+
     get listMenu() {
         return this.content.listMenu;
     }
@@ -124,78 +231,7 @@ export class PersonListView extends AppView {
     }
 
     getExpectedState(model = this.model) {
-        const itemsCount = model.tiles.length + model.hiddenTiles.length;
-        const visibleSelected = this.getSelectedItems(model);
-        const hiddenSelected = this.getHiddenSelectedItems(model);
-        const totalSelected = visibleSelected.length + hiddenSelected.length;
-        const isListMode = model.mode === 'list';
-        const isSortMode = model.mode === 'sort';
-        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
-
-        const showSelectItems = (
-            itemsCount > 0
-            && model.listMenuVisible
-            && model.mode === 'select'
-        );
-
-        const res = {
-            addBtn: { visible: isListMode },
-            listModeBtn: { visible: !isListMode },
-            loadingIndicator: { visible: model.loading },
-            totalCounter: { visible: true, value: itemsCount },
-            hiddenCounter: { visible: true, value: model.hiddenTiles.length },
-            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            menuBtn: { visible: itemsCount > 0 && !isSortMode },
-        };
-
-        if (model.detailsItem) {
-            res.itemInfo = PersonDetails.render(model.detailsItem, App.state);
-            res.itemInfo.visible = true;
-        }
-
-        if (model.listMenuVisible) {
-            res.listMenu = {
-                visible: true,
-                selectModeBtn: { visible: isListMode && itemsCount > 0 },
-                sortModeBtn: { visible: showSortItems },
-                sortByNameBtn: { visible: showSortItems },
-                sortByDateBtn: { visible: showSortItems },
-                selectAllBtn: { visible: showSelectItems && totalSelected < itemsCount },
-                deselectAllBtn: { visible: showSelectItems && totalSelected > 0 },
-                exportBtn: { visible: showSelectItems && (totalSelected > 0) },
-                showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
-                deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
-                hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
-            };
-        }
-
-        if (model.contextMenuVisible) {
-            const ctxPerson = App.state.persons.getItem(model.contextItem);
-            assert(ctxPerson, 'Invalid state');
-
-            const isHidden = App.state.persons.isHidden(ctxPerson);
-
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxExportBtn: { visible: true },
-                ctxShowBtn: { visible: isHidden },
-                ctxHideBtn: { visible: !isHidden },
-                ctxDeleteBtn: { visible: true },
-            };
-        }
-
-        return res;
-    }
-
-    getSelectedItems(model = this.model) {
-        return model.tiles.filter((item) => item.isActive);
-    }
-
-    getHiddenSelectedItems(model = this.model) {
-        return model.hiddenTiles.filter((item) => item.isActive);
+        return PersonListView.getExpectedState(model);
     }
 
     onDeselectAll() {
@@ -419,9 +455,7 @@ export class PersonListView extends AppView {
             sort_persons: this.model.sortMode,
         });
 
-        const expList = PersonListView.render(App.state);
         const expected = this.getExpectedState();
-        Object.assign(expected, expList);
 
         await this.waitForList(() => this.listMenu.select('sortByNameBtn'));
 
@@ -441,9 +475,7 @@ export class PersonListView extends AppView {
             sort_persons: this.model.sortMode,
         });
 
-        const expList = PersonListView.render(App.state);
         const expected = this.getExpectedState();
-        Object.assign(expected, expList);
 
         await this.waitForList(() => this.listMenu.select('sortByDateBtn'));
 
@@ -562,23 +594,5 @@ export class PersonListView extends AppView {
         await this.closeListMenu();
 
         return exportResp.body;
-    }
-
-    static render(state) {
-        const visiblePersons = state.persons.getVisible(true);
-        const hiddenPersons = state.persons.getHidden(true);
-
-        const sortMode = state.profile.settings.sort_persons;
-        const res = {
-            tiles: TilesList.renderPersons(state.persons, false, sortMode),
-            hiddenTiles: TilesList.renderHiddenPersons(state.persons, false, sortMode),
-        };
-        res.tiles.visible = true;
-        res.tiles.noDataMsg = {
-            visible: visiblePersons.length === 0,
-        };
-        res.hiddenTiles.visible = hiddenPersons.length > 0;
-
-        return res;
     }
 }
