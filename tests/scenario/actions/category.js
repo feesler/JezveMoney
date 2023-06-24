@@ -138,7 +138,7 @@ export const submit = async () => {
                 App.state.createCategory(expectedCategory);
             }
 
-            const expected = CategoryListView.render(App.state);
+            const expected = CategoryListView.getInitialState();
             App.view.checkState(expected);
         }
 
@@ -158,7 +158,7 @@ export const deleteFromContextMenu = async (index, removeChildren = true) => {
 
         App.state.deleteCategories({ id, removeChildren });
 
-        const expected = CategoryListView.render(App.state);
+        const expected = CategoryListView.getInitialState();
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
@@ -182,7 +182,7 @@ export const del = async (indexes, removeChildren = true) => {
 
         App.state.deleteCategories({ id, removeChildren });
 
-        const expected = CategoryListView.render(App.state);
+        const expected = CategoryListView.getInitialState();
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
@@ -202,7 +202,8 @@ export const delFromUpdate = async (index, removeChildren = true) => {
 
         const id = App.state.categories.indexToId(index);
         App.state.deleteCategories({ id, removeChildren });
-        const expected = CategoryListView.render(App.state);
+
+        const expected = CategoryListView.getInitialState();
         App.view.checkState(expected);
 
         return App.state.fetchAndTest();
