@@ -9,6 +9,7 @@ use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
+use JezveMoney\App\Model\UserSettingsModel;
 use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
@@ -143,7 +144,7 @@ class Schedule extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("transactions.errors.create");
 
-        $dateInfo = getDateInfo(time(), INTERVAL_MONTH);
+        $dateInfo = getDateInfo(UserSettingsModel::clientTime(), INTERVAL_MONTH);
 
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),

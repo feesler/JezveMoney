@@ -12,6 +12,7 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserCurrencyModel;
+use JezveMoney\App\Model\UserSettingsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -163,7 +164,7 @@ class Transactions extends ListViewController
                 "type" => EXPENSE,
                 "src_amount" => 0,
                 "dest_amount" => 0,
-                "date" => time(),
+                "date" => UserSettingsModel::clientTime(),
                 "category_id" => 0,
                 "comment" => "",
             ];

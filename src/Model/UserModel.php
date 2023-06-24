@@ -466,8 +466,7 @@ class UserModel extends CachedTable
      */
     public function setRemindersDate()
     {
-        $settingsModel = UserSettingsModel::getInstance();
-        $date = date("Y-m-d H:i:s", $settingsModel->getClientTime());
+        $date = date("Y-m-d H:i:s", UserSettingsModel::clientTime());
         $curDate = date("Y-m-d H:i:s");
 
         $user_id = $this->getUser();

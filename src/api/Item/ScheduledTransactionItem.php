@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use JezveMoney\App\Model\IntervalOffsetModel;
+use JezveMoney\App\Model\UserSettingsModel;
 
 class ScheduledTransactionItem
 {
@@ -199,7 +200,7 @@ class ScheduledTransactionItem
             : $this->start_date;
         $endDate = isset($params["endDate"])
             ? intval($params["endDate"])
-            : time();
+            : UserSettingsModel::clientTime();
 
         $res = [];
         $interval = $this->getInterval($startDate);

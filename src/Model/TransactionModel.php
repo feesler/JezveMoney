@@ -2269,7 +2269,7 @@ class TransactionModel extends SortableModel
         }
 
         if ($limit > 0) {
-            $endTime = $dataParams["endDate"] ?? time();
+            $endTime = $dataParams["endDate"] ?? UserSettingsModel::clientTime();
             $dataParams["startDate"] = $this->getLimitStartDate($endTime, $limit, $group_type);
             $dataParams["endDate"] = $endTime;
         }
