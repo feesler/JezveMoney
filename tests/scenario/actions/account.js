@@ -111,22 +111,23 @@ export const submit = async () => {
 
         await App.view.submit();
 
-        if (validInput) {
-            assert.instanceOf(App.view, AccountListView, 'Fail to submit account');
-        }
-
         if (expAccount) {
             if (expAccount.id) {
                 App.state.updateAccount(expAccount);
             } else {
                 App.state.createAccount(expAccount);
             }
+        }
+
+        const expected = AccountListView.getInitialState();
+
+        if (validInput) {
+            assert.instanceOf(App.view, AccountListView, 'Fail to submit account');
         } else {
             await App.view.cancel();
         }
 
-        App.view.expectedState = AccountListView.render(App.state);
-        App.view.checkState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -141,8 +142,8 @@ export const deleteFromContextMenu = async (index) => {
         const id = App.state.getSortedAccountsByIndexes(index, true);
         App.state.deleteAccounts({ id });
 
-        App.view.expectedState = AccountListView.render(App.state);
-        App.view.checkState();
+        const expected = AccountListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -155,12 +156,12 @@ export const del = async (accounts) => {
         await checkNavigation();
 
         const id = App.state.getSortedAccountsByIndexes(indexes, true);
-        App.state.deleteAccounts({ id });
 
         await App.view.deleteAccounts(indexes);
 
-        App.view.expectedState = AccountListView.render(App.state);
-        App.view.checkState();
+        App.state.deleteAccounts({ id });
+        const expected = AccountListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -179,8 +180,8 @@ export const delFromUpdate = async (pos) => {
         const id = App.state.getSortedAccountsByIndexes(ind, true);
         App.state.deleteAccounts({ id });
 
-        App.view.expectedState = AccountListView.render(App.state);
-        App.view.checkState();
+        const expected = AccountListView.getInitialState();
+        App.view.checkState(expected);
 
         await App.goToMainView();
         App.view.expectedState = MainView.render(App.state);
@@ -197,17 +198,17 @@ export const show = async (accounts, val = true) => {
     await test(`${actVerb} account(s) [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        const id = App.state.getSortedAccountsByIndexes(itemIds, true);
-        App.state.showAccounts({ id }, val);
-
         if (val) {
             await App.view.showAccounts(itemIds);
         } else {
             await App.view.hideAccounts(itemIds);
         }
 
-        App.view.expectedState = AccountListView.render(App.state);
-        App.view.checkState();
+        const id = App.state.getSortedAccountsByIndexes(itemIds, true);
+        App.state.showAccounts({ id }, val);
+
+        const expected = AccountListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
