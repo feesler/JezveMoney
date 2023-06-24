@@ -198,11 +198,7 @@ export const show = async (accounts, val = true) => {
     await test(`${actVerb} account(s) [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
-        if (val) {
-            await App.view.showAccounts(itemIds);
-        } else {
-            await App.view.hideAccounts(itemIds);
-        }
+        await App.view.showAccounts(itemIds, val);
 
         const id = App.state.getSortedAccountsByIndexes(itemIds, true);
         App.state.showAccounts({ id }, val);

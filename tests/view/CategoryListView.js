@@ -152,7 +152,7 @@ export class CategoryListView extends AppView {
             items: state.categories.clone(),
         };
 
-        return CategoryListView.getExpectedState(model, state);
+        return this.getExpectedState(model, state);
     }
 
     get listMenu() {

@@ -131,7 +131,7 @@ export class AccountListView extends AppView {
             detailsItem,
         };
 
-        return AccountListView.getExpectedState(model, state);
+        return this.getExpectedState(model, state);
     }
 
     get listMenu() {
