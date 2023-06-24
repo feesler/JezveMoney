@@ -14,7 +14,7 @@ export class SummaryList extends TestComponent {
         res.tiles = await TilesList.create(this, await query(this.elem, '.tiles'));
         res.hiddenTiles = await TilesList.create(this, await query(this.elem, '.tiles + .tiles'));
 
-        res.toggleHiddenBtn = { elem: await query(this.elem, '.link-btn') };
+        res.toggleHiddenBtn = { elem: await query(this.elem, '.tiles + .link-btn') };
 
         return res;
     }

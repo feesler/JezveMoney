@@ -184,8 +184,8 @@ export const delFromUpdate = async (pos) => {
         App.view.checkState(expected);
 
         await App.goToMainView();
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainViewExpected = MainView.getInitialState();
+        App.view.checkState(mainViewExpected);
 
         return App.state.fetchAndTest();
     });

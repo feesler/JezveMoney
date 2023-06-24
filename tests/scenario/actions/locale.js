@@ -107,7 +107,7 @@ export const changeLocale = async (locale) => {
 
 export const checkLocale = async (locale) => {
     await test('Main view', async () => {
-        const expected = MainView.render(App.state);
+        const expected = MainView.getInitialState();
 
         await App.goToMainView();
         assert.instanceOf(App.view, MainView, 'Invalid view');

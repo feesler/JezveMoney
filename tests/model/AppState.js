@@ -1774,11 +1774,13 @@ export class AppState {
 
         // Prepare expected updates of accounts
         this.accounts = this.accounts.createTransaction(expTrans);
+        this.resetUserAccountsCache();
 
         // Prepare expected updates of transactions
         const ind = this.transactions.create(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         const item = this.transactions.getItemByIndex(ind);
 
@@ -1830,11 +1832,13 @@ export class AppState {
 
         // Prepare expected updates of accounts
         this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
+        this.resetUserAccountsCache();
 
         // Prepare expected updates of transactions
         this.transactions.update(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
     }
@@ -1852,10 +1856,13 @@ export class AppState {
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
+        this.resetUserAccountsCache();
+
         this.reminders.deleteTransactions(ids);
         this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
     }

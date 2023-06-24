@@ -296,8 +296,8 @@ export const submit = async () => {
         }
 
         await App.goToMainView();
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -459,8 +459,8 @@ export const del = async (type, transactions) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -486,8 +486,8 @@ export const delFromUpdate = async (type, pos) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -506,8 +506,8 @@ export const setTransactionCategory = async ({ index, category }) => {
 
         await App.view.setTransactionCategory(index, category);
 
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
 
         return App.state.fetchAndTest();
     });
@@ -526,8 +526,8 @@ export const deleteFromMainView = async (pos) => {
         await App.view.deleteTransactionByIndex(ind);
 
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };

@@ -271,8 +271,8 @@ export const submit = async () => {
         }
 
         await App.goToMainView();
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -385,8 +385,8 @@ export const del = async (index) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -409,8 +409,8 @@ export const delFromUpdate = async (pos) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
