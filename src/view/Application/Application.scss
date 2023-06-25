@@ -707,10 +707,7 @@ svg * {
   --checkbox-bg: var(--input-bg-color);
   --checkbox-border: var(--input-border-color);
   --checkbox-checked-fill: var(--accent-color);
-
-  .checkbox__check {
-    border-radius: var(--default-border-radius);
-  }
+  --checkbox-border-radius: var(--default-border-radius);
 }
 
 /* Radio */
