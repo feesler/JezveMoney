@@ -35,6 +35,132 @@ const listMenuSelector = '#listMenu';
 
 /** Scheduled transactions list view class */
 export class ReminderListView extends AppView {
+    static getExpectedState(model, state = App.state) {
+        const filteredItems = this.getFilteredItems(model);
+        const { filtersVisible } = model;
+        const listMode = model.listMode === 'list';
+        const selectMode = model.listMode === 'select';
+        const itemsCount = filteredItems.length;
+        const isItemsAvailable = (itemsCount > 0);
+        const selected = this.getSelectedItems(model);
+        const showSelectItems = (
+            isItemsAvailable
+            && model.listMenuVisible
+            && selectMode
+        );
+        const pageNum = this.currentPage(model);
+
+        const stateFilter = parseInt(model.filter.state, 10);
+        const isConfirmed = stateFilter === REMINDER_CONFIRMED;
+        const isCancelled = stateFilter === REMINDER_CANCELLED;
+
+        const list = this.getExpectedList(model);
+
+        const res = {
+            stateMenu: {
+                value: model.filter.state.toString(),
+                visible: filtersVisible,
+            },
+            totalCounter: { visible: true, value: filteredItems.length },
+            selectedCounter: { visible: selectMode, value: selected.length },
+            modeSelector: { visible: isItemsAvailable },
+            showMoreBtn: {
+                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
+            },
+            paginator: { visible: isItemsAvailable },
+            remindersList: {
+                ...list,
+                visible: true,
+            },
+            listModeBtn: { visible: !listMode },
+            menuBtn: { visible: isItemsAvailable },
+        };
+
+        if (model.detailsItem) {
+            res.itemInfo = ReminderDetails.getExpectedState(model.detailsItem, state);
+            res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: {
+                    visible: listMode && isItemsAvailable,
+                },
+                selectAllBtn: {
+                    visible: showSelectItems && selected.length < itemsCount,
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                },
+                confirmBtn: {
+                    visible: showSelectItems && selected.length > 0 && !isConfirmed,
+                },
+                cancelBtn: {
+                    visible: showSelectItems && selected.length > 0 && !isCancelled,
+                },
+            };
+        }
+
+        if (model.contextMenuVisible) {
+            const contextItem = App.view.items.getItem(model.contextItem);
+            assert(contextItem, 'Context item not found');
+
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
+                ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
+                ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
+            };
+        }
+
+        if (isItemsAvailable) {
+            res.paginator = {
+                ...res.paginator,
+                pages: model.list.pages,
+                active: pageNum,
+            };
+
+            res.modeSelector.title = (model.detailsMode)
+                ? __('transactions.showMain', App.view.locale)
+                : __('transactions.showDetails', App.view.locale);
+        }
+
+        return res;
+    }
+
+    static getExpectedList(model, state = App.state) {
+        const onPage = App.config.transactionsOnPage;
+        const { page, range } = model.list;
+
+        let items = [];
+        const filteredItems = this.getFilteredItems(model);
+
+        if (page !== 0) {
+            const pageItems = filteredItems.getPage(page, onPage, range, true);
+            items = pageItems.data;
+        }
+
+        return TransactionRemindersList.render(items, state);
+    }
+
+    static getFilteredItems(model) {
+        assert.instanceOf(App.view, ReminderListView, 'Invalid view');
+
+        return App.view.items.applyFilter(model.filter);
+    }
+
+    static getSelectedItems(model = this.model) {
+        const filteredItems = this.getFilteredItems(model);
+        return filteredItems.filter((item) => item.selected);
+    }
+
+    static currentPage(model) {
+        return model.list.page + model.list.range - 1;
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -207,18 +333,13 @@ export class ReminderListView extends AppView {
         return this.items.data;
     }
 
-    getSelectedItems(model = this.model) {
-        const filteredItems = this.getFilteredItems(model);
-        return filteredItems.filter((item) => item.selected);
-    }
-
     loadReminders(state = App.state) {
         this.items = state.reminders.clone();
         this.items.sort();
     }
 
     currentPage(model = this.model) {
-        return model.list.page + model.list.range - 1;
+        return ReminderListView.currentPage(model);
     }
 
     currentRange(model = this.model) {
@@ -338,118 +459,11 @@ export class ReminderListView extends AppView {
     }
 
     getFilteredItems(model = this.model) {
-        return this.items.applyFilter(model.filter);
-    }
-
-    getExpectedList(model = this.model) {
-        const onPage = App.config.transactionsOnPage;
-        const { page, range } = model.list;
-
-        let items = [];
-        const filteredItems = this.getFilteredItems(model);
-
-        if (page !== 0) {
-            const pageItems = filteredItems.getPage(page, onPage, range, true);
-            items = pageItems.data;
-        }
-
-        return TransactionRemindersList.render(items, App.state);
+        return ReminderListView.getFilteredItems(model);
     }
 
     getExpectedState(model = this.model) {
-        const filteredItems = this.getFilteredItems(model);
-        const { filtersVisible } = model;
-        const listMode = model.listMode === 'list';
-        const selectMode = model.listMode === 'select';
-        const itemsCount = filteredItems.length;
-        const isItemsAvailable = (itemsCount > 0);
-        const selected = this.getSelectedItems();
-        const showSelectItems = (
-            isItemsAvailable
-            && model.listMenuVisible
-            && selectMode
-        );
-        const pageNum = this.currentPage(model);
-
-        const stateFilter = parseInt(model.filter.state, 10);
-        const isConfirmed = stateFilter === REMINDER_CONFIRMED;
-        const isCancelled = stateFilter === REMINDER_CANCELLED;
-
-        const list = this.getExpectedList(model);
-
-        const res = {
-            stateMenu: {
-                value: model.filter.state.toString(),
-                visible: filtersVisible,
-            },
-            totalCounter: { visible: true, value: filteredItems.length },
-            selectedCounter: { visible: selectMode, value: selected.length },
-            modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: {
-                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
-            },
-            paginator: { visible: isItemsAvailable },
-            remindersList: {
-                ...list,
-                visible: true,
-            },
-            listModeBtn: { visible: !listMode },
-            menuBtn: { visible: isItemsAvailable },
-        };
-
-        if (model.detailsItem) {
-            res.itemInfo = ReminderDetails.render(model.detailsItem, App.state);
-            res.itemInfo.visible = true;
-        }
-
-        if (model.listMenuVisible) {
-            res.listMenu = {
-                visible: true,
-                selectModeBtn: {
-                    visible: listMode && isItemsAvailable,
-                },
-                selectAllBtn: {
-                    visible: showSelectItems && selected.length < itemsCount,
-                },
-                deselectAllBtn: {
-                    visible: showSelectItems && selected.length > 0,
-                },
-                confirmBtn: {
-                    visible: showSelectItems && selected.length > 0 && !isConfirmed,
-                },
-                cancelBtn: {
-                    visible: showSelectItems && selected.length > 0 && !isCancelled,
-                },
-            };
-        }
-
-        if (model.contextMenuVisible) {
-            const contextItem = this.items.getItem(model.contextItem);
-            assert(contextItem, 'Context item not found');
-
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
-                ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
-                ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
-            };
-        }
-
-        if (isItemsAvailable) {
-            res.paginator = {
-                ...res.paginator,
-                pages: model.list.pages,
-                active: pageNum,
-            };
-
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', this.locale)
-                : __('transactions.showDetails', this.locale);
-        }
-
-        return res;
+        return ReminderListView.getExpectedState(model);
     }
 
     async waitForList(action) {

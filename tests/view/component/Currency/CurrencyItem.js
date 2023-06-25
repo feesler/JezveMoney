@@ -6,14 +6,21 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
+import { Currency } from '../../../model/Currency.js';
 
 export class CurrencyItem extends TestComponent {
-    static render(currency) {
-        assert(currency, 'Invalid currency');
+    static getExpectedState(currency) {
+        assert.instanceOf(currency, Currency, 'Invalid currency');
 
-        return {
+        const res = {
             title: currency.formatName(App.view.locale),
         };
+
+        if (currency.selected) {
+            res.selected = true;
+        }
+
+        return res;
     }
 
     async parseContent() {

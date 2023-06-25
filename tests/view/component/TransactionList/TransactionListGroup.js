@@ -21,9 +21,4 @@ export class TransactionListGroup extends TestComponent {
     get id() {
         return this.content.id;
     }
-
-    static render() {
-        const res = {};
-        return res;
-    }
 }

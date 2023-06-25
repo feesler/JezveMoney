@@ -6,16 +6,36 @@ import {
     asyncMap,
     evaluate,
 } from 'jezve-test';
+import { App } from '../../../Application.js';
+import { Currency } from '../../../model/Currency.js';
 import { CurrencyItem } from './CurrencyItem.js';
 
+/**
+ * User currencies list test component
+ */
 export class CurrenciesList extends TestComponent {
-    static render(transactions, state) {
-        assert.isArray(transactions, 'Invalid data');
+    static getExpectedState(model, state = App.state) {
+        assert(model, 'Invalid model');
+        assert.isArray(model.items, 'Invalid currencies');
 
         return {
-            items: transactions.map((item) => (
-                CurrencyItem.render(item, state)
-            )),
+            mode: model.mode,
+            items: model.items.map((item) => {
+                if (!item.id) {
+                    return item;
+                }
+
+                const userCurrency = state.userCurrencies.getItem(item.id);
+                const currency = App.currency.getItem(userCurrency?.curr_id);
+                assert(currency, 'Invalid user currency item');
+
+                const expectedItem = new Currency({
+                    ...item,
+                    ...currency,
+                });
+
+                return CurrencyItem.getExpectedState(expectedItem, state);
+            }),
         };
     }
 

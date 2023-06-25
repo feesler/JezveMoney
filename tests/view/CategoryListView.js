@@ -88,7 +88,7 @@ export class CategoryListView extends AppView {
             };
             if (visible) {
                 section.items = expectedItems.map((item) => ({
-                    content: CategoryItem.render(item),
+                    content: CategoryItem.getExpectedState(item, state),
                 }));
             }
 
@@ -96,7 +96,7 @@ export class CategoryListView extends AppView {
         });
 
         if (model.detailsItem) {
-            res.itemInfo = CategoryDetails.render(model.detailsItem, App.state);
+            res.itemInfo = CategoryDetails.getExpectedState(model.detailsItem, state);
             res.itemInfo.visible = true;
         }
 

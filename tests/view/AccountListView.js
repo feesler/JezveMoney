@@ -68,7 +68,7 @@ export class AccountListView extends AppView {
         res.hiddenTiles.visible = res.hiddenTiles.items.length > 0;
 
         if (model.detailsItem) {
-            res.itemInfo = AccountDetails.render(model.detailsItem, App.state);
+            res.itemInfo = AccountDetails.getExpectedState(model.detailsItem, state);
             res.itemInfo.visible = true;
         }
 

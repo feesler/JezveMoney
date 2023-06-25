@@ -29,6 +29,107 @@ const listMenuSelector = '#listMenu';
 
 /** Scheduled transactions list view class */
 export class ScheduleView extends AppView {
+    static getExpectedState(model) {
+        const listMode = model.listMode === 'list';
+        const selectMode = model.listMode === 'select';
+        const itemsCount = App.view.items.length;
+        const isItemsAvailable = (itemsCount > 0);
+        const selected = this.getSelectedItems();
+        const showSelectItems = (
+            isItemsAvailable
+            && model.listMenuVisible
+            && selectMode
+        );
+        const pageNum = this.currentPage(model);
+
+        const list = this.getExpectedList(model);
+
+        const res = {
+            totalCounter: { visible: true, value: itemsCount },
+            selectedCounter: { visible: selectMode, value: selected.length },
+            modeSelector: { visible: isItemsAvailable },
+            showMoreBtn: {
+                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
+            },
+            paginator: { visible: isItemsAvailable },
+            scheduleList: {
+                ...list,
+                visible: true,
+            },
+            createBtn: { visible: listMode },
+            listModeBtn: { visible: !listMode },
+            menuBtn: { visible: isItemsAvailable },
+        };
+
+        if (model.detailsItem) {
+            res.itemInfo = ScheduleItemDetails.render(model.detailsItem, App.state);
+            res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.listMenu = {
+                visible: true,
+                selectModeBtn: { visible: listMode && isItemsAvailable },
+                selectAllBtn: { visible: showSelectItems && selected.length < itemsCount },
+                deselectAllBtn: { visible: showSelectItems && selected.length > 0 },
+                deleteBtn: { visible: showSelectItems && selected.length > 0 },
+            };
+        }
+
+        if (model.contextMenuVisible) {
+            const contextItem = App.view.items.getItem(model.contextItem);
+            assert(contextItem, 'Context item not found');
+
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxDeleteBtn: { visible: true },
+            };
+        }
+
+        if (isItemsAvailable) {
+            res.paginator = {
+                ...res.paginator,
+                pages: model.list.pages,
+                active: pageNum,
+            };
+
+            res.modeSelector.title = (model.detailsMode)
+                ? __('transactions.showMain', App.view.locale)
+                : __('transactions.showDetails', App.view.locale);
+        }
+
+        return res;
+    }
+
+    static getExpectedList(model) {
+        const onPage = App.config.transactionsOnPage;
+        const { page, range } = model.list;
+
+        let items = [];
+        if (page !== 0) {
+            const pageItems = App.view.items.getPage(page, onPage, range, true);
+            items = pageItems.data;
+        }
+
+        const listModel = {
+            detailsMode: model.detailsMode,
+            items,
+        };
+
+        return ScheduleList.getExpectedState(listModel);
+    }
+
+    static getSelectedItems() {
+        return App.view.items.filter((item) => item.selected);
+    }
+
+    static currentPage(model) {
+        return model.list.page + model.list.range - 1;
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -160,16 +261,12 @@ export class ScheduleView extends AppView {
         return this.items.data;
     }
 
-    getSelectedItems() {
-        return this.items.filter((item) => item.selected);
-    }
-
     loadScheduleItems(state = App.state) {
         this.items = state.schedule.clone();
     }
 
     currentPage(model = this.model) {
-        return model.list.page + model.list.range - 1;
+        return ScheduleView.currentPage(model);
     }
 
     currentRange(model = this.model) {
@@ -198,7 +295,7 @@ export class ScheduleView extends AppView {
         res.list.page = page;
         res.list.range = range;
         const pageItems = this.items.getPage(page, onPage, range, true);
-        const { items } = ScheduleList.render(pageItems.data, App.state);
+        const { items } = ScheduleList.getExpectedState({ items: pageItems.data });
         res.list.items = items;
 
         return res;
@@ -221,7 +318,7 @@ export class ScheduleView extends AppView {
 
         res.list.range = range;
         const pageItems = this.items.getPage(model.list.page, onPage, range, true);
-        const { items } = ScheduleList.render(pageItems.data, App.state);
+        const { items } = ScheduleList.getExpectedState({ items: pageItems.data });
         res.list.items = items;
 
         return res;
@@ -284,95 +381,11 @@ export class ScheduleView extends AppView {
     }
 
     getExpectedList(model = this.model) {
-        const onPage = App.config.transactionsOnPage;
-        const { page, range } = model.list;
-
-        let items = [];
-        if (page !== 0) {
-            const pageItems = this.items.getPage(page, onPage, range, true);
-            items = pageItems.data;
-        }
-
-        const options = {
-            detailsMode: model.detailsMode,
-        };
-
-        return ScheduleList.render(items, App.state, options);
+        return ScheduleView.getExpectedList(model);
     }
 
     getExpectedState(model = this.model) {
-        const listMode = model.listMode === 'list';
-        const selectMode = model.listMode === 'select';
-        const itemsCount = this.items.length;
-        const isItemsAvailable = (itemsCount > 0);
-        const selected = this.getSelectedItems();
-        const showSelectItems = (
-            isItemsAvailable
-            && model.listMenuVisible
-            && selectMode
-        );
-        const pageNum = this.currentPage(model);
-
-        const list = this.getExpectedList(model);
-
-        const res = {
-            totalCounter: { visible: true, value: itemsCount },
-            selectedCounter: { visible: selectMode, value: selected.length },
-            modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: {
-                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
-            },
-            paginator: { visible: isItemsAvailable },
-            scheduleList: {
-                ...list,
-                visible: true,
-            },
-            createBtn: { visible: listMode },
-            listModeBtn: { visible: !listMode },
-            menuBtn: { visible: isItemsAvailable },
-        };
-
-        if (model.detailsItem) {
-            res.itemInfo = ScheduleItemDetails.render(model.detailsItem, App.state);
-            res.itemInfo.visible = true;
-        }
-
-        if (model.listMenuVisible) {
-            res.listMenu = {
-                visible: true,
-                selectModeBtn: { visible: listMode && isItemsAvailable },
-                selectAllBtn: { visible: showSelectItems && selected.length < itemsCount },
-                deselectAllBtn: { visible: showSelectItems && selected.length > 0 },
-                deleteBtn: { visible: showSelectItems && selected.length > 0 },
-            };
-        }
-
-        if (model.contextMenuVisible) {
-            const contextItem = this.items.getItem(model.contextItem);
-            assert(contextItem, 'Context item not found');
-
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxDeleteBtn: { visible: true },
-            };
-        }
-
-        if (isItemsAvailable) {
-            res.paginator = {
-                ...res.paginator,
-                pages: model.list.pages,
-                active: pageNum,
-            };
-
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', this.locale)
-                : __('transactions.showDetails', this.locale);
-        }
-
-        return res;
+        return ScheduleView.getExpectedState(model);
     }
 
     async waitForList(action) {

@@ -6,6 +6,7 @@ import {
     asyncMap,
     queryAll,
     prop,
+    assert,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { Category } from '../../../model/Category.js';
@@ -20,7 +21,59 @@ const fieldSelectors = {
     updateDateField: '.update-date-field',
 };
 
+/**
+ * Category details test component
+ */
 export class CategoryDetails extends TestComponent {
+    static getExpectedState(category, state = App.state) {
+        assert(category, 'Invalid category');
+
+        const parent = state.categories.getItem(category.parent_id);
+        const parentTitle = (parent) ? parent.name : __('categories.noParent', App.view.locale);
+        const subcategories = state.categories.findByParent(category.id);
+        const itemTransactions = state.transactions.applyFilter({
+            categories: category.id,
+        });
+
+        const res = {
+            title: {
+                visible: true,
+                value: category.name,
+            },
+            parentField: {
+                visible: true,
+                value: parentTitle,
+            },
+            typeField: {
+                visible: true,
+                value: Category.typeToString(category.type, App.view.locale),
+            },
+            subcategoriesField: {
+                value: subcategories.length.toString(),
+                visible: !parent,
+            },
+            subcategoriesList: {
+                visible: subcategories.length > 0,
+            },
+            subcategories: subcategories.map((item) => item.name),
+            transactionsField: {
+                value: itemTransactions.length.toString(),
+                visible: true,
+            },
+            transactionsLink: { visible: true },
+            createDateField: {
+                value: App.secondsToDateString(category.createdate),
+                visible: true,
+            },
+            updateDateField: {
+                value: App.secondsToDateString(category.updatedate),
+                visible: true,
+            },
+        };
+
+        return res;
+    }
+
     get loading() {
         return this.content.loading;
     }
@@ -67,52 +120,5 @@ export class CategoryDetails extends TestComponent {
 
     async close() {
         return click(this.content.closeBtn.elem);
-    }
-
-    static render(item, state) {
-        const parent = state.categories.getItem(item.parent_id);
-        const parentTitle = (parent) ? parent.name : __('categories.noParent', App.view.locale);
-        const subcategories = state.categories.findByParent(item.id);
-        const itemTransactions = state.transactions.applyFilter({
-            categories: item.id,
-        });
-
-        const res = {
-            title: {
-                visible: true,
-                value: item.name,
-            },
-            parentField: {
-                visible: true,
-                value: parentTitle,
-            },
-            typeField: {
-                visible: true,
-                value: Category.typeToString(item.type, App.view.locale),
-            },
-            subcategoriesField: {
-                value: subcategories.length.toString(),
-                visible: !parent,
-            },
-            subcategoriesList: {
-                visible: subcategories.length > 0,
-            },
-            subcategories: subcategories.map((category) => category.name),
-            transactionsField: {
-                value: itemTransactions.length.toString(),
-                visible: true,
-            },
-            transactionsLink: { visible: true },
-            createDateField: {
-                value: App.secondsToDateString(item.createdate),
-                visible: true,
-            },
-            updateDateField: {
-                value: App.secondsToDateString(item.updatedate),
-                visible: true,
-            },
-        };
-
-        return res;
     }
 }

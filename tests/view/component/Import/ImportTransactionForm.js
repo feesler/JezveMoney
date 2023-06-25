@@ -39,7 +39,149 @@ const fieldSelectors = [
     '.comment-field',
 ];
 
+/**
+ * Import transaction form test component
+ */
 export class ImportTransactionForm extends TestComponent {
+    static getExpectedState(model) {
+        const isExpense = (model.type === 'expense');
+        const isIncome = (model.type === 'income');
+        const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
+        const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
+        const isLimit = (model.type === 'limit');
+        const isCreditCard = (model.mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD);
+
+        const visibleTypes = ImportTransaction.availTypes.filter((item) => (
+            item.id !== 'limit' || isCreditCard
+        )).map((item) => ({ id: item.id.toString() }));
+
+        const showSrcAmount = (!isExpense && !isLimit) || model.isDifferent;
+        const showDestAmount = isExpense || isLimit || model.isDifferent;
+
+        const realType = ImportTransaction.typeFromString(model.type);
+        const visibleCategories = App.state
+            .getCategoriesForType(realType)
+            .map((item) => ({ id: item.id.toString() }));
+
+        const res = {
+            typeField: {
+                disabled: false,
+                visible: true,
+                dropDown: { items: visibleTypes },
+            },
+            srcAmountField: {
+                disabled: !showSrcAmount,
+                visible: showSrcAmount,
+                invFeedback: {
+                    visible: showSrcAmount && !model.validation.srcAmount,
+                },
+            },
+            destAmountField: {
+                disabled: !showDestAmount,
+                visible: showDestAmount,
+                invFeedback: {
+                    visible: showDestAmount && !model.validation.destAmount,
+                },
+            },
+            transferAccountField: {
+                disabled: !isTransfer,
+                visible: isTransfer,
+            },
+            personField: {
+                visible: isDebt,
+                disabled: !isDebt,
+            },
+            dateField: {
+                value: App.reformatDate(model.date),
+                disabled: false,
+                visible: true,
+                button: {
+                    visible: true,
+                    disabled: false,
+                },
+                invFeedback: {
+                    visible: !model.validation.date,
+                },
+            },
+            categoryField: {
+                value: model.categoryId.toString(),
+                disabled: false,
+                visible: true,
+                dropDown: { items: visibleCategories },
+            },
+            commentField: {
+                value: model.comment.toString(),
+                disabled: false,
+                visible: true,
+            },
+        };
+
+        if (!res.typeField.disabled) {
+            res.typeField.value = model.type.toString();
+        }
+        if (!res.srcAmountField.disabled) {
+            res.srcAmountField.value = model.srcAmount.toString();
+
+            if (isIncome) {
+                res.srcAmountField.dropDown = { value: model.srcCurrId.toString() };
+            }
+        }
+
+        if (!res.destAmountField.disabled) {
+            res.destAmountField.value = model.destAmount.toString();
+
+            if (isExpense) {
+                res.destAmountField.dropDown = { value: model.destCurrId.toString() };
+            }
+        }
+
+        if (!res.transferAccountField.disabled) {
+            const transferAccountId = (model.type === 'transfer_out')
+                ? model.destId
+                : model.sourceId;
+
+            res.transferAccountField.value = transferAccountId.toString();
+        }
+        if (!res.personField.disabled) {
+            res.personField.value = model.personId.toString();
+        }
+
+        if (model.imported) {
+            res.toggleBtn = { visible: true };
+            res.origDataCollapsible = {
+                visible: true,
+                collapsed: model.origDataCollapsed,
+            };
+        }
+
+        return res;
+    }
+
+    static getInitialState(item, state = App.state) {
+        const model = {
+            mainAccount: item.mainAccount,
+            type: item.type,
+            sourceId: item.src_id,
+            destId: item.dest_id,
+            srcAmount: item.src_amount,
+            destAmount: item.dest_amount,
+            srcCurrId: item.src_curr,
+            destCurrId: item.dest_curr,
+            personId: item.person_id,
+            categoryId: item.category_id,
+            date: item.date,
+            comment: item.comment,
+            isDifferent: item.src_curr !== item.dest_curr,
+            validation: {
+                srcAmount: true,
+                destAmount: true,
+                date: true,
+            },
+        };
+
+        return this.getExpectedState(model, state);
+    }
+
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -267,120 +409,7 @@ export class ImportTransactionForm extends TestComponent {
         return res;
     }
 
-    static getExpectedState(model) {
-        const isExpense = (model.type === 'expense');
-        const isIncome = (model.type === 'income');
-        const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
-        const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
-        const isLimit = (model.type === 'limit');
-        const isCreditCard = (model.mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD);
-
-        const visibleTypes = ImportTransaction.availTypes.filter((item) => (
-            item.id !== 'limit' || isCreditCard
-        )).map((item) => ({ id: item.id.toString() }));
-
-        const showSrcAmount = (!isExpense && !isLimit) || model.isDifferent;
-        const showDestAmount = isExpense || isLimit || model.isDifferent;
-
-        const realType = ImportTransaction.typeFromString(model.type);
-        const visibleCategories = App.state
-            .getCategoriesForType(realType)
-            .map((item) => ({ id: item.id.toString() }));
-
-        const res = {
-            typeField: {
-                disabled: false,
-                visible: true,
-                dropDown: { items: visibleTypes },
-            },
-            srcAmountField: {
-                disabled: !showSrcAmount,
-                visible: showSrcAmount,
-                invFeedback: {
-                    visible: showSrcAmount && !model.validation.srcAmount,
-                },
-            },
-            destAmountField: {
-                disabled: !showDestAmount,
-                visible: showDestAmount,
-                invFeedback: {
-                    visible: showDestAmount && !model.validation.destAmount,
-                },
-            },
-            transferAccountField: {
-                disabled: !isTransfer,
-                visible: isTransfer,
-            },
-            personField: {
-                visible: isDebt,
-                disabled: !isDebt,
-            },
-            dateField: {
-                value: App.reformatDate(model.date),
-                disabled: false,
-                visible: true,
-                button: {
-                    visible: true,
-                    disabled: false,
-                },
-                invFeedback: {
-                    visible: !model.validation.date,
-                },
-            },
-            categoryField: {
-                value: model.categoryId.toString(),
-                disabled: false,
-                visible: true,
-                dropDown: { items: visibleCategories },
-            },
-            commentField: {
-                value: model.comment.toString(),
-                disabled: false,
-                visible: true,
-            },
-        };
-
-        if (!res.typeField.disabled) {
-            res.typeField.value = model.type.toString();
-        }
-        if (!res.srcAmountField.disabled) {
-            res.srcAmountField.value = model.srcAmount.toString();
-
-            if (isIncome) {
-                res.srcAmountField.dropDown = { value: model.srcCurrId.toString() };
-            }
-        }
-
-        if (!res.destAmountField.disabled) {
-            res.destAmountField.value = model.destAmount.toString();
-
-            if (isExpense) {
-                res.destAmountField.dropDown = { value: model.destCurrId.toString() };
-            }
-        }
-
-        if (!res.transferAccountField.disabled) {
-            const transferAccountId = (model.type === 'transfer_out')
-                ? model.destId
-                : model.sourceId;
-            res.transferAccountField.value = transferAccountId.toString();
-        }
-        if (!res.personField.disabled) {
-            res.personField.value = model.personId.toString();
-        }
-
-        if (model.imported) {
-            res.toggleBtn = { visible: true };
-            res.origDataCollapsible = {
-                visible: true,
-                collapsed: model.origDataCollapsed,
-            };
-        }
-
-        return res;
-    }
-
-    getExpectedState(model) {
+    getExpectedState(model = this.model) {
         return ImportTransactionForm.getExpectedState(model);
     }
 
@@ -661,11 +690,11 @@ export class ImportTransactionForm extends TestComponent {
 
         this.trimAmounts();
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.typeField.dropDown.selectItem(value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async changeTransferAccount(value) {
@@ -693,13 +722,13 @@ export class ImportTransactionForm extends TestComponent {
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.trimAmounts();
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => (
             this.content.transferAccountField.dropDown.selectItem(value)
         ));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async changePerson(value) {
@@ -708,11 +737,11 @@ export class ImportTransactionForm extends TestComponent {
         this.model.personId = value;
         this.model.person = App.state.persons.getItem(value);
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.personField.dropDown.selectItem(value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async inputSourceAmount(value) {
@@ -724,11 +753,11 @@ export class ImportTransactionForm extends TestComponent {
             this.model.destAmount = cutValue;
         }
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => input(this.content.srcAmountField.inputElem, value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async inputDestAmount(value) {
@@ -740,11 +769,11 @@ export class ImportTransactionForm extends TestComponent {
             this.model.srcAmount = cutValue;
         }
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => input(this.content.destAmountField.inputElem, value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async changeSourceCurrency(value) {
@@ -758,11 +787,11 @@ export class ImportTransactionForm extends TestComponent {
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.trimAmounts();
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => dropDown.selectItem(value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async changeDestCurrency(value) {
@@ -776,11 +805,11 @@ export class ImportTransactionForm extends TestComponent {
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.trimAmounts();
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => dropDown.selectItem(value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async inputDate(value) {
@@ -788,11 +817,11 @@ export class ImportTransactionForm extends TestComponent {
 
         this.model.date = value;
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => input(this.content.dateField.inputElem, value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async changeCategory(value) {
@@ -801,22 +830,22 @@ export class ImportTransactionForm extends TestComponent {
 
         this.model.categoryId = parseInt(value, 10);
         this.cleanValidation();
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => dropDown.selectItem(value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async inputComment(value) {
         this.checkEnabled(this.content.commentField);
 
         this.model.comment = value;
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => input(this.content.commentField.inputElem, value));
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async clickSave() {
@@ -831,104 +860,10 @@ export class ImportTransactionForm extends TestComponent {
         assert(this.content.toggleBtn.visible, 'Toggle button not visible');
 
         this.model.origDataCollapsed = !this.model.origDataCollapsed;
-        this.expectedState = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         await this.performAction(() => click(this.content.toggleBtn.elem));
 
-        return this.checkState();
-    }
-
-    /**
-     * Convert transaction object to expected state of component
-     * Transaction object: { mainAccount, ...fields of transaction }
-     * @param {ImportTransaction} item - transaction item object
-     * @param {AppState} state - application state
-     */
-    static render(item, state) {
-        assert(item && state, 'Invalid parameters');
-        assert(item.mainAccount, 'Main account not defined');
-        const trType = ImportTransaction.getTypeById(item.type);
-        assert(trType, `Unknown import transaction type: ${item.type}`);
-
-        const isExpense = (item.type === 'expense');
-        const isIncome = (item.type === 'income');
-        const isTransfer = (item.type === 'transfer_out' || item.type === 'transfer_in');
-        const isDebt = (item.type === 'debt_out' || item.type === 'debt_in');
-        const isLimit = (item.type === 'limit');
-        const isDiff = (item.src_curr !== item.dest_curr);
-        const showSrcAmount = (!isExpense && !isLimit) || isDiff;
-        const showDestAmount = isExpense || isLimit || isDiff;
-        const dateStr = (typeof item.date === 'string')
-            ? item.date
-            : App.secondsToDateString(item.date);
-
-        const res = {
-            typeField: { disabled: false },
-            srcAmountField: {
-                disabled: !showSrcAmount,
-                visible: showSrcAmount,
-                invFeedback: {
-                    visible: false,
-                },
-            },
-            destAmountField: {
-                disabled: !showDestAmount,
-                visible: showDestAmount,
-                invFeedback: {
-                    visible: false,
-                },
-            },
-            transferAccountField: {
-                disabled: !isTransfer,
-                visible: isTransfer,
-            },
-            personField: {
-                visible: isDebt,
-                disabled: !isDebt,
-            },
-            dateField: {
-                value: App.reformatDate(dateStr),
-                disabled: false,
-                invFeedback: {
-                    visible: false,
-                },
-            },
-            commentField: {
-                value: item.comment,
-                disabled: false,
-            },
-        };
-
-        if (!res.typeField.disabled) {
-            res.typeField.value = item.type.toString();
-        }
-        if (!res.srcAmountField.disabled) {
-            res.srcAmountField.value = item.src_amount.toString();
-
-            if (isIncome) {
-                res.srcAmountField.dropDown = { value: item.src_curr.toString() };
-            }
-        }
-
-        if (!res.destAmountField.disabled) {
-            res.destAmountField.value = item.dest_amount.toString();
-
-            if (!isExpense) {
-                res.destAmountField.dropDown = { value: item.dest_curr.toString() };
-            }
-        }
-
-        if (!res.transferAccountField.disabled) {
-            const transferAccountId = (item.type === 'transfer_out')
-                ? item.dest_id
-                : item.src_id;
-
-            res.transferAccountField.value = transferAccountId.toString();
-        }
-        if (!res.personField.disabled) {
-            res.personField.value = item.person_id.toString();
-        }
-
-        return res;
+        return this.checkState(expected);
     }
 }

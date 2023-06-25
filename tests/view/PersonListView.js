@@ -71,7 +71,7 @@ export class PersonListView extends AppView {
         res.hiddenTiles.visible = hiddenPersons.length > 0;
 
         if (model.detailsItem) {
-            res.itemInfo = PersonDetails.render(model.detailsItem, state);
+            res.itemInfo = PersonDetails.getExpectedState(model.detailsItem, state);
             res.itemInfo.visible = true;
         }
 
