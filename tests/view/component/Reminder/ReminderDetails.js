@@ -22,7 +22,83 @@ const fieldSelectors = {
     updateDateField: '.update-date-field',
 };
 
+/**
+ * Reminder details test component
+ */
 export class ReminderDetails extends TestComponent {
+    static getExpectedState(reminder, state) {
+        assert.instanceOf(reminder, Reminder, 'Invalid item');
+        assert(state, 'Invalid state object');
+
+        reminder.extend(state);
+
+        const srcCurr = App.currency.getItem(reminder.src_curr);
+        assert(srcCurr, `Currency not found: ${reminder.src_curr}`);
+        const destCurr = App.currency.getItem(reminder.dest_curr);
+        assert(destCurr, `Currency not found: ${reminder.dest_curr}`);
+
+        const showSource = reminder.src_id !== 0;
+        const showDest = reminder.dest_id !== 0;
+        const isDiff = reminder.src_curr !== reminder.dest_curr;
+
+        const category = state.categories.getItem(reminder.category_id);
+        const categoryTitle = (category)
+            ? category.name
+            : __('categories.noCategory', App.view.locale);
+
+        const res = {
+            title: {
+                visible: true,
+                value: Transaction.typeToString(reminder.type, App.view.locale),
+            },
+            sourceField: {
+                visible: showSource,
+            },
+            destinationField: {
+                visible: showDest,
+            },
+            srcAmountField: {
+                visible: true,
+                value: srcCurr.format(reminder.src_amount),
+            },
+            destAmountField: {
+                visible: isDiff,
+            },
+            dateField: {
+                visible: true,
+                value: App.secondsToDateString(reminder.date),
+            },
+            categoryField: {
+                visible: true,
+                value: categoryTitle,
+            },
+            commentField: {
+                visible: true,
+                value: reminder.comment,
+            },
+            createDateField: {
+                value: App.secondsToDateString(reminder.createdate),
+                visible: true,
+            },
+            updateDateField: {
+                value: App.secondsToDateString(reminder.updatedate),
+                visible: true,
+            },
+        };
+
+        if (showSource) {
+            res.sourceField.value = this.getAccountOrPerson(reminder.src_id, state);
+        }
+        if (showDest) {
+            res.destinationField.value = this.getAccountOrPerson(reminder.dest_id, state);
+        }
+        if (isDiff) {
+            res.destAmountField.value = destCurr.format(reminder.dest_amount);
+        }
+
+        return res;
+    }
+
     async parseContent() {
         const res = await evaluate((el, selectors) => {
             const textElemState = (elem) => ({
@@ -69,78 +145,5 @@ export class ReminderDetails extends TestComponent {
 
         const person = persons.getItem(account.owner_id);
         return person.name;
-    }
-
-    static render(item, state) {
-        assert.instanceOf(item, Reminder, 'Invalid item');
-        assert(state, 'Invalid state object');
-
-        item.extend(state);
-
-        const srcCurr = App.currency.getItem(item.src_curr);
-        assert(srcCurr, `Currency not found: ${item.src_curr}`);
-        const destCurr = App.currency.getItem(item.dest_curr);
-        assert(destCurr, `Currency not found: ${item.dest_curr}`);
-
-        const showSource = item.src_id !== 0;
-        const showDest = item.dest_id !== 0;
-        const isDiff = item.src_curr !== item.dest_curr;
-
-        const category = state.categories.getItem(item.category_id);
-        const categoryTitle = (category)
-            ? category.name
-            : __('categories.noCategory', App.view.locale);
-
-        const res = {
-            title: {
-                visible: true,
-                value: Transaction.typeToString(item.type, App.view.locale),
-            },
-            sourceField: {
-                visible: showSource,
-            },
-            destinationField: {
-                visible: showDest,
-            },
-            srcAmountField: {
-                visible: true,
-                value: srcCurr.format(item.src_amount),
-            },
-            destAmountField: {
-                visible: isDiff,
-            },
-            dateField: {
-                visible: true,
-                value: App.secondsToDateString(item.date),
-            },
-            categoryField: {
-                visible: true,
-                value: categoryTitle,
-            },
-            commentField: {
-                visible: true,
-                value: item.comment,
-            },
-            createDateField: {
-                value: App.secondsToDateString(item.createdate),
-                visible: true,
-            },
-            updateDateField: {
-                value: App.secondsToDateString(item.updatedate),
-                visible: true,
-            },
-        };
-
-        if (showSource) {
-            res.sourceField.value = this.getAccountOrPerson(item.src_id, state);
-        }
-        if (showDest) {
-            res.destinationField.value = this.getAccountOrPerson(item.dest_id, state);
-        }
-        if (isDiff) {
-            res.destAmountField.value = destCurr.format(item.dest_amount);
-        }
-
-        return res;
     }
 }

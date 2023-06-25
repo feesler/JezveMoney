@@ -297,7 +297,7 @@
         "startDate": "Start date",
         "endDate": "End date",
         "noEndDate": "Endless",
-        "repeat": "Repeat",
+        "repeat": "Repeat transaction",
         "intervals": {
             "none": "Don't repeat",
             "day": "Daily",

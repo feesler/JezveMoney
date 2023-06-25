@@ -3,7 +3,77 @@ import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
 import { dateStringToSeconds } from '../../../common.js';
 
+/**
+ * Import conditions list item test component
+ */
 export class ImportConditionItem extends TestComponent {
+    static getExpectedState(model) {
+        const res = {
+            propertyTitle: { visible: true },
+            operatorTitle: { visible: true },
+            valueTitle: { visible: !model.isFieldValue },
+            valuePropTitle: { visible: model.isFieldValue },
+        };
+
+        // Condition field type
+        const fieldType = ImportCondition.getFieldTypeById(model.fieldType);
+        assert(fieldType, `Invalid property type: '${model.fieldType}'`);
+        res.propertyTitle.value = fieldType.title;
+
+        // Condition operator
+        const operator = ImportCondition.getOperatorById(model.operator);
+        assert(operator, `Operator not found: '${model.operator}'`);
+        res.operatorTitle.value = operator.title;
+
+        // Condition value
+        let value;
+        if (model.isFieldValue) {
+            const valueProp = ImportCondition.getFieldTypeById(model.value);
+            assert(valueProp, `Invalid property type: '${model.value}'`);
+
+            res.valuePropTitle.value = valueProp.title;
+        } else if (ImportCondition.isAccountField(model.fieldType)) {
+            const account = App.state.accounts.getItem(model.value);
+            assert(account, `Account not found: '${model.value}'`);
+
+            value = account.name;
+        } else if (ImportCondition.isTemplateField(model.fieldType)) {
+            const template = App.state.templates.getItem(model.value);
+            assert(template, `Template not found: '${model.value}'`);
+
+            value = template.name;
+        } else if (ImportCondition.isCurrencyField(model.fieldType)) {
+            const currency = App.currency.getItem(model.value);
+            assert(currency, `Currency not found: '${model.value}'`);
+
+            value = currency.code;
+        } else if (ImportCondition.isDateField(model.fieldType)) {
+            const time = parseInt(model.value, 10);
+            value = App.secondsToDateString(time);
+        } else {
+            value = model.value;
+        }
+
+        if (!model.isFieldValue) {
+            res.valueTitle.value = value;
+        }
+
+        return res;
+    }
+
+    static render(item) {
+        assert.instanceOf(item, ImportCondition, 'Invalid item');
+
+        const model = {
+            isFieldValue: item.isPropertyValue(),
+            fieldType: item.field_id,
+            operator: item.operator,
+            value: item.value,
+        };
+
+        return this.getExpectedState(model);
+    }
+
     async parseContent() {
         assert(this.elem, 'Invalid import condition item');
 
@@ -84,72 +154,5 @@ export class ImportConditionItem extends TestComponent {
         }
 
         return res;
-    }
-
-    static getExpectedState(model) {
-        const res = {
-            propertyTitle: { visible: true },
-            operatorTitle: { visible: true },
-            valueTitle: { visible: !model.isFieldValue },
-            valuePropTitle: { visible: model.isFieldValue },
-        };
-
-        // Condition field type
-        const fieldType = ImportCondition.getFieldTypeById(model.fieldType);
-        assert(fieldType, `Invalid property type: '${model.fieldType}'`);
-        res.propertyTitle.value = fieldType.title;
-
-        // Condition operator
-        const operator = ImportCondition.getOperatorById(model.operator);
-        assert(operator, `Operator not found: '${model.operator}'`);
-        res.operatorTitle.value = operator.title;
-
-        // Condition value
-        let value;
-        if (model.isFieldValue) {
-            const valueProp = ImportCondition.getFieldTypeById(model.value);
-            assert(valueProp, `Invalid property type: '${model.value}'`);
-
-            res.valuePropTitle.value = valueProp.title;
-        } else if (ImportCondition.isAccountField(model.fieldType)) {
-            const account = App.state.accounts.getItem(model.value);
-            assert(account, `Account not found: '${model.value}'`);
-
-            value = account.name;
-        } else if (ImportCondition.isTemplateField(model.fieldType)) {
-            const template = App.state.templates.getItem(model.value);
-            assert(template, `Template not found: '${model.value}'`);
-
-            value = template.name;
-        } else if (ImportCondition.isCurrencyField(model.fieldType)) {
-            const currency = App.currency.getItem(model.value);
-            assert(currency, `Currency not found: '${model.value}'`);
-
-            value = currency.code;
-        } else if (ImportCondition.isDateField(model.fieldType)) {
-            const time = parseInt(model.value, 10);
-            value = App.secondsToDateString(time);
-        } else {
-            value = model.value;
-        }
-
-        if (!model.isFieldValue) {
-            res.valueTitle.value = value;
-        }
-
-        return res;
-    }
-
-    static render(item) {
-        assert.instanceOf(item, ImportCondition, 'Invalid item');
-
-        const model = {
-            isFieldValue: item.isPropertyValue(),
-            fieldType: item.field_id,
-            operator: item.operator,
-            value: item.value,
-        };
-
-        return this.getExpectedState(model);
     }
 }

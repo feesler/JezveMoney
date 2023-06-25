@@ -52,6 +52,23 @@ const weekOffsetTokens = [
     'schedule.item.onSaturdays',
 ];
 
+/** Returns interval offset for specified date */
+export const getIntervalOffset = (date, type) => {
+    const utcDate = shiftDate(date, 0);
+
+    if (type === INTERVAL_WEEK) {
+        return utcDate.getDay();
+    }
+    if (type === INTERVAL_MONTH) {
+        return utcDate.getDate() - 1;
+    }
+    if (type === INTERVAL_YEAR) {
+        return (utcDate.getMonth() * 100) + utcDate.getDate() - 1;
+    }
+
+    return 0;
+};
+
 /** Scheduled transaction item */
 export class ScheduledTransaction {
     static requiredProps = [

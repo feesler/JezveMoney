@@ -707,10 +707,7 @@ svg * {
   --checkbox-bg: var(--input-bg-color);
   --checkbox-border: var(--input-border-color);
   --checkbox-checked-fill: var(--accent-color);
-
-  .checkbox__check {
-    border-radius: var(--default-border-radius);
-  }
+  --checkbox-border-radius: var(--default-border-radius);
 }
 
 /* Radio */
@@ -868,8 +865,8 @@ svg * {
 
 /* Horizontal field */
 .field.horizontal-field {
-  --field-title-font-size: 1.15rem;
-  --field-title-font-weight: 300;
+  --field-title-font-size: 1rem;
+  --field-title-font-weight: 400;
   --field-title-color: var(--main-text-color);
 
   display: flex;

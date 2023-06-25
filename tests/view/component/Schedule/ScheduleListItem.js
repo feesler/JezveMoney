@@ -15,7 +15,117 @@ import { App } from '../../../Application.js';
 import { ScheduledTransaction } from '../../../model/ScheduledTransaction.js';
 import { __ } from '../../../model/locale.js';
 
+/**
+ * Scheduled transactions list item test component
+ */
 export class ScheduleListItem extends TestComponent {
+    static getExpectedState(options = {}, state = App.state) {
+        const {
+            item,
+            detailsMode = false,
+        } = options;
+
+        const res = {};
+
+        assert.instanceOf(item, ScheduledTransaction, 'Invalid item');
+        assert(state, 'Invalid state object');
+
+        if (detailsMode) {
+            res.startDate = App.secondsToDateString(item.start_date);
+            res.endDate = this.renderEndDate(item);
+        } else {
+            res.dateRange = this.renderDateRange(item);
+        }
+
+        res.interval = item.renderInterval();
+        res.offset = item.renderIntervalOffset();
+
+        const srcAcc = state.accounts.getItem(item.src_id);
+        const destAcc = state.accounts.getItem(item.dest_id);
+        const srcAmountFmt = App.currency.format(item.src_curr, item.src_amount);
+        const destAmountFmt = App.currency.format(item.dest_curr, item.dest_amount);
+
+        if (item.type === EXPENSE) {
+            res.amountText = `- ${srcAmountFmt}`;
+            if (item.src_curr !== item.dest_curr) {
+                res.amountText += ` (- ${destAmountFmt})`;
+            }
+
+            res.accountTitle = srcAcc.name;
+        } else if (item.type === INCOME) {
+            res.amountText = `+ ${srcAmountFmt}`;
+            if (item.src_curr !== item.dest_curr) {
+                res.amountText += ` (+ ${destAmountFmt})`;
+            }
+
+            res.accountTitle = destAcc.name;
+        } else if (item.type === TRANSFER) {
+            res.amountText = srcAmountFmt;
+            if (item.src_curr !== item.dest_curr) {
+                res.amountText += ` (${destAmountFmt})`;
+            }
+
+            res.accountTitle = `${srcAcc.name} → ${destAcc.name}`;
+        } else if (item.type === DEBT) {
+            res.accountTitle = '';
+            const debtType = (!!srcAcc && srcAcc.owner_id !== state.profile.owner_id);
+            const personAcc = debtType ? srcAcc : destAcc;
+            const person = state.persons.getItem(personAcc.owner_id);
+            assert(person, `Person ${personAcc.owner_id} not found`);
+
+            const acc = (debtType) ? destAcc : srcAcc;
+
+            let sign = '';
+            if (debtType) {
+                res.accountTitle = person.name;
+                if (acc) {
+                    res.accountTitle += ` → ${acc.name}`;
+                } else {
+                    sign = '- ';
+                }
+            } else {
+                if (acc) {
+                    res.accountTitle = `${acc.name} → `;
+                } else {
+                    sign = '+ ';
+                }
+                res.accountTitle += person.name;
+            }
+
+            res.amountText = `${sign}${srcAmountFmt}`;
+            if (item.src_curr !== item.dest_curr) {
+                res.amountText += ` (${sign}${destAmountFmt})`;
+            }
+        }
+
+        const category = state.categories.getItem(item.category_id);
+        res.category = (item.category_id === 0) ? '' : category.name;
+
+        res.comment = item.comment;
+
+        return res;
+    }
+
+    static renderDateRange(item) {
+        const startDateFmt = App.secondsToDateString(item.start_date);
+        const start = __('schedule.item.start', App.view.locale, startDateFmt);
+        if (!item.end_date) {
+            return start;
+        }
+
+        const endDateFmt = App.secondsToDateString(item.end_date);
+        const end = __('schedule.item.end', App.view.locale, endDateFmt);
+        return `${start} ${end}`;
+    }
+
+    static renderEndDate(item) {
+        if (!item.end_date) {
+            return __('schedule.noEndDate', App.view.locale);
+        }
+
+        return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));
+    }
+
     async parseContent() {
         const res = await evaluate((elem, expenseType, incomeType) => {
             const detailsMode = elem.classList.contains('schedule-item_details');
@@ -131,109 +241,5 @@ export class ScheduleListItem extends TestComponent {
 
     async clickMenu() {
         return click(this.content.menuBtn);
-    }
-
-    static renderDateRange(item) {
-        const startDateFmt = App.secondsToDateString(item.start_date);
-        const start = __('schedule.item.start', App.view.locale, startDateFmt);
-        if (!item.end_date) {
-            return start;
-        }
-
-        const endDateFmt = App.secondsToDateString(item.end_date);
-        const end = __('schedule.item.end', App.view.locale, endDateFmt);
-        return `${start} ${end}`;
-    }
-
-    static renderEndDate(item) {
-        if (!item.end_date) {
-            return __('schedule.noEndDate', App.view.locale);
-        }
-
-        return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));
-    }
-
-    static render(item, state, options = {}) {
-        const detailsMode = options?.detailsMode;
-
-        const res = {};
-
-        assert.instanceOf(item, ScheduledTransaction, 'Invalid item');
-        assert(state, 'Invalid state object');
-
-        if (detailsMode) {
-            res.startDate = App.secondsToDateString(item.start_date);
-            res.endDate = this.renderEndDate(item);
-        } else {
-            res.dateRange = this.renderDateRange(item);
-        }
-
-        res.interval = item.renderInterval();
-        res.offset = item.renderIntervalOffset();
-
-        const srcAcc = state.accounts.getItem(item.src_id);
-        const destAcc = state.accounts.getItem(item.dest_id);
-        const srcAmountFmt = App.currency.format(item.src_curr, item.src_amount);
-        const destAmountFmt = App.currency.format(item.dest_curr, item.dest_amount);
-
-        if (item.type === EXPENSE) {
-            res.amountText = `- ${srcAmountFmt}`;
-            if (item.src_curr !== item.dest_curr) {
-                res.amountText += ` (- ${destAmountFmt})`;
-            }
-
-            res.accountTitle = srcAcc.name;
-        } else if (item.type === INCOME) {
-            res.amountText = `+ ${srcAmountFmt}`;
-            if (item.src_curr !== item.dest_curr) {
-                res.amountText += ` (+ ${destAmountFmt})`;
-            }
-
-            res.accountTitle = destAcc.name;
-        } else if (item.type === TRANSFER) {
-            res.amountText = srcAmountFmt;
-            if (item.src_curr !== item.dest_curr) {
-                res.amountText += ` (${destAmountFmt})`;
-            }
-
-            res.accountTitle = `${srcAcc.name} → ${destAcc.name}`;
-        } else if (item.type === DEBT) {
-            res.accountTitle = '';
-            const debtType = (!!srcAcc && srcAcc.owner_id !== state.profile.owner_id);
-            const personAcc = debtType ? srcAcc : destAcc;
-            const person = state.persons.getItem(personAcc.owner_id);
-            assert(person, `Person ${personAcc.owner_id} not found`);
-
-            const acc = (debtType) ? destAcc : srcAcc;
-
-            let sign = '';
-            if (debtType) {
-                res.accountTitle = person.name;
-                if (acc) {
-                    res.accountTitle += ` → ${acc.name}`;
-                } else {
-                    sign = '- ';
-                }
-            } else {
-                if (acc) {
-                    res.accountTitle = `${acc.name} → `;
-                } else {
-                    sign = '+ ';
-                }
-                res.accountTitle += person.name;
-            }
-
-            res.amountText = `${sign}${srcAmountFmt}`;
-            if (item.src_curr !== item.dest_curr) {
-                res.amountText += ` (${sign}${destAmountFmt})`;
-            }
-        }
-
-        const category = state.categories.getItem(item.category_id);
-        res.category = (item.category_id === 0) ? '' : category.name;
-
-        res.comment = item.comment;
-
-        return res;
     }
 }

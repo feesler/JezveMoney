@@ -6,15 +6,24 @@ import {
     evaluate,
     asyncMap,
 } from 'jezve-test';
+import { App } from '../../../Application.js';
 import { ScheduleListItem } from './ScheduleListItem.js';
 
+/**
+ * Scheduled transactions list test component
+ */
 export class ScheduleList extends TestComponent {
-    static render(data, state, options) {
-        assert.isArray(data);
+    static getExpectedState(model, state = App.state) {
+        assert(model, 'Invalid data');
+        assert.isArray(model.items, 'Invalid items');
+
+        const { items, ...options } = model;
 
         return {
-            items: data.map((item) => ScheduleListItem.render(item, state, options)),
-            noDataMessage: { visible: data.length === 0 },
+            items: items.map((item) => (
+                ScheduleListItem.getExpectedState({ ...options, item }, state)
+            )),
+            noDataMessage: { visible: items.length === 0 },
         };
     }
 

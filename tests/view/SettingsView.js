@@ -150,25 +150,7 @@ export class SettingsView extends AppView {
             },
             createBtn: { visible: isCurrenciesTab && isListMode },
             listModeBtn: { visible: isCurrenciesTab && !isListMode },
-            currenciesList: {
-                visible: isCurrenciesTab,
-                mode: model.currenciesList.mode,
-                items: model.currenciesList.items.map((item) => {
-                    const expectedItem = { ...item };
-
-                    if (!item.id) {
-                        return expectedItem;
-                    }
-
-                    const userCurrency = App.state.userCurrencies.getItem(item.id);
-                    const currency = App.currency.getItem(userCurrency?.curr_id);
-                    assert(currency, 'Invalid user currency item');
-
-                    expectedItem.title = currency.formatName(model.locale);
-
-                    return expectedItem;
-                }),
-            },
+            currenciesList: CurrenciesList.getExpectedState(model.currenciesList),
             dateLocaleDropDown: {
                 visible: isRegionalTab,
                 value: model.dateLocale,
@@ -178,6 +160,8 @@ export class SettingsView extends AppView {
                 value: model.decimalLocale,
             },
         };
+
+        res.currenciesList.visible = isCurrenciesTab;
 
         if (model.listMenuVisible) {
             res.listMenu = {

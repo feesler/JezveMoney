@@ -4,23 +4,39 @@ import {
     query,
     prop,
     navigation,
+    asArray,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import {
-    dateStringToSeconds,
-} from '../common.js';
+import { dateStringToSeconds } from '../common.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import {
     DEBT,
     LIMIT_CHANGE,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
-import { AccountsList } from '../model/AccountsList.js';
 import { TransactionForm } from './component/Transaction/TransactionForm.js';
 
 /** Create or update transaction view class */
 export class TransactionView extends AppView {
+    static getInitialState(options, state = App.state) {
+        const res = {
+            form: TransactionForm.getInitialState(options, state),
+        };
+
+        if (options?.action === 'update') {
+            res.deleteBtn = { visible: true };
+        }
+
+        return res;
+    }
+
+    constructor(...args) {
+        super(...args);
+
+        this.loaded = false;
+    }
+
     get form() {
         return this.content.form;
     }
@@ -51,6 +67,10 @@ export class TransactionView extends AppView {
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.form = await TransactionForm.create(this, await query('#form'));
+        if (!this.loaded) {
+            await res.form.waitForLoad();
+            this.loaded = true;
+        }
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
@@ -58,11 +78,7 @@ export class TransactionView extends AppView {
     }
 
     createCancelledState(transactionId) {
-        this.cancelledState = App.state.clone();
-        const origTransaction = this.cancelledState.transactions.getItem(transactionId);
-        const originalAccounts = structuredClone(this.cancelledState.accounts.data);
-        const canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
-        this.cancelledState.accounts.data = canceled;
+        this.cancelledState = App.state.createCancelled({ id: transactionId });
     }
 
     appState(model = this.model) {
@@ -110,6 +126,16 @@ export class TransactionView extends AppView {
             res.id = this.model.id;
         }
         const { form } = this.model;
+        const { repeatEnabled } = form;
+
+        if (repeatEnabled && !this.model.reminderId) {
+            res.start_date = App.dateStringToSeconds(form.startDate);
+            res.end_date = App.dateStringToSeconds(form.endDate);
+            res.interval_type = parseInt(form.intervalType, 10);
+            res.interval_step = parseInt(form.intervalStep, 10);
+            res.interval_offset = asArray(form.intervalOffset)
+                .map((item) => parseInt(item, 10));
+        }
 
         res.type = form.type;
         if (res.type === DEBT) {
@@ -178,6 +204,50 @@ export class TransactionView extends AppView {
 
     async cancel() {
         return this.form.cancel();
+    }
+
+    async inputStartDate(val) {
+        return this.form.inputStartDate(val);
+    }
+
+    async selectStartDate(val) {
+        return this.form.selectStartDate(val);
+    }
+
+    async inputEndDate(val) {
+        return this.form.inputEndDate(val);
+    }
+
+    async selectEndDate(val) {
+        return this.form.selectEndDate(val);
+    }
+
+    async clearEndDate(val) {
+        return this.form.clearEndDate(val);
+    }
+
+    async toggleEnableRepeat() {
+        return this.form.toggleEnableRepeat();
+    }
+
+    async changeIntervalType(val) {
+        return this.form.changeIntervalType(val);
+    }
+
+    async inputIntervalStep(val) {
+        return this.form.inputIntervalStep(val);
+    }
+
+    async selectWeekDayOffset(val) {
+        return this.form.selectWeekDayOffset(val);
+    }
+
+    async selectMonthDayOffset(val) {
+        return this.form.selectMonthDayOffset(val);
+    }
+
+    async selectMonthOffset(val) {
+        return this.form.selectMonthOffset(val);
     }
 
     async changeSrcAccount(val) {

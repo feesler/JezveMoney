@@ -1,6 +1,5 @@
-import { test, setBlock, assert } from 'jezve-test';
+import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { TransactionView } from '../../../view/TransactionView.js';
 import * as Actions from '../../actions/transaction.js';
 
 export const stateLoop = async () => {
@@ -20,18 +19,10 @@ export const stateLoop = async () => {
         IVAN,
     } = App.scenario;
 
-    // Navigate to create debt view
-    await App.goToMainView();
-    await App.view.goToNewTransactionByPerson(0);
-
     setBlock('Debt loop', 2);
-    await test('Initial state of new debt view', () => {
-        assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-        App.view.model.state = (App.view.model.debtType) ? 0 : 3;
-        const expected = App.view.getExpectedState();
-        return App.view.checkState(expected);
-    });
+    // Navigate to create debt view
+    await Actions.createFromPerson(0);
 
     // Input source amount
     await Actions.runGroup('inputSrcAmount', Actions.decimalInputTestStrings);

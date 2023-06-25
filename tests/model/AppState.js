@@ -36,7 +36,7 @@ import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
 import { ImportCondition } from './ImportCondition.js';
 import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
-import { ScheduledTransaction } from './ScheduledTransaction.js';
+import { INTERVAL_NONE, ScheduledTransaction } from './ScheduledTransaction.js';
 import { RemindersList } from './RemindersList.js';
 import {
     REMINDER_CANCELLED,
@@ -298,6 +298,31 @@ export class AppState {
         }
 
         return this.returnState(params.returnState, { ids });
+    }
+
+    createMultipleTransactions(params) {
+        if (!Array.isArray(params?.data)) {
+            return false;
+        }
+
+        const res = { ids: [] };
+        const origState = this.clone();
+
+        for (const item of params.data) {
+            const resExpected = this.createTransaction(item);
+            if (!resExpected) {
+                this.setState(origState);
+                return false;
+            }
+
+            res.ids.push(resExpected.id);
+            if (resExpected.schedule_id) {
+                res.schedule_ids = asArray(res.schedule_ids);
+                res.schedule_ids.push(resExpected.schedule_id);
+            }
+        }
+
+        return this.returnState(params.returnState, res);
     }
 
     /**
@@ -1749,22 +1774,38 @@ export class AppState {
 
         // Prepare expected updates of accounts
         this.accounts = this.accounts.createTransaction(expTrans);
+        this.resetUserAccountsCache();
 
         // Prepare expected updates of transactions
         const ind = this.transactions.create(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         const item = this.transactions.getItemByIndex(ind);
 
-        if (itemData.reminder_id) {
+        const reminderId = itemData.reminder_id ?? 0;
+        if (reminderId) {
             this.confirmReminder({
-                id: itemData.reminder_id,
+                id: reminderId,
                 transaction_id: item.id,
             });
         }
 
-        return this.returnState(params.returnState, { id: item.id });
+        const res = { id: item.id };
+
+        const intervalType = params.interval_type ?? INTERVAL_NONE;
+        if (intervalType !== INTERVAL_NONE && reminderId === 0) {
+            const { returnState, ...scheduleParams } = itemData;
+            const scheduleRes = this.createScheduledTransaction(scheduleParams);
+            if (!scheduleRes) {
+                return false;
+            }
+
+            res.schedule_id = scheduleRes.id;
+        }
+
+        return this.returnState(params.returnState, res);
     }
 
     updateTransaction(params) {
@@ -1791,11 +1832,13 @@ export class AppState {
 
         // Prepare expected updates of accounts
         this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
+        this.resetUserAccountsCache();
 
         // Prepare expected updates of transactions
         this.transactions.update(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
     }
@@ -1813,12 +1856,21 @@ export class AppState {
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
+        this.resetUserAccountsCache();
+
         this.reminders.deleteTransactions(ids);
         this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.resetPersonsCache();
 
         return this.returnState(params.returnState);
+    }
+
+    createCancelled(params) {
+        const res = this.clone();
+        res.deleteTransactions(params);
+        return res;
     }
 
     setTransactionCategory(params) {

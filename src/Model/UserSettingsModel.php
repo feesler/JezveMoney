@@ -65,6 +65,17 @@ class UserSettingsModel extends CachedTable
     }
 
     /**
+     * Returns timestamp for current time with client timezone correction
+     *
+     * @return int
+     */
+    public static function clientTime()
+    {
+        return static::getInstance()->getClientTime();
+    }
+
+
+    /**
      * Model initialization
      */
     protected function onStart()

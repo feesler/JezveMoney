@@ -113,8 +113,8 @@ export const resetData = async (options = {}) => {
     await App.goToMainView();
     await App.view.waitForLoad();
 
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main view update', () => App.view.checkState());
+    const expected = MainView.getInitialState();
+    await test('Main view update', () => App.view.checkState(expected));
 };
 
 export const changeName = async (newName) => {

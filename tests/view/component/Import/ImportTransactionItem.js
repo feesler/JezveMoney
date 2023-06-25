@@ -34,7 +34,100 @@ const fieldSelectors = [
     '.comment-field',
 ];
 
+/**
+ * Import transactions list item test component
+ */
 export class ImportTransactionItem extends TestComponent {
+    static getExpectedState(model, state = App.state) {
+        assert(model, 'Invalid data');
+
+        const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
+        const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
+
+        const transactionType = ImportTransaction.getTypeById(model.type);
+        assert(transactionType, `Invalid transaction type: '${model.type}'`);
+
+        const category = state.categories.getItem(model.categoryId);
+        const categoryName = (model.categoryId === 0) ? '' : category.name;
+
+        const res = {
+            selectMode: model.selectMode,
+            selected: model.selected,
+            enabled: model.enabled,
+            typeField: {
+                visible: true,
+                value: __(transactionType.titleToken, App.view.locale),
+            },
+            srcAmountField: {
+                visible: true,
+                value: model.srcCurrency.format(model.srcAmount),
+            },
+            destAmountField: {
+                visible: model.isDifferent,
+                value: '',
+            },
+            transferAccountField: {
+                visible: isTransfer,
+            },
+            personField: {
+                visible: isDebt,
+            },
+            dateField: {
+                value: model.date.toString(),
+                visible: true,
+            },
+            categoryField: {
+                value: categoryName,
+                visible: (model.categoryId !== 0),
+            },
+            commentField: {
+                value: model.comment,
+                visible: model.comment.length > 0,
+            },
+        };
+
+        if (res.destAmountField.visible) {
+            res.destAmountField.value = model.destCurrency.format(model.destAmount);
+        }
+        if (res.transferAccountField.visible) {
+            const transferAccountId = (model.type === 'transfer_out')
+                ? model.destId
+                : model.sourceId;
+            const account = state.accounts.getItem(transferAccountId);
+            res.transferAccountField.value = account.name;
+        }
+        if (res.personField.visible) {
+            const person = state.persons.getItem(model.personId);
+            res.personField.value = person.name;
+        }
+
+        return res;
+    }
+
+    static render(item, state = App.state) {
+        assert(item, 'Invalid import transaction');
+
+        const model = {
+            selectMode: item.selectMode ?? false,
+            selected: item.selected ?? false,
+            enabled: item.enabled,
+            type: item.type,
+            sourceId: item.src_id,
+            destId: item.dest_id,
+            personId: item.person_id,
+            srcAmount: item.src_amount,
+            destAmount: item.dest_amount,
+            srcCurrency: App.currency.getItem(item.src_curr),
+            destCurrency: App.currency.getItem(item.dest_curr),
+            categoryId: item.category_id,
+            date: App.secondsToDateString(item.date),
+            comment: item.comment,
+            isDifferent: item.src_curr !== item.dest_curr,
+        };
+
+        return this.getExpectedState(model, state);
+    }
+
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -45,11 +138,15 @@ export class ImportTransactionItem extends TestComponent {
 
     async parseContent() {
         const res = await evaluate((el, selectors) => {
-            const selectedControls = el.querySelector('.select-controls');
+            const selectControls = el.querySelector('.select-controls');
             const item = {
                 selected: el.classList.contains('import-item_selected'),
                 enabled: !el.hasAttribute('disabled'),
-                selectMode: selectedControls && !selectedControls.hidden,
+                selectMode: (
+                    !!selectControls
+                    && !selectControls.hidden
+                    && selectControls.offsetWidth > 0
+                ),
             };
 
             [
@@ -202,70 +299,6 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
-    static getExpectedState(model) {
-        const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
-        const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
-
-        const transactionType = ImportTransaction.getTypeById(model.type);
-        assert(transactionType, `Invalid transaction type: '${model.type}'`);
-
-        const category = App.state.categories.getItem(model.categoryId);
-        const categoryName = (model.categoryId === 0) ? '' : category.name;
-
-        const res = {
-            selectMode: model.selectMode,
-            selected: model.selected,
-            enabled: model.enabled,
-            typeField: {
-                visible: true,
-                value: transactionType.title,
-            },
-            srcAmountField: {
-                visible: true,
-                value: model.srcCurrency.format(model.srcAmount),
-            },
-            destAmountField: {
-                visible: model.isDifferent,
-                value: '',
-            },
-            transferAccountField: {
-                visible: isTransfer,
-            },
-            personField: {
-                visible: isDebt,
-            },
-            dateField: {
-                value: model.date.toString(),
-                visible: true,
-            },
-            categoryField: {
-                value: categoryName,
-                visible: (model.categoryId !== 0),
-            },
-            commentField: {
-                value: model.comment,
-                visible: model.comment.length > 0,
-            },
-        };
-
-        if (res.destAmountField.visible) {
-            res.destAmountField.value = model.destCurrency.format(model.destAmount);
-        }
-        if (res.transferAccountField.visible) {
-            const transferAccountId = (model.type === 'transfer_out')
-                ? model.destId
-                : model.sourceId;
-            const account = App.state.accounts.getItem(transferAccountId);
-            res.transferAccountField.value = account.name;
-        }
-        if (res.personField.visible) {
-            const person = App.state.persons.getItem(model.personId);
-            res.personField.value = person.name;
-        }
-
-        return res;
-    }
-
     getExpectedState(model = this.model) {
         return ImportTransactionItem.getExpectedState(model);
     }
@@ -410,80 +443,5 @@ export class ImportTransactionItem extends TestComponent {
     async toggleSelect() {
         assert(this.model.selectMode, 'Invalid state: item not in select mode');
         await click(this.elem);
-    }
-
-    /**
-     * Convert transaction object to expected state of component
-     * Transaction object: { mainAccount, enabled, ...fields of transaction }
-     * @param {ImportTransaction} item - transaction item object
-     * @param {AppState} state - application state
-     */
-    static render(item, state) {
-        assert(item && state, 'Invalid parameters');
-        assert(item.mainAccount, 'Main account not defined');
-        const trType = ImportTransaction.getTypeById(item.type);
-        assert(trType, `Unknown import transaction type: ${item.type}`);
-
-        const isTransfer = (item.type === 'transfer_out' || item.type === 'transfer_in');
-        const isDebt = (item.type === 'debt_out' || item.type === 'debt_in');
-        const isDiff = (item.src_curr !== item.dest_curr);
-
-        const showDestAmount = isDiff;
-
-        const srcCurrency = App.currency.getItem(item.src_curr);
-        const destCurrency = App.currency.getItem(item.dest_curr);
-
-        const category = state.categories.getItem(item.category_id);
-        const categoryName = (item.category_id === 0) ? '' : category.name;
-
-        const res = {
-            enabled: item.enabled,
-            typeField: {
-                visible: true,
-                value: __(trType.titleToken, App.view.locale),
-            },
-            srcAmountField: {
-                visible: true,
-                value: srcCurrency.format(item.src_amount),
-            },
-            destAmountField: {
-                visible: showDestAmount,
-            },
-            transferAccountField: {
-                visible: isTransfer,
-            },
-            personField: {
-                visible: isDebt,
-            },
-            dateField: {
-                value: App.secondsToDateString(item.date),
-                visible: true,
-            },
-            categoryField: {
-                value: categoryName,
-                visible: (item.category_id !== 0),
-            },
-            commentField: {
-                value: item.comment,
-                visible: item.comment.length > 0,
-            },
-        };
-
-        if (res.destAmountField.visible) {
-            res.destAmountField.value = destCurrency.format(item.dest_amount);
-        }
-        if (res.transferAccountField.visible) {
-            const transferAccountId = (item.type === 'transfer_out')
-                ? item.dest_id
-                : item.src_id;
-            const account = App.state.accounts.getItem(transferAccountId);
-            res.transferAccountField.value = account?.name;
-        }
-        if (res.personField.visible) {
-            const person = App.state.persons.getItem(item.person_id);
-            res.personField.value = person.name;
-        }
-
-        return res;
     }
 }

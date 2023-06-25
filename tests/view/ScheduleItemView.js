@@ -16,6 +16,27 @@ import { INTERVAL_NONE } from '../model/ScheduledTransaction.js';
 
 /** Scheduled transaction create/update view class */
 export class ScheduleItemView extends AppView {
+    static getInitialState(options, state = App.state) {
+        const res = {
+            form: TransactionForm.getInitialState(
+                { ...options, formType: SCHEDULE_ITEM_FORM },
+                state,
+            ),
+        };
+
+        if (options?.action === 'update') {
+            res.deleteBtn = { visible: true };
+        }
+
+        return res;
+    }
+
+    constructor(...args) {
+        super(...args);
+
+        this.loaded = false;
+    }
+
     get form() {
         return this.content.form;
     }
@@ -44,6 +65,10 @@ export class ScheduleItemView extends AppView {
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.form = await TransactionForm.create(this, await query('#form'), SCHEDULE_ITEM_FORM);
+        if (!this.loaded) {
+            await res.form.waitForLoad();
+            this.loaded = true;
+        }
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
@@ -83,11 +108,26 @@ export class ScheduleItemView extends AppView {
 
     getExpectedScheduledTransaction() {
         const { form } = this.model;
+        const { repeatEnabled } = form;
+
+        const intervalType = (repeatEnabled)
+            ? parseInt(form.intervalType, 10)
+            : INTERVAL_NONE;
+
+        const intervalStep = (repeatEnabled)
+            ? parseInt(form.intervalStep, 10)
+            : 0;
+
+        const intervalOffsets = (repeatEnabled)
+            ? asArray(form.intervalOffset).map((item) => parseInt(item, 10))
+            : [];
+
         const res = {
             start_date: App.dateStringToSeconds(form.startDate),
             end_date: App.dateStringToSeconds(form.endDate),
-            interval_type: parseInt(form.intervalType, 10),
-            interval_offset: asArray(form.intervalOffset).map((item) => parseInt(item, 10)),
+            interval_type: intervalType,
+            interval_step: intervalStep,
+            interval_offset: intervalOffsets,
             type: form.type,
             src_amount: this.getExpectedSourceAmount(form),
             dest_amount: this.getExpectedDestAmount(form),
@@ -96,9 +136,6 @@ export class ScheduleItemView extends AppView {
             category_id: form.categoryId,
             comment: form.comment,
         };
-        res.interval_step = (res.interval_type !== INTERVAL_NONE)
-            ? parseInt(form.intervalStep, 10)
-            : 0;
 
         if (form.isUpdate) {
             res.id = form.id;
@@ -175,6 +212,10 @@ export class ScheduleItemView extends AppView {
 
     async clearEndDate(val) {
         return this.form.clearEndDate(val);
+    }
+
+    async toggleEnableRepeat() {
+        return this.form.toggleEnableRepeat();
     }
 
     async changeIntervalType(val) {

@@ -612,8 +612,6 @@ class ScheduledTransactionModel extends CachedTable
      */
     protected function getRemindersDateRange($initialRun = false)
     {
-        $settingsModel = UserSettingsModel::getInstance();
-
         $startDate = null;
         if (!$initialRun) {
             $userModel = UserModel::getInstance();
@@ -622,7 +620,7 @@ class ScheduledTransactionModel extends CachedTable
 
         return [
             "startDate" => $startDate,
-            "endDate" => $settingsModel->getClientTime(),
+            "endDate" => UserSettingsModel::clientTime(),
         ];
     }
 

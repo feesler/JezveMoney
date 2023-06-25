@@ -23,6 +23,7 @@ import { generateId } from '../../common.js';
 import { __ } from '../../model/locale.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountsList.js';
 import { TransactionList } from '../../view/component/TransactionList/TransactionList.js';
+import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 
 export const decimalInputTestStrings = [
     '-',
@@ -49,6 +50,58 @@ export const runAction = async ({ action, data }) => {
     assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
     assert(App.view.isActionAvailable(action), 'Invalid action specified');
+
+    if (action === 'inputStartDate') {
+        testDescr = `Input schedule start date '${data}'`;
+    }
+
+    if (action === 'selectStartDate') {
+        testDescr = `Select schedule start date '${formatDate(data, { locales: App.view.locale })}'`;
+    }
+
+    if (action === 'inputEndDate') {
+        testDescr = `Input schedule end date '${data}'`;
+    }
+
+    if (action === 'selectEndDate') {
+        testDescr = `Select schedule end date '${formatDate(data, { locales: App.view.locale })}'`;
+    }
+
+    if (action === 'clearEndDate') {
+        testDescr = 'Clear schedule end date';
+    }
+
+    if (action === 'toggleEnableRepeat') {
+        const { repeatEnabled } = App.view.formModel;
+
+        testDescr = (repeatEnabled)
+            ? 'Disable transaction repeat'
+            : 'Enable transaction repeat';
+    }
+
+    if (action === 'changeIntervalType') {
+        const intervalType = parseInt(data, 10);
+        const type = ScheduledTransaction.intervalTypes[intervalType];
+        assert(type, `Invalid interval type: ${data}`);
+
+        testDescr = `Change schedule interval to '${type}'`;
+    }
+
+    if (action === 'inputIntervalStep') {
+        testDescr = `Input schedule interval step '${data}'`;
+    }
+
+    if (action === 'selectWeekDayOffset') {
+        testDescr = `Select schedule interval week day offset '${data}'`;
+    }
+
+    if (action === 'selectMonthDayOffset') {
+        testDescr = `Select schedule interval month day offset '${data}'`;
+    }
+
+    if (action === 'selectMonthOffset') {
+        testDescr = `Select schedule interval month offset '${data}'`;
+    }
 
     if (action === 'changeSrcAccount') {
         const userAccounts = App.state.getUserAccounts();
@@ -196,20 +249,26 @@ export const runGroup = async (action, data) => {
 export const createFromAccount = async (index) => {
     await test(`Initial state of create transaction view requested from account [${index}]`, async () => {
         await App.goToMainView();
+
+        const [fromAccount] = App.state.getSortedAccountsByIndexes(index, true);
+        const expected = TransactionView.getInitialState({ fromAccount });
+
         await App.view.goToNewTransactionByAccount(index);
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 
 export const createFromPerson = async (index) => {
     await test(`Initial state of create transaction view requested from person [${index}]`, async () => {
         await App.goToMainView();
+
+        const [fromPerson] = App.state.getSortedPersonsByIndexes(index, true);
+        const expected = TransactionView.getInitialState({ fromPerson });
+
         await App.view.goToNewTransactionByPerson(index);
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 
@@ -237,8 +296,8 @@ export const submit = async () => {
         }
 
         await App.goToMainView();
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -250,31 +309,19 @@ export const update = async (type, pos) => {
     await test(`Initial state of update ${Transaction.typeToString(type)} view [${index}]`, async () => {
         await App.view.navigateToTransactions();
         await App.view.filterByType(type);
+
+        const transactions = App.view.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+
+        const expected = TransactionView.getInitialState({
+            action: 'update',
+            id: item.id,
+        });
+
         await App.view.goToUpdateTransaction(pos);
 
-        const origTransaction = App.view.getExpectedTransaction();
-        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
-        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.formModel.state = (isDiff) ? 2 : 0;
-        }
-
-        if (origTransaction.type === TRANSFER) {
-            App.view.formModel.state = (isDiff) ? 3 : 0;
-        }
-
-        if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
-
-            if (isDiffCurr) {
-                App.view.formModel.state = (debtType) ? 10 : 16;
-            } else if (debtType) {
-                App.view.formModel.state = (noAccount) ? 6 : 0;
-            } else {
-                App.view.formModel.state = (noAccount) ? 7 : 3;
-            }
-        }
-
-        const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
 };
@@ -285,31 +332,19 @@ export const updateFromMainView = async (pos) => {
 
     await test(`Initial state of update transaction [${index}] view`, async () => {
         await App.goToMainView();
+
+        const transactions = App.view.transactionsWidget.transList.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+
+        const expected = TransactionView.getInitialState({
+            action: 'update',
+            id: item.id,
+        });
+
         await App.view.goToUpdateTransactionByIndex(pos);
 
-        const origTransaction = App.view.getExpectedTransaction();
-        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
-        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
-            App.view.formModel.state = (isDiff) ? 2 : 0;
-        }
-
-        if (origTransaction.type === TRANSFER) {
-            App.view.formModel.state = (isDiff) ? 3 : 0;
-        }
-
-        if (origTransaction.type === DEBT) {
-            const { debtType, noAccount, isDiffCurr } = App.view.formModel;
-
-            if (isDiffCurr) {
-                App.view.formModel.state = (debtType) ? 10 : 16;
-            } else if (debtType) {
-                App.view.formModel.state = (noAccount) ? 6 : 0;
-            } else {
-                App.view.formModel.state = (noAccount) ? 7 : 3;
-            }
-        }
-
-        const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });
 };
@@ -424,8 +459,8 @@ export const del = async (type, transactions) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -451,8 +486,8 @@ export const delFromUpdate = async (type, pos) => {
     await test('Submit result', async () => {
         await App.goToMainView();
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };
@@ -471,8 +506,8 @@ export const setTransactionCategory = async ({ index, category }) => {
 
         await App.view.setTransactionCategory(index, category);
 
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
 
         return App.state.fetchAndTest();
     });
@@ -491,8 +526,8 @@ export const deleteFromMainView = async (pos) => {
         await App.view.deleteTransactionByIndex(ind);
 
         App.state.setState(expectedState);
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainExpected = MainView.getInitialState();
+        App.view.checkState(mainExpected);
         return App.state.fetchAndTest();
     });
 };

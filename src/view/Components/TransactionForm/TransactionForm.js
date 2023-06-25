@@ -14,6 +14,7 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Spinner } from 'jezvejs/Spinner';
+import { Switch } from 'jezvejs/Switch';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 import { createStore } from 'jezvejs/Store';
 
@@ -146,6 +147,7 @@ export class TransactionForm extends Component {
             isUpdate: this.props.mode === 'update',
             isAvailable: this.props.isAvailable,
             submitStarted: false,
+            renderTime: null,
         };
 
         if (isScheduleItem) {
@@ -158,6 +160,12 @@ export class TransactionForm extends Component {
             initialState.form.intervalOffset = transaction.interval_offset;
         } else {
             initialState.form.date = App.formatInputDate(transaction.date);
+
+            initialState.form.startDate = App.formatInputDate(transaction.date);
+            initialState.form.endDate = '';
+            initialState.form.intervalStep = 1;
+            initialState.form.intervalType = INTERVAL_MONTH;
+            initialState.form.intervalOffset = 0;
         }
 
         if (transaction.type === EXPENSE) {
@@ -218,6 +226,7 @@ export class TransactionForm extends Component {
                 transaction.dest_id = transaction.src_id;
                 transaction.src_id = 0;
                 transaction.dest_curr = transaction.src_curr;
+                transaction.src_amount = -transaction.src_amount;
                 transaction.dest_amount = transaction.src_amount;
             }
         }
@@ -473,10 +482,8 @@ export class TransactionForm extends Component {
         children.push(this.categoryRow.elem, this.commentRow.elem);
 
         // Schedule fields
-        if (this.props.type === 'scheduleItem') {
-            const fields = this.createScheduleFields();
-            children.push(...fields);
-        }
+        const scheduleFields = this.createScheduleFields();
+        children.push(...scheduleFields);
 
         // Controls
         this.submitBtn = Button.create({
@@ -603,6 +610,20 @@ export class TransactionForm extends Component {
             },
         });
 
+        // Repeat transaction field
+        this.repeatSwitch = Switch.create({
+            id: 'repeatSwitch',
+            onChange: (checked) => this.onRepeatChanged(checked),
+        });
+
+        this.repeatSwitchField = Field.create({
+            id: 'repeatSwitchField',
+            htmlFor: 'repeatSwitch',
+            title: __('schedule.repeat'),
+            className: 'horizontal-field form-row',
+            content: this.repeatSwitch.elem,
+        });
+
         // Interval type field
         this.intervalTypeSelect = DropDown.create({
             id: 'intervalTypeSelect',
@@ -610,7 +631,6 @@ export class TransactionForm extends Component {
             className: 'dd_fullwidth interval-type-select',
             onChange: (type) => this.onIntervalTypeChanged(type),
             data: [
-                { id: INTERVAL_NONE, title: __('schedule.intervals.none') },
                 { id: INTERVAL_DAY, title: __('schedule.intervals.day') },
                 { id: INTERVAL_WEEK, title: __('schedule.intervals.week') },
                 { id: INTERVAL_MONTH, title: __('schedule.intervals.month') },
@@ -693,6 +713,7 @@ export class TransactionForm extends Component {
 
         return [
             this.dateRangeField.elem,
+            this.repeatSwitchField.elem,
             this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
@@ -891,6 +912,11 @@ export class TransactionForm extends Component {
         );
     }
 
+    /** Updates form render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
+    }
+
     /**
      * Transaction type change event handler
      * @param {String} value - selected type
@@ -1029,6 +1055,11 @@ export class TransactionForm extends Component {
      */
     onScheduleRangeChange(range) {
         this.store.dispatch(actions.scheduleRangeChange(range));
+        this.notifyChanged();
+    }
+
+    onRepeatChanged(checked) {
+        this.store.dispatch(actions.enableRepeat(checked));
         this.notifyChanged();
     }
 
@@ -1238,7 +1269,10 @@ export class TransactionForm extends Component {
 
         if (type === 'transaction') {
             res.date = transaction.date;
-        } else if (type === 'scheduleItem') {
+        }
+
+        const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
+        if (type === 'scheduleItem' || trIntervalType !== INTERVAL_NONE) {
             res.start_date = transaction.start_date;
             res.end_date = transaction.end_date;
             res.interval_type = transaction.interval_type;
@@ -1715,13 +1749,11 @@ export class TransactionForm extends Component {
     }
 
     renderScheduleFields(state, prevState) {
-        if (state?.type !== 'scheduleItem') {
-            return;
-        }
-
+        const isScheduleItem = (state.type === 'scheduleItem');
         const { transaction, form, validation } = state;
-        const { intervalType } = form;
-        const isRepeat = (intervalType !== INTERVAL_NONE);
+        const { intervalType, intervalOffset } = form;
+        const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = trIntervalType !== INTERVAL_NONE;
 
         // Date range field
         if (
@@ -1729,7 +1761,7 @@ export class TransactionForm extends Component {
             || (form.endDate !== prevState?.form?.endDate)
             || (validation.startDate !== prevState?.validation?.startDate)
             || (validation.endDate !== prevState?.validation?.endDate)
-            || (intervalType !== prevState?.form?.intervalType)
+            || (transaction.interval_type !== prevState?.transaction?.interval_type)
             || (state.submitStarted !== prevState?.submitStarted)
         ) {
             this.dateRangeInput.setState((rangeState) => ({
@@ -1753,13 +1785,17 @@ export class TransactionForm extends Component {
                 disabled: state.submitStarted,
                 endVisible: isRepeat,
             }));
+
+            this.dateRangeField.show(isScheduleItem || isRepeat);
         }
+
+        // Interval type and step fields group
+        show(this.intervalFieldsGroup, isRepeat);
+        App.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval step field
         this.intervalStepInput.value = form.intervalStep;
         this.intervalStepInput.enable(!state.submitStarted);
-        this.intervalStepRow.show(isRepeat);
-        App.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval type field
         this.intervalTypeSelect.setSelection(intervalType);
@@ -1770,9 +1806,9 @@ export class TransactionForm extends Component {
         const isWeekInterval = (intervalType === INTERVAL_WEEK);
 
         this.weekDaySelect.enable(!state.submitStarted);
-        this.weekDayField.show(isWeekInterval);
+        this.weekDayField.show(isRepeat && isWeekInterval);
         if (isWeekInterval) {
-            this.weekDaySelect.setSelection(transaction.interval_offset);
+            this.weekDaySelect.setSelection(intervalOffset);
         }
 
         // Month / year day select field
@@ -1783,11 +1819,11 @@ export class TransactionForm extends Component {
         this.monthSelect.enable(!state.submitStarted);
 
         if (isMonthInterval) {
-            this.monthDaySelect.setSelection(transaction.interval_offset);
+            this.monthDaySelect.setSelection(intervalOffset);
             this.daySelectField.setTitle(__('schedule.offsetMonthDay'));
         } else if (isYearInterval) {
-            const monthIndex = Math.floor(transaction.interval_offset / 100);
-            const dayIndex = (transaction.interval_offset % 100);
+            const monthIndex = Math.floor(intervalOffset / 100);
+            const dayIndex = (intervalOffset % 100);
 
             this.monthDaySelect.setSelection(dayIndex);
             this.monthSelect.setSelection(monthIndex);
@@ -1795,8 +1831,12 @@ export class TransactionForm extends Component {
             this.daySelectField.setTitle(__('schedule.offsetYearDay'));
         }
 
-        this.daySelectField.show(isMonthInterval || isYearInterval);
-        this.monthSelect.show(isYearInterval);
+        this.daySelectField.show(isRepeat && (isMonthInterval || isYearInterval));
+        this.monthSelect.show(isRepeat && isYearInterval);
+    }
+
+    renderTime(state) {
+        this.elem.dataset.time = state?.renderTime ?? '';
     }
 
     render(state, prevState = {}) {
@@ -1805,7 +1845,7 @@ export class TransactionForm extends Component {
         }
 
         const { transaction } = state;
-        const isScheduleItem = (state.type === 'scheduleItem');
+        const isTransaction = (state.type === 'transaction');
 
         if (!state.isAvailable) {
             let message;
@@ -1873,21 +1913,9 @@ export class TransactionForm extends Component {
             this.exchangeRow.hide();
         }
 
-        if (isScheduleItem) {
-            this.dateRangeField.show(state.isAvailable);
-            this.intervalStepRow.show(state.isAvailable);
-            this.intervalTypeRow.show(state.isAvailable);
-            this.weekDayField.show(state.isAvailable);
-            this.daySelectField.show(state.isAvailable);
-        } else {
-            this.dateRow.show(state.isAvailable);
-        }
-        this.categoryRow.show(state.isAvailable);
-        this.commentRow.show(state.isAvailable);
-        show(this.submitControls, state.isAvailable);
-
         // Date field
-        if (!isScheduleItem) {
+        if (isTransaction) {
+            this.dateRow.show(state.isAvailable);
             this.dateRow.setState((dateState) => ({
                 ...dateState,
                 value: state.form.date,
@@ -1897,7 +1925,22 @@ export class TransactionForm extends Component {
             }));
         }
 
+        if (state.isAvailable !== prevState?.isAvailable) {
+            this.categoryRow.show(state.isAvailable);
+            this.commentRow.show(state.isAvailable);
+
+            this.repeatSwitchField.show(state.isAvailable);
+            this.dateRangeField.show(state.isAvailable);
+            this.intervalStepRow.show(state.isAvailable);
+            this.intervalTypeRow.show(state.isAvailable);
+            this.weekDayField.show(state.isAvailable);
+            this.daySelectField.show(state.isAvailable);
+
+            show(this.submitControls, state.isAvailable);
+        }
+
         if (!state.isAvailable) {
+            this.renderTime(state);
             return;
         }
 
@@ -2037,10 +2080,14 @@ export class TransactionForm extends Component {
             disabled: state.submitStarted,
         }));
 
+        // 'Repeat transaction' Switch field
+        const intervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = (intervalType !== INTERVAL_NONE);
+        this.repeatSwitch.check(isRepeat);
+        this.repeatSwitch.enable(!state.submitStarted);
+
         // Schedule fields
-        if (isScheduleItem) {
-            this.renderScheduleFields(state, prevState);
-        }
+        this.renderScheduleFields(state, prevState);
 
         // Controls
         this.submitBtn.enable(!state.submitStarted);
@@ -2051,5 +2098,7 @@ export class TransactionForm extends Component {
         }
 
         this.spinner.show(state.submitStarted);
+
+        this.renderTime(state);
     }
 }

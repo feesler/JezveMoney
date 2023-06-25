@@ -15,10 +15,10 @@ import {
 } from 'jezve-test';
 import { Button, PopupMenu } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { DeleteCategoryDialog } from './component/DeleteCategoryDialog.js';
+import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
-import { CategoryItem } from './component/CategoryItem.js';
+import { CategoryItem } from './component/Category/CategoryItem.js';
 import { Transaction } from '../model/Transaction.js';
 import { CategoryDetails } from './component/Category/CategoryDetails.js';
 import { Category } from '../model/Category.js';
@@ -37,35 +37,122 @@ const transTypes = [...Transaction.availTypes.map((type) => parseInt(type, 10)),
 
 /** List of categories view class */
 export class CategoryListView extends AppView {
-    static render(state) {
+    static getExpectedState(model = this.model, state = App.state) {
+        const itemsCount = state.categories.length;
+        const selectedItems = this.getSelectedItems(model);
+        const totalSelected = selectedItems.length;
+        const isListMode = model.mode === 'list';
+        const isSortMode = model.mode === 'sort';
+        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
+
+        const showSelectItems = (
+            itemsCount > 0
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
+
+        const res = {
+            createBtn: { visible: isListMode },
+            listModeBtn: { visible: !isListMode },
+            loadingIndicator: { visible: model.loading },
+            totalCounter: { visible: true, value: itemsCount },
+            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
+            menuBtn: { visible: itemsCount > 0 && !isSortMode },
+        };
+
         const sortMode = state.getCategoriesSortMode();
 
-        return {
-            sections: transTypes.map((type) => {
-                const typeItems = state.categories.filter((item) => item.type === type);
-                const items = CategoryList.create(typeItems);
-                items.sortBy(sortMode);
+        const categories = model.items.map((item) => {
+            const category = state.categories.getItem(item.id);
+            return {
+                ...item,
+                ...category,
+            };
+        });
 
-                const mainCategories = items.findByParent(0);
-                const expectedItems = mainCategories.flatMap((item) => {
-                    const children = items.findByParent(item.id);
-                    return [item, ...children];
-                });
+        res.sections = transTypes.map((type) => {
+            const typeItems = categories.filter((item) => item.type === type);
+            const items = CategoryList.create(typeItems);
+            items.sortBy(sortMode);
 
-                const visible = expectedItems.length > 0;
-                const section = {
-                    visible,
-                    name: Category.typeToString(type, App.view.locale),
-                };
-                if (visible) {
-                    section.items = expectedItems.map((item) => ({
-                        content: CategoryItem.render(item),
-                    }));
-                }
+            const mainCategories = items.findByParent(0);
+            const expectedItems = mainCategories.flatMap((item) => {
+                const children = items.findByParent(item.id);
+                return [item, ...children];
+            });
 
-                return section;
-            }),
+            const visible = expectedItems.length > 0;
+            const section = {
+                visible,
+                name: Category.typeToString(type, model.locale),
+            };
+            if (visible) {
+                section.items = expectedItems.map((item) => ({
+                    content: CategoryItem.getExpectedState(item, state),
+                }));
+            }
+
+            return section;
+        });
+
+        if (model.detailsItem) {
+            res.itemInfo = CategoryDetails.getExpectedState(model.detailsItem, state);
+            res.itemInfo.visible = true;
+        }
+
+        if (model.listMenuVisible) {
+            res.listMenu = {
+                visible: model.listMenuVisible,
+                selectModeBtn: { visible: model.listMenuVisible && isListMode },
+                sortModeBtn: { visible: showSortItems },
+                sortByNameBtn: { visible: showSortItems },
+                sortByDateBtn: { visible: showSortItems },
+                selectAllBtn: {
+                    visible: showSelectItems && totalSelected < itemsCount,
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && totalSelected > 0,
+                },
+                deleteBtn: { visible: showSelectItems && totalSelected > 0 },
+            };
+        }
+
+        if (model.contextMenuVisible) {
+            const ctxCategory = state.categories.getItem(model.contextItem);
+            assert(ctxCategory, 'Invalid state');
+
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+                ctxDetailsBtn: { visible: true },
+                ctxUpdateBtn: { visible: true },
+                ctxDeleteBtn: { visible: true },
+            };
+        }
+
+        return res;
+    }
+
+    static getSelectedItems(model = this.model) {
+        return model.items.filter((item) => item.selected);
+    }
+
+    static getInitialState(options = {}, state = App.state) {
+        const {
+            detailsItem = null,
+        } = options;
+
+        const model = {
+            locale: App.view.locale,
+            mode: 'list',
+            loading: false,
+            listMenuVisible: false,
+            contextMenuVisible: false,
+            detailsItem,
+            items: state.categories.clone(),
         };
+
+        return this.getExpectedState(model, state);
     }
 
     get listMenu() {
@@ -215,92 +302,7 @@ export class CategoryListView extends AppView {
     }
 
     getExpectedState(model = this.model) {
-        const itemsCount = model.items.length;
-        const selectedItems = this.getSelectedItems(model);
-        const totalSelected = selectedItems.length;
-        const isListMode = model.mode === 'list';
-        const isSortMode = model.mode === 'sort';
-        const showSortItems = model.listMenuVisible && isListMode && itemsCount > 1;
-
-        const showSelectItems = (
-            itemsCount > 0
-            && model.listMenuVisible
-            && model.mode === 'select'
-        );
-
-        const res = {
-            createBtn: { visible: isListMode },
-            listModeBtn: { visible: !isListMode },
-            loadingIndicator: { visible: model.loading },
-            totalCounter: { visible: true, value: itemsCount },
-            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
-            menuBtn: { visible: itemsCount > 0 && !isSortMode },
-        };
-
-        const categories = model.items.map((item) => {
-            const category = App.state.categories.getItem(item.id);
-            return {
-                ...item,
-                ...category,
-            };
-        });
-
-        res.sections = transTypes.map((type) => {
-            const items = categories.filter((item) => item.type === type);
-            const visible = items.length > 0;
-            const section = {
-                visible,
-                name: Category.typeToString(type, model.locale),
-            };
-            if (visible) {
-                section.items = items.map((item) => ({
-                    content: CategoryItem.render(item),
-                }));
-            }
-
-            return section;
-        });
-
-        if (model.detailsItem) {
-            res.itemInfo = CategoryDetails.render(model.detailsItem, App.state);
-            res.itemInfo.visible = true;
-        }
-
-        if (model.listMenuVisible) {
-            res.listMenu = {
-                visible: model.listMenuVisible,
-                selectModeBtn: { visible: model.listMenuVisible && isListMode },
-                sortModeBtn: { visible: showSortItems },
-                sortByNameBtn: { visible: showSortItems },
-                sortByDateBtn: { visible: showSortItems },
-                selectAllBtn: {
-                    visible: showSelectItems && totalSelected < itemsCount,
-                },
-                deselectAllBtn: {
-                    visible: showSelectItems && totalSelected > 0,
-                },
-                deleteBtn: { visible: showSelectItems && totalSelected > 0 },
-            };
-        }
-
-        if (model.contextMenuVisible) {
-            const ctxCategory = App.state.categories.getItem(model.contextItem);
-            assert(ctxCategory, 'Invalid state');
-
-            res.contextMenu = {
-                visible: true,
-                itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxDeleteBtn: { visible: true },
-            };
-        }
-
-        return res;
-    }
-
-    getSelectedItems(model = this.model) {
-        return model.items.filter((item) => item.selected);
+        return CategoryListView.getExpectedState(model);
     }
 
     onDeselectAll() {
@@ -492,9 +494,7 @@ export class CategoryListView extends AppView {
             sort_categories: this.model.sortMode,
         });
 
-        const expList = CategoryListView.render(App.state);
         const expected = this.getExpectedState();
-        Object.assign(expected, expList);
 
         await this.waitForList(() => this.listMenu.select('sortByNameBtn'));
 
@@ -514,9 +514,7 @@ export class CategoryListView extends AppView {
             sort_categories: this.model.sortMode,
         });
 
-        const expList = CategoryListView.render(App.state);
         const expected = this.getExpectedState();
-        Object.assign(expected, expList);
 
         await this.waitForList(() => this.listMenu.select('sortByDateBtn'));
 

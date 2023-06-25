@@ -86,6 +86,7 @@
   --checkbox-hover-bg: #abd7ffd4;
   --checkbox-border: #ffffff8c;
   --checkbox-checked-fill: #ffffff;
+  --checkbox-border-radius: 50%;
 
   position: absolute;
   margin: 0;
@@ -95,7 +96,6 @@
 
   .checkbox__check {
     margin: 0;
-    border-radius: 50%;
   }
 }
 

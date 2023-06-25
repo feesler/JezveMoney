@@ -1164,6 +1164,7 @@ export class ImportView extends AppView {
             src_amount: '',
             dest_amount: '',
             date: App.formatDate(new Date()),
+            category_id: 0,
             comment: '',
         });
         this.formIndex = this.items.length;
@@ -1173,7 +1174,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        this.expectedState.transactionForm = ImportTransactionForm.render(form, App.state);
+        this.expectedState.transactionForm = ImportTransactionForm.getInitialState(form);
 
         await this.performAction(() => this.listMenu.select('createItemBtn'));
 
@@ -1194,7 +1195,7 @@ export class ImportView extends AppView {
         const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
-        this.expectedState.transactionForm = ImportTransactionForm.render(form, App.state);
+        this.expectedState.transactionForm = ImportTransactionForm.getInitialState(form);
 
         await this.performAction(() => this.contextMenu.select('ctxUpdateBtn'));
 
@@ -1289,6 +1290,7 @@ export class ImportView extends AppView {
         this.items.forEach((_, ind) => {
             const item = this.items[ind];
             item.selected = false;
+            item.selectMode = listMode === 'select';
         });
 
         this.model.listMenuVisible = false;

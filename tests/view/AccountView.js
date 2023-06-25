@@ -10,7 +10,7 @@ import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tiles/Tile.js';
-import { InputRow } from './component/InputRow.js';
+import { InputRow } from './component/Fields/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';

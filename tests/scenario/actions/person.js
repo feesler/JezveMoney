@@ -97,8 +97,8 @@ export const submit = async () => {
             await App.view.cancel();
         }
 
-        App.view.expectedState = PersonListView.render(App.state);
-        App.view.checkState();
+        const expected = PersonListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -113,8 +113,8 @@ export const deleteFromContextMenu = async (index) => {
         const id = App.state.getSortedPersonsByIndexes(index, true);
         App.state.deletePersons({ id });
 
-        App.view.expectedState = PersonListView.render(App.state);
-        App.view.checkState();
+        const expected = PersonListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -124,13 +124,13 @@ export const del = async (persons) => {
     await test(`Delete persons [${persons.join()}]`, async () => {
         await checkNavigation();
 
+        await App.view.deletePersons(persons);
+
         const id = App.state.getSortedPersonsByIndexes(persons, true);
         App.state.deletePersons({ id });
 
-        await App.view.deletePersons(persons);
-
-        App.view.expectedState = PersonListView.render(App.state);
-        App.view.checkState();
+        const expected = PersonListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -149,12 +149,12 @@ export const delFromUpdate = async (pos) => {
         const id = App.state.getSortedPersonsByIndexes(ind, true);
         App.state.deletePersons({ id });
 
-        App.view.expectedState = PersonListView.render(App.state);
-        App.view.checkState();
+        const expected = PersonListView.getInitialState();
+        App.view.checkState(expected);
 
         await App.goToMainView();
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
+        const mainViewExpected = MainView.getInitialState();
+        App.view.checkState(mainViewExpected);
 
         return App.state.fetchAndTest();
     });
@@ -167,13 +167,13 @@ export const show = async (persons, val = true) => {
     await test(`${actVerb} person(s) [${itemIds.join()}]`, async () => {
         await checkNavigation();
 
+        await App.view.showPersons(itemIds, val);
+
         const id = App.state.getSortedPersonsByIndexes(itemIds, true);
         App.state.showPersons({ id }, val);
 
-        await App.view.showPersons(itemIds, val);
-
-        App.view.expectedState = PersonListView.render(App.state);
-        App.view.checkState();
+        const expected = PersonListView.getInitialState();
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });

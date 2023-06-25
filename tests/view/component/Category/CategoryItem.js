@@ -6,14 +6,24 @@ import {
     evaluate,
 } from 'jezve-test';
 
+/**
+ * Categories list item test component
+ */
 export class CategoryItem extends TestComponent {
-    static render(category) {
+    static getExpectedState(category) {
         assert(category, 'Invalid category');
 
-        return {
+        const res = {
+            id: category.id,
             title: category.name,
             isChild: (category.parent_id !== 0),
         };
+
+        if (category.selected) {
+            res.selected = true;
+        }
+
+        return res;
     }
 
     async parseContent() {

@@ -7,7 +7,7 @@ import {
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { InputRow } from './component/InputRow.js';
+import { InputRow } from './component/Fields/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 

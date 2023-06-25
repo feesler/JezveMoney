@@ -8,7 +8,6 @@ import {
 } from '../../model/Transaction.js';
 import {
     INTERVAL_DAY,
-    INTERVAL_NONE,
     INTERVAL_WEEK,
     INTERVAL_YEAR,
 } from '../../model/ScheduledTransaction.js';
@@ -92,7 +91,7 @@ export class ScheduleStory extends TestStory {
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '100000' },
             { action: 'inputComment', data: 'One time expense' },
-            { action: 'changeIntervalType', data: INTERVAL_NONE },
+            { action: 'toggleEnableRepeat' },
         ]);
 
         await Actions.createAndSubmit([
@@ -110,6 +109,8 @@ export class ScheduleStory extends TestStory {
             { action: 'changeIntervalType', data: INTERVAL_YEAR },
             { action: 'selectMonthDayOffset', data: 31 },
             { action: 'selectMonthOffset', data: 11 },
+            { action: 'toggleEnableRepeat' },
+            { action: 'toggleEnableRepeat' },
         ]);
 
         await Actions.createAndSubmit([
