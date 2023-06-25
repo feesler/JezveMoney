@@ -13,7 +13,6 @@ import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { Spinner } from 'jezvejs/Spinner';
 import { Switch } from 'jezvejs/Switch';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 import { createStore } from 'jezvejs/Store';
@@ -51,6 +50,7 @@ import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu/TransactionTy
 import { CategorySelect } from '../Inputs/CategorySelect/CategorySelect.js';
 import { Tile } from '../Tile/Tile.js';
 import { AccountTile } from '../AccountTile/AccountTile.js';
+import { FormControls } from '../FormControls/FormControls.js';
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
@@ -486,34 +486,11 @@ export class TransactionForm extends Component {
         children.push(...scheduleFields);
 
         // Controls
-        this.submitBtn = Button.create({
-            id: 'submitBtn',
-            type: 'submit',
-            className: 'submit-btn',
-            title: __('actions.submit'),
-        });
-
-        this.cancelBtn = Button.create({
-            id: 'cancelBtn',
-            type: 'link',
-            url: App.props.nextAddress,
-            className: 'cancel-btn',
-            title: __('actions.cancel'),
-        });
-
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-
-        this.submitControls = createElement('div', {
-            props: {
-                id: 'submitControls',
-                className: 'form-controls',
-            },
-            children: [
-                this.submitBtn.elem,
-                this.cancelBtn.elem,
-                this.spinner.elem,
-            ],
+        this.submitControls = FormControls.create({
+            id: 'submitControls',
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelURL: App.props.nextAddress,
         });
 
         // Hidden inputs
@@ -524,7 +501,7 @@ export class TransactionForm extends Component {
         const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
 
         children.push(
-            this.submitControls,
+            this.submitControls.elem,
             this.notAvailMsg,
             ...hiddenInputs,
         );
@@ -1936,7 +1913,7 @@ export class TransactionForm extends Component {
             this.weekDayField.show(state.isAvailable);
             this.daySelectField.show(state.isAvailable);
 
-            show(this.submitControls, state.isAvailable);
+            this.submitControls.show(state.isAvailable);
         }
 
         if (!state.isAvailable) {
@@ -2090,14 +2067,13 @@ export class TransactionForm extends Component {
         this.renderScheduleFields(state, prevState);
 
         // Controls
-        this.submitBtn.enable(!state.submitStarted);
-        this.cancelBtn.show(!state.submitStarted);
+        if (state.submitStarted !== prevState?.submitStarted) {
+            this.submitControls.setLoading(state.submitStarted);
+        }
 
         if (this.deleteBtn) {
             this.deleteBtn.enable(!state.submitStarted);
         }
-
-        this.spinner.show(state.submitStarted);
 
         this.renderTime(state);
     }

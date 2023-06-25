@@ -1,14 +1,11 @@
 import 'jezvejs/style';
 import {
     show,
-    enable,
-    insertAfter,
     setEvents,
     insertBefore,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
-import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
@@ -24,6 +21,7 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
 import { InputField } from '../../Components/Fields/InputField/InputField.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './CategoryView.scss';
@@ -65,8 +63,6 @@ class CategoryView extends View {
             'categoryForm',
             'parentCategoryField',
             'typeField',
-            'submitBtn',
-            'cancelBtn',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -91,9 +87,14 @@ class CategoryView extends View {
         this.createParentCategorySelect();
         this.createTransactionTypeSelect();
 
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-        insertAfter(this.spinner.elem, this.cancelBtn);
+        // Controls
+        this.submitControls = FormControls.create({
+            id: 'submitControls',
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelURL: App.props.nextAddress,
+        });
+        this.categoryForm.append(this.submitControls.elem);
 
         // Update mode
         if (isUpdate) {
@@ -266,7 +267,7 @@ class CategoryView extends View {
         });
     }
 
-    render(state) {
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
@@ -300,10 +301,10 @@ class CategoryView extends View {
         this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted && parentId === 0);
 
-        enable(this.submitBtn, !state.submitStarted);
-        show(this.cancelBtn, !state.submitStarted);
-
-        this.spinner.show(state.submitStarted);
+        // Controls
+        if (state.submitStarted !== prevState?.submitStarted) {
+            this.submitControls.setLoading(state.submitStarted);
+        }
     }
 }
 

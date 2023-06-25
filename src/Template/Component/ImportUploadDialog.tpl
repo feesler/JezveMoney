@@ -87,11 +87,6 @@
                 <label class="field__title"><?= __("import.templates.columnsMap") ?></label>
             </div>
             <div id="tplFormFeedback" class="feedback"></div>
-
-            <div id="tplControls" class="form-controls">
-                <input id="submitTplBtn" class="btn submit-btn" type="button" value="<?= __("actions.save") ?>">
-                <input id="cancelTplBtn" class="btn cancel-btn" type="button" value="<?= __("actions.cancel") ?>">
-            </div>
         </section>
         <div id="initialAccField" class="field" hidden>
             <label class="field__title"><?= __("import.mainAccount") ?></label>

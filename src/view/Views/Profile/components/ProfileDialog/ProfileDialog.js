@@ -8,6 +8,8 @@ import { Popup } from 'jezvejs/Popup';
 import { App } from '../../../../Application/App.js';
 import { LoadingIndicator } from '../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import './ProfileDialog.scss';
+import { FormControls } from '../../../../Components/FormControls/FormControls.js';
+import { __ } from '../../../../utils/utils.js';
 
 /* CSS classes */
 const DIALOG_CLASS = 'profile-dialog';
@@ -19,6 +21,13 @@ export class ProfileDialog extends Component {
             throw new Error('Failed to initialize dialog');
         }
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+
+        // Submit controls
+        this.formControls = FormControls.create({
+            submitTitle: __('actions.submit'),
+            cancelTitle: null,
+        });
+        this.form.append(this.formControls.elem);
 
         this.popup = Popup.create({
             id,

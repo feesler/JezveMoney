@@ -1,9 +1,11 @@
 import {
     Component,
+    addChilds,
     createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
+import './FormControls.scss';
 
 /* CSS classes */
 const CONTROLS_CLASS = 'form-controls';
@@ -23,6 +25,8 @@ const defaultProps = {
     cancelBtnType: 'link',
     onCancelClick: null,
     disabled: false,
+    showSpinner: true,
+    controls: null,
     loading: false,
 };
 
@@ -72,6 +76,8 @@ export class FormControls extends Component {
                 this.spinner.elem,
             ],
         });
+
+        addChilds(this.elem, this.props.controls);
     }
 
     postInit() {
@@ -113,9 +119,8 @@ export class FormControls extends Component {
             url: state.cancelURL,
             disabled: state.disabled,
         }));
-        this.cancelBtn.show(state.cancelTitle);
         this.cancelBtn.show(state.cancelTitle && !state.loading);
 
-        this.spinner.show(state.loading);
+        this.spinner.show(state.showSpinner && state.loading);
     }
 }

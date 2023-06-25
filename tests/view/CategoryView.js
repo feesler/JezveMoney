@@ -78,10 +78,10 @@ export class CategoryView extends AppView {
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));
         res.typeSelect = await DropDown.createFromChild(this, await query('#type'));
 
-        res.submitBtn = await query('#submitBtn');
+        res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');
 
-        res.cancelBtn = await query('#cancelBtn');
+        res.cancelBtn = await query('.form-controls .cancel-btn');
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await DeleteCategoryDialog.create(

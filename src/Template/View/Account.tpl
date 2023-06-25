@@ -16,6 +16,7 @@
                             <?php if ($this->action == "update") {        ?>
                                 <input id="accid" name="id" type="hidden" value="<?= e($accInfo->id) ?>">
                             <?php    }    ?>
+                            <input id="flags" name="flags" type="hidden" value="<?= e($accInfo->flags) ?>">
 
                             <div id="tileField" class="form-row"></div>
 
@@ -32,13 +33,6 @@
                                 <label for="currency" class="field__title"><?= __("accounts.currency") ?></label>
                                 <select id="currency" name="curr_id"></select>
                             </div>
-
-                            <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("actions.cancel") ?></a>
-                            </div>
-
-                            <input id="flags" name="flags" type="hidden" value="<?= e($accInfo->flags) ?>">
                         </form>
                     </main>
                 </div>

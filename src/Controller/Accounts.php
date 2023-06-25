@@ -92,13 +92,13 @@ class Accounts extends ListViewController
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),
             "icons" => $iconModel->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "account" => $accInfo,
             ],
@@ -158,13 +158,13 @@ class Accounts extends ListViewController
         $accInfo->icon = $this->model->getIconFile($acc_id);
         $data["accInfo"] = $accInfo;
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),
             "icons" => $iconModel->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "account" => $accInfo,
             ],

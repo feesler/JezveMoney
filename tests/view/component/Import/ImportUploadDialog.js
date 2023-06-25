@@ -85,8 +85,8 @@ export class ImportUploadDialog extends TestComponent {
             // Template form
             rawDataTable: { elem: await query('#rawDataTable') },
             createTplBtn: { elem: await query('#createTplBtn') },
-            submitTplBtn: { elem: await query('#submitTplBtn') },
-            cancelTplBtn: { elem: await query('#cancelTplBtn') },
+            submitTplBtn: { elem: await query('#templateForm .form-controls .submit-btn') },
+            cancelTplBtn: { elem: await query('#templateForm .form-controls .cancel-btn') },
             tplFormFeedback: { elem: await query('#tplFormFeedback') },
             initialAccount: await DropDown.createFromChild(this, await query('#initialAccount')),
             submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },

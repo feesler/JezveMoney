@@ -25,6 +25,7 @@ import { AmountInputField } from '../../../../Components/Fields/AmountInputField
 import { DateInputField } from '../../../../Components/Fields/DateInputField/DateInputField.js';
 import { CategorySelect } from '../../../../Components/Inputs/CategorySelect/CategorySelect.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
+import { FormControls } from '../../../../Components/FormControls/FormControls.js';
 
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
@@ -43,10 +44,6 @@ const PERSON_FIELD_CLASS = 'form-row person-field';
 const DATE_FIELD_CLASS = 'form-row date-field';
 const CATEGORY_FIELD_CLASS = 'form-row category-field';
 const COMMENT_FIELD_CLASS = 'form-row comment-field';
-/* Form controls */
-const FORM_CONTROLS_CLASS = 'form-controls';
-const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
-const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
 
 const validateDateOptions = {
     fixShortYear: false,
@@ -93,8 +90,6 @@ export class ImportTransactionForm extends Component {
     }
 
     init() {
-        const { createContainer } = App;
-
         this.createTypeField();
         this.createAccountField();
         this.createPersonField();
@@ -104,33 +99,20 @@ export class ImportTransactionForm extends Component {
         this.createCategoryField();
         this.createCommentField();
 
-        // Save button
-        this.saveBtn = createElement('button', {
-            props: {
-                className: SUBMIT_BUTTON_CLASS,
-                type: 'submit',
-                textContent: __('actions.save'),
-            },
-        });
-        // Cancel button
-        this.cancelBtn = createElement('button', {
-            props: {
-                className: CANCEL_BUTTON_CLASS,
-                type: 'button',
-                textContent: __('actions.cancel'),
-            },
-            events: { click: () => this.cancel() },
-        });
-
         this.toggleExtBtn = ToggleButton.create({
             onClick: () => this.toggleCollapse(),
         });
 
-        this.formControls = createContainer(FORM_CONTROLS_CLASS, [
-            this.saveBtn,
-            this.cancelBtn,
-            this.toggleExtBtn.elem,
-        ]);
+        // Submit controls
+        this.formControls = FormControls.create({
+            submitTitle: __('actions.save'),
+            cancelBtnType: 'button',
+            cancelTitle: __('actions.cancel'),
+            onCancelClick: () => this.cancel(),
+            controls: [
+                this.toggleExtBtn.elem,
+            ],
+        });
 
         this.initContainer(CONTAINER_CLASS, [
             this.trTypeField.elem,
@@ -141,7 +123,7 @@ export class ImportTransactionForm extends Component {
             this.dateField.elem,
             this.categoryField.elem,
             this.commentField.elem,
-            this.formControls,
+            this.formControls.elem,
         ]);
 
         this.popup = Popup.create({

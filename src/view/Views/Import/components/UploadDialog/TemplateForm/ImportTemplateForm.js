@@ -21,6 +21,7 @@ import { InputField } from '../../../../../Components/Fields/InputField/InputFie
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 
 import './ImportTemplateForm.scss';
+import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
 
 /** CSS classes */
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
@@ -86,9 +87,6 @@ export class ImportTemplateForm extends Component {
             'tplAccountField',
             'columnField',
             'dateFormatField',
-            'tplControls',
-            'submitTplBtn',
-            'cancelTplBtn',
             'rawDataTable',
             'tplFormFeedback',
         ];
@@ -146,8 +144,17 @@ export class ImportTemplateForm extends Component {
         setEvents(this.decFirstRowBtn, { click: () => this.onFirstRowDecrease() });
         setEvents(this.incFirstRowBtn, { click: () => this.onFirstRowIncrease() });
 
-        setEvents(this.submitTplBtn, { click: () => this.onSubmit() });
-        setEvents(this.cancelTplBtn, { click: () => this.onCancel() });
+        // Submit controls
+        this.controls = FormControls.create({
+            submitBtnType: 'button',
+            submitTitle: __('actions.save'),
+            cancelBtnType: 'button',
+            cancelTitle: __('actions.cancel'),
+            onSubmitClick: () => this.onSubmit(),
+            onCancelClick: () => this.onCancel(),
+        });
+
+        this.templateForm.append(this.controls.elem);
 
         this.reset();
 
@@ -527,12 +534,9 @@ export class ImportTemplateForm extends Component {
         const { validation } = state;
 
         const templateAvail = (App.model.templates.length > 0);
-        show(this.cancelTplBtn, templateAvail);
 
         this.columnDropDown.enable(!state.listLoading);
         this.dateFormatSelect.enable(!state.listLoading);
-        enable(this.submitTplBtn, !state.listLoading);
-        enable(this.cancelTplBtn, !state.listLoading);
 
         // Name field
         this.nameField.setState((nameState) => ({
@@ -587,5 +591,16 @@ export class ImportTemplateForm extends Component {
         }
 
         this.columnDropDown.setSelection(state.selectedColumn);
+
+        // Submit controls
+        this.controls.setState((controlsState) => ({
+            ...controlsState,
+            cancelTitle: (
+                (templateAvail && !state.listLoading)
+                    ? __('actions.cancel')
+                    : null
+            ),
+            loading: state.listLoading,
+        }));
     }
 }

@@ -9,6 +9,7 @@ import { ListContainer } from 'jezvejs/ListContainer';
 
 import { listData, __, dateStringToTime } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
+
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
@@ -19,7 +20,9 @@ import {
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
 import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
 import { ImportActionList } from '../../../../../Models/ImportActionList.js';
+
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
+import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './ImportRuleForm.scss';
@@ -33,10 +36,6 @@ const ACTIONS_LIST_CLASS = 'actions-list';
 /* Validation */
 const FEEDBACK_CONTAINER_CLASS = 'rule-form__feedback validation-block';
 const INV_FEEDBACK_CLASS = 'feedback invalid-feedback';
-/* Controls */
-const CONTROLS_CLASS = 'form-controls';
-const SUBMIT_BTN_CLASS = 'btn submit-btn';
-const CANCEL_BTN_CLASS = 'btn cancel-btn';
 
 const defaultProps = {
     onSubmit: null,
@@ -149,16 +148,6 @@ export class ImportRuleForm extends Component {
             onStateChange: (expanded) => this.onToggleActions(expanded),
         });
 
-        // Controls
-        this.saveBtn = createElement('button', {
-            props: { className: SUBMIT_BTN_CLASS, type: 'button', textContent: __('actions.submit') },
-            events: { click: () => this.onSubmit() },
-        });
-        this.cancelBtn = createElement('button', {
-            props: { className: CANCEL_BTN_CLASS, type: 'button', textContent: __('actions.cancel') },
-            events: { click: () => this.onCancel() },
-        });
-
         // Invalid feedback message
         this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         this.feedbackContainer = App.createContainer(
@@ -166,17 +155,22 @@ export class ImportRuleForm extends Component {
             this.validFeedback,
         );
 
-        this.controls = App.createContainer(CONTROLS_CLASS, [
-            this.saveBtn,
-            this.cancelBtn,
-        ]);
+        // Submit controls
+        this.controls = FormControls.create({
+            submitBtnType: 'button',
+            submitTitle: __('actions.submit'),
+            cancelBtnType: 'button',
+            cancelTitle: __('actions.cancel'),
+            onSubmitClick: () => this.onSubmit(),
+            onCancelClick: () => this.onCancel(),
+        });
 
         this.elem = App.createContainer(FORM_CLASS, [
             this.idInput,
             this.conditionsCollapse.elem,
             this.actionsCollapse.elem,
             this.feedbackContainer,
-            this.controls,
+            this.controls.elem,
         ]);
     }
 
