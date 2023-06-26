@@ -1,0 +1,8 @@
+/* Form controls */
+.form-controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0 12px 0;
+}

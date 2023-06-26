@@ -84,10 +84,10 @@ class Persons extends ListViewController
         $pInfo->flags = 0;
         $data["pInfo"] = $pInfo;
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "persons" => $personsData,
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "person" => $pInfo
             ]
@@ -126,10 +126,10 @@ class Persons extends ListViewController
 
         $personsData = $this->model->getData(["visibility" => "all"]);
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "persons" => $personsData,
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "person" => $pInfo,
             ],

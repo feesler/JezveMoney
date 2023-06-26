@@ -27,11 +27,6 @@
                                 <label for="type" class="field__title"><?= __("categories.transactionType") ?></label>
                                 <select id="type" name="type"></select>
                             </div>
-
-                            <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= e($nextAddress) ?>"><?= __("actions.cancel") ?></a>
-                            </div>
                         </form>
                     </main>
                 </div>

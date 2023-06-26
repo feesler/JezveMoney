@@ -70,8 +70,8 @@ export class ImportUploadDialog extends TestComponent {
             // First row field
             firstRowField: { elem: await query('#firstRowField') },
             firstRowInp: { elem: await query('#firstRowInp') },
-            decFirstRowBtn: { elem: await query('#decFirstRowBtn') },
-            incFirstRowBtn: { elem: await query('#incFirstRowBtn') },
+            decFirstRowBtn: { elem: await query('#firstRowField .input-group__inner-btn') },
+            incFirstRowBtn: { elem: await query('#firstRowField .input-group__input + .input-group__inner-btn') },
             // Template account field
             tplAccountSwitch: await Switch.create(this, await query(this.elem, '#tplAccountSwitch')),
             tplAccountField: { elem: await query('#tplAccountField') },
@@ -85,8 +85,8 @@ export class ImportUploadDialog extends TestComponent {
             // Template form
             rawDataTable: { elem: await query('#rawDataTable') },
             createTplBtn: { elem: await query('#createTplBtn') },
-            submitTplBtn: { elem: await query('#submitTplBtn') },
-            cancelTplBtn: { elem: await query('#cancelTplBtn') },
+            submitTplBtn: { elem: await query('#templateForm .form-controls .submit-btn') },
+            cancelTplBtn: { elem: await query('#templateForm .form-controls .cancel-btn') },
             tplFormFeedback: { elem: await query('#tplFormFeedback') },
             initialAccount: await DropDown.createFromChild(this, await query('#initialAccount')),
             submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },
@@ -419,8 +419,8 @@ export class ImportUploadDialog extends TestComponent {
             res.firstRowInp = { value: firstRow.toString() };
 
             res.decFirstRowBtn = {
-                visible: true,
-                disabled: (firstRow <= 1),
+                visible: firstRow > 1,
+                disabled: (firstRow === '' || firstRow <= 1),
             };
             res.incFirstRowBtn = {
                 visible: true,

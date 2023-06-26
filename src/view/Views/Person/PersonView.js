@@ -1,12 +1,8 @@
 import 'jezvejs/style';
 import {
-    show,
-    enable,
-    insertAfter,
     setEvents,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
-import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
@@ -20,6 +16,7 @@ import { PersonList } from '../../Models/PersonList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './PersonView.scss';
@@ -58,8 +55,6 @@ class PersonView extends View {
         this.loadElementsByIds([
             'heading',
             'personForm',
-            'submitBtn',
-            'cancelBtn',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -80,9 +75,14 @@ class PersonView extends View {
         });
         this.personForm.prepend(this.nameField.elem);
 
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-        insertAfter(this.spinner.elem, this.cancelBtn);
+        // Controls
+        this.submitControls = FormControls.create({
+            id: 'submitControls',
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelURL: App.props.nextAddress,
+        });
+        this.personForm.append(this.submitControls.elem);
 
         // Update mode
         if (isUpdate) {
@@ -205,7 +205,7 @@ class PersonView extends View {
         });
     }
 
-    render(state) {
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
@@ -224,10 +224,10 @@ class PersonView extends View {
             disabled: state.submitStarted,
         }));
 
-        enable(this.submitBtn, !state.submitStarted);
-        show(this.cancelBtn, !state.submitStarted);
-
-        this.spinner.show(state.submitStarted);
+        // Controls
+        if (state.submitStarted !== prevState?.submitStarted) {
+            this.submitControls.setLoading(state.submitStarted);
+        }
     }
 }
 

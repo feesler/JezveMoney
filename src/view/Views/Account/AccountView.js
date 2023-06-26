@@ -4,12 +4,9 @@ import 'jezvejs/style/InputGroup';
 import {
     setEvents,
     insertAfter,
-    enable,
-    show,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
-import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
 import { getCurrencyPrecision, __ } from '../../utils/utils.js';
@@ -34,6 +31,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './AccountView.scss';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 /**
  * Create/update account view
@@ -85,8 +83,6 @@ class AccountView extends View {
             'tileField',
             'iconField',
             'currencyField',
-            'submitBtn',
-            'cancelBtn',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -161,9 +157,14 @@ class AccountView extends View {
 
         setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
 
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-        insertAfter(this.spinner.elem, this.cancelBtn);
+        // Controls
+        this.submitControls = FormControls.create({
+            id: 'submitControls',
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelURL: App.props.nextAddress,
+        });
+        this.accountForm.append(this.submitControls.elem);
 
         // Update mode
         if (isUpdate) {
@@ -341,7 +342,7 @@ class AccountView extends View {
         });
     }
 
-    render(state) {
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
@@ -411,14 +412,14 @@ class AccountView extends View {
         this.currencySelect.setSelection(state.data.curr_id);
         this.currencySelect.enable(!state.submitStarted);
 
-        enable(this.submitBtn, !state.submitStarted);
-        show(this.cancelBtn, !state.submitStarted);
+        // Controls
+        if (state.submitStarted !== prevState?.submitStarted) {
+            this.submitControls.setLoading(state.submitStarted);
+        }
 
         if (this.deleteBtn) {
             this.deleteBtn.enable(!state.submitStarted);
         }
-
-        this.spinner.show(state.submitStarted);
     }
 }
 

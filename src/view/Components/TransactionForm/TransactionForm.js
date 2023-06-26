@@ -13,7 +13,6 @@ import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { Spinner } from 'jezvejs/Spinner';
 import { Switch } from 'jezvejs/Switch';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 import { createStore } from 'jezvejs/Store';
@@ -49,8 +48,10 @@ import { DateInputField } from '../Fields/DateInputField/DateInputField.js';
 import { DateRangeInput } from '../Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { CategorySelect } from '../Inputs/CategorySelect/CategorySelect.js';
+import { NumberInputGroup } from '../Inputs/NumberInputGroup/NumberInputGroup.js';
 import { Tile } from '../Tile/Tile.js';
 import { AccountTile } from '../AccountTile/AccountTile.js';
+import { FormControls } from '../FormControls/FormControls.js';
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
@@ -486,34 +487,11 @@ export class TransactionForm extends Component {
         children.push(...scheduleFields);
 
         // Controls
-        this.submitBtn = Button.create({
-            id: 'submitBtn',
-            type: 'submit',
-            className: 'submit-btn',
-            title: __('actions.submit'),
-        });
-
-        this.cancelBtn = Button.create({
-            id: 'cancelBtn',
-            type: 'link',
-            url: App.props.nextAddress,
-            className: 'cancel-btn',
-            title: __('actions.cancel'),
-        });
-
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-
-        this.submitControls = createElement('div', {
-            props: {
-                id: 'submitControls',
-                className: 'form-controls',
-            },
-            children: [
-                this.submitBtn.elem,
-                this.cancelBtn.elem,
-                this.spinner.elem,
-            ],
+        this.submitControls = FormControls.create({
+            id: 'submitControls',
+            submitTitle: __('actions.submit'),
+            cancelTitle: __('actions.cancel'),
+            cancelURL: App.props.nextAddress,
         });
 
         // Hidden inputs
@@ -524,7 +502,7 @@ export class TransactionForm extends Component {
         const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
 
         children.push(
-            this.submitControls,
+            this.submitControls.elem,
             this.notAvailMsg,
             ...hiddenInputs,
         );
@@ -586,13 +564,13 @@ export class TransactionForm extends Component {
         });
 
         // Interval step field
-        this.intervalStepInput = DecimalInput.create({
-            id: 'intervalStepInput',
-            name: 'interval_step',
-            className: 'input stretch-input',
+        this.intervalStepGroup = NumberInputGroup.create({
             digits: 0,
             allowNegative: false,
-            onInput: (e) => this.onIntervalStepChanged(e),
+            minValue: 1,
+            step: 1,
+            inputId: 'intervalStepInput',
+            onChange: (value) => this.onIntervalStepChanged(value),
         });
 
         this.intervalStepRow = Field.create({
@@ -600,7 +578,7 @@ export class TransactionForm extends Component {
             htmlFor: 'intervalStepInput',
             title: __('schedule.intervalStep'),
             className: 'interval-step-field',
-            content: this.intervalStepInput.elem,
+            content: this.intervalStepGroup.elem,
         });
 
         this.intervalFeedbackElem = createElement('div', {
@@ -712,11 +690,11 @@ export class TransactionForm extends Component {
         });
 
         return [
-            this.dateRangeField.elem,
             this.repeatSwitchField.elem,
             this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
+            this.dateRangeField.elem,
         ];
     }
 
@@ -1069,8 +1047,8 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    onIntervalStepChanged(e) {
-        this.store.dispatch(actions.intervalStepChange(e.target.value));
+    onIntervalStepChanged(value) {
+        this.store.dispatch(actions.intervalStepChange(value));
         this.notifyChanged();
     }
 
@@ -1794,8 +1772,8 @@ export class TransactionForm extends Component {
         App.setValidation(this.intervalFieldsGroup, validation.intervalStep);
 
         // Interval step field
-        this.intervalStepInput.value = form.intervalStep;
-        this.intervalStepInput.enable(!state.submitStarted);
+        this.intervalStepGroup.setValue(form.intervalStep);
+        this.intervalStepGroup.enable(!state.submitStarted);
 
         // Interval type field
         this.intervalTypeSelect.setSelection(intervalType);
@@ -1936,7 +1914,7 @@ export class TransactionForm extends Component {
             this.weekDayField.show(state.isAvailable);
             this.daySelectField.show(state.isAvailable);
 
-            show(this.submitControls, state.isAvailable);
+            this.submitControls.show(state.isAvailable);
         }
 
         if (!state.isAvailable) {
@@ -2090,14 +2068,13 @@ export class TransactionForm extends Component {
         this.renderScheduleFields(state, prevState);
 
         // Controls
-        this.submitBtn.enable(!state.submitStarted);
-        this.cancelBtn.show(!state.submitStarted);
+        if (state.submitStarted !== prevState?.submitStarted) {
+            this.submitControls.setLoading(state.submitStarted);
+        }
 
         if (this.deleteBtn) {
             this.deleteBtn.enable(!state.submitStarted);
         }
-
-        this.spinner.show(state.submitStarted);
 
         this.renderTime(state);
     }

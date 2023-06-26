@@ -1189,9 +1189,9 @@ export class TransactionForm extends TestComponent {
 
         res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
-        res.submitBtn = await query('#submitBtn');
+        res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');
-        res.cancelBtn = await query('#cancelBtn');
+        res.cancelBtn = await query('.form-controls .cancel-btn');
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));

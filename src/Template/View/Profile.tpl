@@ -49,17 +49,11 @@
 
 <div id="changename" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changename/">
-        <div class="form-controls">
-            <input class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
-        </div>
     </form>
 </div>
 
 <div id="changepass" class="profile-form-container" hidden>
     <form method="post" action="<?= BASEURL ?>profile/changepass/">
-        <div class="form-controls">
-            <input class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
-        </div>
     </form>
 </div>
 
@@ -119,10 +113,6 @@
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label"><?= __("profile.reset.importRules") ?></span>
             </label>
-        </div>
-
-        <div class="form-controls">
-            <input class="btn submit-btn" type="submit" value="<?= __("actions.submit") ?>">
         </div>
     </form>
 </div>

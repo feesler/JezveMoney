@@ -164,7 +164,7 @@ class Transactions extends ListViewController
                 "type" => EXPENSE,
                 "src_amount" => 0,
                 "dest_amount" => 0,
-                "date" => UserSettingsModel::clientTime(),
+                "date" => cutDate(UserSettingsModel::clientTime()),
                 "category_id" => 0,
                 "comment" => "",
             ];

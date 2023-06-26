@@ -1,0 +1,12 @@
+/* Number input group component */
+.number-input-group {
+  max-width: 150px;
+
+  .input.input-group__input {
+    text-align: right;
+  }
+
+  .btn.input-group__inner-btn {
+    --btn-icon-size: 24px;
+  }
+}

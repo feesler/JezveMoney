@@ -80,10 +80,10 @@ class Categories extends ListViewController
 
         $data["category"] = $category;
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "categories" => $this->model->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "category" => $category,
             ]
@@ -120,10 +120,10 @@ class Categories extends ListViewController
         }
         $data["category"] = $category;
 
-        $data["nextAddress"] = $this->getNextAddress();
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "categories" => $this->model->getData(),
+            "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "category" => $category,
             ],

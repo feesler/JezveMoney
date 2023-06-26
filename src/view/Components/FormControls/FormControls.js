@@ -1,22 +1,33 @@
 import {
     Component,
+    addChilds,
     createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { Spinner } from 'jezvejs/Spinner';
+import './FormControls.scss';
 
 /* CSS classes */
 const CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BTN_CLASS = 'submit-btn';
 const CANCEL_BTN_CLASS = 'cancel-btn';
+const SPINNER_CLASS = 'request-spinner';
 
 const defaultProps = {
     id: undefined,
     submitTitle: 'Submit',
     submitBtnClass: SUBMIT_BTN_CLASS,
+    submitBtnType: 'submit',
+    onSubmitClick: null,
     cancelTitle: 'Cancel',
     cancelURL: undefined,
     cancelBtnClass: CANCEL_BTN_CLASS,
+    cancelBtnType: 'link',
+    onCancelClick: null,
     disabled: false,
+    showSpinner: true,
+    controls: null,
+    loading: false,
 };
 
 /**
@@ -43,27 +54,51 @@ export class FormControls extends Component {
 
     init() {
         this.submitBtn = Button.create({
-            type: 'submit',
+            type: this.props.submitBtnType,
             className: this.props.submitBtnClass,
+            onClick: (e) => this.props?.onSubmitClick?.(e),
         });
 
         this.cancelBtn = Button.create({
-            type: 'link',
+            type: this.props.cancelBtnType,
             className: this.props.cancelBtnClass,
+            onClick: (e) => this.props?.onCancelClick?.(e),
         });
+
+        this.spinner = Spinner.create({ className: SPINNER_CLASS });
+        this.spinner.hide();
 
         this.elem = createElement('div', {
             props: { className: CONTROLS_CLASS },
             children: [
                 this.submitBtn.elem,
                 this.cancelBtn.elem,
+                this.spinner.elem,
             ],
         });
+
+        addChilds(this.elem, this.props.controls);
     }
 
     postInit() {
         this.setClassNames();
         this.render(this.state);
+    }
+
+    startLoading() {
+        this.setLoading(true);
+    }
+
+    stopLoading() {
+        this.setLoading(false);
+    }
+
+    setLoading(value = true) {
+        if (this.state.loading === !!value) {
+            return;
+        }
+
+        this.setState({ ...this.state, loading: !!value });
     }
 
     render(state) {
@@ -76,6 +111,7 @@ export class FormControls extends Component {
             title: state.submitTitle,
             disabled: state.disabled,
         }));
+        this.submitBtn.enable(!state.loading);
 
         this.cancelBtn.setState((btnState) => ({
             ...btnState,
@@ -83,6 +119,8 @@ export class FormControls extends Component {
             url: state.cancelURL,
             disabled: state.disabled,
         }));
-        this.cancelBtn.show(state.cancelTitle);
+        this.cancelBtn.show(state.cancelTitle && !state.loading);
+
+        this.spinner.show(state.showSpinner && state.loading);
     }
 }
