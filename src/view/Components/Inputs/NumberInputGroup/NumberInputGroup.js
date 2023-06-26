@@ -139,6 +139,14 @@ export class NumberInputGroup extends InputGroup {
         }
     }
 
+    setValue(value) {
+        if (this.state.value === value) {
+            return;
+        }
+
+        this.setState({ ...this.state, value });
+    }
+
     renderInput(state, prevState) {
         if (state.value !== this.input.value) {
             this.input.value = state.value;
