@@ -690,11 +690,11 @@ export class TransactionForm extends Component {
         });
 
         return [
-            this.dateRangeField.elem,
             this.repeatSwitchField.elem,
             this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
+            this.dateRangeField.elem,
         ];
     }
 
