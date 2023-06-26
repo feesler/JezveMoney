@@ -2059,6 +2059,7 @@ export class TransactionForm extends Component {
         }));
 
         // 'Repeat transaction' Switch field
+        this.repeatSwitchField.show(!transaction.reminder_id);
         const intervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = (intervalType !== INTERVAL_NONE);
         this.repeatSwitch.check(isRepeat);

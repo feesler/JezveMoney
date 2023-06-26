@@ -93,6 +93,7 @@ export class TransactionForm extends TestComponent {
             type = EXPENSE,
             fromAccount = 0,
             fromPerson = 0,
+            fromReminder = 0,
         } = options;
 
         assert(availActions.includes(action), 'Invalid action');
@@ -126,7 +127,7 @@ export class TransactionForm extends TestComponent {
                 model.isAvailable = state.persons.length > 0;
             }
 
-            if (fromAccount || !fromPerson) {
+            if (fromAccount || (!fromPerson && !fromReminder)) {
                 const account = (fromAccount)
                     ? state.accounts.getItem(fromAccount)
                     : state.getFirstAccount();
@@ -188,25 +189,35 @@ export class TransactionForm extends TestComponent {
 
                 model.src_curr_id = model.personAccount.curr_id;
                 model.dest_curr_id = model.personAccount.curr_id;
+            } else if (fromReminder) {
+                const transaction = state.getDefaultReminderTransaction(fromReminder);
+                assert(transaction, 'Invalid reminder');
+
+                Object.assign(
+                    model,
+                    this.transactionToModel({ transaction, formType, isReminder: true }, state),
+                );
             }
 
             model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
             model.srcCurr = App.currency.getItem(model.src_curr_id);
             model.destCurr = App.currency.getItem(model.dest_curr_id);
 
-            model.fSrcAmount = 0;
-            model.srcAmount = '';
+            if (!fromReminder) {
+                model.fSrcAmount = 0;
+                model.srcAmount = '';
 
-            model.fDestAmount = 0;
-            model.destAmount = '';
+                model.fDestAmount = 0;
+                model.destAmount = '';
 
-            model.fSrcResBal = model.srcAccount?.balance ?? '';
-            model.fDestResBal = model.destAccount?.balance ?? '';
+                model.fSrcResBal = model.srcAccount?.balance ?? '';
+                model.fDestResBal = model.destAccount?.balance ?? '';
 
-            model.categoryId = 0;
-            model.comment = '';
+                model.categoryId = 0;
+                model.comment = '';
+            }
 
-            if (formType === TRANSACTION_FORM) {
+            if (formType === TRANSACTION_FORM && !fromReminder) {
                 model.date = App.datesFmt.now;
             } else if (formType === SCHEDULE_ITEM_FORM) {
                 model.repeatEnabled = true;
@@ -216,122 +227,18 @@ export class TransactionForm extends TestComponent {
                 model.intervalType = INTERVAL_MONTH;
                 model.intervalOffset = App.dates.now.getDate() - 1;
             }
-        } else if (model.isUpdate) {
-            const appState = (formType === TRANSACTION_FORM)
-                ? state.createCancelled({ id })
-                : state;
 
+            model.isReminder = !!fromReminder;
+        } else if (model.isUpdate) {
             const transaction = (formType === SCHEDULE_ITEM_FORM)
                 ? state.schedule.getItem(id)
                 : state.transactions.getItem(id);
             assert(transaction, 'Transaction not found');
 
             model.isAvailable = true;
-            model.type = transaction.type;
+            model.isReminder = false;
 
-            model.fSrcAmount = transaction.src_amount;
-            model.fDestAmount = transaction.dest_amount;
-
-            let srcAccountAfter = state.accounts.getItem(transaction.src_id);
-            let destAccountAfter = state.accounts.getItem(transaction.dest_id);
-
-            model.srcAccount = appState.accounts.getItem(transaction.src_id);
-            model.destAccount = appState.accounts.getItem(transaction.dest_id);
-
-            model.src_curr_id = transaction.src_curr;
-            model.dest_curr_id = transaction.dest_curr;
-
-            model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
-            model.srcCurr = App.currency.getItem(model.src_curr_id);
-            model.destCurr = App.currency.getItem(model.dest_curr_id);
-
-            model.categoryId = transaction.category_id;
-            if (formType === TRANSACTION_FORM) {
-                model.date = App.reformatDate(secondsToTime(transaction.date));
-            }
-            model.comment = transaction.comment;
-
-            if (model.type === DEBT) {
-                model.debtType = (
-                    !!model.srcAccount
-                    && model.srcAccount.owner_id !== state.profile.owner_id
-                );
-
-                const personId = (model.debtType)
-                    ? model.srcAccount.owner_id
-                    : model.destAccount.owner_id;
-                const personCurrId = (model.debtType)
-                    ? model.src_curr_id
-                    : model.dest_curr_id;
-
-                model.person = appState.persons.getItem(personId);
-                assert(model.person, 'Person not found');
-
-                model.noAccount = (model.debtType)
-                    ? !model.destAccount
-                    : !model.srcAccount;
-
-                model.personAccount = TransactionForm.getPersonAccount(
-                    model.person.id,
-                    personCurrId,
-                    appState,
-                );
-
-                if (model.noAccount) {
-                    if (model.debtType) {
-                        destAccountAfter = structuredClone(state.getFirstAccount());
-                        if (destAccountAfter) {
-                            destAccountAfter.balance = normalize(
-                                destAccountAfter.balance + model.fDestAmount,
-                                model.destCurr.precision,
-                            );
-                        }
-                    } else {
-                        srcAccountAfter = structuredClone(state.getFirstAccount());
-                        if (srcAccountAfter) {
-                            srcAccountAfter.balance = normalize(
-                                srcAccountAfter.balance - model.fSrcAmount,
-                                model.srcCurr.precision,
-                            );
-                        }
-                    }
-                } else {
-                    model.account = (model.debtType)
-                        ? model.destAccount
-                        : model.srcAccount;
-                }
-            } else if (model.type === LIMIT_CHANGE) {
-                if (model.srcAccount) {
-                    model.destAccount = model.srcAccount;
-                    model.srcAccount = null;
-                    model.destCurr = model.srcCurr;
-
-                    srcAccountAfter = null;
-                    destAccountAfter = state.accounts.getItem(model.destAccount.id);
-
-                    model.dest_curr_id = model.src_curr_id;
-                    model.dest_curr = model.src_curr;
-                    model.fSrcAmount = -model.fSrcAmount;
-                    model.fDestAmount = model.fSrcAmount;
-                }
-            }
-
-            model.srcAmount = model.fSrcAmount.toString();
-            model.destAmount = model.fDestAmount.toString();
-
-            model.fSrcResBal = srcAccountAfter?.balance ?? '';
-            model.fDestResBal = destAccountAfter?.balance ?? '';
-
-            if (formType === SCHEDULE_ITEM_FORM) {
-                model.repeatEnabled = transaction.interval_type !== INTERVAL_NONE;
-                model.startDate = App.reformatDate(secondsToTime(transaction.start_date));
-                model.endDate = (transaction.end_date)
-                    ? App.reformatDate(secondsToTime(transaction.end_date))
-                    : '';
-                model.intervalStep = transaction.interval_step;
-                model.intervalType = transaction.interval_type;
-                model.intervalOffset = transaction.interval_offset;
-            }
+            Object.assign(model, this.transactionToModel({ transaction, formType }, state));
         }
 
         model.srcResBal = model.fSrcResBal.toString();
@@ -377,6 +284,144 @@ export class TransactionForm extends TestComponent {
         }
 
         return this.getExpectedState(model, state);
+    }
+
+    static transactionToModel(options = {}, state) {
+        const {
+            transaction,
+            formType = TRANSACTION_FORM,
+            isReminder = false,
+        } = options;
+
+        const model = {};
+
+        const appState = (formType === TRANSACTION_FORM && !isReminder)
+            ? state.createCancelled({ id: transaction.id })
+            : state;
+
+        model.type = transaction.type;
+
+        model.fSrcAmount = transaction.src_amount;
+        model.fDestAmount = transaction.dest_amount;
+
+        let srcAccountAfter = state.accounts.getItem(transaction.src_id);
+        let destAccountAfter = state.accounts.getItem(transaction.dest_id);
+
+        model.srcAccount = appState.accounts.getItem(transaction.src_id);
+        model.destAccount = appState.accounts.getItem(transaction.dest_id);
+
+        model.src_curr_id = transaction.src_curr;
+        model.dest_curr_id = transaction.dest_curr;
+
+        model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
+        model.srcCurr = App.currency.getItem(model.src_curr_id);
+        model.destCurr = App.currency.getItem(model.dest_curr_id);
+
+        model.categoryId = transaction.category_id;
+        if (formType === TRANSACTION_FORM) {
+            model.date = App.reformatDate(secondsToTime(transaction.date));
+        }
+        model.comment = transaction.comment;
+
+        if (model.type === DEBT) {
+            model.debtType = (
+                !!model.srcAccount
+                && model.srcAccount.owner_id !== state.profile.owner_id
+            );
+
+            const personId = (model.debtType)
+                ? model.srcAccount.owner_id
+                : model.destAccount.owner_id;
+            const personCurrId = (model.debtType)
+                ? model.src_curr_id
+                : model.dest_curr_id;
+
+            model.person = appState.persons.getItem(personId);
+            assert(model.person, 'Person not found');
+
+            model.noAccount = (model.debtType)
+                ? !model.destAccount
+                : !model.srcAccount;
+
+            model.personAccount = TransactionForm.getPersonAccount(
+                model.person.id,
+                personCurrId,
+                appState,
+            );
+
+            if (model.noAccount) {
+                if (model.debtType) {
+                    destAccountAfter = structuredClone(state.getFirstAccount());
+                    if (destAccountAfter) {
+                        destAccountAfter.balance = normalize(
+                            destAccountAfter.balance + model.fDestAmount,
+                            model.destCurr.precision,
+                        );
+                    }
+                } else {
+                    srcAccountAfter = structuredClone(state.getFirstAccount());
+                    if (srcAccountAfter) {
+                        srcAccountAfter.balance = normalize(
+                            srcAccountAfter.balance - model.fSrcAmount,
+                            model.srcCurr.precision,
+                        );
+                    }
+                }
+            } else {
+                model.account = (model.debtType)
+                    ? model.destAccount
+                    : model.srcAccount;
+            }
+        } else if (model.type === LIMIT_CHANGE) {
+            if (model.srcAccount) {
+                model.destAccount = model.srcAccount;
+                model.srcAccount = null;
+                model.destCurr = model.srcCurr;
+
+                srcAccountAfter = null;
+                destAccountAfter = state.accounts.getItem(model.destAccount.id);
+
+                model.dest_curr_id = model.src_curr_id;
+                model.dest_curr = model.src_curr;
+                model.fSrcAmount = -model.fSrcAmount;
+                model.fDestAmount = model.fSrcAmount;
+            }
+        }
+
+        model.srcAmount = model.fSrcAmount.toString();
+        model.destAmount = model.fDestAmount.toString();
+
+        if (isReminder) {
+            model.fSrcResBal = (model.srcAccount)
+                ? normalize(
+                    model.srcAccount.balance - model.fSrcAmount,
+                    model.srcCurr.precision,
+                )
+                : '';
+
+            model.fDestResBal = (model.destAccount)
+                ? normalize(
+                    model.destAccount.balance + model.fDestAmount,
+                    model.destCurr.precision,
+                )
+                : '';
+        } else {
+            model.fSrcResBal = srcAccountAfter?.balance ?? '';
+            model.fDestResBal = destAccountAfter?.balance ?? '';
+        }
+
+        if (formType === SCHEDULE_ITEM_FORM) {
+            model.repeatEnabled = transaction.interval_type !== INTERVAL_NONE;
+            model.startDate = App.reformatDate(secondsToTime(transaction.start_date));
+            model.endDate = (transaction.end_date)
+                ? App.reformatDate(secondsToTime(transaction.end_date))
+                : '';
+            model.intervalStep = transaction.interval_step;
+            model.intervalType = transaction.interval_type;
+            model.intervalOffset = transaction.interval_offset;
+        }
+
+        return model;
     }
 
     static getExpectedState(model, state) {
@@ -474,9 +519,14 @@ export class TransactionForm extends TestComponent {
                 };
             }
 
-            if (isScheduleItemForm || model.repeatEnabled) {
-                const { repeatEnabled } = model;
+            const { repeatEnabled } = model;
 
+            res.repeatSwitch = {
+                visible: !model.isReminder,
+                checked: repeatEnabled,
+            };
+
+            if (isScheduleItemForm || repeatEnabled) {
                 res.dateRangeInput = {
                     visible: true,
                     startInputGroup: { visible: true },
@@ -486,11 +536,6 @@ export class TransactionForm extends TestComponent {
                         endDate: App.reformatDate(model.endDate),
                     },
                     invalidated: model.dateRangeInvalidated,
-                };
-
-                res.repeatSwitch = {
-                    visible: true,
-                    checked: repeatEnabled,
                 };
 
                 res.intervalStepRow = {
@@ -1109,10 +1154,12 @@ export class TransactionForm extends TestComponent {
             ];
         }, this.elem, hiddenInputs);
 
-        res.isUpdate = (await url()).includes('/update/');
+        const location = await url();
+        res.isUpdate = location.includes('/update/');
         if (res.isUpdate) {
             assert(res.id, 'Wrong transaction id');
         }
+        res.isReminder = location.includes('reminder_id=');
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
@@ -1218,6 +1265,7 @@ export class TransactionForm extends TestComponent {
         if (res.isUpdate) {
             res.id = cont.id;
         }
+        res.isReminder = cont.isReminder;
 
         const appState = this.appState(res);
 

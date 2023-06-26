@@ -155,7 +155,9 @@ class Transactions extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("transactions.errors.create");
 
-        if (isset($_GET["reminder_id"])) {
+        $fromReminder = isset($_GET["reminder_id"]);
+
+        if ($fromReminder) {
             $reminderModel = ReminderModel::getInstance();
             $tr = $reminderModel->getDefaultTransaction($_GET["reminder_id"]);
             $tr["reminder_id"] = intval($_GET["reminder_id"]);
@@ -189,7 +191,7 @@ class Transactions extends ListViewController
         }
 
         // Check specified account
-        $accountRequested = isset($_GET["acc_id"]);
+        $accountRequested = isset($_GET["acc_id"]) && !$fromReminder;
         $acc_id = ($accountRequested) ? intval($_GET["acc_id"]) : 0;
         // Redirect if invalid account is specified
         if ($acc_id) {
@@ -210,8 +212,9 @@ class Transactions extends ListViewController
         }
 
         // Check person parameter
+        $personRequested = isset($_GET["person_id"]) && $tr["type"] == DEBT && !$fromReminder;
         $person_id = 0;
-        if (isset($_GET["person_id"]) && $tr["type"] == DEBT) {
+        if ($personRequested) {
             $person_id = intval($_GET["person_id"]);
         }
         if (!$person_id && count($persons) > 0) {
@@ -243,7 +246,7 @@ class Transactions extends ListViewController
             $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = $noAccount;
-        } else {
+        } elseif (!$fromReminder) {
             // set source and destination accounts
             $src_id = 0;
             $dest_id = 0;

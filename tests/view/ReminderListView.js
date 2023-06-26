@@ -638,6 +638,7 @@ export class ReminderListView extends AppView {
         const item = this.content.remindersList.items[num];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
+
         const expected = this.getExpectedState();
 
         await this.performAction(async () => {
@@ -861,12 +862,15 @@ export class ReminderListView extends AppView {
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
+    getFilteredIdsByIndexes(index) {
+        return this.getFilteredItems().indexesToIds(index);
+    }
+
     /** Confirms specified transaction from context menu */
     async confirmFromContextMenu(index) {
         await this.openContextMenu(index);
 
-        const filteredItems = this.getFilteredItems();
-        const id = filteredItems.indexesToIds(index);
+        const id = this.getFilteredIdsByIndexes(index);
         App.state.confirmReminders({ id });
         this.loadReminders();
 
@@ -883,8 +887,7 @@ export class ReminderListView extends AppView {
     async cancelFromContextMenu(index) {
         await this.openContextMenu(index);
 
-        const filteredItems = this.getFilteredItems();
-        const id = filteredItems.indexesToIds(index);
+        const id = this.getFilteredIdsByIndexes(index);
         App.state.cancelReminders({ id });
         App.view.loadReminders();
 
@@ -903,8 +906,7 @@ export class ReminderListView extends AppView {
 
         await this.openListMenu();
 
-        const filteredItems = this.getFilteredItems();
-        const id = filteredItems.indexesToIds(items);
+        const id = this.getFilteredIdsByIndexes(items);
         const confirmRes = App.state.confirmReminders({ id });
         assert(confirmRes, 'Failed to confirm reminders');
         this.loadReminders(App.state);
@@ -924,8 +926,7 @@ export class ReminderListView extends AppView {
 
         await this.openListMenu();
 
-        const filteredItems = this.getFilteredItems();
-        const id = filteredItems.indexesToIds(items);
+        const id = this.getFilteredIdsByIndexes(items);
         App.state.cancelReminders({ id });
         App.view.loadReminders();
 
