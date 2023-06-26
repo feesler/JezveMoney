@@ -198,6 +198,8 @@ class ScheduledTransactionItem
         $startDate = isset($params["startDate"])
             ? intval($params["startDate"])
             : $this->start_date;
+        $startDate = cutDate($startDate);
+
         $endDate = isset($params["endDate"])
             ? intval($params["endDate"])
             : UserSettingsModel::clientTime();

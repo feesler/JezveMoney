@@ -21,6 +21,30 @@ const INTERVAL_DURATION_MAP = [
 ];
 
 /**
+ * Returns timestamp for the start of day
+ *
+ * @param int|DateTime|null $value timestamp or DateTime object to process
+ *
+ * @return int
+ */
+function cutDate(mixed $value)
+{
+    $timestamp = null;
+    if ($value instanceof DateTime) {
+        $timestamp = $value->getTimestamp();
+    } elseif (is_int($value)) {
+        $timestamp = $value;
+    } else {
+        throw new \Error("Invalid value");
+    }
+
+    $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+    $date->setTime(0, 0);
+
+    return $date->getTimestamp();
+}
+
+/**
  * Returns fixed year for week number
  *
  * @param mixed $info
