@@ -50,6 +50,11 @@ export class ImportTemplateStory extends TestStory {
     // Create import template tests
     async create() {
         setBlock('Create import template', 2);
+
+        setBlock('Verify template is not submitted without configured columns', 2);
+        await Actions.inputTemplateName('Template_1');
+        await Actions.submitTemplate();
+
         // Select columns for template
         await App.scenario.runner.runGroup(Actions.selectTemplateColumn, [
             { column: 'accountAmount', index: 11 },
@@ -61,10 +66,11 @@ export class ImportTemplateStory extends TestStory {
         ]);
 
         setBlock('Verify template with empty name not submitted', 2);
+        await Actions.inputTemplateName('');
         await Actions.submitTemplate();
-        await Actions.inputTemplateName('Template_1');
 
         setBlock('Verify template with empty first row not submitted', 2);
+        await Actions.inputTemplateName('Template_1');
         await Actions.inputTemplateFirstRow('');
         await Actions.submitTemplate();
 
