@@ -70,8 +70,8 @@ export class ImportUploadDialog extends TestComponent {
             // First row field
             firstRowField: { elem: await query('#firstRowField') },
             firstRowInp: { elem: await query('#firstRowInp') },
-            decFirstRowBtn: { elem: await query('#decFirstRowBtn') },
-            incFirstRowBtn: { elem: await query('#incFirstRowBtn') },
+            decFirstRowBtn: { elem: await query('#firstRowField .input-group__inner-btn') },
+            incFirstRowBtn: { elem: await query('#firstRowField .input-group__input + .input-group__inner-btn') },
             // Template account field
             tplAccountSwitch: await Switch.create(this, await query(this.elem, '#tplAccountSwitch')),
             tplAccountField: { elem: await query('#tplAccountField') },
@@ -419,8 +419,8 @@ export class ImportUploadDialog extends TestComponent {
             res.firstRowInp = { value: firstRow.toString() };
 
             res.decFirstRowBtn = {
-                visible: true,
-                disabled: (firstRow <= 1),
+                visible: firstRow > 1,
+                disabled: (firstRow === '' || firstRow <= 1),
             };
             res.incFirstRowBtn = {
                 visible: true,

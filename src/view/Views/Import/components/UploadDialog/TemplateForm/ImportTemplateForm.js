@@ -5,10 +5,9 @@ import {
     enable,
     Component,
     re,
-    setEvents,
+    createElement,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Switch } from 'jezvejs/Switch';
 
 import { __ } from '../../../../../utils/utils.js';
@@ -18,10 +17,11 @@ import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTem
 
 import { DateFormatSelect } from '../../../../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { InputField } from '../../../../../Components/Fields/InputField/InputField.js';
+import { NumberInputGroup } from '../../../../../Components/Inputs/NumberInputGroup/NumberInputGroup.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
+import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
 
 import './ImportTemplateForm.scss';
-import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
 
 /** CSS classes */
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
@@ -79,9 +79,6 @@ export class ImportTemplateForm extends Component {
         const elemIds = [
             'templateForm',
             'firstRowField',
-            'firstRowInp',
-            'decFirstRowBtn',
-            'incFirstRowBtn',
             'tplAccountSwitchField',
             'tplAccountSwitch',
             'tplAccountField',
@@ -135,14 +132,24 @@ export class ImportTemplateForm extends Component {
         App.initAccountsList(this.tplAccountDropDown);
         this.tplAccountField.append(this.tplAccountDropDown.elem);
 
-        setEvents(this.firstRowInp, { input: () => this.onFirstRowInput() });
-        DecimalInput.create({
-            elem: this.firstRowInp,
+        // First row field
+        this.firstRowGroup = NumberInputGroup.create({
             digits: 0,
             allowNegative: false,
+            minValue: 1,
+            step: 1,
+            inputId: 'firstRowInp',
+            onChange: (value) => this.onFirstRowChange(value),
         });
-        setEvents(this.decFirstRowBtn, { click: () => this.onFirstRowDecrease() });
-        setEvents(this.incFirstRowBtn, { click: () => this.onFirstRowIncrease() });
+
+        const firstRowFeedback = createElement('div', {
+            props: {
+                className: 'feedback invalid-feedback',
+                textContent: __('import.templates.invalidFirstRow'),
+            },
+        });
+
+        this.firstRowField.append(this.firstRowGroup.elem, firstRowFeedback);
 
         // Submit controls
         this.controls = FormControls.create({
@@ -244,52 +251,13 @@ export class ImportTemplateForm extends Component {
         });
     }
 
-    /** Template first row 'input' event handler */
-    onFirstRowInput() {
+    /** Template first row 'change' event handler */
+    onFirstRowChange(value) {
         this.setState({
             ...this.state,
             template: new ImportTemplate({
                 ...this.state.template,
-                first_row: parseInt(this.firstRowInp.value, 10),
-            }),
-            validation: {
-                ...this.state.validation,
-                firstRow: true,
-            },
-        });
-    }
-
-    /** Template first row decrease button 'click' event handler */
-    onFirstRowDecrease() {
-        const { template } = this.state;
-        if (Number.isNaN(template.first_row) || template.first_row === 1) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                first_row: template.first_row - 1,
-            }),
-            validation: {
-                ...this.state.validation,
-                firstRow: true,
-            },
-        });
-    }
-
-    /** Template first row increase button 'click' event handler */
-    onFirstRowIncrease() {
-        const { template } = this.state;
-
-        this.setState({
-            ...this.state,
-            template: new ImportTemplate({
-                ...template,
-                first_row: (
-                    Number.isNaN(template.first_row) ? 1 : template.first_row + 1
-                ),
+                first_row: parseInt(value, 10),
             }),
             validation: {
                 ...this.state.validation,
@@ -568,7 +536,11 @@ export class ImportTemplateForm extends Component {
         re(this.dataTable?.elem);
         this.dataTable = dataTable;
 
-        this.firstRowInp.value = state.template.first_row;
+        this.firstRowGroup.setState((fieldState) => ({
+            ...fieldState,
+            value: state.template.first_row,
+        }));
+
         enable(this.decFirstRowBtn, state.template.first_row > 1);
         App.setValidation(this.firstRowField, validation.firstRow);
 

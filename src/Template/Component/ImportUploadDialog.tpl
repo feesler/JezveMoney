@@ -47,12 +47,6 @@
         <section id="templateForm" class="template-form" hidden>
             <div id="firstRowField" class="field form-row first-row-field validation-block">
                 <label for="firstRowInp" class="field__title"><?= __("import.templates.firstRow") ?></label>
-                <div class="input-group">
-                    <button id="decFirstRowBtn" class="btn input-group__btn" type="button">-</button>
-                    <input id="firstRowInp" class="input input-group__input right-align-text" type="text" autocomplete="off">
-                    <button id="incFirstRowBtn" class="btn input-group__btn" type="button">+</button>
-                </div>
-                <div class="feedback invalid-feedback"><?= __("import.templates.invalidFirstRow") ?></div>
             </div>
 
             <div id="tplAccountSwitchField" class="field form-row horizontal-field">
