@@ -1,6 +1,7 @@
 .import-form-popup {
   --import-form-popup-zindex: 500;
   --popup-max-width: 600px;
+  --popup-content-padding: 0 0 1rem 0;
 }
 
 /* Transaction item */
@@ -22,6 +23,8 @@
   /* Input field and label group */
   .field {
     max-width: 300px;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .field__title {
@@ -48,6 +51,11 @@
     --ig-height: var(--input-height);
   }
 
+  .form-controls {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   /* Toggle expand/collapse button */
   .toggle-btn {
     --btn-icon-color: var(--list-item-icon-fill);
@@ -60,7 +68,7 @@
     flex-flow: column nowrap;
     row-gap: 1rem;
     border-top: 1px solid;
-    padding: 8px;
+    padding: 1rem 1rem 0 1rem;
     overflow: hidden;
     color: var(--text-color-3);
     border-color: var(--border-color-2);
