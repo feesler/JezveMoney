@@ -16,7 +16,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     __,
@@ -59,7 +59,7 @@ const SHOW_ON_PAGE = 10;
 /**
  * List of scheduled transactions view
  */
-class ScheduleView extends View {
+class ScheduleView extends AppView {
     constructor(...args) {
         super(...args);
 

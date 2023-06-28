@@ -4,7 +4,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -28,7 +28,7 @@ const titleMap = {
 /**
  * User profile view
  */
-class ProfileView extends View {
+class ProfileView extends AppView {
     constructor(...args) {
         super(...args);
 

@@ -12,7 +12,7 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -47,7 +47,7 @@ const ANY_TYPE = 0;
 /**
  * List of persons view
  */
-class CategoryListView extends View {
+class CategoryListView extends AppView {
     constructor(...args) {
         super(...args);
 

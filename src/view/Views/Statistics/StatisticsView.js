@@ -26,7 +26,7 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
@@ -68,7 +68,7 @@ const defaultProps = {
 /**
  * Statistics view
  */
-class StatisticsView extends View {
+class StatisticsView extends AppView {
     constructor(...args) {
         super(...args);
 

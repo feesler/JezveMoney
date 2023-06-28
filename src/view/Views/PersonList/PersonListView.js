@@ -21,7 +21,7 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { PersonList } from '../../Models/PersonList.js';
@@ -39,7 +39,7 @@ import './PersonListView.scss';
 /**
  * List of persons view
  */
-class PersonListView extends View {
+class PersonListView extends AppView {
     constructor(...args) {
         super(...args);
 

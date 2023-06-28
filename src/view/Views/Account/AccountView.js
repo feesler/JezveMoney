@@ -12,7 +12,7 @@ import { createStore } from 'jezvejs/Store';
 import { getCurrencyPrecision, __ } from '../../utils/utils.js';
 import { normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 import { IconList } from '../../Models/IconList.js';
@@ -36,7 +36,7 @@ import { FormControls } from '../../Components/FormControls/FormControls.js';
 /**
  * Create/update account view
  */
-class AccountView extends View {
+class AccountView extends AppView {
     constructor(...args) {
         super(...args);
 

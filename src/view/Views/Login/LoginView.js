@@ -5,7 +5,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { __, parseCookies, setCookie } from '../../utils/utils.js';
 
 import { Field } from '../../Components/Fields/Field/Field.js';
@@ -18,7 +18,7 @@ import './LoginView.scss';
 /**
  * User log in view
  */
-class LoginView extends View {
+class LoginView extends AppView {
     constructor(...args) {
         super(...args);
 

@@ -4,7 +4,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
@@ -18,7 +18,7 @@ import './RegisterView.scss';
 /**
  * User registration view
  */
-class RegisterView extends View {
+class RegisterView extends AppView {
     constructor(...args) {
         super(...args);
 

@@ -12,7 +12,7 @@ import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
@@ -29,7 +29,7 @@ import './CategoryView.scss';
 /**
  * Create/update category view
  */
-class CategoryView extends View {
+class CategoryView extends AppView {
     constructor(...args) {
         super(...args);
 

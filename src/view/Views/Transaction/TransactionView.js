@@ -10,7 +10,7 @@ import {
     Transaction,
 } from '../../Models/Transaction.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -28,7 +28,7 @@ import './TransactionView.scss';
 /**
  * Create/update transaction view
  */
-class TransactionView extends View {
+class TransactionView extends AppView {
     constructor(...args) {
         super(...args);
         const availModes = ['create', 'update'];

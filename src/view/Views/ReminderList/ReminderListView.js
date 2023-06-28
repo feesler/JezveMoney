@@ -16,7 +16,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     __,
@@ -57,7 +57,7 @@ const SELECT_MODE_CLASS = 'reminder-list_select';
 /**
  * Scheduled transaction reminders list view
  */
-class ReminderListView extends View {
+class ReminderListView extends AppView {
     constructor(...args) {
         super(...args);
 

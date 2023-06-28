@@ -12,7 +12,7 @@ import { TabList } from 'jezvejs/TabList';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -38,7 +38,7 @@ const SELECT_MODE_CLASS = 'currencies-list_select';
 /**
  * Settings view
  */
-class SettingsView extends View {
+class SettingsView extends AppView {
     constructor(...args) {
         super(...args);
 

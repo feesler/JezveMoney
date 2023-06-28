@@ -108,7 +108,7 @@ export class RemindersStory extends TestStory {
 
         await Actions.updateFromContextMenu(0);
         await trActions.runActions([
-            { action: 'inputSrcAmount', data: '100' },
+            { action: 'inputDestAmount', data: '100' },
         ]);
         await trActions.submit();
     }

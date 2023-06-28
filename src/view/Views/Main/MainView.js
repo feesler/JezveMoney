@@ -25,7 +25,7 @@ import {
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
@@ -43,7 +43,7 @@ import './MainView.scss';
 /**
  * Main view
  */
-class MainView extends View {
+class MainView extends AppView {
     constructor(...args) {
         super(...args);
 

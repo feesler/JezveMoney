@@ -1,7 +1,8 @@
 import 'jezvejs/style';
+
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
@@ -9,7 +10,7 @@ import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/Theme
 /**
  * About view
  */
-class AboutView extends View {
+class AboutView extends AppView {
     /**
      * View initialization
      */

@@ -5,6 +5,7 @@ import {
     isFunction,
     removeChilds,
     show,
+    getFormData,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Checkbox } from 'jezvejs/Checkbox';
@@ -1183,7 +1184,7 @@ class AdminApiConsoleView extends AdminView {
         e.preventDefault();
 
         const formEl = e.target;
-        const frmData = this.getFormData(formEl);
+        const frmData = getFormData(formEl);
         if (!frmData) {
             return;
         }
@@ -1408,7 +1409,7 @@ class AdminApiConsoleView extends AdminView {
         e.preventDefault();
 
         const formEl = e.target;
-        const frmData = this.getFormData(formEl);
+        const frmData = getFormData(formEl);
         if (!frmData) {
             return;
         }
@@ -1433,7 +1434,7 @@ class AdminApiConsoleView extends AdminView {
     onUpdateSettingsSubmit(e) {
         e.preventDefault();
 
-        const frmData = this.getFormData(e.target);
+        const frmData = getFormData(e.target);
         const { name, value } = frmData;
 
         if (name.length === 0) {
@@ -1453,7 +1454,7 @@ class AdminApiConsoleView extends AdminView {
     onListTransactionSubmit(e) {
         e.preventDefault();
 
-        const frmData = this.getFormData(e.target);
+        const frmData = getFormData(e.target);
         if (!frmData) {
             return;
         }
@@ -1482,7 +1483,7 @@ class AdminApiConsoleView extends AdminView {
     onStatisticsSubmit(e) {
         e.preventDefault();
 
-        const frmData = this.getFormData(e.target);
+        const frmData = getFormData(e.target);
         if (!frmData) {
             return;
         }
@@ -1508,7 +1509,7 @@ class AdminApiConsoleView extends AdminView {
     onSetCategorySubmit(e) {
         e.preventDefault();
 
-        const frmData = this.getFormData(e.target);
+        const frmData = getFormData(e.target);
         if (!frmData) {
             return;
         }
@@ -1531,7 +1532,7 @@ class AdminApiConsoleView extends AdminView {
         e.preventDefault();
 
         const formEl = e.target;
-        const frmData = this.getFormData(formEl);
+        const frmData = getFormData(formEl);
         if (!frmData) {
             return;
         }
@@ -1562,7 +1563,7 @@ class AdminApiConsoleView extends AdminView {
         e.preventDefault();
 
         const formEl = e.target;
-        const frmData = this.getFormData(formEl);
+        const frmData = getFormData(formEl);
         if (!frmData) {
             return;
         }
