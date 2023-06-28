@@ -10,6 +10,7 @@ import { __, parseCookies, setCookie } from '../../utils/utils.js';
 
 import { Field } from '../../Components/Fields/Field/Field.js';
 import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { PasswordField } from '../../Components/Fields/PasswordField/PasswordField.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
@@ -62,12 +63,11 @@ class LoginView extends AppView {
         });
 
         // Password field
-        this.passwordField = InputField.create({
+        this.passwordField = PasswordField.create({
             id: 'passwordField',
             inputId: 'passwordInp',
             className: 'form-row',
             name: 'password',
-            type: 'password',
             title: __('login.password'),
             validate: true,
             feedbackMessage: __('login.invalidPassword'),
