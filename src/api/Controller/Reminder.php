@@ -69,24 +69,22 @@ class Reminder extends ApiListController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["id"])) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            if (!$request || !isset($request["id"])) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
 
-        $reqData = copyFields($request, ["transaction_id"]);
-        if ($reqData === false) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
+            $reqData = copyFields($request, ["transaction_id"]);
+            if ($reqData === false) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
 
-        $this->begin();
+            $this->model->confirm($request["id"], $reqData);
+            $result = $this->getStateResult($request);
 
-        $this->model->confirm($request["id"], $reqData);
-        $result = $this->getStateResult($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 
     /**
@@ -98,20 +96,18 @@ class Reminder extends ApiListController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (!is_array($ids) || count($ids) === 0) {
-            throw new \Error(__("errors.noIds"));
-        }
+        $this->runTransaction(function () {
+            $ids = $this->getRequestedIds(true, $this->isJsonContent());
+            if (!is_array($ids) || count($ids) === 0) {
+                throw new \Error(__("errors.noIds"));
+            }
 
-        $this->begin();
+            $this->model->cancel($ids);
 
-        $this->model->cancel($ids);
+            $request = $this->getRequestData();
+            $result = $this->getStateResult($request);
 
-        $request = $this->getRequestData();
-        $result = $this->getStateResult($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 }

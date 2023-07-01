@@ -57,9 +57,7 @@ class DBVersion
      */
     private function install()
     {
-        try {
-            Model::begin();
-
+        Model::runTransaction(function () {
             $this->createCurrencyTable();
             $this->createAccountsTable();
             $this->createPersonsTable();
@@ -80,12 +78,7 @@ class DBVersion
 
             $this->createDBVersionTable();
             $this->setVersion(DB_VERSION);
-
-            Model::commit();
-        } catch (\Error $e) {
-            wlog("DB install error: " . $e->getMessage());
-            Model::rollback();
-        }
+        });
     }
 
     /**
@@ -171,9 +164,7 @@ class DBVersion
      */
     public function autoUpdate()
     {
-        try {
-            Model::begin();
-
+        Model::runTransaction(function () {
             $current = $this->getCurrentVersion();
             $latest = $this->getLatestVersion();
             wlog("Current DB version: $current; latest: $latest");
@@ -187,12 +178,7 @@ class DBVersion
             }
 
             $this->setVersion($current);
-
-            Model::commit();
-        } catch (\Error $e) {
-            wlog("DB install error: " . $e->getMessage());
-            Model::rollback();
-        }
+        });
     }
 
     /**

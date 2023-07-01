@@ -29,7 +29,6 @@ class ApiController extends Controller
         try {
             $this->$action();
         } catch (\Error $e) {
-            $this->rollback();
             $this->fail($e->getMessage());
         }
     }
