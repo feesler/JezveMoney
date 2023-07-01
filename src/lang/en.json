@@ -262,7 +262,7 @@
     "categories": {
         "listTitle": "Categories",
         "noCategory": "No category",
-        "noDate": "No categories",
+        "noData": "No categories",
         "create": "New category",
         "update": "Edit category",
         "delete": "Delete category",

@@ -3,6 +3,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { __ } from '../../../../utils/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
+import { NoDataMessage } from '../../../../Components/NoDataMessage/NoDataMessage.js';
 import './ImportTransactionList.scss';
 
 /* CSS classes */
@@ -15,7 +16,8 @@ const defaultProps = {
     itemSelector: '.import-item',
     itemSortSelector: '.import-item.import-item_sort',
     className: LIST_CLASS,
-    noItemsMessage: __('import.noData'),
+    PlaceholderComponent: NoDataMessage,
+    getPlaceholderProps: () => ({ title: __('import.noData') }),
     onSort: null,
 };
 

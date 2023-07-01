@@ -23,6 +23,7 @@ import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/Loc
 import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { DateFormatSelect } from '../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
@@ -147,7 +148,6 @@ class SettingsView extends AppView {
                 listMode,
                 showControls: (listMode === 'list'),
             }),
-            getItemById: (id) => this.getItemById(id),
             className: 'currencies-list',
             itemSelector: '.currency-item',
             itemSortSelector: '.currency-item.currency-item_sort',
@@ -155,7 +155,8 @@ class SettingsView extends AppView {
             sortModeClass: 'currencies-list_sort',
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('settings.currencies.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('settings.currencies.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         });

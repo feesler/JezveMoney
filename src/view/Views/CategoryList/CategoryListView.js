@@ -10,6 +10,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
+
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
@@ -25,16 +26,20 @@ import {
     getApplicationURL,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
+
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { availTransTypes, Transaction } from '../../Models/Transaction.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
 import { CategoryListContextMenu } from './components/ContextMenu/CategoryListContextMenu.js';
 import { CategoryListMainMenu } from './components/MainMenu/CategoryListMainMenu.js';
+
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import { getCategoriesSortMode } from './helpers.js';
 import './CategoryListView.scss';
@@ -115,7 +120,8 @@ class CategoryListView extends AppView {
             treeSort: true,
             childContainerSelector: '.category-item__children',
             listMode: 'list',
-            noItemsMessage: __('categories.noDate'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('categories.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };

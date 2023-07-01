@@ -35,6 +35,7 @@ import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 
 import { ScheduleItemContextMenu } from './components/ContextMenu/ScheduleItemContextMenu.js';
@@ -158,7 +159,8 @@ class ScheduleView extends AppView {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'schedule-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('schedule.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('schedule.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 

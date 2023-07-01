@@ -37,6 +37,7 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -169,7 +170,8 @@ class ReminderListView extends AppView {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'reminder-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('reminders.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('reminders.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 

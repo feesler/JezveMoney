@@ -18,6 +18,7 @@ import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDi
 import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
 import { SearchInput } from '../../../../../Components/Inputs/SearchInput/SearchInput.js';
 import { RuleListContextMenu } from '../ContextMenu/RuleListContextMenu.js';
+import { NoDataMessage } from '../../../../../Components/NoDataMessage/NoDataMessage.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 
@@ -102,6 +103,12 @@ export class ImportRulesDialog extends Component {
                 ruleId: rule.id,
                 conditions: rule.conditions,
                 actions: rule.actions,
+            }),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: (state) => ({
+                title: (state.filter !== '')
+                    ? __('import.rules.notFound')
+                    : __('import.rules.noData'),
             }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
@@ -377,7 +384,6 @@ export class ImportRulesDialog extends Component {
         this.rulesList.setState((listState) => ({
             ...listState,
             items,
-            noItemsMessage: (state.filter !== '') ? __('import.rules.notFound') : __('import.rules.noData'),
             renderTime: state.renderTime,
         }));
 

@@ -9,6 +9,7 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { createStore } from 'jezvejs/Store';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
+
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -23,15 +24,19 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
+
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { PersonList } from '../../Models/PersonList.js';
+
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 import { Tile } from '../../Components/Tile/Tile.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { PersonListContextMenu } from './components/ContextMenu/PersonListContextMenu.js';
 import { PersonListMainMenu } from './components/MainMenu/PersonListMainMenu.js';
+
 import { actions, createList, reducer } from './reducer.js';
 import { getPersonsSortMode, getSelectedIds } from './helpers.js';
 import './PersonListView.scss';
@@ -109,7 +114,8 @@ class PersonListView extends AppView {
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
-            noItemsMessage: __('persons.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('persons.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };
