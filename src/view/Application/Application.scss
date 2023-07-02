@@ -1039,6 +1039,28 @@ a.paginator-arrow:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
+/* Tabs */
+.tab-list {
+  --tab-padding: 1rem 0;
+  --tab-gap: 24px;
+  --tab-border-width: 0;
+  --tab-content-background: none;
+  --tab-content-padding: 0;
+  --tab-item-color: var(--dimmed-text-color);
+  --tab-hover-color: var(--main-text-color);
+  --tab-active-color: var(--accent-color-alt);
+  --tab-selected-color: var(--main-text-color);
+
+  .link-menu-item {
+    border-bottom-width: 2px;
+    text-decoration: none;
+  }
+
+  .link-menu-item_selected {
+    border-bottom-color: var(--accent-color-alt);
+  }
+}
+
 /* Filters */
 .filter-item .link-menu {
   min-height: var(--input-height);
