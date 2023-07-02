@@ -9,11 +9,13 @@ import {
 } from '../common.js';
 
 export class CategoryList extends SortableList {
+/*
     setData(data) {
         super.setData(data);
 
         this.sortByParent();
     }
+    */
 
     /**
      * Create list item from specified object

@@ -126,6 +126,7 @@ export class CategoryListView extends AppView {
                 itemId: model.contextItem,
                 ctxDetailsBtn: { visible: true },
                 ctxUpdateBtn: { visible: true },
+                ctxAddSubcategoryBtn: { visible: ctxCategory.parent_id === 0 },
                 ctxDeleteBtn: { visible: true },
             };
         }
@@ -356,11 +357,18 @@ export class CategoryListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    /** Select specified category, click on edit button */
-    async goToUpdateCategory(num) {
-        await this.openContextMenu(num);
+    /** Opens context menu for specified category and clicks by 'Edit' button */
+    async goToUpdateCategory(index) {
+        await this.openContextMenu(index);
 
-        await navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+    }
+
+    /** Opens context menu for specified category and clicks by 'Add subcategory' button */
+    async goToAddSubcategory(index) {
+        await this.openContextMenu(index);
+
+        return navigation(() => this.contextMenu.select('ctxAddSubcategoryBtn'));
     }
 
     async waitForList(action) {
@@ -449,9 +457,7 @@ export class CategoryListView extends AppView {
         this.onDeselectAll();
         if (listMode === 'sort') {
             this.model.sortMode = SORT_MANUALLY;
-            App.state.updateSettings({
-                sort_categories: this.model.sortMode,
-            });
+            App.state.changeCategoriesSortMode(this.model.sortMode);
 
             this.model.items = App.state.getSortedCategories();
         }
@@ -490,9 +496,7 @@ export class CategoryListView extends AppView {
             ? SORT_BY_NAME_DESC
             : SORT_BY_NAME_ASC;
 
-        App.state.updateSettings({
-            sort_categories: this.model.sortMode,
-        });
+        App.state.changeCategoriesSortMode(this.model.sortMode);
 
         const expected = this.getExpectedState();
 
@@ -510,9 +514,7 @@ export class CategoryListView extends AppView {
             ? SORT_BY_CREATEDATE_DESC
             : SORT_BY_CREATEDATE_ASC;
 
-        App.state.updateSettings({
-            sort_categories: this.model.sortMode,
-        });
+        App.state.changeCategoriesSortMode(this.model.sortMode);
 
         const expected = this.getExpectedState();
 

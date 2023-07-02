@@ -21,6 +21,10 @@ export class CategoryListContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
             }, {
+                id: 'ctxAddSubcategoryBtn',
+                type: 'link',
+                title: __('categories.addSubcategory'),
+            }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
                 title: __('actions.delete'),
@@ -67,6 +71,9 @@ export class CategoryListContextMenu extends PopupMenu {
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}categories/${category.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${category.id}`);
+
+        items.ctxAddSubcategoryBtn.show(category.parent_id === 0);
+        items.ctxAddSubcategoryBtn.setURL(`${baseURL}categories/create/?parent_id=${category.id}`);
 
         this.attachAndShow(menuButton);
     }
