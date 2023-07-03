@@ -345,9 +345,9 @@
         "update": "Редактировать",
         "cancel": "Отменить",
         "state": {
-            "scheduled": "Запланированная",
-            "submitted": "Внесенная",
-            "cancelled": "Отмененная"
+            "scheduled": "Запланированные",
+            "submitted": "Внесенные",
+            "cancelled": "Отмененные"
         },
         "noData": "Нет напоминаний",
         "errors": {
