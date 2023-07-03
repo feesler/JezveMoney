@@ -48,10 +48,8 @@ class Transactions extends ListViewController
     public function index()
     {
         $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
-        $baseUrl = BASEURL . "transactions/";
         $data = [
             "titleString" => __("appName") . " | " . __("transactions.listTitle"),
-            "clearAllURL" => $baseUrl
         ];
 
         $requestDefaults = [

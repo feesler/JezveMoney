@@ -23,12 +23,11 @@
 }
 
 /* Clear all filters button */
-.clear-all-btn {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
+.btn.clear-all-btn {
+  --btn-title-color: var(--accent-color);
+  --btn-hover-title-color: var(--accent-hover-color);
+  --btn-size: var(--input-height);
+
   text-decoration: none;
 }
 
@@ -79,7 +78,7 @@
 }
 
 @media (hover: hover) {
-  .clear-all-btn {
+  .btn.clear-all-btn:hover {
     text-decoration: underline;
   }
 }

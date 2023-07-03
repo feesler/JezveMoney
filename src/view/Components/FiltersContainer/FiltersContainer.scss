@@ -78,7 +78,7 @@
 }
 
 /* Filters controls */
-.filters-controls {
+.filters-container .filters-controls {
   flex-flow: column nowrap;
   align-items: stretch;
 }
@@ -120,7 +120,7 @@
     display: flex;
   }
 
-  .filters-controls {
+  .filters-container .filters-controls {
     flex-flow: row nowrap;
     align-items: center;
   }

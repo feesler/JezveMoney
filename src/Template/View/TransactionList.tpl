@@ -54,12 +54,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-controls filters-controls">
-                                    <button id="applyFiltersBtn" class="btn submit-btn" type="button"><?= __("actions.apply") ?></button>
-                                    <a id="clearFiltersBtn" class="clear-all-btn" href="<?= e($clearAllURL) ?>">
-                                        <span><?= __("actions.clearAll") ?></span>
-                                    </a>
-                                </div>
+                                <hr class="filters-separator">
                             </aside>
 
                             <header class="list-header">

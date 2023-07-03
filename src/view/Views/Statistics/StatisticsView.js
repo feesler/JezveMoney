@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     getClassName,
-    setEvents,
     show,
     asArray,
 } from 'jezvejs';
@@ -39,8 +38,9 @@ import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategoryS
 import { DateRangeSelector } from '../../Components/Inputs/Date/DateRangeSelector/DateRangeSelector.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 
 import { isSameSelection, actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
@@ -117,7 +117,6 @@ class StatisticsView extends AppView {
             'contentHeader',
             // Filters
             'filtersContainer',
-            'applyFiltersBtn',
             'typeFilter',
             'reportTypeFilter',
             'groupTypeFilter',
@@ -157,7 +156,14 @@ class StatisticsView extends AppView {
         });
         this.contentHeader.prepend(this.filters.elem);
 
-        setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
+        // Controls
+        this.filtersControls = FormControls.create({
+            className: 'filters-controls',
+            submitTitle: __('actions.apply'),
+            onSubmitClick: () => this.filters.close(),
+            cancelTitle: null,
+        });
+        this.filtersContainer.append(this.filtersControls.elem);
 
         // Transaction type filter
         this.typeMenu = TransactionTypeMenu.create({
