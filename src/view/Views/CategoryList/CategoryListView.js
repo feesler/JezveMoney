@@ -1,7 +1,6 @@
 import 'jezvejs/style';
 import {
     asArray,
-    createElement,
     insertAfter,
     isFunction,
     show,
@@ -9,10 +8,12 @@ import {
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
+import { TabList } from 'jezvejs/TabList';
 import { createStore } from 'jezvejs/Store';
+
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -25,16 +26,20 @@ import {
     getApplicationURL,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
+
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
-import { availTransTypes, Transaction } from '../../Models/Transaction.js';
+import { availTransTypes } from '../../Models/Transaction.js';
+
 import { Heading } from '../../Components/Heading/Heading.js';
 import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
 import { CategoryListContextMenu } from './components/ContextMenu/CategoryListContextMenu.js';
 import { CategoryListMainMenu } from './components/MainMenu/CategoryListMainMenu.js';
+
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import { getCategoriesSortMode } from './helpers.js';
 import './CategoryListView.scss';
@@ -47,7 +52,7 @@ const ANY_TYPE = 0;
 /**
  * List of persons view
  */
-class CategoryListView extends View {
+class CategoryListView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -115,7 +120,8 @@ class CategoryListView extends View {
             treeSort: true,
             childContainerSelector: '.category-item__children',
             listMode: 'list',
-            noItemsMessage: __('categories.noDate'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('categories.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };
@@ -145,36 +151,29 @@ class CategoryListView extends View {
 
         this.sections = {};
 
-        this.transTypes.forEach((type) => {
-            const section = {
-                header: createElement('header', {
-                    props: {
-                        className: 'list-header',
-                        textContent: Category.getTypeTitle(type),
-                    },
-                }),
-                list: SortableListContainer.create({
-                    ...listProps,
-                    sortGroup: type,
-                }),
-            };
+        // Tabs
+        this.tabs = TabList.create({
+            items: this.transTypes.map((type) => {
+                const key = Category.getTypeString(type);
+                const section = {
+                    list: SortableListContainer.create({
+                        ...listProps,
+                        sortGroup: type,
+                    }),
+                };
 
-            section.container = createElement('section', {
-                props: {
-                    className: 'list-section',
-                    dataset: { type },
-                },
-                children: [
-                    section.header,
-                    section.list.elem,
-                ],
-            });
+                this.sections[key] = section;
 
-            const key = Category.getTypeString(type);
-            this.sections[key] = section;
-
-            this.contentContainer.append(section.container);
+                return {
+                    id: key,
+                    value: key,
+                    title: Category.getTypeTitle(type),
+                    content: section.list.elem,
+                };
+            }),
         });
+
+        this.contentContainer.append(this.tabs.elem);
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
@@ -650,7 +649,7 @@ class CategoryListView extends View {
 
         // List of categories
         this.transTypes.forEach((type) => {
-            const key = (type !== 0) ? Transaction.getTypeString(type) : 'any';
+            const key = Category.getTypeString(type);
             const section = this.sections[key];
             const typeCategories = mainCategories.filter((item) => item.type === type);
 
@@ -661,7 +660,7 @@ class CategoryListView extends View {
                 renderTime: Date.now(),
             }));
 
-            show(section.container, typeCategories.length > 0);
+            this.tabs.showItem(key, typeCategories.length > 0);
         });
     }
 

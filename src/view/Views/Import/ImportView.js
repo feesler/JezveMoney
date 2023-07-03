@@ -16,7 +16,7 @@ import { createStore } from 'jezvejs/Store';
 import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
@@ -53,7 +53,7 @@ const defaultPagination = {
 /**
  * Import view constructor
  */
-class ImportView extends View {
+class ImportView extends AppView {
     constructor(...args) {
         super(...args);
 

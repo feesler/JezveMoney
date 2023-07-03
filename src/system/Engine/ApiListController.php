@@ -213,45 +213,43 @@ class ApiListController extends ApiController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        $requestData = asArray($request["data"] ?? [$request]);
-        if (!is_array($requestData) || count($requestData) === 0) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
-
-        $this->begin();
-
-        $items = [];
-        foreach ($requestData as $item) {
-            if (!is_array($item)) {
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            $requestData = asArray($request["data"] ?? [$request]);
+            if (!is_array($requestData) || count($requestData) === 0) {
                 throw new \Error(__("errors.invalidRequestData"));
             }
 
-            $expectedFields = $this->getExpectedFields($item);
-            $default = $this->getDefaultValues($item);
-            $itemData = array_merge($default, $item);
-            checkFields($itemData, $expectedFields, true);
+            $items = [];
+            foreach ($requestData as $item) {
+                if (!is_array($item)) {
+                    throw new \Error(__("errors.invalidRequestData"));
+                }
 
-            $items[] = $this->preCreate($itemData);
-        }
+                $expectedFields = $this->getExpectedFields($item);
+                $default = $this->getDefaultValues($item);
+                $itemData = array_merge($default, $item);
+                checkFields($itemData, $expectedFields, true);
 
-        $ids = null;
-        try {
-            $ids = (count($items) > 1)
-                ? $this->model->createMultiple($items)
-                : $this->model->create($items[0]);
-        } catch (\Error $e) {
-            wlog("Create item error: " . $e->getMessage());
-        }
-        if (!$ids) {
-            throw new \Error($this->createErrorMsg);
-        }
+                $items[] = $this->preCreate($itemData);
+            }
 
-        $result = $this->postCreate($ids, $request);
+            $ids = null;
+            try {
+                $ids = (count($items) > 1)
+                    ? $this->model->createMultiple($items)
+                    : $this->model->create($items[0]);
+            } catch (\Error $e) {
+                wlog("Create item error: " . $e->getMessage());
+            }
+            if (!$ids) {
+                throw new \Error($this->createErrorMsg);
+            }
 
-        $this->commit();
+            $result = $this->postCreate($ids, $request);
 
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 
     /**
@@ -286,36 +284,34 @@ class ApiListController extends ApiController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["id"])) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            if (!$request || !isset($request["id"])) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
 
-        $expectedFields = $this->getExpectedFields($request);
-        $reqData = copyFields($request, $expectedFields);
-        if ($reqData === false) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
+            $expectedFields = $this->getExpectedFields($request);
+            $reqData = copyFields($request, $expectedFields);
+            if ($reqData === false) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
 
-        $this->begin();
+            $itemData = $this->preUpdate($request);
 
-        $itemData = $this->preUpdate($request);
+            $updateResult = false;
+            try {
+                $updateResult = $this->model->update($request["id"], $itemData);
+            } catch (\Error $e) {
+                wlog("Update item error: " . $e->getMessage());
+            }
+            if (!$updateResult) {
+                throw new \Error($this->updateErrorMsg);
+            }
 
-        $updateResult = false;
-        try {
-            $updateResult = $this->model->update($request["id"], $itemData);
-        } catch (\Error $e) {
-            wlog("Update item error: " . $e->getMessage());
-        }
-        if (!$updateResult) {
-            throw new \Error($this->updateErrorMsg);
-        }
+            $result = $this->postUpdate($request);
 
-        $result = $this->postUpdate($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 
     /**
@@ -338,28 +334,26 @@ class ApiListController extends ApiController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("errors.noIds"));
-        }
+        $this->runTransaction(function () {
+            $ids = $this->getRequestedIds(true, $this->isJsonContent());
+            if (!is_array($ids) || !count($ids)) {
+                throw new \Error(__("errors.noIds"));
+            }
 
-        $this->begin();
+            $deleteResult = false;
+            try {
+                $deleteResult = $this->model->del($ids);
+            } catch (\Error $e) {
+                wlog("Delete item(s) error: " . $e->getMessage());
+            }
+            if (!$deleteResult) {
+                throw new \Error($this->deleteErrorMsg);
+            }
 
-        $deleteResult = false;
-        try {
-            $deleteResult = $this->model->del($ids);
-        } catch (\Error $e) {
-            wlog("Delete item(s) error: " . $e->getMessage());
-        }
-        if (!$deleteResult) {
-            throw new \Error($this->deleteErrorMsg);
-        }
+            $request = $this->getRequestData();
+            $result = $this->postDelete($request);
 
-        $request = $this->getRequestData();
-        $result = $this->postDelete($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 }

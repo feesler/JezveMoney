@@ -372,6 +372,11 @@ export class ImportTemplateForm extends Component {
             request.id = template.id;
         }
 
+        this.validateTemplateAndSetState();
+        if (!this.state.validation.valid) {
+            return;
+        }
+
         if (isFunction(this.state.onSubmit)) {
             this.state.onSubmit(request);
         }

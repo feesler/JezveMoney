@@ -35,6 +35,7 @@ export class CategoriesStory extends TestStory {
         await this.sort();
         await this.details();
         await this.update();
+        await this.addSubcategoryFromContextMenu();
         await this.deleteFromContextMenu();
         await this.del();
 
@@ -142,6 +143,18 @@ export class CategoriesStory extends TestStory {
         await Actions.submit();
     }
 
+    async addSubcategoryFromContextMenu() {
+        setBlock('Add subcategory from context menu', 1);
+
+        const {
+            SHOP_CATEGORY,
+        } = App.scenario;
+
+        await Actions.addSubcategory(SHOP_CATEGORY);
+        await Actions.inputName('Сlothes');
+        await Actions.submit();
+    }
+
     async deleteFromContextMenu() {
         setBlock('Delete category from context menu', 1);
 
@@ -152,7 +165,7 @@ export class CategoriesStory extends TestStory {
         setBlock('Delete categories', 1);
 
         await Actions.del(0);
-        await Actions.del(2, false);
+        await Actions.del(0, false);
         await Actions.del([0, 1]);
     }
 

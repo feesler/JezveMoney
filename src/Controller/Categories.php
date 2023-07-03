@@ -72,11 +72,21 @@ class Categories extends ListViewController
             "titleString" => __("appName") . " | " . __("categories.create"),
         ];
 
+        $parent_id = isset($_GET["parent_id"]) ? intval($_GET["parent_id"]) : 0;
+        $parentCategory = $this->model->getItem($parent_id);
+        if (!$parentCategory) {
+            $parent_id = 0;
+        }
+
+        $type = isset($_GET["type"])
+            ? intval($_GET["type"])
+            : ($parentCategory->type ?? 0);
+
         $category = new \stdClass();
         $category->id = 0;
         $category->name = "";
-        $category->parent_id = 0;
-        $category->type = 0;
+        $category->parent_id = $parent_id;
+        $category->type = $type;
 
         $data["category"] = $category;
 

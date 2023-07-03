@@ -30,19 +30,17 @@ class ApiSortableListController extends ApiListController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $this->changePosFields, true);
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            $reqData = checkFields($request, $this->changePosFields, true);
 
-        $this->begin();
+            if (!$this->model->updatePosition($reqData)) {
+                throw new \Error($this->changePosErrorMsg);
+            }
 
-        if (!$this->model->updatePosition($reqData)) {
-            throw new \Error($this->changePosErrorMsg);
-        }
+            $result = $this->postSetPos($request);
 
-        $result = $this->postSetPos($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 }

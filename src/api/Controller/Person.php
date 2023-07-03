@@ -63,23 +63,21 @@ class Person extends ApiSortableListController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("errors.noIds"));
-        }
+        $this->runTransaction(function () {
+            $ids = $this->getRequestedIds(true, $this->isJsonContent());
+            if (!is_array($ids) || !count($ids)) {
+                throw new \Error(__("errors.noIds"));
+            }
 
-        $this->begin();
+            if (!$this->model->show($ids)) {
+                throw new \Error(__("persons.errors.show"));
+            }
 
-        if (!$this->model->show($ids)) {
-            throw new \Error(__("persons.errors.show"));
-        }
+            $request = $this->getRequestData();
+            $result = $this->getStateResult($request);
 
-        $request = $this->getRequestData();
-        $result = $this->getStateResult($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 
     /**
@@ -91,22 +89,20 @@ class Person extends ApiSortableListController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (!is_array($ids) || !count($ids)) {
-            throw new \Error(__("errors.noIds"));
-        }
+        $this->runTransaction(function () {
+            $ids = $this->getRequestedIds(true, $this->isJsonContent());
+            if (!is_array($ids) || !count($ids)) {
+                throw new \Error(__("errors.noIds"));
+            }
 
-        $this->begin();
+            if (!$this->model->hide($ids)) {
+                throw new \Error(__("persons.errors.hide"));
+            }
 
-        if (!$this->model->hide($ids)) {
-            throw new \Error(__("persons.errors.hide"));
-        }
+            $request = $this->getRequestData();
+            $result = $this->getStateResult($request);
 
-        $request = $this->getRequestData();
-        $result = $this->getStateResult($request);
-
-        $this->commit();
-
-        $this->ok($result);
+            $this->ok($result);
+        });
     }
 }

@@ -63,31 +63,29 @@ class Profile extends ApiController
      */
     public function changename()
     {
-        $requiredFields = ["name"];
-
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields, true);
+        $this->runTransaction(function () {
+            $requiredFields = ["name"];
 
-        $this->begin();
+            $request = $this->getRequestData();
+            $reqData = checkFields($request, $requiredFields, true);
 
-        $result = false;
-        try {
-            $result = $this->personMod->update($this->owner_id, $reqData);
-        } catch (\Error $e) {
-            wlog("Change name error: " . $e->getMessage());
-        }
-        if (!$result) {
-            throw new \Error(__("profile.errors.changeName"));
-        }
+            $result = false;
+            try {
+                $result = $this->personMod->update($this->owner_id, $reqData);
+            } catch (\Error $e) {
+                wlog("Change name error: " . $e->getMessage());
+            }
+            if (!$result) {
+                throw new \Error(__("profile.errors.changeName"));
+            }
 
-        $this->commit();
-
-        $this->setMessage(__("profile.nameChangedMessage"));
-        $this->ok($reqData);
+            $this->setMessage(__("profile.nameChangedMessage"));
+            $this->ok($reqData);
+        });
     }
 
     /**
@@ -95,36 +93,34 @@ class Profile extends ApiController
      */
     public function changepass()
     {
-        $requiredFields = ["current", "new"];
-
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields, true);
+        $this->runTransaction(function () {
+            $requiredFields = ["current", "new"];
 
-        $this->begin();
+            $request = $this->getRequestData();
+            $reqData = checkFields($request, $requiredFields, true);
 
-        $uObj = $this->uMod->getItem($this->user_id);
-        if (!$uObj) {
-            throw new \Error(__("profile.errors.changePassword"));
-        }
+            $uObj = $this->uMod->getItem($this->user_id);
+            if (!$uObj) {
+                throw new \Error(__("profile.errors.changePassword"));
+            }
 
-        $result = false;
-        try {
-            $result = $this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]);
-        } catch (\Error $e) {
-            wlog("Change password error: " . $e->getMessage());
-        }
-        if (!$result) {
-            throw new \Error(__("profile.errors.changePassword"));
-        }
+            $result = false;
+            try {
+                $result = $this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]);
+            } catch (\Error $e) {
+                wlog("Change password error: " . $e->getMessage());
+            }
+            if (!$result) {
+                throw new \Error(__("profile.errors.changePassword"));
+            }
 
-        $this->commit();
-
-        $this->setMessage(__("profile.passwordChangedMessage"));
-        $this->ok();
+            $this->setMessage(__("profile.passwordChangedMessage"));
+            $this->ok();
+        });
     }
 
     /**
@@ -273,53 +269,51 @@ class Profile extends ApiController
             throw new \Error("Invalid type of request");
         }
 
-        $resetOptions = [
-            "currencies",
-            "accounts",
-            "persons",
-            "categories",
-            "transactions",
-            "schedule",
-            "keepbalance",
-            "importtpl",
-            "importrules"
-        ];
-        $request = $this->getRequestData();
-        foreach ($resetOptions as $opt) {
-            $request[$opt] = isset($request[$opt]);
-        }
+        $this->runTransaction(function () {
+            $resetOptions = [
+                "currencies",
+                "accounts",
+                "persons",
+                "categories",
+                "transactions",
+                "schedule",
+                "keepbalance",
+                "importtpl",
+                "importrules"
+            ];
+            $request = $this->getRequestData();
+            foreach ($resetOptions as $opt) {
+                $request[$opt] = isset($request[$opt]);
+            }
 
-        $this->begin();
+            if ($request["currencies"]) {
+                $this->resetUserCurrencies();
+            }
+            if ($request["accounts"]) {
+                $this->resetAccounts($request["persons"]);
+            }
+            if ($request["persons"]) {
+                $this->resetPersons();
+            }
+            if ($request["categories"]) {
+                $this->resetCategories();
+            }
+            if ($request["transactions"]) {
+                $this->resetTransactions($request["keepbalance"]);
+            }
+            if ($request["schedule"]) {
+                $this->resetScheduledTransactions();
+            }
+            if ($request["importtpl"]) {
+                $this->resetImportTemplates();
+            }
+            if ($request["importrules"]) {
+                $this->resetImportRules();
+            }
 
-        if ($request["currencies"]) {
-            $this->resetUserCurrencies();
-        }
-        if ($request["accounts"]) {
-            $this->resetAccounts($request["persons"]);
-        }
-        if ($request["persons"]) {
-            $this->resetPersons();
-        }
-        if ($request["categories"]) {
-            $this->resetCategories();
-        }
-        if ($request["transactions"]) {
-            $this->resetTransactions($request["keepbalance"]);
-        }
-        if ($request["schedule"]) {
-            $this->resetScheduledTransactions();
-        }
-        if ($request["importtpl"]) {
-            $this->resetImportTemplates();
-        }
-        if ($request["importrules"]) {
-            $this->resetImportRules();
-        }
-
-        $this->commit();
-
-        $this->setMessage(__("profile.resetMessage"));
-        $this->ok();
+            $this->setMessage(__("profile.resetMessage"));
+            $this->ok();
+        });
     }
 
     /**
@@ -331,27 +325,25 @@ class Profile extends ApiController
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        if (!$request) {
-            throw new \Error(__("errors.invalidRequestData"));
-        }
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            if (!$request) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
 
-        $this->begin();
+            $updateResult = false;
+            try {
+                $settingsModel = UserSettingsModel::getInstance();
+                $updateResult = $settingsModel->updateSettings($request);
+            } catch (\Error $e) {
+                wlog("Update item error: " . $e->getMessage());
+            }
+            if (!$updateResult) {
+                throw new \Error(__("settings.errors.update"));
+            }
 
-        $updateResult = false;
-        try {
-            $settingsModel = UserSettingsModel::getInstance();
-            $updateResult = $settingsModel->updateSettings($request);
-        } catch (\Error $e) {
-            wlog("Update item error: " . $e->getMessage());
-        }
-        if (!$updateResult) {
-            throw new \Error(__("settings.errors.update"));
-        }
-
-        $this->commit();
-
-        $this->ok();
+            $this->ok();
+        });
     }
 
     /**
@@ -363,22 +355,20 @@ class Profile extends ApiController
             throw new \Error("Invalid type of request");
         }
 
-        $this->begin();
+        $this->runTransaction(function () {
+            $result = false;
+            try {
+                $result = $this->uMod->del($this->user_id);
+            } catch (\Error $e) {
+                wlog("Delete profile error: " . $e->getMessage());
+            }
+            if (!$result) {
+                throw new \Error(__("profile.errors.delete"));
+            }
 
-        $result = false;
-        try {
-            $result = $this->uMod->del($this->user_id);
-        } catch (\Error $e) {
-            wlog("Delete profile error: " . $e->getMessage());
-        }
-        if (!$result) {
-            throw new \Error(__("profile.errors.delete"));
-        }
-
-        $this->commit();
-
-        Message::setSuccess(__("profile.deletedMessage"));
-        $this->setMessage(__("profile.deletedMessage"));
-        $this->ok();
+            Message::setSuccess(__("profile.deletedMessage"));
+            $this->setMessage(__("profile.deletedMessage"));
+            $this->ok();
+        });
     }
 }

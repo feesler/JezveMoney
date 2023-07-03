@@ -20,19 +20,19 @@
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
-  column-gap: 16px;
+  column-gap: 2rem;
 
   .column-group {
     display: flex;
     flex-flow: column nowrap;
     align-items: normal;
-    column-gap: 16px;
+    column-gap: 2rem;
   }
 
   .column {
     display: flex;
     flex-flow: row nowrap;
-    column-gap: 8px;
+    column-gap: 0.5rem;
   }
 
   .column__header {
@@ -56,7 +56,7 @@
 @media (min-width: 992px) {
   .orig-data-table {
     flex-flow: row wrap;
-    row-gap: 8px;
+    row-gap: 1rem;
 
     .column-group {
       flex-flow: row nowrap;

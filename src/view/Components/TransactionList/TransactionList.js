@@ -1,6 +1,7 @@
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { __ } from '../../utils/utils.js';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
+import { NoDataMessage } from '../NoDataMessage/NoDataMessage.js';
 import './TransactionList.scss';
 
 /** CSS classes */
@@ -18,7 +19,8 @@ const defaultProps = {
     placeholderClass: ITEM_PLACEHOLDER_CLASS,
     sortModeClass: SORT_MODE_CLASS,
     sortGroup: 'transactions',
-    noItemsMessage: __('transactions.noData'),
+    PlaceholderComponent: NoDataMessage,
+    getPlaceholderProps: () => ({ title: __('transactions.noData') }),
     mode: 'classic',
     showControls: true,
     showDate: true,

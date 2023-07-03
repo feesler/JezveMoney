@@ -72,25 +72,23 @@ class User extends ApiListController
             throw new \Error("Need to log out first");
         }
 
-        $request = $this->getRequestData();
-        $request["access"] = 0;
-        $reqData = checkFields($request, $this->createRequiredFields, true);
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            $request["access"] = 0;
+            $reqData = checkFields($request, $this->createRequiredFields, true);
 
-        $this->begin();
+            $user_id = null;
+            try {
+                $user_id = $this->uMod->create($reqData);
+            } catch (\Error $e) {
+                wlog("Create user error: " . $e->getMessage());
+            }
+            if (!$user_id) {
+                throw new \Error(__("registration.errorMessage"));
+            }
 
-        $user_id = null;
-        try {
-            $user_id = $this->uMod->create($reqData);
-        } catch (\Error $e) {
-            wlog("Create user error: " . $e->getMessage());
-        }
-        if (!$user_id) {
-            throw new \Error(__("registration.errorMessage"));
-        }
-
-        $this->commit();
-
-        $this->ok();
+            $this->ok();
+        });
     }
 
     /**
@@ -139,37 +137,36 @@ class User extends ApiListController
     {
         $this->checkAdminAccess();
 
-        $requiredFields = ["id", "password"];
-        $defMsg = __("profile.errors.changePassword");
 
         if (!$this->isPOST()) {
             throw new \Error(__("errors.invalidRequest"));
         }
 
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $requiredFields, true);
+        $this->runTransaction(function () {
+            $requiredFields = ["id", "password"];
+            $defMsg = __("profile.errors.changePassword");
 
-        $this->begin();
+            $request = $this->getRequestData();
+            $reqData = checkFields($request, $requiredFields, true);
 
-        $uObj = $this->uMod->getItem($reqData["id"]);
-        if (!$uObj) {
-            throw new \Error($defMsg);
-        }
+            $uObj = $this->uMod->getItem($reqData["id"]);
+            if (!$uObj) {
+                throw new \Error($defMsg);
+            }
 
-        $result = false;
-        try {
-            $result = $this->uMod->setPassword($uObj->login, $reqData["password"]);
-        } catch (\Error $e) {
-            wlog("Set password error: " . $e->getMessage());
-        }
-        if (!$result) {
-            throw new \Error($defMsg);
-        }
+            $result = false;
+            try {
+                $result = $this->uMod->setPassword($uObj->login, $reqData["password"]);
+            } catch (\Error $e) {
+                wlog("Set password error: " . $e->getMessage());
+            }
+            if (!$result) {
+                throw new \Error($defMsg);
+            }
 
-        $this->commit();
-
-        $this->setMessage(__("profile.passwordChangedMessage"));
-        $this->ok();
+            $this->setMessage(__("profile.passwordChangedMessage"));
+            $this->ok();
+        });
     }
 
     /**

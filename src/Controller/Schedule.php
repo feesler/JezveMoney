@@ -144,7 +144,7 @@ class Schedule extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("transactions.errors.create");
 
-        $dateInfo = getDateInfo(UserSettingsModel::clientTime(), INTERVAL_MONTH);
+        $dateInfo = getDateInfo(cutDate(UserSettingsModel::clientTime()), INTERVAL_MONTH);
 
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),

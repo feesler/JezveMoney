@@ -4,11 +4,12 @@ import { createStore } from 'jezvejs/Store';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { PasswordField } from '../../Components/Fields/PasswordField/PasswordField.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
@@ -18,7 +19,7 @@ import './RegisterView.scss';
 /**
  * User registration view
  */
-class RegisterView extends View {
+class RegisterView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -78,12 +79,11 @@ class RegisterView extends View {
         });
 
         // Password field
-        this.passwordField = InputField.create({
+        this.passwordField = PasswordField.create({
             id: 'passwordField',
             inputId: 'passwordInp',
             className: 'form-row',
             name: 'password',
-            type: 'password',
             title: __('registration.password'),
             validate: true,
             feedbackMessage: __('registration.invalidPassword'),

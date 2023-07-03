@@ -9,39 +9,16 @@ abstract class Model
 {
     protected $dbObj = null;
     protected $tbl_name = null;
-    protected $useTransactions = true;
 
     /**
-     * Starts transaction
+     * Runs function inside database transaction
      *
      * @return bool
      */
-    public static function begin()
+    public static function runTransaction($func)
     {
         $dbInstance = MySqlDB::getInstance();
-        return $dbInstance->startTransaction();
-    }
-
-    /**
-     * Commits current transaction
-     *
-     * @return bool
-     */
-    public static function commit()
-    {
-        $dbInstance = MySqlDB::getInstance();
-        return $dbInstance->commitTransaction();
-    }
-
-    /**
-     * Rolls back current transaction
-     *
-     * @return bool
-     */
-    public static function rollback()
-    {
-        $dbInstance = MySqlDB::getInstance();
-        return $dbInstance->rollbackTransaction();
+        return $dbInstance->runTransaction($func);
     }
 
     /**

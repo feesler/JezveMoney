@@ -119,6 +119,8 @@ export class AppState {
         this.persons = null;
         this.personsCache = null;
         this.sortedPersonsCache = null;
+        this.categories = null;
+        this.sortedCategoriesCache = null;
         this.transactions = null;
         this.schedule = null;
         this.reminders = null;
@@ -1481,15 +1483,24 @@ export class AppState {
         return this.returnState(params.returnState);
     }
 
+    changeCategoriesSortMode(sortMode) {
+        this.updateSettings({ sort_categories: sortMode });
+        this.sortCategories();
+    }
+
     sortCategories() {
         const sortMode = this.getCategoriesSortMode();
         this.categories.sortBy(sortMode);
+        this.resetCategoriesCache();
+    }
+
+    resetCategoriesCache() {
+        this.sortedCategoriesCache = null;
     }
 
     getSortedCategories() {
         if (!this.sortedCategoriesCache) {
             const sortMode = this.getCategoriesSortMode();
-
             const sortedItems = transTypes.flatMap((type) => {
                 const typeItems = this.categories.filter((item) => item.type === type);
                 const items = CategoryList.create(typeItems);

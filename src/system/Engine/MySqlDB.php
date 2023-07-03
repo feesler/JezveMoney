@@ -249,6 +249,7 @@ class MySqlDB
     protected $errorMessage = null;
     protected $insert_id = 0;
     protected $affected = 0;
+    protected $transactionRunning = false;
 
     /**
      * Sets up database configuration
@@ -419,6 +420,49 @@ class MySqlDB
     {
         $this->rawQ("ROLLBACK;");
         return ($this->errno == 0);
+    }
+
+    /**
+     * Runs function inside database transaction
+     */
+    public function runTransaction($func)
+    {
+        $isNesting = $this->transactionRunning;
+        $res = false;
+
+        try {
+            if (!$isNesting) {
+                if (!$this->startTransaction()) {
+                    throw new \Error("Failed to start database transaction");
+                }
+
+                $this->transactionRunning = true;
+            }
+
+            $func();
+
+            if (!$isNesting) {
+                if (!$this->commitTransaction()) {
+                    throw new \Error("Failed to commit database transaction");
+                }
+            }
+
+            $res = true;
+        } catch (\Error $e) {
+            wlog("runTransaction() error: " . $e->getMessage());
+
+            if (!$isNesting) {
+                $this->rollbackTransaction();
+            }
+
+            throw $e;
+        }
+
+        if (!$isNesting) {
+            $this->transactionRunning = false;
+        }
+
+        return $res;
     }
 
 

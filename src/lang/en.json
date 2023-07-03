@@ -262,7 +262,7 @@
     "categories": {
         "listTitle": "Categories",
         "noCategory": "No category",
-        "noDate": "No categories",
+        "noData": "No categories",
         "create": "New category",
         "update": "Edit category",
         "delete": "Delete category",
@@ -270,6 +270,7 @@
         "deleteMessage": "Are you sure want to delete selected category?",
         "deleteMultipleMessage": "Are you sure want to delete selected categories?",
         "deleteChildren": "Delete child categories",
+        "addSubcategory": "Add subcategory",
         "name": "Name",
         "invalidName": "Input name",
         "existingName": "Category with this name already exist",

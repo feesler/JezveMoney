@@ -1,7 +1,7 @@
 import { ge } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
-import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
+import { PasswordField } from '../../../../Components/Fields/PasswordField/PasswordField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /** CSS classes */
@@ -27,12 +27,11 @@ export class ChangePasswordDialog extends ProfileDialog {
         });
 
         // Old password field
-        this.oldPassField = InputField.create({
+        this.oldPassField = PasswordField.create({
             id: 'oldPassField',
             inputId: 'oldPassInp',
             className: 'form-row',
             name: 'current',
-            type: 'password',
             title: __('profile.currentPassword'),
             validate: true,
             feedbackMessage: __('profile.invalidCurrentPassword'),
@@ -40,12 +39,11 @@ export class ChangePasswordDialog extends ProfileDialog {
         });
 
         // New password field
-        this.newPassField = InputField.create({
+        this.newPassField = PasswordField.create({
             id: 'newPassField',
             inputId: 'newPassInp',
             className: 'form-row',
             name: 'new',
-            type: 'password',
             title: __('profile.newPassword'),
             validate: true,
             feedbackMessage: __('profile.invalidNewPassword'),

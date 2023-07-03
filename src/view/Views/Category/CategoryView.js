@@ -12,10 +12,11 @@ import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
+import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
@@ -29,7 +30,7 @@ import './CategoryView.scss';
 /**
  * Create/update category view
  */
-class CategoryView extends View {
+class CategoryView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -66,7 +67,7 @@ class CategoryView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: (isUpdate) ? __('categories.update') : __('categories.create'),
+            title: this.getHeaderTitle(isUpdate),
             showInHeaderOnScroll: false,
         });
 
@@ -111,6 +112,10 @@ class CategoryView extends View {
         this.subscribeToStore(this.store);
     }
 
+    getHeaderTitle(isUpdate) {
+        return (isUpdate) ? __('categories.update') : __('categories.create');
+    }
+
     /** Creates parent category select */
     createParentCategorySelect() {
         const { original } = this.store.getState();
@@ -124,13 +129,17 @@ class CategoryView extends View {
             noResultsMessage: __('notFound'),
             onItemSelect: (o) => this.onParentSelect(o),
         });
+        this.parentSelect.setSelection(original.parent_id);
     }
 
     /** Creates transaction type select */
     createTransactionTypeSelect() {
+        const { original } = this.store.getState();
+
         const data = Category.getAvailTypes().map((id) => ({
             id,
             title: Category.getTypeTitle(id),
+            selected: original.type === id,
         }));
 
         this.typeSelect = DropDown.create({
@@ -267,10 +276,36 @@ class CategoryView extends View {
         });
     }
 
+    replaceHistory(state) {
+        const { baseURL } = App;
+        const { data } = state;
+        const isUpdate = state.original.id;
+        const baseAddress = (isUpdate)
+            ? `${baseURL}categories/update/${data.id}`
+            : `${baseURL}categories/create/`;
+
+        const url = new URL(baseAddress);
+
+        if (data.type !== 0) {
+            const typeStr = Transaction.getTypeString(data.type);
+            url.searchParams.set('type', typeStr);
+        }
+
+        if (data.parent_id !== 0) {
+            url.searchParams.set('parent_id', data.parent_id);
+        }
+
+        const title = `${__('appName')} | ${this.getHeaderTitle(isUpdate)}`;
+
+        window.history.replaceState({}, title, url);
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
+
+        this.replaceHistory(state);
 
         if (this.deleteBtn) {
             this.deleteBtn.enable(!state.submitStarted);

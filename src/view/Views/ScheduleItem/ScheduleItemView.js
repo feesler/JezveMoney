@@ -6,7 +6,7 @@ import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 
 import { AccountList } from '../../Models/AccountList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -25,7 +25,7 @@ import './ScheduleItemView.scss';
 /**
  * Create/update scheduled transaction view
  */
-class ScheduleItemView extends View {
+class ScheduleItemView extends AppView {
     constructor(...args) {
         super(...args);
 

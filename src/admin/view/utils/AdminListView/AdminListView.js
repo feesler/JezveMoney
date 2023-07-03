@@ -6,6 +6,7 @@ import {
     removeChilds,
     show,
     setEvents,
+    getFormData,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 
@@ -203,7 +204,7 @@ export class AdminListView extends AdminView {
         e.preventDefault();
 
         const formEl = e.target;
-        let els = this.getFormData(formEl);
+        let els = getFormData(formEl);
         els = this.prepareRequestData(els);
 
         this.requestSubmit(formEl.method, formEl.action, els);

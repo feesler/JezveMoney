@@ -5,11 +5,12 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { __, parseCookies, setCookie } from '../../utils/utils.js';
 
 import { Field } from '../../Components/Fields/Field/Field.js';
 import { InputField } from '../../Components/Fields/InputField/InputField.js';
+import { PasswordField } from '../../Components/Fields/PasswordField/PasswordField.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
@@ -18,7 +19,7 @@ import './LoginView.scss';
 /**
  * User log in view
  */
-class LoginView extends View {
+class LoginView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -62,12 +63,11 @@ class LoginView extends View {
         });
 
         // Password field
-        this.passwordField = InputField.create({
+        this.passwordField = PasswordField.create({
             id: 'passwordField',
             inputId: 'passwordInp',
             className: 'form-row',
             name: 'password',
-            type: 'password',
             title: __('login.password'),
             validate: true,
             feedbackMessage: __('login.invalidPassword'),

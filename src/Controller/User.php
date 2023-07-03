@@ -116,29 +116,27 @@ class User extends TemplateController
      */
     protected function registerUser()
     {
-        $registerFields = ["login", "password", "name"];
-
         if (!$this->isPOST()) {
             setLocation(BASEURL);
         }
 
-        $this->begin();
+        $this->runTransaction(function () {
+            $registerFields = ["login", "password", "name"];
+            $reqData = checkFields($_POST, $registerFields, true);
 
-        $reqData = checkFields($_POST, $registerFields, true);
+            $user_id = null;
+            try {
+                $user_id = $this->uMod->create($reqData);
+            } catch (\Error $e) {
+                wlog("Create user error: " . $e->getMessage());
+            }
+            if (!$user_id) {
+                throw new \Error(__("registration.errorMessage"));
+            }
 
-        $user_id = null;
-        try {
-            $user_id = $this->uMod->create($reqData);
-        } catch (\Error $e) {
-            wlog("Create user error: " . $e->getMessage());
-        }
-        if (!$user_id) {
-            throw new \Error(__("registration.errorMessage"));
-        }
+            Message::setSuccess(__("registration.registeredMessage"));
+        });
 
-        $this->commit();
-
-        Message::setSuccess(__("registration.registeredMessage"));
         setLocation(BASEURL);
     }
 }

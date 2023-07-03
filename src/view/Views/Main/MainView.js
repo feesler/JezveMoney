@@ -25,7 +25,7 @@ import {
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
@@ -39,11 +39,12 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';
+import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
 
 /**
  * Main view
  */
-class MainView extends View {
+class MainView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -120,7 +121,11 @@ class MainView extends View {
             className: 'tiles',
             itemSelector: AccountTile.selector,
             listMode: 'list',
-            noItemsMessage: () => this.renderAccountsNoData(),
+            PlaceholderComponent: NoDataGroup,
+            getPlaceholderProps: () => ({
+                title: __('main.noAccounts'),
+                url: `${App.baseURL}accounts/create/`,
+            }),
         };
 
         this.visibleAccounts = ListContainer.create({
@@ -152,7 +157,11 @@ class MainView extends View {
             className: 'tiles',
             itemSelector: Tile.selector,
             listMode: 'list',
-            noItemsMessage: () => this.renderPersonsNoData(),
+            PlaceholderComponent: NoDataGroup,
+            getPlaceholderProps: () => ({
+                title: __('persons.noData'),
+                url: `${App.baseURL}persons/create/`,
+            }),
         };
 
         this.visiblePersons = ListContainer.create({
@@ -209,7 +218,7 @@ class MainView extends View {
                 items: this.props.transactions,
                 listMode: 'list',
                 showControls: true,
-                noItemsMessage: __('main.noTransactions'),
+                getPlaceholderProps: () => ({ title: __('main.noTransactions') }),
                 onItemClick: (id, e) => this.onTransactionClick(id, e),
             });
             this.transactionsWidget.append(this.latestList.elem);
@@ -405,44 +414,6 @@ class MainView extends View {
             title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
             content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
             onConfirm: () => this.deleteItems(),
-        });
-    }
-
-    /** Returns accounts 'No data' container */
-    renderAccountsNoData() {
-        return this.renderNoDataGroup(
-            __('main.noAccounts'),
-            `${App.baseURL}accounts/create/`,
-        );
-    }
-
-    /** Returns persons 'No data' container */
-    renderPersonsNoData() {
-        return this.renderNoDataGroup(
-            __('persons.noData'),
-            `${App.baseURL}persons/create/`,
-        );
-    }
-
-    /** Returns container with 'No data' message and create link */
-    renderNoDataGroup(message, createURL) {
-        return createElement('div', {
-            props: { className: 'nodata-group' },
-            children: [
-                createElement('span', {
-                    props: {
-                        className: 'nodata-message',
-                        textContent: message,
-                    },
-                }),
-                createElement('a', {
-                    props: {
-                        className: 'btn link-btn',
-                        href: createURL,
-                        textContent: __('actions.create'),
-                    },
-                }),
-            ],
         });
     }
 

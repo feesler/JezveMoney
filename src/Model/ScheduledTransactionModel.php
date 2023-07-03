@@ -1223,7 +1223,7 @@ class ScheduledTransactionModel extends CachedTable
      */
     public function updateAllReminders()
     {
-        try {
+        Model::runTransaction(function () {
             $userModel = UserModel::getInstance();
 
             if (!$this->checkCache()) {
@@ -1233,8 +1233,6 @@ class ScheduledTransactionModel extends CachedTable
             $params = $this->getRemindersDateRange();
             $diff = getDateDiff($params["startDate"], $params["endDate"], INTERVAL_DAY);
 
-            Model::begin();
-
             if ($diff !== 0) {
                 $userModel->setRemindersDate();
 
@@ -1242,13 +1240,7 @@ class ScheduledTransactionModel extends CachedTable
                     $this->createReminders($item->id, $params);
                 }
             }
-
-            Model::commit();
-        } catch (\Error $e) {
-            $message = $e->getMessage();
-            wlog($message);
-            Model::rollback();
-        }
+        });
 
         return true;
     }

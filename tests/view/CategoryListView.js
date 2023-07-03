@@ -8,12 +8,11 @@ import {
     click,
     queryAll,
     evaluate,
-    isVisible,
     goTo,
     baseUrl,
     wait,
 } from 'jezve-test';
-import { Button, PopupMenu } from 'jezvejs-test';
+import { Button, PopupMenu, TabList } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
@@ -81,7 +80,8 @@ export class CategoryListView extends AppView {
                 return [item, ...children];
             });
 
-            const visible = expectedItems.length > 0;
+            const typeStr = Category.getTypeString(type);
+            const visible = model.selectedType === typeStr && expectedItems.length > 0;
             const section = {
                 visible,
                 name: Category.typeToString(type, model.locale),
@@ -126,6 +126,7 @@ export class CategoryListView extends AppView {
                 itemId: model.contextItem,
                 ctxDetailsBtn: { visible: true },
                 ctxUpdateBtn: { visible: true },
+                ctxAddSubcategoryBtn: { visible: ctxCategory.parent_id === 0 },
                 ctxDeleteBtn: { visible: true },
             };
         }
@@ -152,7 +153,22 @@ export class CategoryListView extends AppView {
             items: state.categories.clone(),
         };
 
+        const type = model.items.reduce((selectedType, item) => {
+            if (selectedType === null) {
+                return item.type;
+            }
+
+            return (item.type === ANY_TYPE)
+                ? selectedType
+                : Math.min(selectedType, item.type);
+        }, null);
+        model.selectedType = Category.getTypeString(type);
+
         return this.getExpectedState(model, state);
+    }
+
+    get tabs() {
+        return this.content.tabs;
     }
 
     get listMenu() {
@@ -191,25 +207,27 @@ export class CategoryListView extends AppView {
         }
 
         // Categories list
-        const sectionElems = await queryAll('#contentContainer .list-section');
+        res.tabs = await TabList.create(this, await query('#contentContainer .tab-list'));
+        const sectionElems = await queryAll('#contentContainer .tab-list__content-item');
 
         res.sections = await asyncMap(sectionElems, async (elem) => {
-            const listHeader = await query(elem, '.list-header');
             const listContainer = await query(elem, '.categories-list');
 
             const [
                 type,
                 name,
+                visible,
                 renderTime,
                 isSelectMode,
                 isSortMode,
-            ] = await evaluate((el, hrdEl, listEl) => ([
-                parseInt(el.dataset.type, 10),
-                hrdEl.textContent,
+            ] = await evaluate((el, listEl) => ([
+                el.dataset.id,
+                el.closest('.tab-list')?.querySelector(`[data-value="${el.dataset.id}"] .link-menu-item__title`)?.textContent,
+                el && !el.hidden,
                 parseInt(listEl.dataset.time, 10),
                 listEl.classList.contains('categories-list_select'),
                 listEl.classList.contains('categories-list_sort'),
-            ]), elem, listHeader, listContainer);
+            ]), elem, listContainer);
 
             const listItems = await queryAll(listContainer, '.category-item');
 
@@ -223,7 +241,7 @@ export class CategoryListView extends AppView {
             return {
                 elem,
                 type,
-                visible: await isVisible(elem),
+                visible,
                 name,
                 listMode,
                 renderTime,
@@ -231,8 +249,10 @@ export class CategoryListView extends AppView {
             };
         });
 
-        res.renderTime = res.sections[0].renderTime;
-        res.listMode = res.sections[0].listMode;
+        const [firstSection] = res.sections;
+
+        res.renderTime = firstSection?.renderTime;
+        res.listMode = firstSection?.listMode;
 
         res.itemInfo = await CategoryDetails.create(this, await query('#itemInfo .list-item-details'));
 
@@ -257,6 +277,7 @@ export class CategoryListView extends AppView {
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible,
             items: [],
+            selectedType: cont.tabs?.selectedId ?? null,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
@@ -356,11 +377,38 @@ export class CategoryListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    /** Select specified category, click on edit button */
-    async goToUpdateCategory(num) {
-        await this.openContextMenu(num);
+    /** Opens specified categories tab */
+    async openTabByType(type) {
+        assert(this.tabs, 'Tabs not available');
 
-        await navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+        const typeStr = (typeof type === 'string')
+            ? type
+            : Category.getTypeString(type);
+
+        if (this.model.selectedType === typeStr) {
+            return true;
+        }
+
+        this.model.selectedType = typeStr;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.tabs.selectTabById(typeStr));
+
+        return this.checkState(expected);
+    }
+
+    /** Opens context menu for specified category and clicks by 'Edit' button */
+    async goToUpdateCategory(index) {
+        await this.openContextMenu(index);
+
+        return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+    }
+
+    /** Opens context menu for specified category and clicks by 'Add subcategory' button */
+    async goToAddSubcategory(index) {
+        await this.openContextMenu(index);
+
+        return navigation(() => this.contextMenu.select('ctxAddSubcategoryBtn'));
     }
 
     async waitForList(action) {
@@ -378,6 +426,13 @@ export class CategoryListView extends AppView {
         });
 
         await this.parse();
+    }
+
+    getItemById(id) {
+        const strId = id?.toString() ?? null;
+        return (strId === null)
+            ? null
+            : this.model.items.find((item) => item?.id?.toString() === strId);
     }
 
     getItemByIndex(index) {
@@ -401,6 +456,8 @@ export class CategoryListView extends AppView {
         await this.setListMode();
 
         const item = this.model.items[index];
+        await this.openTabByType(item.type);
+
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
@@ -449,9 +506,7 @@ export class CategoryListView extends AppView {
         this.onDeselectAll();
         if (listMode === 'sort') {
             this.model.sortMode = SORT_MANUALLY;
-            App.state.updateSettings({
-                sort_categories: this.model.sortMode,
-            });
+            App.state.changeCategoriesSortMode(this.model.sortMode);
 
             this.model.items = App.state.getSortedCategories();
         }
@@ -490,9 +545,7 @@ export class CategoryListView extends AppView {
             ? SORT_BY_NAME_DESC
             : SORT_BY_NAME_ASC;
 
-        App.state.updateSettings({
-            sort_categories: this.model.sortMode,
-        });
+        App.state.changeCategoriesSortMode(this.model.sortMode);
 
         const expected = this.getExpectedState();
 
@@ -510,9 +563,7 @@ export class CategoryListView extends AppView {
             ? SORT_BY_CREATEDATE_DESC
             : SORT_BY_CREATEDATE_ASC;
 
-        App.state.updateSettings({
-            sort_categories: this.model.sortMode,
-        });
+        App.state.changeCategoriesSortMode(this.model.sortMode);
 
         const expected = this.getExpectedState();
 
@@ -529,13 +580,14 @@ export class CategoryListView extends AppView {
         const indexes = asArray(data);
         for (const index of indexes) {
             const categoryItem = this.getItemByIndex(index);
-            assert(categoryItem, `Failed to obtain item [${index}]`);
+            assert(categoryItem, `Failed to obtain list item [${index}]`);
 
-            const item = this.model.items.find((category) => (
-                category.id === categoryItem.model.id
-            ));
-            assert(item, `Category '${categoryItem.model.id}' not found`);
+            const itemId = categoryItem.model.id;
+            let item = this.getItemById(itemId);
+            assert(item, `Category '${itemId}' not found`);
+            await this.openTabByType(item.type);
 
+            item = this.getItemById(itemId);
             item.selected = !item.selected;
 
             const expected = this.getExpectedState();

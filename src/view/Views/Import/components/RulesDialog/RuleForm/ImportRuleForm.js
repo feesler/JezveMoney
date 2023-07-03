@@ -23,8 +23,10 @@ import { ImportActionList } from '../../../../../Models/ImportActionList.js';
 
 import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
 import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
+import { NoDataMessage } from '../../../../../Components/NoDataMessage/NoDataMessage.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
+
 import './ImportRuleForm.scss';
 
 /* CSS classes */
@@ -90,7 +92,8 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportConditionForm,
             className: CONDITIONS_LIST_CLASS,
             itemSelector: ImportConditionForm.selector,
-            noItemsMessage: __('import.conditions.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('import.conditions.noData') }),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (
@@ -126,7 +129,8 @@ export class ImportRuleForm extends Component {
             ItemComponent: ImportActionForm,
             className: ACTIONS_LIST_CLASS,
             itemSelector: ImportActionForm.selector,
-            noItemsMessage: __('import.actions.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('import.actions.noData') }),
             invalidItemIndex: -1,
             message: null,
             isListChanged: (state, prevState) => (

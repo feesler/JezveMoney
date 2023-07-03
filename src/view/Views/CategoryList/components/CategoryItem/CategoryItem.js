@@ -158,7 +158,6 @@ export class CategoryItem extends Component {
             itemSelector: '.category-item',
             sortModeClass: 'categories-list_sort',
             listMode: 'list',
-            noItemsMessage: null,
         });
 
         this.collapse.setContent(this.childContainer.elem);

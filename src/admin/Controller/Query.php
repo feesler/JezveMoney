@@ -82,23 +82,21 @@ class Query extends AdminController
             return;
         }
 
-        $latestQueries = $this->getLatestQueries(1);
-        if (count($latestQueries) == 1 && $latestQueries[0] == $query) {
-            return;
-        }
+        $this->runTransaction(function () use ($query) {
+            $latestQueries = $this->getLatestQueries(1);
+            if (count($latestQueries) == 1 && $latestQueries[0] == $query) {
+                return;
+            }
 
-        $this->begin();
+            $escapedQuery = $this->db->escape($query);
 
-        $escapedQuery = $this->db->escape($query);
-
-        $this->db->insertQ($this->tableName, [
-            "id" => null,
-            "title" => "",
-            "query" => $escapedQuery,
-            "flags" => 0
-        ]);
-
-        $this->commit();
+            $this->db->insertQ($this->tableName, [
+                "id" => null,
+                "title" => "",
+                "query" => $escapedQuery,
+                "flags" => 0
+            ]);
+        });
     }
 
     /**

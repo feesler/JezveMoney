@@ -30,11 +30,13 @@ export const updateFromContextMenu = async (index) => {
     await test(`Update reminder from context menu [${index}]`, async () => {
         await checkNavigation();
 
+        const [fromReminder] = App.view.getFilteredIdsByIndexes(index);
+        const expected = TransactionView.getInitialState({ fromReminder });
+
         await App.view.goToUpdateItem(index);
         assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-        App.view.expectedState = App.view.getExpectedState();
-        return App.view.checkState();
+        return App.view.checkState(expected);
     });
 };
 

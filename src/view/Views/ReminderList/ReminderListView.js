@@ -16,7 +16,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     __,
@@ -37,6 +37,7 @@ import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -57,7 +58,7 @@ const SELECT_MODE_CLASS = 'reminder-list_select';
 /**
  * Scheduled transaction reminders list view
  */
-class ReminderListView extends View {
+class ReminderListView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -169,7 +170,8 @@ class ReminderListView extends View {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'reminder-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('reminders.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('reminders.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 

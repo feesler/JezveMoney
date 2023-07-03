@@ -9,9 +9,10 @@ import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
+
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -23,16 +24,20 @@ import {
     getApplicationURL,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
+
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { IconList } from '../../Models/IconList.js';
+
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { AccountDetails } from './components/AccountDetails/AccountDetails.js';
 import { AccountListContextMenu } from './components/ContextMenu/AccountListContextMenu.js';
 import { AccountListMainMenu } from './components/MainMenu/AccountListMainMenu.js';
+
 import { actions, createList, reducer } from './reducer.js';
 import { getAccountsSortMode, getSelectedIds } from './helpers.js';
 import './AccountListView.scss';
@@ -40,7 +45,7 @@ import './AccountListView.scss';
 /**
  * List of accounts view
  */
-class AccountListView extends View {
+class AccountListView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -110,7 +115,8 @@ class AccountListView extends View {
             sortModeClass: 'tiles_sort',
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
-            noItemsMessage: __('accounts.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('accounts.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };

@@ -22,7 +22,7 @@ const checkNavigation = async () => {
 
 /**
  * Navigate to create category view from categories list view
- * @param {Object} params
+ * @param {Object} options - object with optional category fields
  */
 export const create = async () => {
     await test('Create category', async () => {
@@ -30,10 +30,10 @@ export const create = async () => {
 
         const expected = CategoryView.getExpectedState({
             locale: App.view.locale,
-            isUpdate: false,
             name: '',
             parent_id: 0,
             type: 0,
+            isUpdate: false,
         });
 
         await App.view.goToCreateCategory();
@@ -70,6 +70,33 @@ export const update = async (index) => {
 export const updateById = (id) => {
     const sortedCategories = App.state.getSortedCategories();
     return update(sortedCategories.getIndexById(id));
+};
+
+/** Navigate to create child category view for specified parent category */
+export const addSubcategory = async (id) => {
+    const sortedCategories = App.state.getSortedCategories();
+    const category = sortedCategories.getItem(id);
+    assert(category && category.parent_id === 0, 'Invalid category');
+
+    const index = sortedCategories.getIndexById(id);
+    assert.arrayIndex(sortedCategories.data, index, 'Invalid category');
+
+    await test(`Add subcategory for '${category.name}'`, async () => {
+        await checkNavigation();
+
+        const expected = CategoryView.getExpectedState({
+            locale: App.view.locale,
+            name: '',
+            parent_id: category.id,
+            type: category.type,
+            isUpdate: false,
+        });
+
+        await App.view.goToAddSubcategory(index);
+        assert.instanceOf(App.view, CategoryView, 'Invalid view');
+
+        return App.view.checkState(expected);
+    });
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {

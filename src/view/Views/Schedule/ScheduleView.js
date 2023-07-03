@@ -16,7 +16,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { View } from '../../utils/View.js';
+import { AppView } from '../../Components/AppView/AppView.js';
 import {
     listData,
     __,
@@ -35,6 +35,7 @@ import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 
 import { ScheduleItemContextMenu } from './components/ContextMenu/ScheduleItemContextMenu.js';
@@ -59,7 +60,7 @@ const SHOW_ON_PAGE = 10;
 /**
  * List of scheduled transactions view
  */
-class ScheduleView extends View {
+class ScheduleView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -158,7 +159,8 @@ class ScheduleView extends View {
             selectModeClass: SELECT_MODE_CLASS,
             placeholderClass: 'schedule-item_placeholder',
             listMode: 'list',
-            noItemsMessage: __('schedule.noData'),
+            PlaceholderComponent: NoDataMessage,
+            getPlaceholderProps: () => ({ title: __('schedule.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
