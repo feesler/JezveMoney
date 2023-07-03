@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.65.1",
+    "version": "1.66.0",
     "description": "",
     "main": "index.js",
     "type": "module",
