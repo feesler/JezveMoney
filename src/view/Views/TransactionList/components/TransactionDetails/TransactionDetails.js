@@ -125,7 +125,7 @@ export class TransactionDetails extends ItemDetails {
 
         this.heading.setTitle(Transaction.getTypeTitle(item.type));
 
-        this.destinationField.show(showSource);
+        this.sourceField.show(showSource);
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
 
         this.destinationField.show(showDest);
