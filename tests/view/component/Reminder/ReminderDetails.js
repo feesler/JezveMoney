@@ -73,7 +73,7 @@ export class ReminderDetails extends TestComponent {
                 value: categoryTitle,
             },
             commentField: {
-                visible: true,
+                visible: reminder.comment.length > 0,
                 value: reminder.comment,
             },
             createDateField: {

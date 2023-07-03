@@ -148,6 +148,7 @@ export class ReminderDetails extends ItemDetails {
         const categoryTitle = this.getCategoryTitle(state);
         this.categoryField.setContent(categoryTitle);
 
+        this.commentField.show(item.comment.length > 0);
         this.commentField.setContent(item.comment);
 
         this.renderDateField(this.createDateField, item.createdate);
