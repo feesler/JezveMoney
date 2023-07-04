@@ -61,7 +61,7 @@ export class TransactionListView extends AppView {
             createBtn: await Button.create(this, await query('#createBtn')),
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
-            clearFiltersBtn: { elem: await query('#clearFiltersBtn') },
+            clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
