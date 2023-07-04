@@ -239,6 +239,7 @@ export const api = {
         read: apiRead,
         create: apiCreate,
         update: apiUpdate,
+        finish: apiPostMethod('finish'),
         del: apiDelete,
         list: apiList,
     }),

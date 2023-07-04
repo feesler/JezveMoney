@@ -793,6 +793,62 @@ const list = async () => {
     await App.scenario.runner.runGroup(Actions.list, data);
 };
 
+const finish = async () => {
+    setBlock('Finish scheduled transactions', 2);
+
+    const {
+        SCHEDULED_TR_EXPENSE_1,
+        SCHEDULED_TR_INCOME_1,
+        SCHEDULED_TR_MULTI_CHAINED_2,
+    } = App.scenario;
+
+    const data = [
+        { id: SCHEDULED_TR_EXPENSE_1 },
+        { id: [SCHEDULED_TR_INCOME_1, SCHEDULED_TR_MULTI_CHAINED_2] },
+    ];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.finish(params);
+        assert(res, `Failed to finish scheduled transactions: { ${formatProps(params)} }`);
+    }, data);
+};
+
+const finishWithChainedRequest = async () => {
+    setBlock('Finish scheduled transactions with chained request', 2);
+
+    const { SCHEDULED_TR_TRANSFER_2 } = App.scenario;
+
+    const data = [
+        {
+            id: [SCHEDULED_TR_TRANSFER_2],
+            returnState: {
+                schedule: {},
+            },
+        },
+    ];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.finish(params);
+        assert(res, `Failed to finish scheduled transactions: { ${formatProps(params)} }`);
+    }, data);
+};
+
+const finishInvalid = async () => {
+    setBlock('Finish scheduled transactions with invalid data', 2);
+
+    const data = [
+        null,
+        [null, null],
+        [],
+        [-1],
+    ];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.finish(params);
+        assert(!res, `Finished scheduled transactions with invalid data: { ${formatProps(params)} }`);
+    }, data);
+};
+
 const del = async () => {
     setBlock('Delete scheduled transactions', 2);
 
@@ -865,6 +921,9 @@ export const apiScheduleTests = {
         await update();
         await updateWithChainedRequest();
         await updateInvalid();
+        await finish();
+        await finishWithChainedRequest();
+        await finishInvalid();
     },
 
     async listTests() {

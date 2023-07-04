@@ -41,6 +41,8 @@ export class ScheduleStory extends TestStory {
         await this.create();
         await this.list();
         await this.update();
+        await this.finishFromContextMenu();
+        await this.finish();
         await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
@@ -165,6 +167,27 @@ export class ScheduleStory extends TestStory {
         await Actions.updateAndSubmit(7, [
             { action: 'selectWeekDayOffset', data: [2, 4, 6] },
         ]);
+    }
+
+    async finishFromContextMenu() {
+        setBlock('Finish scheduled transaction from context menu', 1);
+
+        const data = [
+            0,
+        ];
+
+        await App.scenario.runner.runGroup(Actions.finishFromContextMenu, data);
+    }
+
+    async finish() {
+        setBlock('Finish scheduled transactions', 1);
+
+        const data = [
+            0,
+            [0, 1],
+        ];
+
+        await App.scenario.runner.runGroup(Actions.finish, data);
     }
 
     async deleteFromContextMenu() {

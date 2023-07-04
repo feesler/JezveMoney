@@ -10,6 +10,7 @@ import {
     normalize,
     dateStringToSeconds,
     timeToSeconds,
+    dateToSeconds,
 } from '../common.js';
 import {
     EXPENSE,
@@ -521,7 +522,7 @@ export class AppState {
 
     getImportTemplates() {
         const res = {
-            data: structuredClone(this.templates.data),
+            data: this.getNoDatesList(this.templates.data),
         };
 
         return res;
@@ -618,13 +619,14 @@ export class AppState {
 
     getScheduledTransactions() {
         return {
-            data: structuredClone(this.schedule.data),
+            data: this.getNoDatesList(this.schedule.data),
         };
     }
 
     getReminders(options) {
         const res = this.reminders.clone();
-        return res.applyFilter(options);
+        const filtered = res.applyFilter(options);
+        return this.getNoDatesList(filtered);
     }
 
     getState(request) {
@@ -2235,6 +2237,47 @@ export class AppState {
             (origOffsets.length !== newOffsets.length)
             || (origOffsets.some((offset) => !newOffsets.includes(offset)))
         );
+    }
+
+    finishScheduledTransaction(params) {
+        const ids = asArray(params?.id);
+        if (!ids.length) {
+            return false;
+        }
+
+        const today = dateToSeconds(new Date());
+        const itemsToDelete = [];
+
+        const res = ids.every((id) => {
+            const item = this.schedule.getItem(id);
+            if (!item) {
+                return false;
+            }
+
+            if (item.interval_type === INTERVAL_NONE) {
+                return true;
+            }
+
+            // Remove scheduled transaction if start date is in future
+            if (item.start_date > today) {
+                itemsToDelete.push(id);
+                return true;
+            }
+
+            return this.schedule.update({
+                ...item,
+                end_date: today,
+            });
+        });
+        if (!res) {
+            return false;
+        }
+
+        if (itemsToDelete.length > 0) {
+            this.deleteScheduledTransaction({ id: itemsToDelete });
+        }
+
+        return this.returnState(params.returnState);
     }
 
     deleteScheduledTransaction(params) {

@@ -68,11 +68,13 @@ class ScheduleView extends AppView {
             selectModeBtn: () => this.setListMode('select'),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
+            finishBtn: () => this.finishSelected(),
             deleteBtn: () => this.confirmDelete(),
         };
 
         this.contextMenuActions = {
             ctxDetailsBtn: () => this.showDetails(),
+            ctxFinishBtn: () => this.finishSelected(),
             ctxDeleteBtn: () => this.confirmDelete(),
         };
 
@@ -244,16 +246,19 @@ class ScheduleView extends AppView {
 
     showMore() {
         this.store.dispatch(actions.showMore());
+        this.setRenderTime();
     }
 
     onChangePage(page) {
         this.store.dispatch(actions.changePage(page));
+        this.setRenderTime();
     }
 
     onToggleMode(e) {
         e.preventDefault();
 
         this.store.dispatch(actions.toggleMode());
+        this.setRenderTime();
     }
 
     getItemById(itemId) {
@@ -311,6 +316,7 @@ class ScheduleView extends AppView {
 
     async setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
     }
 
     startLoading() {
@@ -362,6 +368,7 @@ class ScheduleView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     async requestList(options = {}) {
@@ -378,6 +385,7 @@ class ScheduleView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     getListRequest() {
@@ -416,6 +424,33 @@ class ScheduleView extends AppView {
         } catch (e) {
             App.createErrorNotification(e.message);
         }
+    }
+
+    /** Sends finish API request for selected items */
+    async finishSelected() {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const ids = this.getContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            const request = this.prepareRequest({ id: ids });
+            const response = await API.schedule.finish(request);
+            const data = this.getListDataFromResponse(response);
+            this.setListData(data);
+        } catch (e) {
+            App.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setRenderTime();
     }
 
     /** Show person(s) delete confirmation popup */
@@ -578,6 +613,7 @@ class ScheduleView extends AppView {
             && state.pagination.onPage === prevState?.pagination?.onPage
             && state.loading === prevState?.loading
             && state.isLoadingMore === prevState?.isLoadingMore
+            && state.renderTime === prevState?.renderTime
         ) {
             return;
         }
@@ -622,7 +658,7 @@ class ScheduleView extends AppView {
             items,
             mode: state.mode,
             listMode: state.listMode,
-            renderTime: Date.now(),
+            renderTime: state.renderTime,
         }));
     }
 

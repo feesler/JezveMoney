@@ -272,6 +272,10 @@ export const API = {
             return apiPost('schedule/update', data);
         },
 
+        async finish(data) {
+            return apiPost('schedule/finish', data);
+        },
+
         async del(data) {
             return apiPost('schedule/delete', data);
         },

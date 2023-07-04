@@ -295,6 +295,7 @@
         "deleteMultiple": "Delete scheduled transactions",
         "deleteMessage": "Are you sure want to delete selected scheduled transaction?",
         "deleteMultipleMessage": "Are you sure want to delete selected scheduled transactions?",
+        "finish": "Finish",
         "startDate": "Start date",
         "endDate": "End date",
         "noEndDate": "Endless",

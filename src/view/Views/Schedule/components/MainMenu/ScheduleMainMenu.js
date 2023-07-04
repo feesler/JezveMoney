@@ -22,6 +22,12 @@ export class ScheduleMainMenu extends PopupMenu {
                 id: 'separator2',
                 type: 'separator',
             }, {
+                id: 'finishBtn',
+                title: __('schedule.finish'),
+            }, {
+                id: 'separator3',
+                type: 'separator',
+            }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: __('actions.delete'),
@@ -57,8 +63,10 @@ export class ScheduleMainMenu extends PopupMenu {
 
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
+        show(items.separator2, isSelectMode && selCount > 0);
+        show(items.separator3, isSelectMode && selCount > 0);
 
+        items.finishBtn.show(selCount > 0);
         items.deleteBtn.show(selCount > 0);
     }
 }

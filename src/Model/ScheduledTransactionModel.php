@@ -721,6 +721,48 @@ class ScheduledTransactionModel extends CachedTable
     }
 
     /**
+     * Changes end date of scheduled transaction(s) to today
+     *
+     * @param mixed $ids item id or array of ids
+     *
+     * @return bool
+     */
+    public function finish(mixed $ids)
+    {
+        $ids = asArray($ids);
+
+        $today = cutDate(UserSettingsModel::clientTime());
+        $itemsToDelete = [];
+
+        foreach ($ids as $item_id) {
+            $item = $this->getItem($item_id);
+            if (!$item) {
+                throw new \Error("Invalid scheduled transaction");
+            }
+            if ($item->interval_type === INTERVAL_NONE) {
+                continue;
+            }
+
+            // Remove scheduled transaction if start date is in future
+            if ($item->start_date > $today) {
+                $itemsToDelete[] = $item_id;
+                continue;
+            }
+
+            $finishedItem = clone $item;
+            $finishedItem->end_date = $today;
+
+            $this->pushAffected($finishedItem);
+        }
+
+        $this->commitAffected();
+
+        $this->del($itemsToDelete);
+
+        return true;
+    }
+
+    /**
      * Checks delete conditions and returns bool result
      *
      * @param array $items array of item ids to remove

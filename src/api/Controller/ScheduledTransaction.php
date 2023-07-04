@@ -98,4 +98,26 @@ class ScheduledTransaction extends ApiListController
             return $request;
         }
     }
+
+    /**
+     * Updates end date of specified scheduled transaction(s) to today
+     */
+    public function finish()
+    {
+        if (!$this->isPOST()) {
+            throw new \Error(__("errors.invalidRequest"));
+        }
+
+        $this->runTransaction(function () {
+            $request = $this->getRequestData();
+            if (!$request || !isset($request["id"])) {
+                throw new \Error(__("errors.invalidRequestData"));
+            }
+
+            $this->model->finish($request["id"]);
+            $result = $this->getStateResult($request);
+
+            $this->ok($result);
+        });
+    }
 }
