@@ -76,7 +76,7 @@ const getPagination = (state) => {
 
 const slice = createSlice({
     showMenu: (state) => (
-        (state.showMenu) ? state : { ...state, showMenu: true }
+        (state.showMenu) ? state : { ...state, showMenu: true, showContextMenu: false }
     ),
 
     hideMenu: (state) => (
@@ -86,7 +86,12 @@ const slice = createSlice({
     showContextMenu: (state, itemIndex) => (
         (state.contextItemIndex === itemIndex && state.showContextMenu)
             ? state
-            : { ...state, contextItemIndex: itemIndex, showContextMenu: true }
+            : {
+                ...state,
+                contextItemIndex: itemIndex,
+                showContextMenu: true,
+                showMenu: false,
+            }
     ),
 
     hideContextMenu: (state) => (
