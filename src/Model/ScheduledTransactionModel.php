@@ -1019,7 +1019,6 @@ class ScheduledTransactionModel extends CachedTable
                 ($destMatch && $trans->src_id == 0)
             ) {
                 $idsToRemove[] = $item_id;
-                unset($this->cache[$item_id]);
                 continue;
             }
 
@@ -1080,15 +1079,9 @@ class ScheduledTransactionModel extends CachedTable
             }
         }
 
-        if (count($idsToRemove) > 0) {
-            if (!$this->dbObj->deleteQ($this->tbl_name, "id" . inSetCondition($idsToRemove))) {
-                return false;
-            }
-
-            $this->cleanCache();
-        }
-
         $this->commitAffected();
+
+        $this->del($idsToRemove);
 
         return true;
     }

@@ -303,6 +303,8 @@ class PersonListView extends AppView {
 
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -326,8 +328,11 @@ class PersonListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.person.del(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -360,6 +365,7 @@ class PersonListView extends AppView {
             ...data,
             returnState: {
                 persons: this.getListRequest(),
+                profile: {},
             },
         };
     }
@@ -422,8 +428,11 @@ class PersonListView extends AppView {
         try {
             const request = this.prepareRequest({ id, pos });
             const response = await API.person.setPos(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data, true);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             this.cancelPosChange();
         }

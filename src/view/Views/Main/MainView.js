@@ -382,7 +382,9 @@ class MainView extends AppView {
 
         try {
             const result = await API.state.main();
-            const { accounts, persons } = result.data;
+            const { accounts, persons, profile } = result.data;
+
+            App.updateProfile(profile);
 
             App.model.accounts.setData(accounts.data);
             App.model.userAccounts = null;

@@ -8,6 +8,7 @@ import { Button } from 'jezvejs/Button';
 
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
+import { Badge } from '../Badge/Badge.js';
 
 /* CSS classes */
 const MENU_CLASS = 'nav-list';
@@ -49,6 +50,17 @@ export class NavigationMenu extends Component {
         this.elem = createElement('ul', { props: { className: MENU_CLASS } });
     }
 
+    setBadgeByURL(url, badge) {
+        this.setState({
+            ...this.state,
+            items: this.state.items.map((item) => (
+                (item.url === url)
+                    ? { ...item, badge }
+                    : item
+            )),
+        });
+    }
+
     renderSeparator() {
         return createElement('li', { props: { className: SEPARATOR_CLASS } });
     }
@@ -72,6 +84,13 @@ export class NavigationMenu extends Component {
             },
         });
         const children = [linkElem];
+
+        if (item.badge) {
+            const badge = Badge.create({
+                title: item.badge,
+            });
+            children.push(badge.elem);
+        }
 
         if (item.createButton) {
             const createBtn = Button.create({

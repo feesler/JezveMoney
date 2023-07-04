@@ -314,7 +314,7 @@ class ScheduleView extends AppView {
         this.store.dispatch(actions.deselectAllItems());
     }
 
-    async setListMode(listMode) {
+    setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
         this.setRenderTime();
     }
@@ -361,8 +361,11 @@ class ScheduleView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.schedule.del(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -397,6 +400,7 @@ class ScheduleView extends AppView {
             ...data,
             returnState: {
                 schedule: this.getListRequest(),
+                profile: {},
             },
         };
     }
@@ -443,8 +447,11 @@ class ScheduleView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.schedule.finish(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }

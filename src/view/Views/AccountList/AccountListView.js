@@ -304,6 +304,8 @@ class AccountListView extends AppView {
 
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -327,8 +329,11 @@ class AccountListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.account.del(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -361,6 +366,7 @@ class AccountListView extends AppView {
             ...data,
             returnState: {
                 accounts: this.getListRequest(),
+                profile: {},
             },
         };
     }
@@ -423,8 +429,11 @@ class AccountListView extends AppView {
         try {
             const request = this.prepareRequest({ id, pos });
             const response = await API.account.setPos(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data, true);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             this.cancelPosChange();
         }

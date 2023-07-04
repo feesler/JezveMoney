@@ -284,6 +284,9 @@ class State extends ApiController
         $res->owner_id = $this->owner_id;
         $res->name = $person->name;
 
+        $reminderModel = ReminderModel::getInstance();
+        $res->remindersCount = $reminderModel->getScheduledCount();
+
         $settingsModel = UserSettingsModel::getInstance();
         $settings = $settingsModel->getSettings();
         $res->settings = $settings->getUserData();
@@ -381,6 +384,7 @@ class State extends ApiController
             "accounts" => [],
             "persons" => [],
             "transactions" => ["order" => "desc", "onPage" => 5],
+            "profile" => [],
         ]);
 
         // Statistics

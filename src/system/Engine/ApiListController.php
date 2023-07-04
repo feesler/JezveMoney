@@ -163,6 +163,9 @@ class ApiListController extends ApiController
         }
 
         $stateController = new State();
+        $stateController->uMod = $this->uMod;
+        $stateController->user_id = $this->user_id;
+        $stateController->owner_id = $this->owner_id;
         return $stateController->getData($stateRequest);
     }
 

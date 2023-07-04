@@ -67,13 +67,7 @@ export class Application {
         this.modelClass = {};
 
         if (this.props.profile) {
-            this.model.profile = { ...this.props.profile };
-
-            const { settings } = this.model.profile;
-            if (settings) {
-                this.config.dateFormatLocale = settings.date_locale;
-                this.config.decimalFormatLocale = settings.decimal_locale;
-            }
+            this.updateProfile(this.props.profile);
         }
 
         this.notification = null;
@@ -291,6 +285,45 @@ export class Application {
         } catch (e) {
             this.createErrorNotification(e.message);
         }
+    }
+
+    updateProfile(profile) {
+        if (!profile) {
+            this.model.profile = null;
+            return;
+        }
+
+        this.model.profile = { ...profile };
+
+        const { settings } = this.model.profile;
+        if (settings) {
+            this.config.dateFormatLocale = settings.date_locale;
+            this.config.decimalFormatLocale = settings.decimal_locale;
+        }
+
+        this.updateRemindersBadge();
+    }
+
+    getProfileFromResponse(response) {
+        return response?.data?.state?.profile;
+    }
+
+    updateProfileFromResponse(response) {
+        const profile = this.getProfileFromResponse(response);
+        this.updateProfile(profile);
+    }
+
+    /**
+     * Updates reminders count badge
+     */
+    updateRemindersBadge() {
+        const navMenu = this.view?.header?.navigationMenu;
+        if (!this.model.profile || !navMenu) {
+            return;
+        }
+
+        const { remindersCount } = this.model.profile;
+        navMenu.setBadgeByURL('reminders/', remindersCount);
     }
 
     /**

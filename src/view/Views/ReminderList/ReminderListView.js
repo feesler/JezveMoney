@@ -380,6 +380,7 @@ class ReminderListView extends AppView {
             ...data,
             returnState: {
                 reminders: this.getListRequest(),
+                profile: {},
             },
         };
     }
@@ -426,8 +427,11 @@ class ReminderListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.reminder.confirm(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -452,8 +456,11 @@ class ReminderListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids });
             const response = await API.reminder.cancel(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }

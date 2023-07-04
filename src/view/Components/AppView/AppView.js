@@ -17,6 +17,8 @@ export class AppView extends View {
 
         const headerElem = document.querySelector('.header');
         this.header = (headerElem) ? Header.fromElement(headerElem) : null;
+
+        App.updateRemindersBadge();
     }
 
     /**

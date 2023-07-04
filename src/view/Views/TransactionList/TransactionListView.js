@@ -482,6 +482,7 @@ class TransactionListView extends AppView {
             ...data,
             returnState: {
                 transactions: this.getListRequest(state),
+                profile: {},
             },
         };
     }
@@ -540,8 +541,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id, pos }, state);
             const response = await API.transaction.setPos(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data, true);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             this.cancelPosChange();
         }
@@ -665,8 +669,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids }, state);
             const response = await API.transaction.del(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -711,8 +718,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids, category_id: categoryId }, state);
             const response = await API.transaction.setCategory(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }

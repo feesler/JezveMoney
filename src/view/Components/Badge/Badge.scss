@@ -1,0 +1,15 @@
+.badge {
+  --badge-size: 1.5rem;
+  --badge-text-color: #ffffff;
+  --badge-background: #b90d0d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100vh;
+  height: var(--badge-size);
+  line-height: var(--badge-size);
+  min-width: var(--badge-size);
+  padding: 0 0.25rem;
+  background-color: var(--badge-background);
+}

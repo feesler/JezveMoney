@@ -401,6 +401,26 @@ class ReminderModel extends CachedTable
     }
 
     /**
+     * Returns count of scheduled reminders
+     *
+     * @return int
+     */
+    public function getScheduledCount()
+    {
+        if (!self::$user_id) {
+            return 0;
+        }
+
+        return $this->dbObj->countQ(
+            $this->tbl_name,
+            [
+                "user_id=" . self::$user_id,
+                "state=" . REMINDER_SCHEDULED,
+            ],
+        );
+    }
+
+    /**
      * Returns default transaction for specified reminder
      *
      * @param int $item_id item id

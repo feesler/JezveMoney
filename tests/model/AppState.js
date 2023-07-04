@@ -556,6 +556,11 @@ export class AppState {
         return structuredClone(this.profile);
     }
 
+    updateRemindersCount() {
+        const scheduledReminders = this.getReminders({ state: REMINDER_SCHEDULED });
+        this.profile.remindersCount = scheduledReminders.length;
+    }
+
     getTransactions(options = {}) {
         const defaultOptions = {
             onPage: 10,
@@ -895,6 +900,7 @@ export class AppState {
         this.accounts.update(expAccount);
 
         this.transactions.updateResults(this.accounts);
+        this.updateRemindersCount();
         this.updatePersonAccounts();
         this.resetUserAccountsCache();
 
@@ -912,17 +918,16 @@ export class AppState {
 
         this.rules.deleteAccounts(ids);
         this.templates.deleteAccounts(ids);
-        this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
-        this.schedule = this.schedule.deleteAccounts(
-            this.accounts.data,
-            ids,
-        );
+        if (!this.onDeleteAccounts(ids)) {
+            return false;
+        }
 
         // Prepare expected updates of accounts list
         this.accounts.deleteItems(ids);
 
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
+        this.updateRemindersCount();
         this.resetUserAccountsCache();
 
         return this.returnState(params.returnState);
@@ -1149,16 +1154,38 @@ export class AppState {
         this.resetPersonsCache();
 
         // Prepare expected updates of transactions
-        this.transactions = this.transactions.deleteAccounts(this.accounts.data, accountsToDelete);
-        this.schedule = this.schedule.deleteAccounts(
-            this.accounts.data,
-            accountsToDelete,
-        );
+        if (!this.onDeleteAccounts(accountsToDelete)) {
+            return false;
+        }
 
         this.accounts.deleteItems(accountsToDelete);
+        this.updateRemindersCount();
         this.transactions.updateResults(this.accounts);
 
         return this.returnState(params.returnState);
+    }
+
+    onDeleteAccounts(items) {
+        const ids = asArray(items);
+
+        this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
+
+        const newSchedule = this.schedule.deleteAccounts(
+            this.accounts.data,
+            ids,
+        );
+
+        const removedScheduleItems = this.schedule
+            .filter((item) => !newSchedule.getItem(item.id))
+            .map((item) => item.id);
+
+        if (!this.deleteReminders(removedScheduleItems)) {
+            return false;
+        }
+
+        this.schedule = newSchedule;
+
+        return true;
     }
 
     /* eslint-disable no-bitwise */
@@ -2187,6 +2214,7 @@ export class AppState {
         if (!this.createReminders(item.id)) {
             return false;
         }
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState, { id: item.id });
     }
@@ -2217,6 +2245,7 @@ export class AppState {
         if (remindersChanged && !this.updateReminders(expItem.id)) {
             return false;
         }
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState);
     }
@@ -2276,6 +2305,7 @@ export class AppState {
         if (itemsToDelete.length > 0) {
             this.deleteScheduledTransaction({ id: itemsToDelete });
         }
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState);
     }
@@ -2296,6 +2326,7 @@ export class AppState {
         if (!this.deleteReminders(ids)) {
             return false;
         }
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState);
     }
@@ -2393,6 +2424,7 @@ export class AppState {
         const data = copyFields(itemData, Reminder.availProps);
         const ind = this.reminders.create(data);
         const item = this.reminders.getItemByIndex(ind);
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState, { id: item.id });
     }
@@ -2413,6 +2445,7 @@ export class AppState {
         }
 
         this.reminders.update(expItem);
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState);
     }
@@ -2429,6 +2462,7 @@ export class AppState {
         }
 
         this.reminders.deleteItems(ids);
+        this.updateRemindersCount();
 
         return this.returnState(params.returnState);
     }
