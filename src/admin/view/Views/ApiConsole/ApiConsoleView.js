@@ -538,6 +538,15 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
+        const finishForm = ItemIdsForm.create({
+            id: 'finishScheduledTrForm',
+            title: 'Finish scheduled transactions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('schedule/finish'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
         this.formsContainer.append(
             listForm.elem,
             readForm.elem,
@@ -546,6 +555,7 @@ class AdminApiConsoleView extends AdminView {
             updateForm.elem,
             updateDebtForm.elem,
             delForm.elem,
+            finishForm.elem,
         );
     }
 

@@ -79,6 +79,7 @@ const controllers = [
             { title: 'Update', formId: 'updateScheduledTrForm' },
             { title: 'Update debt', formId: 'updateScheduledDebtForm' },
             { title: 'Delete', formId: 'delScheduledTrForm' },
+            { title: 'Finish', formId: 'finishScheduledTrForm' },
         ],
     },
     {
