@@ -282,7 +282,7 @@ export class TransactionForm extends TestComponent {
             }
 
             if (model.type === LIMIT_CHANGE) {
-                model.state = 0;
+                model.state = (formType === SCHEDULE_ITEM_FORM) ? 1 : 0;
             }
         } else {
             model.state = -1;
@@ -550,8 +550,10 @@ export class TransactionForm extends TestComponent {
                 };
                 res.intervalTypeSelect = {
                     visible: repeatEnabled,
-                    value: model.intervalType.toString(),
                 };
+                if (repeatEnabled) {
+                    res.intervalTypeSelect.value = model.intervalType.toString();
+                }
 
                 res.weekDayOffsetSelect = {
                     visible: repeatEnabled && model.intervalType === INTERVAL_WEEK,

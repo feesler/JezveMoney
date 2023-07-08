@@ -217,7 +217,9 @@ export class TransactionForm extends Component {
                 }
             }
         } else if (transaction.type === LIMIT_CHANGE) {
-            initialState.id = STATE.L_RESULT;
+            initialState.id = (isScheduleItem)
+                ? STATE.L_AMOUNT
+                : STATE.L_RESULT;
 
             if (transaction.src_id !== 0) {
                 initialState.destAccount = initialState.srcAccount;
