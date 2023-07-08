@@ -107,6 +107,7 @@ export class AppState {
         transactions: 'getTransactions',
         schedule: 'getScheduledTransactions',
         reminders: 'getReminders',
+        upcoming: 'getUpcomingReminders',
         statistics: 'getStatistics',
         categories: 'getCategories',
         importtemplates: 'getImportTemplates',
@@ -633,7 +634,43 @@ export class AppState {
     getReminders(options) {
         const res = this.reminders.clone();
         const filtered = res.applyFilter(options);
-        return this.getNoDatesList(filtered);
+        return {
+            data: this.getNoDatesList(filtered),
+        };
+    }
+
+    getUpcomingReminders(options = {}) {
+        const reminderOptions = {
+            startDate: App.dates.tomorrow,
+            endDate: App.dates.yearAfter,
+            ...options,
+        };
+
+        reminderOptions.startDate = cutDate(reminderOptions.startDate);
+        reminderOptions.endDate = cutDate(reminderOptions.endDate);
+
+        const res = [];
+        this.schedule.forEach((item) => {
+            const reminderDates = item.getReminders(reminderOptions);
+
+            reminderDates.forEach((timestamp) => {
+                const reminder = {
+                    schedule_id: item.id,
+                    state: REMINDER_UPCOMING,
+                    date: timeToSeconds(timestamp),
+                    transaction_id: 0,
+                };
+
+                if (!this.reminders.isSameItemExist(reminder)) {
+                    res.push(reminder);
+                }
+            });
+        });
+
+        const list = RemindersList.create(res);
+        list.sort(false);
+
+        return list;
     }
 
     getState(request) {
@@ -2375,40 +2412,6 @@ export class AppState {
         return true;
     }
 
-    getUpcomingReminders(options = {}) {
-        const reminderOptions = {
-            startDate: App.dates.tomorrow,
-            endDate: App.dates.yearAfter,
-            ...options,
-        };
-
-        reminderOptions.startDate = cutDate(reminderOptions.startDate);
-        reminderOptions.endDate = cutDate(reminderOptions.endDate);
-
-        const res = [];
-        this.schedule.forEach((item) => {
-            const reminderDates = item.getReminders(reminderOptions);
-
-            reminderDates.forEach((timestamp) => {
-                const reminder = {
-                    schedule_id: item.id,
-                    state: REMINDER_UPCOMING,
-                    date: timeToSeconds(timestamp),
-                    transaction_id: 0,
-                };
-
-                if (!this.reminders.isSameItemExist(reminder)) {
-                    res.push(reminder);
-                }
-            });
-        });
-
-        const list = RemindersList.create(res);
-        list.sort(false);
-
-        return list;
-    }
-
     /**
      * Scheduled transactions reminders
      */
@@ -2479,7 +2482,7 @@ export class AppState {
     }
 
     updateReminder(params) {
-        const origItem = this.reminders.getItem(params.id);
+        const origItem = this.reminders.getItem(params?.id);
         if (!origItem) {
             return false;
         }
@@ -2561,6 +2564,10 @@ export class AppState {
     }
 
     confirmUpcomingReminder(params) {
+        if (!params?.schedule_id || !params?.date) {
+            return false;
+        }
+
         let transactionId = params?.transaction_id;
         if (typeof transactionId === 'undefined') {
             const transaction = this.getDefaultReminderTransactionBySchedule(
@@ -2580,7 +2587,7 @@ export class AppState {
     }
 
     cancelReminder(params) {
-        const origItem = this.reminders.getItem(params.id);
+        const origItem = this.reminders.getItem(params?.id);
         if (!origItem) {
             return false;
         }
@@ -2598,8 +2605,8 @@ export class AppState {
 
     cancelUpcomingReminder(params) {
         return this.createReminder({
-            schedule_id: params.schedule_id,
-            date: params.date,
+            schedule_id: params?.schedule_id,
+            date: params?.date,
             state: REMINDER_CANCELLED,
             transaction_id: 0,
         });
@@ -2609,15 +2616,18 @@ export class AppState {
         const ids = asArray(params?.id);
         const upcoming = asArray(params?.upcoming);
 
-        if (ids.length > 0) {
-            if (!ids.every((id) => this.confirmReminder({ id }))) {
-                return false;
-            }
-        } else if (upcoming.length > 0) {
-            if (!upcoming.every((item) => this.confirmUpcomingReminder(item))) {
-                return false;
-            }
-        } else {
+        if (ids.length === 0 && upcoming.length === 0) {
+            return false;
+        }
+
+        const origState = this.clone();
+
+        const res = (ids.length > 0)
+            ? ids.every((id) => this.confirmReminder({ id }))
+            : upcoming.every((item) => this.confirmUpcomingReminder(item));
+
+        if (!res) {
+            this.setState(origState);
             return false;
         }
 
@@ -2628,15 +2638,18 @@ export class AppState {
         const ids = asArray(params?.id);
         const upcoming = asArray(params?.upcoming);
 
-        if (ids.length > 0) {
-            if (!ids.every((id) => this.cancelReminder({ id }))) {
-                return false;
-            }
-        } else if (upcoming.length > 0) {
-            if (!upcoming.every((item) => this.cancelUpcomingReminder(item))) {
-                return false;
-            }
-        } else {
+        if (ids.length === 0 && upcoming.length === 0) {
+            return false;
+        }
+
+        const origState = this.clone();
+
+        const res = (ids.length > 0)
+            ? ids.every((id) => this.cancelReminder({ id }))
+            : upcoming.every((item) => this.cancelUpcomingReminder(item));
+
+        if (!res) {
+            this.setState(origState);
             return false;
         }
 

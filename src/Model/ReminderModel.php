@@ -529,14 +529,21 @@ class ReminderModel extends CachedTable
      */
     public function confirmUpcoming(mixed $upcoming, array $request)
     {
-        $upcoming = asArray($upcoming);
+        $upcoming = (is_array($upcoming) && isset($upcoming["schedule_id"]))
+            ? [$upcoming]
+            : asArray($upcoming);
+
+        if (count($upcoming) === 0) {
+            throw new \Error(__("errors.invalidRequestData"));
+        }
+
         if (count($upcoming) > 1 && isset($request["transaction_id"])) {
             throw new \Error(__("reminders.errors.sameTransaction"));
         }
 
         foreach ($upcoming as $item) {
-            if (!$item["schedule_id"] || !$item["date"]) {
-                throw new \Error("Invalid reminder data");
+            if (!is_array($item) || !isset($item["schedule_id"]) || !isset($item["date"])) {
+                throw new \Error("Invalid upcoming reminder data");
             }
 
             if (isset($request["transaction_id"])) {
@@ -610,10 +617,17 @@ class ReminderModel extends CachedTable
      */
     public function cancelUpcoming(mixed $upcoming)
     {
-        $upcoming = asArray($upcoming);
+        $upcoming = (is_array($upcoming) && isset($upcoming["schedule_id"]))
+            ? [$upcoming]
+            : asArray($upcoming);
+
+        if (count($upcoming) === 0) {
+            throw new \Error(__("errors.invalidRequestData"));
+        }
+
         foreach ($upcoming as $item) {
-            if (!$item["schedule_id"] || !$item["date"]) {
-                throw new \Error("Invalid reminder data");
+            if (!is_array($item) || !isset($item["schedule_id"]) || !isset($item["date"])) {
+                throw new \Error("Invalid upcoming reminder data");
             }
 
             $res = $this->create([

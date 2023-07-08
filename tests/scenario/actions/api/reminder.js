@@ -12,7 +12,7 @@ export const confirm = async (params) => {
     let result;
 
     await test(`Confirm reminder (${formatProps(params)})`, async () => {
-        const resExpected = App.state.confirmReminder(params);
+        const resExpected = App.state.confirmReminders(params);
 
         try {
             result = await api.reminder.confirm(params);
@@ -37,7 +37,7 @@ export const cancel = async (params) => {
     let result;
 
     await test(`Cancel reminder (${formatProps(params)})`, async () => {
-        const resExpected = App.state.cancelReminder(params);
+        const resExpected = App.state.cancelReminders(params);
 
         try {
             result = await api.reminder.cancel(params);

@@ -51,6 +51,75 @@ const confirmRemindersWithChainedRequest = async () => {
     }, data);
 };
 
+const confirmUpcomingReminders = async () => {
+    setBlock('Confirm upcoming reminders', 2);
+
+    const { data: reminders } = App.state.getUpcomingReminders();
+
+    const data = [{
+        upcoming: {
+            schedule_id: reminders[0].schedule_id,
+            date: reminders[0].date,
+        },
+    }, {
+        upcoming: [{
+            schedule_id: reminders[1].schedule_id,
+            date: reminders[1].date,
+        }, {
+            schedule_id: reminders[2].schedule_id,
+            date: reminders[2].date,
+        }],
+    }];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.confirm(params);
+        assert(res, 'Failed to confirm upcoming reminder');
+    }, data);
+};
+
+const getInvalidUpcomingData = () => {
+    const { data: reminders } = App.state.getUpcomingReminders();
+
+    return [
+        // Empty 'upcoming' object
+        { upcoming: {} },
+        { upcoming: [] },
+        // Invalid 'upcoming' value
+        { upcoming: null },
+        { upcoming: [null] },
+        // No 'date' field
+        {
+            upcoming: {
+                schedule_id: reminders[0].schedule_id,
+            },
+        },
+        // No 'schedule_id' field
+        {
+            upcoming: {
+                date: reminders[0].date,
+            },
+        },
+        // Mixing valid and invalid objects
+        {
+            upcoming: [{
+                schedule_id: reminders[1].schedule_id,
+                date: reminders[1].date,
+            }, null],
+        },
+    ];
+};
+
+const confirmUpcomingRemindersInvalid = async () => {
+    setBlock('Confirm upcoming reminders with invalid data', 2);
+
+    const data = getInvalidUpcomingData();
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.confirm(params);
+        assert(!res, 'Reminder confirmed with invalid request');
+    }, data);
+};
+
 const confirmCancelledReminders = async () => {
     setBlock('Confirm cancelled reminders', 2);
 
@@ -111,6 +180,43 @@ const cancelRemindersWithChainedRequest = async () => {
     await App.scenario.runner.runGroup(async (params) => {
         const res = await Actions.cancel(params);
         assert(res, 'Failed to cancel reminder');
+    }, data);
+};
+
+const cancelUpcomingReminders = async () => {
+    setBlock('Cancel upcoming reminders', 2);
+
+    const { data: reminders } = App.state.getUpcomingReminders();
+
+    const data = [{
+        upcoming: {
+            schedule_id: reminders[0].schedule_id,
+            date: reminders[0].date,
+        },
+    }, {
+        upcoming: [{
+            schedule_id: reminders[1].schedule_id,
+            date: reminders[1].date,
+        }, {
+            schedule_id: reminders[2].schedule_id,
+            date: reminders[2].date,
+        }],
+    }];
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.cancel(params);
+        assert(res, 'Failed to cancel upcoming reminder');
+    }, data);
+};
+
+const cancelUpcomingRemindersInvalid = async () => {
+    setBlock('Cancel upcoming reminders with invalid data', 2);
+
+    const data = getInvalidUpcomingData();
+
+    await App.scenario.runner.runGroup(async (params) => {
+        const res = await Actions.cancel(params);
+        assert(!res, 'Reminder canceled with invalid request');
     }, data);
 };
 
@@ -180,12 +286,16 @@ export const apiRemindersTests = {
         await confirmReminders();
         await confirmRemindersInvalid();
         await confirmRemindersWithChainedRequest();
+        await confirmUpcomingReminders();
+        await confirmUpcomingRemindersInvalid();
     },
 
     async cancelRemindersTests() {
         await cancelReminders();
         await cancelRemindersInvalid();
         await cancelRemindersWithChainedRequest();
+        await cancelUpcomingReminders();
+        await cancelUpcomingRemindersInvalid();
     },
 
     async confirmCancelledTests() {
