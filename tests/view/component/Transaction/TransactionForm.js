@@ -190,7 +190,12 @@ export class TransactionForm extends TestComponent {
                 model.src_curr_id = model.personAccount.curr_id;
                 model.dest_curr_id = model.personAccount.curr_id;
             } else if (fromReminder) {
-                const transaction = state.getDefaultReminderTransaction(fromReminder);
+                const transaction = isObject(fromReminder)
+                    ? state.getDefaultReminderTransactionBySchedule(
+                        fromReminder.schedule_id,
+                        fromReminder.date,
+                    )
+                    : state.getDefaultReminderTransaction(fromReminder);
                 assert(transaction, 'Invalid reminder');
 
                 Object.assign(
@@ -1159,7 +1164,7 @@ export class TransactionForm extends TestComponent {
         if (res.isUpdate) {
             assert(res.id, 'Wrong transaction id');
         }
-        res.isReminder = location.includes('reminder_id=');
+        res.isReminder = location.includes('reminder_id=') || location.includes('schedule_id=');
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');

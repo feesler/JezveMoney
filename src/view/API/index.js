@@ -290,6 +290,10 @@ export const API = {
             return idsRequest('reminder/', data);
         },
 
+        async upcoming(options = {}) {
+            return apiGet('reminder/upcoming', options);
+        },
+
         async confirm(data) {
             return apiPost('reminder/confirm', data);
         },

@@ -153,12 +153,26 @@ class Transactions extends ListViewController
         $iconModel = IconModel::getInstance();
         $defMsg = __("transactions.errors.create");
 
-        $fromReminder = isset($_GET["reminder_id"]);
+        $bySchedule = isset($_GET["schedule_id"]);
+        $fromReminder = isset($_GET["reminder_id"]) || $bySchedule;
 
         if ($fromReminder) {
             $reminderModel = ReminderModel::getInstance();
-            $tr = $reminderModel->getDefaultTransaction($_GET["reminder_id"]);
-            $tr["reminder_id"] = intval($_GET["reminder_id"]);
+            if ($bySchedule) {
+                $reminderDate = isset($_GET["reminder_date"])
+                    ? intval($_GET["reminder_date"])
+                    : cutDate(UserSettingsModel::clientTime());
+
+                $tr = $reminderModel->getDefaultTransactionBySchedule(
+                    $_GET["schedule_id"],
+                    $reminderDate,
+                );
+                $tr["schedule_id"] = intval($_GET["schedule_id"]);
+                $tr["reminder_date"] = $reminderDate;
+            } else {
+                $tr = $reminderModel->getDefaultTransaction($_GET["reminder_id"]);
+                $tr["reminder_id"] = intval($_GET["reminder_id"]);
+            }
         } else {
             $tr = [
                 "type" => EXPENSE,

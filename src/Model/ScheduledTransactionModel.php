@@ -620,7 +620,7 @@ class ScheduledTransactionModel extends CachedTable
 
         return [
             "startDate" => $startDate,
-            "endDate" => UserSettingsModel::clientTime(),
+            "endDate" => cutDate(UserSettingsModel::clientTime()),
         ];
     }
 
@@ -1188,6 +1188,76 @@ class ScheduledTransactionModel extends CachedTable
     }
 
     /**
+     * Returns array of expected reminders for specified scheduled transaction
+     *
+     * @param int $item_id scheduled transaction id
+     * @param array $params
+     *
+     * @return array
+     */
+    public function getExpectedReminders(int $item_id, array $params = [])
+    {
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+
+        $reminderState = $params["state"] ?? REMINDER_UPCOMING;
+
+        $res = [];
+        $reminderDates = $item->getReminders($params);
+        foreach ($reminderDates as $date) {
+            $reminder = [
+                "schedule_id" => $item_id,
+                "state" => $reminderState,
+                "date" => $date,
+                "transaction_id" => 0,
+            ];
+
+            if (!$this->reminderModel->isSameItemExist($reminder)) {
+                $res[] = $reminder;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * Returns array of expected reminders for all scheduled transaction
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function getAllExpectedReminders(array $params = [])
+    {
+        if (!$this->checkCache()) {
+            throw new \Error("Failed to update cache");
+        }
+
+        if (!isset($params["state"])) {
+            $params["state"] = REMINDER_UPCOMING;
+        }
+
+        $res = [];
+        foreach ($this->cache as $item) {
+            $reminders = $this->getExpectedReminders($item->id, $params);
+            array_push($res, ...$reminders);
+        }
+
+        usort(
+            $res,
+            function ($a, $b) {
+                return ($a["date"] === $b["date"])
+                    ? $a["schedule_id"] - $b["schedule_id"]
+                    : $a["date"] - $b["date"];
+            },
+        );
+
+        return $res;
+    }
+
+    /**
      * Creates reminders for specified scheduled transaction
      *
      * @param int $item_id scheduled transaction id
@@ -1197,30 +1267,9 @@ class ScheduledTransactionModel extends CachedTable
      */
     protected function createReminders(int $item_id, array $params = [])
     {
-        $item = $this->getItem($item_id);
-        if (!$item) {
-            throw new \Error("Item not found");
-        }
+        $params["state"] = REMINDER_SCHEDULED;
 
-        $reminderDates = $item->getReminders($params);
-        if (count($reminderDates) === 0) {
-            return true;
-        }
-
-        $reminders = [];
-        foreach ($reminderDates as $date) {
-            $reminder = [
-                "schedule_id" => $item_id,
-                "state" => REMINDER_SCHEDULED,
-                "date" => $date,
-                "transaction_id" => 0,
-            ];
-
-            if (!$this->reminderModel->isSameItemExist($reminder)) {
-                $reminders[] = $reminder;
-            }
-        }
-
+        $reminders = $this->getExpectedReminders($item_id, $params);
         $this->reminderModel->createMultiple($reminders);
 
         return true;
@@ -1261,22 +1310,37 @@ class ScheduledTransactionModel extends CachedTable
         Model::runTransaction(function () {
             $userModel = UserModel::getInstance();
 
-            if (!$this->checkCache()) {
-                return false;
-            }
-
             $params = $this->getRemindersDateRange();
             $diff = getDateDiff($params["startDate"], $params["endDate"], INTERVAL_DAY);
-
-            if ($diff !== 0) {
-                $userModel->setRemindersDate();
-
-                foreach ($this->cache as $item) {
-                    $this->createReminders($item->id, $params);
-                }
+            if ($diff === 0) {
+                return;
             }
+
+            $userModel->setRemindersDate();
+
+            $reminders = $this->getAllExpectedReminders($params);
+            $this->reminderModel->createMultiple($reminders);
         });
 
         return true;
+    }
+
+    /**
+     * Returns array of upcoming reminders
+     *
+     * @return array
+     */
+    public function getUpcomingReminders()
+    {
+        $today = cutDate(UserSettingsModel::clientTime());
+        $tomorrow = getNextDateInterval($today, INTERVAL_DAY);
+        $yearAfter = stepInterval($today, INTERVAL_YEAR);
+
+        $params = [
+            "startDate" => $tomorrow,
+            "endDate" => $yearAfter,
+        ];
+
+        return $this->getAllExpectedReminders($params);
     }
 }

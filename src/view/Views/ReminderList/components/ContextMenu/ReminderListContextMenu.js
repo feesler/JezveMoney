@@ -1,7 +1,8 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../../../tests/model/Reminder.js';
+import { REMINDER_UPCOMING } from '../../../../Models/Reminder.js';
 
 /** Reminders list context menu component */
 export class ReminderListContextMenu extends PopupMenu {
@@ -39,7 +40,12 @@ export class ReminderListContextMenu extends PopupMenu {
     }
 
     getContextItem(state) {
-        return App.model.reminders.getItem(state.contextItem);
+        const strId = state.contextItem?.toString() ?? null;
+        if (strId === null) {
+            return null;
+        }
+
+        return state.items?.find((item) => item.id.toString() === strId);
     }
 
     getHostElement(itemId) {
@@ -72,8 +78,20 @@ export class ReminderListContextMenu extends PopupMenu {
         items.ctxConfirmBtn.show(reminder.state !== REMINDER_CONFIRMED);
         items.ctxUpdateBtn.show(reminder.state !== REMINDER_CONFIRMED);
         items.ctxCancelBtn.show(reminder.state !== REMINDER_CANCELLED);
+
+        items.ctxDetailsBtn.show(reminder.state !== REMINDER_UPCOMING);
         items.ctxDetailsBtn.setURL(`${baseURL}reminders/${reminder.id}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}transactions/create/?reminder_id=${reminder.id}`);
+
+        const updateParams = {};
+        if (reminder.state === REMINDER_UPCOMING) {
+            updateParams.schedule_id = reminder.schedule_id;
+            updateParams.reminder_date = reminder.date;
+        } else {
+            updateParams.reminder_id = reminder.id;
+        }
+
+        const updateURL = getApplicationURL('transactions/create/', updateParams);
+        items.ctxUpdateBtn.setURL(updateURL.toString());
 
         this.attachAndShow(menuButton);
     }

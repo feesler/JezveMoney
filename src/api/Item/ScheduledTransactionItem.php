@@ -123,29 +123,12 @@ class ScheduledTransactionItem
             return null;
         }
 
-        $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
-        $date->setTime(0, 0);
-
-        if ($this->interval_type === INTERVAL_MONTH) {
-            $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
-            $maxDate->setTime(0, 0);
-            $maxDate->modify("last day of next month");
-
-            $dateInfo = getdate($date->getTimestamp());
-            $res = mktime(0, 0, 0, $dateInfo["mon"] + $this->interval_step, 1, $dateInfo["year"]);
-            $res = min($res, $maxDate->getTimestamp());
-        } else {
-            $duration = "P" . $this->interval_step . self::$durationMap[$this->interval_type];
-            $date->add(new DateInterval($duration));
-            $res = $date->getTimestamp();
-        }
-
+        $res = getNextDateInterval($timestamp, $this->interval_type, $this->interval_step);
         if ($this->end_date && $this->end_date < $res) {
             return null;
         }
 
-        $dateInfo = getDateIntervalStart($res, $this->interval_type);
-        return $dateInfo["time"];
+        return $res;
     }
 
     /**
@@ -198,11 +181,21 @@ class ScheduledTransactionItem
         $startDate = isset($params["startDate"])
             ? intval($params["startDate"])
             : $this->start_date;
-        $startDate = cutDate($startDate);
+
+        $startDate = max(cutDate($startDate), $this->start_date);
+
+        $itemEndDate = $this->end_date;
+        if ($this->interval_type === INTERVAL_NONE) {
+            $itemEndDate = $this->start_date;
+        }
 
         $endDate = isset($params["endDate"])
             ? intval($params["endDate"])
-            : UserSettingsModel::clientTime();
+            : ($this->end_date ?? cutDate(UserSettingsModel::clientTime()));
+
+        if ($itemEndDate) {
+            $endDate = min($itemEndDate, $endDate);
+        }
 
         $res = [];
         $interval = $this->getInterval($startDate);

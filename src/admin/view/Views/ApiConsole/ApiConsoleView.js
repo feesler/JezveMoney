@@ -567,6 +567,13 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isRemindersArray),
         });
 
+        const upcomingForm = ApiRequestForm.create({
+            id: 'upcomingRemindersForm',
+            title: 'Upcoming reminders',
+            action: this.getRequestURL('reminder/upcoming'),
+            onSubmit: this.getVerifyHandler(apiTypes.isUpcomingRemindersArray),
+        });
+
         const readForm = ItemIdsForm.create({
             id: 'readReminderForm',
             title: 'Read reminders by ids',
@@ -605,6 +612,7 @@ class AdminApiConsoleView extends AdminView {
         this.formsContainer.append(
             listForm.elem,
             readForm.elem,
+            upcomingForm.elem,
             confirmForm.elem,
             cancelForm.elem,
         );

@@ -490,6 +490,42 @@ class TransactionModel extends SortableModel
     }
 
     /**
+     * Saves reminder confirmation data to process on post create stage
+     *
+     * @param array $params item fields
+     */
+    protected function saveConfirmReminder(array $params)
+    {
+        if (is_null($this->confirmReminders)) {
+            $this->confirmReminders = [];
+        }
+
+        $reminderProps = ["reminder_id", "schedule_id", "reminder_date"];
+
+        $reminder = [];
+        foreach ($reminderProps as $prop) {
+            $reminder[$prop] = isset($params[$prop]) ? intval($params[$prop]) : 0;
+        }
+
+        $this->confirmReminders[] = $reminder;
+    }
+
+    /**
+     * Saves item data for requested scheduled transaction to process on post create stage
+     *
+     * @param array $params item fields
+     */
+    protected function saveRequestedSchedule(array $params)
+    {
+        if (is_null($this->requestedItems)) {
+            $this->requestedItems = [];
+        }
+
+        $intervalType = isset($params["interval_type"]) ? intval($params["interval_type"]) : 0;
+        $this->requestedItems[] = ($intervalType === 0) ? null : $params;
+    }
+
+    /**
      * Checks item create conditions and returns array of expressions
      *
      * @param array $params item fields
@@ -507,18 +543,8 @@ class TransactionModel extends SortableModel
 
         $this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
 
-        if (is_null($this->confirmReminders)) {
-            $this->confirmReminders = [];
-        }
-        $reminderId = (isset($params["reminder_id"])) ? intval($params["reminder_id"]) : 0;
-        $this->confirmReminders[] = $reminderId;
-
-        if (is_null($this->requestedItems)) {
-            $this->requestedItems = [];
-        }
-
-        $intervalType = isset($params["interval_type"]) ? intval($params["interval_type"]) : 0;
-        $this->requestedItems[] = ($intervalType === 0) ? null : $params;
+        $this->saveConfirmReminder($params);
+        $this->saveRequestedSchedule($params);
 
         $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
@@ -563,10 +589,19 @@ class TransactionModel extends SortableModel
 
             $reminderId = 0;
             if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
-                $reminderId = array_shift($this->confirmReminders);
+                $reminder = array_shift($this->confirmReminders);
+                $reminderId = $reminder["reminder_id"];
+                $scheduleId = $reminder["schedule_id"];
                 if ($reminderId !== 0) {
                     $reminderModel->confirm($reminderId, [
                         "transaction_id" => $item_id,
+                    ]);
+                } elseif ($scheduleId !== 0) {
+                    $reminderId = $reminderModel->create([
+                        "schedule_id" => $scheduleId,
+                        "transaction_id" => $item_id,
+                        "date" => $reminder["reminder_date"],
+                        "state" => REMINDER_CONFIRMED,
                     ]);
                 }
             }

@@ -10,10 +10,10 @@ export class List {
         assert(ids, 'Invalid parameters');
 
         const itemIds = asArray(ids)
-            .map((id) => parseInt(id, 10))
+            .map((id) => id?.toString())
             .filter((id) => !!id);
 
-        const res = list.filter((item) => !itemIds.includes(item.id));
+        const res = list.filter((item) => !itemIds.includes(item.id?.toString()));
 
         return res;
     }
@@ -61,41 +61,44 @@ export class List {
     }
 
     getItem(id) {
-        const itemId = parseInt(id, 10);
-        if (!itemId) {
+        const itemId = id?.toString() ?? null;
+        if (itemId === null) {
             return null;
         }
-        const res = this.data.find((item) => item.id === itemId);
+
+        const res = this.data.find((item) => item?.id?.toString() === itemId);
         return (res) ? this.createItem(res) : null;
     }
 
     getItems(ids) {
-        const itemIds = asArray(ids).map((id) => parseInt(id, 10));
-        const res = this.filter((item) => itemIds.includes(item.id));
+        const itemIds = asArray(ids).map((id) => id?.toString());
+        const res = this.filter((item) => itemIds.includes(item.id.toString()));
         return res.map((item) => this.createItem(item));
     }
 
     getItemByIndex(ind) {
         const pos = parseInt(ind, 10);
-        if (Number.isNaN(pos) || pos < 0 || pos >= this.length) {
-            return null;
-        }
+        assert.arrayIndex(this.data, pos, `Invalid item index: ${ind}`);
 
         return this.createItem(this.data[pos]);
     }
 
+    getItemsByIndexes(index) {
+        return asArray(index).map((ind) => this.getItemByIndex(ind));
+    }
+
     // Return index of item with specified id
     getIndexById(id) {
-        const itemId = parseInt(id, 10);
-        if (!itemId) {
+        const itemId = id?.toString() ?? null;
+        if (itemId === null) {
             return null;
         }
 
-        return this.data.findIndex((item) => item.id === itemId);
+        return this.data.findIndex((item) => item.id.toString() === itemId);
     }
 
     getLatestId() {
-        return this.data.reduce((res, item) => Math.max(item.id, res), 0);
+        return this.data.reduce((res, item) => Math.max(parseInt(item.id, 10), res), 0);
     }
 
     /** Return id of item with specified index(absolute position) in list */
@@ -178,6 +181,13 @@ export class List {
         if (ind === -1) {
             return false;
         }
+
+        return this.updateByIndex(item, ind);
+    }
+
+    updateByIndex(item, index) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.data, ind);
 
         const itemObj = this.createItem(item);
         this.data.splice(ind, 1, itemObj);

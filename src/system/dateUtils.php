@@ -218,3 +218,58 @@ function getDateIntervalOffset(mixed $dateInfo, int $intervalType)
 
     return 0;
 }
+
+/**
+ * Increases timestamp up to next interval and returns result
+ *  or null in case invalid data
+ *
+ * @param int $timestamp timestamp to find next date interval for
+ * @param int $intervalType type of interval
+ * @param int $step count of intervals to add
+ *
+ * @return int|null
+ */
+function stepInterval(int $timestamp, int $intervalType, int $step = 1)
+{
+    if ($intervalType === INTERVAL_NONE || $step < 1) {
+        return null;
+    }
+
+    $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+    $date->setTime(0, 0);
+
+    if ($intervalType === INTERVAL_MONTH) {
+        $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
+        $maxDate->setTime(0, 0);
+        $maxDate->modify("last day of next month");
+
+        $dateInfo = getdate($date->getTimestamp());
+        $res = mktime(0, 0, 0, $dateInfo["mon"] + $step, 1, $dateInfo["year"]);
+        return min($res, $maxDate->getTimestamp());
+    }
+
+    $duration = "P" . $step . INTERVAL_DURATION_MAP[$intervalType];
+    $date->add(new DateInterval($duration));
+    return $date->getTimestamp();
+}
+
+/**
+ * Returns timestamp for the start next interval of specified type
+ *  or null in case invalid data
+ *
+ * @param int $timestamp timestamp to find next date interval for
+ * @param int $intervalType type of interval
+ * @param int $step count of intervals to add
+ *
+ * @return int|null
+ */
+function getNextDateInterval(int $timestamp, int $intervalType, int $step = 1)
+{
+    $res = stepInterval($timestamp, $intervalType, $step);
+    if (!$res) {
+        return null;
+    }
+
+    $dateInfo = getDateIntervalStart($res, $intervalType);
+    return $dateInfo["time"];
+}

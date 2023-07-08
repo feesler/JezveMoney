@@ -39,7 +39,8 @@ export const isEmpty = (obj) => {
 };
 
 /** Return timestamp for the start of the day */
-export const cutDate = (date) => {
+export const cutDate = (value) => {
+    const date = (typeof value === 'number') ? (new Date(value)) : value;
     if (!isDate(date)) {
         return null;
     }

@@ -88,6 +88,7 @@ const controllers = [
         methods: [
             { title: 'List', formId: 'listReminderForm' },
             { title: 'Read', formId: 'readReminderForm' },
+            { title: 'Upcoming', formId: 'upcomingRemindersForm' },
             { title: 'Confirm', formId: 'confirmReminderForm' },
             { title: 'Cancel', formId: 'cancelReminderForm' },
         ],

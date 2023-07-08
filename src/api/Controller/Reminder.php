@@ -4,6 +4,7 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ReminderModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 
 /**
  * Scheduled transactions reminders API controller
@@ -61,6 +62,17 @@ class Reminder extends ApiListController
     }
 
     /**
+     * Returns array of upcoming reminders
+     */
+    public function upcoming()
+    {
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+
+        $result = $scheduleModel->getUpcomingReminders();
+        $this->ok($result);
+    }
+
+    /**
      * Changes state of reminder to 'Confirmed'
      */
     public function confirm()
@@ -71,7 +83,8 @@ class Reminder extends ApiListController
 
         $this->runTransaction(function () {
             $request = $this->getRequestData();
-            if (!$request || !isset($request["id"])) {
+            $isUpcoming = isset($request["upcoming"]);
+            if (!$request || (!isset($request["id"]) && !$isUpcoming)) {
                 throw new \Error(__("errors.invalidRequestData"));
             }
 
@@ -80,7 +93,12 @@ class Reminder extends ApiListController
                 throw new \Error(__("errors.invalidRequestData"));
             }
 
-            $this->model->confirm($request["id"], $reqData);
+            if ($isUpcoming) {
+                $this->model->confirmUpcoming($request["upcoming"], $reqData);
+            } else {
+                $this->model->confirm($request["id"], $reqData);
+            }
+
             $result = $this->getStateResult($request);
 
             $this->ok($result);
@@ -97,12 +115,17 @@ class Reminder extends ApiListController
         }
 
         $this->runTransaction(function () {
-            $ids = $this->getRequestedIds(true, $this->isJsonContent());
-            if (!is_array($ids) || count($ids) === 0) {
-                throw new \Error(__("errors.noIds"));
+            $request = $this->getRequestData();
+            $isUpcoming = isset($request["upcoming"]);
+            if (!$request || (!isset($request["id"]) && !$isUpcoming)) {
+                throw new \Error(__("errors.invalidRequestData"));
             }
 
-            $this->model->cancel($ids);
+            if ($isUpcoming) {
+                $this->model->cancelUpcoming($request["upcoming"]);
+            } else {
+                $this->model->cancel($request["id"]);
+            }
 
             $request = $this->getRequestData();
             $result = $this->getStateResult($request);

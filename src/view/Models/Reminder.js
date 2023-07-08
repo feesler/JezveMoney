@@ -25,6 +25,7 @@ const commonTransactionFields = [
 ];
 
 /* Reminder state */
+export const REMINDER_UPCOMING = 0;
 export const REMINDER_SCHEDULED = 1;
 export const REMINDER_CONFIRMED = 2;
 export const REMINDER_CANCELLED = 3;
@@ -33,16 +34,16 @@ export const REMINDER_CANCELLED = 3;
  * Scheduled transaction reminder class
  */
 export class Reminder extends ListItem {
-    static stateTypes = [
-        { id: REMINDER_SCHEDULED, name: 'scheduled', token: 'reminders.state.scheduled' },
-        { id: REMINDER_CONFIRMED, name: 'confirmed', token: 'reminders.state.submitted' },
-        { id: REMINDER_CANCELLED, name: 'cancelled', token: 'reminders.state.cancelled' },
-    ];
+    static stateNames = {
+        [REMINDER_UPCOMING]: 'upcoming',
+        [REMINDER_SCHEDULED]: 'scheduled',
+        [REMINDER_CONFIRMED]: 'confirmed',
+        [REMINDER_CANCELLED]: 'cancelled',
+    };
 
     static getStateName(stateType) {
         const type = parseInt(stateType, 10);
-        const state = this.stateTypes.find((item) => item.id === type);
-        return state?.name ?? null;
+        return this.stateNames[type] ?? null;
     }
 
     /**

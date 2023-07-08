@@ -37,6 +37,7 @@ class State extends ApiController
         "categories" => "getCategories",
         "schedule" => "getSchedule",
         "reminders" => "getReminders",
+        "upcoming" => "getUpcomingReminders",
         "importtemplates" => "getImportTemplates",
         "importrules" => "getImportRules",
         "importconditions" => "getImportConditions",
@@ -181,6 +182,23 @@ class State extends ApiController
     protected function getReminders(array $options = [])
     {
         return $this->getList(ReminderModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns upcoming reminders data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getUpcomingReminders(array $options = [])
+    {
+        $model = ScheduledTransactionModel::getInstance();
+
+        $res = new \stdClass();
+        $res->data = $model->getUpcomingReminders($options);
+
+        return $res;
     }
 
     /**

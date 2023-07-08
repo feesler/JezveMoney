@@ -489,14 +489,25 @@ export class ScheduledTransaction {
     }
 
     getReminders(options = {}) {
-        const {
-            limit = 100,
+        const start = secondsToTime(this.start_date);
+
+        const { limit = 100 } = options;
+        let {
+            startDate = start,
             endDate = Date.now(),
         } = options;
-        const startDate = secondsToTime(this.start_date);
+
+        startDate = Math.max(start, startDate);
+
+        if (this.interval_type === INTERVAL_NONE) {
+            endDate = startDate;
+        } else if (this.end_date) {
+            const endTime = secondsToTime(this.end_date);
+            endDate = Math.min(endTime, endDate);
+        }
 
         const res = [];
-        let interval = this.getFirstInterval();
+        let interval = this.getIntervalStart(startDate, this.interval_type);
 
         while (
             interval

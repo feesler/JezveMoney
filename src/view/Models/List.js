@@ -106,12 +106,12 @@ export class List {
      * @param {Number} itemId - identifier of item to find
      */
     getItem(itemId) {
-        const id = parseInt(itemId, 10);
-        if (!id) {
+        const strId = itemId?.toString() ?? null;
+        if (strId === null) {
             return null;
         }
 
-        return this.data.find((item) => item && item.id === id);
+        return this.data.find((item) => item && item.id.toString() === strId);
     }
 
     /**
@@ -120,12 +120,12 @@ export class List {
      * @param {Number} itemId - identifier of item to find
      */
     getItemIndex(itemId) {
-        const id = parseInt(itemId, 10);
-        if (!id) {
+        const strId = itemId?.toString() ?? null;
+        if (strId === null) {
             return -1;
         }
 
-        return this.data.findIndex((item) => item && item.id === id);
+        return this.data.findIndex((item) => item && item.id.toString() === strId);
     }
 
     /**
@@ -181,12 +181,12 @@ export class List {
      * @param {Number} itemId - id item to remove
      */
     deleteItem(itemId) {
-        const id = parseInt(itemId, 10);
-        if (!id) {
+        const strId = itemId?.toString() ?? null;
+        if (strId === null) {
             return;
         }
 
-        this.data = this.data.filter((item) => item.id !== id);
+        this.data = this.data.filter((item) => item.id.toString() !== strId);
     }
 
     /**

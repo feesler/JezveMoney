@@ -11,6 +11,7 @@ import {
     dateStringToSeconds,
     timeToSeconds,
     dateToSeconds,
+    cutDate,
 } from '../common.js';
 import {
     EXPENSE,
@@ -43,6 +44,7 @@ import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
+    REMINDER_UPCOMING,
     Reminder,
 } from './Reminder.js';
 import { Account } from './Account.js';
@@ -1825,9 +1827,16 @@ export class AppState {
         const item = this.transactions.getItemByIndex(ind);
 
         const reminderId = itemData.reminder_id ?? 0;
+        const scheduleId = itemData.schedule_id ?? 0;
         if (reminderId) {
             this.confirmReminder({
                 id: reminderId,
+                transaction_id: item.id,
+            });
+        } else if (scheduleId) {
+            this.confirmUpcomingReminder({
+                schedule_id: itemData.schedule_id,
+                date: itemData.reminder_date,
                 transaction_id: item.id,
             });
         }
@@ -1835,7 +1844,7 @@ export class AppState {
         const res = { id: item.id };
 
         const intervalType = params.interval_type ?? INTERVAL_NONE;
-        if (intervalType !== INTERVAL_NONE && reminderId === 0) {
+        if (intervalType !== INTERVAL_NONE && reminderId === 0 && scheduleId === 0) {
             const { returnState, ...scheduleParams } = itemData;
             const scheduleRes = this.createScheduledTransaction(scheduleParams);
             if (!scheduleRes) {
@@ -2340,14 +2349,20 @@ export class AppState {
         const reminderDates = item.getReminders({
             endDate: App.dates.now.getTime(),
         });
-        return reminderDates.every((timestamp) => (
-            this.createReminder({
+        return reminderDates.every((timestamp) => {
+            const reminder = {
                 schedule_id: scheduleId,
                 state: REMINDER_SCHEDULED,
                 date: timeToSeconds(timestamp),
                 transaction_id: 0,
-            })
-        ));
+            };
+
+            if (this.reminders.isSameItemExist(reminder)) {
+                return true;
+            }
+
+            return this.createReminder(reminder);
+        });
     }
 
     updateReminders(scheduleId) {
@@ -2358,6 +2373,40 @@ export class AppState {
     deleteReminders(scheduleId) {
         this.reminders.deleteRemindersBySchedule(scheduleId);
         return true;
+    }
+
+    getUpcomingReminders(options = {}) {
+        const reminderOptions = {
+            startDate: App.dates.tomorrow,
+            endDate: App.dates.yearAfter,
+            ...options,
+        };
+
+        reminderOptions.startDate = cutDate(reminderOptions.startDate);
+        reminderOptions.endDate = cutDate(reminderOptions.endDate);
+
+        const res = [];
+        this.schedule.forEach((item) => {
+            const reminderDates = item.getReminders(reminderOptions);
+
+            reminderDates.forEach((timestamp) => {
+                const reminder = {
+                    schedule_id: item.id,
+                    state: REMINDER_UPCOMING,
+                    date: timeToSeconds(timestamp),
+                    transaction_id: 0,
+                };
+
+                if (!this.reminders.isSameItemExist(reminder)) {
+                    res.push(reminder);
+                }
+            });
+        });
+
+        const list = RemindersList.create(res);
+        list.sort(false);
+
+        return list;
     }
 
     /**
@@ -2467,10 +2516,9 @@ export class AppState {
         return this.returnState(params.returnState);
     }
 
-    getDefaultReminderTransaction(id) {
-        const reminder = this.reminders.getItem(id);
-        const schedule = this.schedule.getItem(reminder?.schedule_id);
-        if (!reminder) {
+    getDefaultReminderTransactionBySchedule(scheduleId, date) {
+        const schedule = this.schedule.getItem(scheduleId);
+        if (!schedule || !date) {
             return null;
         }
 
@@ -2483,9 +2531,18 @@ export class AppState {
             src_curr: schedule.src_curr,
             dest_curr: schedule.dest_curr,
             category_id: schedule.category_id,
-            date: reminder.date,
+            date,
             comment: schedule.comment,
         };
+    }
+
+    getDefaultReminderTransaction(id) {
+        const reminder = this.reminders.getItem(id);
+        if (!reminder) {
+            return null;
+        }
+
+        return this.getDefaultReminderTransactionBySchedule(reminder.schedule_id, reminder.date);
     }
 
     confirmReminder(params) {
@@ -2498,6 +2555,25 @@ export class AppState {
 
         return this.updateReminder({
             id: params.id,
+            state: REMINDER_CONFIRMED,
+            transaction_id: transactionId,
+        });
+    }
+
+    confirmUpcomingReminder(params) {
+        let transactionId = params?.transaction_id;
+        if (typeof transactionId === 'undefined') {
+            const transaction = this.getDefaultReminderTransactionBySchedule(
+                params.schedule_id,
+                params.date,
+            );
+            const res = this.createTransaction(transaction);
+            transactionId = res?.id;
+        }
+
+        return this.createReminder({
+            schedule_id: params.schedule_id,
+            date: params.date,
             state: REMINDER_CONFIRMED,
             transaction_id: transactionId,
         });
@@ -2520,13 +2596,28 @@ export class AppState {
         });
     }
 
+    cancelUpcomingReminder(params) {
+        return this.createReminder({
+            schedule_id: params.schedule_id,
+            date: params.date,
+            state: REMINDER_CANCELLED,
+            transaction_id: 0,
+        });
+    }
+
     confirmReminders(params) {
         const ids = asArray(params?.id);
-        if (!ids.length) {
-            return false;
-        }
+        const upcoming = asArray(params?.upcoming);
 
-        if (!ids.every((id) => this.confirmReminder({ id }))) {
+        if (ids.length > 0) {
+            if (!ids.every((id) => this.confirmReminder({ id }))) {
+                return false;
+            }
+        } else if (upcoming.length > 0) {
+            if (!upcoming.every((item) => this.confirmUpcomingReminder(item))) {
+                return false;
+            }
+        } else {
             return false;
         }
 
@@ -2535,11 +2626,17 @@ export class AppState {
 
     cancelReminders(params) {
         const ids = asArray(params?.id);
-        if (!ids.length) {
-            return false;
-        }
+        const upcoming = asArray(params?.upcoming);
 
-        if (!ids.every((id) => this.cancelReminder({ id }))) {
+        if (ids.length > 0) {
+            if (!ids.every((id) => this.cancelReminder({ id }))) {
+                return false;
+            }
+        } else if (upcoming.length > 0) {
+            if (!upcoming.every((item) => this.cancelUpcomingReminder(item))) {
+                return false;
+            }
+        } else {
             return false;
         }
 

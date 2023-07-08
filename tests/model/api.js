@@ -249,6 +249,7 @@ export const api = {
         confirm: apiPostMethod('confirm'),
         cancel: apiPostMethod('cancel'),
         list: apiList,
+        upcoming: apiGetMethod('upcoming'),
     }),
 
     importrule: apiController('importrule', {

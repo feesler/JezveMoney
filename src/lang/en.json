@@ -346,6 +346,7 @@
         "update": "Edit",
         "cancel": "Cancel",
         "state": {
+            "upcoming": "Upcoming",
             "scheduled": "Scheduled",
             "submitted": "Submitted",
             "cancelled": "Cancelled"

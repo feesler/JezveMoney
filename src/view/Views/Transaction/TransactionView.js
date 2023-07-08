@@ -199,6 +199,9 @@ class TransactionView extends AppView {
 
             if (transaction.reminder_id) {
                 url.searchParams.set('reminder_id', transaction.reminder_id);
+            } else if (transaction.schedule_id) {
+                url.searchParams.set('schedule_id', transaction.schedule_id);
+                url.searchParams.set('reminder_date', transaction.reminder_date);
             }
         }
 

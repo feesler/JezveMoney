@@ -1,5 +1,6 @@
 import { assert } from 'jezve-test';
 
+export const REMINDER_UPCOMING = 0;
 export const REMINDER_SCHEDULED = 1;
 export const REMINDER_CONFIRMED = 2;
 export const REMINDER_CANCELLED = 3;
@@ -36,7 +37,15 @@ export class Reminder {
         REMINDER_CANCELLED,
     ];
 
+    static allStates = [
+        REMINDER_UPCOMING,
+        REMINDER_SCHEDULED,
+        REMINDER_CONFIRMED,
+        REMINDER_CANCELLED,
+    ];
+
     static stateNames = {
+        [REMINDER_UPCOMING]: 'upcoming',
         [REMINDER_SCHEDULED]: 'scheduled',
         [REMINDER_CONFIRMED]: 'confirmed',
         [REMINDER_CANCELLED]: 'cancelled',

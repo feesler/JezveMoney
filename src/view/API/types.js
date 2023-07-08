@@ -268,6 +268,17 @@ export const isReminder = (obj) => verifyObject(obj, {
 /** Verify object is array of reminders */
 export const isRemindersArray = isArrayOf(isReminder);
 
+/** Verify object is upcoming reminder */
+export const isUpcomingReminder = (obj) => verifyObject(obj, {
+    schedule_id: isInt,
+    state: isInt,
+    date: isInt,
+    transaction_id: isInt,
+});
+
+/** Verify object is array of upcoming reminders */
+export const isUpcomingRemindersArray = isArrayOf(isUpcomingReminder);
+
 /** Verify object is import template */
 export const isTemplateColumns = (obj) => verifyObject(obj, {
     accountAmount: isInt,

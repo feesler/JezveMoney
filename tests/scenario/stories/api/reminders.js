@@ -165,6 +165,16 @@ const list = async () => {
     await App.scenario.runner.runGroup(Actions.list, data);
 };
 
+const upcoming = async () => {
+    setBlock('Upcoming reminders list', 2);
+
+    const data = [
+        {},
+    ];
+
+    await App.scenario.runner.runGroup(Actions.upcoming, data);
+};
+
 export const apiRemindersTests = {
     async confirmRemindersTests() {
         await confirmReminders();
@@ -189,6 +199,7 @@ export const apiRemindersTests = {
     async listTests() {
         await read();
         await list();
+        await upcoming();
     },
 
     async run() {

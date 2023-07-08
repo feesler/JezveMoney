@@ -108,3 +108,31 @@ export const list = async (params) => {
 
     return res;
 };
+
+/**
+ * Reads list of upcoming reminders
+ */
+export const upcoming = async (params) => {
+    let res = [];
+
+    await test(`Upcoming reminders (${formatProps(params)})`, async () => {
+        const { data: resExpected } = App.state.getUpcomingReminders(params);
+
+        let listRes;
+        try {
+            listRes = await api.reminder.upcoming(params);
+
+            assert.deepMeet(listRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = listRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
+};
