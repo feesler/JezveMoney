@@ -190,7 +190,12 @@ export class TransactionForm extends TestComponent {
                 model.src_curr_id = model.personAccount.curr_id;
                 model.dest_curr_id = model.personAccount.curr_id;
             } else if (fromReminder) {
-                const transaction = state.getDefaultReminderTransaction(fromReminder);
+                const transaction = isObject(fromReminder)
+                    ? state.getDefaultReminderTransactionBySchedule(
+                        fromReminder.schedule_id,
+                        fromReminder.date,
+                    )
+                    : state.getDefaultReminderTransaction(fromReminder);
                 assert(transaction, 'Invalid reminder');
 
                 Object.assign(
@@ -277,7 +282,7 @@ export class TransactionForm extends TestComponent {
             }
 
             if (model.type === LIMIT_CHANGE) {
-                model.state = 0;
+                model.state = (formType === SCHEDULE_ITEM_FORM) ? 1 : 0;
             }
         } else {
             model.state = -1;
@@ -540,13 +545,16 @@ export class TransactionForm extends TestComponent {
 
                 res.intervalStepRow = {
                     visible: repeatEnabled,
-                    value: model.intervalStep.toString(),
                     isInvalid: model.intervalStepInvalidated,
                 };
                 res.intervalTypeSelect = {
                     visible: repeatEnabled,
-                    value: model.intervalType.toString(),
                 };
+
+                if (repeatEnabled) {
+                    res.intervalStepRow.value = model.intervalStep.toString();
+                    res.intervalTypeSelect.value = model.intervalType.toString();
+                }
 
                 res.weekDayOffsetSelect = {
                     visible: repeatEnabled && model.intervalType === INTERVAL_WEEK,
@@ -1159,7 +1167,7 @@ export class TransactionForm extends TestComponent {
         if (res.isUpdate) {
             assert(res.id, 'Wrong transaction id');
         }
-        res.isReminder = location.includes('reminder_id=');
+        res.isReminder = location.includes('reminder_id=') || location.includes('schedule_id=');
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
@@ -1595,6 +1603,9 @@ export class TransactionForm extends TestComponent {
             if (!this.isValidDate(this.model.startDate)) {
                 return false;
             }
+        }
+
+        if (this.model.repeatEnabled) {
             if (this.model.endDate && !this.isValidDate(this.model.endDate)) {
                 return false;
             }
@@ -2322,19 +2333,26 @@ export class TransactionForm extends TestComponent {
             isValid = isValid && dateValid;
         }
 
+        let startDateValid = true;
+        let endDateValid = true;
+
         if (this.isScheduleItemForm() || this.model.repeatEnabled) {
-            const { startDate, endDate, intervalStep } = this.model;
+            const { startDate } = this.model;
+            startDateValid = this.isValidDate(startDate);
+            isValid = isValid && startDateValid;
+        }
 
-            const startDateValid = this.isValidDate(startDate);
-            const endDateValid = !endDate || this.isValidDate(endDate);
-
-            this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
+        if (this.model.repeatEnabled) {
+            const { endDate, intervalStep } = this.model;
+            endDateValid = !endDate || this.isValidDate(endDate);
 
             const intervalStepValid = parseInt(intervalStep, 10) > 0;
             this.model.intervalStepInvalidated = !intervalStepValid;
 
-            isValid = isValid && startDateValid && endDateValid && intervalStepValid;
+            isValid = isValid && endDateValid && intervalStepValid;
         }
+
+        this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
 
         const action = () => click(this.content.submitBtn);
 
@@ -2413,6 +2431,15 @@ export class TransactionForm extends TestComponent {
 
     async toggleEnableRepeat() {
         this.model.repeatEnabled = !this.model.repeatEnabled;
+        if (this.model.repeatEnabled) {
+            const type = INTERVAL_MONTH;
+            const startDate = App.parseDate(this.model.startDate);
+
+            this.model.intervalStep = 1;
+            this.model.intervalType = type;
+            this.model.intervalOffset = getIntervalOffset(new Date(startDate), type);
+        }
+
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.repeatSwitch.toggle());

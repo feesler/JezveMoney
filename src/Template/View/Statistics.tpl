@@ -62,9 +62,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-controls filters-controls">
-                                <button id="applyFiltersBtn" class="btn submit-btn" type="button"><?= __("actions.apply") ?></button>
-                            </div>
+                            <hr class="filters-separator">
                         </aside>
                     </header>
 

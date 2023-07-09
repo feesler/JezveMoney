@@ -79,6 +79,7 @@ const controllers = [
             { title: 'Update', formId: 'updateScheduledTrForm' },
             { title: 'Update debt', formId: 'updateScheduledDebtForm' },
             { title: 'Delete', formId: 'delScheduledTrForm' },
+            { title: 'Finish', formId: 'finishScheduledTrForm' },
         ],
     },
     {
@@ -87,6 +88,7 @@ const controllers = [
         methods: [
             { title: 'List', formId: 'listReminderForm' },
             { title: 'Read', formId: 'readReminderForm' },
+            { title: 'Upcoming', formId: 'upcomingRemindersForm' },
             { title: 'Confirm', formId: 'confirmReminderForm' },
             { title: 'Cancel', formId: 'cancelReminderForm' },
         ],

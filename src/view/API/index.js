@@ -272,6 +272,10 @@ export const API = {
             return apiPost('schedule/update', data);
         },
 
+        async finish(data) {
+            return apiPost('schedule/finish', data);
+        },
+
         async del(data) {
             return apiPost('schedule/delete', data);
         },
@@ -284,6 +288,10 @@ export const API = {
 
         async read(data) {
             return idsRequest('reminder/', data);
+        },
+
+        async upcoming(options = {}) {
+            return apiGet('reminder/upcoming', options);
         },
 
         async confirm(data) {

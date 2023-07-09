@@ -37,6 +37,7 @@ class State extends ApiController
         "categories" => "getCategories",
         "schedule" => "getSchedule",
         "reminders" => "getReminders",
+        "upcoming" => "getUpcomingReminders",
         "importtemplates" => "getImportTemplates",
         "importrules" => "getImportRules",
         "importconditions" => "getImportConditions",
@@ -184,6 +185,23 @@ class State extends ApiController
     }
 
     /**
+     * Returns upcoming reminders data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getUpcomingReminders(array $options = [])
+    {
+        $model = ScheduledTransactionModel::getInstance();
+
+        $res = new \stdClass();
+        $res->data = $model->getUpcomingReminders($options);
+
+        return $res;
+    }
+
+    /**
      * Returns import templates data for specified request
      *
      * @param array $options
@@ -284,6 +302,9 @@ class State extends ApiController
         $res->owner_id = $this->owner_id;
         $res->name = $person->name;
 
+        $reminderModel = ReminderModel::getInstance();
+        $res->remindersCount = $reminderModel->getScheduledCount();
+
         $settingsModel = UserSettingsModel::getInstance();
         $settings = $settingsModel->getSettings();
         $res->settings = $settings->getUserData();
@@ -381,6 +402,7 @@ class State extends ApiController
             "accounts" => [],
             "persons" => [],
             "transactions" => ["order" => "desc", "onPage" => 5],
+            "profile" => [],
         ]);
 
         // Statistics

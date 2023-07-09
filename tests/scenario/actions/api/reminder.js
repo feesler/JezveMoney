@@ -12,7 +12,7 @@ export const confirm = async (params) => {
     let result;
 
     await test(`Confirm reminder (${formatProps(params)})`, async () => {
-        const resExpected = App.state.confirmReminder(params);
+        const resExpected = App.state.confirmReminders(params);
 
         try {
             result = await api.reminder.confirm(params);
@@ -37,7 +37,7 @@ export const cancel = async (params) => {
     let result;
 
     await test(`Cancel reminder (${formatProps(params)})`, async () => {
-        const resExpected = App.state.cancelReminder(params);
+        const resExpected = App.state.cancelReminders(params);
 
         try {
             result = await api.reminder.cancel(params);
@@ -94,6 +94,34 @@ export const list = async (params) => {
         let listRes;
         try {
             listRes = await api.reminder.list(params);
+            assert.deepMeet(listRes, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        res = listRes ?? resExpected;
+
+        return App.state.fetchAndTest();
+    });
+
+    return res;
+};
+
+/**
+ * Reads list of upcoming reminders
+ */
+export const upcoming = async (params) => {
+    let res = [];
+
+    await test(`Upcoming reminders (${formatProps(params)})`, async () => {
+        const { data: resExpected } = App.state.getUpcomingReminders(params);
+
+        let listRes;
+        try {
+            listRes = await api.reminder.upcoming(params);
+
             assert.deepMeet(listRes, resExpected);
         } catch (e) {
             if (!(e instanceof ApiRequestError) || resExpected) {

@@ -1,19 +1,37 @@
-import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { ReminderList } from '../../Models/ReminderList.js';
+import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../Models/Reminder.js';
+
+export const getStateFilter = (state) => (
+    state?.filter?.state ?? REMINDER_SCHEDULED
+);
+
+export const getItemsSource = (state) => (
+    (getStateFilter(state) === REMINDER_UPCOMING)
+        ? (state.upcomingItems ?? [])
+        : App.model.reminders.data
+);
 
 export const createList = (items, state) => {
-    const stateFilter = asArray(state?.filter?.state);
+    const stateFilter = getStateFilter(state);
 
-    const res = (stateFilter.length > 0)
-        ? items.filter((item) => stateFilter.includes(item?.state))
-        : items;
+    const res = items.filter((item) => stateFilter === item?.state);
 
-    return ReminderList.create(res);
+    const list = ReminderList.create(res);
+    if (stateFilter === REMINDER_UPCOMING) {
+        list.sortByDateAsc();
+    }
+
+    return list;
 };
+
+const upcomingId = (item, index) => ({
+    ...item,
+    id: `u${index}`,
+});
 
 // Reducers
 const reduceDeselectAll = (state) => ({
@@ -22,11 +40,11 @@ const reduceDeselectAll = (state) => ({
 });
 
 export const updateList = (state) => {
-    const { reminders } = App.model;
     const result = state;
     const { pagination } = result;
 
-    const items = createList(reminders.data, state);
+    const itemsSource = getItemsSource(state);
+    const items = createList(itemsSource, state);
     result.items = items;
 
     pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
@@ -62,7 +80,7 @@ const slice = createSlice({
     ),
 
     showMenu: (state) => (
-        (state.showMenu) ? state : { ...state, showMenu: true }
+        (state.showMenu) ? state : { ...state, showMenu: true, showContextMenu: false }
     ),
 
     hideMenu: (state) => (
@@ -72,25 +90,22 @@ const slice = createSlice({
     showContextMenu: (state, itemId) => (
         (state.contextItem === itemId && state.showContextMenu)
             ? state
-            : { ...state, contextItem: itemId, showContextMenu: true }
+            : {
+                ...state,
+                contextItem: itemId,
+                showContextMenu: true,
+                showMenu: false,
+            }
     ),
 
     hideContextMenu: (state) => (
         (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
 
-    toggleSelectItem: (state, itemId) => {
-        const item = App.model.reminders.getItem(itemId);
-        if (!item) {
-            return state;
-        }
-
-        const toggleItem = reduceToggleItem(itemId);
-        return {
-            ...state,
-            items: state.items.map(toggleItem),
-        };
-    },
+    toggleSelectItem: (state, itemId) => ({
+        ...state,
+        items: state.items.map(reduceToggleItem(itemId)),
+    }),
 
     selectAllItems: (state) => ({
         ...state,
@@ -162,11 +177,16 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    listRequestLoaded: (state, keepState) => ({
+    listRequestLoaded: (state, { upcoming, keepState }) => updateList({
         ...state,
-        items: createList(App.model.reminders, state),
+        upcomingItems: (upcoming) ? upcoming.map(upcomingId) : state.upcomingItems,
         listMode: (keepState) ? state.listMode : 'list',
         contextItem: null,
+    }),
+
+    upcomingItemsLoaded: (state, items) => updateList({
+        ...state,
+        upcomingItems: items.map(upcomingId),
     }),
 });
 

@@ -538,6 +538,15 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
+        const finishForm = ItemIdsForm.create({
+            id: 'finishScheduledTrForm',
+            title: 'Finish scheduled transactions',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('schedule/finish'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+
         this.formsContainer.append(
             listForm.elem,
             readForm.elem,
@@ -546,6 +555,7 @@ class AdminApiConsoleView extends AdminView {
             updateForm.elem,
             updateDebtForm.elem,
             delForm.elem,
+            finishForm.elem,
         );
     }
 
@@ -555,6 +565,13 @@ class AdminApiConsoleView extends AdminView {
             id: 'listReminderForm',
             title: 'List reminders',
             onSubmit: this.getVerifyHandler(apiTypes.isRemindersArray),
+        });
+
+        const upcomingForm = ApiRequestForm.create({
+            id: 'upcomingRemindersForm',
+            title: 'Upcoming reminders',
+            action: this.getRequestURL('reminder/upcoming'),
+            onSubmit: this.getVerifyHandler(apiTypes.isUpcomingRemindersArray),
         });
 
         const readForm = ItemIdsForm.create({
@@ -595,6 +612,7 @@ class AdminApiConsoleView extends AdminView {
         this.formsContainer.append(
             listForm.elem,
             readForm.elem,
+            upcomingForm.elem,
             confirmForm.elem,
             cancelForm.elem,
         );

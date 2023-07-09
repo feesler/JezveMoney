@@ -42,6 +42,16 @@ export class RemindersList extends List {
         return new Reminder(obj);
     }
 
+    isSameItemExist(reminder) {
+        const options = {
+            schedule_id: reminder.schedule_id,
+            date: reminder.date,
+        };
+
+        const res = RemindersList.filterItems(this.data, options);
+        return res.length > 0;
+    }
+
     /**
      * Returns reminder confirmed with specified transactions
      * @param {Number} transactionId transaction id
@@ -132,17 +142,25 @@ export class RemindersList extends List {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = structuredClone(list);
+        const res = list;
 
         if (desc) {
-            return res.sort((a, b) => b.date - a.date);
+            return res.sort((a, b) => (
+                (a.date === b.date)
+                    ? (b.schedule_id - a.schedule_id)
+                    : (b.date - a.date)
+            ));
         }
 
-        return res.sort((a, b) => a.date - b.date);
+        return res.sort((a, b) => (
+            (a.date === b.date)
+                ? (a.schedule_id - b.schedule_id)
+                : (a.date - b.date)
+        ));
     }
 
-    sort() {
-        this.data = this.sortItems(this.data, true);
+    sort(desc = true) {
+        this.data = this.sortItems(this.data, desc);
     }
 
     sortAsc() {

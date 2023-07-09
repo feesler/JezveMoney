@@ -16,6 +16,7 @@ import {
     TRANSFER,
     DEBT,
     LIMIT_CHANGE,
+    Transaction,
 } from '../../Models/Transaction.js';
 
 import { Field } from '../Fields/Field/Field.js';
@@ -36,6 +37,7 @@ const DATE_COMMENT_CLASS = 'trans-item__date-comment';
 const DETAILS_CLASS = 'trans-item_details';
 const COLUMN_CLASS = 'trans-item__column';
 /* Fields */
+const TYPE_FIELD_CLASS = 'trans-item__type-field';
 const TITLE_FIELD_CLASS = 'trans-item__account-field';
 const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
 const RESULT_FIELD_CLASS = 'trans-item__result-field';
@@ -117,6 +119,11 @@ export class TransactionListItem extends Component {
     }
 
     initDetails() {
+        // Type
+        this.typeField = Field.create({
+            title: __('transactions.type'),
+            className: TYPE_FIELD_CLASS,
+        });
         // Accounts
         this.sourceField = Field.create({
             title: __('transactions.source'),
@@ -192,6 +199,7 @@ export class TransactionListItem extends Component {
         });
 
         this.contentElem.append(
+            this.typeField.elem,
             sourceDestGroup,
             amountResultGroup,
             dateCategoryGroup,
@@ -205,6 +213,7 @@ export class TransactionListItem extends Component {
         this.titleElem = null;
         this.amountElem = null;
         // Details mode elements
+        this.typeField = null;
         this.sourceField = null;
         this.destField = null;
         this.srcAmountField = null;
@@ -413,6 +422,9 @@ export class TransactionListItem extends Component {
     renderDetails(state) {
         const { item } = state;
         const { currency } = App.model;
+
+        // Type
+        this.typeField.setContent(Transaction.getTypeTitle(item.type));
 
         // Source
         const showSource = (item.src_id !== 0);

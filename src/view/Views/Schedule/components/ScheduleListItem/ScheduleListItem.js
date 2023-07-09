@@ -15,6 +15,7 @@ import {
     TRANSFER,
     DEBT,
     LIMIT_CHANGE,
+    Transaction,
 } from '../../../../Models/Transaction.js';
 import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
 
@@ -39,11 +40,14 @@ const AMOUNT_CATEGORY_CLASS = 'schedule-item__amount-category';
 /* Details mode */
 const DETAILS_CLASS = 'schedule-item_details';
 const COLUMN_CLASS = 'schedule-item__column';
+const SCHEDULE_ROW_CLASS = 'schedule-item__schedule-row';
+const MAIN_ROW_CLASS = 'schedule-item__main-row';
 /* Fields */
 const START_DATE_FIELD_CLASS = 'schedule-item__start-date-field';
 const END_DATE_FIELD_CLASS = 'schedule-item__end-date-field';
 const INTERVAL_FIELD_CLASS = 'schedule-item__interval-field';
 const OFFSET_FIELD_CLASS = 'schedule-item__offset-field';
+const TYPE_FIELD_CLASS = 'schedule-item__type-field';
 const TITLE_FIELD_CLASS = 'schedule-item__account-field';
 const AMOUNT_FIELD_CLASS = 'schedule-item__amount-field';
 const CATEGORY_FIELD_CLASS = 'schedule-item__category-field';
@@ -152,6 +156,11 @@ export class ScheduleListItem extends Component {
             content: this.endDateElem,
             className: END_DATE_FIELD_CLASS,
         });
+        const dateRangeGroup = createElement('div', {
+            props: { className: COLUMN_CLASS },
+            children: [this.startDateField.elem, this.endDateField.elem],
+        });
+
         // Interval
         this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
         this.intervalField = Field.create({
@@ -166,18 +175,25 @@ export class ScheduleListItem extends Component {
             content: this.offsetElem,
             className: OFFSET_FIELD_CLASS,
         });
+        const intervalGroup = createElement('div', {
+            props: { className: COLUMN_CLASS },
+            children: [this.intervalField.elem, this.offsetField.elem],
+        });
 
         const scheduleGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
+            props: { className: SCHEDULE_ROW_CLASS },
             children: [
-                this.startDateField.elem,
-                this.endDateField.elem,
-                this.intervalField.elem,
-                this.offsetField.elem,
+                dateRangeGroup,
+                intervalGroup,
             ],
         });
 
         // Main content
+        // Type
+        this.typeField = Field.create({
+            title: __('transactions.type'),
+            className: TYPE_FIELD_CLASS,
+        });
         // Accounts
         this.sourceField = Field.create({
             title: __('transactions.source'),
@@ -221,8 +237,9 @@ export class ScheduleListItem extends Component {
         });
 
         const transactionGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
+            props: { className: MAIN_ROW_CLASS },
             children: [
+                this.typeField.elem,
                 sourceDestGroup,
                 amountGroup,
                 this.categoryField.elem,
@@ -242,6 +259,7 @@ export class ScheduleListItem extends Component {
         this.titleElem = null;
         this.amountElem = null;
         // Details mode elements
+        this.typeField = null;
         this.sourceField = null;
         this.destField = null;
         this.srcAmountField = null;
@@ -487,6 +505,9 @@ export class ScheduleListItem extends Component {
         this.offsetField.setContent(item.renderIntervalOffset());
 
         // Transaction
+        // Type
+        this.typeField.setContent(Transaction.getTypeTitle(item.type));
+
         // Source
         const showSource = (item.src_id !== 0);
         if (showSource) {

@@ -28,6 +28,7 @@ import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
+    REMINDER_UPCOMING,
     Reminder,
 } from '../model/Reminder.js';
 
@@ -53,6 +54,7 @@ export class ReminderListView extends AppView {
         const stateFilter = parseInt(model.filter.state, 10);
         const isConfirmed = stateFilter === REMINDER_CONFIRMED;
         const isCancelled = stateFilter === REMINDER_CANCELLED;
+        const isUpcoming = stateFilter === REMINDER_UPCOMING;
 
         const list = this.getExpectedList(model);
 
@@ -103,13 +105,22 @@ export class ReminderListView extends AppView {
         }
 
         if (model.contextMenuVisible) {
-            const contextItem = App.view.items.getItem(model.contextItem);
+            const sourceItems = App.view.getSourceItems(model);
+            let contextItem = null;
+            if (isUpcoming) {
+                const strId = model.contextItem?.toString();
+                const index = model.list.items.findIndex((item) => item?.id?.toString() === strId);
+                const absIndex = App.view.getAbsoluteIndex(index, model);
+                contextItem = sourceItems.getItemByIndex(absIndex);
+            } else {
+                contextItem = sourceItems.getItem(model.contextItem);
+            }
             assert(contextItem, 'Context item not found');
 
             res.contextMenu = {
                 visible: true,
-                itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
+                itemId: model.contextItem.toString(),
+                ctxDetailsBtn: { visible: contextItem.state !== REMINDER_UPCOMING },
                 ctxUpdateBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
                 ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
                 ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
@@ -134,12 +145,13 @@ export class ReminderListView extends AppView {
     static getExpectedList(model, state = App.state) {
         const onPage = App.config.transactionsOnPage;
         const { page, range } = model.list;
+        const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
 
         let items = [];
-        const filteredItems = this.getFilteredItems(model);
 
         if (page !== 0) {
-            const pageItems = filteredItems.getPage(page, onPage, range, true);
+            const filteredItems = this.getFilteredItems(model);
+            const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
             items = pageItems.data;
         }
 
@@ -149,7 +161,13 @@ export class ReminderListView extends AppView {
     static getFilteredItems(model) {
         assert.instanceOf(App.view, ReminderListView, 'Invalid view');
 
-        return App.view.items.applyFilter(model.filter);
+        const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
+        const sourceItems = App.view.getSourceItems(model);
+
+        const list = sourceItems.applyFilter(model.filter);
+        list.sort(!isUpcoming);
+
+        return list;
     }
 
     static getSelectedItems(model = this.model) {
@@ -165,6 +183,7 @@ export class ReminderListView extends AppView {
         super(...args);
 
         this.items = null;
+        this.upcomingItems = null;
     }
 
     get listMenu() {
@@ -202,9 +221,7 @@ export class ReminderListView extends AppView {
         if (res.contextMenu?.elem) {
             res.contextMenu.content.itemId = await evaluate((menuEl) => {
                 const contextParent = menuEl?.closest('.reminder-item');
-                return (contextParent)
-                    ? parseInt(contextParent.dataset.id, 10)
-                    : null;
+                return contextParent?.dataset.id ?? null;
             }, res.contextMenu.elem);
         }
 
@@ -235,7 +252,7 @@ export class ReminderListView extends AppView {
         const res = {
             locale: cont.locale,
             filter: {},
-            contextItem: cont.contextMenu?.content?.itemId,
+            contextItem: cont.contextMenu?.content?.itemId?.toString(),
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible: cont.contextMenu?.visible,
@@ -271,7 +288,7 @@ export class ReminderListView extends AppView {
         }
 
         const reminderState = parseInt(cont.stateMenu.value, 10);
-        assert(Reminder.availStates.includes(reminderState), 'Invalid reminder state');
+        assert(Reminder.allStates.includes(reminderState), 'Invalid reminder state');
         res.filter.state = reminderState;
 
         if (cont.modeSelector?.link) {
@@ -298,28 +315,28 @@ export class ReminderListView extends AppView {
 
     updateModelFilter(model) {
         const res = this.cloneModel(model);
-        const range = 1;
+        const isUpcoming = (res.filter.state === REMINDER_UPCOMING);
 
         const filteredItems = this.getFilteredItems(model);
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
-            const pageItems = filteredItems.getPage(1, onPage, range, true);
+            const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
             const { items } = TransactionRemindersList.render(pageItems.data, App.state);
 
             res.list = {
                 page: 1,
                 pages: filteredItems.expectedPages(),
                 items,
-                range,
             };
         } else {
             res.list = {
                 page: 0,
                 pages: 0,
                 items: [],
-                range,
             };
         }
+
+        res.list.range = 1;
 
         return res;
     }
@@ -330,12 +347,15 @@ export class ReminderListView extends AppView {
     }
 
     getItems() {
-        return this.items.data;
+        return this.getSourceItems().data;
     }
 
     loadReminders(state = App.state) {
         this.items = state.reminders.clone();
         this.items.sort();
+
+        this.upcomingItems = state.getUpcomingReminders();
+        this.upcomingItems.sort(false);
     }
 
     currentPage(model = this.model) {
@@ -348,6 +368,14 @@ export class ReminderListView extends AppView {
 
     pagesCount(model = this.model) {
         return model.list.pages;
+    }
+
+    getAbsoluteIndex(index, model = this.model) {
+        const ind = parseInt(index, 10);
+        const onPage = App.config.transactionsOnPage;
+        const { page } = model.list;
+
+        return (page - 1) * onPage + ind;
     }
 
     isFirstPage() {
@@ -363,11 +391,14 @@ export class ReminderListView extends AppView {
 
         const res = this.cloneModel(model);
         const onPage = App.config.transactionsOnPage;
+        const isUpcoming = res.filter.state === REMINDER_UPCOMING;
         const range = 1;
 
         res.list.page = page;
         res.list.range = range;
-        const pageItems = this.items.getPage(page, onPage, range, true);
+
+        const filteredItems = this.getFilteredItems(model);
+        const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
         const { items } = TransactionRemindersList.render(pageItems.data, App.state);
         res.list.items = items;
 
@@ -388,10 +419,11 @@ export class ReminderListView extends AppView {
 
         const res = this.cloneModel(model);
         const onPage = App.config.transactionsOnPage;
+        const isUpcoming = res.filter.state === REMINDER_UPCOMING;
 
         res.list.range = range;
         const filteredItems = this.getFilteredItems(model);
-        const pageItems = filteredItems.getPage(model.list.page, onPage, range, true);
+        const pageItems = filteredItems.getPage(model.list.page, onPage, range, !isUpcoming);
         const { items } = TransactionRemindersList.render(pageItems.data, App.state);
         res.list.items = items;
 
@@ -400,6 +432,40 @@ export class ReminderListView extends AppView {
 
     onRangeChanged(range) {
         this.model = this.setModelRange(this.model, range);
+        return this.getExpectedState();
+    }
+
+    onListUpdated(model = this.model) {
+        const res = this.cloneModel(model);
+        const isUpcoming = (res.filter.state === REMINDER_UPCOMING);
+
+        const filteredItems = this.getFilteredItems(model);
+        if (filteredItems.length > 0) {
+            const onPage = App.config.transactionsOnPage;
+            const pages = filteredItems.expectedPages();
+            const page = Math.min(model.list.page, pages);
+            const range = Math.min(model.list.range, pages - page + 1);
+
+            const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
+            const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+
+            res.list = {
+                page,
+                pages,
+                items,
+                range,
+            };
+        } else {
+            res.list = {
+                page: 0,
+                pages: 0,
+                items: [],
+                range: 1,
+            };
+        }
+
+        this.model = res;
+
         return this.getExpectedState();
     }
 
@@ -458,12 +524,37 @@ export class ReminderListView extends AppView {
         return res.toString();
     }
 
+    getSourceItems(model = this.model) {
+        const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
+        return (isUpcoming) ? this.upcomingItems : this.items;
+    }
+
+    setSourceItems(items, model = this.model) {
+        const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
+        const list = RemindersList.create(items);
+
+        if (isUpcoming) {
+            this.upcomingItems = list;
+        } else {
+            this.items = list;
+        }
+    }
+
     getFilteredItems(model = this.model) {
         return ReminderListView.getFilteredItems(model);
     }
 
     getExpectedState(model = this.model) {
         return ReminderListView.getExpectedState(model);
+    }
+
+    async waitForLoad() {
+        await waitForFunction(async () => {
+            await this.parse();
+            return !!this.model.renderTime;
+        });
+
+        await this.parse();
     }
 
     async waitForList(action) {
@@ -517,7 +608,11 @@ export class ReminderListView extends AppView {
 
     async filterByState(state, directNavigate = false) {
         const stateType = parseInt(state, 10);
-        assert(Reminder.availStates.includes(stateType), 'Invalid reminder state');
+        assert(Reminder.allStates.includes(stateType), 'Invalid reminder state');
+
+        if (this.model.filter.state === stateType && !directNavigate) {
+            return true;
+        }
 
         if (directNavigate) {
             this.model.filtersVisible = false;
@@ -530,8 +625,9 @@ export class ReminderListView extends AppView {
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
+            await App.view.waitForLoad();
         } else {
-            await this.performAction(() => this.content.stateMenu.selectItemByValue(state));
+            await this.waitForList(() => this.content.stateMenu.selectItemByValue(state));
         }
 
         return App.view.checkState(expected);
@@ -635,6 +731,8 @@ export class ReminderListView extends AppView {
 
         assert.arrayIndex(this.model.list.items, num, 'Invalid transaction index');
 
+        const isUpcoming = (this.model.filter.state === REMINDER_UPCOMING);
+
         const item = this.content.remindersList.items[num];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
@@ -643,7 +741,8 @@ export class ReminderListView extends AppView {
 
         await this.performAction(async () => {
             await item.clickMenu();
-            return wait('#ctxDetailsBtn', { visible: true });
+            const selector = (isUpcoming) ? '#ctxCancelBtn' : '#ctxDetailsBtn';
+            return wait(selector, { visible: true });
         });
 
         return this.checkState(expected);
@@ -759,17 +858,33 @@ export class ReminderListView extends AppView {
 
         await this.setSelectMode();
 
+        const isUpcoming = (this.model.filter.state === REMINDER_UPCOMING);
+
         const transactions = asArray(data);
         for (const num of transactions) {
             assert.arrayIndex(this.content.remindersList.items, num);
 
-            const { id } = this.model.list.items[num];
-            const item = this.items.getItem(id);
+            const sourceItems = this.getSourceItems();
 
-            this.items.update({
-                ...item,
-                selected: !item.selected,
-            });
+            if (isUpcoming) {
+                const absIndex = this.getAbsoluteIndex(num);
+                const item = sourceItems.getItemByIndex(absIndex);
+                assert(item, 'Item not found');
+
+                sourceItems.updateByIndex({
+                    ...item,
+                    selected: !item.selected,
+                }, absIndex);
+            } else {
+                const { id } = this.model.list.items[num];
+                const item = sourceItems.getItem(id);
+                assert(item, 'Item not found');
+
+                sourceItems.update({
+                    ...item,
+                    selected: !item.selected,
+                });
+            }
 
             const expected = this.getExpectedState();
 
@@ -786,7 +901,9 @@ export class ReminderListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.items = RemindersList.create(this.items.map(selectItem));
+        const sourceItems = this.getSourceItems();
+        this.setSourceItems(sourceItems.map(selectItem));
+
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.listMenu.select('selectAllBtn'));
@@ -802,7 +919,9 @@ export class ReminderListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.items = RemindersList.create(this.items.map(deselectItem));
+        const sourceItems = this.getSourceItems();
+        this.setSourceItems(sourceItems.map(deselectItem));
+
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.listMenu.select('deselectAllBtn'));
@@ -862,21 +981,38 @@ export class ReminderListView extends AppView {
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
-    getFilteredIdsByIndexes(index) {
-        return this.getFilteredItems().indexesToIds(index);
+    getFilteredIdsByIndexes(index, model = this.model) {
+        return this.getFilteredItems(model).indexesToIds(index);
+    }
+
+    getRequestData(index, model = this.model) {
+        const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
+        const filteredItems = this.getFilteredItems(model);
+        if (isUpcoming) {
+            const items = filteredItems.getItemsByIndexes(index);
+            return {
+                upcoming: items.map((item) => ({
+                    schedule_id: item.schedule_id,
+                    date: item.date,
+                })),
+            };
+        }
+
+        const id = filteredItems.indexesToIds(index);
+        return { id };
     }
 
     /** Confirms specified transaction from context menu */
     async confirmFromContextMenu(index) {
         await this.openContextMenu(index);
 
-        const id = this.getFilteredIdsByIndexes(index);
-        App.state.confirmReminders({ id });
+        const request = this.getRequestData(index);
+        App.state.confirmReminders(request);
         this.loadReminders();
 
         this.model.contextMenuVisible = false;
         this.model.contextItem = null;
-        const expected = this.getExpectedState();
+        const expected = this.onListUpdated();
 
         await this.waitForList(() => this.contextMenu.select('ctxConfirmBtn'));
 
@@ -887,13 +1023,13 @@ export class ReminderListView extends AppView {
     async cancelFromContextMenu(index) {
         await this.openContextMenu(index);
 
-        const id = this.getFilteredIdsByIndexes(index);
-        App.state.cancelReminders({ id });
+        const request = this.getRequestData(index);
+        App.state.cancelReminders(request);
         App.view.loadReminders();
 
         this.model.contextMenuVisible = false;
         this.model.contextItem = null;
-        const expected = this.getExpectedState();
+        const expected = this.onListUpdated();
 
         await this.waitForList(() => this.contextMenu.select('ctxCancelBtn'));
 
@@ -906,14 +1042,14 @@ export class ReminderListView extends AppView {
 
         await this.openListMenu();
 
-        const id = this.getFilteredIdsByIndexes(items);
-        const confirmRes = App.state.confirmReminders({ id });
+        const request = this.getRequestData(items);
+        const confirmRes = App.state.confirmReminders(request);
         assert(confirmRes, 'Failed to confirm reminders');
         this.loadReminders(App.state);
 
         this.model.listMenuVisible = false;
         this.model.listMode = 'list';
-        const expected = this.getExpectedState();
+        const expected = this.onListUpdated();
 
         await this.waitForList(() => this.listMenu.select('confirmBtn'));
 
@@ -926,13 +1062,13 @@ export class ReminderListView extends AppView {
 
         await this.openListMenu();
 
-        const id = this.getFilteredIdsByIndexes(items);
-        App.state.cancelReminders({ id });
+        const request = this.getRequestData(items);
+        App.state.cancelReminders(request);
         App.view.loadReminders();
 
         this.model.listMenuVisible = false;
         this.model.listMode = 'list';
-        const expected = this.getExpectedState();
+        const expected = this.onListUpdated();
 
         await this.waitForList(() => this.listMenu.select('cancelBtn'));
 

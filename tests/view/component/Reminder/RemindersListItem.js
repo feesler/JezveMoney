@@ -19,7 +19,7 @@ export class RemindersListItem extends TestComponent {
         const res = await evaluate((elem, expenseType, incomeType) => {
             const detailsMode = elem.classList.contains('reminder-item_details');
             const item = {
-                id: parseInt(elem.dataset.id, 10),
+                id: elem.dataset.id,
                 type: parseInt(elem.dataset.type, 10),
                 selected: elem.classList.contains('reminder-item_selected'),
                 detailsMode,

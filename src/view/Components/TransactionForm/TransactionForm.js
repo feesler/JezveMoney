@@ -217,7 +217,9 @@ export class TransactionForm extends Component {
                 }
             }
         } else if (transaction.type === LIMIT_CHANGE) {
-            initialState.id = STATE.L_RESULT;
+            initialState.id = (isScheduleItem)
+                ? STATE.L_AMOUNT
+                : STATE.L_RESULT;
 
             if (transaction.src_id !== 0) {
                 initialState.destAccount = initialState.srcAccount;
@@ -1264,6 +1266,9 @@ export class TransactionForm extends Component {
 
         if (transaction.reminder_id) {
             res.reminder_id = transaction.reminder_id;
+        } else if (transaction.schedule_id) {
+            res.schedule_id = transaction.schedule_id;
+            res.reminder_date = transaction.reminder_date;
         }
 
         if (res.type === DEBT) {
@@ -2059,7 +2064,8 @@ export class TransactionForm extends Component {
         }));
 
         // 'Repeat transaction' Switch field
-        this.repeatSwitchField.show(!transaction.reminder_id);
+        const isConfirmReminder = transaction.reminder_id || transaction.schedule_id;
+        this.repeatSwitchField.show(!isConfirmReminder);
         const intervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = (intervalType !== INTERVAL_NONE);
         this.repeatSwitch.check(isRepeat);

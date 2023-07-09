@@ -315,6 +315,41 @@ export const updateAndSubmit = async (pos, actions) => {
     await submit();
 };
 
+export const finishFromContextMenu = async (index) => {
+    await test(`Finish scheduled transaction from context menu [${index}]`, async () => {
+        await checkNavigation();
+        await App.view.finishFromContextMenu(index);
+
+        const id = App.state.schedule.indexesToIds(index);
+        App.state.finishScheduledTransaction({ id });
+        App.view.loadScheduleItems();
+
+        const expected = App.view.getExpectedState();
+        App.view.checkState(expected);
+
+        return App.state.fetchAndTest();
+    });
+};
+
+export const finish = async (index) => {
+    const indexes = asArray(index);
+
+    await test(`Finish scheduled transaction [${indexes.join()}]`, async () => {
+        await checkNavigation();
+
+        await App.view.finishItems(index);
+
+        const id = App.state.schedule.indexesToIds(index);
+        App.state.finishScheduledTransaction({ id });
+        App.view.loadScheduleItems();
+
+        const expected = App.view.getExpectedState();
+        App.view.checkState(expected);
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const deleteFromContextMenu = async (index) => {
     await test(`Delete scheduled transaction from context menu [${index}]`, async () => {
         await checkNavigation();

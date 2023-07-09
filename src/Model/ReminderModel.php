@@ -10,6 +10,7 @@ use JezveMoney\App\Item\ReminderItem;
 use function JezveMoney\Core\inSetCondition;
 
 // Reminder state
+define("REMINDER_UPCOMING", 0);
 define("REMINDER_SCHEDULED", 1);
 define("REMINDER_CONFIRMED", 2);
 define("REMINDER_CANCELLED", 3);
@@ -28,6 +29,7 @@ class ReminderModel extends CachedTable
     ];
 
     public static $stateNames = [
+        REMINDER_UPCOMING => "upcoming",
         REMINDER_SCHEDULED => "scheduled",
         REMINDER_CONFIRMED => "confirmed",
         REMINDER_CANCELLED => "cancelled",
@@ -401,21 +403,37 @@ class ReminderModel extends CachedTable
     }
 
     /**
+     * Returns count of scheduled reminders
+     *
+     * @return int
+     */
+    public function getScheduledCount()
+    {
+        if (!self::$user_id) {
+            return 0;
+        }
+
+        return $this->dbObj->countQ(
+            $this->tbl_name,
+            [
+                "user_id=" . self::$user_id,
+                "state=" . REMINDER_SCHEDULED,
+            ],
+        );
+    }
+
+    /**
      * Returns default transaction for specified reminder
      *
-     * @param int $item_id item id
+     * @param int $schedule_id scheduled transaction id
+     * @param int $date date
      *
      * @return array
      */
-    public function getDefaultTransaction(int $item_id)
+    public function getDefaultTransactionBySchedule(int $schedule_id, int $date)
     {
-        $item = $this->getItem($item_id);
-        if (!$item) {
-            throw new \Error("Invalid reminder");
-        }
-
         $scheduleModel = ScheduledTransactionModel::getInstance();
-        $schedule = $scheduleModel->getItem($item->schedule_id);
+        $schedule = $scheduleModel->getItem($schedule_id);
         if (!$schedule) {
             throw new \Error("Invalid schedule_id");
         }
@@ -429,11 +447,28 @@ class ReminderModel extends CachedTable
             "src_curr" => $schedule->src_curr,
             "dest_curr" => $schedule->dest_curr,
             "category_id" => $schedule->category_id,
-            "date" => $item->date,
+            "date" => $date,
             "comment" => $schedule->comment,
         ];
 
         return $res;
+    }
+
+    /**
+     * Returns default transaction for specified reminder
+     *
+     * @param int $item_id item id
+     *
+     * @return array
+     */
+    public function getDefaultTransaction(int $item_id)
+    {
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Invalid reminder");
+        }
+
+        return $this->getDefaultTransactionBySchedule($item->schedule_id, $item->date);
     }
 
     /**
@@ -485,6 +520,59 @@ class ReminderModel extends CachedTable
     }
 
     /**
+     * Creates 'Confirmed' reminder(s)
+     *
+     * @param mixed $upcoming upcoming reminder or array of
+     * @param array $request request data
+     *
+     * @return bool
+     */
+    public function confirmUpcoming(mixed $upcoming, array $request)
+    {
+        $upcoming = (is_array($upcoming) && isset($upcoming["schedule_id"]))
+            ? [$upcoming]
+            : asArray($upcoming);
+
+        if (count($upcoming) === 0) {
+            throw new \Error(__("errors.invalidRequestData"));
+        }
+
+        if (count($upcoming) > 1 && isset($request["transaction_id"])) {
+            throw new \Error(__("reminders.errors.sameTransaction"));
+        }
+
+        foreach ($upcoming as $item) {
+            if (!is_array($item) || !isset($item["schedule_id"]) || !isset($item["date"])) {
+                throw new \Error("Invalid upcoming reminder data");
+            }
+
+            if (isset($request["transaction_id"])) {
+                $transaction_id = $request["transaction_id"];
+            } else {
+                $transaction = $this->getDefaultTransactionBySchedule($item["schedule_id"], $item["date"]);
+
+                $transactionModel = TransactionModel::getInstance();
+                $transaction_id = $transactionModel->create($transaction);
+                if (!$transaction_id) {
+                    throw new \Error("Failed to create transaction");
+                }
+            }
+
+            $createRes = $this->create([
+                "schedule_id" => $item["schedule_id"],
+                "date" => $item["date"],
+                "state" => REMINDER_CONFIRMED,
+                "transaction_id" => $transaction_id,
+            ]);
+            if (!$createRes) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Changes state of reminder to 'Cancelled'
      *
      * @param mixed $ids reminder id or array of ids
@@ -509,6 +597,42 @@ class ReminderModel extends CachedTable
             }
 
             $res = $this->update($item_id, [
+                "state" => REMINDER_CANCELLED,
+                "transaction_id" => 0,
+            ]);
+            if (!$res) {
+                throw new \Error("Failed to cancel reminder");
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Changes state of reminder to 'Cancelled'
+     *
+     * @param mixed $upcoming upcoming reminder or array of
+     *
+     * @return bool
+     */
+    public function cancelUpcoming(mixed $upcoming)
+    {
+        $upcoming = (is_array($upcoming) && isset($upcoming["schedule_id"]))
+            ? [$upcoming]
+            : asArray($upcoming);
+
+        if (count($upcoming) === 0) {
+            throw new \Error(__("errors.invalidRequestData"));
+        }
+
+        foreach ($upcoming as $item) {
+            if (!is_array($item) || !isset($item["schedule_id"]) || !isset($item["date"])) {
+                throw new \Error("Invalid upcoming reminder data");
+            }
+
+            $res = $this->create([
+                "schedule_id" => $item["schedule_id"],
+                "date" => $item["date"],
                 "state" => REMINDER_CANCELLED,
                 "transaction_id" => 0,
             ]);

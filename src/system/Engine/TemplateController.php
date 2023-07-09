@@ -5,6 +5,7 @@ namespace JezveMoney\Core;
 use JezveMoney\Core\Controller;
 use JezveMoney\App\Model\UserModel;
 use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\UserSettingsModel;
 
 /**
@@ -193,11 +194,14 @@ abstract class TemplateController extends Controller
             return null;
         }
 
+        $reminderModel = ReminderModel::getInstance();
+
         return [
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
             "settings" => $this->getSettings(),
+            "remindersCount" => $reminderModel->getScheduledCount(),
         ];
     }
 

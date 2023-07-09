@@ -4,6 +4,7 @@ import { App } from '../../Application.js';
 import {
     DEBT,
     INCOME,
+    LIMIT_CHANGE,
     TRANSFER,
 } from '../../model/Transaction.js';
 import {
@@ -41,6 +42,8 @@ export class ScheduleStory extends TestStory {
         await this.create();
         await this.list();
         await this.update();
+        await this.finishFromContextMenu();
+        await this.finish();
         await this.deleteFromContextMenu();
         await this.del();
         await this.deleteFromUpdate();
@@ -74,6 +77,10 @@ export class ScheduleStory extends TestStory {
 
     async create() {
         setBlock('Create scheduled transaction', 1);
+
+        const {
+            CREDIT_CARD,
+        } = App.scenario;
 
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '1000' },
@@ -141,7 +148,10 @@ export class ScheduleStory extends TestStory {
             { action: 'selectWeekDayOffset', data: [] },
         ]);
         await Actions.createAndSubmit([
+            { action: 'changeSrcAccount', data: CREDIT_CARD },
+            { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'inputDestAmount', data: '9' },
+            { action: 'toggleEnableRepeat' },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '10' },
@@ -165,6 +175,33 @@ export class ScheduleStory extends TestStory {
         await Actions.updateAndSubmit(7, [
             { action: 'selectWeekDayOffset', data: [2, 4, 6] },
         ]);
+
+        setBlock('Update scheduled Credit limit change transaction', 2);
+        await Actions.updateAndSubmit(9, [
+            { action: 'inputDestAmount', data: '900' },
+            { action: 'toggleEnableRepeat' },
+        ]);
+    }
+
+    async finishFromContextMenu() {
+        setBlock('Finish scheduled transaction from context menu', 1);
+
+        const data = [
+            0,
+        ];
+
+        await App.scenario.runner.runGroup(Actions.finishFromContextMenu, data);
+    }
+
+    async finish() {
+        setBlock('Finish scheduled transactions', 1);
+
+        const data = [
+            0,
+            [0, 1],
+        ];
+
+        await App.scenario.runner.runGroup(Actions.finish, data);
     }
 
     async deleteFromContextMenu() {

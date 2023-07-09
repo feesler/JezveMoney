@@ -24,10 +24,18 @@ export class ReminderList extends List {
     }
 
     sortByDateAsc() {
-        this.sort((a, b) => a.date - b.date);
+        this.sort((a, b) => (
+            (a.date === b.date)
+                ? (a.schedule_id - b.schedule_id)
+                : (a.date - b.date)
+        ));
     }
 
     sortByDateDesc() {
-        this.sort((a, b) => b.date - a.date);
+        this.sort((a, b) => (
+            (a.date === b.date)
+                ? (b.schedule_id - a.schedule_id)
+                : (b.date - a.date)
+        ));
     }
 }

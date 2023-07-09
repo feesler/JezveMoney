@@ -103,6 +103,8 @@ export class TransactionView extends AppView {
 
         const viewURL = new URL(this.location);
         res.reminderId = viewURL.searchParams.get('reminder_id');
+        res.scheduleId = viewURL.searchParams.get('schedule_id');
+        res.reminderDate = viewURL.searchParams.get('reminder_date');
 
         return res;
     }
@@ -128,7 +130,7 @@ export class TransactionView extends AppView {
         const { form } = this.model;
         const { repeatEnabled } = form;
 
-        if (repeatEnabled && !this.model.reminderId) {
+        if (repeatEnabled && !this.model.reminderId && !this.model.scheduleId) {
             res.start_date = App.dateStringToSeconds(form.startDate);
             res.end_date = App.dateStringToSeconds(form.endDate);
             res.interval_type = parseInt(form.intervalType, 10);
@@ -163,7 +165,10 @@ export class TransactionView extends AppView {
         res.comment = form.comment;
 
         if (this.model.reminderId) {
-            res.reminder_id = this.model.reminderId;
+            res.reminder_id = parseInt(this.model.reminderId, 10);
+        } else if (this.model.scheduleId) {
+            res.schedule_id = parseInt(this.model.scheduleId, 10);
+            res.reminder_date = parseInt(this.model.reminderDate, 10);
         }
 
         return res;

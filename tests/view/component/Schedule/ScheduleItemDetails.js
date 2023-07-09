@@ -135,7 +135,7 @@ export class ScheduleItemDetails extends TestComponent {
                 value: categoryTitle,
             },
             commentField: {
-                visible: true,
+                visible: item.comment.length > 0,
                 value: item.comment,
             },
             createDateField: {

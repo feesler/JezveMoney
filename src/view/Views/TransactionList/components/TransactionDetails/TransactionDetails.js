@@ -125,7 +125,7 @@ export class TransactionDetails extends ItemDetails {
 
         this.heading.setTitle(Transaction.getTypeTitle(item.type));
 
-        this.destinationField.show(showSource);
+        this.sourceField.show(showSource);
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
 
         this.destinationField.show(showDest);
@@ -157,6 +157,7 @@ export class TransactionDetails extends ItemDetails {
         const categoryTitle = this.getCategoryTitle(state);
         this.categoryField.setContent(categoryTitle);
 
+        this.commentField.show(item.comment.length > 0);
         this.commentField.setContent(item.comment);
 
         this.renderDateField(this.createDateField, item.createdate);

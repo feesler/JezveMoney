@@ -6,6 +6,7 @@ import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
+    REMINDER_UPCOMING,
 } from '../../model/Reminder.js';
 
 export class RemindersStory extends TestStory {
@@ -34,6 +35,7 @@ export class RemindersStory extends TestStory {
         await this.cancelFromContextMenu();
         await this.updateAndConfirm();
         await this.filters();
+        await this.upcoming();
         await this.confirmCancelled();
         await this.cancelConfirmed();
     }
@@ -65,6 +67,23 @@ export class RemindersStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(Actions.cancel, data);
+    }
+
+    async upcoming() {
+        setBlock('Upcoming reminders', 1);
+
+        await Actions.filterByState({ state: REMINDER_UPCOMING });
+        await Actions.confirm(0);
+        await Actions.confirmFromContextMenu(0);
+
+        await Actions.cancel(0);
+        await Actions.cancelFromContextMenu(0);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.runActions([
+            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+        ]);
+        await trActions.submit();
     }
 
     async confirmCancelled() {
@@ -169,5 +188,7 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_CANCELLED, directNavigate: true });
         await Actions.filterByState({ state: REMINDER_CONFIRMED, directNavigate: true });
         await Actions.filterByState({ state: REMINDER_SCHEDULED });
+        await Actions.filterByState({ state: REMINDER_UPCOMING });
+        await Actions.filterByState({ state: REMINDER_UPCOMING, directNavigate: true });
     }
 }

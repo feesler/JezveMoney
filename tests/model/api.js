@@ -239,6 +239,7 @@ export const api = {
         read: apiRead,
         create: apiCreate,
         update: apiUpdate,
+        finish: apiPostMethod('finish'),
         del: apiDelete,
         list: apiList,
     }),
@@ -248,6 +249,7 @@ export const api = {
         confirm: apiPostMethod('confirm'),
         cancel: apiPostMethod('cancel'),
         list: apiList,
+        upcoming: apiGetMethod('upcoming'),
     }),
 
     importrule: apiController('importrule', {

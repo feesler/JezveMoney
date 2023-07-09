@@ -21,6 +21,11 @@ export class ScheduleItemContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
             }, {
+                id: 'ctxFinishBtn',
+                title: __('schedule.finish'),
+            }, {
+                type: 'separator',
+            }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
                 title: __('actions.delete'),

@@ -1,7 +1,12 @@
-import { asArray, isObject, shiftDate } from 'jezvejs';
+import {
+    asArray,
+    isDate,
+    isObject,
+    shiftDate,
+} from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 
-import { dateStringToTime } from '../../utils/utils.js';
+import { dateStringToTime, getSeconds, parseDate } from '../../utils/utils.js';
 import {
     normalize,
     normalizeExch,
@@ -27,7 +32,8 @@ import {
 // Tools
 
 /** Returns interval offset for specified date */
-const getIntervalOffset = (date, type) => {
+const getIntervalOffset = (value, type) => {
+    const date = isDate(value) ? value : new Date();
     const utcDate = shiftDate(date, 0);
 
     if (type === INTERVAL_WEEK) {
@@ -47,29 +53,30 @@ const getIntervalOffset = (date, type) => {
 export const calculateSourceResult = (state) => {
     const result = state;
     const { transaction } = result;
+    if (transaction.type === INCOME || transaction.type === LIMIT_CHANGE || !state.isAvailable) {
+        return result;
+    }
+
+    const isDebt = transaction.type === DEBT;
     const precision = result.srcCurrency?.precision;
-
     const sourceAmount = transaction.src_amount;
-    let sourceResult = result.form.fSourceResult;
+    let sourceBalance = 0;
 
-    if (transaction.type !== DEBT) {
-        if (!result.srcAccount) {
-            return result;
-        }
-
-        sourceResult = normalize(result.srcAccount.balance - sourceAmount, precision);
-    } else if (result.srcAccount && !transaction.noAccount) {
-        sourceResult = normalize(result.srcAccount.balance - sourceAmount, precision);
-    } else if (result.transaction.noAccount) {
-        if (result.transaction.debtType) {
-            sourceResult = normalize(result.personAccount.balance - sourceAmount, precision);
+    if (
+        !isDebt
+        || (isDebt && result.srcAccount && !transaction.noAccount)
+    ) {
+        sourceBalance = result.srcAccount.balance;
+    } else if (isDebt && transaction.noAccount) {
+        if (transaction.debtType) {
+            sourceBalance = result.personAccount.balance;
         } else {
             const lastAcc = App.model.accounts.getItem(transaction.lastAcc_id);
-            const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            sourceResult = normalize(accBalance - sourceAmount, precision);
+            sourceBalance = (lastAcc) ? lastAcc.balance : 0;
         }
     }
 
+    const sourceResult = normalize(sourceBalance - sourceAmount, precision);
     if (result.form.fSourceResult !== sourceResult) {
         result.form.sourceResult = sourceResult;
         result.form.fSourceResult = sourceResult;
@@ -82,29 +89,30 @@ export const calculateSourceResult = (state) => {
 export const calculateDestResult = (state) => {
     const result = state;
     const { transaction } = result;
+    if (transaction.type === EXPENSE || !state.isAvailable) {
+        return result;
+    }
+
+    const isDebt = transaction.type === DEBT;
     const precision = result.destCurrency?.precision;
-
     const destAmount = transaction.dest_amount;
-    let destResult = result.form.fDestResult;
+    let destBalance = 0;
 
-    if (transaction.type !== DEBT) {
-        if (!result.destAccount) {
-            return result;
-        }
-
-        destResult = normalize(result.destAccount.balance + destAmount, precision);
-    } else if (result.destAccount && !transaction.noAccount) {
-        destResult = normalize(result.destAccount.balance + destAmount, precision);
-    } else if (transaction.noAccount) {
+    if (
+        !isDebt
+        || (isDebt && result.destAccount && !transaction.noAccount)
+    ) {
+        destBalance = result.destAccount.balance;
+    } else if (isDebt && transaction.noAccount) {
         if (transaction.debtType) {
             const lastAcc = App.model.accounts.getItem(transaction.lastAcc_id);
-            const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            destResult = normalize(accBalance + destAmount, precision);
+            destBalance = (lastAcc) ? lastAcc.balance : 0;
         } else {
-            destResult = normalize(result.personAccount.balance + destAmount, precision);
+            destBalance = result.personAccount.balance;
         }
     }
 
+    const destResult = normalize(destBalance + destAmount, precision);
     if (result.form.fDestResult !== destResult) {
         result.form.fDestResult = destResult;
         result.form.destResult = destResult;
@@ -1182,22 +1190,29 @@ const slice = createSlice({
             return state;
         }
 
-        const intervalType = (value) ? state.form.intervalType : INTERVAL_NONE;
-        const intervalOffset = (value) ? state.form.intervalOffset : [];
-        const intervalStep = (value) ? state.form.intervalStep : 0;
+        const startDate = parseDate(state.form.startDate);
         const endDate = (value && state.form.endDate)
             ? dateStringToTime(state.form.endDate)
             : null;
+        const intervalType = (value) ? INTERVAL_MONTH : INTERVAL_NONE;
+        const intervalOffset = (value) ? getIntervalOffset(startDate, intervalType) : [];
+        const intervalStep = (value) ? 1 : 0;
 
         return {
             ...state,
             transaction: {
                 ...state.transaction,
-                start_date: dateStringToTime(state.form.startDate),
+                start_date: getSeconds(startDate),
                 end_date: endDate,
                 interval_type: intervalType,
                 interval_offset: intervalOffset,
                 interval_step: intervalStep,
+            },
+            form: {
+                ...state.form,
+                intervalType,
+                intervalOffset,
+                intervalStep,
             },
         };
     },

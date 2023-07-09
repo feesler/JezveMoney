@@ -72,6 +72,7 @@ export class ScheduleView extends AppView {
                 selectModeBtn: { visible: listMode && isItemsAvailable },
                 selectAllBtn: { visible: showSelectItems && selected.length < itemsCount },
                 deselectAllBtn: { visible: showSelectItems && selected.length > 0 },
+                finishBtn: { visible: showSelectItems && selected.length > 0 },
                 deleteBtn: { visible: showSelectItems && selected.length > 0 },
             };
         }
@@ -85,6 +86,7 @@ export class ScheduleView extends AppView {
                 itemId: model.contextItem,
                 ctxDetailsBtn: { visible: true },
                 ctxUpdateBtn: { visible: true },
+                ctxFinishBtn: { visible: true },
                 ctxDeleteBtn: { visible: true },
             };
         }
@@ -702,6 +704,29 @@ export class ScheduleView extends AppView {
         await this.openContextMenu(num);
 
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+    }
+
+    /** Finishes specified scheduled transaction from context menu */
+    async finishFromContextMenu(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        this.model.contextItem = null;
+
+        await this.waitForList(() => this.contextMenu.select('ctxFinishBtn'));
+    }
+
+    /** Finishes specified scheduled transactions */
+    async finishItems(data) {
+        const items = asArray(data);
+        assert(items.length > 0, 'No items specified');
+
+        await this.selectItems(items);
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+
+        await this.waitForList(() => this.listMenu.select('finishBtn'));
     }
 
     /** Delete specified transaction from context menu */

@@ -116,6 +116,13 @@ export class TransactionListStory extends TestStory {
         const { FOOD_CATEGORY, TAXES_CATEGORY } = App.scenario;
 
         await Actions.toggleGroupByDate();
+
+        await Actions.showDetails({ index: 0 });
+        await Actions.closeDetails();
+
+        await Actions.toggleSelect(0);
+        await Actions.toggleSelect([1, 2]);
+
         await Actions.toggleGroupByDate();
 
         await Actions.toggleSelect(0);

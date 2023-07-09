@@ -30,7 +30,13 @@ import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Schedule } from '../../Models/Schedule.js';
-import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
+import {
+    REMINDER_CANCELLED,
+    REMINDER_CONFIRMED,
+    REMINDER_SCHEDULED,
+    REMINDER_UPCOMING,
+    Reminder,
+} from '../../Models/Reminder.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
@@ -44,6 +50,7 @@ import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js
 
 import {
     actions,
+    getStateFilter,
     reducer,
     updateList,
 } from './reducer.js';
@@ -85,13 +92,14 @@ class ReminderListView extends AppView {
 
         const initialState = updateList({
             ...this.props,
+            upcomingItems: null,
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
             showMenu: false,
             showContextMenu: false,
             contextItem: null,
-            renderTime: Date.now(),
+            renderTime: null,
         });
 
         this.store = createStore(reducer, { initialState });
@@ -129,10 +137,12 @@ class ReminderListView extends AppView {
         this.stateMenu = LinkMenu.create({
             id: 'stateMenu',
             itemParam: 'state',
-            items: Reminder.stateTypes.map((stateType) => ({
-                value: stateType.id,
-                title: __(stateType.token),
-            })),
+            items: [
+                { value: REMINDER_SCHEDULED, title: __('reminders.state.scheduled') },
+                { value: REMINDER_UPCOMING, title: __('reminders.state.upcoming') },
+                { value: REMINDER_CONFIRMED, title: __('reminders.state.submitted') },
+                { value: REMINDER_CANCELLED, title: __('reminders.state.cancelled') },
+            ],
             onChange: (value) => this.onSelectStateType(value),
         });
         this.stateFilter.append(this.stateMenu.elem);
@@ -164,7 +174,6 @@ class ReminderListView extends AppView {
                 || state.listMode !== prevState.listMode
                 || state.showControls !== prevState.showControls
             ),
-            getItemById: (id) => this.getItemById(id),
             className: LIST_CLASS,
             itemSelector: ReminderListItem.selector,
             selectModeClass: SELECT_MODE_CLASS,
@@ -227,6 +236,17 @@ class ReminderListView extends AppView {
         listFooter.append(this.showMoreBtn.elem, this.spinner.elem, this.paginator.elem);
 
         this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    async onPostInit() {
+        const state = this.store.getState();
+        const stateFilter = getStateFilter(state);
+
+        if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
+            await this.requestUpcoming();
+        }
+        this.setRenderTime();
     }
 
     showMenu() {
@@ -241,8 +261,20 @@ class ReminderListView extends AppView {
      * Reminder state filter change callback
      * @param {string} value - selected state types
      */
-    onSelectStateType(value) {
+    async onSelectStateType(value) {
+        const stateFilter = parseInt(value, 10);
+        const state = this.store.getState();
+        const currentStateFilter = getStateFilter(state);
+        if (currentStateFilter === stateFilter) {
+            return;
+        }
+
+        if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
+            await this.requestUpcoming();
+        }
+
         this.store.dispatch(actions.changeStateFilter(value));
+        this.setRenderTime();
     }
 
     onMenuClick(item) {
@@ -265,28 +297,22 @@ class ReminderListView extends AppView {
 
     showMore() {
         this.store.dispatch(actions.showMore());
+        this.setRenderTime();
     }
 
     onChangePage(page) {
         this.store.dispatch(actions.changePage(page));
+        this.setRenderTime();
     }
 
     onToggleMode(e) {
         e.preventDefault();
 
         this.store.dispatch(actions.toggleMode());
+        this.setRenderTime();
     }
 
-    getItemById(itemId) {
-        return App.model.reminders.getItem(itemId);
-    }
-
-    onItemClick(itemId, e) {
-        const id = parseInt(itemId, 10);
-        if (!id) {
-            return;
-        }
-
+    onItemClick(id, e) {
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
             const menuBtn = e?.target?.closest('.menu-btn');
@@ -330,7 +356,7 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.deselectAllItems());
     }
 
-    async setListMode(listMode) {
+    setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
     }
 
@@ -380,7 +406,27 @@ class ReminderListView extends AppView {
             ...data,
             returnState: {
                 reminders: this.getListRequest(),
+                upcoming: {},
+                profile: {},
             },
+        };
+    }
+
+    getRequestData(state) {
+        const ids = this.getContextIds(state);
+        if (getStateFilter(state) !== REMINDER_UPCOMING) {
+            return { id: ids };
+        }
+
+        return {
+            upcoming: ids.map((id) => {
+                const strId = id?.toString();
+                const reminder = state.items.find((item) => item?.id?.toString() === strId);
+                return {
+                    schedule_id: reminder.schedule_id,
+                    date: reminder.date,
+                };
+            }),
         };
     }
 
@@ -388,9 +434,22 @@ class ReminderListView extends AppView {
         return response?.data?.state?.reminders?.data;
     }
 
+    getUpcomingDataFromResponse(response) {
+        return response?.data?.state?.upcoming?.data;
+    }
+
     setListData(data, keepState = false) {
         App.model.reminders.setData(data);
-        this.store.dispatch(actions.listRequestLoaded(keepState));
+        this.store.dispatch(actions.listRequestLoaded({ keepState }));
+    }
+
+    setListDataFromResponse(response, keepState = false) {
+        const reminders = this.getListDataFromResponse(response);
+        const upcoming = this.getUpcomingDataFromResponse(response);
+
+        App.model.reminders.setData(reminders);
+
+        this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
     }
 
     async requestItem() {
@@ -409,6 +468,24 @@ class ReminderListView extends AppView {
         }
     }
 
+    async requestUpcoming() {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            const { data } = await API.reminder.upcoming();
+            this.store.dispatch(actions.upcomingItemsLoaded(data));
+        } catch (e) {
+            App.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+    }
+
     /** Creates transactions for selected reminders */
     async confirmReminder() {
         const state = this.store.getState();
@@ -424,15 +501,17 @@ class ReminderListView extends AppView {
         this.startLoading();
 
         try {
-            const request = this.prepareRequest({ id: ids });
+            const request = this.prepareRequest(this.getRequestData(state));
             const response = await API.reminder.confirm(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
+
+            this.setListDataFromResponse(response);
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /** Cancels selected reminders */
@@ -450,15 +529,17 @@ class ReminderListView extends AppView {
         this.startLoading();
 
         try {
-            const request = this.prepareRequest({ id: ids });
+            const request = this.prepareRequest(this.getRequestData(state));
             const response = await API.reminder.cancel(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
+
+            this.setListDataFromResponse(response);
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     renderContextMenu(state) {
@@ -477,6 +558,7 @@ class ReminderListView extends AppView {
         this.contextMenu.setState({
             showContextMenu: state.showContextMenu,
             contextItem: state.contextItem,
+            items: state.items,
         });
     }
 
@@ -586,6 +668,7 @@ class ReminderListView extends AppView {
             state.detailsId === prevState?.detailsId
             && state.mode === prevState?.mode
             && state.pagination?.page === prevState?.pagination?.page
+            && state.filter === prevState?.filter
         ) {
             return;
         }
@@ -620,6 +703,7 @@ class ReminderListView extends AppView {
             && state.pagination.onPage === prevState?.pagination?.onPage
             && state.loading === prevState?.loading
             && state.isLoadingMore === prevState?.isLoadingMore
+            && state.renderTime === prevState?.renderTime
         ) {
             return;
         }
@@ -664,7 +748,7 @@ class ReminderListView extends AppView {
             items,
             mode: state.mode,
             listMode: state.listMode,
-            renderTime: Date.now(),
+            renderTime: state.renderTime,
         }));
     }
 

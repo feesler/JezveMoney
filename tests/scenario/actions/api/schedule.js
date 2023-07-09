@@ -98,6 +98,31 @@ export const update = async (params) => {
 };
 
 /**
+ * Finished specified transaction(s) and check expected state of app
+ * @param {number[]} ids - array of transaction identificators
+ */
+export const finish = async (params) => {
+    let result;
+
+    await test(`Finish scheduled transaction (${formatProps(params)})`, async () => {
+        const resExpected = App.state.finishScheduledTransaction(params);
+
+        try {
+            result = await api.schedule.finish(params);
+            assert.deepMeet(result, resExpected);
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+
+    return result;
+};
+
+/**
  * Deletes specified transaction(s) and check expected state of app
  * @param {number[]} ids - array of transaction identificators
  */

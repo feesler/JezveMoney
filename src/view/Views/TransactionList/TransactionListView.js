@@ -3,7 +3,6 @@ import {
     show,
     insertAfter,
     asArray,
-    setEvents,
     debounce,
     isFunction,
     createElement,
@@ -48,6 +47,7 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import { SearchInput } from '../../Components/Inputs/SearchInput/SearchInput.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
 import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
 import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
@@ -133,8 +133,6 @@ class TransactionListView extends AppView {
             'contentHeader',
             // Filters
             'filtersContainer',
-            'applyFiltersBtn',
-            'clearFiltersBtn',
             'typeFilter',
             'accountsFilter',
             'categoriesFilter',
@@ -178,8 +176,18 @@ class TransactionListView extends AppView {
         });
         this.contentHeader.prepend(this.filters.elem);
 
-        setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
-        setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });
+        // Controls
+        const clearAllURL = getApplicationURL('transactions/');
+        this.filtersControls = FormControls.create({
+            className: 'filters-controls',
+            submitTitle: __('actions.apply'),
+            onSubmitClick: () => this.filters.close(),
+            cancelTitle: __('actions.clearAll'),
+            cancelURL: clearAllURL.toString(),
+            cancelBtnClass: 'clear-all-btn',
+            onCancelClick: (e) => this.onClearAllFilters(e),
+        });
+        this.filtersContainer.append(this.filtersControls.elem);
 
         // Transaction type filter
         this.typeMenu = TransactionTypeMenu.create({
@@ -474,6 +482,7 @@ class TransactionListView extends AppView {
             ...data,
             returnState: {
                 transactions: this.getListRequest(state),
+                profile: {},
             },
         };
     }
@@ -532,8 +541,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id, pos }, state);
             const response = await API.transaction.setPos(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data, true);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             this.cancelPosChange();
         }
@@ -657,8 +669,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids }, state);
             const response = await API.transaction.del(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -703,8 +718,11 @@ class TransactionListView extends AppView {
         try {
             const request = this.prepareRequest({ id: ids, category_id: categoryId }, state);
             const response = await API.transaction.setCategory(request);
+
             const data = this.getListDataFromResponse(response);
             this.setListData(data);
+
+            App.updateProfileFromResponse(response);
         } catch (e) {
             App.createErrorNotification(e.message);
         }
