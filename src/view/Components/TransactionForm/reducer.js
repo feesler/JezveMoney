@@ -1,7 +1,12 @@
-import { asArray, isObject, shiftDate } from 'jezvejs';
+import {
+    asArray,
+    isDate,
+    isObject,
+    shiftDate,
+} from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 
-import { dateStringToTime } from '../../utils/utils.js';
+import { dateStringToTime, getSeconds, parseDate } from '../../utils/utils.js';
 import {
     normalize,
     normalizeExch,
@@ -27,7 +32,8 @@ import {
 // Tools
 
 /** Returns interval offset for specified date */
-const getIntervalOffset = (date, type) => {
+const getIntervalOffset = (value, type) => {
+    const date = isDate(value) ? value : new Date();
     const utcDate = shiftDate(date, 0);
 
     if (type === INTERVAL_WEEK) {
@@ -1182,22 +1188,29 @@ const slice = createSlice({
             return state;
         }
 
-        const intervalType = (value) ? state.form.intervalType : INTERVAL_NONE;
-        const intervalOffset = (value) ? state.form.intervalOffset : [];
-        const intervalStep = (value) ? state.form.intervalStep : 0;
+        const startDate = parseDate(state.form.startDate);
         const endDate = (value && state.form.endDate)
             ? dateStringToTime(state.form.endDate)
             : null;
+        const intervalType = (value) ? INTERVAL_MONTH : INTERVAL_NONE;
+        const intervalOffset = (value) ? getIntervalOffset(startDate, intervalType) : [];
+        const intervalStep = (value) ? 1 : 0;
 
         return {
             ...state,
             transaction: {
                 ...state.transaction,
-                start_date: dateStringToTime(state.form.startDate),
+                start_date: getSeconds(startDate),
                 end_date: endDate,
                 interval_type: intervalType,
                 interval_offset: intervalOffset,
                 interval_step: intervalStep,
+            },
+            form: {
+                ...state.form,
+                intervalType,
+                intervalOffset,
+                intervalStep,
             },
         };
     },

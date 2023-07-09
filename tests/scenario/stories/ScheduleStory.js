@@ -151,6 +151,7 @@ export class ScheduleStory extends TestStory {
             { action: 'changeSrcAccount', data: CREDIT_CARD },
             { action: 'changeTransactionType', data: LIMIT_CHANGE },
             { action: 'inputDestAmount', data: '9' },
+            { action: 'toggleEnableRepeat' },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '10' },
@@ -178,6 +179,7 @@ export class ScheduleStory extends TestStory {
         setBlock('Update scheduled Credit limit change transaction', 2);
         await Actions.updateAndSubmit(9, [
             { action: 'inputDestAmount', data: '900' },
+            { action: 'toggleEnableRepeat' },
         ]);
     }
 

@@ -545,13 +545,14 @@ export class TransactionForm extends TestComponent {
 
                 res.intervalStepRow = {
                     visible: repeatEnabled,
-                    value: model.intervalStep.toString(),
                     isInvalid: model.intervalStepInvalidated,
                 };
                 res.intervalTypeSelect = {
                     visible: repeatEnabled,
                 };
+
                 if (repeatEnabled) {
+                    res.intervalStepRow.value = model.intervalStep.toString();
                     res.intervalTypeSelect.value = model.intervalType.toString();
                 }
 
@@ -1602,6 +1603,9 @@ export class TransactionForm extends TestComponent {
             if (!this.isValidDate(this.model.startDate)) {
                 return false;
             }
+        }
+
+        if (this.model.repeatEnabled) {
             if (this.model.endDate && !this.isValidDate(this.model.endDate)) {
                 return false;
             }
@@ -2329,19 +2333,26 @@ export class TransactionForm extends TestComponent {
             isValid = isValid && dateValid;
         }
 
+        let startDateValid = true;
+        let endDateValid = true;
+
         if (this.isScheduleItemForm() || this.model.repeatEnabled) {
-            const { startDate, endDate, intervalStep } = this.model;
+            const { startDate } = this.model;
+            startDateValid = this.isValidDate(startDate);
+            isValid = isValid && startDateValid;
+        }
 
-            const startDateValid = this.isValidDate(startDate);
-            const endDateValid = !endDate || this.isValidDate(endDate);
-
-            this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
+        if (this.model.repeatEnabled) {
+            const { endDate, intervalStep } = this.model;
+            endDateValid = !endDate || this.isValidDate(endDate);
 
             const intervalStepValid = parseInt(intervalStep, 10) > 0;
             this.model.intervalStepInvalidated = !intervalStepValid;
 
-            isValid = isValid && startDateValid && endDateValid && intervalStepValid;
+            isValid = isValid && endDateValid && intervalStepValid;
         }
+
+        this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
 
         const action = () => click(this.content.submitBtn);
 
@@ -2420,6 +2431,15 @@ export class TransactionForm extends TestComponent {
 
     async toggleEnableRepeat() {
         this.model.repeatEnabled = !this.model.repeatEnabled;
+        if (this.model.repeatEnabled) {
+            const type = INTERVAL_MONTH;
+            const startDate = App.parseDate(this.model.startDate);
+
+            this.model.intervalStep = 1;
+            this.model.intervalType = type;
+            this.model.intervalOffset = getIntervalOffset(new Date(startDate), type);
+        }
+
         this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.repeatSwitch.toggle());
