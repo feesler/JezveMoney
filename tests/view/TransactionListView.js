@@ -1576,6 +1576,7 @@ export class TransactionListView extends AppView {
 
     /** Toggle enables/disables group transactions by date */
     async toggleGroupByDate() {
+        await this.setListMode();
         await this.openListMenu();
 
         this.model.groupByDate = !this.model.groupByDate;

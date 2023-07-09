@@ -39,6 +39,8 @@ export class TransactionListGroup extends Component {
 
         this.list = TransactionList.create({
             listMode: 'list',
+            onItemClick: (id, e) => this.onItemClick(id, e),
+            onSort: (info) => this.onSort(info),
         });
 
         this.elem = createElement('section', {
