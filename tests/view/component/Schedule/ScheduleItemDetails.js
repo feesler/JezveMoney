@@ -8,6 +8,7 @@ import {
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
+import { INTERVAL_NONE } from '../../../model/ScheduledTransaction.js';
 
 const fieldSelectors = {
     startDateField: '.start-date-field',
@@ -82,6 +83,10 @@ export class ScheduleItemDetails extends TestComponent {
     }
 
     static render(item, state) {
+        const startDateToken = (item.interval_type === INTERVAL_NONE)
+            ? 'schedule.date'
+            : 'schedule.startDate';
+
         const srcCurr = App.currency.getItem(item.src_curr);
         assert(srcCurr, `Currency not found: ${item.src_curr}`);
         const destCurr = App.currency.getItem(item.dest_curr);
@@ -103,10 +108,12 @@ export class ScheduleItemDetails extends TestComponent {
             },
             startDateField: {
                 visible: true,
+                title: __(startDateToken, App.view.locale),
                 value: App.secondsToDateString(item.start_date),
             },
             endDateField: {
-                visible: true,
+                visible: item.interval_type !== INTERVAL_NONE,
+                title: __('schedule.endDate', App.view.locale),
                 value: this.renderEndDate(item),
             },
             intervalField: {
@@ -114,7 +121,7 @@ export class ScheduleItemDetails extends TestComponent {
                 value: item.renderInterval(),
             },
             offsetField: {
-                visible: true,
+                visible: item.interval_type !== INTERVAL_NONE,
                 value: item.renderIntervalOffset(),
             },
             sourceField: {

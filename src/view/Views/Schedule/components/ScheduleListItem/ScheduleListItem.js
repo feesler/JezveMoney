@@ -17,7 +17,7 @@ import {
     LIMIT_CHANGE,
     Transaction,
 } from '../../../../Models/Transaction.js';
-import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
+import { INTERVAL_NONE, ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
 
 import { Field } from '../../../../Components/Fields/Field/Field.js';
 
@@ -481,10 +481,36 @@ export class ScheduleListItem extends Component {
         this.commentElem.setAttribute('title', item.comment);
     }
 
+    renderStartDateField(state) {
+        const { item } = state;
+        const startDateToken = (item.interval_type === INTERVAL_NONE)
+            ? 'schedule.date'
+            : 'schedule.startDate';
+        this.startDateField.setTitle(__(startDateToken));
+        this.startDateField.setContent(App.formatDate(item.start_date));
+    }
+
     renderEndDate(item) {
         return (item.end_date)
             ? __('schedule.item.end', App.formatDate(item.end_date))
             : __('schedule.noEndDate');
+    }
+
+    renderEndDateField(state) {
+        const { item } = state;
+        this.endDateField.show(item.interval_type !== INTERVAL_NONE);
+        this.endDateField.setContent(this.renderEndDate(item));
+    }
+
+    renderIntervalField(state) {
+        const { item } = state;
+        this.intervalField.setContent(item.renderInterval());
+    }
+
+    renderIntervalOffsetField(state) {
+        const { item } = state;
+        this.offsetField.show(item.interval_type !== INTERVAL_NONE);
+        this.offsetField.setContent(item.renderIntervalOffset());
     }
 
     renderDetails(state) {
@@ -492,17 +518,10 @@ export class ScheduleListItem extends Component {
         const { currency } = App.model;
 
         // Schedule
-        // Start date
-        this.startDateField.setContent(App.formatDate(item.start_date));
-
-        // End date
-        this.endDateField.setContent(this.renderEndDate(item));
-
-        // Interval
-        this.intervalField.setContent(item.renderInterval());
-
-        // Offset
-        this.offsetField.setContent(item.renderIntervalOffset());
+        this.renderStartDateField(state);
+        this.renderEndDateField(state);
+        this.renderIntervalField(state);
+        this.renderIntervalOffsetField(state);
 
         // Transaction
         // Type
