@@ -28,7 +28,7 @@ export class TransactionListItem extends TestComponent {
                 const [
                     srcAccEl,
                     dAccEl,
-                ] = Array.from(elem.querySelectorAll('.trans-item__account-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__account-field .field__content'));
                 const sourceContent = srcAccEl.textContent;
                 const destContent = dAccEl.textContent;
                 const sourceVisible = sourceContent.length > 0;
@@ -48,7 +48,7 @@ export class TransactionListItem extends TestComponent {
                 const [
                     sAmount,
                     dAmount,
-                ] = Array.from(elem.querySelectorAll('.trans-item__amount-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__amount-field .field__content'));
                 const srcAmount = sAmount.textContent;
                 if (srcAmount.length > 0 && dAmount?.textContent.length > 0) {
                     item.amountText = `${sign}${srcAmount} (${sign}${dAmount.textContent})`;
@@ -56,25 +56,25 @@ export class TransactionListItem extends TestComponent {
                     item.amountText = srcAmount;
                 }
             } else {
-                const titleElem = elem.querySelector('.trans-item__title');
+                const titleElem = elem.querySelector('.trans-item-base__title');
                 item.accountTitle = titleElem.textContent;
 
-                const amountElem = elem.querySelector('.trans-item__amount');
+                const amountElem = elem.querySelector('.trans-item-base__amount');
                 item.amountText = amountElem.textContent;
             }
 
             const dateElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__date-field .field__content' : '.trans-item__date',
+                (detailsMode) ? '.trans-item-base__date-field .field__content' : '.trans-item-base__date',
             );
             item.dateFmt = dateElem.textContent;
 
             const categoryElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__category-field .field__content' : '.trans-item__category',
+                (detailsMode) ? '.trans-item-base__category-field .field__content' : '.trans-item-base__category',
             );
             item.category = categoryElem.textContent;
 
             const commentElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__comment-field .field__content' : '.trans-item__comment',
+                (detailsMode) ? '.trans-item-base__comment-field .field__content' : '.trans-item-base__comment',
             );
             item.comment = commentElem?.textContent ?? '';
 
