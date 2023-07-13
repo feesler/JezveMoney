@@ -190,14 +190,14 @@ export const createTransactions = async () => {
     let lastExpense = null;
     for (const transaction of data) {
         const extracted = Transaction.extract(transaction, App.state);
-        for (const date of App.dateSecList) {
-            multi.push({
-                ...extracted,
-                date,
-            });
-        }
+        const copies = Object.keys(App.dates).map((key) => ({
+            ...extracted,
+            date: App.datesSec[key],
+        }));
+        multi.push(...copies);
+
         if (transaction.type === EXPENSE) {
-            lastExpense = multi[multi.length - 1];
+            lastExpense = structuredClone(multi[multi.length - 1]);
         }
     }
 
