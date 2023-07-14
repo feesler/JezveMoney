@@ -187,8 +187,9 @@ export const setTransactionCategory = async ({ index, category }) => {
 
         App.state.setTransactionCategory({ id, category });
         const expectedItems = App.state.transactions.getItems(pageIds);
+        const showDate = !App.state.getGroupByDate();
         const expected = {
-            transList: TransactionList.render(expectedItems, App.state),
+            transList: TransactionList.render(expectedItems, App.state, showDate),
         };
         App.view.checkState(expected);
         App.view.updateTransactions();
@@ -218,8 +219,9 @@ export const setCategory = async ({ items, category }) => {
             category,
         });
         const expectedItems = App.state.transactions.getItems(pageIds);
+        const showDate = !App.state.getGroupByDate();
         const expected = {
-            transList: TransactionList.render(expectedItems, App.state),
+            transList: TransactionList.render(expectedItems, App.state, showDate),
         };
         App.view.checkState(expected);
         App.view.updateTransactions();

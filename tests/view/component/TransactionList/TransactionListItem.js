@@ -16,7 +16,7 @@ import { App } from '../../../Application.js';
 export class TransactionListItem extends TestComponent {
     async parseContent() {
         const res = await evaluate((elem, expenseType, incomeType) => {
-            const detailsMode = elem.classList.contains('trans-item_details');
+            const detailsMode = !!elem.querySelector('.trans-item-base_details');
             const item = {
                 id: parseInt(elem.dataset.id, 10),
                 type: parseInt(elem.dataset.type, 10),
@@ -66,7 +66,7 @@ export class TransactionListItem extends TestComponent {
             const dateElem = elem.querySelector(
                 (detailsMode) ? '.trans-item-base__date-field .field__content' : '.trans-item-base__date',
             );
-            item.dateFmt = dateElem.textContent;
+            item.dateFmt = dateElem?.textContent ?? '';
 
             const categoryElem = elem.querySelector(
                 (detailsMode) ? '.trans-item-base__category-field .field__content' : '.trans-item-base__category',
@@ -98,7 +98,7 @@ export class TransactionListItem extends TestComponent {
         return click(this.content.menuBtn);
     }
 
-    static render(transaction, state) {
+    static render(transaction, state, showDate = true) {
         const res = {};
 
         assert(transaction, 'Invalid transaction object');
@@ -162,7 +162,9 @@ export class TransactionListItem extends TestComponent {
             }
         }
 
-        res.dateFmt = App.secondsToDateString(transaction.date);
+        if (showDate) {
+            res.dateFmt = App.secondsToDateString(transaction.date);
+        }
 
         const category = state.categories.getItem(transaction.category_id);
         res.category = (transaction.category_id === 0) ? '' : category.name;

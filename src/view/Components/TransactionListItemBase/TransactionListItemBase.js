@@ -46,6 +46,7 @@ const defaultProps = {
     item: null,
     mode: 'classic', // 'classic' or 'details'
     showDate: true,
+    showResults: true,
 };
 
 /**
@@ -104,7 +105,7 @@ export class TransactionListItemBase extends Component {
         );
     }
 
-    initDetails() {
+    initDetails(state) {
         // Type
         this.typeField = Field.create({
             title: __('transactions.type'),
@@ -136,24 +137,31 @@ export class TransactionListItemBase extends Component {
             props: { className: COLUMN_CLASS },
             children: [this.srcAmountField.elem, this.destAmountField.elem],
         });
-        // Result balance
-        this.srcResultField = Field.create({
-            title: __('transactions.sourceResult'),
-            className: RESULT_FIELD_CLASS,
-        });
-        this.destResultField = Field.create({
-            title: __('transactions.destResult'),
-            className: RESULT_FIELD_CLASS,
-        });
-        const resultsGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [this.srcResultField.elem, this.destResultField.elem],
-        });
 
-        const amountResultGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [amountGroup, resultsGroup],
-        });
+        let amountResultGroup;
+
+        if (state.showResults) {
+            // Result balance
+            this.srcResultField = Field.create({
+                title: __('transactions.sourceResult'),
+                className: RESULT_FIELD_CLASS,
+            });
+            this.destResultField = Field.create({
+                title: __('transactions.destResult'),
+                className: RESULT_FIELD_CLASS,
+            });
+            const resultsGroup = createElement('div', {
+                props: { className: COLUMN_CLASS },
+                children: [this.srcResultField.elem, this.destResultField.elem],
+            });
+            amountResultGroup = createElement('div', {
+                props: { className: COLUMN_CLASS },
+                children: [amountGroup, resultsGroup],
+            });
+        } else {
+            amountResultGroup = amountGroup;
+        }
+
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
@@ -396,23 +404,25 @@ export class TransactionListItemBase extends Component {
         }
         this.destAmountField.show(isDiff);
 
-        // Source result
-        if (showSource) {
-            const srcResultLabel = (showDest) ? __('transactions.sourceResult') : __('transactions.result');
-            this.srcResultField.setTitle(srcResultLabel);
-            const srcResult = currency.formatCurrency(item.src_result, item.src_curr);
-            this.srcResultField.setContent(srcResult);
-        }
-        this.srcResultField.show(showSource);
+        if (state.showResults) {
+            // Source result
+            if (showSource) {
+                const srcResultLabel = (showDest) ? __('transactions.sourceResult') : __('transactions.result');
+                this.srcResultField.setTitle(srcResultLabel);
+                const srcResult = currency.formatCurrency(item.src_result, item.src_curr);
+                this.srcResultField.setContent(srcResult);
+            }
+            this.srcResultField.show(showSource);
 
-        // Destination result
-        if (showDest) {
-            const destResultLabel = (showSource) ? __('transactions.destResult') : __('transactions.result');
-            this.destResultField.setTitle(destResultLabel);
-            const destResult = currency.formatCurrency(item.dest_result, item.dest_curr);
-            this.destResultField.setContent(destResult);
+            // Destination result
+            if (showDest) {
+                const destResultLabel = (showSource) ? __('transactions.destResult') : __('transactions.result');
+                this.destResultField.setTitle(destResultLabel);
+                const destResult = currency.formatCurrency(item.dest_result, item.dest_curr);
+                this.destResultField.setContent(destResult);
+            }
+            this.destResultField.show(showDest);
         }
-        this.destResultField.show(showDest);
 
         // Date
         if (state.showDate) {
@@ -444,7 +454,7 @@ export class TransactionListItemBase extends Component {
         if (state.mode !== prevState.mode) {
             this.resetContent();
             if (state.mode === 'details') {
-                this.initDetails();
+                this.initDetails(state);
             } else {
                 this.initClassic();
             }

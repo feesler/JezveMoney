@@ -459,7 +459,8 @@ export class TransactionListView extends AppView {
             items = pageItems.data;
         }
 
-        return TransactionList.render(items, App.state);
+        const showDate = !App.state.getGroupByDate();
+        return TransactionList.render(items, App.state, showDate);
     }
 
     getExpectedState(model = this.model) {
