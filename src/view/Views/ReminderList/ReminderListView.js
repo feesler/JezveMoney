@@ -717,10 +717,11 @@ class ReminderListView extends AppView {
         this.selItemsCount.textContent = selected.length;
 
         // Paginator
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
+        const showPaginator = !isUpcoming && state.items.length > 0;
         const range = state.pagination.range ?? 1;
         const pageNum = state.pagination.page + range - 1;
-        if (this.paginator) {
-            this.paginator.show(state.items.length > 0);
+        if (showPaginator) {
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: this.getURL(state),
@@ -728,12 +729,13 @@ class ReminderListView extends AppView {
                 pageNum,
             }));
         }
+        this.paginator.show(showPaginator);
 
         // 'Show more' button
         const loadingMore = state.loading && state.isLoadingMore;
         this.showMoreBtn.show(
             state.items.length > 0
-            && pageNum < state.pagination.pagesCount
+            && (isUpcoming || pageNum < state.pagination.pagesCount)
             && !loadingMore,
         );
         this.spinner.show(loadingMore);

@@ -73,6 +73,8 @@ export class RemindersStory extends TestStory {
         setBlock('Upcoming reminders', 1);
 
         await Actions.filterByState({ state: REMINDER_UPCOMING });
+        await Actions.showMore();
+
         await Actions.confirm(0);
         await Actions.confirmFromContextMenu(0);
 

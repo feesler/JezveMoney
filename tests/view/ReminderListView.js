@@ -58,6 +58,13 @@ export class ReminderListView extends AppView {
 
         const list = this.getExpectedList(model);
 
+        const showPaginator = !isUpcoming && isItemsAvailable;
+        const showMoreBtnVisible = (
+            isItemsAvailable
+            && (isUpcoming || pageNum < model.list.pages)
+            && !model.isLoadingMore
+        );
+
         const res = {
             stateMenu: {
                 value: model.filter.state.toString(),
@@ -66,10 +73,8 @@ export class ReminderListView extends AppView {
             totalCounter: { visible: true, value: filteredItems.length },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: {
-                visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,
-            },
-            paginator: { visible: isItemsAvailable },
+            showMoreBtn: { visible: showMoreBtnVisible },
+            paginator: { visible: showPaginator },
             remindersList: {
                 ...list,
                 visible: true,
@@ -127,13 +132,15 @@ export class ReminderListView extends AppView {
             };
         }
 
-        if (isItemsAvailable) {
+        if (showPaginator) {
             res.paginator = {
                 ...res.paginator,
                 pages: model.list.pages,
                 active: pageNum,
             };
+        }
 
+        if (isItemsAvailable) {
             res.modeSelector.title = (model.detailsMode)
                 ? __('transactions.showMain', App.view.locale)
                 : __('transactions.showDetails', App.view.locale);
@@ -264,15 +271,24 @@ export class ReminderListView extends AppView {
             this.loadReminders();
         }
 
-        if (cont.paginator && cont.remindersList) {
+        if (cont.remindersList) {
             const items = cont.remindersList.getItems();
             const range = (items.length > 0)
                 ? Math.ceil(items.length / App.config.transactionsOnPage)
                 : 1;
 
+            const paginatorVisible = cont.paginator?.content?.visible;
+            const activePage = (paginatorVisible)
+                ? cont.paginator.active
+                : range;
+            const page = activePage - range + 1;
+            const pages = (paginatorVisible)
+                ? cont.paginator.pages
+                : page;
+
             res.list = {
-                page: cont.paginator.active - range + 1,
-                pages: cont.paginator.pages,
+                page,
+                pages,
                 items,
                 range,
             };
@@ -383,7 +399,12 @@ export class ReminderListView extends AppView {
     }
 
     isLastPage() {
-        return !this.content.paginator || this.content.paginator.isLastPage();
+        const isUpcoming = this.model.filter.state === REMINDER_UPCOMING;
+
+        return (
+            !isUpcoming
+            && (!this.content.paginator || this.content.paginator.isLastPage())
+        );
     }
 
     setModelPage(model, page) {
@@ -411,15 +432,17 @@ export class ReminderListView extends AppView {
     }
 
     setModelRange(model, range) {
-        assert(
-            range >= 1
-            && range <= model.list.pages - model.list.page + 1,
-            `Invalid pages range ${range}`,
-        );
-
         const res = this.cloneModel(model);
         const onPage = App.config.transactionsOnPage;
         const isUpcoming = res.filter.state === REMINDER_UPCOMING;
+
+        if (!isUpcoming) {
+            assert(
+                range >= 1
+                && range <= model.list.pages - model.list.page + 1,
+                `Invalid pages range ${range}`,
+            );
+        }
 
         res.list.range = range;
         const filteredItems = this.getFilteredItems(model);
