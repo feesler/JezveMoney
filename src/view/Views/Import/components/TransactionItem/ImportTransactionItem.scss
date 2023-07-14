@@ -2,6 +2,7 @@
 .import-item {
   --ii-font-size: 0.9rem;
   --ii-min-column-width: 150px;
+  --ii-content-border-radius: 5px;
 
   display: flex;
   flex-flow: column nowrap;
@@ -17,7 +18,7 @@
     flex: 1 1 auto;
     align-items: start;
     gap: 8px 16px;
-    padding: 4px 0 4px 8px;
+    padding: 8px 0 8px 8px;
     overflow: hidden;
     position: relative;
     background-color: var(--list-item-bg-color);
@@ -105,16 +106,23 @@
   .collapsible-content {
     flex-flow: column nowrap;
     row-gap: 1rem;
-    border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
+    border-bottom-left-radius: var(--ii-content-border-radius);
+    border-bottom-right-radius: var(--ii-content-border-radius);
     color: var(--text-color-3);
-    border-color: var(--border-color-2);
-    background-color: var(--bg-color-3);
+    background-color: var(--list-item-alt-bg-color);
   }
 
-  &.collapsible__expanded .toggle-btn .btn__icon {
-    transform: rotate(180deg);
+  &.collapsible__expanded {
+    .collapsible-header {
+      box-shadow: 0 2px 5px -2px #00000088;
+      z-index: 2;
+    }
+
+    .toggle-btn .btn__icon {
+      transform: rotate(180deg);
+    }
   }
 
   /* Sort mode */
@@ -152,7 +160,6 @@
 
   .collapsible-content {
     color: var(--text-color-6);
-    border-color: var(--bg-color-5);
     background-color: var(--bg-color-3);
   }
 }
@@ -187,7 +194,6 @@
 
     .item-container {
       grid-template-columns: repeat(4, 1fr);
-      padding: 4px 0 6px 8px;
     }
   }
 }

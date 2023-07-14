@@ -49,4 +49,9 @@
 .template-select__controls {
   display: flex;
   flex-flow: row nowrap;
+
+  .btn {
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+  }
 }
