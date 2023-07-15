@@ -2364,14 +2364,12 @@ class TransactionModel extends SortableModel
                     }
                 }
 
-                $label = $this->getLabel($groupStart);
-                $groupArr[] = [$label, 1];
+                $groupArr[] = $this->getLabel($groupStart);
                 // Append series for empty values
                 $groupDate = $groupStart;
                 for ($i = 1; $i < $dateDiff; $i++) {
                     $groupDate = $this->getNextDate($groupDate, $group_type);
-                    $label = $this->getLabel($groupDate);
-                    $groupArr[] = [$label, 1];
+                    $groupArr[] = $this->getLabel($groupDate);
                 }
 
                 $sumDate = $curDate;
@@ -2393,8 +2391,7 @@ class TransactionModel extends SortableModel
                 }
             }
 
-            $label = $this->getLabel($groupStart);
-            $groupArr[] = [$label, 1];
+            $groupArr[] = $this->getLabel($groupStart);
         }
 
         // Flatten arrays of values
@@ -2420,22 +2417,7 @@ class TransactionModel extends SortableModel
                 $dataSets[$index]["data"] = array_slice($dataSet["data"], -$limitCount);
             }
 
-            $newGroupsCount = 0;
-            $groupLimit = 0;
-            $firstSerieSize = 0;
-            $i = count($groupArr) - 1;
-            while ($i >= 0 && $groupLimit < $limitCount) {
-                $firstSerieSize = $limitCount - $groupLimit;
-                $groupLimit += $groupArr[$i][1];
-
-                $newGroupsCount++;
-                $i--;
-            }
-
-            $groupArr = array_slice($groupArr, -$newGroupsCount);
-            if (count($groupArr) > 0) {
-                $groupArr[0][1] = $firstSerieSize;
-            }
+            $groupArr = array_slice($groupArr, -$limitCount);
         }
 
         $res = new \stdClass();

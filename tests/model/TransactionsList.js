@@ -912,14 +912,12 @@ export class TransactionsList extends SortableList {
                     }
                 }
 
-                let label = this.getStatisticsLabel(groupStart, groupType);
-                groupArr.push([label, 1]);
+                groupArr.push(this.getStatisticsLabel(groupStart, groupType));
                 // Append series for empty values
                 let groupDate = groupStart;
                 for (let i = 1; i < dateDiff; i += 1) {
                     groupDate = this.getNextDate(groupDate, groupType);
-                    label = this.getStatisticsLabel(groupDate, groupType);
-                    groupArr.push([label, 1]);
+                    groupArr.push(this.getStatisticsLabel(groupDate, groupType));
                 }
 
                 sumDate = curDate;
@@ -941,8 +939,7 @@ export class TransactionsList extends SortableList {
                 }
             }
 
-            const label = this.getStatisticsLabel(groupStart, groupType);
-            groupArr.push([label, 1]);
+            groupArr.push(this.getStatisticsLabel(groupStart, groupType));
         }
 
         const dataSets = [];
@@ -968,19 +965,7 @@ export class TransactionsList extends SortableList {
                 dataSets[index].data = dataSet.data.slice(-limitCount);
             });
 
-            let newGroupsCount = 0;
-            let groupLimit = 0;
-            let firstSerieSize = 0;
-            let i = groupArr.length - 1;
-            while (i >= 0 && groupLimit < limitCount) {
-                firstSerieSize = limitCount - groupLimit;
-                groupLimit += groupArr[i][1];
-                newGroupsCount += 1;
-                i -= 1;
-            }
-
-            groupArr = groupArr.slice(-newGroupsCount);
-            groupArr[0][1] = firstSerieSize;
+            groupArr = groupArr.slice(-limitCount);
         }
 
         return {
