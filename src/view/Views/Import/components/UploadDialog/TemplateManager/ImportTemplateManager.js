@@ -606,7 +606,7 @@ export class ImportTemplateManager extends Component {
 
         this.renderTemplateSelect(state, prevState);
 
-        if (isLoadingState) {
+        if (isLoadingState || isFormState) {
             show(this.convertFeedback, false);
         }
 

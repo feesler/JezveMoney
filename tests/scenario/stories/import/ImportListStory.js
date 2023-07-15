@@ -86,6 +86,10 @@ export class ImportListStory extends TestStory {
             account: ACC_USD,
         });
 
+        setBlock('Check convert feedback is hidden on open template form', 2);
+        await Actions.createTemplate();
+        await Actions.cancelTemplate();
+
         setBlock('Check main account is updated after select it at upload dialog', 2);
         await Actions.selectUploadAccount(ACC_RUB);
     }
