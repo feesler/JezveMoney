@@ -76,7 +76,7 @@
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     color: var(--text-color-3);
-    background-color: var(--bg-color-5);
+    background-color: var(--list-item-alt-bg-color);
   }
 
   .link-btn {
@@ -122,6 +122,6 @@
 
 @media (hover: hover) {
   .rule-form-collapse .collapsible-header:hover {
-    background-color: var(--bg-color-4);
+    background-color: var(--list-item-hover-bg-color);
   }
 }

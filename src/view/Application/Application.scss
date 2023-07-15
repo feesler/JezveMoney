@@ -109,10 +109,12 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   /* List item */
   --list-item-text-color: #b0b0b0;
   --list-item-bg-color: var(--alt-bg-color);
+  --list-item-alt-bg-color: #252525;
   --list-item-disabled-bg-color: #292929;
-
-  /* List item icons */
   --list-item-icon-fill: #888888;
+
+  /* List item hover state */
+  --list-item-hover-bg-color: #363636;
   --list-item-hover-icon-fill: #dddddd;
 
   /* Popup menu */
@@ -178,10 +180,12 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   /* List item */
   --list-item-text-color: #808080;
   --list-item-bg-color: var(--alt-bg-color);
+  --list-item-alt-bg-color: #f5f5f5;
   --list-item-disabled-bg-color: #e8e8e8;
-
-  /* List item icons */
   --list-item-icon-fill: #a7a7a7;
+
+  /* List item hover state */
+  --list-item-hover-bg-color: #e5e5e5;
   --list-item-hover-icon-fill: #808080;
 
   /* Popup menu */

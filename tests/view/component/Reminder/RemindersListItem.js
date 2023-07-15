@@ -17,7 +17,7 @@ import { Reminder } from '../../../model/Reminder.js';
 export class RemindersListItem extends TestComponent {
     async parseContent() {
         const res = await evaluate((elem, expenseType, incomeType) => {
-            const detailsMode = elem.classList.contains('reminder-item_details');
+            const detailsMode = !!elem.querySelector('.trans-item-base_details');
             const item = {
                 id: elem.dataset.id,
                 type: parseInt(elem.dataset.type, 10),
@@ -29,7 +29,7 @@ export class RemindersListItem extends TestComponent {
                 const [
                     srcAccEl,
                     dAccEl,
-                ] = Array.from(elem.querySelectorAll('.reminder-item__account-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__account-field .field__content'));
                 const sourceContent = srcAccEl.textContent;
                 const destContent = dAccEl.textContent;
                 const sourceVisible = sourceContent.length > 0;
@@ -49,7 +49,7 @@ export class RemindersListItem extends TestComponent {
                 const [
                     sAmount,
                     dAmount,
-                ] = Array.from(elem.querySelectorAll('.reminder-item__amount-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__amount-field .field__content'));
                 const srcAmount = sAmount.textContent;
                 if (srcAmount.length > 0 && dAmount?.textContent.length > 0) {
                     item.amountText = `${sign}${srcAmount} (${sign}${dAmount.textContent})`;
@@ -57,25 +57,25 @@ export class RemindersListItem extends TestComponent {
                     item.amountText = srcAmount;
                 }
             } else {
-                const titleElem = elem.querySelector('.reminder-item__title');
+                const titleElem = elem.querySelector('.trans-item-base__title');
                 item.accountTitle = titleElem.textContent;
 
-                const amountElem = elem.querySelector('.reminder-item__amount');
+                const amountElem = elem.querySelector('.trans-item-base__amount');
                 item.amountText = amountElem.textContent;
             }
 
             const dateElem = elem.querySelector(
-                (detailsMode) ? '.reminder-item__date-field .field__content' : '.reminder-item__date',
+                (detailsMode) ? '.trans-item-base__date-field .field__content' : '.trans-item-base__date',
             );
             item.dateFmt = dateElem.textContent;
 
             const categoryElem = elem.querySelector(
-                (detailsMode) ? '.reminder-item__category-field .field__content' : '.reminder-item__category',
+                (detailsMode) ? '.trans-item-base__category-field .field__content' : '.trans-item-base__category',
             );
             item.category = categoryElem?.textContent;
 
             const commentElem = elem.querySelector(
-                (detailsMode) ? '.reminder-item__comment-field .field__content' : '.reminder-item__comment',
+                (detailsMode) ? '.trans-item-base__comment-field .field__content' : '.trans-item-base__comment',
             );
             item.comment = commentElem?.textContent ?? '';
 

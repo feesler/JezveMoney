@@ -18,9 +18,50 @@ import {
     formatInputDate,
     reformatDate,
     secondsToDateString,
+    shiftDate,
+    shiftMonth,
+    shiftYear,
 } from './common.js';
 
 class Application extends TestApplication {
+    dates = {
+        get now() {
+            return new Date(cutDate(new Date()));
+        },
+
+        get monthAgo() {
+            return shiftMonth(this.now, -1);
+        },
+
+        get monthAfter() {
+            return shiftMonth(this.now, 1);
+        },
+
+        get weekAgo() {
+            return shiftDate(this.now, -7);
+        },
+
+        get weekAfter() {
+            return shiftDate(this.now, 7);
+        },
+
+        get yesterday() {
+            return shiftDate(this.now, -1);
+        },
+
+        get tomorrow() {
+            return shiftDate(this.now, 1);
+        },
+
+        get yearAgo() {
+            return shiftYear(this.now, -1);
+        },
+
+        get yearAfter() {
+            return shiftYear(this.now, 1);
+        },
+    };
+
     constructor() {
         super();
 
@@ -33,23 +74,6 @@ class Application extends TestApplication {
 
         this.scenario = await Scenario.create(this.environment);
 
-        const now = new Date(cutDate(new Date()));
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        const day = now.getDate();
-        this.dates = {
-            now,
-            monthAgo: new Date(Date.UTC(year, month - 1, day)),
-            monthAfter: new Date(Date.UTC(year, month + 1, day)),
-            weekAgo: new Date(Date.UTC(year, month, day - 7)),
-            weekAfter: new Date(Date.UTC(year, month, day + 7)),
-            yesterday: new Date(Date.UTC(year, month, day - 1)),
-            tomorrow: new Date(Date.UTC(year, month, day + 1)),
-            yearAgo: new Date(Date.UTC(year - 1, month, day)),
-            yearAfter: new Date(Date.UTC(year + 1, month, day)),
-        };
-
-        const self = this;
         this.dateFormatOptions = {
             dateStyle: 'short',
         };
@@ -57,50 +81,23 @@ class Application extends TestApplication {
             style: 'decimal',
         };
 
-        this.datesFmt = {
-            get now() {
-                return self.formatDate(self.dates.now);
-            },
-
-            get monthAgo() {
-                return self.formatDate(self.dates.monthAgo);
-            },
-
-            get monthAfter() {
-                return self.formatDate(self.dates.monthAfter);
-            },
-
-            get weekAgo() {
-                return self.formatDate(self.dates.weekAgo);
-            },
-
-            get weekAfter() {
-                return self.formatDate(self.dates.weekAfter);
-            },
-
-            get yesterday() {
-                return self.formatDate(self.dates.yesterday);
-            },
-
-            get tomorrow() {
-                return self.formatDate(self.dates.tomorrow);
-            },
-
-            get yearAgo() {
-                return self.formatDate(self.dates.yearAgo);
-            },
-
-            get yearAfter() {
-                return self.formatDate(self.dates.yearAfter);
-            },
-        };
-
+        this.datesFmt = {};
         this.datesSec = {};
-        Object.keys(this.dates).forEach((key) => {
-            this.datesSec[key] = dateToSeconds(this.dates[key]);
-        });
+        const self = this;
 
-        this.dateSecList = Object.values(this.datesSec);
+        Object.keys(this.dates).forEach((key) => {
+            Object.defineProperty(this.datesFmt, key, {
+                get() {
+                    return self.formatDate(self.dates[key]);
+                },
+            });
+
+            Object.defineProperty(this.datesSec, key, {
+                get() {
+                    return dateToSeconds(self.dates[key]);
+                },
+            });
+        });
     }
 
     isValidDateString(value) {

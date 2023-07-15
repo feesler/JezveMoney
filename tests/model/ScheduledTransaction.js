@@ -293,6 +293,10 @@ export class ScheduledTransaction {
     }
 
     renderInterval() {
+        if (this.interval_type === INTERVAL_NONE) {
+            return __('schedule.item.noRepeat', App.view.locale);
+        }
+
         const renderSteps = (this.interval_step > 1);
         const tokens = (renderSteps) ? stepIntervalTokens : intervalTokens;
         const token = tokens[this.interval_type];

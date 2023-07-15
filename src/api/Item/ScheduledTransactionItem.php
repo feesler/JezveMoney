@@ -29,13 +29,6 @@ class ScheduledTransactionItem
     public $createdate = 0;
     public $updatedate = 0;
 
-    private static $durationMap = [
-        INTERVAL_DAY => "D",
-        INTERVAL_WEEK => "W",
-        INTERVAL_MONTH => "M",
-        INTERVAL_YEAR => "Y",
-    ];
-
     /**
      * Converts table row from database to ScheduledTransactionItem object
      *

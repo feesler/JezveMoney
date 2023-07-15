@@ -1,7 +1,7 @@
 .import-form-popup {
   --import-form-popup-zindex: 500;
   --popup-max-width: 600px;
-  --popup-content-padding: 0 0 1rem 0;
+  --popup-content-padding: 0;
 }
 
 /* Transaction item */
@@ -68,10 +68,12 @@
     flex-flow: column nowrap;
     row-gap: 1rem;
     border-top: 1px solid;
-    padding: 1rem 1rem 0 1rem;
+    padding: 1rem;
     overflow: hidden;
     color: var(--text-color-3);
     border-color: var(--border-color-2);
-    background-color: var(--bg-color-3);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: var(--list-item-alt-bg-color);
   }
 }

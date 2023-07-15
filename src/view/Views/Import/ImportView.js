@@ -187,7 +187,7 @@ class ImportView extends AppView {
         listFooter.append(this.showMoreBtn);
 
         // Submit progress indicator
-        this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
+        this.submitProgress = LoadingIndicator.create({ title: __('import.submitInProgress') });
         this.submitProgressIndicator = createElement('div');
         this.submitProgress.elem.append(this.submitProgressIndicator);
         const contentWrapper = document.querySelector('.content_wrap');

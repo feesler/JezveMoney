@@ -296,9 +296,10 @@
         "deleteMessage": "Are you sure want to delete selected scheduled transaction?",
         "deleteMultipleMessage": "Are you sure want to delete selected scheduled transactions?",
         "finish": "Finish",
+        "date": "Date",
         "startDate": "Start date",
         "endDate": "End date",
-        "noEndDate": "Endless",
+        "noEndDate": "Not specified",
         "repeat": "Repeat transaction",
         "intervals": {
             "none": "Don't repeat",
@@ -316,6 +317,7 @@
         "item": {
             "start": "from ${1}",
             "end": "to ${1}",
+            "noRepeat": "No repeat",
             "everyDay": "every day",
             "everyWeek": "every week",
             "everyMonth": "every month",
@@ -466,6 +468,7 @@
         "useServer": "Use address on server",
         "itemRestore": "Cancel changes",
         "originalData": "Original imported data",
+        "submitInProgress": "Saving items...",
         "successMessage": "All transactions have been successfully imported",
         "templates": {
             "title": "Template",

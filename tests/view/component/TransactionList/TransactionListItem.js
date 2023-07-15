@@ -16,7 +16,7 @@ import { App } from '../../../Application.js';
 export class TransactionListItem extends TestComponent {
     async parseContent() {
         const res = await evaluate((elem, expenseType, incomeType) => {
-            const detailsMode = elem.classList.contains('trans-item_details');
+            const detailsMode = !!elem.querySelector('.trans-item-base_details');
             const item = {
                 id: parseInt(elem.dataset.id, 10),
                 type: parseInt(elem.dataset.type, 10),
@@ -28,7 +28,7 @@ export class TransactionListItem extends TestComponent {
                 const [
                     srcAccEl,
                     dAccEl,
-                ] = Array.from(elem.querySelectorAll('.trans-item__account-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__account-field .field__content'));
                 const sourceContent = srcAccEl.textContent;
                 const destContent = dAccEl.textContent;
                 const sourceVisible = sourceContent.length > 0;
@@ -48,7 +48,7 @@ export class TransactionListItem extends TestComponent {
                 const [
                     sAmount,
                     dAmount,
-                ] = Array.from(elem.querySelectorAll('.trans-item__amount-field .field__content'));
+                ] = Array.from(elem.querySelectorAll('.trans-item-base__amount-field .field__content'));
                 const srcAmount = sAmount.textContent;
                 if (srcAmount.length > 0 && dAmount?.textContent.length > 0) {
                     item.amountText = `${sign}${srcAmount} (${sign}${dAmount.textContent})`;
@@ -56,25 +56,25 @@ export class TransactionListItem extends TestComponent {
                     item.amountText = srcAmount;
                 }
             } else {
-                const titleElem = elem.querySelector('.trans-item__title');
+                const titleElem = elem.querySelector('.trans-item-base__title');
                 item.accountTitle = titleElem.textContent;
 
-                const amountElem = elem.querySelector('.trans-item__amount');
+                const amountElem = elem.querySelector('.trans-item-base__amount');
                 item.amountText = amountElem.textContent;
             }
 
             const dateElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__date-field .field__content' : '.trans-item__date',
+                (detailsMode) ? '.trans-item-base__date-field .field__content' : '.trans-item-base__date',
             );
-            item.dateFmt = dateElem.textContent;
+            item.dateFmt = dateElem?.textContent ?? '';
 
             const categoryElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__category-field .field__content' : '.trans-item__category',
+                (detailsMode) ? '.trans-item-base__category-field .field__content' : '.trans-item-base__category',
             );
             item.category = categoryElem.textContent;
 
             const commentElem = elem.querySelector(
-                (detailsMode) ? '.trans-item__comment-field .field__content' : '.trans-item__comment',
+                (detailsMode) ? '.trans-item-base__comment-field .field__content' : '.trans-item-base__comment',
             );
             item.comment = commentElem?.textContent ?? '';
 
@@ -98,7 +98,7 @@ export class TransactionListItem extends TestComponent {
         return click(this.content.menuBtn);
     }
 
-    static render(transaction, state) {
+    static render(transaction, state, showDate = true) {
         const res = {};
 
         assert(transaction, 'Invalid transaction object');
@@ -162,7 +162,9 @@ export class TransactionListItem extends TestComponent {
             }
         }
 
-        res.dateFmt = App.secondsToDateString(transaction.date);
+        if (showDate) {
+            res.dateFmt = App.secondsToDateString(transaction.date);
+        }
 
         const category = state.categories.getItem(transaction.category_id);
         res.category = (transaction.category_id === 0) ? '' : category.name;

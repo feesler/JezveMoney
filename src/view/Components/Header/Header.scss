@@ -262,6 +262,7 @@
   flex-flow: row nowrap;
   align-items: center;
   height: 40px;
+  flex-shrink: 0;
 }
 
 .nav-item__title {

@@ -97,11 +97,11 @@ export class TransactionList extends TestComponent {
             .map((item) => this.content.items.indexOf(item));
     }
 
-    static render(transactions, state) {
+    static render(transactions, state, showDate = true) {
         assert.isArray(transactions);
 
         return {
-            items: transactions.map((item) => TransactionListItem.render(item, state)),
+            items: transactions.map((item) => TransactionListItem.render(item, state, showDate)),
             noDataMessage: { visible: transactions.length === 0 },
         };
     }
@@ -111,7 +111,7 @@ export class TransactionList extends TestComponent {
 
         const res = {
             title: __('transactions.listTitle', App.view.locale),
-            transList: this.render(transactions, state),
+            transList: this.render(transactions, state, true),
         };
 
         return res;

@@ -1318,6 +1318,7 @@ class ScheduledTransactionModel extends CachedTable
 
             $userModel->setRemindersDate();
 
+            $params["state"] = REMINDER_SCHEDULED;
             $reminders = $this->getAllExpectedReminders($params);
             $this->reminderModel->createMultiple($reminders);
         });

@@ -9,17 +9,10 @@ import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
-import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
-    LIMIT_CHANGE,
-    Transaction,
-} from '../../../../Models/Transaction.js';
-import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
+import { INTERVAL_NONE, ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
 
 import { Field } from '../../../../Components/Fields/Field/Field.js';
+import { TransactionListItemBase } from '../../../../Components/TransactionListItemBase/TransactionListItemBase.js';
 
 import './ScheduleListItem.scss';
 
@@ -32,26 +25,14 @@ const START_DATE_CLASS = 'schedule-item__start-date';
 const END_DATE_CLASS = 'schedule-item__end-date';
 const INTERVAL_CLASS = 'schedule-item__interval';
 const OFFSET_CLASS = 'schedule-item__offset';
-const TITLE_CLASS = 'schedule-item__title';
-const AMOUNT_CLASS = 'schedule-item__amount';
-const CATEGORY_CLASS = 'schedule-item__category';
-const COMMENT_CLASS = 'schedule-item__comment';
-const AMOUNT_CATEGORY_CLASS = 'schedule-item__amount-category';
 /* Details mode */
 const DETAILS_CLASS = 'schedule-item_details';
 const COLUMN_CLASS = 'schedule-item__column';
-const SCHEDULE_ROW_CLASS = 'schedule-item__schedule-row';
-const MAIN_ROW_CLASS = 'schedule-item__main-row';
 /* Fields */
 const START_DATE_FIELD_CLASS = 'schedule-item__start-date-field';
 const END_DATE_FIELD_CLASS = 'schedule-item__end-date-field';
 const INTERVAL_FIELD_CLASS = 'schedule-item__interval-field';
 const OFFSET_FIELD_CLASS = 'schedule-item__offset-field';
-const TYPE_FIELD_CLASS = 'schedule-item__type-field';
-const TITLE_FIELD_CLASS = 'schedule-item__account-field';
-const AMOUNT_FIELD_CLASS = 'schedule-item__amount-field';
-const CATEGORY_FIELD_CLASS = 'schedule-item__category-field';
-const COMMENT_FIELD_CLASS = 'schedule-item__comment-field';
 /* Select controls */
 const SELECT_CONTROLS_CLASS = 'schedule-item__select';
 /* Controls */
@@ -89,6 +70,7 @@ export class ScheduleListItem extends Component {
 
         this.selectControls = null;
         this.controlsElem = null;
+        this.transactionBase = null;
 
         this.init();
     }
@@ -104,6 +86,9 @@ export class ScheduleListItem extends Component {
             children: this.contentElem,
         });
 
+        this.scheduleGroup = createElement('div', { props: { className: SCHEDULE_GROUP_CLASS } });
+        this.contentElem.append(this.scheduleGroup);
+
         this.render(this.state);
     }
 
@@ -111,33 +96,11 @@ export class ScheduleListItem extends Component {
         this.dateRangeElem = createElement('div', { props: { className: DATE_RANGE_CLASS } });
         this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
         this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
-        const scheduleElem = createElement('div', {
-            props: { className: SCHEDULE_GROUP_CLASS },
-            children: [
-                this.dateRangeElem,
-                this.intervalElem,
-                this.offsetElem,
-            ],
-        });
 
-        this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
-        this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
-        this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
-        const amountCategoryElem = createElement('div', {
-            props: { className: AMOUNT_CATEGORY_CLASS },
-            children: [
-                this.amountElem,
-                this.categoryElem,
-            ],
-        });
-
-        this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
-
-        this.contentElem.append(
-            scheduleElem,
-            this.titleElem,
-            amountCategoryElem,
-            this.commentElem,
+        this.scheduleGroup.append(
+            this.dateRangeElem,
+            this.intervalElem,
+            this.offsetElem,
         );
     }
 
@@ -180,104 +143,26 @@ export class ScheduleListItem extends Component {
             children: [this.intervalField.elem, this.offsetField.elem],
         });
 
-        const scheduleGroup = createElement('div', {
-            props: { className: SCHEDULE_ROW_CLASS },
-            children: [
-                dateRangeGroup,
-                intervalGroup,
-            ],
-        });
-
-        // Main content
-        // Type
-        this.typeField = Field.create({
-            title: __('transactions.type'),
-            className: TYPE_FIELD_CLASS,
-        });
-        // Accounts
-        this.sourceField = Field.create({
-            title: __('transactions.source'),
-            className: TITLE_FIELD_CLASS,
-        });
-        this.destField = Field.create({
-            title: __('transactions.destination'),
-            className: TITLE_FIELD_CLASS,
-        });
-        const sourceDestGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [this.sourceField.elem, this.destField.elem],
-        });
-        // Amount
-        this.srcAmountField = Field.create({
-            title: __('transactions.sourceAmount'),
-            className: AMOUNT_FIELD_CLASS,
-        });
-        this.destAmountField = Field.create({
-            title: __('transactions.destAmount'),
-            className: AMOUNT_FIELD_CLASS,
-        });
-        const amountGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
-            children: [this.srcAmountField.elem, this.destAmountField.elem],
-        });
-
-        // Category
-        this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
-        this.categoryField = Field.create({
-            title: __('transactions.category'),
-            content: this.categoryElem,
-            className: CATEGORY_FIELD_CLASS,
-        });
-        // Comment
-        this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
-        this.commentField = Field.create({
-            title: __('transactions.comment'),
-            content: this.commentElem,
-            className: COMMENT_FIELD_CLASS,
-        });
-
-        const transactionGroup = createElement('div', {
-            props: { className: MAIN_ROW_CLASS },
-            children: [
-                this.typeField.elem,
-                sourceDestGroup,
-                amountGroup,
-                this.categoryField.elem,
-                this.commentField.elem,
-            ],
-        });
-
-        this.contentElem.append(
-            scheduleGroup,
-            transactionGroup,
+        this.scheduleGroup.append(
+            dateRangeGroup,
+            intervalGroup,
         );
     }
 
     resetContent() {
-        removeChilds(this.contentElem);
-        // Classic mode elements
-        this.titleElem = null;
-        this.amountElem = null;
+        removeChilds(this.scheduleGroup);
+
         // Details mode elements
-        this.typeField = null;
-        this.sourceField = null;
-        this.destField = null;
-        this.srcAmountField = null;
-        this.destAmountField = null;
         this.startDateField = null;
         this.endDateField = null;
         this.intervalField = null;
         this.offsetField = null;
-        this.categoryField = null;
-        this.commentField = null;
         // Common
         this.startDateElem = null;
         this.endDateElem = null;
         this.dateRangeElem = null;
         this.intervalElem = null;
         this.offsetElem = null;
-        this.categoryElem = null;
-        this.commentElem = null;
     }
 
     createSelectControls() {
@@ -307,127 +192,6 @@ export class ScheduleListItem extends Component {
         });
 
         this.elem.append(this.controlsElem);
-    }
-
-    getDebtType(item) {
-        if (item.type !== DEBT) {
-            throw new Error('Invalid item type');
-        }
-
-        const { profile, accounts } = App.model;
-        const srcAcc = accounts.getItem(item.src_id);
-        return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
-    }
-
-    getAccountOrPerson(accountId) {
-        const { profile, accounts, persons } = App.model;
-        const account = accounts.getItem(accountId);
-        if (!account) {
-            return null;
-        }
-        if (account.owner_id === profile.owner_id) {
-            return account.name;
-        }
-
-        const person = persons.getItem(account.owner_id);
-        return person.name;
-    }
-
-    formatAccounts(item) {
-        if (!item) {
-            throw new Error('Invalid transaction');
-        }
-
-        const accountModel = App.model.accounts;
-        const srcAcc = accountModel.getItem(item.src_id);
-        const destAcc = accountModel.getItem(item.dest_id);
-
-        if (item.type === EXPENSE) {
-            return srcAcc.name;
-        }
-
-        if (item.type === INCOME) {
-            return destAcc.name;
-        }
-
-        if (item.type === TRANSFER) {
-            return `${srcAcc.name} → ${destAcc.name}`;
-        }
-
-        if (item.type === LIMIT_CHANGE) {
-            return srcAcc?.name ?? destAcc?.name;
-        }
-
-        if (item.type !== DEBT) {
-            throw new Error('Invalid type of transaction');
-        }
-
-        const personModel = App.model.persons;
-        const debtType = this.getDebtType(item);
-        const personAcc = (debtType) ? srcAcc : destAcc;
-        const person = personModel.getItem(personAcc.owner_id);
-        if (!person) {
-            throw new Error(`Person ${personAcc.owner_id} not found`);
-        }
-
-        const acc = (debtType) ? destAcc : srcAcc;
-        if (acc) {
-            return (debtType)
-                ? `${person.name} → ${acc.name}`
-                : `${acc.name} → ${person.name}`;
-        }
-
-        return person.name;
-    }
-
-    formatAmount(item) {
-        if (!item) {
-            throw new Error('Invalid transaction');
-        }
-
-        const currencyModel = App.model.currency;
-        const srcAmountFmt = currencyModel.formatCurrency(item.src_amount, item.src_curr);
-        const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
-        const diffCurrency = item.src_curr !== item.dest_curr;
-
-        let sign = '';
-        if (item.type === EXPENSE) {
-            sign = '- ';
-        }
-        if (item.type === INCOME) {
-            sign = '+ ';
-        }
-
-        if (item.type === DEBT) {
-            const debtType = this.getDebtType(item);
-            const acc = (debtType) ? item.dest_id : item.src_id;
-            if (!acc) {
-                sign = (debtType) ? '- ' : '+ ';
-            }
-        }
-
-        if (item.type === LIMIT_CHANGE) {
-            sign = (item.src_id !== 0) ? '- ' : '+ ';
-        }
-
-        return (diffCurrency)
-            ? `${sign}${srcAmountFmt} (${sign}${destAmountFmt})`
-            : `${sign}${srcAmountFmt}`;
-    }
-
-    getCategoryTitle(state) {
-        const { item } = state;
-        if (item.category_id === 0) {
-            return null;
-        }
-
-        const { categories } = App.model;
-        const category = categories.getItem(item.category_id);
-        if (!category) {
-            throw new Error('Invalid category');
-        }
-
-        return category.name;
     }
 
     renderSelectControls(state, prevState) {
@@ -463,22 +227,18 @@ export class ScheduleListItem extends Component {
     renderClassic(state) {
         const { item } = state;
 
-        const accountTitle = this.formatAccounts(item);
-        this.titleElem.textContent = accountTitle;
-        this.titleElem.setAttribute('title', accountTitle);
-
-        this.amountElem.textContent = this.formatAmount(item);
-
         this.dateRangeElem.textContent = this.renderDateRange(item);
         this.intervalElem.textContent = item.renderInterval();
         this.offsetElem.textContent = item.renderIntervalOffset();
+    }
 
-        const categoryTitle = this.getCategoryTitle(state);
-        show(this.categoryElem, !!categoryTitle);
-        this.categoryElem.textContent = categoryTitle;
-
-        this.commentElem.textContent = item.comment;
-        this.commentElem.setAttribute('title', item.comment);
+    renderStartDateField(state) {
+        const { item } = state;
+        const startDateToken = (item.interval_type === INTERVAL_NONE)
+            ? 'schedule.date'
+            : 'schedule.startDate';
+        this.startDateField.setTitle(__(startDateToken));
+        this.startDateField.setContent(App.formatDate(item.start_date));
     }
 
     renderEndDate(item) {
@@ -487,70 +247,31 @@ export class ScheduleListItem extends Component {
             : __('schedule.noEndDate');
     }
 
-    renderDetails(state) {
+    renderEndDateField(state) {
         const { item } = state;
-        const { currency } = App.model;
-
-        // Schedule
-        // Start date
-        this.startDateField.setContent(App.formatDate(item.start_date));
-
-        // End date
+        this.endDateField.show(item.interval_type !== INTERVAL_NONE);
         this.endDateField.setContent(this.renderEndDate(item));
-
-        // Interval
-        this.intervalField.setContent(item.renderInterval());
-
-        // Offset
-        this.offsetField.setContent(item.renderIntervalOffset());
-
-        // Transaction
-        // Type
-        this.typeField.setContent(Transaction.getTypeTitle(item.type));
-
-        // Source
-        const showSource = (item.src_id !== 0);
-        if (showSource) {
-            const sourceContent = this.getAccountOrPerson(item.src_id);
-            this.sourceField.setContent(sourceContent);
-        }
-        this.sourceField.show(showSource);
-
-        // Destination
-        const showDest = (item.dest_id !== 0);
-        if (showDest) {
-            const destContent = this.getAccountOrPerson(item.dest_id);
-            this.destField.setContent(destContent);
-        }
-        this.destField.show(showDest);
-
-        // Amount
-        const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
-        this.srcAmountField.setTitle(srcAmountLabel);
-        if (isDiff) {
-            const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);
-            this.srcAmountField.setContent(srcAmountFmt);
-            const destAmountFmt = currency.formatCurrency(item.dest_amount, item.dest_curr);
-            this.destAmountField.setContent(destAmountFmt);
-        } else {
-            const amountFmt = this.formatAmount(item);
-            this.srcAmountField.setContent(amountFmt);
-        }
-        this.destAmountField.show(isDiff);
-
-        // Category field
-        const categoryTitle = this.getCategoryTitle(state);
-        this.categoryField.show(!!categoryTitle);
-        this.categoryField.setContent(categoryTitle);
-
-        // Comment
-        const hasComment = item.comment.length > 0;
-        this.commentField.show(hasComment);
-        this.commentField.setContent(item.comment);
     }
 
-    renderContent(state, prevState) {
+    renderIntervalField(state) {
+        const { item } = state;
+        this.intervalField.setContent(item.renderInterval());
+    }
+
+    renderIntervalOffsetField(state) {
+        const { item } = state;
+        this.offsetField.show(item.interval_type !== INTERVAL_NONE);
+        this.offsetField.setContent(item.renderIntervalOffset());
+    }
+
+    renderDetails(state) {
+        this.renderStartDateField(state);
+        this.renderEndDateField(state);
+        this.renderIntervalField(state);
+        this.renderIntervalOffsetField(state);
+    }
+
+    renderScheduleContent(state, prevState) {
         if (state.mode !== prevState.mode) {
             this.resetContent();
             if (state.mode === 'details') {
@@ -565,6 +286,34 @@ export class ScheduleListItem extends Component {
         } else {
             this.renderClassic(state);
         }
+    }
+
+    renderTransactionContent(state, prevState) {
+        if (
+            state.item === prevState?.item
+            && state.mode === prevState?.mode
+        ) {
+            return;
+        }
+
+        const transactionState = {
+            item: state.item,
+            mode: state.mode,
+            showDate: false,
+            showResults: false,
+        };
+
+        if (this.transactionBase) {
+            this.transactionBase.setState(transactionState);
+        } else {
+            this.transactionBase = TransactionListItemBase.create(transactionState);
+            this.contentElem.append(this.transactionBase.elem);
+        }
+    }
+
+    renderContent(state, prevState) {
+        this.renderScheduleContent(state, prevState);
+        this.renderTransactionContent(state, prevState);
     }
 
     render(state, prevState = {}) {

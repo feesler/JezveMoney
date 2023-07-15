@@ -88,6 +88,7 @@ export class ImportUploadDialog extends TestComponent {
             submitTplBtn: { elem: await query('#templateForm .form-controls .submit-btn') },
             cancelTplBtn: { elem: await query('#templateForm .form-controls .cancel-btn') },
             tplFormFeedback: { elem: await query('#tplFormFeedback') },
+            convertFeedback: { elem: await query('#convertFeedback') },
             initialAccount: await DropDown.createFromChild(this, await query('#initialAccount')),
             submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },
         };
@@ -155,8 +156,22 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFormFeedback.title,
             res.tplFormFeedback.isValid,
             res.tplFormTitle.title,
+            res.convertFeedback.title,
+            res.convertFeedback.visible,
         ] = await evaluate(
-            (fileEl, serverEl, tplEl, nameEl, inpEl, decBtn, incBtn, fbEl, formFbEl, titleEl) => ([
+            (
+                fileEl,
+                serverEl,
+                tplEl,
+                nameEl,
+                inpEl,
+                decBtn,
+                incBtn,
+                fbEl,
+                formFbEl,
+                titleEl,
+                convFbEL,
+            ) => ([
                 fileEl.value,
                 serverEl.value,
                 tplEl.textContent,
@@ -169,6 +184,8 @@ export class ImportUploadDialog extends TestComponent {
                 formFbEl.textContent,
                 formFbEl.classList.contains('valid-feedback'),
                 titleEl?.textContent,
+                convFbEL?.textContent,
+                !!convFbEL && !convFbEL.hidden,
             ]),
             res.fileNameElem.elem,
             res.serverAddressInput.elem,
@@ -180,6 +197,7 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFeedback.elem,
             res.tplFormFeedback.elem,
             res.tplFormTitle.elem,
+            res.convertFeedback.elem,
         );
 
         res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
@@ -255,6 +273,7 @@ export class ImportUploadDialog extends TestComponent {
         res.isTplLoading = cont.isTplLoading;
         res.isValid = cont.tplFeedback.isValid;
         res.isFormValid = cont.tplFormFeedback.isValid;
+        res.convertFeedbackVisible = cont.convertFeedback.visible;
 
         res.useServerAddress = cont.useServerAddress;
         res.filename = cont.uploadFilename;
@@ -395,6 +414,7 @@ export class ImportUploadDialog extends TestComponent {
         res.columnField = { visible: isFormState };
         res.dateFormatField = { visible: isFormState && isDateFormatColumn };
         res.tplFormFeedback = { visible: isFormState };
+        res.convertFeedback = { visible: model.convertFeedbackVisible };
         res.submitTplBtn = { visible: isFormState };
 
         const showCancelBtn = (model.state === CREATE_TPL_STATE)
@@ -567,6 +587,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = CREATE_TPL_STATE;
+        this.model.convertFeedbackVisible = false;
         this.model.selectedColumn = 'accountAmount';
         this.model.template = new ImportTemplate({
             name: '',
@@ -593,6 +614,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = UPDATE_TPL_STATE;
+        this.model.convertFeedbackVisible = false;
         this.model.selectedColumn = 'accountAmount';
         this.model.template = App.state.templates.getItem(this.content.templateDropDown.value);
         this.expectedState = this.getExpectedState(this.model);
