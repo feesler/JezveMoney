@@ -468,6 +468,7 @@
         "useServer": "Использовать адрес на сервере",
         "itemRestore": "Отменить изменения",
         "originalData": "Исходные данные",
+        "submitInProgress": "Отправка транзакций...",
         "successMessage": "Транзакции были успешно импортированы",
         "templates": {
             "title": "Шаблон",

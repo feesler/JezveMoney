@@ -468,6 +468,7 @@
         "useServer": "Use address on server",
         "itemRestore": "Cancel changes",
         "originalData": "Original imported data",
+        "submitInProgress": "Saving items...",
         "successMessage": "All transactions have been successfully imported",
         "templates": {
             "title": "Template",
