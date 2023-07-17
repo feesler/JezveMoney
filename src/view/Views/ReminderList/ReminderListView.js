@@ -45,6 +45,7 @@ import { ReminderList } from '../../Models/ReminderList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
@@ -175,6 +176,17 @@ class ReminderListView extends AppView {
             onChange: (data) => this.changeDateFilter(data),
         });
         this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
+
+        // Controls
+        this.filtersControls = FormControls.create({
+            className: 'filters-controls',
+            submitTitle: __('actions.apply'),
+            onSubmitClick: () => this.filters.close(),
+            cancelTitle: __('actions.clearAll'),
+            cancelBtnClass: 'clear-all-btn',
+            onCancelClick: (e) => this.onClearAllFilters(e),
+        });
+        this.filtersContainer.append(this.filtersControls.elem);
 
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
@@ -373,6 +385,26 @@ class ReminderListView extends AppView {
         }
 
         this.store.dispatch(actions.changeDateFilter(data));
+        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                range: 1,
+                page: 1,
+                keepState: true,
+            });
+        }
+
+        this.setRenderTime();
+    }
+
+    /**
+     * Clear all filters
+     * @param {Event} e - click event object
+     */
+    async onClearAllFilters(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.clearAllFilters());
         if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
             await this.requestUpcoming({
                 ...this.getUpcomingRequestData(),
@@ -838,6 +870,20 @@ class ReminderListView extends AppView {
                 startDate: dateStringToTime(state.form.startDate),
                 endDate: dateStringToTime(state.form.endDate),
             },
+        }));
+
+        // Controls
+        const { filter } = state;
+        const clearAllURLParams = {};
+
+        if (filter.state !== REMINDER_SCHEDULED) {
+            clearAllURLParams.state = Reminder.getStateName(filter.state);
+        }
+
+        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
+        this.filtersControls.setState((controlsState) => ({
+            ...controlsState,
+            cancelURL: clearAllURL.toString(),
         }));
     }
 

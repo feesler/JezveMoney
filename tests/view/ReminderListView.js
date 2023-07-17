@@ -93,6 +93,9 @@ export class ReminderListView extends AppView {
                     endDate: endDateFmt,
                 },
             },
+            clearFiltersBtn: {
+                visible: filtersVisible,
+            },
             totalCounter: { visible: true, value: filteredItems.length },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
@@ -229,6 +232,7 @@ export class ReminderListView extends AppView {
         const res = {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
+            clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
@@ -722,6 +726,27 @@ export class ReminderListView extends AppView {
         }
 
         return this.checkState(expected);
+    }
+
+    async clearAllFilters(directNavigate = false) {
+        if (!directNavigate) {
+            await this.openFilters();
+        }
+
+        this.model.filter = {
+            state: this.model.filter.state,
+            startDate: null,
+            endDate: null,
+        };
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => click(this.content.clearFiltersBtn.elem));
+        }
+
+        return App.view.checkState(expected);
     }
 
     async filterByState(state, directNavigate = false) {

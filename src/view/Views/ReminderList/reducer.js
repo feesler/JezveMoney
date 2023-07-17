@@ -174,6 +174,18 @@ const slice = createSlice({
         },
     }),
 
+    clearAllFilters: (state) => ({
+        ...state,
+        form: {
+            state: state.form.state,
+        },
+        pagination: {
+            ...state.pagination,
+            page: 1,
+            range: 1,
+        },
+    }),
+
     toggleMode: (state) => ({
         ...state,
         mode: (state.mode === 'details') ? 'classic' : 'details',

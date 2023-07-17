@@ -108,6 +108,16 @@ export const toggleSelect = async (transactions) => {
     });
 };
 
+export const clearAllFilters = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear all filters', () => (
+        App.view.clearAllFilters(directNavigate)
+    ));
+};
+
 export const filterByState = async ({ state, directNavigate = false }) => {
     const stateType = parseInt(state, 10);
     const stateName = Reminder.stateNames[stateType];
