@@ -1,5 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import {
+    dateStringToTime,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { ReminderList } from '../../Models/ReminderList.js';
@@ -17,8 +22,13 @@ export const getItemsSource = (state) => (
 
 export const createList = (items, state) => {
     const stateFilter = getStateFilter(state);
+    const { startDate, endDate } = state.filter;
 
-    const res = items.filter((item) => stateFilter === item?.state);
+    const res = items.filter((item) => (
+        stateFilter === item?.state
+        && (!startDate || item.date >= startDate)
+        && (!endDate || item.date <= endDate)
+    ));
 
     const list = ReminderList.create(res);
     if (stateFilter === REMINDER_UPCOMING) {
@@ -166,18 +176,28 @@ const slice = createSlice({
         },
     }),
 
-    changeDateFilter: (state, data) => ({
+    changeDateFilter: (state, data) => updateList({
         ...state,
         form: {
             ...state.form,
             ...data,
         },
+        filter: {
+            ...state.filter,
+            startDate: dateStringToTime(data.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(data.endDate, { fixShortYear: false }),
+        },
     }),
 
-    clearAllFilters: (state) => ({
+    clearAllFilters: (state) => updateList({
         ...state,
         form: {
             state: state.form.state,
+        },
+        filter: {
+            state: state.filter.state,
+            startDate: null,
+            endDate: null,
         },
         pagination: {
             ...state.pagination,

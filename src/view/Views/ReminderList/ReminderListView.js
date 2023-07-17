@@ -312,7 +312,7 @@ class ReminderListView extends AppView {
 
         this.store.dispatch(actions.changeStateFilter(value));
 
-        if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
+        if (stateFilter === REMINDER_UPCOMING) {
             await this.requestUpcoming(this.getUpcomingRequestData());
         }
 

@@ -697,6 +697,16 @@ export class ReminderListView extends AppView {
         await this.parse();
     }
 
+    async goToExpectedURL() {
+        await goTo(this.getExpectedURL());
+        return App.view.waitForLoad();
+    }
+
+    async goToDetailsURL() {
+        await goTo(this.getDetailsURL());
+        return App.view.waitForLoad();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -741,7 +751,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => click(this.content.clearFiltersBtn.elem));
         }
@@ -769,8 +779,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
-            await App.view.waitForLoad();
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.stateMenu.selectItemByValue(state));
         }
@@ -795,7 +804,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.dateFilter.selectStart(date));
         }
@@ -820,7 +829,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.dateFilter.selectEnd(date));
         }
@@ -839,7 +848,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.dateFilter.clearStart());
         }
@@ -858,7 +867,7 @@ export class ReminderListView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.dateFilter.clearEnd());
         }
@@ -879,7 +888,7 @@ export class ReminderListView extends AppView {
         const expected = this.onPageChanged(1);
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.paginator.goToFirstPage());
         }
@@ -900,7 +909,7 @@ export class ReminderListView extends AppView {
         const expected = this.onPageChanged(this.pagesCount());
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.paginator.goToLastPage());
         }
@@ -919,7 +928,7 @@ export class ReminderListView extends AppView {
         const expected = this.onPageChanged(this.currentPage() - 1);
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.paginator.goToPrevPage());
         }
@@ -938,7 +947,7 @@ export class ReminderListView extends AppView {
         const expected = this.onPageChanged(this.currentPage() + 1);
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.paginator.goToNextPage());
         }
@@ -1061,7 +1070,7 @@ export class ReminderListView extends AppView {
         const expected = this.getExpectedState();
 
         if (directNavigate) {
-            await goTo(this.getExpectedURL());
+            await this.goToExpectedURL();
         } else {
             await this.waitForList(() => this.content.modeSelector.click());
         }
@@ -1180,7 +1189,7 @@ export class ReminderListView extends AppView {
         const expected = this.getExpectedState();
 
         if (directNavigate) {
-            await goTo(this.getDetailsURL());
+            await this.goToDetailsURL();
         } else {
             await this.performAction(() => this.contextMenu.select('ctxDetailsBtn'));
         }
@@ -1199,7 +1208,7 @@ export class ReminderListView extends AppView {
         const expected = this.getExpectedState();
 
         if (directNavigate) {
-            await goTo(this.getDetailsURL());
+            await this.goToDetailsURL();
         } else {
             await this.performAction(() => this.content.itemInfo.close());
         }
