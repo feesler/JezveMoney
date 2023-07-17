@@ -47,7 +47,11 @@ export const updateList = (state) => {
     const items = createList(itemsSource, state);
     result.items = items;
 
-    pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+    const stateFilter = getStateFilter(result);
+    if (stateFilter !== REMINDER_UPCOMING) {
+        pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+    }
+
     pagination.page = (pagination.pagesCount > 0)
         ? Math.min(pagination.pagesCount, pagination.page)
         : 1;
@@ -130,6 +134,10 @@ const slice = createSlice({
 
     changeStateFilter: (state, value) => updateList({
         ...state,
+        form: {
+            ...state.form,
+            state: value,
+        },
         filter: {
             ...state.filter,
             state: value,
@@ -158,6 +166,14 @@ const slice = createSlice({
         },
     }),
 
+    changeDateFilter: (state, data) => ({
+        ...state,
+        form: {
+            ...state.form,
+            ...data,
+        },
+    }),
+
     toggleMode: (state) => ({
         ...state,
         mode: (state.mode === 'details') ? 'classic' : 'details',
@@ -182,17 +198,24 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    listRequestLoaded: (state, { upcoming, keepState }) => updateList({
-        ...state,
-        upcomingItems: (upcoming) ? upcoming.map(upcomingId) : state.upcomingItems,
-        listMode: (keepState) ? state.listMode : 'list',
-        contextItem: null,
-    }),
+    listRequestLoaded: (state, { upcoming, keepState }) => {
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
 
-    upcomingItemsLoaded: (state, items) => updateList({
-        ...state,
-        upcomingItems: items.map(upcomingId),
-    }),
+        return updateList({
+            ...state,
+            pagination: (isUpcoming && upcoming?.pagination)
+                ? { ...upcoming.pagination }
+                : state.pagination,
+            filter: (isUpcoming && upcoming?.filter)
+                ? { ...state.filter, ...upcoming.filter }
+                : state.filter,
+            upcomingItems: (isUpcoming && Array.isArray(upcoming?.items))
+                ? upcoming.items.map(upcomingId)
+                : state.upcomingItems,
+            listMode: (keepState) ? state.listMode : 'list',
+            contextItem: null,
+        });
+    },
 });
 
 export const { actions, reducer } = slice;

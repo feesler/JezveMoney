@@ -3,6 +3,7 @@ import {
     isInt,
     assert,
     asArray,
+    isDate,
 } from 'jezve-test';
 import {
     isValidValue,
@@ -13,6 +14,7 @@ import {
     dateToSeconds,
     cutDate,
     shiftYear,
+    secondsToDate,
 } from '../common.js';
 import {
     EXPENSE,
@@ -640,13 +642,36 @@ export class AppState {
     }
 
     getUpcomingReminders(options = {}) {
-        const {
+        let {
             page = 1,
             range = 1,
-            onPage = 10,
             startDate = App.dates.tomorrow,
             endDate = App.dates.yearAfter,
         } = options;
+        const {
+            onPage = 10,
+        } = options;
+
+        if (startDate && !isDate(startDate)) {
+            startDate = secondsToDate(startDate);
+        }
+        if (endDate && !isDate(endDate)) {
+            endDate = secondsToDate(endDate);
+        }
+
+        const pagination = {
+            page,
+            range,
+            onPage,
+        };
+
+        const filter = {};
+        if (options.startDate) {
+            filter.startDate = options.startDate;
+        }
+        if (options.endDate) {
+            filter.endDate = options.endDate;
+        }
 
         const reminderOptions = {
             startDate: cutDate(startDate),
@@ -660,19 +685,32 @@ export class AppState {
         const firstItemIndex = (page - 1) * onPage;
         const lastItemIndex = (page + range - 1) * onPage;
 
-        while (remindersCount > prevCount && remindersCount < lastItemIndex) {
+        if (options.endDate && onPage > 0) {
+            pagination.total = remindersCount;
+            pagination.pagesCount = Math.ceil(remindersCount / onPage);
+            page = Math.min(pagination.pagesCount, page);
+            range = Math.min(pagination.pagesCount - page + 1, range);
+        }
+
+        pagination.page = page;
+        pagination.range = range;
+
+        while (
+            !options.endDate
+            && remindersCount > prevCount
+            && remindersCount < lastItemIndex
+        ) {
             reminderOptions.endDate = shiftYear(new Date(reminderOptions.endDate), 1);
             res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
             prevCount = remindersCount;
             remindersCount = res.length;
         }
 
-        res = res.slice(firstItemIndex, lastItemIndex);
-
-        const list = RemindersList.create(res);
-        list.sort(false);
-
-        return list;
+        return {
+            items: res.slice(firstItemIndex, lastItemIndex),
+            pagination,
+            filter,
+        };
     }
 
     getState(request) {

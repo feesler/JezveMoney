@@ -39,6 +39,7 @@ import { SetTransactionCategoryForm } from './components/Forms/Transactions/SetT
 import { StatisticsForm } from './components/Forms/Transactions/StatisticsForm.js';
 import { ScheduledTransactionForm } from './components/Forms/Schedule/ScheduledTransactionForm.js';
 import { RemindersListForm } from './components/Forms/Reminders/RemindersListForm.js';
+import { UpcomingRemindersListForm } from './components/Forms/Reminders/UpcomingRemindersListForm.js';
 import { ImportTemplateForm } from './components/Forms/ImportTemplates/ImportTemplateForm.js';
 import { ImportRuleForm } from './components/Forms/ImportRules/ImportRuleForm.js';
 import { ImportConditionForm } from './components/Forms/ImportConditions/ImportConditionForm.js';
@@ -567,11 +568,11 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isRemindersArray),
         });
 
-        const upcomingForm = ApiRequestForm.create({
+        const upcomingForm = UpcomingRemindersListForm.create({
             id: 'upcomingRemindersForm',
             title: 'Upcoming reminders',
             action: this.getRequestURL('reminder/upcoming'),
-            onSubmit: this.getVerifyHandler(apiTypes.isUpcomingRemindersArray),
+            onSubmit: this.getVerifyHandler(apiTypes.isUpcomingRemindersList),
         });
 
         const readForm = ItemIdsForm.create({

@@ -72,11 +72,21 @@ class Reminder extends ApiListController
             "range" => 1,
         ];
 
+        $result = new \stdClass();
+
         $request = $this->getRequestData();
         $request = array_merge($requestDefaults, $request);
 
         $scheduleModel = ScheduledTransactionModel::getInstance();
-        $result = $scheduleModel->getUpcomingReminders($request);
+
+        $request = $scheduleModel->getUpcomingRequestFilters($request);
+        $params = $request["params"];
+
+        $reminders = $scheduleModel->getUpcomingReminders($params);
+
+        $result->items = $reminders["items"];
+        $result->filter = (object)$request["filter"];
+        $result->pagination = $reminders["pagination"];
 
         $this->ok($result);
     }

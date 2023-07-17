@@ -116,7 +116,7 @@ export const upcoming = async (params) => {
     let res = [];
 
     await test(`Upcoming reminders (${formatProps(params)})`, async () => {
-        const { data: resExpected } = App.state.getUpcomingReminders(params);
+        const resExpected = App.state.getUpcomingReminders(params);
 
         let listRes;
         try {

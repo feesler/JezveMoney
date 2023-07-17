@@ -3,7 +3,7 @@ import { List } from './List.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { TransactionsList } from './TransactionsList.js';
 import { App } from '../Application.js';
-import { cutDate, timeToSeconds } from '../common.js';
+import { timeToSeconds } from '../common.js';
 import { REMINDER_UPCOMING } from './Reminder.js';
 import { RemindersList } from './RemindersList.js';
 
@@ -98,9 +98,6 @@ export class ScheduledTransactionsList extends List {
             endDate: yearAfter,
             ...options,
         };
-
-        reminderOptions.startDate = Math.max(cutDate(options.startDate), tomorrow);
-        reminderOptions.endDate = Math.max(cutDate(options.endDate), yearAfter);
 
         const res = [];
         this.forEach((item) => {

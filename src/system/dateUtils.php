@@ -223,15 +223,15 @@ function getDateIntervalOffset(mixed $dateInfo, int $intervalType)
  * Increases timestamp up to next interval and returns result
  *  or null in case invalid data
  *
- * @param int $timestamp timestamp to find next date interval for
+ * @param int|null $timestamp timestamp to find next date interval for
  * @param int $intervalType type of interval
  * @param int $step count of intervals to add
  *
  * @return int|null
  */
-function stepInterval(int $timestamp, int $intervalType, int $step = 1)
+function stepInterval(?int $timestamp, int $intervalType, int $step = 1)
 {
-    if ($intervalType === INTERVAL_NONE || $step < 1) {
+    if (!$timestamp || $intervalType === INTERVAL_NONE || $step < 1) {
         return null;
     }
 
@@ -257,13 +257,13 @@ function stepInterval(int $timestamp, int $intervalType, int $step = 1)
  * Returns timestamp for the start next interval of specified type
  *  or null in case invalid data
  *
- * @param int $timestamp timestamp to find next date interval for
+ * @param int|null $timestamp timestamp to find next date interval for
  * @param int $intervalType type of interval
  * @param int $step count of intervals to add
  *
  * @return int|null
  */
-function getNextDateInterval(int $timestamp, int $intervalType, int $step = 1)
+function getNextDateInterval(?int $timestamp, int $intervalType, int $step = 1)
 {
     $res = stepInterval($timestamp, $intervalType, $step);
     if (!$res) {

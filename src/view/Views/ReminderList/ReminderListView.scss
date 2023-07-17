@@ -28,6 +28,11 @@
   max-width: var(--section-width);
 }
 
+/* Date range filter */
+.date-range-filter {
+  max-width: 400px;
+}
+
 /* Scheduled transaction reminders list component */
 .reminder-list {
   display: flex;

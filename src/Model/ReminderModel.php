@@ -301,7 +301,7 @@ class ReminderModel extends CachedTable
         $filter = [];
         $pagination = [];
 
-        // State type
+        // Reminder state filter
         if (isset($request["state"])) {
             $requestedState = $request["state"];
             $stateType = intval($requestedState);
@@ -317,6 +317,18 @@ class ReminderModel extends CachedTable
             $filter["state"] = REMINDER_SCHEDULED;
         }
         $isUpcoming = $filter["state"] === REMINDER_UPCOMING;
+
+        // Start date filter
+        $startDate = isset($request["startDate"]) ? intval($request["startDate"]) : 0;
+        if ($startDate) {
+            $filter["startDate"] = $startDate;
+        }
+
+        // End date filter
+        $endDate = isset($request["endDate"]) ? intval($request["endDate"]) : 0;
+        if ($endDate) {
+            $filter["endDate"] = $endDate;
+        }
 
         // Page
         $page = isset($request["page"]) ? intval($request["page"]) : DEFAULT_PAGE;
@@ -380,6 +392,8 @@ class ReminderModel extends CachedTable
         $trFilter = isset($params["transaction_id"]) ? intval($params["transaction_id"]) : null;
         $stateFilter = isset($params["state"]) ? intval($params["state"]) : null;
         $dateFilter = isset($params["date"]) ? intval($params["date"]) : null;
+        $startDateFilter = isset($params["startDate"]) ? intval($params["startDate"]) : null;
+        $endDateFilter = isset($params["endDate"]) ? intval($params["endDate"]) : null;
         $returnIds = $params["returnIds"] ?? false;
 
         $res = [];
@@ -399,6 +413,12 @@ class ReminderModel extends CachedTable
                 continue;
             }
             if (!is_null($dateFilter) && $item->date != $dateFilter) {
+                continue;
+            }
+            if (!is_null($startDateFilter) && $item->date < $startDateFilter) {
+                continue;
+            }
+            if (!is_null($endDateFilter) && $item->date > $endDateFilter) {
                 continue;
             }
 

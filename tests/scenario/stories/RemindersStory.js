@@ -192,5 +192,22 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_SCHEDULED });
         await Actions.filterByState({ state: REMINDER_UPCOMING });
         await Actions.filterByState({ state: REMINDER_UPCOMING, directNavigate: true });
+
+        await Actions.selectEndDateFilter({ date: App.dates.monthAfter });
+        await Actions.selectStartDateFilter({ date: App.dates.weekAfter });
+        await Actions.clearEndDateFilter();
+        await Actions.clearStartDateFilter();
+        await Actions.selectStartDateFilter(
+            { date: App.dates.weekAfter, directNavigate: true },
+        );
+        await Actions.selectEndDateFilter(
+            { date: App.dates.monthAgo, directNavigate: true },
+        );
+        await Actions.showMore();
+        await Actions.showMore();
+
+        await Actions.clearEndDateFilter();
+        await Actions.clearStartDateFilter();
+        await Actions.filterByState({ state: REMINDER_SCHEDULED });
     }
 }

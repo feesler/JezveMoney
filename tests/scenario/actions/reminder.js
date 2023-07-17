@@ -119,6 +119,50 @@ export const filterByState = async ({ state, directNavigate = false }) => {
     });
 };
 
+export const selectStartDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select start date (${dateFmt})`, () => (
+        App.view.selectStartDateFilter(date, directNavigate)
+    ));
+};
+
+export const selectEndDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select end date (${dateFmt})`, () => (
+        App.view.selectEndDateFilter(date, directNavigate)
+    ));
+};
+
+export const clearStartDateFilter = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear start date', () => (
+        App.view.clearStartDateFilter(directNavigate)
+    ));
+};
+
+export const clearEndDateFilter = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear end date', () => (
+        App.view.clearEndDateFilter(directNavigate)
+    ));
+};
+
 export const showDetails = async ({ index, directNavigate = false }) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of transaction not specified');

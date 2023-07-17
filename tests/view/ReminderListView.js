@@ -22,6 +22,7 @@ import { __ } from '../model/locale.js';
 import { RemindersList } from '../model/RemindersList.js';
 import { AppView } from './AppView.js';
 import { Counter } from './component/Counter.js';
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
 import { ReminderDetails } from './component/Reminder/ReminderDetails.js';
 import { TransactionRemindersList } from './component/Reminder/TransactionRemindersList.js';
 import {
@@ -31,6 +32,7 @@ import {
     REMINDER_UPCOMING,
     Reminder,
 } from '../model/Reminder.js';
+import { dateToSeconds } from '../common.js';
 
 const listMenuSelector = '#listMenu';
 
@@ -56,12 +58,26 @@ export class ReminderListView extends AppView {
         const isCancelled = stateFilter === REMINDER_CANCELLED;
         const isUpcoming = stateFilter === REMINDER_UPCOMING;
 
+        const { startDate, endDate } = model.filter;
+
+        let startDateFmt = '';
+        if (startDate) {
+            const dateFmt = App.secondsToDateString(startDate);
+            startDateFmt = App.reformatDate(dateFmt);
+        }
+
+        let endDateFmt = '';
+        if (endDate) {
+            const dateFmt = App.secondsToDateString(endDate);
+            endDateFmt = App.reformatDate(dateFmt);
+        }
+
         const list = this.getExpectedList(model);
 
         const showPaginator = !isUpcoming && isItemsAvailable;
         const showMoreBtnVisible = (
             isItemsAvailable
-            && (isUpcoming || pageNum < model.list.pages)
+            && (!model.list.pages || pageNum < model.list.pages)
             && !model.isLoadingMore
         );
 
@@ -69,6 +85,13 @@ export class ReminderListView extends AppView {
             stateMenu: {
                 value: model.filter.state.toString(),
                 visible: filtersVisible,
+            },
+            dateFilter: {
+                visible: filtersVisible,
+                value: {
+                    startDate: startDateFmt,
+                    endDate: endDateFmt,
+                },
             },
             totalCounter: { visible: true, value: filteredItems.length },
             selectedCounter: { visible: selectMode, value: selected.length },
@@ -191,6 +214,7 @@ export class ReminderListView extends AppView {
 
         this.items = null;
         this.upcomingItems = null;
+        this.upcomingPagination = null;
     }
 
     get listMenu() {
@@ -232,7 +256,12 @@ export class ReminderListView extends AppView {
             }, res.contextMenu.elem);
         }
 
+        // Reminder state filter
         res.stateMenu = await LinkMenu.create(this, await query('#stateMenu'));
+
+        // Date range filter
+        res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
+        assert(res.dateFilter, 'Date filter not found');
 
         res.modeSelector = await Button.create(this, await query('.mode-selector'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
@@ -258,7 +287,10 @@ export class ReminderListView extends AppView {
     buildModel(cont) {
         const res = {
             locale: cont.locale,
-            filter: {},
+            filter: {
+                startDate: null,
+                endDate: null,
+            },
             contextItem: cont.contextMenu?.content?.itemId?.toString(),
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
             listMenuVisible: cont.listMenu?.visible,
@@ -266,6 +298,21 @@ export class ReminderListView extends AppView {
             filtersVisible: cont.filtersContainer.visible,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
+
+        const reminderState = parseInt(cont.stateMenu.value, 10);
+        assert(Reminder.allStates.includes(reminderState), 'Invalid reminder state');
+        const isUpcoming = reminderState === REMINDER_UPCOMING;
+        res.filter.state = reminderState;
+
+        const dateRange = cont.dateFilter.getSelectedRange();
+        if (dateRange?.startDate) {
+            const startDate = new Date(App.parseDate(dateRange.startDate));
+            res.filter.startDate = dateToSeconds(startDate);
+        }
+        if (dateRange?.endDate) {
+            const endDate = new Date(App.parseDate(dateRange.endDate));
+            res.filter.endDate = dateToSeconds(endDate);
+        }
 
         if (cont.remindersList) {
             const items = cont.remindersList.getItems();
@@ -278,16 +325,16 @@ export class ReminderListView extends AppView {
                 ? cont.paginator.active
                 : range;
             const page = activePage - range + 1;
-            const pages = (paginatorVisible)
-                ? cont.paginator.pages
-                : page;
 
             res.list = {
                 page,
-                pages,
                 items,
                 range,
             };
+
+            if (paginatorVisible) {
+                res.list.pages = cont.paginator.pages;
+            }
 
             res.renderTime = cont.remindersList.content.renderTime;
         } else {
@@ -299,12 +346,12 @@ export class ReminderListView extends AppView {
             };
         }
 
-        const reminderState = parseInt(cont.stateMenu.value, 10);
-        assert(Reminder.allStates.includes(reminderState), 'Invalid reminder state');
-        res.filter.state = reminderState;
-
         if (this.items === null) {
             this.loadReminders(res);
+        }
+
+        if (isUpcoming && res.filter.endDate) {
+            res.list.pages = this.upcomingPagination?.pagesCount;
         }
 
         if (cont.modeSelector?.link) {
@@ -333,7 +380,9 @@ export class ReminderListView extends AppView {
         const res = this.cloneModel(model);
         const isUpcoming = (res.filter.state === REMINDER_UPCOMING);
 
-        const filteredItems = this.getFilteredItems(model);
+        this.loadReminders(res);
+
+        const filteredItems = this.getFilteredItems(res);
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
@@ -341,15 +390,22 @@ export class ReminderListView extends AppView {
 
             res.list = {
                 page: 1,
-                pages: filteredItems.expectedPages(),
                 items,
             };
+
+            if (!isUpcoming) {
+                res.list.pages = filteredItems.expectedPages();
+            }
         } else {
             res.list = {
                 page: 0,
                 pages: 0,
                 items: [],
             };
+        }
+
+        if (isUpcoming && res.filter.endDate) {
+            res.list.pages = this.upcomingPagination?.pagesCount;
         }
 
         res.list.range = 1;
@@ -370,12 +426,28 @@ export class ReminderListView extends AppView {
         this.items = state.reminders.clone();
         this.items.sort();
 
-        const upcomingParams = {
-            page: model.list.page,
-            range: model.list.range,
-        };
+        this.loadUpcomingReminders(model, state);
+    }
 
-        this.upcomingItems = state.getUpcomingReminders(upcomingParams);
+    loadUpcomingReminders(model = this.model, state = App.state) {
+        const { filter, list } = model;
+
+        const params = {
+            page: list.page,
+            range: list.range,
+        };
+        if (filter.startDate) {
+            params.startDate = filter.startDate;
+        }
+        if (filter.endDate) {
+            params.endDate = filter.endDate;
+        }
+
+        const { items, pagination } = state.getUpcomingReminders(params);
+        this.upcomingItems = RemindersList.create(items);
+        this.upcomingItems.sort(false);
+
+        this.upcomingPagination = pagination;
     }
 
     currentPage(model = this.model) {
@@ -483,10 +555,13 @@ export class ReminderListView extends AppView {
 
             res.list = {
                 page,
-                pages,
                 items,
                 range,
             };
+
+            if (!isUpcoming) {
+                res.list.pages = pages;
+            }
         } else {
             res.list = {
                 page: 0,
@@ -494,6 +569,10 @@ export class ReminderListView extends AppView {
                 items: [],
                 range: 1,
             };
+        }
+
+        if (isUpcoming && res.filter.endDate) {
+            res.list.pages = this.upcomingPagination?.pagesCount;
         }
 
         this.model = res;
@@ -534,6 +613,13 @@ export class ReminderListView extends AppView {
 
         if (model.filter.state !== REMINDER_SCHEDULED) {
             params.state = Reminder.stateNames[model.filter.state];
+        }
+
+        if (model.filter.startDate) {
+            params.startDate = model.filter.startDate;
+        }
+        if (model.filter.endDate) {
+            params.endDate = model.filter.endDate;
         }
 
         if (model.list.page !== 0) {
@@ -662,6 +748,94 @@ export class ReminderListView extends AppView {
             await App.view.waitForLoad();
         } else {
             await this.waitForList(() => this.content.stateMenu.selectItemByValue(state));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async selectStartDateFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const date = new Date(App.parseDate(value));
+        const startDate = dateToSeconds(date);
+        if (this.model.filter.startDate === startDate) {
+            return true;
+        }
+
+        this.model.filter.startDate = startDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.selectStart(date));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async selectEndDateFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const date = new Date(App.parseDate(value));
+        const endDate = dateToSeconds(date);
+        if (this.model.filter.endDate === endDate) {
+            return true;
+        }
+
+        this.model.filter.endDate = endDate;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.selectEnd(date));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearStartDateFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        this.model.filter.startDate = null;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.clearStart());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearEndDateFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        this.model.filter.endDate = null;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.clearEnd());
         }
 
         return App.view.checkState(expected);

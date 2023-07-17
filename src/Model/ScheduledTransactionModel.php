@@ -1327,7 +1327,57 @@ class ScheduledTransactionModel extends CachedTable
     }
 
     /**
+     * Converts request object to reminders request parameters
+     *
+     * @param array $request
+     *
+     * @return array
+     */
+    public function getUpcomingRequestFilters(array $request)
+    {
+        $filter = [];
+        $pagination = [];
+
+        // Page
+        $page = isset($request["page"]) ? intval($request["page"]) : DEFAULT_PAGE;
+        $page = ($page > 0) ? $page : DEFAULT_PAGE;
+        $pagination["page"] = $page;
+
+        // Limit
+        $onPage = isset($request["onPage"]) ? intval($request["onPage"]) : DEFAULT_PAGE_LIMIT;
+        $onPage = ($onPage > 0) ? $onPage : DEFAULT_PAGE_LIMIT;
+        $pagination["onPage"] = $onPage;
+
+        // Pages range
+        $range = isset($request["range"]) ? intval($request["range"]) : DEFAULT_PAGE_RANGE;
+        $range = ($range > 0) ? $range : DEFAULT_PAGE_RANGE;
+        $pagination["range"] = $range;
+
+        // Start date filter
+        $startDate = isset($request["startDate"]) ? intval($request["startDate"]) : 0;
+        if ($startDate) {
+            $filter["startDate"] = $startDate;
+        }
+
+        // End date filter
+        $endDate = isset($request["endDate"]) ? intval($request["endDate"]) : 0;
+        if ($endDate) {
+            $filter["endDate"] = $endDate;
+        }
+
+        $params = array_merge($filter, $pagination);
+
+        return [
+            "filter" => $filter,
+            "pagination" => $pagination,
+            "params" => $params,
+        ];
+    }
+
+    /**
      * Returns array of upcoming reminders
+     *
+     * @param array $params
      *
      * @return array
      */
@@ -1337,27 +1387,16 @@ class ScheduledTransactionModel extends CachedTable
         $tomorrow = getNextDateInterval($today, INTERVAL_DAY);
         $yearAfter = stepInterval($today, INTERVAL_YEAR);
 
-        $pagination = [];
-
-        // Page
-        $page = isset($params["page"]) ? intval($params["page"]) : DEFAULT_PAGE;
-        $page = ($page > 0) ? $page : DEFAULT_PAGE;
-        $pagination["page"] = $page;
-
-        // Limit
-        $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : DEFAULT_PAGE_LIMIT;
-        $onPage = ($onPage > 0) ? $onPage : DEFAULT_PAGE_LIMIT;
-        $pagination["onPage"] = $onPage;
-
-        // Pages range
-        $range = isset($params["range"]) ? intval($params["range"]) : DEFAULT_PAGE_RANGE;
-        $range = ($range > 0) ? $range : DEFAULT_PAGE_RANGE;
-        $pagination["range"] = $range;
-
         $request = [
             "startDate" => $params["startDate"] ?? $tomorrow,
             "endDate" => $params["endDate"] ?? $yearAfter,
         ];
+
+        $pagination = [];
+
+        $page = $params["page"] ?? DEFAULT_PAGE;
+        $onPage = $params["onPage"] ?? DEFAULT_PAGE_LIMIT;
+        $range = $params["range"] ?? DEFAULT_PAGE_RANGE;
 
         $firstItemIndex = ($page - 1) * $onPage;
         $lastItemIndex = ($page + $range - 1) * $onPage;
@@ -1366,18 +1405,40 @@ class ScheduledTransactionModel extends CachedTable
         $reminders = $this->getAllExpectedReminders($request);
         $remindersCount = count($reminders);
 
-        while ($remindersCount > $prevCount && $remindersCount < $lastItemIndex) {
+        if (isset($params["endDate"]) && $onPage > 0) {
+            $pagination["total"] = $remindersCount;
+
+            $pagesCount = ceil($remindersCount / $onPage);
+            $pagination["pagesCount"] = $pagesCount;
+
+            $page = min($pagesCount, $page);
+            $range = min($pagesCount - $page + 1, $range);
+        }
+
+        $pagination["onPage"] = $onPage;
+        $pagination["page"] = $page;
+        $pagination["range"] = $range;
+
+        while (
+            !isset($params["endDate"])
+            && $remindersCount > $prevCount
+            && $remindersCount < $lastItemIndex
+        ) {
             $request["endDate"] = stepInterval($request["endDate"], INTERVAL_YEAR);
             $reminders = $this->getAllExpectedReminders($request);
             $prevCount = $remindersCount;
             $remindersCount = count($reminders);
         }
 
-        if ($remindersCount < $firstItemIndex) {
-            return [];
+        $items = [];
+        if ($firstItemIndex < $remindersCount) {
+            $resultLength = $lastItemIndex - $firstItemIndex;
+            $items = array_slice($reminders, $firstItemIndex, $resultLength);
         }
 
-        $resultLength = $lastItemIndex - $firstItemIndex;
-        return array_slice($reminders, $firstItemIndex, $resultLength);
+        return [
+            "items" => $items,
+            "pagination" => $pagination,
+        ];
     }
 }
