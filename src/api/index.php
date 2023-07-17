@@ -49,8 +49,10 @@ $router->onStart(function ($controller, $contrStr, $routeParts) {
 
 $router->onBeforeAction(function ($controller, $contrStr, $action, $routeParts) {
     if ($controller instanceof Core\ApiController) {
-        $controller->initAPI();
+        return $controller->runAction("initAPI");
     }
+
+    return true;
 });
 
 $router->route();

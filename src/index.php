@@ -45,6 +45,7 @@ $router->onStart(function ($controller, $contrStr, $routeParts) {
 
 $router->onBeforeAction(function ($controller, $contrStr, $action) {
     $controller->initDefResources();
+    return true;
 });
 
 $router->onAfterAction(function () {

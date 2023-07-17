@@ -23,13 +23,15 @@ class ApiController extends Controller
     public function runAction(string $action)
     {
         if (!method_exists($this, $action)) {
-            return;
+            return false;
         }
 
         try {
             $this->$action();
+            return true;
         } catch (\Error $e) {
             $this->fail($e->getMessage());
+            return false;
         }
     }
 
@@ -81,7 +83,7 @@ class ApiController extends Controller
     {
         if (!UserModel::isAdminUser()) {
             header("HTTP/1.1 403 Forbidden", true, 403);
-            $this->fail("Access denied");
+            throw new \Error("Access denied");
         }
     }
 
@@ -90,7 +92,7 @@ class ApiController extends Controller
     {
         if (!method_exists($this, $method)) {
             header("HTTP/1.1 400 Bad Request", true, 400);
-            $this->fail("Access denied");
+            throw new \Error("Access denied");
         }
 
         return call_user_func_array([$this, $method], $parameters);
@@ -112,7 +114,7 @@ class ApiController extends Controller
         $this->user_id = $this->uMod->check();
         if ($this->authRequired && $this->user_id == 0) {
             header("HTTP/1.1 401 Unauthorized", true, 401);
-            $this->fail("Access denied");
+            throw new \Error("Access denied");
         }
 
         $this->owner_id = $this->uMod->getOwner();
