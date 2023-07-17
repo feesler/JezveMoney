@@ -1331,17 +1331,53 @@ class ScheduledTransactionModel extends CachedTable
      *
      * @return array
      */
-    public function getUpcomingReminders()
+    public function getUpcomingReminders(array $params = [])
     {
         $today = cutDate(UserSettingsModel::clientTime());
         $tomorrow = getNextDateInterval($today, INTERVAL_DAY);
         $yearAfter = stepInterval($today, INTERVAL_YEAR);
 
-        $params = [
-            "startDate" => $tomorrow,
-            "endDate" => $yearAfter,
+        $pagination = [];
+
+        // Page
+        $page = isset($params["page"]) ? intval($params["page"]) : DEFAULT_PAGE;
+        $page = ($page > 0) ? $page : DEFAULT_PAGE;
+        $pagination["page"] = $page;
+
+        // Limit
+        $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : DEFAULT_PAGE_LIMIT;
+        $onPage = ($onPage > 0) ? $onPage : DEFAULT_PAGE_LIMIT;
+        $pagination["onPage"] = $onPage;
+
+        // Pages range
+        $range = isset($params["range"]) ? intval($params["range"]) : DEFAULT_PAGE_RANGE;
+        $range = ($range > 0) ? $range : DEFAULT_PAGE_RANGE;
+        $pagination["range"] = $range;
+
+        $request = [
+            "startDate" => $params["startDate"] ?? $tomorrow,
+            "endDate" => $params["endDate"] ?? $yearAfter,
         ];
 
-        return $this->getAllExpectedReminders($params);
+        $firstItemIndex = ($page - 1) * $onPage;
+        $lastItemIndex = ($page + $range - 1) * $onPage;
+
+        $prevCount = 0;
+        $reminders = $this->getAllExpectedReminders($request);
+        $remindersCount = count($reminders);
+
+        while ($remindersCount > $prevCount && $remindersCount < $lastItemIndex) {
+            $request["endDate"] = stepInterval($request["endDate"], INTERVAL_YEAR);
+            $reminders = $this->getAllExpectedReminders($request);
+            $prevCount = $remindersCount;
+            $remindersCount = count($reminders);
+        }
+
+        if ($remindersCount < $firstItemIndex) {
+            return [];
+        }
+
+        $resultLength = $lastItemIndex - $firstItemIndex;
+        return array_slice($reminders, $firstItemIndex, $resultLength);
     }
 }

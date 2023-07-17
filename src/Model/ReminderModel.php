@@ -15,6 +15,11 @@ define("REMINDER_SCHEDULED", 1);
 define("REMINDER_CONFIRMED", 2);
 define("REMINDER_CANCELLED", 3);
 
+// Reminders list defaults
+define("DEFAULT_PAGE", 1);
+define("DEFAULT_PAGE_RANGE", 1);
+define("DEFAULT_PAGE_LIMIT", 10);
+
 /**
  * Scheduled transactions reminder model
  */
@@ -311,43 +316,44 @@ class ReminderModel extends CachedTable
         } else {
             $filter["state"] = REMINDER_SCHEDULED;
         }
+        $isUpcoming = $filter["state"] === REMINDER_UPCOMING;
 
         // Page
-        if (isset($request["page"])) {
-            $page = intval($request["page"]);
-            if ($page > 0) {
-                $pagination["page"] = $page;
-            }
-        }
+        $page = isset($request["page"]) ? intval($request["page"]) : DEFAULT_PAGE;
+        $page = ($page > 0) ? $page : DEFAULT_PAGE;
+        $pagination["page"] = $page;
 
         // Limit
-        if (isset($request["onPage"])) {
-            $onPage = intval($request["onPage"]);
-            if ($onPage < 0 && $throw) {
-                throw new \Error("Invalid page limit");
-            }
-            if ($onPage > 0) {
-                $pagination["onPage"] = $onPage;
-            }
+        $onPage = isset($request["onPage"]) ? intval($request["onPage"]) : DEFAULT_PAGE_LIMIT;
+        if (
+            $throw
+            && ((!$isUpcoming && $onPage < 0) || ($isUpcoming && $onPage <= 0))
+        ) {
+            throw new \Error("Invalid page limit");
         }
+        $onPage = ($onPage > 0) ? $onPage : DEFAULT_PAGE_LIMIT;
+        $pagination["onPage"] = $onPage;
 
         // Pages range
-        if (isset($request["range"])) {
-            $range = intval($request["range"]);
-            if ($range > 0) {
-                $pagination["range"] = $range;
-            }
-        }
+        $range = isset($request["range"]) ? intval($request["range"]) : DEFAULT_PAGE_RANGE;
+        $range = ($range > 0) ? $range : DEFAULT_PAGE_RANGE;
+        $pagination["range"] = $range;
 
-        $itemsCount = $this->getCount();
+        // Items count
+        if ($filter["state"] === REMINDER_UPCOMING) {
+            $itemsCount = $onPage * ($page + $range - 1);
+        } else {
+            $itemsCount = $this->getCount();
+        }
         $pagination["total"] = $itemsCount;
 
         // Pagination
-        if (isset($pagination["onPage"]) && $pagination["onPage"] > 0) {
-            $pagesCount = ceil($itemsCount / $pagination["onPage"]);
+        if ($onPage > 0) {
+            $pagesCount = ceil($itemsCount / $onPage);
             $pagination["pagesCount"] = $pagesCount;
-            $page = $pagination["page"] ?? 1;
-            $pagination["page"] = min($pagesCount, $page);
+
+            $page = min($pagesCount, $page);
+            $pagination["page"] = $page;
         }
 
         return [

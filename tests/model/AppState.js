@@ -12,6 +12,7 @@ import {
     timeToSeconds,
     dateToSeconds,
     cutDate,
+    shiftYear,
 } from '../common.js';
 import {
     EXPENSE,
@@ -44,7 +45,6 @@ import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
-    REMINDER_UPCOMING,
     Reminder,
 } from './Reminder.js';
 import { Account } from './Account.js';
@@ -640,32 +640,34 @@ export class AppState {
     }
 
     getUpcomingReminders(options = {}) {
+        const {
+            page = 1,
+            range = 1,
+            onPage = 10,
+            startDate = App.dates.tomorrow,
+            endDate = App.dates.yearAfter,
+        } = options;
+
         const reminderOptions = {
-            startDate: App.dates.tomorrow,
-            endDate: App.dates.yearAfter,
-            ...options,
+            startDate: cutDate(startDate),
+            endDate: cutDate(endDate),
         };
 
-        reminderOptions.startDate = cutDate(reminderOptions.startDate);
-        reminderOptions.endDate = cutDate(reminderOptions.endDate);
+        let res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
+        let prevCount = 0;
+        let remindersCount = res.length;
 
-        const res = [];
-        this.schedule.forEach((item) => {
-            const reminderDates = item.getReminders(reminderOptions);
+        const firstItemIndex = (page - 1) * onPage;
+        const lastItemIndex = (page + range - 1) * onPage;
 
-            reminderDates.forEach((timestamp) => {
-                const reminder = {
-                    schedule_id: item.id,
-                    state: REMINDER_UPCOMING,
-                    date: timeToSeconds(timestamp),
-                    transaction_id: 0,
-                };
+        while (remindersCount > prevCount && remindersCount < lastItemIndex) {
+            reminderOptions.endDate = shiftYear(new Date(reminderOptions.endDate), 1);
+            res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
+            prevCount = remindersCount;
+            remindersCount = res.length;
+        }
 
-                if (!this.reminders.isSameItemExist(reminder)) {
-                    res.push(reminder);
-                }
-            });
-        });
+        res = res.slice(firstItemIndex, lastItemIndex);
 
         const list = RemindersList.create(res);
         list.sort(false);

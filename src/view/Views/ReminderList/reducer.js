@@ -134,9 +134,14 @@ const slice = createSlice({
             ...state.filter,
             state: value,
         },
+        pagination: {
+            ...state.pagination,
+            page: 1,
+            range: 1,
+        },
     }),
 
-    showMore: (state) => ({
+    showMore: (state) => updateList({
         ...state,
         pagination: {
             ...state.pagination,
@@ -160,15 +165,15 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    startLoading: (state) => (
+    startLoading: (state, isLoadingMore = false) => (
         (state.loading)
             ? state
-            : { ...state, loading: true }
+            : { ...state, isLoadingMore, loading: true }
     ),
 
     stopLoading: (state) => (
         (state.loading)
-            ? { ...state, loading: false }
+            ? { ...state, loading: false, isLoadingMore: false }
             : state
     ),
 

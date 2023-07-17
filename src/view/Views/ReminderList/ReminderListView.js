@@ -47,6 +47,8 @@ import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
+import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
+import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
 
 import {
     actions,
@@ -55,8 +57,6 @@ import {
     updateList,
 } from './reducer.js';
 import './ReminderListView.scss';
-import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
-import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
 
 /* CSS classes */
 const LIST_CLASS = 'reminder-list';
@@ -244,7 +244,7 @@ class ReminderListView extends AppView {
         const stateFilter = getStateFilter(state);
 
         if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            await this.requestUpcoming();
+            await this.requestUpcoming(this.getUpcomingRequestData());
         }
         this.setRenderTime();
     }
@@ -270,7 +270,7 @@ class ReminderListView extends AppView {
         }
 
         if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            await this.requestUpcoming();
+            await this.requestUpcoming(this.getUpcomingRequestData());
         }
 
         this.store.dispatch(actions.changeStateFilter(value));
@@ -295,8 +295,31 @@ class ReminderListView extends AppView {
         }
     }
 
-    showMore() {
-        this.store.dispatch(actions.showMore());
+    async showMore() {
+        const state = this.store.getState();
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
+
+        if (!isUpcoming) {
+            this.store.dispatch(actions.showMore());
+            this.setRenderTime();
+            return;
+        }
+
+        const { page } = state.pagination;
+        let { range } = state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        await this.requestUpcoming({
+            ...this.getUpcomingRequestData(),
+            range,
+            page,
+            keepState: true,
+            isLoadingMore: true,
+        });
+
         this.setRenderTime();
     }
 
@@ -360,8 +383,8 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.changeListMode(listMode));
     }
 
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
+    startLoading(isLoadingMore = false) {
+        this.store.dispatch(actions.startLoading(isLoadingMore));
     }
 
     stopLoading() {
@@ -401,12 +424,24 @@ class ReminderListView extends AppView {
         return {};
     }
 
+    getUpcomingListRequest() {
+        const state = this.store.getState();
+        if (getStateFilter(state) !== REMINDER_UPCOMING) {
+            return {};
+        }
+
+        return {
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
+    }
+
     prepareRequest(data) {
         return {
             ...data,
             returnState: {
                 reminders: this.getListRequest(),
-                upcoming: {},
+                upcoming: this.getUpcomingListRequest(),
                 profile: {},
             },
         };
@@ -468,17 +503,38 @@ class ReminderListView extends AppView {
         }
     }
 
-    async requestUpcoming() {
+    getUpcomingRequestData() {
+        const { pagination } = this.store.getState();
+
+        const res = {
+            page: pagination.page,
+            range: pagination.range,
+        };
+
+        return res;
+    }
+
+    async requestUpcoming(options = {}) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
+        const {
+            keepState = false,
+            isLoadingMore = false,
+            ...request
+        } = options;
+
         this.startLoading();
 
         try {
-            const { data } = await API.reminder.upcoming();
-            this.store.dispatch(actions.upcomingItemsLoaded(data));
+            const { data: upcoming } = await API.reminder.upcoming(request);
+            this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
+
+            if (isLoadingMore) {
+                this.store.dispatch(actions.showMore());
+            }
         } catch (e) {
             App.createErrorNotification(e.message);
         }
