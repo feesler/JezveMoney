@@ -349,7 +349,7 @@ class ScheduledTransactionModel extends CachedTable
                 throw new \Error("Invalid offset for month interval specified");
             }
         } elseif ($type === INTERVAL_YEAR) {
-            $monthIndex = intval($offset / 100);
+            $monthIndex = floor($offset / 100);
             $dayIndex = ($offset % 100);
             if (
                 $monthIndex < 0
@@ -1138,7 +1138,7 @@ class ScheduledTransactionModel extends CachedTable
 
         $res = [];
         foreach ($values as $offset) {
-            $monthIndex = intval($offset / 100);
+            $monthIndex = floor($offset / 100);
             $dayIndex = ($offset % 100);
 
             $offsetItem = [
