@@ -1223,6 +1223,46 @@ class ScheduledTransactionModel extends CachedTable
     }
 
     /**
+     * Returns array for longest interval of scheduled transactions
+     *
+     * @return ScheduledTransactionItem
+     */
+    public function getLongestInterval()
+    {
+        if (!$this->checkCache()) {
+            throw new \Error("Failed to update cache");
+        }
+
+        $res = null;
+        $maxDays = 0;
+
+        foreach ($this->cache as $item) {
+            $maxOffset = 0;
+            $offsets = asArray($item->interval_offset);
+            foreach ($offsets as $offset) {
+                if ($item->interval_type === INTERVAL_YEAR) {
+                    $monthIndex = floor($offset / 100);
+                    $dayIndex = ($offset % 100);
+                    $daysOffset = ($monthIndex * 30) + $dayIndex;
+                } else {
+                    $daysOffset = $offset;
+                }
+
+                $maxOffset = max($daysOffset, $maxOffset);
+            }
+
+            $days = getIntervalDays($item->interval_type, $item->interval_step) + $maxOffset;
+
+            if (is_null($res) || $days > $maxDays) {
+                $res = clone $item;
+                $maxDays = $days;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
      * Returns array of expected reminders for all scheduled transaction
      *
      * @param array $params
@@ -1401,6 +1441,14 @@ class ScheduledTransactionModel extends CachedTable
         $firstItemIndex = ($page - 1) * $onPage;
         $lastItemIndex = ($page + $range - 1) * $onPage;
 
+        $longestInterval = $this->getLongestInterval();
+
+        $request["endDate"] = stepInterval(
+            $request["endDate"],
+            $longestInterval->interval_type,
+            $longestInterval->interval_step + 1,
+        );
+
         $prevCount = 0;
         $reminders = $this->getAllExpectedReminders($request);
         $remindersCount = count($reminders);
@@ -1424,7 +1472,11 @@ class ScheduledTransactionModel extends CachedTable
             && $remindersCount > $prevCount
             && $remindersCount < $lastItemIndex
         ) {
-            $request["endDate"] = stepInterval($request["endDate"], INTERVAL_YEAR);
+            $request["endDate"] = stepInterval(
+                $request["endDate"],
+                $longestInterval->interval_type,
+                $longestInterval->interval_step + 1,
+            );
             $reminders = $this->getAllExpectedReminders($request);
             $prevCount = $remindersCount;
             $remindersCount = count($reminders);

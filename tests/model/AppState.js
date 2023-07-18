@@ -13,8 +13,9 @@ import {
     timeToSeconds,
     dateToSeconds,
     cutDate,
-    shiftYear,
     secondsToDate,
+    stepInterval,
+    INTERVAL_NONE,
 } from '../common.js';
 import {
     EXPENSE,
@@ -41,7 +42,7 @@ import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
 import { ImportCondition } from './ImportCondition.js';
 import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
-import { INTERVAL_NONE, ScheduledTransaction } from './ScheduledTransaction.js';
+import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { RemindersList } from './RemindersList.js';
 import {
     REMINDER_CANCELLED,
@@ -678,6 +679,13 @@ export class AppState {
             endDate: cutDate(endDate),
         };
 
+        const longestInterval = this.schedule.getLongestInterval();
+        reminderOptions.endDate = stepInterval(
+            reminderOptions.endDate,
+            longestInterval.interval_type,
+            longestInterval.interval_step + 1,
+        );
+
         let res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
         let prevCount = 0;
         let remindersCount = res.length;
@@ -700,7 +708,11 @@ export class AppState {
             && remindersCount > prevCount
             && remindersCount < lastItemIndex
         ) {
-            reminderOptions.endDate = shiftYear(new Date(reminderOptions.endDate), 1);
+            reminderOptions.endDate = stepInterval(
+                reminderOptions.endDate,
+                longestInterval.interval_type,
+                longestInterval.interval_step + 1,
+            );
             res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
             prevCount = remindersCount;
             remindersCount = res.length;

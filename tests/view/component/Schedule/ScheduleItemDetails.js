@@ -8,7 +8,7 @@ import {
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
-import { INTERVAL_NONE } from '../../../model/ScheduledTransaction.js';
+import { INTERVAL_NONE } from '../../../common.js';
 
 const fieldSelectors = {
     startDateField: '.start-date-field',

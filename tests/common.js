@@ -8,6 +8,7 @@ import {
 } from 'jezve-test';
 
 export const MS_IN_SECOND = 1000;
+export const DAYS_IN_WEEK = 7;
 export const MONTHS_IN_YEAR = 12;
 
 export const SORT_BY_CREATEDATE_ASC = 1;
@@ -23,6 +24,13 @@ export const availSortTypes = [
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
 ];
+
+/** Schedule interval types */
+export const INTERVAL_NONE = 0;
+export const INTERVAL_DAY = 1;
+export const INTERVAL_WEEK = 2;
+export const INTERVAL_MONTH = 3;
+export const INTERVAL_YEAR = 4;
 
 /* Decimal values precision */
 export const DEFAULT_PRECISION = 2;
@@ -181,6 +189,45 @@ export const getLastDayOfMonth = (date) => (
         0,
     ))
 );
+
+export const stepInterval = (timestamp, intervalType, step = 1) => {
+    if (!timestamp || intervalType === INTERVAL_NONE || step < 1) {
+        return null;
+    }
+
+    const date = new Date(cutDate(timestamp));
+
+    if (intervalType === INTERVAL_DAY) {
+        const targetDate = shiftDate(date, step);
+        return targetDate.getTime();
+    }
+
+    if (intervalType === INTERVAL_WEEK) {
+        const targetWeek = shiftDate(date, step * DAYS_IN_WEEK);
+        return targetWeek.getTime();
+    }
+
+    if (intervalType === INTERVAL_MONTH) {
+        const targetMonth = new Date(Date.UTC(
+            date.getFullYear(),
+            date.getMonth() + step,
+            1,
+        ));
+        const maxDate = getLastDayOfMonth(targetMonth);
+
+        return Date.UTC(
+            date.getFullYear(),
+            date.getMonth() + step,
+            Math.min(date.getDate(), maxDate.getDate()),
+        );
+    }
+
+    if (intervalType === INTERVAL_YEAR) {
+        return shiftYear(date, step);
+    }
+
+    throw new Error('Invalid type of interval');
+};
 
 function firstUpperCase(str, locales = []) {
     const first = str.substring(0, 1);

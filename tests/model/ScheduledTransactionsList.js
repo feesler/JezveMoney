@@ -91,6 +91,21 @@ export class ScheduledTransactionsList extends List {
         return this.sortItems(this.data, true);
     }
 
+    getLongestInterval() {
+        let maxDays = 0;
+        let res = null;
+
+        this.forEach((item) => {
+            const days = item.getIntervalLength();
+            if (res === null || maxDays < days) {
+                res = item;
+                maxDays = days;
+            }
+        });
+
+        return res;
+    }
+
     getUpcomingReminders(options = {}, reminders = null) {
         const { tomorrow, yearAfter } = App.dates;
         const reminderOptions = {

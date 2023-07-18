@@ -1,14 +1,14 @@
 import { App } from '../../Application.js';
-import { dateToSeconds } from '../../common.js';
 import { api } from '../../model/api.js';
+import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 import {
     INTERVAL_DAY,
     INTERVAL_WEEK,
     INTERVAL_MONTH,
     INTERVAL_YEAR,
-    ScheduledTransaction,
     INTERVAL_NONE,
-} from '../../model/ScheduledTransaction.js';
+    dateToSeconds,
+} from '../../common.js';
 import {
     EXPENSE,
     INCOME,
@@ -164,6 +164,16 @@ export const createScheduledTransactions = async () => {
         interval_type: INTERVAL_MONTH,
         interval_step: 1,
         interval_offset: 20,
+    }, {
+        type: EXPENSE,
+        src_id: ACC_RUB,
+        src_amount: 1000,
+        comment: 'Once in two years',
+        start_date: dateToSeconds(new Date(2020, 2, 3)),
+        end_date: null,
+        interval_type: INTERVAL_YEAR,
+        interval_step: 2,
+        interval_offset: 23,
     }];
 
     const multi = data.map((item) => (

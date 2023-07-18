@@ -20,6 +20,14 @@ const INTERVAL_DURATION_MAP = [
     INTERVAL_YEAR => "Y",
 ];
 
+const INTERVAL_DAYS_MAP = [
+    INTERVAL_NONE => 0,
+    INTERVAL_DAY => 1,
+    INTERVAL_WEEK => 7,
+    INTERVAL_MONTH => 30,
+    INTERVAL_YEAR => 365,
+];
+
 /**
  * Returns timestamp for the start of day
  *
@@ -272,4 +280,24 @@ function getNextDateInterval(?int $timestamp, int $intervalType, int $step = 1)
 
     $dateInfo = getDateIntervalStart($res, $intervalType);
     return $dateInfo["time"];
+}
+
+/**
+ * Returns count of days for specified interval type and step
+ *
+ * @param int $intervalType interval type
+ * @param int $step interval step
+ *
+ * @return int
+ */
+function getIntervalDays(int $intervalType, int $step = 1)
+{
+    if (!isset(INTERVAL_DAYS_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
+    }
+    if ($step < 1) {
+        return 0;
+    }
+
+    return INTERVAL_DAYS_MAP[$intervalType] * $step;
 }

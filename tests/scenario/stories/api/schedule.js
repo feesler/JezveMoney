@@ -8,13 +8,14 @@ import {
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 import * as Actions from '../../actions/api/schedule.js';
-import { dateToSeconds, formatProps } from '../../../common.js';
 import {
+    dateToSeconds,
+    formatProps,
     INTERVAL_DAY,
     INTERVAL_WEEK,
     INTERVAL_MONTH,
     INTERVAL_YEAR,
-} from '../../../model/ScheduledTransaction.js';
+} from '../../../common.js';
 
 const create = async () => {
     setBlock('Create scheduled transactions', 2);

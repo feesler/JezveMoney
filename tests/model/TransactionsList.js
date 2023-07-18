@@ -11,6 +11,7 @@ import {
     secondsToDate,
     MONTHS_IN_YEAR,
     secondsToTime,
+    DAYS_IN_WEEK,
 } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -26,7 +27,6 @@ import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
 
 const WEEKS_IN_YEAR = 52;
-const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
 
 const defaultExportDateLocale = 'ru';
