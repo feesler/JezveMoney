@@ -1007,7 +1007,7 @@ class DBVersion
                 $intervalOffset = intval($row["interval_offset"]);
 
                 if ($intervalType === INTERVAL_YEAR) {
-                    $monthIndex = intval($intervalOffset / 100);
+                    $monthIndex = floor($intervalOffset / 100);
                     $dayindex = $intervalOffset % 100;
                 } else {
                     $monthIndex = 0;

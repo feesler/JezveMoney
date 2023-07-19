@@ -160,7 +160,11 @@
 
   .collapsible-content {
     color: var(--text-color-6);
-    background-color: var(--bg-color-3);
+    background-color: var(--list-item-disabled-bg-color);
+  }
+
+  .orig-data {
+    --odt-header-color: var(--neutral-color);
   }
 }
 

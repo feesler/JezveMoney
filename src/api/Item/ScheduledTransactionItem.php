@@ -133,7 +133,13 @@ class ScheduledTransactionItem
      */
     public function getReminderDates(int $timestamp)
     {
+        $timestamp = cutDate($timestamp);
         $res = [];
+
+        if ($this->interval_type === INTERVAL_NONE) {
+            $res[] = $timestamp;
+            return $res;
+        }
 
         $offsets = asArray($this->interval_offset);
         if (count($offsets) === 0) {
@@ -143,14 +149,22 @@ class ScheduledTransactionItem
         foreach ($offsets as $offset) {
             $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
 
-            if (
-                $this->interval_type !== INTERVAL_NONE
-                && $offset > 0
-            ) {
-                if ($this->interval_type === INTERVAL_WEEK) {
-                    $offset = ($offset === 0) ? 6 : ($offset - 1);
-                }
+            if ($this->interval_type === INTERVAL_WEEK) {
+                $offset = ($offset === 0) ? 6 : ($offset - 1);
+            }
 
+            if ($this->interval_type === INTERVAL_YEAR) {
+                $monthIndex = intval($offset / 100);
+                $dayIndex = intval($offset % 100);
+
+                $dateInfo = getDateIntervalStart($date->getTimestamp(), INTERVAL_YEAR);
+                $targetMonth = getNextDateInterval($dateInfo["time"], INTERVAL_MONTH, $monthIndex);
+                $date->setTimestamp($targetMonth);
+
+                $offset = $dayIndex;
+            }
+
+            if ($offset > 0) {
                 $duration = "P" . $offset . "D";
                 $date->add(new DateInterval($duration));
             }

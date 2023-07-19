@@ -32,8 +32,8 @@ $router->onStart(function ($controller) {
 });
 
 $router->onBeforeAction(function ($controller) {
-
     $controller->initDefResources();
+    return true;
 });
 
 $router->route();

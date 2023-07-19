@@ -12,23 +12,34 @@ class Logger
     /**
      * Returns total count of log files
      *
-     * @return int
+     * @return string[]
      */
-    protected static function getLogsCount()
+    protected static function getFiles()
     {
+        $res = [];
         $files = glob(LOGS_PATH . "log*.txt");
         if ($files === false || count($files) === 0) {
-            return 0;
+            return $res;
         }
 
-        $res = 0;
         foreach ($files as $fname) {
             if ($fname != "." && $fname != "..") {
-                $res++;
+                $res[] = $fname;
             }
         }
 
         return $res;
+    }
+
+    /**
+     * Returns total count of log files
+     *
+     * @return int
+     */
+    protected static function getLogsCount()
+    {
+        $files = self::getFiles();
+        return count($files);
     }
 
     /**
@@ -76,9 +87,9 @@ class Logger
     /**
      * Writes string to log file
      *
-     * @param string $str
+     * @param mixed $args
      */
-    public static function write(string $str)
+    public static function write(mixed ...$args)
     {
         if (file_exists(self::$filename) && !is_writable(self::$filename)) {
             return;
@@ -87,11 +98,13 @@ class Logger
             return;
         }
 
-        if (is_null($str)) {
-            $str = "";
+        $strings = [];
+        foreach ($args as $argument) {
+            $strArg = is_string($argument) ? $argument : var_export($argument, true);
+            $strings[] = $strArg;
         }
 
-        file_put_contents(self::$filename, $str . "\r\n", FILE_APPEND);
+        file_put_contents(self::$filename, implode("", $strings) . "\r\n", FILE_APPEND);
     }
 
     /**
@@ -113,10 +126,11 @@ class Logger
      */
     public static function clean()
     {
-        if (!file_exists(self::$filename) || !is_writable(self::$filename)) {
-            return;
+        $files = self::getFiles();
+        foreach ($files as $filename) {
+            if (file_exists($filename) && is_writable($filename)) {
+                unlink($filename);
+            }
         }
-
-        file_put_contents(self::$filename, "");
     }
 }

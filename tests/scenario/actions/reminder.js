@@ -108,6 +108,16 @@ export const toggleSelect = async (transactions) => {
     });
 };
 
+export const clearAllFilters = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear all filters', () => (
+        App.view.clearAllFilters(directNavigate)
+    ));
+};
+
 export const filterByState = async ({ state, directNavigate = false }) => {
     const stateType = parseInt(state, 10);
     const stateName = Reminder.stateNames[stateType];
@@ -117,6 +127,50 @@ export const filterByState = async ({ state, directNavigate = false }) => {
         await checkNavigation();
         return App.view.filterByState(state, directNavigate);
     });
+};
+
+export const selectStartDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select start date (${dateFmt})`, () => (
+        App.view.selectStartDateFilter(date, directNavigate)
+    ));
+};
+
+export const selectEndDateFilter = async ({ date, directNavigate = false }) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select end date (${dateFmt})`, () => (
+        App.view.selectEndDateFilter(date, directNavigate)
+    ));
+};
+
+export const clearStartDateFilter = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear start date', () => (
+        App.view.clearStartDateFilter(directNavigate)
+    ));
+};
+
+export const clearEndDateFilter = async ({ directNavigate = false } = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear end date', () => (
+        App.view.clearEndDateFilter(directNavigate)
+    ));
 };
 
 export const showDetails = async ({ index, directNavigate = false }) => {

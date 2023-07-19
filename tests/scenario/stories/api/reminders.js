@@ -54,7 +54,7 @@ const confirmRemindersWithChainedRequest = async () => {
 const confirmUpcomingReminders = async () => {
     setBlock('Confirm upcoming reminders', 2);
 
-    const { data: reminders } = App.state.getUpcomingReminders();
+    const { items: reminders } = App.state.getUpcomingReminders();
 
     const data = [{
         upcoming: {
@@ -78,7 +78,7 @@ const confirmUpcomingReminders = async () => {
 };
 
 const getInvalidUpcomingData = () => {
-    const { data: reminders } = App.state.getUpcomingReminders();
+    const { items: reminders } = App.state.getUpcomingReminders();
 
     return [
         // Empty 'upcoming' object
@@ -186,7 +186,7 @@ const cancelRemindersWithChainedRequest = async () => {
 const cancelUpcomingReminders = async () => {
     setBlock('Cancel upcoming reminders', 2);
 
-    const { data: reminders } = App.state.getUpcomingReminders();
+    const { items: reminders } = App.state.getUpcomingReminders();
 
     const data = [{
         upcoming: {
@@ -276,6 +276,18 @@ const upcoming = async () => {
 
     const data = [
         {},
+        { page: 2 },
+        { range: 2 },
+        { endDate: App.datesSec.monthAfter },
+        {
+            startDate: App.datesSec.weekAfter,
+            endDate: App.datesSec.monthAfter,
+        },
+        {
+            page: 2,
+            startDate: App.datesSec.weekAfter,
+            endDate: App.datesSec.monthAfter,
+        },
     ];
 
     await App.scenario.runner.runGroup(Actions.upcoming, data);

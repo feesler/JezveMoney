@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     asArray,
+    createElement,
     isFunction,
     show,
 } from 'jezvejs';
@@ -22,6 +23,8 @@ import {
     __,
     getSelectedIds,
     getApplicationURL,
+    dateStringToTime,
+    formatDateRange,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
@@ -42,11 +45,15 @@ import { ReminderList } from '../../Models/ReminderList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
 
 import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
+import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
+import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
 
 import {
     actions,
@@ -55,10 +62,9 @@ import {
     updateList,
 } from './reducer.js';
 import './ReminderListView.scss';
-import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
-import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
 
 /* CSS classes */
+const FILTER_HEADER_CLASS = 'filter-item__title';
 const LIST_CLASS = 'reminder-list';
 const SELECT_MODE_CLASS = 'reminder-list_select';
 
@@ -90,8 +96,14 @@ class ReminderListView extends AppView {
         App.loadModel(Schedule, 'schedule', App.props.schedule);
         App.loadModel(ReminderList, 'reminders', App.props.reminders);
 
+        const filter = this.props.filter ?? {};
+
         const initialState = updateList({
             ...this.props,
+            form: {
+                ...filter,
+                ...formatDateRange(filter),
+            },
             upcomingItems: null,
             loading: false,
             isLoadingMore: false,
@@ -113,6 +125,7 @@ class ReminderListView extends AppView {
             'contentHeader',
             'filtersContainer',
             'stateFilter',
+            'dateFilter',
             'itemsCount',
             'selectedCounter',
             'selItemsCount',
@@ -146,6 +159,34 @@ class ReminderListView extends AppView {
             onChange: (value) => this.onSelectStateType(value),
         });
         this.stateFilter.append(this.stateMenu.elem);
+
+        // Date range filter
+        this.dateRangeFilterTitle = createElement('span', {
+            props: { textContent: __('filters.dateRange') },
+        });
+        this.dateRangeHeader = createElement('header', {
+            props: { className: FILTER_HEADER_CLASS },
+            children: this.dateRangeFilterTitle,
+        });
+
+        this.dateRangeFilter = DateRangeInput.create({
+            id: 'dateFrm',
+            startPlaceholder: __('dateRange.from'),
+            endPlaceholder: __('dateRange.to'),
+            onChange: (data) => this.changeDateFilter(data),
+        });
+        this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
+
+        // Controls
+        this.filtersControls = FormControls.create({
+            className: 'filters-controls',
+            submitTitle: __('actions.apply'),
+            onSubmitClick: () => this.filters.close(),
+            cancelTitle: __('actions.clearAll'),
+            cancelBtnClass: 'clear-all-btn',
+            onCancelClick: (e) => this.onClearAllFilters(e),
+        });
+        this.filtersContainer.append(this.filtersControls.elem);
 
         this.filters = FiltersContainer.create({
             content: this.filtersContainer,
@@ -244,7 +285,7 @@ class ReminderListView extends AppView {
         const stateFilter = getStateFilter(state);
 
         if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            await this.requestUpcoming();
+            await this.requestUpcoming(this.getUpcomingRequestData());
         }
         this.setRenderTime();
     }
@@ -269,11 +310,12 @@ class ReminderListView extends AppView {
             return;
         }
 
-        if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            await this.requestUpcoming();
+        this.store.dispatch(actions.changeStateFilter(value));
+
+        if (stateFilter === REMINDER_UPCOMING) {
+            await this.requestUpcoming(this.getUpcomingRequestData());
         }
 
-        this.store.dispatch(actions.changeStateFilter(value));
         this.setRenderTime();
     }
 
@@ -295,13 +337,83 @@ class ReminderListView extends AppView {
         }
     }
 
-    showMore() {
-        this.store.dispatch(actions.showMore());
+    async showMore() {
+        const state = this.store.getState();
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
+
+        if (!isUpcoming) {
+            this.store.dispatch(actions.showMore());
+            this.setRenderTime();
+            return;
+        }
+
+        const { page } = state.pagination;
+        let { range } = state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        await this.requestUpcoming({
+            ...this.getUpcomingRequestData(),
+            range,
+            page,
+            keepState: true,
+            isLoadingMore: true,
+        });
+
         this.setRenderTime();
     }
 
     onChangePage(page) {
         this.store.dispatch(actions.changePage(page));
+        this.setRenderTime();
+    }
+
+    /** Date range filter change handler */
+    async changeDateFilter(data) {
+        const { filter } = this.store.getState();
+        const startDate = filter.startDate ?? null;
+        const endDate = filter.endDate ?? null;
+        const timeData = {
+            startDate: dateStringToTime(data.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(data.endDate, { fixShortYear: false }),
+        };
+
+        if (startDate === timeData.startDate && endDate === timeData.endDate) {
+            return;
+        }
+
+        this.store.dispatch(actions.changeDateFilter(data));
+        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                range: 1,
+                page: 1,
+                keepState: true,
+            });
+        }
+
+        this.setRenderTime();
+    }
+
+    /**
+     * Clear all filters
+     * @param {Event} e - click event object
+     */
+    async onClearAllFilters(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.clearAllFilters());
+        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                range: 1,
+                page: 1,
+                keepState: true,
+            });
+        }
+
         this.setRenderTime();
     }
 
@@ -360,8 +472,8 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.changeListMode(listMode));
     }
 
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
+    startLoading(isLoadingMore = false) {
+        this.store.dispatch(actions.startLoading(isLoadingMore));
     }
 
     stopLoading() {
@@ -398,7 +510,27 @@ class ReminderListView extends AppView {
     }
 
     getListRequest() {
-        return {};
+        const state = this.store.getState();
+        if (getStateFilter(state) === REMINDER_UPCOMING) {
+            return {};
+        }
+
+        return {
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
+    }
+
+    getUpcomingListRequest() {
+        const state = this.store.getState();
+        if (getStateFilter(state) !== REMINDER_UPCOMING) {
+            return {};
+        }
+
+        return {
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
     }
 
     prepareRequest(data) {
@@ -406,7 +538,7 @@ class ReminderListView extends AppView {
             ...data,
             returnState: {
                 reminders: this.getListRequest(),
-                upcoming: {},
+                upcoming: this.getUpcomingListRequest(),
                 profile: {},
             },
         };
@@ -468,17 +600,41 @@ class ReminderListView extends AppView {
         }
     }
 
-    async requestUpcoming() {
+    getUpcomingRequestData() {
+        const { pagination, form } = this.store.getState();
+
+        const res = {
+            page: pagination.page,
+            range: pagination.range,
+        };
+
+        if (form.startDate) {
+            res.startDate = dateStringToTime(form.startDate, { fixShortYear: false });
+        }
+        if (form.endDate) {
+            res.endDate = dateStringToTime(form.endDate, { fixShortYear: false });
+        }
+
+        return res;
+    }
+
+    async requestUpcoming(options = {}) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        this.startLoading();
+        const {
+            keepState = false,
+            isLoadingMore = false,
+            ...request
+        } = options;
+
+        this.startLoading(isLoadingMore);
 
         try {
-            const { data } = await API.reminder.upcoming();
-            this.store.dispatch(actions.upcomingItemsLoaded(data));
+            const { data: upcoming } = await API.reminder.upcoming(request);
+            this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
         } catch (e) {
             App.createErrorNotification(e.message);
         }
@@ -637,6 +793,13 @@ class ReminderListView extends AppView {
             params.state = Reminder.getStateName(filter.state);
         }
 
+        if (filter.startDate) {
+            params.startDate = filter.startDate;
+        }
+        if (filter.endDate) {
+            params.endDate = filter.endDate;
+        }
+
         if (keepPage) {
             params.page = state.pagination.page;
         }
@@ -681,14 +844,47 @@ class ReminderListView extends AppView {
     renderFilters(state, prevState) {
         if (
             state.filter === prevState?.filter
+            && state.form === prevState?.form
+            && state.form.startDate === prevState?.form?.startDate
+            && state.form.endDate === prevState?.form?.endDate
         ) {
             return;
         }
 
         const filterUrl = this.getURL(state, false);
 
+        // Reminder state filter
         this.stateMenu.setURL(filterUrl);
         this.stateMenu.setSelection(state.filter.state);
+
+        // Date range filter
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            form: {
+                ...rangeState.form,
+                startDate: state.form.startDate,
+                endDate: state.form.endDate,
+            },
+            filter: {
+                ...rangeState.filter,
+                startDate: dateStringToTime(state.form.startDate),
+                endDate: dateStringToTime(state.form.endDate),
+            },
+        }));
+
+        // Controls
+        const { filter } = state;
+        const clearAllURLParams = {};
+
+        if (filter.state !== REMINDER_SCHEDULED) {
+            clearAllURLParams.state = Reminder.getStateName(filter.state);
+        }
+
+        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
+        this.filtersControls.setState((controlsState) => ({
+            ...controlsState,
+            cancelURL: clearAllURL.toString(),
+        }));
     }
 
     renderList(state, prevState) {
@@ -735,7 +931,7 @@ class ReminderListView extends AppView {
         const loadingMore = state.loading && state.isLoadingMore;
         this.showMoreBtn.show(
             state.items.length > 0
-            && (isUpcoming || pageNum < state.pagination.pagesCount)
+            && (!state.pagination.pagesCount || pageNum < state.pagination.pagesCount)
             && !loadingMore,
         );
         this.spinner.show(loadingMore);

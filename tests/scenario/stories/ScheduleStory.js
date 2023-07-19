@@ -11,7 +11,7 @@ import {
     INTERVAL_DAY,
     INTERVAL_WEEK,
     INTERVAL_YEAR,
-} from '../../model/ScheduledTransaction.js';
+} from '../../common.js';
 
 export class ScheduleStory extends TestStory {
     async beforeRun() {

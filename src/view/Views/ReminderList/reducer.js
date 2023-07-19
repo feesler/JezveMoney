@@ -1,5 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import {
+    dateStringToTime,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { ReminderList } from '../../Models/ReminderList.js';
@@ -17,8 +22,13 @@ export const getItemsSource = (state) => (
 
 export const createList = (items, state) => {
     const stateFilter = getStateFilter(state);
+    const { startDate, endDate } = state.filter;
 
-    const res = items.filter((item) => stateFilter === item?.state);
+    const res = items.filter((item) => (
+        stateFilter === item?.state
+        && (!startDate || item.date >= startDate)
+        && (!endDate || item.date <= endDate)
+    ));
 
     const list = ReminderList.create(res);
     if (stateFilter === REMINDER_UPCOMING) {
@@ -47,7 +57,11 @@ export const updateList = (state) => {
     const items = createList(itemsSource, state);
     result.items = items;
 
-    pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+    const stateFilter = getStateFilter(result);
+    if (stateFilter !== REMINDER_UPCOMING) {
+        pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+    }
+
     pagination.page = (pagination.pagesCount > 0)
         ? Math.min(pagination.pagesCount, pagination.page)
         : 1;
@@ -130,13 +144,22 @@ const slice = createSlice({
 
     changeStateFilter: (state, value) => updateList({
         ...state,
+        form: {
+            ...state.form,
+            state: value,
+        },
         filter: {
             ...state.filter,
             state: value,
         },
+        pagination: {
+            ...state.pagination,
+            page: 1,
+            range: 1,
+        },
     }),
 
-    showMore: (state) => ({
+    showMore: (state) => updateList({
         ...state,
         pagination: {
             ...state.pagination,
@@ -153,6 +176,36 @@ const slice = createSlice({
         },
     }),
 
+    changeDateFilter: (state, data) => updateList({
+        ...state,
+        form: {
+            ...state.form,
+            ...data,
+        },
+        filter: {
+            ...state.filter,
+            startDate: dateStringToTime(data.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(data.endDate, { fixShortYear: false }),
+        },
+    }),
+
+    clearAllFilters: (state) => updateList({
+        ...state,
+        form: {
+            state: state.form.state,
+        },
+        filter: {
+            state: state.filter.state,
+            startDate: null,
+            endDate: null,
+        },
+        pagination: {
+            ...state.pagination,
+            page: 1,
+            range: 1,
+        },
+    }),
+
     toggleMode: (state) => ({
         ...state,
         mode: (state.mode === 'details') ? 'classic' : 'details',
@@ -160,15 +213,15 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    startLoading: (state) => (
+    startLoading: (state, isLoadingMore = false) => (
         (state.loading)
             ? state
-            : { ...state, loading: true }
+            : { ...state, isLoadingMore, loading: true }
     ),
 
     stopLoading: (state) => (
         (state.loading)
-            ? { ...state, loading: false }
+            ? { ...state, loading: false, isLoadingMore: false }
             : state
     ),
 
@@ -177,17 +230,24 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    listRequestLoaded: (state, { upcoming, keepState }) => updateList({
-        ...state,
-        upcomingItems: (upcoming) ? upcoming.map(upcomingId) : state.upcomingItems,
-        listMode: (keepState) ? state.listMode : 'list',
-        contextItem: null,
-    }),
+    listRequestLoaded: (state, { upcoming, keepState }) => {
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
 
-    upcomingItemsLoaded: (state, items) => updateList({
-        ...state,
-        upcomingItems: items.map(upcomingId),
-    }),
+        return updateList({
+            ...state,
+            pagination: (isUpcoming && upcoming?.pagination)
+                ? { ...upcoming.pagination }
+                : state.pagination,
+            filter: (isUpcoming && upcoming?.filter)
+                ? { ...state.filter, ...upcoming.filter }
+                : state.filter,
+            upcomingItems: (isUpcoming && Array.isArray(upcoming?.items))
+                ? upcoming.items.map(upcomingId)
+                : state.upcomingItems,
+            listMode: (keepState) ? state.listMode : 'list',
+            contextItem: null,
+        });
+    },
 });
 
 export const { actions, reducer } = slice;

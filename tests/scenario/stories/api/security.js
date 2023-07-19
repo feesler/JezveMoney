@@ -12,7 +12,7 @@ import * as personActions from '../../actions/api/person.js';
 import * as categoryActions from '../../actions/api/category.js';
 import * as transactionActions from '../../actions/api/transaction.js';
 import * as scheduleActions from '../../actions/api/schedule.js';
-import { INTERVAL_DAY } from '../../../model/ScheduledTransaction.js';
+import { INTERVAL_DAY } from '../../../common.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);

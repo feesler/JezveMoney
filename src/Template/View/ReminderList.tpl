@@ -25,6 +25,10 @@
                                         <section id="stateFilter" class="filter-item trans-type-filter">
                                             <header class="filter-item__title"><?= __("filters.reminderState") ?></header>
                                         </section>
+
+                                        <hr class="filters-separator">
+
+                                        <section id="dateFilter" class="filter-item date-range-filter validation-block"></section>
                                     </div>
                                 </div>
                             </aside>

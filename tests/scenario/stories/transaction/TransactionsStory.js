@@ -18,7 +18,7 @@ import * as creditLimitActions from './creditLimit.js';
 import * as accountActions from '../../actions/account.js';
 import { testLocales } from '../../actions/locale.js';
 import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
-import { INTERVAL_DAY, INTERVAL_WEEK } from '../../../model/ScheduledTransaction.js';
+import { INTERVAL_DAY, INTERVAL_WEEK } from '../../../common.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {

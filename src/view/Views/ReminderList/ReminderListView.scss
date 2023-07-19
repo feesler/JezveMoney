@@ -28,6 +28,31 @@
   max-width: var(--section-width);
 }
 
+/* Date range filter */
+.date-range-filter {
+  max-width: 400px;
+}
+
+/* Clear all filters button */
+.btn.clear-all-btn {
+  --btn-title-color: var(--accent-color);
+  --btn-hover-title-color: var(--accent-hover-color);
+  --btn-size: var(--input-height);
+
+  text-decoration: none;
+}
+
+/* Filters inside Collapsible container */
+.filters-collapsible {
+  .submit-btn {
+    display: none;
+  }
+
+  .filters-controls {
+    padding-top: 12px;
+  }
+}
+
 /* Scheduled transaction reminders list component */
 .reminder-list {
   display: flex;
@@ -39,4 +64,10 @@
 
 .reminder-list_select .reminder-item {
   cursor: pointer;
+}
+
+@media (hover: hover) {
+  .btn.clear-all-btn:hover {
+    text-decoration: underline;
+  }
 }

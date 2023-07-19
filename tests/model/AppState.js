@@ -3,6 +3,7 @@ import {
     isInt,
     assert,
     asArray,
+    isDate,
 } from 'jezve-test';
 import {
     isValidValue,
@@ -12,6 +13,9 @@ import {
     timeToSeconds,
     dateToSeconds,
     cutDate,
+    secondsToDate,
+    stepInterval,
+    INTERVAL_NONE,
 } from '../common.js';
 import {
     EXPENSE,
@@ -38,13 +42,12 @@ import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
 import { ImportCondition } from './ImportCondition.js';
 import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
-import { INTERVAL_NONE, ScheduledTransaction } from './ScheduledTransaction.js';
+import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { RemindersList } from './RemindersList.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
-    REMINDER_UPCOMING,
     Reminder,
 } from './Reminder.js';
 import { Account } from './Account.js';
@@ -640,37 +643,86 @@ export class AppState {
     }
 
     getUpcomingReminders(options = {}) {
-        const reminderOptions = {
-            startDate: App.dates.tomorrow,
-            endDate: App.dates.yearAfter,
-            ...options,
+        let {
+            page = 1,
+            range = 1,
+            startDate = App.dates.tomorrow,
+            endDate = App.dates.yearAfter,
+        } = options;
+        const {
+            onPage = 10,
+        } = options;
+
+        if (startDate && !isDate(startDate)) {
+            startDate = secondsToDate(startDate);
+        }
+        if (endDate && !isDate(endDate)) {
+            endDate = secondsToDate(endDate);
+        }
+
+        const pagination = {
+            page,
+            range,
+            onPage,
         };
 
-        reminderOptions.startDate = cutDate(reminderOptions.startDate);
-        reminderOptions.endDate = cutDate(reminderOptions.endDate);
+        const filter = {};
+        if (options.startDate) {
+            filter.startDate = options.startDate;
+        }
+        if (options.endDate) {
+            filter.endDate = options.endDate;
+        }
 
-        const res = [];
-        this.schedule.forEach((item) => {
-            const reminderDates = item.getReminders(reminderOptions);
+        const reminderOptions = {
+            startDate: cutDate(startDate),
+            endDate: cutDate(endDate),
+        };
 
-            reminderDates.forEach((timestamp) => {
-                const reminder = {
-                    schedule_id: item.id,
-                    state: REMINDER_UPCOMING,
-                    date: timeToSeconds(timestamp),
-                    transaction_id: 0,
-                };
+        const longestInterval = this.schedule.getLongestInterval();
+        reminderOptions.endDate = stepInterval(
+            reminderOptions.endDate,
+            longestInterval.interval_type,
+            longestInterval.interval_step + 1,
+        );
 
-                if (!this.reminders.isSameItemExist(reminder)) {
-                    res.push(reminder);
-                }
-            });
-        });
+        let res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
+        let prevCount = 0;
+        let remindersCount = res.length;
 
-        const list = RemindersList.create(res);
-        list.sort(false);
+        const firstItemIndex = (page - 1) * onPage;
+        const lastItemIndex = (page + range - 1) * onPage;
 
-        return list;
+        if (options.endDate && onPage > 0) {
+            pagination.total = remindersCount;
+            pagination.pagesCount = Math.ceil(remindersCount / onPage);
+            page = Math.min(pagination.pagesCount, page);
+            range = Math.min(pagination.pagesCount - page + 1, range);
+        }
+
+        pagination.page = page;
+        pagination.range = range;
+
+        while (
+            !options.endDate
+            && remindersCount > prevCount
+            && remindersCount < lastItemIndex
+        ) {
+            reminderOptions.endDate = stepInterval(
+                reminderOptions.endDate,
+                longestInterval.interval_type,
+                longestInterval.interval_step + 1,
+            );
+            res = this.schedule.getUpcomingReminders(reminderOptions, this.reminders);
+            prevCount = remindersCount;
+            remindersCount = res.length;
+        }
+
+        return {
+            items: res.slice(firstItemIndex, lastItemIndex),
+            pagination,
+            filter,
+        };
     }
 
     getState(request) {

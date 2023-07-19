@@ -169,14 +169,21 @@ class Router
         }
         $controller->actionParam = $actionParam;
 
+        $args = [$controller, $contrStr, $action, $routeParts];
         if (is_callable($this->onBeforeActionHandler)) {
-            call_user_func_array($this->onBeforeActionHandler, [$controller, $contrStr, $action, $routeParts]);
+            $beforeActionResult = call_user_func_array($this->onBeforeActionHandler, $args);
+            if (!$beforeActionResult) {
+                return;
+            }
         }
 
-        $controller->runAction($action);
+        $actionResult = $controller->runAction($action);
+        if (!$actionResult) {
+            return;
+        }
 
         if (is_callable($this->onAfterActionHandler)) {
-            call_user_func_array($this->onAfterActionHandler, [$controller, $contrStr, $action, $routeParts]);
+            call_user_func_array($this->onAfterActionHandler, $args);
         }
     }
 }

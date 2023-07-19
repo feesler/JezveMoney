@@ -38,15 +38,17 @@ abstract class Controller
     public function runAction(string $action)
     {
         if (!method_exists($this, $action)) {
-            return;
+            return false;
         }
 
         try {
             $this->$action();
+            return true;
         } catch (\Error $e) {
             $message = $e->getMessage();
             wlog($message);
             $this->fail($message);
+            return false;
         }
     }
 

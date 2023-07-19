@@ -38,7 +38,7 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
 import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
-import { DateRangeSelector } from '../../Components/Inputs/Date/DateRangeSelector/DateRangeSelector.js';
+import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -255,20 +255,20 @@ class TransactionListView extends AppView {
             props: { textContent: __('filters.dateRange') },
         });
 
-        this.weekRangeBtn = DateRangeSelector.create({
-            rangeType: 'week',
+        this.weekRangeBtn = FieldHeaderButton.create({
+            dataValue: 'week',
             title: __('dateRange.forWeek'),
             onClick: (e) => this.showWeekRange(e),
         });
 
-        this.monthRangeBtn = DateRangeSelector.create({
-            rangeType: 'month',
+        this.monthRangeBtn = FieldHeaderButton.create({
+            dataValue: 'month',
             title: __('dateRange.forMonth'),
             onClick: (e) => this.showMonthRange(e),
         });
 
-        this.halfYearRangeBtn = DateRangeSelector.create({
-            rangeType: 'halfyear',
+        this.halfYearRangeBtn = FieldHeaderButton.create({
+            dataValue: 'halfyear',
             title: __('dateRange.forHalfYear'),
             onClick: (e) => this.showHalfYearRange(e),
         });

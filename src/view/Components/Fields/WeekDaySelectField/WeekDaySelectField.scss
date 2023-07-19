@@ -1,0 +1,8 @@
+.field.week-day-field {
+  .field__title {
+    display: flex;
+    flex-flow: row nowrap;
+    column-gap: 1.5rem;
+    white-space: nowrap;
+  }
+}

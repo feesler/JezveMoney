@@ -25,7 +25,6 @@ class ApiResponse
         wlog("API response: " . $output);
 
         echo ($output);
-        // exit;
     }
 
     /**

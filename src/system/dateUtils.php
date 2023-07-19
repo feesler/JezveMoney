@@ -20,6 +20,14 @@ const INTERVAL_DURATION_MAP = [
     INTERVAL_YEAR => "Y",
 ];
 
+const INTERVAL_DAYS_MAP = [
+    INTERVAL_NONE => 0,
+    INTERVAL_DAY => 1,
+    INTERVAL_WEEK => 7,
+    INTERVAL_MONTH => 30,
+    INTERVAL_YEAR => 365,
+];
+
 /**
  * Returns timestamp for the start of day
  *
@@ -223,29 +231,36 @@ function getDateIntervalOffset(mixed $dateInfo, int $intervalType)
  * Increases timestamp up to next interval and returns result
  *  or null in case invalid data
  *
- * @param int $timestamp timestamp to find next date interval for
+ * @param int|null $timestamp timestamp to find next date interval for
  * @param int $intervalType type of interval
  * @param int $step count of intervals to add
  *
- * @return int|null
+ * @return int
  */
-function stepInterval(int $timestamp, int $intervalType, int $step = 1)
+function stepInterval(?int $timestamp, int $intervalType, int $step = 1)
 {
-    if ($intervalType === INTERVAL_NONE || $step < 1) {
-        return null;
+    if (!$timestamp) {
+        throw new \Error("Invalid timestamp");
+    }
+    if (!isset(INTERVAL_DURATION_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
+    }
+    if ($step < 0) {
+        throw new \Error("Invalid interval step");
     }
 
     $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
     $date->setTime(0, 0);
 
-    if ($intervalType === INTERVAL_MONTH) {
-        $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
-        $maxDate->setTime(0, 0);
-        $maxDate->modify("last day of next month");
+    if ($step === 0) {
+        return $date->getTimestamp();
+    }
 
+    if ($intervalType === INTERVAL_MONTH) {
         $dateInfo = getdate($date->getTimestamp());
+        $maxDate = mktime(0, 0, 0, $dateInfo["mon"] + $step + 1, 0, $dateInfo["year"]);
         $res = mktime(0, 0, 0, $dateInfo["mon"] + $step, 1, $dateInfo["year"]);
-        return min($res, $maxDate->getTimestamp());
+        return min($res, $maxDate);
     }
 
     $duration = "P" . $step . INTERVAL_DURATION_MAP[$intervalType];
@@ -257,13 +272,13 @@ function stepInterval(int $timestamp, int $intervalType, int $step = 1)
  * Returns timestamp for the start next interval of specified type
  *  or null in case invalid data
  *
- * @param int $timestamp timestamp to find next date interval for
+ * @param int|null $timestamp timestamp to find next date interval for
  * @param int $intervalType type of interval
  * @param int $step count of intervals to add
  *
  * @return int|null
  */
-function getNextDateInterval(int $timestamp, int $intervalType, int $step = 1)
+function getNextDateInterval(?int $timestamp, int $intervalType, int $step = 1)
 {
     $res = stepInterval($timestamp, $intervalType, $step);
     if (!$res) {
@@ -272,4 +287,24 @@ function getNextDateInterval(int $timestamp, int $intervalType, int $step = 1)
 
     $dateInfo = getDateIntervalStart($res, $intervalType);
     return $dateInfo["time"];
+}
+
+/**
+ * Returns count of days for specified interval type and step
+ *
+ * @param int $intervalType interval type
+ * @param int $step interval step
+ *
+ * @return int
+ */
+function getIntervalDays(int $intervalType, int $step = 1)
+{
+    if (!isset(INTERVAL_DAYS_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
+    }
+    if ($step < 1) {
+        return 0;
+    }
+
+    return INTERVAL_DAYS_MAP[$intervalType] * $step;
 }

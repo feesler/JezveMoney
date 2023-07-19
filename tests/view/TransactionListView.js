@@ -105,9 +105,9 @@ export class TransactionListView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
-        res.weekRangeBtn = { elem: await query('.range-selector-btn[data-range="week"]') };
-        res.monthRangeBtn = { elem: await query('.range-selector-btn[data-range="month"]') };
-        res.halfYearRangeBtn = { elem: await query('.range-selector-btn[data-range="halfyear"]') };
+        res.weekRangeBtn = { elem: await query('.field-header-btn[data-value="week"]') };
+        res.monthRangeBtn = { elem: await query('.field-header-btn[data-value="month"]') };
+        res.halfYearRangeBtn = { elem: await query('.field-header-btn[data-value="halfyear"]') };
 
         res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');

@@ -8,24 +8,22 @@ import {
     Transaction,
 } from './Transaction.js';
 import {
+    DAYS_IN_WEEK,
+    INTERVAL_DAY,
+    INTERVAL_MONTH,
+    INTERVAL_NONE,
+    INTERVAL_WEEK,
+    INTERVAL_YEAR,
     MONTHS_IN_YEAR,
     cutDate,
-    getLastDayOfMonth,
     getWeekdayShort,
     secondsToTime,
     shiftDate,
+    stepInterval,
 } from '../common.js';
 import { __ } from './locale.js';
 import { App } from '../Application.js';
 
-/** Types of transactions */
-export const INTERVAL_NONE = 0;
-export const INTERVAL_DAY = 1;
-export const INTERVAL_WEEK = 2;
-export const INTERVAL_MONTH = 3;
-export const INTERVAL_YEAR = 4;
-
-const DAYS_IN_WEEK = 7;
 const MAX_DAYS_IN_MONTH = 31;
 
 /* Schedule interval type tokens */
@@ -426,38 +424,7 @@ export class ScheduledTransaction {
             return null;
         }
 
-        const date = new Date(timestamp);
-        let res;
-
-        if (this.interval_type === INTERVAL_DAY) {
-            const targetDate = shiftDate(date, this.interval_step);
-            res = targetDate.getTime();
-        } else if (this.interval_type === INTERVAL_WEEK) {
-            const targetWeek = shiftDate(date, this.interval_step * DAYS_IN_WEEK);
-            res = targetWeek.getTime();
-        } else if (this.interval_type === INTERVAL_MONTH) {
-            const targetMonth = new Date(Date.UTC(
-                date.getFullYear(),
-                date.getMonth() + this.interval_step,
-                1,
-            ));
-            const maxDate = getLastDayOfMonth(targetMonth);
-
-            res = Date.UTC(
-                date.getFullYear(),
-                date.getMonth() + this.interval_step,
-                Math.min(date.getDate(), maxDate.getDate()),
-            );
-        } else if (this.interval_type === INTERVAL_YEAR) {
-            res = Date.UTC(
-                date.getFullYear() + this.interval_step,
-                date.getMonth(),
-                date.getDate(),
-            );
-        } else {
-            throw new Error('Invalid type of interval');
-        }
-
+        const res = stepInterval(timestamp, this.interval_type, this.interval_step);
         if (endDate && endDate < res) {
             return null;
         }
@@ -466,7 +433,11 @@ export class ScheduledTransaction {
     }
 
     getReminderDates(timestamp) {
-        const dayStart = cutDate(new Date(timestamp));
+        const dayStart = cutDate(timestamp);
+
+        if (this.interval_type === INTERVAL_NONE) {
+            return [dayStart];
+        }
 
         const offsets = [...asArray(this.interval_offset)];
         if (offsets.length === 0) {
@@ -477,16 +448,21 @@ export class ScheduledTransaction {
             let res = new Date(dayStart);
             let offset = value;
 
-            if (
-                this.interval_type !== INTERVAL_NONE
-                && offset > 0
-            ) {
-                if (this.interval_type === INTERVAL_WEEK) {
-                    offset = (offset === 0) ? 6 : (offset - 1);
-                }
-
-                res = shiftDate(res, offset);
+            if (this.interval_type === INTERVAL_WEEK) {
+                offset = (offset === 0) ? 6 : (offset - 1);
             }
+
+            if (this.interval_type === INTERVAL_YEAR) {
+                const monthIndex = Math.floor(offset / 100);
+                const dayIndex = (offset % 100);
+
+                const yearStart = this.getIntervalStart(dayStart, INTERVAL_YEAR);
+                res = stepInterval(yearStart.getTime(), INTERVAL_MONTH, monthIndex);
+                res = this.getIntervalStart(res, INTERVAL_MONTH);
+                offset = dayIndex;
+            }
+
+            res = shiftDate(res, offset);
 
             return res.getTime();
         });
@@ -531,5 +507,29 @@ export class ScheduledTransaction {
         }
 
         return res;
+    }
+
+    getIntervalDays() {
+        const type = this.interval_type;
+        if (type === INTERVAL_DAY) {
+            return 1;
+        }
+        if (type === INTERVAL_WEEK) {
+            return 7;
+        }
+        if (type === INTERVAL_MONTH) {
+            return 30;
+        }
+        if (type === INTERVAL_YEAR) {
+            return 365;
+        }
+
+        return 0;
+    }
+
+    getIntervalLength() {
+        const offsets = asArray(this.interval_offset);
+        const maxOffset = offsets.reduce((prev, offset) => Math.max(prev, offset), 0);
+        return this.getIntervalDays() * this.interval_step + maxOffset;
     }
 }

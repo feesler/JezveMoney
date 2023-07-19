@@ -24,6 +24,11 @@ import {
     EXCHANGE_PRECISION,
     dateStringToSeconds,
     secondsToTime,
+    INTERVAL_DAY,
+    INTERVAL_MONTH,
+    INTERVAL_NONE,
+    INTERVAL_WEEK,
+    INTERVAL_YEAR,
 } from '../../../common.js';
 import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu.js';
 import { InputRow } from '../Fields/InputRow.js';
@@ -41,15 +46,7 @@ import {
 } from '../../../model/Transaction.js';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
-import {
-    INTERVAL_DAY,
-    INTERVAL_MONTH,
-    INTERVAL_NONE,
-    INTERVAL_WEEK,
-    INTERVAL_YEAR,
-    ScheduledTransaction,
-    getIntervalOffset,
-} from '../../../model/ScheduledTransaction.js';
+import { ScheduledTransaction, getIntervalOffset } from '../../../model/ScheduledTransaction.js';
 import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 
 export const TRANSACTION_FORM = 'transaction';

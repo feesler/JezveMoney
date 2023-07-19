@@ -15,12 +15,16 @@ export class RemindersList extends List {
         const scheduleFilter = options?.schedule_id ?? null;
         const stateFilter = options?.state ?? null;
         const dateFilter = options?.date ?? null;
+        const startDateFilter = options?.startDate ?? null;
+        const endDateFilter = options?.endDate ?? null;
         const trFilter = options?.transaction_id ?? null;
 
         if (
             scheduleFilter === null
             && stateFilter === null
             && dateFilter === null
+            && startDateFilter === null
+            && endDateFilter === null
             && trFilter === null
         ) {
             return list;
@@ -30,6 +34,8 @@ export class RemindersList extends List {
             (scheduleFilter === null || item.schedule_id === scheduleFilter)
             && (stateFilter === null || item.state === stateFilter)
             && (dateFilter === null || item.date === dateFilter)
+            && (startDateFilter === null || item.date >= startDateFilter)
+            && (endDateFilter === null || item.date <= endDateFilter)
             && (trFilter === null || item.transaction_id === trFilter)
         ));
     }

@@ -56,6 +56,8 @@
     "dateRange": {
         "from": "From",
         "to": "To",
+        "weekdays": "Weekdays",
+        "weekend": "Weekend",
         "forWeek": "For week",
         "forMonth": "For month",
         "forHalfYear": "For half a year",

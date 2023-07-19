@@ -3,6 +3,9 @@ import { List } from './List.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { TransactionsList } from './TransactionsList.js';
 import { App } from '../Application.js';
+import { timeToSeconds } from '../common.js';
+import { REMINDER_UPCOMING } from './Reminder.js';
+import { RemindersList } from './RemindersList.js';
 
 /** List of scheduled transactions */
 export class ScheduledTransactionsList extends List {
@@ -86,5 +89,52 @@ export class ScheduledTransactionsList extends List {
 
     sortDesc() {
         return this.sortItems(this.data, true);
+    }
+
+    getLongestInterval() {
+        let maxDays = 0;
+        let res = null;
+
+        this.forEach((item) => {
+            const days = item.getIntervalLength();
+            if (res === null || maxDays < days) {
+                res = item;
+                maxDays = days;
+            }
+        });
+
+        return res;
+    }
+
+    getUpcomingReminders(options = {}, reminders = null) {
+        const { tomorrow, yearAfter } = App.dates;
+        const reminderOptions = {
+            startDate: tomorrow,
+            endDate: yearAfter,
+            ...options,
+        };
+
+        const res = [];
+        this.forEach((item) => {
+            const reminderDates = item.getReminders(reminderOptions);
+
+            reminderDates.forEach((timestamp) => {
+                const reminder = {
+                    schedule_id: item.id,
+                    state: REMINDER_UPCOMING,
+                    date: timeToSeconds(timestamp),
+                    transaction_id: 0,
+                };
+
+                if (!reminders?.isSameItemExist(reminder)) {
+                    res.push(reminder);
+                }
+            });
+        });
+
+        const list = RemindersList.create(res);
+        list.sort(false);
+
+        return list;
     }
 }

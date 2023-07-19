@@ -192,5 +192,35 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_SCHEDULED });
         await Actions.filterByState({ state: REMINDER_UPCOMING });
         await Actions.filterByState({ state: REMINDER_UPCOMING, directNavigate: true });
+
+        await Actions.selectEndDateFilter({ date: App.dates.monthAfter });
+        await Actions.selectStartDateFilter({ date: App.dates.weekAfter });
+        await Actions.clearEndDateFilter();
+        await Actions.clearStartDateFilter();
+        await Actions.selectStartDateFilter(
+            { date: App.dates.weekAfter, directNavigate: true },
+        );
+        await Actions.selectEndDateFilter(
+            { date: App.dates.monthAgo, directNavigate: true },
+        );
+        await Actions.showMore();
+        await Actions.showMore();
+
+        await Actions.clearAllFilters();
+        await Actions.selectEndDateFilter(
+            { date: App.dates.monthAgo, directNavigate: true },
+        );
+        await Actions.clearAllFilters({ directNavigate: true });
+
+        await Actions.filterByState({ state: REMINDER_SCHEDULED });
+        await Actions.selectStartDateFilter({ date: App.dates.monthAgo });
+        await Actions.selectEndDateFilter({ date: App.dates.weekAgo });
+
+        await Actions.filterByState({ state: REMINDER_CONFIRMED });
+        await Actions.selectEndDateFilter({ date: App.dates.yesterday });
+
+        await Actions.filterByState({ state: REMINDER_CANCELLED });
+        await Actions.clearEndDateFilter();
+        await Actions.clearAllFilters();
     }
 }

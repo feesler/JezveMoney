@@ -154,8 +154,8 @@ export const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
     accounts: isIntArray,
     persons: isIntArray,
     categories: isIntArray,
-    startDate: isString,
-    endDate: isString,
+    startDate: isInt,
+    endDate: isInt,
     search: isString,
 });
 
@@ -216,8 +216,8 @@ export const isStatisticsFilter = (obj) => verifyObject(obj, {
     accounts: isIntArray,
     curr_id: isInt,
     group: isString,
-    startDate: isString,
-    endDate: isString,
+    startDate: isInt,
+    endDate: isInt,
 });
 
 /** Verify object is statistics response */
@@ -278,6 +278,29 @@ export const isUpcomingReminder = (obj) => verifyObject(obj, {
 
 /** Verify object is array of upcoming reminders */
 export const isUpcomingRemindersArray = isArrayOf(isUpcomingReminder);
+
+/** Verifies object is upcoming reminders filter */
+export const isUpcomingRemindersFilter = (obj) => verifyObject(obj, {}, {
+    startDate: isInt,
+    endDate: isInt,
+});
+
+/** Verify object is upcoming reminders list paginator */
+export const isUpcomingRemindersPaginator = (obj) => verifyObject(obj, {
+    onPage: isInt,
+    page: isInt,
+    range: isInt,
+}, {
+    total: isInt,
+    pagesCount: isInt,
+});
+
+/** Verifies object is upcoming reminders list */
+export const isUpcomingRemindersList = (obj) => verifyObject(obj, {
+    items: isUpcomingRemindersArray,
+    filter: isUpcomingRemindersFilter,
+    pagination: isUpcomingRemindersPaginator,
+});
 
 /** Verify object is import template */
 export const isTemplateColumns = (obj) => verifyObject(obj, {

@@ -75,8 +75,6 @@ class Transaction extends ApiSortableListController
      */
     public function getList()
     {
-        $res = new \stdClass();
-
         $data = $this->getRequestData();
 
         $factory = TransactionsFactory::getInstance();

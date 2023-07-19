@@ -12,7 +12,7 @@ import { DEBT, LIMIT_CHANGE } from '../model/Transaction.js';
 import { AppView } from './AppView.js';
 import { SCHEDULE_ITEM_FORM, TransactionForm } from './component/Transaction/TransactionForm.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { INTERVAL_NONE } from '../model/ScheduledTransaction.js';
+import { INTERVAL_NONE } from '../common.js';
 
 /** Scheduled transaction create/update view class */
 export class ScheduleItemView extends AppView {
