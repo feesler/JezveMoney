@@ -14,7 +14,6 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Switch } from 'jezvejs/Switch';
-import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 import { createStore } from 'jezvejs/Store';
 
 import {
@@ -47,6 +46,7 @@ import { AmountInputField } from '../Fields/AmountInputField/AmountInputField.js
 import { DateInputField } from '../Fields/DateInputField/DateInputField.js';
 import { DateRangeInput } from '../Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { TransactionTypeMenu } from '../Fields/TransactionTypeMenu/TransactionTypeMenu.js';
+import { WeekDaySelectField } from '../Fields/WeekDaySelectField/WeekDaySelectField.js';
 import { CategorySelect } from '../Inputs/CategorySelect/CategorySelect.js';
 import { NumberInputGroup } from '../Inputs/NumberInputGroup/NumberInputGroup.js';
 import { Tile } from '../Tile/Tile.js';
@@ -644,19 +644,13 @@ export class TransactionForm extends Component {
 
         // Interval offset
         // Week day field
-        this.weekDaySelect = WeekDaySelect.create({
-            id: 'weekDaySelect',
-            type: 'buttons',
-            multiple: true,
-            onChange: (offset) => this.onWeekdayOffsetChanged(offset),
-        });
-
-        this.weekDayField = Field.create({
+        this.weekDayField = WeekDaySelectField.create({
             id: 'weekDayField',
+            selectId: 'weekDaySelect',
             htmlFor: 'weekDaySelect',
+            className: 'form-row',
             title: __('schedule.offsetWeekDays'),
-            className: 'form-row week-day-field',
-            content: this.weekDaySelect.elem,
+            onChange: (offset) => this.onWeekdayOffsetChanged(offset),
         });
 
         // Month day / year day field
@@ -1788,10 +1782,10 @@ export class TransactionForm extends Component {
         // Week day field
         const isWeekInterval = (intervalType === INTERVAL_WEEK);
 
-        this.weekDaySelect.enable(!state.submitStarted);
+        this.weekDayField.enable(!state.submitStarted);
         this.weekDayField.show(isRepeat && isWeekInterval);
         if (isWeekInterval) {
-            this.weekDaySelect.setSelection(intervalOffset);
+            this.weekDayField.setSelection(intervalOffset);
         }
 
         // Month / year day select field

@@ -56,6 +56,8 @@
     "dateRange": {
         "from": "Начало",
         "to": "Конец",
+        "weekdays": "Будни",
+        "weekend": "Выходные",
         "forWeek": "За неделю",
         "forMonth": "За месяц",
         "forHalfYear": "За полгода",
