@@ -83,7 +83,7 @@
         "stylelint-config-prettier-scss": "^0.0.1",
         "stylelint-config-standard-scss": "^6.1.0",
         "svgo": "^3.0.2",
-        "webpack": "^5.88.1",
+        "webpack": "^5.88.2",
         "webpack-cli": "^4.10.0",
         "webpack-manifest-plugin": "^5.0.0",
         "webpack-merge": "^5.9.0"
@@ -91,7 +91,7 @@
     "dependencies": {
         "@babel/runtime": "^7.22.6",
         "core-js": "^3.31.1",
-        "jezvejs": "^1.104.0",
-        "whatwg-fetch": "^3.6.2"
+        "jezvejs": "^1.105.0",
+        "whatwg-fetch": "^3.6.16"
     }
 }
