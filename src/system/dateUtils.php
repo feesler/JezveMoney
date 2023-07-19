@@ -235,25 +235,32 @@ function getDateIntervalOffset(mixed $dateInfo, int $intervalType)
  * @param int $intervalType type of interval
  * @param int $step count of intervals to add
  *
- * @return int|null
+ * @return int
  */
 function stepInterval(?int $timestamp, int $intervalType, int $step = 1)
 {
-    if (!$timestamp || $intervalType === INTERVAL_NONE || $step < 1) {
-        return null;
+    if (!$timestamp) {
+        throw new \Error("Invalid timestamp");
+    }
+    if (!isset(INTERVAL_DURATION_MAP[$intervalType])) {
+        throw new \Error("Invalid interval type");
+    }
+    if ($step < 0) {
+        throw new \Error("Invalid interval step");
     }
 
     $date = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
     $date->setTime(0, 0);
 
-    if ($intervalType === INTERVAL_MONTH) {
-        $maxDate = new DateTime("@" . $timestamp, new DateTimeZone('UTC'));
-        $maxDate->setTime(0, 0);
-        $maxDate->modify("last day of next month");
+    if ($step === 0) {
+        return $date->getTimestamp();
+    }
 
+    if ($intervalType === INTERVAL_MONTH) {
         $dateInfo = getdate($date->getTimestamp());
+        $maxDate = mktime(0, 0, 0, $dateInfo["mon"] + $step + 1, 0, $dateInfo["year"]);
         $res = mktime(0, 0, 0, $dateInfo["mon"] + $step, 1, $dateInfo["year"]);
-        return min($res, $maxDate->getTimestamp());
+        return min($res, $maxDate);
     }
 
     $duration = "P" . $step . INTERVAL_DURATION_MAP[$intervalType];

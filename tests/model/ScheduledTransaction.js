@@ -433,7 +433,11 @@ export class ScheduledTransaction {
     }
 
     getReminderDates(timestamp) {
-        const dayStart = cutDate(new Date(timestamp));
+        const dayStart = cutDate(timestamp);
+
+        if (this.interval_type === INTERVAL_NONE) {
+            return [dayStart];
+        }
 
         const offsets = [...asArray(this.interval_offset)];
         if (offsets.length === 0) {
@@ -444,16 +448,21 @@ export class ScheduledTransaction {
             let res = new Date(dayStart);
             let offset = value;
 
-            if (
-                this.interval_type !== INTERVAL_NONE
-                && offset > 0
-            ) {
-                if (this.interval_type === INTERVAL_WEEK) {
-                    offset = (offset === 0) ? 6 : (offset - 1);
-                }
-
-                res = shiftDate(res, offset);
+            if (this.interval_type === INTERVAL_WEEK) {
+                offset = (offset === 0) ? 6 : (offset - 1);
             }
+
+            if (this.interval_type === INTERVAL_YEAR) {
+                const monthIndex = Math.floor(offset / 100);
+                const dayIndex = (offset % 100);
+
+                const yearStart = this.getIntervalStart(dayStart, INTERVAL_YEAR);
+                res = stepInterval(yearStart.getTime(), INTERVAL_MONTH, monthIndex);
+                res = this.getIntervalStart(res, INTERVAL_MONTH);
+                offset = dayIndex;
+            }
+
+            res = shiftDate(res, offset);
 
             return res.getTime();
         });

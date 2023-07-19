@@ -191,11 +191,15 @@ export const getLastDayOfMonth = (date) => (
 );
 
 export const stepInterval = (timestamp, intervalType, step = 1) => {
-    if (!timestamp || intervalType === INTERVAL_NONE || step < 1) {
-        return null;
+    assert(timestamp, 'Invalid timestamp');
+    assert(step >= 0, 'Invalid interval step');
+
+    const dayStart = cutDate(timestamp);
+    if (step === 0) {
+        return dayStart;
     }
 
-    const date = new Date(cutDate(timestamp));
+    const date = new Date(dayStart);
 
     if (intervalType === INTERVAL_DAY) {
         const targetDate = shiftDate(date, step);
