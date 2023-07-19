@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\Controller;
 
+use JezveMoney\App\API\Factory\TransactionsFactory;
 use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
@@ -52,24 +53,17 @@ class Transactions extends ListViewController
             "titleString" => __("appName") . " | " . __("transactions.listTitle"),
         ];
 
-        $requestDefaults = [
-            "page" => 1,
-            "range" => 1,
-            "onPage" => 10,
+        $fixedOptions = [
+            "order" => "desc",
         ];
 
-        $request = $this->model->getRequestFilters($_GET, $requestDefaults);
+        $request = array_merge($_GET, $fixedOptions);
+
+        $factory = TransactionsFactory::getInstance();
+        $transactions = $factory->getList($request);
 
         // Obtain requested view mode
-        $showDetails = false;
-        if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
-            $showDetails = true;
-        }
-
-        $params = $request["params"];
-        $params["desc"] = true;
-
-        $transactions = $this->model->getData($params);
+        $showDetails = (isset($_GET["mode"]) && $_GET["mode"] == "details");
 
         $detailsId = $this->getRequestedItem();
 
@@ -80,9 +74,9 @@ class Transactions extends ListViewController
             "currency" => $this->currModel->getData(),
             "categories" => $this->catModel->getData(),
             "view" => [
-                "items" => $transactions,
-                "filter" => $request["filter"],
-                "pagination" => $request["pagination"],
+                "items" => $transactions->items,
+                "filter" => $transactions->filter,
+                "pagination" => $transactions->pagination,
                 "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
                 "detailsItem" => $this->model->getItem($detailsId),
