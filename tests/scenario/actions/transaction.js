@@ -95,6 +95,14 @@ export const runAction = async ({ action, data }) => {
         testDescr = `Select schedule interval week day offset '${data}'`;
     }
 
+    if (action === 'selectWeekdaysOffset') {
+        testDescr = 'Select weekdays as schedule interval offset';
+    }
+
+    if (action === 'selectWeekendOffset') {
+        testDescr = 'Select weekend as schedule interval offset';
+    }
+
     if (action === 'selectMonthDayOffset') {
         testDescr = `Select schedule interval month day offset '${data}'`;
     }

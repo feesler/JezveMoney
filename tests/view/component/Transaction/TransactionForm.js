@@ -558,6 +558,7 @@ export class TransactionForm extends TestComponent {
                 };
                 if (res.weekDayOffsetSelect.visible) {
                     const offset = asArray(model.intervalOffset).map((item) => item?.toString());
+                    offset.sort();
                     res.weekDayOffsetSelect.value = offset;
                 }
 
@@ -1235,6 +1236,10 @@ export class TransactionForm extends TestComponent {
         res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
 
         res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
+        res.weekDayOffsetSelect.content.value.sort();
+        res.weekdaysBtn = { elem: await query('.field-header-btn[data-value="weekdays"]') };
+        res.weekendBtn = { elem: await query('.field-header-btn[data-value="weekend"]') };
+
         res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
 
         res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
@@ -1545,7 +1550,8 @@ export class TransactionForm extends TestComponent {
         if (res.intervalType === INTERVAL_DAY) {
             res.intervalOffset = 0;
         } else if (res.intervalType === INTERVAL_WEEK) {
-            res.intervalOffset = cont.weekDayOffsetSelect.value;
+            res.intervalOffset = structuredClone(cont.weekDayOffsetSelect.value);
+            res.intervalOffset.sort();
         } else if (res.intervalType === INTERVAL_MONTH) {
             const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
             res.intervalOffset = offset;
@@ -2489,6 +2495,30 @@ export class TransactionForm extends TestComponent {
         for (const item of itemsToDeselect) {
             await this.performAction(() => this.content.weekDayOffsetSelect.toggle(item));
         }
+
+        return this.checkState(expected);
+    }
+
+    async selectWeekdaysOffset() {
+        const { intervalType } = this.model;
+        assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
+
+        this.model.intervalOffset = [1, 2, 3, 4, 5];
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.weekdaysBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectWeekendOffset() {
+        const { intervalType } = this.model;
+        assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
+
+        this.model.intervalOffset = [0, 6];
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.weekendBtn.elem));
 
         return this.checkState(expected);
     }

@@ -136,6 +136,8 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '1000' },
             { action: 'toggleEnableRepeat' },
             { action: 'selectDate', data: App.dates.weekAgo },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekendOffset' },
         ]);
 
         // Check create transaction with hidden account
