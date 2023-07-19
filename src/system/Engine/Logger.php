@@ -12,23 +12,34 @@ class Logger
     /**
      * Returns total count of log files
      *
-     * @return int
+     * @return string[]
      */
-    protected static function getLogsCount()
+    protected static function getFiles()
     {
+        $res = [];
         $files = glob(LOGS_PATH . "log*.txt");
         if ($files === false || count($files) === 0) {
-            return 0;
+            return $res;
         }
 
-        $res = 0;
         foreach ($files as $fname) {
             if ($fname != "." && $fname != "..") {
-                $res++;
+                $res[] = $fname;
             }
         }
 
         return $res;
+    }
+
+    /**
+     * Returns total count of log files
+     *
+     * @return int
+     */
+    protected static function getLogsCount()
+    {
+        $files = self::getFiles();
+        return count($files);
     }
 
     /**
@@ -115,10 +126,11 @@ class Logger
      */
     public static function clean()
     {
-        if (!file_exists(self::$filename) || !is_writable(self::$filename)) {
-            return;
+        $files = self::getFiles();
+        foreach ($files as $filename) {
+            if (file_exists($filename) && is_writable($filename)) {
+                unlink($filename);
+            }
         }
-
-        file_put_contents(self::$filename, "");
     }
 }
