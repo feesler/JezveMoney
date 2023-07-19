@@ -11,6 +11,11 @@ const CONTAINER_CLASS = 'field';
 const TITLE_CLASS = 'field__title';
 const CONTENT_CLASS = 'field__content';
 
+const defaultProps = {
+    title: null,
+    content: null,
+};
+
 /**
  * Field component
  */
@@ -20,8 +25,11 @@ export class Field extends Component {
         titleElem: ['htmlFor'],
     };
 
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         this.state = { ...this.props };
 

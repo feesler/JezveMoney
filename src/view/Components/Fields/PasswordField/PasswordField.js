@@ -53,10 +53,6 @@ export class PasswordField extends Field {
             className: getClassNames(FIELD_CLASS, props.className),
             htmlFor: props.inputId,
         });
-
-        this.state = {
-            ...this.props,
-        };
     }
 
     init() {
