@@ -69,13 +69,13 @@ function isLogsEnabled()
  */
 function setupLogs()
 {
-    function wlog(?string $str = null)
+    function wlog(...$args)
     {
         if (!isLogsEnabled()) {
             return;
         }
 
-        \JezveMoney\Core\Logger::write((string)$str);
+        \JezveMoney\Core\Logger::write(...$args);
     }
 
     if (isLogsEnabled()) {

@@ -76,9 +76,9 @@ class Logger
     /**
      * Writes string to log file
      *
-     * @param string $str
+     * @param mixed $args
      */
-    public static function write(string $str)
+    public static function write(mixed ...$args)
     {
         if (file_exists(self::$filename) && !is_writable(self::$filename)) {
             return;
@@ -87,11 +87,13 @@ class Logger
             return;
         }
 
-        if (is_null($str)) {
-            $str = "";
+        $strings = [];
+        foreach ($args as $argument) {
+            $strArg = is_string($argument) ? $argument : var_export($argument, true);
+            $strings[] = $strArg;
         }
 
-        file_put_contents(self::$filename, $str . "\r\n", FILE_APPEND);
+        file_put_contents(self::$filename, implode("", $strings) . "\r\n", FILE_APPEND);
     }
 
     /**
