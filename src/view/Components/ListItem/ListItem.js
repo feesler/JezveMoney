@@ -23,6 +23,7 @@ const defaultProps = {
     item: null,
     selected: false,
     listMode: 'list',
+    showMenuButton: true,
     showControls: false,
     collapsible: false,
 };
@@ -113,13 +114,18 @@ export class ListItem extends Component {
     }
 
     renderControls(state, prevState) {
-        if (state.showControls === prevState.showControls) {
+        if (
+            state.showControls === prevState.showControls
+            && state.showMenuButton === prevState.showMenuButton
+        ) {
             return;
         }
 
         if (state.showControls) {
             this.createControls();
         }
+
+        this.menuButton?.show(state.showMenuButton);
 
         show(this.controlsElem, state.showControls);
     }

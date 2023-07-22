@@ -80,7 +80,8 @@ export class ImportTransactionList extends ListContainer {
             selected: item.selected,
             toggleButton: !!item.originalData,
             listMode,
-            showControls: (listMode === 'list'),
+            showMenuButton: (listMode === 'list'),
+            showControls: true,
         };
     }
 

@@ -11,6 +11,7 @@
   .collapsible-header {
     display: flex;
     flex-flow: row nowrap;
+    position: relative;
   }
 
   .list-item__content {
@@ -58,6 +59,11 @@
     --btn-hover-icon-color: var(--list-item-hover-icon-fill);
   }
 
+  .menu-btn,
+  .toggle-btn {
+    z-index: 4;
+  }
+
   .collapsible-content {
     flex-flow: column nowrap;
     row-gap: 1rem;
@@ -70,9 +76,16 @@
   }
 
   &.collapsible__expanded {
-    .collapsible-header {
+    .collapsible-header::before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       box-shadow: 0 2px 5px -2px #00000088;
-      z-index: 2;
+      transition: left 0.2s ease;
     }
 
     .toggle-btn .btn__icon {
@@ -86,20 +99,16 @@
       display: none;
     }
 
-    .collapsible-header {
-      position: relative;
-    }
-
     .collapsible-header::after {
-      border: 2px solid var(--accent-color);
-      bottom: 0;
       content: "";
-      cursor: pointer;
       display: block;
-      left: 32px;
       position: absolute;
+      left: 32px;
       right: 0;
       top: 0;
+      bottom: 0;
+      border: 2px solid var(--accent-color);
+      z-index: 2;
     }
   }
 }
@@ -124,6 +133,10 @@
 
 /* Select mode */
 .list_select .import-item {
+  .collapsible-header::before {
+    left: 32px;
+  }
+
   .collapsible-content {
     margin-left: 32px;
   }
