@@ -8,13 +8,13 @@ import './ImportTransactionList.scss';
 
 /* CSS classes */
 const LIST_CLASS = 'import-list';
-const SELECT_MODE_CLASS = 'import-list_select';
-const SORT_MODE_CLASS = 'import-list_sort';
+const SELECT_MODE_CLASS = 'list_select';
+const SORT_MODE_CLASS = 'list_sort';
 
 const defaultProps = {
     ItemComponent: ImportTransactionItem,
     itemSelector: '.import-item',
-    itemSortSelector: '.import-item.import-item_sort',
+    itemSortSelector: '.import-item.list-item_sort',
     className: LIST_CLASS,
     PlaceholderComponent: NoDataMessage,
     getPlaceholderProps: () => ({ title: __('import.noData') }),
@@ -73,9 +73,14 @@ export class ImportTransactionList extends ListContainer {
         this.props.onSort(fromIndex, toIndex);
     }
 
-    getItemProps(item) {
+    getItemProps(item, { listMode }) {
         return {
-            transaction: item,
+            item,
+            collapsed: item.collapsed,
+            selected: item.selected,
+            toggleButton: !!item.originalData,
+            listMode,
+            showControls: (listMode === 'list'),
         };
     }
 

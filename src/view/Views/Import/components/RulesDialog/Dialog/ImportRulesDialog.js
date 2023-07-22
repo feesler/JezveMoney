@@ -98,12 +98,7 @@ export class ImportRulesDialog extends Component {
             ItemComponent: ImportRuleItem,
             className: LIST_CLASS,
             itemSelector: ImportRuleItem.selector,
-            getItemProps: (rule) => ({
-                data: rule,
-                ruleId: rule.id,
-                conditions: rule.conditions,
-                actions: rule.actions,
-            }),
+            getItemProps: (item) => ({ item }),
             PlaceholderComponent: NoDataMessage,
             getPlaceholderProps: (state) => ({
                 title: (state.filter !== '')

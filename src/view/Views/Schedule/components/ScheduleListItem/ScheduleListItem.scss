@@ -13,96 +13,19 @@
   position: relative;
 }
 
-.schedule-item__select {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  width: 0;
-  flex-shrink: 0;
-  transition: width 0.2s ease;
-
-  .checkbox {
-    --checkbox-size: 24px;
-    --checkbox-border-radius: 50%;
-
-    margin: 0;
-  }
-
-  .checkbox__check {
-    margin: 0;
-  }
-}
-
-.schedule-item__content {
+.schedule-item .list-item__content {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  row-gap: var(--schedule-item-row-gap);
-  flex: 1 1 auto;
-  padding: 8px 0 8px 8px;
-  position: relative;
-  overflow: hidden;
-  background-color: var(--list-item-bg-color);
 }
 
 .schedule-item__schedule {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  row-gap: var(--schedule-item-row-gap);
-  column-gap: var(--schedule-item-column-gap);
+  row-gap: var(--list-item-row-gap);
+  column-gap: var(--list-item-column-gap);
   overflow: hidden;
-}
-
-.schedule-item__controls {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  background-color: var(--list-item-bg-color);
-
-  .btn.menu-btn {
-    --btn-size: 32px;
-    --btn-icon-size: 24px;
-    --btn-padding: 0;
-    --btn-background: none;
-    --btn-icon-color: var(--list-item-icon-fill);
-
-    margin: 0 4px;
-  }
-
-  .menu-btn:focus {
-    .btn__icon {
-      fill: var(--list-item-hover-icon-fill);
-    }
-  }
-}
-
-.schedule-item_placeholder {
-  opacity: 0;
-}
-
-/* Select mode */
-.schedule-list_select {
-  .schedule-item__select {
-    width: 32px;
-  }
-
-  .schedule-item__content {
-    padding: 8px;
-  }
-}
-
-.schedule-item_selected::after {
-  border: 2px solid var(--schedule-item-selected-color);
-  bottom: 0;
-  content: "";
-  cursor: pointer;
-  display: block;
-  left: 32px;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 
 .schedule-item__date-range,
@@ -181,14 +104,6 @@
     .schedule-item__schedule {
       align-items: flex-start;
       grid-template-columns: 2fr 2fr;
-    }
-  }
-}
-
-@media (hover: hover) {
-  .schedule-item__controls .menu-btn:hover {
-    .btn__icon {
-      fill: var(--list-item-hover-icon-fill);
     }
   }
 }

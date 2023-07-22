@@ -53,7 +53,8 @@ import './ScheduleView.scss';
 
 /* CSS classes */
 const LIST_CLASS = 'schedule-list';
-const SELECT_MODE_CLASS = 'schedule-list_select';
+const DETAILS_CLASS = 'schedule-list_details';
+const SELECT_MODE_CLASS = 'list_select';
 
 const SHOW_ON_PAGE = 10;
 
@@ -159,7 +160,7 @@ class ScheduleView extends AppView {
             className: LIST_CLASS,
             itemSelector: ScheduleListItem.selector,
             selectModeClass: SELECT_MODE_CLASS,
-            placeholderClass: 'schedule-item_placeholder',
+            placeholderClass: 'list-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
             getPlaceholderProps: () => ({ title: __('schedule.noData') }),
@@ -667,6 +668,7 @@ class ScheduleView extends AppView {
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
+        this.scheduleList.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
     }
 
     render(state, prevState = {}) {

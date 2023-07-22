@@ -36,7 +36,7 @@ export class CurrencyItem extends TestComponent {
             return {
                 id: parseInt(el.dataset.id, 10),
                 title: titleEl?.textContent,
-                selected: el.classList.contains('currency-item_selected'),
+                selected: el.classList.contains('list-item_selected'),
             };
         }, this.elem);
         assert(res, 'Invalid currency item element');

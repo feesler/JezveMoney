@@ -20,7 +20,7 @@ export class TransactionListItem extends TestComponent {
             const item = {
                 id: parseInt(elem.dataset.id, 10),
                 type: parseInt(elem.dataset.type, 10),
-                selected: elem.classList.contains('trans-item_selected'),
+                selected: elem.classList.contains('list-item_selected'),
                 detailsMode,
             };
 

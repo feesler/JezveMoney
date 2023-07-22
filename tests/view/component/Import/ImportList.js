@@ -31,8 +31,8 @@ export class ImportList extends TestComponent {
         }
 
         const { selectMode, sortMode } = await evaluate((el) => ({
-            selectMode: el.classList.contains('import-list_select'),
-            sortMode: el.classList.contains('import-list_sort'),
+            selectMode: el.classList.contains('list_select'),
+            sortMode: el.classList.contains('list_sort'),
         }), dataContainer);
 
         if (selectMode) {

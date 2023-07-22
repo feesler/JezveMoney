@@ -1,14 +1,16 @@
 /* Import rule item */
-.rule-item {
+.list-item.rule-item {
   flex: 0 0 auto;
+  flex-flow: column nowrap;
 
   /* Main static view */
   .collapsible-header {
     flex-flow: row nowrap;
     align-items: center;
     font-size: 16px;
-    padding: 8px 4px 8px 8px;
     border: 0;
+    width: 100%;
+    flex-shrink: 0;
     cursor: pointer;
     color: var(--main-text-color);
     background-color: var(--list-item-bg-color);
@@ -17,17 +19,6 @@
   /* Menu */
   .popup-menu {
     position: static;
-  }
-
-  .btn.menu-btn {
-    --btn-size: 32px;
-    --btn-icon-size: 24px;
-    --btn-padding: 0;
-    --btn-background: none;
-    --btn-icon-color: var(--list-item-icon-fill);
-    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
-
-    margin: 0 4px;
   }
 
   .popup-menu-list {
@@ -62,11 +53,6 @@
     color: var(--text-color-3);
     background-color: var(--list-item-alt-bg-color);
   }
-}
-
-.rule-item__main-info {
-  flex-grow: 1;
-  overflow: hidden;
 }
 
 /* Top row: property, operator, value */
@@ -111,11 +97,6 @@
 }
 
 /* Controls */
-.rule-item__main-controls {
-  display: flex;
-  flex-flow: row nowrap;
-}
-
 .rule-item.collapsible__expanded .toggle-btn .btn__icon {
   transform: rotate(180deg);
 }
@@ -163,6 +144,9 @@
 
 @media (hover: hover) {
   .rule-item .collapsible-header:hover {
-    background-color: var(--list-item-hover-bg-color);
+    .list-item__content,
+    .list-item__controls {
+      background-color: var(--list-item-hover-bg-color);
+    }
   }
 }

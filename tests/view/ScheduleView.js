@@ -545,9 +545,9 @@ export class ScheduleView extends AppView {
         const expected = this.getExpectedState();
 
         if (listMode === 'list') {
-            await this.performAction(() => this.content.listModeBtn.click());
+            await this.waitForList(() => this.content.listModeBtn.click());
         } else if (listMode === 'select') {
-            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+            await this.waitForList(() => this.listMenu.select('selectModeBtn'));
         }
 
         return this.checkState(expected);

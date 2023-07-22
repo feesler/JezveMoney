@@ -4,7 +4,6 @@ import {
     hasFlag,
     query,
     queryAll,
-    prop,
     evaluate,
     click,
     wait,
@@ -51,12 +50,22 @@ export class ImportRulesDialog extends TestComponent {
             'Failed to initialize import rules dialog',
         );
 
-        res.contextMenu.itemId = await evaluate((menuEl) => {
+        [
+            res.contextMenu.itemId,
+            res.rulesList.renderTime,
+            res.header.title,
+        ] = await evaluate((menuEl, listEl, hdrEl) => {
             const contextParent = menuEl?.closest('.rule-item');
-            return (contextParent)
+            const contextId = (contextParent)
                 ? parseInt(contextParent.dataset.id, 10)
                 : null;
-        }, res.contextMenu.elem);
+
+            return [
+                contextId,
+                listEl?.dataset?.time,
+                hdrEl?.textContent,
+            ];
+        }, res.contextMenu.elem, res.rulesList.elem, res.header.labelElem);
 
         if (res.contextMenu.itemId) {
             const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
@@ -64,9 +73,6 @@ export class ImportRulesDialog extends TestComponent {
             const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');
             res.deleteBtn = await Button.create(this, deleteBtnElem);
         }
-
-        res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
-        res.header.title = await prop(res.header.labelElem, 'textContent');
 
         const listItems = await queryAll(res.rulesList.elem, '.rule-item');
         res.items = await asyncMap(

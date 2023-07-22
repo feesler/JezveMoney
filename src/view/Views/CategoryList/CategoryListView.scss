@@ -7,13 +7,6 @@ main {
   position: relative;
 }
 
-.list-section {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: baseline;
-  margin-bottom: 1rem;
-}
-
 .list-header {
   padding: 0.2rem 0;
   font-size: 1rem;
@@ -29,12 +22,4 @@ main {
   align-items: stretch;
   width: 100%;
   gap: 4px;
-}
-
-.categories-list_select .category-item {
-  cursor: pointer;
-}
-
-.list-section > .categories-list {
-  padding-bottom: 1rem;
 }

@@ -6,15 +6,15 @@ import './TransactionList.scss';
 
 /** CSS classes */
 const LIST_CLASS = 'trans-list';
-const SELECT_MODE_CLASS = 'trans-list_select';
-const SORT_MODE_CLASS = 'trans-list_sort';
+const SELECT_MODE_CLASS = 'list_select';
+const SORT_MODE_CLASS = 'list_sort';
 const DETAILS_CLASS = 'trans-list_details';
-const ITEM_PLACEHOLDER_CLASS = 'trans-item_placeholder';
+const ITEM_PLACEHOLDER_CLASS = 'list-item_placeholder';
 
 const defaultProps = {
     ItemComponent: TransactionListItem,
     itemSelector: '.trans-item',
-    itemSortSelector: '.trans-item.trans-item_sort',
+    itemSortSelector: '.trans-item.list-item_sort',
     className: LIST_CLASS,
     placeholderClass: ITEM_PLACEHOLDER_CLASS,
     sortModeClass: SORT_MODE_CLASS,

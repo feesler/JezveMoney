@@ -27,6 +27,10 @@ export class SettingsView extends AppView {
         return this.content.tabs;
     }
 
+    get currenciesList() {
+        return this.content.currenciesList;
+    }
+
     get listMenu() {
         return this.content.listMenu;
     }
@@ -343,35 +347,42 @@ export class SettingsView extends AppView {
         return this.checkState(expected);
     }
 
-    async changeCurrenciesListMode(mode) {
+    async changeCurrenciesListMode(listMode) {
         await this.showUserCurrenciesTab();
 
-        if (this.model.currenciesList.mode === mode) {
+        if (this.model.currenciesList.mode === listMode) {
             return true;
         }
 
         assert(
-            this.model.currenciesList.mode === 'list' || mode === 'list',
-            `Can't change list mode from ${this.model.currenciesList.mode} to ${mode}.`,
+            this.model.currenciesList.mode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.currenciesList.mode} to ${listMode}.`,
         );
 
-        if (mode !== 'list') {
+        if (listMode !== 'list') {
             await this.openCurrenciesListMenu();
         }
 
         this.model.listMenuVisible = false;
-        this.model.currenciesList.mode = mode;
+        this.model.currenciesList.mode = listMode;
         this.onDeselectAllCurrencies();
 
         const expected = this.getExpectedState();
 
-        if (mode === 'list') {
+        if (listMode === 'list') {
             await this.performAction(() => this.content.listModeBtn.click());
-        } else if (mode === 'select') {
+        } else if (listMode === 'select') {
             await this.performAction(() => this.listMenu.select('selectModeBtn'));
-        } else if (mode === 'sort') {
-            await this.waitForList(() => this.listMenu.select('sortModeBtn'));
+        } else if (listMode === 'sort') {
+            await this.performAction(() => this.listMenu.select('sortModeBtn'));
         }
+
+        await this.performAction(async () => {
+            await wait(async () => {
+                const mode = await CurrenciesList.getListMode(this.currenciesList.elem);
+                return mode === listMode;
+            });
+        });
 
         return this.checkState(expected);
     }
