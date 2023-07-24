@@ -392,6 +392,18 @@ export const updateItem = async (params) => {
     await runFormActions(params.action);
 };
 
+/** Duplicate item */
+export const duplicateItem = async (params) => {
+    assert(params && ('pos' in params), 'Invalid parameters');
+
+    await test(`Duplicate item [${params.pos}]`, async () => {
+        await checkNavigation();
+        return App.view.duplicateItemByPos(params.pos);
+    });
+
+    await runFormActions(params.action);
+};
+
 /** Save current import transaction form */
 export const saveItem = async () => {
     await test('Save import form', async () => {
@@ -417,6 +429,12 @@ export const createItemAndSave = async (action) => {
 /** Update item and save */
 export const updateItemAndSave = async (params) => {
     await updateItem(params);
+    await saveItem();
+};
+
+/** Duplicate item and save */
+export const duplicateItemAndSave = async (params) => {
+    await duplicateItem(params);
     await saveItem();
 };
 

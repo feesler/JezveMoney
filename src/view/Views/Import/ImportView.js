@@ -76,6 +76,7 @@ class ImportView extends AppView {
             ctxRestoreBtn: () => this.onRestoreItem(),
             ctxEnableBtn: () => this.onToggleEnableItem(),
             ctxUpdateBtn: () => this.onUpdateItem(),
+            ctxDuplicateBtn: () => this.onDuplicateItem(),
             ctxDeleteBtn: () => this.onRemoveItem(),
         };
 
@@ -510,6 +511,10 @@ class ImportView extends AppView {
 
     onUpdateItem() {
         this.store.dispatch(actions.editItem());
+    }
+
+    onDuplicateItem() {
+        this.store.dispatch(actions.duplicateItem());
     }
 
     /**
