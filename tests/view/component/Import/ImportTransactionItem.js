@@ -138,9 +138,9 @@ export class ImportTransactionItem extends TestComponent {
 
     async parseContent() {
         const res = await evaluate((el, selectors) => {
-            const selectControls = el.querySelector('.select-controls');
+            const selectControls = el.querySelector('.list-item__select');
             const item = {
-                selected: el.classList.contains('import-item_selected'),
+                selected: el.classList.contains('list-item_selected'),
                 enabled: !el.hasAttribute('disabled'),
                 selectMode: (
                     !!selectControls
@@ -180,15 +180,10 @@ export class ImportTransactionItem extends TestComponent {
             return item;
         }, this.elem, fieldSelectors);
 
-        res.menuBtn = await query(this.elem, '.menu-btn');
+        res.menuBtn = { elem: await query(this.elem, '.menu-btn') };
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.origDataTable = await query(this.elem, '.orig-data-table');
-
-        assert(
-            res.menuBtn,
-            'Invalid structure of import item',
-        );
 
         res.originalData = null;
         if (res.origDataTable) {
@@ -437,7 +432,8 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     async clickMenu() {
-        return click(this.content.menuBtn);
+        assert(this.content.menuBtn.visible, 'Menu button not visible');
+        return click(this.content.menuBtn.elem);
     }
 
     async toggleSelect() {

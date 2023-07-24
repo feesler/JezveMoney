@@ -88,6 +88,7 @@ export class TransactionForm extends TestComponent {
             action = 'create',
             formType = TRANSACTION_FORM,
             type = EXPENSE,
+            from = 0,
             fromAccount = 0,
             fromPerson = 0,
             fromReminder = 0,
@@ -95,6 +96,7 @@ export class TransactionForm extends TestComponent {
 
         assert(availActions.includes(action), 'Invalid action');
 
+        const isCreate = action === 'create';
         const model = {
             formType,
             type,
@@ -115,7 +117,26 @@ export class TransactionForm extends TestComponent {
 
         const userAccounts = state.getUserAccounts();
 
-        if (action === 'create') {
+        if (isCreate && from) {
+            const item = (formType === SCHEDULE_ITEM_FORM)
+                ? state.schedule.getItem(from)
+                : state.transactions.getItem(from);
+            assert(item, 'Transaction not found');
+
+            const transaction = structuredClone(item);
+            delete transaction.id;
+
+            model.isAvailable = true;
+            model.isReminder = false;
+
+            const transactionOptions = {
+                transaction,
+                formType,
+                isDuplicate: true,
+            };
+
+            Object.assign(model, this.transactionToModel(transactionOptions, state));
+        } else if (isCreate && !from) {
             if (type === EXPENSE || type === INCOME) {
                 model.isAvailable = userAccounts.length > 0;
             } else if (type === TRANSFER) {
@@ -293,6 +314,7 @@ export class TransactionForm extends TestComponent {
             transaction,
             formType = TRANSACTION_FORM,
             isReminder = false,
+            isDuplicate = false,
         } = options;
 
         const model = {};
@@ -393,7 +415,7 @@ export class TransactionForm extends TestComponent {
         model.srcAmount = model.fSrcAmount.toString();
         model.destAmount = model.fDestAmount.toString();
 
-        if (isReminder) {
+        if (isReminder || isDuplicate) {
             model.fSrcResBal = (model.srcAccount)
                 ? normalize(
                     model.srcAccount.balance - model.fSrcAmount,
@@ -558,6 +580,7 @@ export class TransactionForm extends TestComponent {
                 };
                 if (res.weekDayOffsetSelect.visible) {
                     const offset = asArray(model.intervalOffset).map((item) => item?.toString());
+                    offset.sort();
                     res.weekDayOffsetSelect.value = offset;
                 }
 
@@ -1235,6 +1258,10 @@ export class TransactionForm extends TestComponent {
         res.intervalTypeSelect = await DropDown.create(this, intervalTypeSel);
 
         res.weekDayOffsetSelect = await LinkMenu.create(this, await query('.weekday-select'));
+        res.weekDayOffsetSelect.content.value.sort();
+        res.weekdaysBtn = { elem: await query('.field-header-btn[data-value="weekdays"]') };
+        res.weekendBtn = { elem: await query('.field-header-btn[data-value="weekend"]') };
+
         res.monthDayOffsetSelect = await DropDown.create(this, await query('.month-day-select'));
 
         res.monthOffsetSelect = await DropDown.create(this, await query('.month-select'));
@@ -1545,7 +1572,8 @@ export class TransactionForm extends TestComponent {
         if (res.intervalType === INTERVAL_DAY) {
             res.intervalOffset = 0;
         } else if (res.intervalType === INTERVAL_WEEK) {
-            res.intervalOffset = cont.weekDayOffsetSelect.value;
+            res.intervalOffset = structuredClone(cont.weekDayOffsetSelect.value);
+            res.intervalOffset.sort();
         } else if (res.intervalType === INTERVAL_MONTH) {
             const offset = parseInt(cont.monthDayOffsetSelect.value, 10);
             res.intervalOffset = offset;
@@ -2489,6 +2517,30 @@ export class TransactionForm extends TestComponent {
         for (const item of itemsToDeselect) {
             await this.performAction(() => this.content.weekDayOffsetSelect.toggle(item));
         }
+
+        return this.checkState(expected);
+    }
+
+    async selectWeekdaysOffset() {
+        const { intervalType } = this.model;
+        assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
+
+        this.model.intervalOffset = [1, 2, 3, 4, 5];
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.weekdaysBtn.elem));
+
+        return this.checkState(expected);
+    }
+
+    async selectWeekendOffset() {
+        const { intervalType } = this.model;
+        assert.equal(intervalType, INTERVAL_WEEK, `Invalid interval type: ${intervalType}`);
+
+        this.model.intervalOffset = [0, 6];
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.weekendBtn.elem));
 
         return this.checkState(expected);
     }

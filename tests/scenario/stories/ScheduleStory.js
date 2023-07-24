@@ -42,6 +42,7 @@ export class ScheduleStory extends TestStory {
         await this.create();
         await this.list();
         await this.update();
+        await this.duplicate();
         await this.finishFromContextMenu();
         await this.finish();
         await this.deleteFromContextMenu();
@@ -140,7 +141,7 @@ export class ScheduleStory extends TestStory {
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '7' },
             { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekDayOffset', data: [1, 2, 3, 4, 5] },
+            { action: 'selectWeekdaysOffset' },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '8' },
@@ -155,6 +156,8 @@ export class ScheduleStory extends TestStory {
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '10' },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekendOffset' },
         ]);
         await Actions.createAndSubmit([
             { action: 'inputDestAmount', data: '11' },
@@ -180,6 +183,14 @@ export class ScheduleStory extends TestStory {
         await Actions.updateAndSubmit(9, [
             { action: 'inputDestAmount', data: '900' },
             { action: 'toggleEnableRepeat' },
+        ]);
+    }
+
+    async duplicate() {
+        setBlock('Duplicate scheduled transaction', 1);
+
+        await Actions.duplicateAndSubmit(0, [
+            { action: 'selectWeekDayOffset', data: 4 },
         ]);
     }
 

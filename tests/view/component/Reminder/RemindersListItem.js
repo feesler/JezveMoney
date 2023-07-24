@@ -21,7 +21,7 @@ export class RemindersListItem extends TestComponent {
             const item = {
                 id: elem.dataset.id,
                 type: parseInt(elem.dataset.type, 10),
-                selected: elem.classList.contains('reminder-item_selected'),
+                selected: elem.classList.contains('list-item_selected'),
                 detailsMode,
             };
 

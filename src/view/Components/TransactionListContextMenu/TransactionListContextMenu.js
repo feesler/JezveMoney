@@ -24,6 +24,11 @@ export class TransactionListContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
             }, {
+                id: 'ctxDuplicateBtn',
+                type: 'link',
+                icon: 'duplicate',
+                title: __('actions.duplicate'),
+            }, {
                 id: 'ctxSetCategoryBtn',
                 title: __('transactions.setCategoryMenu'),
             }, {
@@ -70,6 +75,7 @@ export class TransactionListContextMenu extends PopupMenu {
         show(items.separator1, state.showDetailsItem);
         items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
         items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+        items.ctxDuplicateBtn.setURL(`${baseURL}transactions/create?from=${itemId}`);
 
         this.attachAndShow(menuButton);
     }

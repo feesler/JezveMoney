@@ -34,7 +34,7 @@ import '../../Application/Application.scss';
 import './SettingsView.scss';
 
 /* CSS classes */
-const SELECT_MODE_CLASS = 'currencies-list_select';
+const SELECT_MODE_CLASS = 'list_select';
 
 /**
  * Settings view
@@ -150,9 +150,9 @@ class SettingsView extends AppView {
             }),
             className: 'currencies-list',
             itemSelector: '.currency-item',
-            itemSortSelector: '.currency-item.currency-item_sort',
+            itemSortSelector: '.currency-item.list-item_sort',
             selectModeClass: SELECT_MODE_CLASS,
-            sortModeClass: 'currencies-list_sort',
+            sortModeClass: 'list_sort',
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
@@ -263,12 +263,17 @@ class SettingsView extends AppView {
         this.store.dispatch(actions.stopLoading());
     }
 
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
+    }
+
     setDateRenderTime() {
         this.store.dispatch(actions.setDateRenderTime());
     }
 
     setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
     }
 
     getSelectedItems(state) {
@@ -371,6 +376,7 @@ class SettingsView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -391,6 +397,7 @@ class SettingsView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -425,6 +432,7 @@ class SettingsView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     onDateFormatSelect(format) {

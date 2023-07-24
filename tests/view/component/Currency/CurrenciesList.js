@@ -1,7 +1,6 @@
 import {
     TestComponent,
     assert,
-    query,
     queryAll,
     asyncMap,
     evaluate,
@@ -43,15 +42,11 @@ export class CurrenciesList extends TestComponent {
         if (!elem) {
             return null;
         }
-        const dataContainer = await query(elem, '.import-list');
-        if (!dataContainer) {
-            return null;
-        }
 
         const { selectMode, sortMode } = await evaluate((el) => ({
-            selectMode: el.classList.contains('import-list_select'),
-            sortMode: el.classList.contains('import-list_sort'),
-        }), dataContainer);
+            selectMode: el.classList.contains('list_select'),
+            sortMode: el.classList.contains('list_sort'),
+        }), elem);
 
         if (selectMode) {
             return 'select';
@@ -71,8 +66,8 @@ export class CurrenciesList extends TestComponent {
             isSortMode,
         ] = await evaluate((el) => ([
             parseInt(el?.dataset?.time, 10),
-            el?.classList?.contains('currencies-list_select'),
-            el?.classList?.contains('currencies-list_sort'),
+            el?.classList?.contains('list_select'),
+            el?.classList?.contains('list_sort'),
         ]), this.elem);
 
         res.renderTime = renderTime;

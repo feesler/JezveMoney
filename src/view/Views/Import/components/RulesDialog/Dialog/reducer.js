@@ -49,9 +49,13 @@ export const getAbsoluteIndex = (index, state) => {
 export const createList = (items, state) => {
     const filter = state?.filter ?? '';
 
-    const res = (filter !== '')
+    let res = (filter !== '')
         ? items.filter((rule) => rule.isMatchFilter(filter))
         : items;
+
+    res = res.map((item) => (
+        ('collapsed' in item) ? item : { ...item, collapsed: true }
+    ));
 
     return ImportRuleList.create(res);
 };
@@ -92,6 +96,15 @@ const slice = createSlice({
     hideContextMenu: (state) => (
         (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
+
+    toggleCollapseItem: (state, itemId) => ({
+        ...state,
+        items: state.items.map((item) => (
+            (item.id === itemId)
+                ? { ...item, collapsed: !item.collapsed }
+                : item
+        )),
+    }),
 
     startLoading: (state) => (
         (state.listLoading)
@@ -175,6 +188,32 @@ const slice = createSlice({
         return {
             ...state,
             id: UPDATE_STATE,
+            rule: new ImportRule(rule),
+        };
+    },
+
+    duplicateRule: (state) => {
+        const item = App.model.rules.getItem(state.contextItem);
+        if (!item) {
+            return state;
+        }
+
+        const rule = {
+            ...item,
+            conditions: item.conditions.map((condition) => (
+                (ImportCondition.isDateField(condition.field_id))
+                    ? {
+                        ...condition,
+                        value: App.formatDate(condition.value),
+                    }
+                    : condition
+            )),
+        };
+        delete rule.id;
+
+        return {
+            ...state,
+            id: CREATE_STATE,
             rule: new ImportRule(rule),
         };
     },

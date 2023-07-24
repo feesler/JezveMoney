@@ -39,7 +39,7 @@ export class CategoryItem extends TestComponent {
             return {
                 id: parseInt(el.dataset.id, 10),
                 title: titleEl?.textContent,
-                selected: el.classList.contains('category-item_selected'),
+                selected: el.classList.contains('list-item_selected'),
                 isChild: !!el.closest('.category-item__children'),
             };
         }, this.elem);

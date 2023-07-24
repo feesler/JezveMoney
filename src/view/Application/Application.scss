@@ -1126,6 +1126,7 @@ a.paginator-arrow:focus-visible {
     top: var(--header-size);
     width: auto;
     max-width: var(--section-width);
+    z-index: auto;
   }
 }
 

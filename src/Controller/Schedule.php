@@ -123,6 +123,51 @@ class Schedule extends ListViewController
     }
 
     /**
+     * Returns array with view data for specified transaction
+     *
+     * @param int $item_id transaction id
+     *
+     * @return array|null
+     */
+    private function getTransactionData(int $item_id)
+    {
+        $item = $this->model->getItem($item_id);
+        if (is_null($item)) {
+            return null;
+        }
+        $tr = (array)$item;
+        if ($tr["type"] !== DEBT) {
+            return $tr;
+        }
+
+        $src = $this->accModel->getItem($tr["src_id"]);
+        $dest = $this->accModel->getItem($tr["dest_id"]);
+
+        $debtType = (!is_null($src) && $src->owner_id !== $this->owner_id);
+
+        $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
+        $person = $this->personMod->getItem($person_id);
+        if (!$person) {
+            throw new \Error(__("persons.errors.notFound"));
+        }
+
+        $debtAcc = $debtType ? $dest : $src;
+        $noAccount = is_null($debtAcc);
+
+        $acc_id = ($noAccount)
+            ? $this->accModel->getAnother()
+            : $debtAcc->id;
+
+        $tr["person_id"] = $person_id;
+        $tr["debtType"] = $debtType;
+        $tr["acc_id"] = $acc_id;
+        $tr["lastAcc_id"] = $acc_id;
+        $tr["noAccount"] = $noAccount;
+
+        return $tr;
+    }
+
+    /**
      * /schedule/create/ route handler
      * Renders create scheduled transaction view
      */
@@ -142,22 +187,32 @@ class Schedule extends ListViewController
         $userAccounts = $this->accModel->getUserAccounts();
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = __("transactions.errors.create");
 
-        $dateInfo = getDateInfo(cutDate(UserSettingsModel::clientTime()), INTERVAL_MONTH);
+        $fromTransaction = isset($_GET["from"]) ? intval($_GET["from"]) : 0;
 
-        $tr = [
-            "type" => $this->getRequestedType($_GET, EXPENSE),
-            "src_amount" => 0,
-            "dest_amount" => 0,
-            "category_id" => 0,
-            "comment" => "",
-            "start_date" => $dateInfo["time"],
-            "end_date" => null,
-            "interval_type" => INTERVAL_MONTH,
-            "interval_step" => 1,
-            "interval_offset" => $dateInfo["info"]["mday"] - 1,
-        ];
+        if ($fromTransaction) {
+            $tr = $this->getTransactionData($fromTransaction);
+            if (!$tr) {
+                throw new \Error(__("schedule.errors.create"));
+            }
+
+            unset($tr["id"]);
+        } else {
+            $dateInfo = getDateInfo(cutDate(UserSettingsModel::clientTime()), INTERVAL_MONTH);
+
+            $tr = [
+                "type" => $this->getRequestedType($_GET, EXPENSE),
+                "src_amount" => 0,
+                "dest_amount" => 0,
+                "category_id" => 0,
+                "comment" => "",
+                "start_date" => $dateInfo["time"],
+                "end_date" => null,
+                "interval_type" => INTERVAL_MONTH,
+                "interval_step" => 1,
+                "interval_offset" => $dateInfo["info"]["mday"] - 1,
+            ];
+        }
 
         // Check availability of selected type of transaction
         $trAvailable = false;
@@ -182,7 +237,7 @@ class Schedule extends ListViewController
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
             if (!$account || $account->owner_id != $this->owner_id) {
-                $this->fail($defMsg);
+                $this->fail(__("schedule.errors.create"));
             }
         }
         // Use first account if nothing is specified
@@ -230,7 +285,7 @@ class Schedule extends ListViewController
             $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = $noAccount;
-        } else {
+        } elseif (!$fromTransaction) {
             // set source and destination accounts
             $src_id = 0;
             $dest_id = 0;
@@ -265,14 +320,10 @@ class Schedule extends ListViewController
                 }
             }
 
-            if ($tr["type"] == EXPENSE) {
+            if ($tr["type"] == EXPENSE || ($tr["type"] == TRANSFER && !$trAvailable)) {
                 $tr["dest_curr"] = $tr["src_curr"];
             } elseif ($tr["type"] == INCOME || $tr["type"] == LIMIT_CHANGE) {
                 $tr["src_curr"] = $tr["dest_curr"];
-            }
-
-            if ($tr["type"] == TRANSFER && !$trAvailable) {
-                $tr["dest_curr"] = $tr["src_curr"];
             }
         }
 
@@ -313,44 +364,13 @@ class Schedule extends ListViewController
         ];
 
         $itemId = intval($this->actionParam);
-        if (!$itemId) {
-            $this->fail(__("schedule.errors.update"));
+        $tr = $this->getTransactionData($itemId);
+        if (!$tr) {
+            throw new \Error(__("schedule.errors.update"));
         }
-
-        $item = $this->model->getItem($itemId);
-        if (!$item) {
-            $this->fail(__("schedule.errors.update"));
-        }
-        $tr = (array)$item;
 
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
-
-        if ($tr["type"] == DEBT) {
-            $src = $this->accModel->getItem($tr["src_id"]);
-            $dest = $this->accModel->getItem($tr["dest_id"]);
-
-            $debtType = (!is_null($src) && $src->owner_id !== $this->owner_id);
-
-            $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
-            $person = $this->personMod->getItem($person_id);
-            if (!$person) {
-                throw new \Error(__("persons.errors.notFound"));
-            }
-
-            $debtAcc = $debtType ? $dest : $src;
-            $noAccount = is_null($debtAcc);
-
-            $acc_id = ($noAccount)
-                ? $this->accModel->getAnother()
-                : $debtAcc->id;
-
-            $tr["person_id"] = $person_id;
-            $tr["debtType"] = $debtType;
-            $tr["acc_id"] = $acc_id;
-            $tr["lastAcc_id"] = $acc_id;
-            $tr["noAccount"] = $noAccount;
-        }
 
         $iconModel = IconModel::getInstance();
 

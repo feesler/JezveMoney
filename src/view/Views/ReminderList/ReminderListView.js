@@ -66,7 +66,8 @@ import './ReminderListView.scss';
 /* CSS classes */
 const FILTER_HEADER_CLASS = 'filter-item__title';
 const LIST_CLASS = 'reminder-list';
-const SELECT_MODE_CLASS = 'reminder-list_select';
+const DETAILS_CLASS = 'reminder-list_details';
+const SELECT_MODE_CLASS = 'list_select';
 
 /**
  * Scheduled transaction reminders list view
@@ -218,7 +219,7 @@ class ReminderListView extends AppView {
             className: LIST_CLASS,
             itemSelector: ReminderListItem.selector,
             selectModeClass: SELECT_MODE_CLASS,
-            placeholderClass: 'reminder-item_placeholder',
+            placeholderClass: 'list-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
             getPlaceholderProps: () => ({ title: __('reminders.noData') }),
@@ -470,6 +471,7 @@ class ReminderListView extends AppView {
 
     setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
     }
 
     startLoading(isLoadingMore = false) {
@@ -948,6 +950,7 @@ class ReminderListView extends AppView {
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
+        this.reminderList.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
     }
 
     render(state, prevState = {}) {

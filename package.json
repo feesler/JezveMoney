@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.69.0",
+    "version": "1.70.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -75,7 +75,7 @@
         "npm-run-all": "^4.1.5",
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
-        "sass": "^1.63.6",
+        "sass": "^1.64.1",
         "sass-loader": "^13.3.2",
         "ssh2-sftp-client": "^9.1.0",
         "style-loader": "^2.0.0",
@@ -91,7 +91,7 @@
     "dependencies": {
         "@babel/runtime": "^7.22.6",
         "core-js": "^3.31.1",
-        "jezvejs": "^1.105.0",
-        "whatwg-fetch": "^3.6.16"
+        "jezvejs": "^1.105.1",
+        "whatwg-fetch": "^3.6.17"
     }
 }

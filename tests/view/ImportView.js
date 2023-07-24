@@ -974,6 +974,15 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    async duplicateRule(index) {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.duplicateRule(index));
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
+    }
+
     async deleteRule(index) {
         this.checkRulesListState();
 
@@ -1198,6 +1207,30 @@ export class ImportView extends AppView {
         this.expectedState.transactionForm = ImportTransactionForm.getInitialState(form);
 
         await this.performAction(() => this.contextMenu.select('ctxUpdateBtn'));
+
+        return this.checkState(expected);
+    }
+
+    async duplicateItemByPos(pos) {
+        this.checkMainState();
+        this.checkValidIndex(pos);
+
+        await this.openContextMenu(pos);
+
+        const item = structuredClone(this.items[pos]);
+        delete item.id;
+
+        const form = new ImportTransaction(item);
+        form.enabled = true;
+
+        this.formIndex = this.items.length;
+        this.model.contextMenuVisible = false;
+        const expected = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
+        this.expectedState.transactionForm = ImportTransactionForm.getInitialState(form);
+
+        await this.performAction(() => this.contextMenu.select('ctxDuplicateBtn'));
 
         return this.checkState(expected);
     }

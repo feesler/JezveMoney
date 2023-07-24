@@ -1,11 +1,8 @@
 import {
     createElement,
+    getClassName,
     removeChilds,
-    show,
-    Component,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
@@ -13,12 +10,12 @@ import { INTERVAL_NONE, ScheduledTransaction } from '../../../../Models/Schedule
 
 import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { TransactionListItemBase } from '../../../../Components/TransactionListItemBase/TransactionListItemBase.js';
+import { ListItem } from '../../../../Components/ListItem/ListItem.js';
 
 import './ScheduleListItem.scss';
 
 /** CSS classes */
 const ITEM_CLASS = 'schedule-item';
-const CONTENT_CLASS = 'schedule-item__content';
 const SCHEDULE_GROUP_CLASS = 'schedule-item__schedule';
 const DATE_RANGE_CLASS = 'schedule-item__date-range';
 const START_DATE_CLASS = 'schedule-item__start-date';
@@ -33,63 +30,32 @@ const START_DATE_FIELD_CLASS = 'schedule-item__start-date-field';
 const END_DATE_FIELD_CLASS = 'schedule-item__end-date-field';
 const INTERVAL_FIELD_CLASS = 'schedule-item__interval-field';
 const OFFSET_FIELD_CLASS = 'schedule-item__offset-field';
-/* Select controls */
-const SELECT_CONTROLS_CLASS = 'schedule-item__select';
-/* Controls */
-const CONTROLS_CLASS = 'schedule-item__controls';
-/* Other */
-const SELECTED_CLASS = 'schedule-item_selected';
-const SORT_CLASS = 'schedule-item_sort';
 
 const defaultProps = {
-    selected: false,
-    listMode: 'list',
-    showControls: false,
 };
 
 /**
  * Scheduled transaction list item component
  */
-export class ScheduleListItem extends Component {
+export class ScheduleListItem extends ListItem {
     static get selector() {
         return `.${ITEM_CLASS}`;
     }
 
-    constructor(props) {
-        super(props);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
-
-        this.state = {
-            ...this.props,
+            ...props,
+            className: getClassName(ITEM_CLASS, props.className),
             item: ScheduledTransaction.create(props.item),
-        };
-
-        this.selectControls = null;
-        this.controlsElem = null;
-        this.transactionBase = null;
-
-        this.init();
-    }
-
-    get id() {
-        return this.state.item.id;
+        });
     }
 
     init() {
-        this.contentElem = createElement('div', { props: { className: CONTENT_CLASS } });
-        this.elem = createElement('div', {
-            props: { className: ITEM_CLASS },
-            children: this.contentElem,
-        });
+        super.init();
 
         this.scheduleGroup = createElement('div', { props: { className: SCHEDULE_GROUP_CLASS } });
         this.contentElem.append(this.scheduleGroup);
-
-        this.render(this.state);
     }
 
     initClassic() {
@@ -163,55 +129,6 @@ export class ScheduleListItem extends Component {
         this.dateRangeElem = null;
         this.intervalElem = null;
         this.offsetElem = null;
-    }
-
-    createSelectControls() {
-        const { createContainer } = App;
-
-        if (this.selectControls) {
-            return;
-        }
-
-        this.checkbox = Checkbox.create();
-        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
-            this.checkbox.elem,
-        ]);
-
-        this.elem.prepend(this.selectControls);
-    }
-
-    createControls() {
-        if (this.controlsElem) {
-            return;
-        }
-
-        this.menuButton = MenuButton.create();
-        this.controlsElem = createElement('div', {
-            props: { className: CONTROLS_CLASS },
-            children: this.menuButton.elem,
-        });
-
-        this.elem.append(this.controlsElem);
-    }
-
-    renderSelectControls(state, prevState) {
-        if (state.listMode === prevState.listMode) {
-            return;
-        }
-
-        this.createSelectControls();
-    }
-
-    renderControls(state, prevState) {
-        if (state.showControls === prevState.showControls) {
-            return;
-        }
-
-        if (state.showControls) {
-            this.createControls();
-        }
-
-        show(this.controlsElem, state.showControls);
     }
 
     renderDateRange(item) {
@@ -317,32 +234,14 @@ export class ScheduleListItem extends Component {
     }
 
     render(state, prevState = {}) {
-        if (!state) {
-            throw new Error('Invalid state object');
-        }
+        super.render(state, prevState);
 
         const { item } = state;
         if (!item) {
             throw new Error('Invalid transaction object');
         }
 
-        this.elem.setAttribute('data-id', item.id);
         this.elem.setAttribute('data-type', item.type);
-
-        this.renderSelectControls(state, prevState);
-        this.renderControls(state, prevState);
-
         this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
-        this.elem.classList.toggle(SORT_CLASS, state.listMode === 'sort');
-
-        this.renderContent(state, prevState);
-
-        const selectMode = state.listMode === 'select';
-        const selected = selectMode && !!state.selected;
-        this.elem.classList.toggle(SELECTED_CLASS, selected);
-        this.checkbox?.check(selected);
-        if (this.checkbox) {
-            this.checkbox.input.tabIndex = (selectMode) ? 0 : -1;
-        }
     }
 }

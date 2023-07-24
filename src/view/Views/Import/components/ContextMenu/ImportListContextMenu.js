@@ -24,6 +24,10 @@ export class ImportListContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
             }, {
+                id: 'ctxDuplicateBtn',
+                icon: 'duplicate',
+                title: __('actions.duplicate'),
+            }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
                 title: __('actions.delete'),

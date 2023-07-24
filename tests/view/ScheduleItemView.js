@@ -230,6 +230,14 @@ export class ScheduleItemView extends AppView {
         return this.form.selectWeekDayOffset(val);
     }
 
+    async selectWeekdaysOffset() {
+        return this.form.selectWeekdaysOffset();
+    }
+
+    async selectWeekendOffset() {
+        return this.form.selectWeekendOffset();
+    }
+
     async selectMonthDayOffset(val) {
         return this.form.selectMonthDayOffset(val);
     }

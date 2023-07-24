@@ -73,9 +73,14 @@ const slice = createSlice({
 
     stopLoading: (state) => (
         (state.loading)
-            ? { ...state, loading: false, renderTime: Date.now() }
+            ? { ...state, loading: false }
             : state
     ),
+
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
 
     setDateRenderTime: (state) => ({
         ...state,

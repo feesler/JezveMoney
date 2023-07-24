@@ -45,7 +45,8 @@ import { getCategoriesSortMode } from './helpers.js';
 import './CategoryListView.scss';
 
 /* CSS classes */
-const SELECT_MODE_CLASS = 'categories-list_select';
+const SELECT_MODE_CLASS = 'list_select';
+const SORT_MODE_CLASS = 'list_sort';
 
 const ANY_TYPE = 0;
 
@@ -113,9 +114,9 @@ class CategoryListView extends AppView {
             getItemById: (id) => this.getItemById(id),
             className: 'categories-list',
             itemSelector: '.category-item',
-            itemSortSelector: '.category-item.category-item_sort',
+            itemSortSelector: '.category-item.list-item_sort',
             selectModeClass: SELECT_MODE_CLASS,
-            sortModeClass: 'categories-list_sort',
+            sortModeClass: SORT_MODE_CLASS,
             placeholderClass: 'category-item_placeholder',
             treeSort: true,
             childContainerSelector: '.category-item__children',

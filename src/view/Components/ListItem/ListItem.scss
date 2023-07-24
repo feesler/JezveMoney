@@ -1,0 +1,107 @@
+.list-item {
+  --list-item-selected-color: var(--accent-color);
+  --list-item-row-gap: 2px;
+  --list-item-column-gap: 16px;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  position: relative;
+  border: 0;
+}
+
+/* Select controls */
+.list-item__select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 0;
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+
+  .checkbox {
+    --checkbox-size: 24px;
+    --checkbox-border-radius: 50%;
+
+    margin: 0;
+  }
+
+  .checkbox__check {
+    margin: 0;
+  }
+}
+
+/* Item content */
+.list-item__content {
+  display: grid;
+  align-items: start;
+  row-gap: var(--list-item-row-gap);
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 auto;
+  padding: 8px 0 8px 8px;
+  background-color: var(--list-item-bg-color);
+}
+
+/* Item controls */
+.list-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: var(--list-item-bg-color);
+
+  .btn.menu-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 0;
+    --btn-background: none;
+    --btn-icon-color: var(--list-item-icon-fill);
+    --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+    --btn-focus-icon-color: var(--list-item-hover-icon-fill);
+
+    margin: 0 4px;
+  }
+}
+
+/* Sort placeholder state */
+.list-item_placeholder {
+  opacity: 0;
+}
+
+/* Select mode */
+.list_select {
+  .list-item {
+    cursor: pointer;
+  }
+
+  .list-item__select {
+    width: 32px;
+  }
+
+  .list-item__content {
+    padding: 8px;
+  }
+}
+
+/* Selected state */
+.list-item_selected::after {
+  border: 2px solid var(--list-item-selected-color);
+  bottom: 0;
+  content: "";
+  cursor: pointer;
+  display: block;
+  left: 32px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+/* Sort mode */
+.list-item_sort {
+  cursor: move;
+
+  .list-item__content {
+    padding: 8px;
+  }
+}

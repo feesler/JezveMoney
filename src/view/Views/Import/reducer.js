@@ -340,6 +340,21 @@ const slice = createSlice({
         };
     },
 
+    duplicateItem: (state, index) => {
+        const contextItemIndex = index ?? state.contextItemIndex;
+        if (contextItemIndex === -1) {
+            return state;
+        }
+
+        const item = state.items[contextItemIndex];
+        return {
+            ...state,
+            contextItemIndex: -1,
+            form: item.enable(true),
+            activeItemIndex: state.items.length,
+        };
+    },
+
     cancelEditItem: (state) => ({
         ...state,
         activeItemIndex: -1,

@@ -1,15 +1,12 @@
-import { enable, Component } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { Collapsible } from 'jezvejs/Collapsible';
-import { MenuButton } from 'jezvejs/MenuButton';
+import { enable, getClassName } from 'jezvejs';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { ImportTransaction, typeNames } from '../../../../Models/ImportTransaction.js';
 
+import { CollapsibleListItem } from '../../../../Components/CollapsibleListItem/CollapsibleListItem.js';
 import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 
@@ -17,7 +14,6 @@ import './ImportTransactionItem.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
-const ITEM_CONTAINER_CLASS = 'item-container';
 const COLUMN_CLASS = 'item-column';
 const AMOUNT_COLUMN_CLASS = 'amount-col';
 const DATE_COLUMN_CLASS = 'date-col';
@@ -32,38 +28,26 @@ const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
 const DATE_FIELD_CLASS = 'date-field';
 const CATEGORY_FIELD_CLASS = 'category-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
-/* Controls */
-const CONTROLS_CLASS = 'controls';
-/* Select controls */
-const SELECT_CONTROLS_CLASS = 'select-controls';
-const SELECTED_CLASS = 'import-item_selected';
-/* Sort state */
-const SORT_CLASS = 'import-item_sort';
 
 /**
  * Import transaction form component
  */
-export class ImportTransactionItem extends Component {
+export class ImportTransactionItem extends CollapsibleListItem {
     constructor(props) {
-        super(props);
-
-        if (!this.props?.transaction?.mainAccount) {
+        if (!props?.item?.mainAccount) {
             throw new Error('Invalid props');
         }
 
-        this.state = {
-            ...this.props,
-            transaction: new ImportTransaction(this.props.transaction),
-        };
-
-        this.init();
-    }
-
-    get id() {
-        return this.state.transaction.id;
+        super({
+            ...props,
+            item: new ImportTransaction(props.item),
+            className: getClassName(CONTAINER_CLASS, props.className),
+            toggleOnClick: false,
+        });
     }
 
     init() {
+        super.init();
         const { createContainer } = App;
 
         const fields = [
@@ -88,7 +72,7 @@ export class ImportTransactionItem extends Component {
             this.commentField,
         ] = fields.map(([title, className]) => Field.create({ title, className }));
 
-        this.itemContainer = createContainer(ITEM_CONTAINER_CLASS, [
+        this.contentElem.append(
             createContainer([COLUMN_CLASS, TYPE_COLUMN_CLASS], [
                 this.trTypeField.elem,
                 this.accountField.elem,
@@ -105,74 +89,18 @@ export class ImportTransactionItem extends Component {
             createContainer([COLUMN_CLASS, COMMENT_COLUMN_CLASS], [
                 this.commentField.elem,
             ]),
-        ]);
-
-        this.menuButton = MenuButton.create();
-        this.toggleExtBtn = ToggleButton.create();
-        this.controls = createContainer(CONTROLS_CLASS, [
-            this.menuButton.elem,
-            this.toggleExtBtn.elem,
-        ]);
-
-        this.createSelectControls();
-
-        this.collapse = Collapsible.create({
-            toggleOnClick: false,
-            className: CONTAINER_CLASS,
-            header: [
-                this.selectControls,
-                this.itemContainer,
-                this.controls,
-            ],
-        });
-        this.elem = this.collapse.elem;
-
-        this.render(this.state);
-    }
-
-    createSelectControls() {
-        const { createContainer } = App;
-
-        if (this.selectControls) {
-            return;
-        }
-
-        this.checkbox = Checkbox.create();
-        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
-            this.checkbox.elem,
-        ]);
-    }
-
-    renderSelectControls(state, prevState = {}) {
-        const { transaction } = state;
-        const prevTransaction = prevState?.transaction;
-        const { listMode, selected } = transaction;
-        if (
-            listMode === prevTransaction?.listMode
-            && selected === prevTransaction?.selected
-        ) {
-            return;
-        }
-
-        const selectMode = listMode === 'select';
-        const isSelected = selectMode && !!selected;
-        this.elem.classList.toggle(SELECTED_CLASS, isSelected);
-        this.checkbox?.check(isSelected);
-        if (this.checkbox) {
-            this.checkbox.input.tabIndex = (selectMode) ? 0 : -1;
-        }
+        );
     }
 
     renderContainer(state, prevState) {
-        const originalData = state.transaction.originalData ?? null;
-        const prevOriginalData = prevState?.transaction?.originalData;
+        const originalData = state.item.originalData ?? null;
+        const prevOriginalData = prevState?.item?.originalData;
         if (originalData === prevOriginalData) {
             return;
         }
 
-        this.toggleExtBtn.show(!!originalData);
         if (!originalData) {
-            this.collapse.setContent(null);
+            this.setCollapsibleContent(null);
             return;
         }
 
@@ -182,51 +110,38 @@ export class ImportTransactionItem extends Component {
 
         const content = [origDataContainer.elem];
 
-        const { similarTransaction } = state.transaction;
+        const { similarTransaction } = state.item;
         if (similarTransaction) {
             const info = SimilarTransactionInfo.create(similarTransaction);
             content.push(info.elem);
         }
 
-        this.collapse.setContent(content);
+        this.setCollapsibleContent(content);
     }
 
-    /** Render component */
-    render(state, prevState = {}) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
-        this.renderContainer(state, prevState);
-        this.elem.setAttribute('data-id', state.transaction.id);
-
-        const { transaction } = state;
-        const isDiff = transaction.isDiff();
+    renderContent(state) {
+        const { item } = state;
+        const isDiff = item.isDiff();
         const { userAccounts, persons, currency } = App.model;
-        const isTransfer = ['transfer_out', 'transfer_in'].includes(transaction.type);
-        const isDebt = ['debt_out', 'debt_in'].includes(transaction.type);
+        const isTransfer = ['transfer_out', 'transfer_in'].includes(item.type);
+        const isDebt = ['debt_out', 'debt_in'].includes(item.type);
 
-        enable(this.elem, transaction.enabled);
-
-        this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
-
-        // Select controls
-        this.renderSelectControls(state, prevState);
+        enable(this.elem, item.enabled);
 
         // Type field
-        if (!(transaction.type in typeNames)) {
+        if (!(item.type in typeNames)) {
             throw new Error('Invalid transaction type');
         }
-        this.trTypeField.setContent(typeNames[transaction.type]);
-        this.trTypeField.elem.dataset.type = transaction.type;
+        this.trTypeField.setContent(typeNames[item.type]);
+        this.trTypeField.elem.dataset.type = item.type;
 
         // Account field
         this.accountField.show(isTransfer);
         if (isTransfer) {
-            const isTransferOut = transaction.type === 'transfer_out';
+            const isTransferOut = item.type === 'transfer_out';
             const accountId = (isTransferOut)
-                ? transaction.destAccountId
-                : transaction.sourceAccountId;
+                ? item.destAccountId
+                : item.sourceAccountId;
             const account = userAccounts.getItem(accountId);
             this.accountField.setContent(account.name);
 
@@ -238,58 +153,55 @@ export class ImportTransactionItem extends Component {
         // Person field
         this.personField.show(isDebt);
         if (isDebt) {
-            const person = persons.getItem(transaction.personId);
+            const person = persons.getItem(item.personId);
             this.personField.setContent(person.name);
         }
 
         // Amount fields
         const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
-        const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
+        const srcAmount = currency.formatCurrency(item.sourceAmount, item.srcCurrId);
         this.srcAmountField.setContent(srcAmount);
 
-        this.srcAmountField.elem.dataset.amount = transaction.sourceAmount;
-        this.srcAmountField.elem.dataset.curr = transaction.srcCurrId;
+        this.srcAmountField.elem.dataset.amount = item.sourceAmount;
+        this.srcAmountField.elem.dataset.curr = item.srcCurrId;
 
         this.destAmountField.show(isDiff);
         const destAmount = (isDiff)
-            ? currency.formatCurrency(transaction.destAmount, transaction.destCurrId)
+            ? currency.formatCurrency(item.destAmount, item.destCurrId)
             : '';
         this.destAmountField.setContent(destAmount);
 
-        this.destAmountField.elem.dataset.amount = transaction.destAmount;
-        this.destAmountField.elem.dataset.curr = transaction.destCurrId;
+        this.destAmountField.elem.dataset.amount = item.destAmount;
+        this.destAmountField.elem.dataset.curr = item.destCurrId;
 
         // Date field
-        this.dateField.setContent(transaction.date);
+        this.dateField.setContent(item.date);
 
         // Category field
-        if (transaction.categoryId === 0) {
+        if (item.categoryId === 0) {
             this.categoryField.setContent('');
         } else {
             const { categories } = App.model;
-            const category = categories.getItem(transaction.categoryId);
+            const category = categories.getItem(item.categoryId);
             if (!category) {
                 throw new Error('invalid category');
             }
 
             this.categoryField.setContent(category.name);
         }
-        this.categoryField.show(transaction.categoryId !== 0);
+        this.categoryField.show(item.categoryId !== 0);
 
         // Comment field
-        const hasComment = transaction.comment.length > 0;
+        const hasComment = item.comment.length > 0;
         this.commentField.show(hasComment);
-        this.commentField.setContent(transaction.comment);
+        this.commentField.setContent(item.comment);
+    }
 
-        this.menuButton.show(transaction.listMode === 'list');
+    /** Render component */
+    render(state, prevState = {}) {
+        super.render(state, prevState);
 
-        if (this.collapse) {
-            if (transaction.collapsed) {
-                this.collapse.collapse();
-            } else {
-                this.collapse.expand();
-            }
-        }
+        this.renderContainer(state, prevState);
     }
 }

@@ -571,6 +571,7 @@ export class TransactionListView extends AppView {
                 itemId: model.contextItem,
                 ctxDetailsBtn: { visible: true },
                 ctxUpdateBtn: { visible: true },
+                ctxDuplicateBtn: { visible: true },
                 ctxSetCategoryBtn: { visible: true },
                 ctxDeleteBtn: { visible: true },
             };
@@ -693,11 +694,11 @@ export class TransactionListView extends AppView {
         const expected = this.getExpectedState();
 
         if (listMode === 'list') {
-            await this.performAction(() => this.content.listModeBtn.click());
+            await this.waitForList(() => this.content.listModeBtn.click());
         } else if (listMode === 'select') {
-            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+            await this.waitForList(() => this.listMenu.select('selectModeBtn'));
         } else if (listMode === 'sort') {
-            await this.performAction(() => this.listMenu.select('sortModeBtn'));
+            await this.waitForList(() => this.listMenu.select('sortModeBtn'));
         }
 
         return this.checkState(expected);
@@ -1444,6 +1445,13 @@ export class TransactionListView extends AppView {
         await this.openContextMenu(num);
 
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+    }
+
+    /** Select specified transaction, click on 'Duplicate' button */
+    async goToDuplicateTransaction(num) {
+        await this.openContextMenu(num);
+
+        return navigation(() => this.contextMenu.select('ctxDuplicateBtn'));
     }
 
     /** Export transactions of specified accounts */

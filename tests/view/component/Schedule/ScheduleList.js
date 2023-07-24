@@ -36,7 +36,7 @@ export class ScheduleList extends TestComponent {
         const props = await evaluate((elem) => ({
             renderTime: elem.dataset.time,
             details: elem.classList.contains('schedule-list_details'),
-            isSelectMode: elem.classList.contains('schedule-list_select'),
+            isSelectMode: elem.classList.contains('list_select'),
         }), this.elem);
         res.renderTime = props.renderTime;
         res.details = props.details;

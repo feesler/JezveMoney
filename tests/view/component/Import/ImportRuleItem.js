@@ -40,6 +40,7 @@ export class ImportRuleItem extends TestComponent {
 
             return {
                 ruleId: el.dataset.id,
+                collapsed: el.classList.contains('collapsible__expanded'),
                 propertyElem: textElemState(propertyEl),
                 operatorElem: textElemState(operatorEl),
                 valueElem: textElemState(valueEl),
@@ -50,23 +51,17 @@ export class ImportRuleItem extends TestComponent {
         res.menuBtn = { elem: await query(this.elem, '.menu-btn') };
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
 
+        assert(res.propertyElem.visible, 'Preperty element not visible');
+        assert(res.operatorElem.visible, 'Operator element not visible');
+        assert(res.valueElem.visible, 'Value element not visible');
+        assert(res.menuBtn.elem, 'Menu button not found');
+        assert(res.toggleBtn.elem, 'Toggle button not found');
+
         const conditionsElem = await query(this.elem, '.rule-item__conditions');
         res.conditions = await ImportRuleItemConditions.create(this, conditionsElem);
 
         const actionsElem = await query(this.elem, '.rule-item__actions');
         res.actions = await ImportRuleItemActions.create(this, actionsElem);
-
-        assert(
-            res.propertyElem.visible
-            && res.operatorElem.visible
-            && res.valueElem.visible
-            && res.infoElem.visible
-            && res.menuBtn.elem
-            && res.toggleBtn.elem
-            && res.conditions.elem
-            && res.actions.elem,
-            'Invalid structure of import item',
-        );
 
         return res;
     }
@@ -74,6 +69,7 @@ export class ImportRuleItem extends TestComponent {
     buildModel(cont) {
         const res = {
             id: parseInt(cont.ruleId, 10),
+            collapsed: cont.collapsed,
             conditions: cont.conditions.content.items.map(
                 (item) => structuredClone(item.model),
             ),
@@ -87,6 +83,7 @@ export class ImportRuleItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
+            collapsed: model.collapsed,
             propertyElem: { visible: true },
             operatorElem: { visible: true },
             valueElem: { visible: true },
@@ -112,10 +109,12 @@ export class ImportRuleItem extends TestComponent {
     }
 
     async toggleExpand() {
+        assert(this.content.toggleBtn.elem, 'Toggle button not found');
         return click(this.content.toggleBtn.elem);
     }
 
     async openMenu() {
+        assert(this.content.menuBtn.elem, 'Menu button not found');
         await click(this.content.menuBtn.elem);
     }
 

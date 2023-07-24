@@ -3,62 +3,62 @@ import {
     show,
     addChilds,
     removeChilds,
-    Component,
+    getClassName,
 } from 'jezvejs';
-import { Collapsible } from 'jezvejs/Collapsible';
-import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
+
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
 import { ImportActionList } from '../../../../../Models/ImportActionList.js';
-import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
+
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
+import { CollapsibleListItem } from '../../../../../Components/CollapsibleListItem/CollapsibleListItem.js';
+
 import './ImportRuleItem.scss';
 
 /* CSS classes */
 const ITEM_CLASS = 'rule-item';
 
+const defaultProps = {
+    collapsed: true,
+    showControls: true,
+    toggleButton: true,
+};
+
 /**
  * ImportRuleItem component
  * @param {Object} props
  */
-export class ImportRuleItem extends Component {
+export class ImportRuleItem extends CollapsibleListItem {
     static get selector() {
         return `.${ITEM_CLASS}`;
     }
 
-    constructor(...args) {
-        super(...args);
-
-        if (!this.props?.data) {
-            throw new Error('Invalid props');
-        }
-        if (!(this.props.data instanceof ImportRule)) {
+    constructor(props = {}) {
+        if (!(props?.item instanceof ImportRule)) {
             throw new Error('Invalid rule item');
         }
 
-        this.init();
-        this.setData(this.props.data);
-    }
-
-    get id() {
-        return this.state.ruleId;
+        super({
+            ...defaultProps,
+            ...props,
+            className: getClassName(ITEM_CLASS, props.className),
+        });
     }
 
     /** Main structure initialization */
     init() {
+        super.init();
+
         this.propertyLabel = createElement('span', { props: { className: 'rule-item__property' } });
         this.operatorLabel = createElement('span', { props: { className: 'rule-item__operator' } });
         this.valueLabel = createElement('span', { props: { className: 'rule-item__value' } });
         this.infoLabel = createElement('span', { props: { className: 'rule-item__info' } });
 
         // Toggle expand/collapse
-        this.toggleExtBtn = ToggleButton.create({
-            onClick: (e) => this.onToggle(e),
-        });
 
         this.topRow = App.createContainer('rule-item__main-top', [
             this.propertyLabel,
@@ -69,16 +69,10 @@ export class ImportRuleItem extends Component {
             this.infoLabel,
         ]);
 
-        this.infoContainer = App.createContainer('rule-item__main-info', [
+        this.contentElem.append(
             this.topRow,
             this.bottomRow,
-        ]);
-
-        this.menuButton = MenuButton.create();
-        this.controls = App.createContainer('rule-item__main-controls', [
-            this.menuButton.elem,
-            this.toggleExtBtn.elem,
-        ]);
+        );
 
         this.conditionsHeader = createElement('label', {
             props: { className: 'rule-item__header', textContent: __('import.conditions.title') },
@@ -90,54 +84,17 @@ export class ImportRuleItem extends Component {
         });
         this.actionsContainer = App.createContainer('rule-item__actions');
 
-        this.collapse = Collapsible.create({
-            toggleOnClick: false,
-            className: ITEM_CLASS,
-            header: [this.infoContainer, this.controls],
-            content: [
-                this.conditionsHeader,
-                this.conditionsContainer,
-                this.actionsHeader,
-                this.actionsContainer,
-            ],
-        });
-        this.elem = this.collapse.elem;
-    }
-
-    /** Set main state of component */
-    setData(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
-
-        this.state = {
-            ruleId: data.id,
-            conditions: data.conditions,
-            actions: data.actions,
-        };
-
-        this.render(this.state);
-    }
-
-    /** Return import rule object */
-    getData() {
-        const res = {
-            flags: 0,
-        };
-
-        if (this.state.ruleId) {
-            res.id = this.state.ruleId;
-        }
-
-        res.actions = structuredClone(this.state.actions);
-        res.conditions = structuredClone(this.state.conditions);
-
-        return res;
+        this.setCollapsibleContent([
+            this.conditionsHeader,
+            this.conditionsContainer,
+            this.actionsHeader,
+            this.actionsContainer,
+        ]);
     }
 
     /** Toggle expand/collapse button 'click' event handler */
     onToggle() {
-        this.collapse.toggle();
+        this.toggle();
     }
 
     /** Set data for list container */
@@ -156,23 +113,22 @@ export class ImportRuleItem extends Component {
     }
 
     /** Render component state */
-    render(state) {
+    render(state, prevState = {}) {
+        super.render(state, prevState);
+
+        const { item } = state;
+
         if (
-            !state
-            || !(state.actions instanceof ImportActionList)
-            || !(state.conditions instanceof ImportConditionList)
-            || state.conditions.length === 0
-            || state.actions.length === 0
+            !(item.actions instanceof ImportActionList)
+            || !(item.conditions instanceof ImportConditionList)
+            || item.conditions.length === 0
+            || item.actions.length === 0
         ) {
             throw new Error('Invalid state');
         }
 
-        if (state.ruleId) {
-            this.elem.setAttribute('data-id', state.ruleId);
-        }
-
         // Render conditions
-        const conditionItems = state.conditions.map(
+        const conditionItems = item.conditions.map(
             (data) => ImportConditionItem.create({ data }),
         );
         this.setListContainerData(this.conditionsContainer, conditionItems);
@@ -186,7 +142,7 @@ export class ImportRuleItem extends Component {
         this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
         this.valueLabel.textContent = firstCondition.valueLabel.textContent;
 
-        const actionsTitle = __('import.rules.actionsInfo', state.actions.length);
+        const actionsTitle = __('import.rules.actionsInfo', item.actions.length);
         if (conditionItems.length > 1) {
             const conditionsTitle = __('import.rules.conditionsInfo', conditionItems.length - 1);
             this.infoLabel.textContent = `${conditionsTitle} ${actionsTitle}`;
@@ -195,10 +151,8 @@ export class ImportRuleItem extends Component {
         }
 
         // Render actions
-        const actionItems = state.actions.map(
-            (item) => (new ImportActionItem({
-                data: item,
-            })),
+        const actionItems = item.actions.map(
+            (data) => ImportActionItem.create({ data }),
         );
         show(this.actionsHeader, (actionItems.length > 0));
         this.setListContainerData(this.actionsContainer, actionItems);

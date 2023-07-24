@@ -42,6 +42,8 @@ export class TransactionsStory extends TestStory {
         await this.create();
         await this.update();
         await this.updateFromMainView();
+        await this.duplicate();
+        await this.duplicateFromMainView();
         await this.setCategoryFromMainView();
         await this.locales();
         await this.deleteFromContextMenu();
@@ -136,6 +138,8 @@ export class TransactionsStory extends TestStory {
             { action: 'inputDestAmount', data: '1000' },
             { action: 'toggleEnableRepeat' },
             { action: 'selectDate', data: App.dates.weekAgo },
+            { action: 'changeIntervalType', data: INTERVAL_WEEK },
+            { action: 'selectWeekendOffset' },
         ]);
 
         // Check create transaction with hidden account
@@ -783,6 +787,24 @@ export class TransactionsStory extends TestStory {
         await Actions.updateFromMainViewAndSubmit(4, [
             { action: 'inputDestAmount', data: '555' },
             { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+        ]);
+    }
+
+    async duplicate() {
+        setBlock('Duplicate transaction', 1);
+
+        const { TRANSPORT_CATEGORY } = App.scenario;
+
+        await Actions.duplicateAndSubmit(EXPENSE, 0, [
+            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
+        ]);
+    }
+
+    async duplicateFromMainView() {
+        setBlock('Duplicate transaction from main view', 1);
+
+        await Actions.duplicateFromMainViewAndSubmit(0, [
+            { action: 'inputComment', data: 'Duplicate' },
         ]);
     }
 

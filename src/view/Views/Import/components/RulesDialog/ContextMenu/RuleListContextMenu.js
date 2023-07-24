@@ -5,6 +5,7 @@ import { App } from '../../../../../Application/App.js';
 
 /* CSS classes */
 const UPDATE_BUTTON_CLASS = 'update-btn';
+const DUPLICATE_BUTTON_CLASS = 'duplicate-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 
 /** Import rules list context menu component */
@@ -18,6 +19,11 @@ export class RuleListContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
                 className: UPDATE_BUTTON_CLASS,
+            }, {
+                id: 'ctxDuplicateRuleBtn',
+                icon: 'duplicate',
+                title: __('actions.duplicate'),
+                className: DUPLICATE_BUTTON_CLASS,
             }, {
                 id: 'ctxDeleteRuleBtn',
                 icon: 'del',

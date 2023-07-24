@@ -225,8 +225,8 @@ export class CategoryListView extends AppView {
                 el.closest('.tab-list')?.querySelector(`[data-value="${el.dataset.id}"] .link-menu-item__title`)?.textContent,
                 el && !el.hidden,
                 parseInt(listEl.dataset.time, 10),
-                listEl.classList.contains('categories-list_select'),
-                listEl.classList.contains('categories-list_sort'),
+                listEl.classList.contains('list_select'),
+                listEl.classList.contains('list_sort'),
             ]), elem, listContainer);
 
             const listItems = await queryAll(listContainer, '.category-item');

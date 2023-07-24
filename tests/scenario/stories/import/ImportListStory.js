@@ -41,6 +41,7 @@ export class ImportListStory extends TestStory {
         await this.convert();
         await this.pagination();
         await this.listModes();
+        await this.duplicate();
         await this.checkSimilar();
         await this.enableDisableRules();
         await this.del();
@@ -181,6 +182,23 @@ export class ImportListStory extends TestStory {
         await Actions.setListMode();
         await Actions.setSortMode();
         await Actions.setListMode();
+
+        await Actions.deleteAllItems();
+    }
+
+    async duplicate() {
+        setBlock('Duplicate import transactions', 1);
+
+        const { cardFile } = App.scenario;
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded(cardFile);
+
+        await Actions.duplicateItemAndSave({
+            pos: 0,
+            action: [
+                { action: 'inputComment', data: 'Duplicate' },
+            ],
+        });
 
         await Actions.deleteAllItems();
     }

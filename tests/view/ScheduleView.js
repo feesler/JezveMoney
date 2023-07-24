@@ -86,6 +86,7 @@ export class ScheduleView extends AppView {
                 itemId: model.contextItem,
                 ctxDetailsBtn: { visible: true },
                 ctxUpdateBtn: { visible: true },
+                ctxDuplicateBtn: { visible: true },
                 ctxFinishBtn: { visible: true },
                 ctxDeleteBtn: { visible: true },
             };
@@ -545,9 +546,9 @@ export class ScheduleView extends AppView {
         const expected = this.getExpectedState();
 
         if (listMode === 'list') {
-            await this.performAction(() => this.content.listModeBtn.click());
+            await this.waitForList(() => this.content.listModeBtn.click());
         } else if (listMode === 'select') {
-            await this.performAction(() => this.listMenu.select('selectModeBtn'));
+            await this.waitForList(() => this.listMenu.select('selectModeBtn'));
         }
 
         return this.checkState(expected);
@@ -704,6 +705,13 @@ export class ScheduleView extends AppView {
         await this.openContextMenu(num);
 
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
+    }
+
+    /** Select specified transaction, click on 'Duplicate' button */
+    async goToDuplicateItem(num) {
+        await this.openContextMenu(num);
+
+        return navigation(() => this.contextMenu.select('ctxDuplicateBtn'));
     }
 
     /** Finishes specified scheduled transaction from context menu */
