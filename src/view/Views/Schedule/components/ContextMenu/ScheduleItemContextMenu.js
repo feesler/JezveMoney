@@ -21,6 +21,11 @@ export class ScheduleItemContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
             }, {
+                id: 'ctxDuplicateBtn',
+                type: 'link',
+                icon: 'duplicate',
+                title: __('actions.duplicate'),
+            }, {
                 id: 'ctxFinishBtn',
                 title: __('schedule.finish'),
             }, {
@@ -71,6 +76,7 @@ export class ScheduleItemContextMenu extends PopupMenu {
         const { items } = this;
         items.ctxDetailsBtn.setURL(`${baseURL}schedule/${scheduleItem.id}`);
         items.ctxUpdateBtn.setURL(`${baseURL}schedule/update/${scheduleItem.id}`);
+        items.ctxDuplicateBtn.setURL(`${baseURL}schedule/create?from=${scheduleItem.id}`);
 
         this.attachAndShow(menuButton);
     }

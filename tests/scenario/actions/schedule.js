@@ -304,6 +304,22 @@ export const update = async (pos) => {
     });
 };
 
+export const duplicate = async (pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index) && index >= 0, 'Position of item not specified');
+
+    await test(`Initial state of duplicate scheduled transaction view [${index}]`, async () => {
+        await checkNavigation();
+
+        const from = App.state.schedule.indexesToIds(index);
+        const expected = ScheduleItemView.getInitialState({ from });
+
+        await App.view.goToDuplicateItem(pos);
+
+        return App.view.checkState(expected);
+    });
+};
+
 export const createAndSubmit = async (...args) => {
     const descr = (args.length > 1) ? args[0] : 'Create scheduled transaction';
     setBlock(descr, 2);
@@ -319,6 +335,14 @@ export const updateAndSubmit = async (pos, actions) => {
     setBlock(`Update scheduled transaction [${pos}]`, 2);
 
     await update(pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const duplicateAndSubmit = async (pos, actions) => {
+    setBlock(`Duplicate scheduled transaction [${pos}]`, 2);
+
+    await duplicate(pos);
     await runActions(actions);
     await submit();
 };
