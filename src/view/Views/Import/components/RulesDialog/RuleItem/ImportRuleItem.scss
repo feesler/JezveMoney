@@ -6,7 +6,6 @@
   /* Main static view */
   .collapsible-header {
     flex-flow: row nowrap;
-    align-items: center;
     font-size: 16px;
     border: 0;
     width: 100%;
@@ -140,13 +139,4 @@
 .rule-item__actions .action-item:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-}
-
-@media (hover: hover) {
-  .rule-item .collapsible-header:hover {
-    .list-item__content,
-    .list-item__controls {
-      background-color: var(--list-item-hover-bg-color);
-    }
-  }
 }
