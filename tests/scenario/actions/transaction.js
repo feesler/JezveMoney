@@ -357,6 +357,49 @@ export const updateFromMainView = async (pos) => {
     });
 };
 
+export const duplicate = async (type, pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+
+    await test(`Initial state of duplicate ${Transaction.typeToString(type)} view [${index}]`, async () => {
+        await App.view.navigateToTransactions();
+        await App.view.filterByType(type);
+
+        const transactions = App.view.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+        const expected = TransactionView.getInitialState({
+            from: item.id,
+        });
+
+        await App.view.goToDuplicateTransaction(pos);
+
+        return App.view.checkState(expected);
+    });
+};
+
+export const duplicateFromMainView = async (pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+
+    await test(`Initial state of duplicate transaction [${index}] view`, async () => {
+        await App.goToMainView();
+
+        const transactions = App.view.transactionsWidget.transList.getItems();
+        assert.arrayIndex(transactions, index, 'Invalid position of transaction');
+
+        const item = transactions[index];
+        const expected = TransactionView.getInitialState({
+            from: item.id,
+        });
+
+        await App.view.goToDuplicateTransactionByIndex(pos);
+
+        return App.view.checkState(expected);
+    });
+};
+
 export const createFromAccountAndSubmit = async (pos, actions) => {
     setBlock(`Create transaction from account [${pos}]`, 2);
 
@@ -385,6 +428,22 @@ export const updateFromMainViewAndSubmit = async (pos, actions) => {
     setBlock(`Update transaction [${pos}] from main view`, 2);
 
     await updateFromMainView(pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const duplicateAndSubmit = async (type, pos, actions) => {
+    setBlock(`Duplicate transaction [${pos}] from main view`, 2);
+
+    await duplicate(type, pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const duplicateFromMainViewAndSubmit = async (pos, actions) => {
+    setBlock(`Update transaction [${pos}] from main view`, 2);
+
+    await duplicateFromMainView(pos);
     await runActions(actions);
     await submit();
 };

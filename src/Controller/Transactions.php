@@ -126,6 +126,51 @@ class Transactions extends ListViewController
     }
 
     /**
+     * Returns array with view data for specified transaction
+     *
+     * @param int $item_id transaction id
+     *
+     * @return array|null
+     */
+    private function getTransactionData(int $item_id)
+    {
+        $item = $this->model->getItem($item_id);
+        if (is_null($item)) {
+            return null;
+        }
+        $tr = (array)$item;
+        if ($tr["type"] !== DEBT) {
+            return $tr;
+        }
+
+        $src = $this->accModel->getItem($tr["src_id"]);
+        $dest = $this->accModel->getItem($tr["dest_id"]);
+
+        $debtType = (!is_null($src) && $src->owner_id !== $this->owner_id);
+
+        $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
+        $person = $this->personMod->getItem($person_id);
+        if (!$person) {
+            throw new \Error(__("persons.errors.notFound"));
+        }
+
+        $debtAcc = $debtType ? $dest : $src;
+        $noAccount = is_null($debtAcc);
+
+        $acc_id = ($noAccount)
+            ? $this->accModel->getAnother()
+            : $debtAcc->id;
+
+        $tr["person_id"] = $person_id;
+        $tr["debtType"] = $debtType;
+        $tr["acc_id"] = $acc_id;
+        $tr["lastAcc_id"] = $acc_id;
+        $tr["noAccount"] = $noAccount;
+
+        return $tr;
+    }
+
+    /**
      * /transactions/create/ route handler
      * Renders create transaction view
      */
@@ -145,12 +190,19 @@ class Transactions extends ListViewController
         $userAccounts = $this->accModel->getUserAccounts();
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = __("transactions.errors.create");
 
+        $fromTransaction = isset($_GET["from"]) ? intval($_GET["from"]) : 0;
         $bySchedule = isset($_GET["schedule_id"]);
         $fromReminder = isset($_GET["reminder_id"]) || $bySchedule;
 
-        if ($fromReminder) {
+        if ($fromTransaction) {
+            $tr = $this->getTransactionData($fromTransaction);
+            if (!$tr) {
+                $this->fail(__("transactions.errors.create"));
+            }
+
+            unset($tr["id"]);
+        } elseif ($fromReminder) {
             $reminderModel = ReminderModel::getInstance();
             if ($bySchedule) {
                 $reminderDate = isset($_GET["reminder_date"])
@@ -203,7 +255,7 @@ class Transactions extends ListViewController
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
             if (!$account || $account->owner_id != $this->owner_id) {
-                $this->fail($defMsg);
+                $this->fail(__("transactions.errors.create"));
             }
         }
         // Use first account if nothing is specified
@@ -233,26 +285,23 @@ class Transactions extends ListViewController
             }
         }
 
-        $debtType = true;
-        $noAccount = ($acc_id == 0);
-        $debtAcc = $this->accModel->getItem($acc_id);
-
-        // Prepare person account
-        $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
-        $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
-        $person_acc_id = ($person_acc) ? $person_acc->id : 0;
-
         if ($tr["type"] == DEBT) {
+            $debtAcc = $this->accModel->getItem($acc_id);
+            // Prepare person account
+            $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
+            $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
+            $person_acc_id = ($person_acc) ? $person_acc->id : 0;
+
             $tr["src_id"] = $person_acc_id;
             $tr["dest_id"] = $acc_id;
             $tr["src_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
             $tr["dest_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
             $tr["person_id"] = $person_id;
-            $tr["debtType"] = $debtType;
+            $tr["debtType"] = true;
             $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
-            $tr["noAccount"] = $noAccount;
-        } elseif (!$fromReminder) {
+            $tr["noAccount"] = ($acc_id == 0);
+        } elseif (!$fromReminder && !$fromTransaction) {
             // set source and destination accounts
             $src_id = 0;
             $dest_id = 0;
@@ -287,14 +336,10 @@ class Transactions extends ListViewController
                 }
             }
 
-            if ($tr["type"] == EXPENSE) {
+            if ($tr["type"] == EXPENSE || ($tr["type"] == TRANSFER && !$trAvailable)) {
                 $tr["dest_curr"] = $tr["src_curr"];
             } elseif ($tr["type"] == INCOME || $tr["type"] == LIMIT_CHANGE) {
                 $tr["src_curr"] = $tr["dest_curr"];
-            }
-
-            if ($tr["type"] == TRANSFER && !$trAvailable) {
-                $tr["dest_curr"] = $tr["src_curr"];
             }
         }
 
@@ -336,50 +381,15 @@ class Transactions extends ListViewController
         ];
 
         $iconModel = IconModel::getInstance();
-        $defMsg = __("transactions.errors.update");
 
         $trans_id = intval($this->actionParam);
-        if (!$trans_id) {
-            $this->fail($defMsg);
+        $tr = $this->getTransactionData($trans_id);
+        if (is_null($tr)) {
+            throw new \Error(__("transactions.errors.update"));
         }
-        if (!$this->model->isExist($trans_id)) {
-            $this->fail($defMsg);
-        }
-
-        $item = $this->model->getItem($trans_id);
-        if (is_null($item)) {
-            $this->fail($defMsg);
-        }
-        $tr = (array)$item;
 
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
-
-        if ($tr["type"] == DEBT) {
-            $src = $this->accModel->getItem($tr["src_id"]);
-            $dest = $this->accModel->getItem($tr["dest_id"]);
-
-            $debtType = (!is_null($src) && $src->owner_id !== $this->owner_id);
-
-            $person_id = ($debtType) ? $src->owner_id : $dest->owner_id;
-            $person = $this->personMod->getItem($person_id);
-            if (!$person) {
-                throw new \Error(__("persons.errors.notFound"));
-            }
-
-            $debtAcc = $debtType ? $dest : $src;
-            $noAccount = is_null($debtAcc);
-
-            $acc_id = ($noAccount)
-                ? $this->accModel->getAnother()
-                : $debtAcc->id;
-
-            $tr["person_id"] = $person_id;
-            $tr["debtType"] = $debtType;
-            $tr["acc_id"] = $acc_id;
-            $tr["lastAcc_id"] = $acc_id;
-            $tr["noAccount"] = $noAccount;
-        }
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),

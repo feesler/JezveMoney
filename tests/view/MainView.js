@@ -273,6 +273,12 @@ export class MainView extends AppView {
         return this.content.transactionsWidget.updateByIndex(index);
     }
 
+    async goToDuplicateTransactionByIndex(index) {
+        assert(this.content.transactionsWidget, 'Transactions widget not found');
+
+        return this.content.transactionsWidget.duplicateByIndex(index);
+    }
+
     /** Select category for specified transaction */
     async setTransactionCategory(index, category) {
         assert(this.content.transactionsWidget, 'Transactions widget not found');

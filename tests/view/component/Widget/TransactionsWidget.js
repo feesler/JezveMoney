@@ -60,6 +60,12 @@ export class TransactionsWidget extends Widget {
         return navigation(() => this.contextMenu.select('ctxUpdateBtn'));
     }
 
+    async duplicateByIndex(index) {
+        await this.openContextMenu(index);
+
+        return navigation(() => this.contextMenu.select('ctxDuplicateBtn'));
+    }
+
     async setCategoryByIndex(index) {
         await this.openContextMenu(index);
 
