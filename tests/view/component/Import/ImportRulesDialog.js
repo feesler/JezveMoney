@@ -70,6 +70,8 @@ export class ImportRulesDialog extends TestComponent {
         if (res.contextMenu.itemId) {
             const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
             res.updateBtn = await Button.create(this, updateBtnElem);
+            const duplicateBtnElem = await query(res.contextMenu.elem, '.duplicate-btn');
+            res.duplicateBtn = await Button.create(this, duplicateBtnElem);
             const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');
             res.deleteBtn = await Button.create(this, deleteBtnElem);
         }
@@ -354,22 +356,22 @@ export class ImportRulesDialog extends TestComponent {
         return this.checkState();
     }
 
-    async updateRule(index) {
+    async openContextMenu(index) {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.items, ind);
 
         assert(this.isListState(), 'Invalid state');
 
         this.model.contextMenuVisible = true;
-        let expected = this.getExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.items[ind].openMenu());
 
-        this.checkState(expected);
+        return this.checkState(expected);
+    }
 
-        this.model.state = 'update';
-        const ruleItem = App.state.rules.getItemByIndex(ind);
-        const ruleConditions = ruleItem.conditions.map((item) => {
+    ruleToModel(rule) {
+        const ruleConditions = rule.conditions.map((item) => {
             const condition = {
                 fieldType: item.field_id,
                 operator: item.operator,
@@ -383,17 +385,27 @@ export class ImportRulesDialog extends TestComponent {
 
             return condition;
         });
-        const ruleActions = ruleItem.actions.map((item) => ({
+
+        const ruleActions = rule.actions.map((item) => ({
             actionType: item.action_id,
             value: item.value,
         }));
-        this.model.rule = {
-            id: ruleItem.id,
+
+        return {
+            id: rule.id,
             conditions: ruleConditions,
             actions: ruleActions,
         };
+    }
+
+    async updateRule(index) {
+        await this.openContextMenu(index);
+
+        this.model.state = 'update';
+        const ruleItem = App.state.rules.getItemByIndex(index);
+        this.model.rule = this.ruleToModel(ruleItem);
         this.model.contextMenuVisible = false;
-        expected = this.getExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.updateBtn.click());
 
@@ -405,21 +417,35 @@ export class ImportRulesDialog extends TestComponent {
         return this.checkState(expected);
     }
 
-    async deleteRule(index) {
-        assert(this.model.state === 'list', 'Invalid state');
+    async duplicateRule(index) {
+        await this.openContextMenu(index);
 
-        const ind = parseInt(index, 10);
-        assert.arrayIndex(this.content.items, ind);
-
-        this.model.contextMenuVisible = true;
-        let expected = this.getExpectedState();
-
-        await this.performAction(() => this.content.items[ind].openMenu());
-
-        this.checkState(expected);
+        this.model.state = 'create';
+        const ruleItem = App.state.rules.getItemByIndex(index);
+        const { conditions, actions } = this.ruleToModel(ruleItem);
+        this.model.rule = {
+            conditions,
+            actions,
+        };
 
         this.model.contextMenuVisible = false;
-        expected = this.getExpectedState();
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.duplicateBtn.click());
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return this.model.state === 'create';
+        });
+
+        return this.checkState(expected);
+    }
+
+    async deleteRule(index) {
+        await this.openContextMenu(index);
+
+        this.model.contextMenuVisible = false;
+        let expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deleteBtn.click());
         await this.performAction(() => wait(this.content.ruleDeletePopupId, { visible: true }));
@@ -430,7 +456,7 @@ export class ImportRulesDialog extends TestComponent {
 
         const prevTime = this.model.renderTime;
 
-        const id = App.state.rules.indexToId(ind);
+        const id = App.state.rules.indexToId(index);
         App.state.deleteRules({ id });
         expected = this.getExpectedState();
 

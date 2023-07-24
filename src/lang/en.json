@@ -16,6 +16,7 @@
         "openItem": "Show details",
         "create": "Create",
         "update": "Edit",
+        "duplicate": "Duplicate",
         "delete": "Delete",
         "deleteSelected": "Delete selected",
         "deleteAll": "Delete all",

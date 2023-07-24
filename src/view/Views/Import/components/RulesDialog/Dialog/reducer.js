@@ -191,6 +191,32 @@ const slice = createSlice({
             rule: new ImportRule(rule),
         };
     },
+
+    duplicateRule: (state) => {
+        const item = App.model.rules.getItem(state.contextItem);
+        if (!item) {
+            return state;
+        }
+
+        const rule = {
+            ...item,
+            conditions: item.conditions.map((condition) => (
+                (ImportCondition.isDateField(condition.field_id))
+                    ? {
+                        ...condition,
+                        value: App.formatDate(condition.value),
+                    }
+                    : condition
+            )),
+        };
+        delete rule.id;
+
+        return {
+            ...state,
+            id: CREATE_STATE,
+            rule: new ImportRule(rule),
+        };
+    },
 });
 
 export const { actions, reducer } = slice;

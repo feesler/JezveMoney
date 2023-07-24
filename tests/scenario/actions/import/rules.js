@@ -125,6 +125,17 @@ export const updateRule = async (index) => {
     });
 };
 
+/** Click by 'Duplicate' import rule button */
+export const duplicateRule = async (index) => {
+    const ind = parseInt(index, 10);
+    assert(!Number.isNaN(ind), 'Invalid rule index');
+
+    await test(`Update rule [${ind}]`, async () => {
+        await checkRulesDialog();
+        return App.view.duplicateRule(ind);
+    });
+};
+
 /** Click by delete import rule button */
 export const deleteRule = async (index) => {
     const ind = parseInt(index, 10);

@@ -52,6 +52,7 @@ export class ImportRulesDialog extends Component {
 
         this.contextMenuActions = {
             ctxUpdateRuleBtn: () => this.onUpdateItem(),
+            ctxDuplicateRuleBtn: () => this.onDuplicateItem(),
             ctxDeleteRuleBtn: () => this.onDeleteItem(),
         };
 
@@ -270,6 +271,11 @@ export class ImportRulesDialog extends Component {
     /** Rule 'update' event handler */
     onUpdateItem() {
         this.store.dispatch(actions.updateRule());
+    }
+
+    /** Rule 'duplicate' event handler */
+    onDuplicateItem() {
+        this.store.dispatch(actions.duplicateRule());
     }
 
     /** Rule 'delete' event handler */

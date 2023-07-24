@@ -974,6 +974,15 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    async duplicateRule(index) {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.duplicateRule(index));
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
+    }
+
     async deleteRule(index) {
         this.checkRulesListState();
 

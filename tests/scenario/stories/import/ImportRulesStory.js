@@ -64,6 +64,7 @@ export class ImportRulesStory extends TestStory {
         await this.validation();
         await this.create();
         await this.update();
+        await this.duplicate();
         await this.del();
         await this.search();
         await this.pagination();
@@ -469,6 +470,19 @@ export class ImportRulesStory extends TestStory {
         await Actions.updateRule(2);
         await Actions.deleteRuleCondition(0);
         await Actions.deleteRuleAction(0);
+        await Actions.submitRule();
+    }
+
+    // Duplicate import rule tests
+    async duplicate() {
+        setBlock('Duplicate import rules', 1);
+
+        await Actions.duplicateRule(0);
+        await Actions.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'Duplicate' },
+        ]);
         await Actions.submitRule();
     }
 
