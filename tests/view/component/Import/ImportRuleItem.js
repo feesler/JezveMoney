@@ -40,6 +40,7 @@ export class ImportRuleItem extends TestComponent {
 
             return {
                 ruleId: el.dataset.id,
+                collapsed: el.classList.contains('collapsible__expanded'),
                 propertyElem: textElemState(propertyEl),
                 operatorElem: textElemState(operatorEl),
                 valueElem: textElemState(valueEl),
@@ -47,13 +48,14 @@ export class ImportRuleItem extends TestComponent {
             };
         }, this.elem);
 
+        res.menuBtn = { elem: await query(this.elem, '.menu-btn') };
+        res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
+
         assert(res.propertyElem.visible, 'Preperty element not visible');
         assert(res.operatorElem.visible, 'Operator element not visible');
         assert(res.valueElem.visible, 'Value element not visible');
-        assert(res.infoElem.visible, 'Information element not visible');
-
-        res.menuBtn = { elem: await query(this.elem, '.menu-btn') };
-        res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
+        assert(res.menuBtn.elem, 'Menu button not found');
+        assert(res.toggleBtn.elem, 'Toggle button not found');
 
         const conditionsElem = await query(this.elem, '.rule-item__conditions');
         res.conditions = await ImportRuleItemConditions.create(this, conditionsElem);
@@ -67,6 +69,7 @@ export class ImportRuleItem extends TestComponent {
     buildModel(cont) {
         const res = {
             id: parseInt(cont.ruleId, 10),
+            collapsed: cont.collapsed,
             conditions: cont.conditions.content.items.map(
                 (item) => structuredClone(item.model),
             ),
@@ -80,6 +83,7 @@ export class ImportRuleItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
+            collapsed: model.collapsed,
             propertyElem: { visible: true },
             operatorElem: { visible: true },
             valueElem: { visible: true },

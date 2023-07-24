@@ -22,6 +22,12 @@ import './ImportRuleItem.scss';
 /* CSS classes */
 const ITEM_CLASS = 'rule-item';
 
+const defaultProps = {
+    collapsed: true,
+    showControls: true,
+    toggleButton: true,
+};
+
 /**
  * ImportRuleItem component
  * @param {Object} props
@@ -37,10 +43,9 @@ export class ImportRuleItem extends CollapsibleListItem {
         }
 
         super({
+            ...defaultProps,
             ...props,
             className: getClassName(ITEM_CLASS, props.className),
-            showControls: true,
-            toggleButton: true,
         });
     }
 

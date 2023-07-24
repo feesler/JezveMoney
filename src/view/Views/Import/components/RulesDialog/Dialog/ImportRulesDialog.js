@@ -98,7 +98,12 @@ export class ImportRulesDialog extends Component {
             ItemComponent: ImportRuleItem,
             className: LIST_CLASS,
             itemSelector: ImportRuleItem.selector,
-            getItemProps: (item) => ({ item }),
+            getItemProps: (item) => ({
+                item,
+                collapsed: item.collapsed,
+                toggleButton: true,
+                showControls: true,
+            }),
             PlaceholderComponent: NoDataMessage,
             getPlaceholderProps: (state) => ({
                 title: (state.filter !== '')
@@ -223,14 +228,17 @@ export class ImportRulesDialog extends Component {
     onItemClick(itemId, e) {
         const state = this.store.getState();
 
-        if (
-            state.id !== LIST_STATE
-            || !e.target.closest('.menu-btn')
-        ) {
+        if (e.target.closest('.toggle-btn')) {
+            this.toggleCollapseItem(itemId);
             return;
         }
 
-        this.showContextMenu(itemId);
+        if (
+            state.id === LIST_STATE
+            && e.target.closest('.menu-btn')
+        ) {
+            this.showContextMenu(itemId);
+        }
     }
 
     showContextMenu(itemId) {
@@ -239,6 +247,10 @@ export class ImportRulesDialog extends Component {
 
     hideContextMenu() {
         this.store.dispatch(actions.hideContextMenu());
+    }
+
+    toggleCollapseItem(itemId) {
+        this.store.dispatch(actions.toggleCollapseItem(itemId));
     }
 
     /** Rule 'submit' event handler */

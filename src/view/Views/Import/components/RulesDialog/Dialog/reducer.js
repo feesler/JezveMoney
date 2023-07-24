@@ -49,9 +49,13 @@ export const getAbsoluteIndex = (index, state) => {
 export const createList = (items, state) => {
     const filter = state?.filter ?? '';
 
-    const res = (filter !== '')
+    let res = (filter !== '')
         ? items.filter((rule) => rule.isMatchFilter(filter))
         : items;
+
+    res = res.map((item) => (
+        ('collapsed' in item) ? item : { ...item, collapsed: true }
+    ));
 
     return ImportRuleList.create(res);
 };
@@ -92,6 +96,15 @@ const slice = createSlice({
     hideContextMenu: (state) => (
         (state.showContextMenu) ? { ...state, showContextMenu: false } : state
     ),
+
+    toggleCollapseItem: (state, itemId) => ({
+        ...state,
+        items: state.items.map((item) => (
+            (item.id === itemId)
+                ? { ...item, collapsed: !item.collapsed }
+                : item
+        )),
+    }),
 
     startLoading: (state) => (
         (state.listLoading)

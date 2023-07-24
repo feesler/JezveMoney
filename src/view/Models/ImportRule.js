@@ -31,6 +31,7 @@ export class ImportRule extends ListItem {
     isAvailField(field) {
         const availFields = [
             'id',
+            'collapsed',
             'flags',
             'conditions',
             'actions',
