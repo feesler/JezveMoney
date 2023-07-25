@@ -21,7 +21,7 @@
 
 <nav class="main-navigation navigation-content">
     <div class="navigation-controls">
-        <button class="btn close-btn"><?= svgIcon("back", "btn__icon") ?></button>
+        <button class="btn close-btn circle-btn"><?= svgIcon("back", "btn__icon") ?></button>
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>admin/">
                 <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
@@ -48,7 +48,7 @@
             <?= svgIcon("user", "btn__icon") ?>
             <span class="btn__content"><?= e($this->user_name) ?></span>
         </div>
-        <button class="btn close-btn right-align" tabindex="3"><?= svgIcon("close", "btn__icon") ?></button>
+        <button class="btn close-btn circle-btn right-align" tabindex="3"><?= svgIcon("close", "btn__icon") ?></button>
     </div>
 
     <?php if ($this->user_id != 0) {        ?>

@@ -930,6 +930,12 @@ svg * {
   --popup-bg: var(--main-bg-color);
   --popup-footer-padding: 2rem 1rem 1rem 1rem;
   --popup-content-padding: 0 1rem 1rem 1rem;
+  --popup-close-btn: var(--list-item-icon-fill);
+  --popup-close-btn-bg: none;
+  --popup-close-btn-hover: var(--list-item-hover-icon-fill);
+  --popup-close-btn-hover-bg: var(--icon-btn-hover-bg);
+  --popup-close-btn-active: var(--list-item-hover-icon-fill);
+  --popup-close-btn-active-bg: var(--icon-btn-active-bg);
 }
 
 .popup__content {

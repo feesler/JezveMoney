@@ -42,11 +42,7 @@
   }
 
   .create-btn {
-    --btn-size: 24px;
-
-    .btn__icon {
-      padding: 0;
-    }
+    --btn-icon-color: var(--list-item-icon-fill);
   }
 }
 

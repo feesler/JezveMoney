@@ -113,35 +113,14 @@
 }
 
 /* Back buton  */
-.back-btn {
-  --back-btn-size: 32px;
+.btn.back-btn {
+  --btn-icon-color: var(--list-item-icon-fill);
 
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  width: var(--back-btn-size);
-  height: var(--back-btn-size);
-  padding: 0;
-  cursor: pointer;
-  background: none;
-  border: 0 none;
-  border-radius: 100vh;
-
-  .back-icon {
-    width: 24px;
-    height: 24px;
-    fill: var(--main-text-color);
-  }
+  margin-left: -6px;
 }
 
 @media (hover: hover) {
   .upload-form__file:hover .browse-btn {
     background-color: var(--accent-hover-color);
-  }
-
-  .back-btn:hover {
-    background: var(--icon-btn-hover-bg);
   }
 }

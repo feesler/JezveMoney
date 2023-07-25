@@ -94,7 +94,7 @@ export class ImportTemplateManager extends Component {
 
         this.createTplBtn = Button.create({
             id: 'createTplBtn',
-            className: 'create-btn',
+            className: 'create-btn circle-btn',
             icon: 'plus',
             onClick: () => this.onCreateTemplateClick(),
         });

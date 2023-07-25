@@ -38,7 +38,7 @@ import { App } from '../../../../../Application/App.js';
 const DIALOG_CLASS = 'rules-dialog';
 const POPUP_CLASS = 'rules-popup';
 const HEADER_CLASS = 'rules-header';
-const CREATE_BTN_CLASS = 'create-btn';
+const CREATE_BTN_CLASS = 'create-btn circle-btn';
 const DIALOG_CONTENT_CLASS = 'rules-content';
 const LIST_CONTAINER_CLASS = 'rules-list-container';
 const LIST_CLASS = 'rules-list';

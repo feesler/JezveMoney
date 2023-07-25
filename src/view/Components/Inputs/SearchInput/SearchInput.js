@@ -73,7 +73,7 @@ export class SearchInput extends Component {
         });
 
         const clearIcon = Icon.create({
-            icon: 'close',
+            icon: 'close-sm',
             className: BTN_ICON_CLASS,
         });
         this.clearBtn = createElement('button', {
