@@ -121,6 +121,12 @@
     color: var(--neutral-color);
   }
 
+  .field {
+    --field-title-color: #85858580;
+
+    color: #88888880;
+  }
+
   .collapsible-content {
     color: var(--text-color-6);
     background-color: var(--list-item-disabled-bg-color);
@@ -128,6 +134,7 @@
 
   .orig-data {
     --odt-header-color: var(--neutral-color);
+    --odt-column-header-color: var(--dimmed-text);
   }
 }
 
