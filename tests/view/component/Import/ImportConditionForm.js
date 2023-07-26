@@ -54,6 +54,81 @@ const fieldSelectors = [
 
 /** Import condition form */
 export class ImportConditionForm extends TestComponent {
+    static getExpectedState(model) {
+        const res = {
+            fieldTypeField: {
+                value: model.fieldType.toString(),
+                visible: true,
+                dropDown: {
+                    items: model.fieldsAvailable.map((id) => ({ id })),
+                },
+            },
+            operatorField: { value: model.operator.toString(), visible: true },
+            fieldValueCheck: {
+                checked: model.isFieldValue,
+                visible: ImportCondition.isPropertyValueAvailable(model.fieldType),
+            },
+            feedbackElem: { visible: model.feedbackVisible },
+            deleteBtn: { visible: true },
+        };
+
+        const state = ImportConditionForm.getStateName(model);
+
+        fieldValueTypes.forEach((fieldName) => {
+            const controlName = `${fieldName}Field`;
+            const visible = state === fieldName;
+
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
+            if (visible) {
+                res[controlName].value = model.value.toString();
+            }
+        });
+
+        return res;
+    }
+
+    static getExpectedPropertyValue(model) {
+        assert(
+            model.isFieldValue && ImportCondition.isPropertyValueAvailable(model.fieldType),
+            'Preperty value not available',
+        );
+
+        if (model.fieldType === IMPORT_COND_FIELD_TR_AMOUNT) {
+            return IMPORT_COND_FIELD_ACC_AMOUNT;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_ACC_AMOUNT) {
+            return IMPORT_COND_FIELD_TR_AMOUNT;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_TR_CURRENCY) {
+            return IMPORT_COND_FIELD_ACC_CURRENCY;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
+            return IMPORT_COND_FIELD_TR_CURRENCY;
+        }
+
+        throw new Error(`Invalid field type: ${model.fieldType}`);
+    }
+
+    static getStateName(model) {
+        if (model.isFieldValue) {
+            return 'property';
+        }
+
+        assert(model.fieldType in fieldValueMap, `Invalid field type: ${model.fieldType}`);
+
+        return fieldValueMap[model.fieldType];
+    }
+
+    static getStateValue(model) {
+        const name = this.getStateName(model);
+        assert(name in model, `Invalid property: '${name}'`);
+
+        return model[name];
+    }
+
     async parseContent() {
         const res = {
             fieldValueCheck: await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox')),
@@ -122,23 +197,6 @@ export class ImportConditionForm extends TestComponent {
         return res;
     }
 
-    static getStateName(model) {
-        if (model.isFieldValue) {
-            return 'property';
-        }
-
-        assert(model.fieldType in fieldValueMap, `Invalid field type: ${model.fieldType}`);
-
-        return fieldValueMap[model.fieldType];
-    }
-
-    static getStateValue(model) {
-        const name = this.getStateName(model);
-        assert(name in model, `Invalid property: '${name}'`);
-
-        return model[name];
-    }
-
     buildModel(cont) {
         const res = {
             fieldType: parseInt(cont.fieldTypeField.value, 10),
@@ -158,64 +216,6 @@ export class ImportConditionForm extends TestComponent {
         res.value = ImportConditionForm.getStateValue(res);
 
         return res;
-    }
-
-    static getExpectedState(model) {
-        const res = {
-            fieldTypeField: {
-                value: model.fieldType.toString(),
-                visible: true,
-                dropDown: {
-                    items: model.fieldsAvailable.map((id) => ({ id })),
-                },
-            },
-            operatorField: { value: model.operator.toString(), visible: true },
-            fieldValueCheck: {
-                checked: model.isFieldValue,
-                visible: ImportCondition.isPropertyValueAvailable(model.fieldType),
-            },
-            feedbackElem: { visible: model.feedbackVisible },
-            deleteBtn: { visible: true },
-        };
-
-        const state = ImportConditionForm.getStateName(model);
-
-        fieldValueTypes.forEach((fieldName) => {
-            const controlName = `${fieldName}Field`;
-            const visible = state === fieldName;
-
-            if (!res[controlName]) {
-                res[controlName] = {};
-            }
-            res[controlName].visible = visible;
-            if (visible) {
-                res[controlName].value = model.value.toString();
-            }
-        });
-
-        return res;
-    }
-
-    static getExpectedPropertyValue(model) {
-        assert(
-            model.isFieldValue && ImportCondition.isPropertyValueAvailable(model.fieldType),
-            'Preperty value not available',
-        );
-
-        if (model.fieldType === IMPORT_COND_FIELD_TR_AMOUNT) {
-            return IMPORT_COND_FIELD_ACC_AMOUNT;
-        }
-        if (model.fieldType === IMPORT_COND_FIELD_ACC_AMOUNT) {
-            return IMPORT_COND_FIELD_TR_AMOUNT;
-        }
-        if (model.fieldType === IMPORT_COND_FIELD_TR_CURRENCY) {
-            return IMPORT_COND_FIELD_ACC_CURRENCY;
-        }
-        if (model.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
-            return IMPORT_COND_FIELD_TR_CURRENCY;
-        }
-
-        throw new Error(`Invalid field type: ${model.fieldType}`);
     }
 
     async changeFieldType(value) {

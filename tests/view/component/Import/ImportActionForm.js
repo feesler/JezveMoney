@@ -50,6 +50,50 @@ const fieldSelectors = [
 
 /** Import action form */
 export class ImportActionForm extends TestComponent {
+    static getExpectedState(model) {
+        const res = {
+            actionField: {
+                visible: true,
+                value: model.actionType.toString(),
+                dropDown: {
+                    items: model.actionsAvailable.map((id) => ({ id })),
+                },
+            },
+            feedbackElem: { visible: model.feedbackVisible },
+            deleteBtn: { visible: true },
+        };
+
+        const state = ImportActionForm.getStateName(model);
+
+        actionValueTypes.forEach((fieldName) => {
+            const controlName = `${fieldName}Field`;
+            const visible = state === fieldName;
+
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
+            if (visible) {
+                res[controlName].value = model.value.toString();
+            }
+        });
+
+        return res;
+    }
+
+    static getStateName(model) {
+        assert(model.actionType in actionValueMap, `Invalid action type: ${model.actionType}`);
+
+        return actionValueMap[model.actionType];
+    }
+
+    static getStateValue(model) {
+        const actionValue = this.getStateName(model);
+        assert(actionValue in model, `Invalid action value: ${actionValue}`);
+
+        return model[actionValue];
+    }
+
     async parseContent() {
         assert(this.elem, 'Invalid import action form');
 
@@ -116,19 +160,6 @@ export class ImportActionForm extends TestComponent {
         return res;
     }
 
-    static getStateName(model) {
-        assert(model.actionType in actionValueMap, `Invalid action type: ${model.actionType}`);
-
-        return actionValueMap[model.actionType];
-    }
-
-    static getStateValue(model) {
-        const actionValue = this.getStateName(model);
-        assert(actionValue in model, `Invalid action value: ${actionValue}`);
-
-        return model[actionValue];
-    }
-
     buildModel(cont) {
         const res = {
             actionType: parseInt(cont.actionField.value, 10),
@@ -144,37 +175,6 @@ export class ImportActionForm extends TestComponent {
 
         res.state = ImportActionForm.getStateName(res);
         res.value = ImportActionForm.getStateValue(res);
-
-        return res;
-    }
-
-    static getExpectedState(model) {
-        const res = {
-            actionField: {
-                visible: true,
-                value: model.actionType.toString(),
-                dropDown: {
-                    items: model.actionsAvailable.map((id) => ({ id })),
-                },
-            },
-            feedbackElem: { visible: model.feedbackVisible },
-            deleteBtn: { visible: true },
-        };
-
-        const state = ImportActionForm.getStateName(model);
-
-        actionValueTypes.forEach((fieldName) => {
-            const controlName = `${fieldName}Field`;
-            const visible = state === fieldName;
-
-            if (!res[controlName]) {
-                res[controlName] = {};
-            }
-            res[controlName].visible = visible;
-            if (visible) {
-                res[controlName].value = model.value.toString();
-            }
-        });
 
         return res;
     }

@@ -29,12 +29,21 @@ import { __ } from '../../../model/locale.js';
 
 export class ImportRuleForm extends TestComponent {
     static getExpectedCondition(model) {
-        return {
+        const res = {
             field_id: parseInt(model.fieldType, 10),
             operator: parseInt(model.operator, 10),
             value: model.value.toString(),
             flags: (model.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
         };
+
+        if (ImportCondition.isDateField(res.field_id)) {
+            const seconds = App.dateStringToSeconds(res.value);
+            if (seconds) {
+                res.value = seconds.toString();
+            }
+        }
+
+        return res;
     }
 
     static getExpectedAction(model) {
@@ -82,6 +91,34 @@ export class ImportRuleForm extends TestComponent {
         );
 
         return res;
+    }
+
+    static ruleToModel(rule) {
+        const ruleConditions = rule.conditions.map((item) => {
+            const condition = {
+                fieldType: item.field_id,
+                operator: item.operator,
+                value: item.value,
+                isFieldValue: ImportCondition.isPropertyValueFlag(item.flags),
+            };
+
+            if (ImportCondition.isDateField(item.field_id)) {
+                condition.value = App.secondsToDateString(parseInt(condition.value, 10));
+            }
+
+            return condition;
+        });
+
+        const ruleActions = rule.actions.map((item) => ({
+            actionType: item.action_id,
+            value: item.value,
+        }));
+
+        return {
+            id: rule.id,
+            conditions: ruleConditions,
+            actions: ruleActions,
+        };
     }
 
     static setExpectedRule(model) {

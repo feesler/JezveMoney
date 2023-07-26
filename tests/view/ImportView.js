@@ -971,7 +971,9 @@ export class ImportView extends AppView {
         this.checkRulesListState();
 
         await this.performAction(() => this.rulesDialog.createRule());
-        return true;
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async updateRule(index) {

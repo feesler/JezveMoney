@@ -58,14 +58,17 @@ export class ImportActionItem extends TestComponent {
         return res;
     }
 
-    static render(item) {
-        assert.instanceOf(item, ImportAction, 'Invalid item');
+    static actionToModel(action) {
+        assert(action, 'Invallid import action object');
 
-        const model = {
-            actionType: item.action_id,
-            value: item.value,
+        return {
+            actionType: action.action_id,
+            value: action.value,
         };
+    }
 
+    static render(item) {
+        const model = this.actionToModel(item);
         return this.getExpectedState(model);
     }
 
