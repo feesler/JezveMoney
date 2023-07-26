@@ -67,6 +67,7 @@ export class ImportRulesStory extends TestStory {
         await this.duplicate();
         await this.del();
         await this.search();
+        await this.toggleExpand();
         await this.pagination();
         await this.createTemplateRule(0);
         await this.locales();
@@ -500,6 +501,16 @@ export class ImportRulesStory extends TestStory {
         await Actions.inputRulesSearch('MOBILE');
         await Actions.inputRulesSearch('Taxi');
         await Actions.clearRulesSearch();
+    }
+
+    // Toggle expand/collapse import rule items
+    async toggleExpand() {
+        setBlock('Toggle expand/collapse import rule items', 1);
+
+        await Actions.toggleExpandRule(0);
+        await Actions.toggleExpandRule(1);
+        await Actions.toggleExpandRule(1);
+        await Actions.toggleExpandRule(0);
     }
 
     // Import rules paginator tests

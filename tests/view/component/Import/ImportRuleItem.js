@@ -40,7 +40,7 @@ export class ImportRuleItem extends TestComponent {
 
             return {
                 ruleId: el.dataset.id,
-                collapsed: el.classList.contains('collapsible__expanded'),
+                collapsed: !el.classList.contains('collapsible__expanded'),
                 propertyElem: textElemState(propertyEl),
                 operatorElem: textElemState(operatorEl),
                 valueElem: textElemState(valueEl),
@@ -127,6 +127,7 @@ export class ImportRuleItem extends TestComponent {
 
         const res = {
             ruleId: item.id.toString(),
+            collapsed: item?.collapsed ?? true,
             propertyElem: { visible: true },
             operatorElem: { visible: true },
             valueElem: { visible: true },

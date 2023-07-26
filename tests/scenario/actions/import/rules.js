@@ -102,6 +102,14 @@ export const iterateRulesList = async () => {
     });
 };
 
+/** Click by 'toggle' button of specified import rule */
+export const toggleExpandRule = async (index) => {
+    await test(`Toggle expand rule [${index}]`, async () => {
+        await checkRulesDialog();
+        return App.view.toggleExpandRule(index);
+    });
+};
+
 /** Click by create import rule button */
 export const createRule = async () => {
     await test('Create rule', async () => {

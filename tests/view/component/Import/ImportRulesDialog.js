@@ -158,7 +158,14 @@ export class ImportRulesDialog extends TestComponent {
             const pageItems = filteredRules.slice(firstItem, lastItem);
             const hasItems = pageItems.length > 0;
 
-            res.items = pageItems.map((rule) => ImportRuleItem.render(rule));
+            res.items = pageItems.map((rule) => {
+                const strId = rule.id.toString();
+                const modelRule = model.rules.find((item) => item.id.toString() === strId);
+                return ImportRuleItem.render({
+                    ...rule,
+                    collapsed: modelRule?.collapsed ?? true,
+                });
+            });
 
             if (pagesCount > 1) {
                 res.paginator = {
@@ -354,6 +361,22 @@ export class ImportRulesDialog extends TestComponent {
         });
 
         return this.checkState();
+    }
+
+    async toggleExpandRule(index) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.items, ind);
+
+        assert(this.isListState(), 'Invalid state');
+
+        this.model.contextMenuVisible = false;
+        const rule = this.model.rules[ind];
+        rule.collapsed = !rule.collapsed;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.items[ind].toggleExpand());
+
+        return this.checkState(expected);
     }
 
     async openContextMenu(index) {
