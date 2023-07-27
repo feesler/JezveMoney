@@ -18,7 +18,6 @@ LOGS_PATH - path to the logs directory
 define("APP_PROTOCOL", "https://");
 
 define("PROD_HOST", "jezvemoney.ru");
-define("DEV_HOST", "jezve.net");
 define("LOCAL_DEV_HOST", "testsrv");
 
 define("DEFAULT_LOCALE", "en");
@@ -51,7 +50,7 @@ function domainFromHost(string $host)
  */
 function verifyHost()
 {
-    $avHosts = [PROD_HOST, DEV_HOST, LOCAL_DEV_HOST];
+    $avHosts = [PROD_HOST, LOCAL_DEV_HOST];
 
     if (!isset($_SERVER["HTTP_HOST"]) || !in_array($_SERVER["HTTP_HOST"], $avHosts)) {
         header("HTTP/1.1 400 Bad Request", true, 400);
@@ -116,11 +115,6 @@ function defineHostConstants()
         define("APP_ROOT", $approot);
         define("APP_PATH", "/");
         define("PRODUCTION", true);
-        define("LOCAL_DEV", false);
-    } elseif (strcmp(APP_HOST, DEV_HOST) == 0) {
-        define("APP_ROOT", $approot . "money/");
-        define("APP_PATH", "/money/");
-        define("PRODUCTION", false);
         define("LOCAL_DEV", false);
     } elseif (strcmp(APP_HOST, LOCAL_DEV_HOST) == 0) {
         define("APP_ROOT", $approot);
