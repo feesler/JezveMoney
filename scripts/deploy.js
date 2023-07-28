@@ -26,7 +26,7 @@ const skipList = [
     'vendor',
 ];
 
-const createDirs = ['system/logs', 'system/uploads'];
+const createDirs = ['system/logs', 'system/uploads', 'admin/view/tests'];
 
 const option = (process.argv.length > 2) ? process.argv[2] : null;
 const isFullDeploy = option?.toLowerCase() === 'full';
