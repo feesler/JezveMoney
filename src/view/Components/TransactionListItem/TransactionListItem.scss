@@ -1,3 +1,12 @@
+:root {
+  /* Transaction colors */
+  --trans-item-expense-amount: #fa6767;
+  --trans-item-income-amount: #409c0b;
+  --trans-item-transfer-amount: #0d67a3;
+  --trans-item-debt-amount: #c1ce0f;
+  --trans-item-credit-limit-amount: #9370db;
+}
+
 /* Transaction list item */
 .trans-item {
   --trans-item-amount-color: var(--accent-color-alt);
@@ -10,4 +19,35 @@
   /* List item */
   --list-item-selected-color: var(--trans-item-selected-color);
   --list-item-row-gap: var(--trans-item-row-gap);
+}
+
+.trans-item[data-type="1"] {
+  --transaction-color: var(--trans-item-expense-amount);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type="2"] {
+  --transaction-color: var(--trans-item-income-amount);
+  --trans-item-amount-color: var(--trans-item-income-amount);
+}
+
+.trans-item[data-type="3"] {
+  --transaction-color: var(--trans-item-transfer-amount);
+  --trans-item-amount-color: var(--trans-item-transfer-amount);
+}
+
+.trans-item[data-type="4"] {
+  --transaction-color: var(--trans-item-debt-amount);
+  --trans-item-amount-color: var(--trans-item-debt-amount);
+}
+
+.trans-item[data-type="5"] {
+  --transaction-color: var(--trans-item-credit-limit-amount);
+  --trans-item-amount-color: var(--trans-item-credit-limit-amount);
+}
+
+.trans-item[data-type] .list-item__content {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--transaction-color);
 }
