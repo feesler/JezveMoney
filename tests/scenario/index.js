@@ -69,7 +69,7 @@ const storiesMap = {
 };
 
 export class Scenario {
-    static async create() {
+    static create() {
         return new this();
     }
 

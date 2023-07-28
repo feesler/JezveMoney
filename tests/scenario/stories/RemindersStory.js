@@ -82,9 +82,7 @@ export class RemindersStory extends TestStory {
         await Actions.cancelFromContextMenu(0);
 
         await Actions.updateFromContextMenu(0);
-        await trActions.runActions([
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
-        ]);
+        await trActions.inputDate(App.formatInputDate(App.dates.yesterday));
         await trActions.submit();
     }
 
@@ -128,9 +126,7 @@ export class RemindersStory extends TestStory {
         setBlock('Edit reminder transaction and submit', 1);
 
         await Actions.updateFromContextMenu(0);
-        await trActions.runActions([
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
-        ]);
+        await trActions.inputDate(App.formatInputDate(App.dates.yesterday));
         await trActions.submit();
     }
 

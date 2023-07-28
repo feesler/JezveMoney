@@ -15,9 +15,7 @@ export const stateLoop = async () => {
     const index = sortedAccounts.getIndexById(CREDIT_CARD);
 
     await Actions.createFromAccount(index);
-    await Actions.runActions([
-        { action: 'changeTransactionType', data: LIMIT_CHANGE },
-    ]);
+    await Actions.changeTransactionType(LIMIT_CHANGE);
 
     // State 1
     await test('Initial state of new credit limit view', () => {
@@ -27,34 +25,31 @@ export const stateLoop = async () => {
     });
 
     // Input destination amount
-    await Actions.runGroup('inputDestAmount', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(Actions.inputDestAmount, Actions.decimalInputTestStrings);
 
-    await Actions.runActions([
-        // Transition 2: Click on destination result balance block and move from State 1 to State 0
-        { action: 'clickDestResultBalance' },
-    ]);
+    // Transition 2: Click on destination result balance block and move from State 1 to State 0
+    await Actions.clickDestResultBalance();
 
     // Input result balance
-    await Actions.runGroup('inputDestResBalance', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(
+        Actions.inputDestResBalance,
+        Actions.decimalInputTestStrings,
+    );
 
-    await Actions.runActions([
-        // Transition 1: Click on destination amount block and move from State 0 to State 1
-        { action: 'clickDestAmount' },
-        // Test input values for precise currency
-        { action: 'changeDestAccount', data: BTC_CREDIT },
-        { action: 'inputDestAmount', data: '0.12345678' },
-        { action: 'clickDestResultBalance' },
-        { action: 'inputDestResBalance', data: '555.12345678' },
-        // Transition 4: Click on destination amount block and move from State 1 to State 0
-        { action: 'clickDestAmount' },
-        // Test input values for precise currency
-        { action: 'changeDestAccount', data: CREDIT_CARD },
-        { action: 'inputDestAmount', data: '100' },
-    ]);
+    // Transition 1: Click on destination amount block and move from State 0 to State 1
+    await Actions.clickDestAmount();
+    // Test input values for precise currency
+    await Actions.changeDestAccount(BTC_CREDIT);
+    await Actions.inputDestAmount('0.12345678');
+    await Actions.clickDestResultBalance();
+    await Actions.inputDestResBalance('555.12345678');
+    // Transition 4: Click on destination amount block and move from State 1 to State 0
+    await Actions.clickDestAmount();
+    // Test input values for precise currency
+    await Actions.changeDestAccount(CREDIT_CARD);
+    await Actions.inputDestAmount('100');
 
     // Test handling invalid date string on show date picker
-    await Actions.runActions([
-        { action: 'inputDate', data: '' },
-        { action: 'selectDate', data: App.dates.now },
-    ]);
+    await Actions.inputDate('');
+    await Actions.selectDate(App.dates.now);
 };

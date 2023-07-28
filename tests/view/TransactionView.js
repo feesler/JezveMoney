@@ -15,13 +15,18 @@ import {
     LIMIT_CHANGE,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
-import { TransactionForm } from './component/Transaction/TransactionForm.js';
+import { TRANSACTION_FORM, TransactionForm } from './component/Transaction/TransactionForm.js';
 
 /** Create or update transaction view class */
 export class TransactionView extends AppView {
+    static formType = TRANSACTION_FORM;
+
     static getInitialState(options, state = App.state) {
         const res = {
-            form: TransactionForm.getInitialState(options, state),
+            form: TransactionForm.getInitialState(
+                { ...options, formType: this.formType },
+                state,
+            ),
         };
 
         if (options?.action === 'update') {
@@ -60,13 +65,12 @@ export class TransactionView extends AppView {
         }
 
         res.heading = { elem: await query('.heading > h1') };
-        if (res.heading.elem) {
-            res.heading.title = await prop(res.heading.elem, 'textContent');
-        }
+        assert(res.heading.elem, 'Heading element not found');
+        res.heading.title = await prop(res.heading.elem, 'textContent');
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
-        res.form = await TransactionForm.create(this, await query('#form'));
+        res.form = await TransactionForm.create(this, await query('#form'), this.constructor.formType);
         if (!this.loaded) {
             await res.form.waitForLoad();
             this.loaded = true;
@@ -122,13 +126,18 @@ export class TransactionView extends AppView {
     }
 
     getExpectedTransaction() {
-        const res = {};
-
-        if (this.model.isUpdate) {
-            res.id = this.model.id;
-        }
         const { form } = this.model;
         const { repeatEnabled } = form;
+
+        const res = {
+            type: form.type,
+            src_amount: this.getExpectedSourceAmount(form),
+            dest_amount: this.getExpectedDestAmount(form),
+            src_curr: form.src_curr_id,
+            dest_curr: form.dest_curr_id,
+            category_id: form.categoryId,
+            comment: form.comment,
+        };
 
         if (repeatEnabled && !this.model.reminderId && !this.model.scheduleId) {
             res.start_date = App.dateStringToSeconds(form.startDate);
@@ -139,7 +148,10 @@ export class TransactionView extends AppView {
                 .map((item) => parseInt(item, 10));
         }
 
-        res.type = form.type;
+        if (form.isUpdate) {
+            res.id = form.id;
+        }
+
         if (res.type === DEBT) {
             res.person_id = form.person.id;
             res.acc_id = form.noAccount ? 0 : form.account.id;
@@ -153,16 +165,10 @@ export class TransactionView extends AppView {
             res.dest_id = (form.destAccount) ? form.destAccount.id : 0;
         }
 
-        res.src_amount = this.getExpectedSourceAmount(form);
-        res.dest_amount = this.getExpectedDestAmount(form);
-        res.src_curr = form.src_curr_id;
-        res.dest_curr = form.dest_curr_id;
         res.date = dateStringToSeconds(form.date, {
             locales: this.appState().getDateFormatLocale(),
             options: App.dateFormatOptions,
         });
-        res.category_id = form.categoryId;
-        res.comment = form.comment;
 
         if (this.model.reminderId) {
             res.reminder_id = parseInt(this.model.reminderId, 10);
@@ -227,8 +233,8 @@ export class TransactionView extends AppView {
         return this.form.selectEndDate(val);
     }
 
-    async clearEndDate(val) {
-        return this.form.clearEndDate(val);
+    async clearEndDate() {
+        return this.form.clearEndDate();
     }
 
     async toggleEnableRepeat() {
