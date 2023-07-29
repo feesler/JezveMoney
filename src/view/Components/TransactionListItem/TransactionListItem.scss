@@ -1,12 +1,3 @@
-:root {
-  /* Transaction colors */
-  --trans-item-expense-amount: #fa6767;
-  --trans-item-income-amount: #409c0b;
-  --trans-item-transfer-amount: #0d67a3;
-  --trans-item-debt-amount: #c1ce0f;
-  --trans-item-credit-limit-amount: #9370db;
-}
-
 /* Transaction list item */
 .trans-item {
   --trans-item-amount-color: var(--accent-color-alt);
@@ -22,28 +13,28 @@
 }
 
 .trans-item[data-type="1"] {
-  --transaction-color: var(--trans-item-expense-amount);
+  --transaction-color: var(--transaction-expense);
   --trans-item-amount-color: var(--transaction-color);
 }
 
 .trans-item[data-type="2"] {
-  --transaction-color: var(--trans-item-income-amount);
-  --trans-item-amount-color: var(--trans-item-income-amount);
+  --transaction-color: var(--transaction-income);
+  --trans-item-amount-color: var(--transaction-color);
 }
 
 .trans-item[data-type="3"] {
-  --transaction-color: var(--trans-item-transfer-amount);
-  --trans-item-amount-color: var(--trans-item-transfer-amount);
+  --transaction-color: var(--transaction-transfer);
+  --trans-item-amount-color: var(--transaction-color);
 }
 
 .trans-item[data-type="4"] {
-  --transaction-color: var(--trans-item-debt-amount);
-  --trans-item-amount-color: var(--trans-item-debt-amount);
+  --transaction-color: var(--transaction-debt);
+  --trans-item-amount-color: var(--transaction-color);
 }
 
 .trans-item[data-type="5"] {
-  --transaction-color: var(--trans-item-credit-limit-amount);
-  --trans-item-amount-color: var(--trans-item-credit-limit-amount);
+  --transaction-color: var(--transaction-credit-limit);
+  --trans-item-amount-color: var(--transaction-color);
 }
 
 .trans-item[data-type] .list-item__content {

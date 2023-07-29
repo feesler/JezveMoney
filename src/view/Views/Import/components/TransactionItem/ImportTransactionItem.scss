@@ -1,4 +1,4 @@
-/* Transaction item */
+/* Import transaction list item */
 .import-item {
   --ii-font-size: 0.9rem;
   --ii-min-column-width: 150px;
@@ -113,7 +113,33 @@
   }
 }
 
-/* Import item */
+.import-item[data-type="1"] {
+  --transaction-color: var(--transaction-expense);
+}
+
+.import-item[data-type="2"] {
+  --transaction-color: var(--transaction-income);
+}
+
+.import-item[data-type="3"] {
+  --transaction-color: var(--transaction-transfer);
+}
+
+.import-item[data-type="4"] {
+  --transaction-color: var(--transaction-debt);
+}
+
+.import-item[data-type="5"] {
+  --transaction-color: var(--transaction-credit-limit);
+}
+
+.import-item[data-type] .list-item__content {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--transaction-color);
+}
+
+/* Disabled state */
 .import-item[disabled] {
   .list-item__content,
   .list-item__controls {

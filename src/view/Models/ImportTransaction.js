@@ -120,6 +120,14 @@ export class ImportTransaction {
         return new ImportTransaction(item);
     }
 
+    static getTargetType(type) {
+        if (!(type in transTypeMap)) {
+            throw new Error('Invalid transaction type');
+        }
+
+        return transTypeMap[type];
+    }
+
     constructor(props) {
         const data = (props instanceof ImportTransaction)
             ? structuredClone(props)
@@ -466,7 +474,7 @@ export class ImportTransaction {
         const { categories } = App.model;
         if (state.categoryId !== 0) {
             const category = categories.getItem(state.categoryId);
-            const realType = transTypeMap[state.type];
+            const realType = ImportTransaction.getTargetType(state.type);
             if (category.type !== 0 && category.type !== realType) {
                 state.categoryId = 0;
             }
@@ -739,15 +747,11 @@ export class ImportTransaction {
     getData() {
         const { accounts, persons } = App.model;
 
-        if (!(this.type in transTypeMap)) {
-            throw new Error('Invalid transaction type');
-        }
-
         const srcAmountVal = parseFloat(fixFloat(this.sourceAmount));
         const destAmountVal = parseFloat(fixFloat(this.destAmount));
         const isDiff = this.isDiff();
         const res = {
-            type: transTypeMap[this.type],
+            type: ImportTransaction.getTargetType(this.type),
             src_curr: this.srcCurrId,
             dest_curr: this.destCurrId,
             date: dateStringToTime(this.date),

@@ -45,6 +45,13 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --popup-menu-backdrop-filter: blur(2px);
   --popupmenu-z-index: 9999;
 
+  /* Transaction colors */
+  --transaction-expense: #fa6767;
+  --transaction-income: #409c0b;
+  --transaction-transfer: #0d67a3;
+  --transaction-debt: #c1ce0f;
+  --transaction-credit-limit: #9370db;
+
   /* Chart colors */
   @for $i from 1 through length($colors) {
     --charts-color-#{$i}: #{list.nth($colors, $i)};
