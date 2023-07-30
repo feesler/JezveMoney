@@ -38,6 +38,7 @@ export class FiltersContainer extends Component {
 
         this.closeBtn = CloseButton.create({
             id: 'closeFiltersBtn',
+            small: false,
             className: 'circle-btn',
             onClick: () => this.closeOffcanvas(),
         });

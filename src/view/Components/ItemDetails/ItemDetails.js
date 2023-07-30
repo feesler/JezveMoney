@@ -44,6 +44,7 @@ export class ItemDetails extends Component {
     /** Component initialization */
     init() {
         this.closeBtn = CloseButton.create({
+            small: false,
             onClick: () => this.onClose(),
         });
 
