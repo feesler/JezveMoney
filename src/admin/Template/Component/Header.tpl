@@ -6,8 +6,8 @@
     <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
     <div class="header__container">
-        <div class="header__content">
-            <button id="userbtn" class="btn user-btn right-align" type="button">
+        <div class="header__content main-header-content">
+            <button id="userbtn" class="btn header-btn user-btn" type="button">
                 <?= svgIcon("user", "btn__icon") ?>
                 <span class="btn__content"><?= e($this->user_name) ?></span>
             </button>
@@ -44,7 +44,7 @@
 
 <div class="user-navigation-content" hidden>
     <div class="user-navigation-controls">
-        <div class="btn user-btn">
+        <div class="btn header-btn user-btn">
             <?= svgIcon("user", "btn__icon") ?>
             <span class="btn__content"><?= e($this->user_name) ?></span>
         </div>

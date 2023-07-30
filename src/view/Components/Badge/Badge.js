@@ -35,6 +35,10 @@ export class Badge extends Component {
         this.setUserProps();
     }
 
+    setTitle(title) {
+        this.setState({ ...this.state, title });
+    }
+
     render(state) {
         this.elem.textContent = state?.title ?? '';
     }

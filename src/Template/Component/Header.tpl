@@ -6,8 +6,8 @@
     <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
     <div class="header__container">
-        <div class="header__content">
-            <button id="userbtn" class="btn user-btn right-align" type="button" tabindex="2">
+        <div class="header__content main-header-content">
+            <button id="userbtn" class="btn header-btn user-btn" type="button" tabindex="2">
                 <?php if ($this->user_id != 0) {        ?>
                     <?= svgIcon("user", "btn__icon") ?>
                     <span class="btn__content"><?= e($this->user_name) ?></span>
@@ -38,7 +38,7 @@
 <nav class="user-navigation-content" hidden>
     <div class="user-navigation-controls">
         <?php if ($this->user_id != 0) {        ?>
-            <div class="btn user-btn">
+            <div class="btn header-btn user-btn">
                 <?= svgIcon("user", "btn__icon") ?>
                 <span class="btn__content"><?= e($this->user_name) ?></span>
             </div>
