@@ -69,42 +69,11 @@ export const cancel = async (index) => {
     });
 };
 
-export const toggleSelect = async (transactions) => {
-    const itemIds = asArray(transactions);
-
-    await test(`Toggle select items [${itemIds.join()}]`, async () => {
+export const toggleSelect = async (index) => {
+    const indexes = asArray(index);
+    await test(`Toggle select items [${indexes.join()}]`, async () => {
         await checkNavigation();
-
-        const origItems = App.view.getItems();
-        // Check correctness of arguments
-        const indexes = [];
-        for (const pos of itemIds) {
-            const ind = parseInt(pos, 10);
-            assert.arrayIndex(origItems, ind);
-
-            indexes.push(ind);
-        }
-
-        let expectedItems = origItems.map((item, ind) => {
-            const res = structuredClone(item);
-            if (indexes.includes(ind)) {
-                res.selected = !res.selected;
-            }
-
-            return res;
-        });
-
-        await App.view.selectItems(indexes);
-        let items = App.view.getItems();
-        assert.deepMeet(items, expectedItems);
-
-        // Click by items again to inverse selection
-        expectedItems = origItems;
-        await App.view.selectItems(indexes);
-        items = App.view.getItems();
-        assert.deepMeet(items, expectedItems);
-
-        return true;
+        return App.view.selectItems(index);
     });
 };
 

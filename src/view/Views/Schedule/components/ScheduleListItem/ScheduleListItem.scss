@@ -1,8 +1,5 @@
 .schedule-item {
-  --schedule-item-amount-color: var(--accent-color-alt);
-  --schedule-item-selected-color: var(--accent-color);
   --schedule-item-column-gap: 16px;
-  --schedule-item-row-gap: 2px;
   --schedule-item-details-row-gap: 8px;
   --schedule-item-min-column-width: 130px;
 
@@ -13,10 +10,38 @@
   position: relative;
 }
 
+.schedule-item[data-type="1"] {
+  --transaction-color: var(--transaction-expense);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.schedule-item[data-type="2"] {
+  --transaction-color: var(--transaction-income);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.schedule-item[data-type="3"] {
+  --transaction-color: var(--transaction-transfer);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.schedule-item[data-type="4"] {
+  --transaction-color: var(--transaction-debt);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.schedule-item[data-type="5"] {
+  --transaction-color: var(--transaction-credit-limit);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
 .schedule-item .list-item__content {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--transaction-color);
 }
 
 .schedule-item__schedule {

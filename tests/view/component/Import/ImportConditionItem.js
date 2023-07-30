@@ -61,16 +61,19 @@ export class ImportConditionItem extends TestComponent {
         return res;
     }
 
-    static render(item) {
-        assert.instanceOf(item, ImportCondition, 'Invalid item');
+    static conditionToModel(condition) {
+        assert(condition, 'Invallid import condition object');
 
-        const model = {
-            isFieldValue: item.isPropertyValue(),
-            fieldType: item.field_id,
-            operator: item.operator,
-            value: item.value,
+        return {
+            fieldType: condition.field_id,
+            operator: condition.operator,
+            value: condition.value,
+            isFieldValue: ImportCondition.isPropertyValueFlag(condition.flags),
         };
+    }
 
+    static render(item) {
+        const model = this.conditionToModel(item);
         return this.getExpectedState(model);
     }
 

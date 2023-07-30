@@ -3,6 +3,8 @@ import {
     assert,
     formatDate,
     isValidDateString,
+    goTo,
+    baseUrl,
 } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
@@ -71,8 +73,7 @@ class Application extends TestApplication {
 
     async init() {
         this.state = new AppState();
-
-        this.scenario = await Scenario.create(this.environment);
+        this.scenario = Scenario.create();
 
         this.dateFormatOptions = {
             dateStyle: 'short',
@@ -200,7 +201,7 @@ class Application extends TestApplication {
         if (this.view) {
             await this.view.goToMainView();
         } else {
-            await this.environment.goTo(this.environment.baseUrl());
+            await goTo(baseUrl());
         }
     }
 }

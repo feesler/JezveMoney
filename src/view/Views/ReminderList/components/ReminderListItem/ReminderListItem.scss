@@ -1,7 +1,41 @@
 .reminder-item {
-  --list-item-amount-color: var(--accent-color-alt);
+  --trans-item-column-gap: 16px;
+  --trans-item-row-gap: 2px;
+  --trans-item-details-row-gap: 8px;
+  --trans-item-min-column-width: 130px;
   --list-item-selected-color: var(--accent-color);
   --list-item-column-gap: 16px;
   --list-item-row-gap: 2px;
   --list-item-details-row-gap: 8px;
+}
+
+.reminder-item[data-type="1"] {
+  --transaction-color: var(--transaction-expense);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.reminder-item[data-type="2"] {
+  --transaction-color: var(--transaction-income);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.reminder-item[data-type="3"] {
+  --transaction-color: var(--transaction-transfer);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.reminder-item[data-type="4"] {
+  --transaction-color: var(--transaction-debt);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.reminder-item[data-type="5"] {
+  --transaction-color: var(--transaction-credit-limit);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.reminder-item .list-item__content {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--transaction-color);
 }

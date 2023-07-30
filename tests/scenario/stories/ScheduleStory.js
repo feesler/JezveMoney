@@ -61,18 +61,18 @@ export class ScheduleStory extends TestStory {
         setBlock('Scheduled transaction form validation', 1);
 
         await Actions.createAndSubmit('Invalid interval step', [
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputIntervalStep', data: '' },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputIntervalStep, data: '' },
         ]);
 
         await Actions.createAndSubmit('Invalid interval step', [
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputIntervalStep', data: '0' },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputIntervalStep, data: '0' },
         ]);
 
         await Actions.createAndSubmit('Invalid start date', [
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputStartDate', data: '' },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
     }
 
@@ -84,86 +84,86 @@ export class ScheduleStory extends TestStory {
         } = App.scenario;
 
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '1000' },
-            { action: 'inputComment', data: 'some fee' },
-            { action: 'inputStartDate', data: App.datesFmt.weekAgo },
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.inputComment, data: 'some fee' },
+            { action: Actions.inputStartDate, data: App.datesFmt.weekAgo },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '100' },
-            { action: 'inputComment', data: 'Daily expense' },
-            { action: 'changeIntervalType', data: INTERVAL_DAY },
-            { action: 'selectStartDate', data: App.dates.weekAfter },
+            { action: Actions.inputDestAmount, data: '100' },
+            { action: Actions.inputComment, data: 'Daily expense' },
+            { action: Actions.changeIntervalType, data: INTERVAL_DAY },
+            { action: Actions.selectStartDate, data: App.dates.weekAfter },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '100000' },
-            { action: 'inputComment', data: 'One time expense' },
-            { action: 'toggleEnableRepeat' },
+            { action: Actions.inputDestAmount, data: '100000' },
+            { action: Actions.inputComment, data: 'One time expense' },
+            { action: Actions.toggleEnableRepeat },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '500' },
-            { action: 'inputComment', data: 'Percents' },
-            { action: 'selectMonthDayOffset', data: 31 },
-            { action: 'inputEndDate', data: App.datesFmt.yearAfter },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '500' },
+            { action: Actions.inputComment, data: 'Percents' },
+            { action: Actions.selectMonthDayOffset, data: 31 },
+            { action: Actions.inputEndDate, data: App.datesFmt.yearAfter },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '75000' },
-            { action: 'inputComment', data: 'Annual percents' },
-            { action: 'changeIntervalType', data: INTERVAL_YEAR },
-            { action: 'selectMonthDayOffset', data: 31 },
-            { action: 'selectMonthOffset', data: 11 },
-            { action: 'toggleEnableRepeat' },
-            { action: 'toggleEnableRepeat' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '75000' },
+            { action: Actions.inputComment, data: 'Annual percents' },
+            { action: Actions.changeIntervalType, data: INTERVAL_YEAR },
+            { action: Actions.selectMonthDayOffset, data: 31 },
+            { action: Actions.selectMonthOffset, data: 11 },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.toggleEnableRepeat },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '5000' },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekDayOffset', data: 4 },
-            { action: 'selectEndDate', data: App.dates.yearAfter },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '5000' },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekDayOffset, data: 4 },
+            { action: Actions.selectEndDate, data: App.dates.yearAfter },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'inputDestAmount', data: '1000' },
-            { action: 'inputIntervalStep', data: '6' },
-            { action: 'selectMonthDayOffset', data: 1 },
-            { action: 'selectEndDate', data: App.dates.tomorrow },
-            { action: 'clearEndDate' },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.inputIntervalStep, data: '6' },
+            { action: Actions.selectMonthDayOffset, data: 1 },
+            { action: Actions.selectEndDate, data: App.dates.tomorrow },
+            { action: Actions.clearEndDate },
         ]);
 
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '7' },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekdaysOffset' },
+            { action: Actions.inputDestAmount, data: '7' },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekdaysOffset },
         ]);
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '8' },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekDayOffset', data: [] },
+            { action: Actions.inputDestAmount, data: '8' },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekDayOffset, data: [] },
         ]);
         await Actions.createAndSubmit([
-            { action: 'changeSrcAccount', data: CREDIT_CARD },
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'inputDestAmount', data: '9' },
-            { action: 'toggleEnableRepeat' },
+            { action: Actions.changeSrcAccount, data: CREDIT_CARD },
+            { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
+            { action: Actions.inputDestAmount, data: '9' },
+            { action: Actions.toggleEnableRepeat },
         ]);
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '10' },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekendOffset' },
+            { action: Actions.inputDestAmount, data: '10' },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekendOffset },
         ]);
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '11' },
+            { action: Actions.inputDestAmount, data: '11' },
         ]);
         await Actions.createAndSubmit([
-            { action: 'inputDestAmount', data: '12' },
+            { action: Actions.inputDestAmount, data: '12' },
         ]);
     }
 
@@ -171,18 +171,18 @@ export class ScheduleStory extends TestStory {
         setBlock('Update scheduled transaction', 1);
 
         await Actions.updateAndSubmit(0, [
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekDayOffset', data: 2 },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekDayOffset, data: 2 },
         ]);
 
         await Actions.updateAndSubmit(7, [
-            { action: 'selectWeekDayOffset', data: [2, 4, 6] },
+            { action: Actions.selectWeekDayOffset, data: [2, 4, 6] },
         ]);
 
         setBlock('Update scheduled Credit limit change transaction', 2);
         await Actions.updateAndSubmit(9, [
-            { action: 'inputDestAmount', data: '900' },
-            { action: 'toggleEnableRepeat' },
+            { action: Actions.inputDestAmount, data: '900' },
+            { action: Actions.toggleEnableRepeat },
         ]);
     }
 
@@ -190,7 +190,7 @@ export class ScheduleStory extends TestStory {
         setBlock('Duplicate scheduled transaction', 1);
 
         await Actions.duplicateAndSubmit(0, [
-            { action: 'selectWeekDayOffset', data: 4 },
+            { action: Actions.selectWeekDayOffset, data: 4 },
         ]);
     }
 

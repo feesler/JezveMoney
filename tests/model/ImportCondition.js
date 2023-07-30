@@ -396,6 +396,12 @@ export class ImportCondition {
         return !Number.isNaN(amount);
     }
 
+    /** Validate condition amount value */
+    isValidDate(value) {
+        const timestamp = parseInt(value, 10);
+        return timestamp > 0 && timestamp.toString() === value.toString();
+    }
+
     /** Returns true if possible to compare current field type with another field */
     isPropertyValueAvailable() {
         return ImportCondition.isPropertyValueAvailable(this.field_id);
@@ -418,7 +424,7 @@ export class ImportCondition {
 
         // Check date condition
         if (this.isDateField()) {
-            res.date = App.isValidDateString(this.value);
+            res.date = this.isValidDate(this.value);
         }
 
         // Check empty condition value is used only for string field

@@ -7,11 +7,6 @@ const isBrowser = typeof window !== 'undefined';
 
 const run = async () => {
     if (isBrowser) {
-        const { origin } = window.location;
-        if (origin.includes('jezve.net')) {
-            envOptions.appPath = '/money/';
-        }
-
         envOptions.container = document.getElementById('testscontainer');
     }
 

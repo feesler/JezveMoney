@@ -9,7 +9,6 @@ import {
     isValidValue,
     availSortTypes,
     normalize,
-    dateStringToSeconds,
     timeToSeconds,
     dateToSeconds,
     cutDate,
@@ -40,7 +39,6 @@ import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 import { CategoryList } from './CategoryList.js';
 import { UserCurrencyList } from './UserCurrencyList.js';
-import { ImportCondition } from './ImportCondition.js';
 import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { RemindersList } from './RemindersList.js';
@@ -2887,34 +2885,21 @@ export class AppState {
         }
     }
 
+    mapValueToString(items) {
+        assert.isArray(items);
+
+        return items.map((item) => ({
+            ...item,
+            value: item.value?.toString(),
+        }));
+    }
+
     prepareConditions(conditions) {
-        assert.isArray(conditions, 'Invalid conditions parameter');
-
-        return conditions.map((item) => {
-            const condition = {
-                ...item,
-                value: item.value?.toString(),
-            };
-
-            if (ImportCondition.isDateField(item.field_id)) {
-                const time = dateStringToSeconds(item.value, {
-                    locales: this.getDateFormatLocale(),
-                    options: App.dateFormatOptions,
-                });
-                condition.value = time?.toString() ?? null;
-            }
-
-            return condition;
-        });
+        return this.mapValueToString(conditions);
     }
 
     prepareActions(actions) {
-        assert.isArray(actions, 'Invalid actions parameter');
-
-        return actions.map((action) => ({
-            ...action,
-            value: action.value?.toString(),
-        }));
+        return this.mapValueToString(actions);
     }
 
     createRule(params) {

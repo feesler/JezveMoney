@@ -22,129 +22,118 @@ export const stateLoop = async () => {
 
     // Navigate to create income view
     await Actions.createFromAccount(0);
-    await Actions.runActions([
-        { action: 'changeTransactionType', data: INCOME },
-    ]);
+    await Actions.changeTransactionType(INCOME);
 
     // Input source amount
-    await Actions.runGroup('inputSrcAmount', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(Actions.inputSrcAmount, Actions.decimalInputTestStrings);
 
-    await Actions.runActions([
-        // Transition 2: Click on destination result balance block and move from State 0 to State 1
-        { action: 'clickDestResultBalance' },
-        // Transition 23: Change account to another one with different currency and stay on State 1
-        { action: 'changeDestAccount', data: ACC_EUR },
-        { action: 'changeDestAccount', data: ACC_3 },
-    ]);
+    // Transition 2: Click on destination result balance block and move from State 0 to State 1
+    await Actions.clickDestResultBalance();
+    // Transition 23: Change account to another one with different currency and stay on State 1
+    await Actions.changeDestAccount(ACC_EUR);
+    await Actions.changeDestAccount(ACC_3);
 
     // Input result balance
-    await Actions.runGroup('inputDestResBalance', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(
+        Actions.inputDestResBalance,
+        Actions.decimalInputTestStrings,
+    );
 
-    await Actions.runActions([
-        // Transition 4: Click on source amount block and move from State 1 to State 0
-        { action: 'clickSrcAmount' },
-        // Transition 3: Change source currency to different than currency of account and move
-        //  from State 0 to State 2
-        { action: 'changeSourceCurrency', data: USD },
-        // Transition 5: Change account to another one with currency different than current source
-        //  currency and stay on State 2
-        { action: 'changeDestAccount', data: ACC_EUR },
-        { action: 'changeDestAccount', data: ACC_3 },
-    ]);
+    // Transition 4: Click on source amount block and move from State 1 to State 0
+    await Actions.clickSrcAmount();
+    // Transition 3: Change source currency to different than currency of account and move
+    //  from State 0 to State 2
+    await Actions.changeSourceCurrency(USD);
+    // Transition 5: Change account to another one with currency different than current source
+    //  currency and stay on State 2
+    await Actions.changeDestAccount(ACC_EUR);
+    await Actions.changeDestAccount(ACC_3);
 
     // Input destination amount
-    await Actions.runGroup('inputDestAmount', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(Actions.inputDestAmount, Actions.decimalInputTestStrings);
 
-    await Actions.runActions([
-        // Transition 7: Click on result balance block and move from State 2 to State 4
-        { action: 'clickDestResultBalance' },
-        // Transition 17: Change account to another one with currency different than current
-        //  source currency and stay on State 4
-        { action: 'changeDestAccount', data: ACC_EUR },
-        { action: 'changeDestAccount', data: ACC_3 },
-        // Transition 21: Change source currency to different than currency of account and stay
-        //  on State 4
-        { action: 'changeSourceCurrency', data: EUR },
-        { action: 'changeSourceCurrency', data: USD },
-        // Transition 20: Click on exchange rate block and move from State 4 to State 3
-        { action: 'clickExchRate' },
-        // Transition 14: Click on exchange rate block and move from State 4 to State 3
-        { action: 'clickDestResultBalance' },
-        // Transition 19: Click on destination amount block and move from State 4 to State 3
-        { action: 'clickDestAmount' },
-        // Transition 8: Click on exchange rate block and move from State 2 to State 3
-        { action: 'clickExchRate' },
-    ]);
+    // Transition 7: Click on result balance block and move from State 2 to State 4
+    await Actions.clickDestResultBalance();
+    // Transition 17: Change account to another one with currency different than current
+    //  source currency and stay on State 4
+    await Actions.changeDestAccount(ACC_EUR);
+    await Actions.changeDestAccount(ACC_3);
+    // Transition 21: Change source currency to different than currency of account and stay
+    //  on State 4
+    await Actions.changeSourceCurrency(EUR);
+    await Actions.changeSourceCurrency(USD);
+    // Transition 20: Click on exchange rate block and move from State 4 to State 3
+    await Actions.clickExchRate();
+    // Transition 14: Click on exchange rate block and move from State 4 to State 3
+    await Actions.clickDestResultBalance();
+    // Transition 19: Click on destination amount block and move from State 4 to State 3
+    await Actions.clickDestAmount();
+    // Transition 8: Click on exchange rate block and move from State 2 to State 3
+    await Actions.clickExchRate();
 
     // Input exchange rate
-    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(Actions.inputExchRate, Actions.decimalInputTestStrings);
 
     // Toggle direction of exchange rate and stay on State 3
-    await Actions.runAction({ action: 'toggleExchange' });
+    await Actions.toggleExchange();
     // Input back exchange rate
-    await Actions.runGroup('inputExchRate', Actions.decimalInputTestStrings);
+    await App.scenario.runner.runGroup(Actions.inputExchRate, Actions.decimalInputTestStrings);
     // Toggle direction of exchange rate and stay on State 3
-    await Actions.runAction({ action: 'toggleExchange' });
+    await Actions.toggleExchange();
 
-    await Actions.runActions([
-        // Transition 13: Click on destination amount block and move from State 3 to State 2
-        { action: 'clickDestAmount' },
-        // Transition 9: change source currency to different than currency of account and
-        //  stay on State 2
-        { action: 'changeSourceCurrency', data: EUR },
-        // Transition 10: Change source currency to the same as currency of account and
-        //  move from State 2 to State 0
-        { action: 'changeSourceCurrency', data: RUB },
-        // Transition 11: Change destination account to another with currency different
-        //  currest source currency
-        { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
-        { action: 'clickExchRate' }, // move from State 2 to State 3
-        { action: 'changeDestAccount', data: ACC_EUR },
-        // Transition 12: Change destination account to another one with same currency as
-        //  currest source currency
-        { action: 'changeDestAccount', data: ACC_USD },
-        // Transition 15: Change source currency to different than currency of account and
-        //  stay on State 3
-        { action: 'changeSourceCurrency', data: RUB }, // move from State 0 to State 2
-        { action: 'clickExchRate' }, // move from State 2 to State 3
-        { action: 'changeSourceCurrency', data: EUR },
-        // Transition 16: Change source currency to different than currency of account
-        //  and stay on State 3
-        { action: 'changeSourceCurrency', data: USD },
-        // Transition 18: Change destination account to another one with same currency as currest
-        //  source currency and move from State 4 to State 1
-        { action: 'changeSourceCurrency', data: RUB }, // move from State 0 to State 2
-        { action: 'clickDestResultBalance' }, // move from State 2 to State 4
-        { action: 'changeDestAccount', data: ACC_RUB },
-        // Transition 6: Change destination account to another one with same currency as currest
-        //  source currency
-        { action: 'clickSrcAmount' }, // move from State 1 to State 0
-        { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
-        { action: 'changeDestAccount', data: ACC_USD },
-        // Transition 1: Change destination account to another one with same currency as currest
-        //  source currency
-        { action: 'changeDestAccount', data: ACC_3 },
-        // Transition 22: Change source currency to the same as currency of account and move from
-        //  State 4 to State 1
-        { action: 'changeSourceCurrency', data: USD }, // move from State 0 to State 2
-        { action: 'clickDestResultBalance' }, // move from State 2 to State 4
-        { action: 'changeSourceCurrency', data: RUB },
-        // Transition 4: Click on source amount block and move from State 1 to State 0
-        { action: 'clickSrcAmount' },
-    ]);
+    // Transition 13: Click on destination amount block and move from State 3 to State 2
+    await Actions.clickDestAmount();
+    // Transition 9: change source currency to different than currency of account and
+    //  stay on State 2
+    await Actions.changeSourceCurrency(EUR);
+    // Transition 10: Change source currency to the same as currency of account and
+    //  move from State 2 to State 0
+    await Actions.changeSourceCurrency(RUB);
+    // Transition 11: Change destination account to another with currency different
+    //  currest source currency
+    await Actions.changeSourceCurrency(USD); // move from State 0 to State 2
+    await Actions.clickExchRate(); // move from State 2 to State 3
+    await Actions.changeDestAccount(ACC_EUR);
+    // Transition 12: Change destination account to another one with same currency as
+    //  currest source currency
+    await Actions.changeDestAccount(ACC_USD);
+    // Transition 15: Change source currency to different than currency of account and
+    //  stay on State 3
+    await Actions.changeSourceCurrency(RUB); // move from State 0 to State 2
+    await Actions.clickExchRate(); // move from State 2 to State 3
+    await Actions.changeSourceCurrency(EUR);
+    // Transition 16: Change source currency to different than currency of account
+    //  and stay on State 3
+    await Actions.changeSourceCurrency(USD);
+    // Transition 18: Change destination account to another one with same currency as currest
+    //  source currency and move from State 4 to State 1
+    await Actions.changeSourceCurrency(RUB); // move from State 0 to State 2
+    await Actions.clickDestResultBalance(); // move from State 2 to State 4
+    await Actions.changeDestAccount(ACC_RUB);
+    // Transition 6: Change destination account to another one with same currency as currest
+    //  source currency
+    await Actions.clickSrcAmount(); // move from State 1 to State 0
+    await Actions.changeSourceCurrency(USD); // move from State 0 to State 2
+    await Actions.changeDestAccount(ACC_USD);
+    // Transition 1: Change destination account to another one with same currency as currest
+    //  source currency
+    await Actions.changeDestAccount(ACC_3);
+    // Transition 22: Change source currency to the same as currency of account and move from
+    //  State 4 to State 1
+    await Actions.changeSourceCurrency(USD); // move from State 0 to State 2
+    await Actions.clickDestResultBalance(); // move from State 2 to State 4
+    await Actions.changeSourceCurrency(RUB);
+    // Transition 4: Click on source amount block and move from State 1 to State 0
+    await Actions.clickSrcAmount();
 
     // Test input values for precise currency
-    await Actions.runActions([
-        { action: 'changeSourceCurrency', data: BTC },
-        { action: 'inputSrcAmount', data: '0.12345678' },
-        { action: 'changeDestAccount', data: ACC_BTC },
-        { action: 'clickDestResultBalance' },
-        { action: 'inputDestResBalance', data: '555.12345678' },
-    ]);
+    await Actions.changeSourceCurrency(BTC);
+    await Actions.inputSrcAmount('0.12345678');
+    await Actions.changeDestAccount(ACC_BTC);
+    await Actions.clickDestResultBalance();
+    await Actions.inputDestResBalance('555.12345678');
 
     // Test handling invalid date string on show date picker
-    await Actions.runActions([
-        { action: 'inputDate', data: '' },
-        { action: 'selectDate', data: App.dates.now },
-    ]);
+    await Actions.inputDate('');
+    await Actions.selectDate(App.dates.now);
 };

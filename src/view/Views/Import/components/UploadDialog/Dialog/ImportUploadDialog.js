@@ -25,9 +25,9 @@ import './ImportUploadDialog.scss';
 const UPLOAD_POPUP_CLASS = 'upload-popup';
 const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
-const BACK_BTN_CLASS = 'btn back-btn';
+const BACK_BTN_CLASS = 'btn back-btn circle-btn';
 const TPL_FORM_TITLE_CLASS = 'template-form-title';
-const BACK_ICON_CLASS = 'icon back-icon';
+const BACK_ICON_CLASS = 'btn__icon';
 
 /** States */
 const UPLOAD_STATE = 1;

@@ -82,9 +82,7 @@ export class RemindersStory extends TestStory {
         await Actions.cancelFromContextMenu(0);
 
         await Actions.updateFromContextMenu(0);
-        await trActions.runActions([
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
-        ]);
+        await trActions.inputDate(App.formatInputDate(App.dates.yesterday));
         await trActions.submit();
     }
 
@@ -128,9 +126,7 @@ export class RemindersStory extends TestStory {
         setBlock('Edit reminder transaction and submit', 1);
 
         await Actions.updateFromContextMenu(0);
-        await trActions.runActions([
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
-        ]);
+        await trActions.inputDate(App.formatInputDate(App.dates.yesterday));
         await trActions.submit();
     }
 
@@ -144,17 +140,23 @@ export class RemindersStory extends TestStory {
     async select() {
         setBlock('Select reminders', 1);
 
-        const data = [
-            [0],
-            [1, 2],
-        ];
-
         setBlock('Toggle select reminders', 2);
-        await App.scenario.runner.runGroup(Actions.toggleSelect, data);
+        await Actions.toggleSelect(0);
+        await Actions.toggleSelect(0);
+        await Actions.toggleSelect([1, 2]);
+        await Actions.toggleSelect([1, 2]);
 
         setBlock('Select/deselect all reminders', 2);
         await Actions.selectAll();
         await Actions.deselectAll();
+
+        setBlock('Check selection after change page', 2);
+        await Actions.toggleSelect(0);
+        await Actions.goToNextPage();
+        await Actions.goToPrevPage();
+        await Actions.showMore();
+        await Actions.goToFirstPage();
+        await Actions.toggleSelect(0);
     }
 
     async details() {

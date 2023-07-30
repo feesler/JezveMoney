@@ -69,19 +69,11 @@ const storiesMap = {
 };
 
 export class Scenario {
-    constructor(environment) {
-        this.environment = environment;
+    static create() {
+        return new this();
     }
 
-    static async create(environment) {
-        const instance = new this(environment);
-        await instance.init();
-
-        return instance;
-    }
-
-    async init() {
-        // Setup test runner
+    constructor() {
         this.runner = new Runner();
     }
 

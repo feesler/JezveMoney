@@ -317,13 +317,13 @@ export class Application {
      * Updates reminders count badge
      */
     updateRemindersBadge() {
-        const navMenu = this.view?.header?.navigationMenu;
-        if (!this.model.profile || !navMenu) {
+        const header = this.view?.header;
+        if (!this.model.profile || !header) {
             return;
         }
 
         const { remindersCount } = this.model.profile;
-        navMenu.setBadgeByURL('reminders/', remindersCount);
+        header.setRemindersCount(remindersCount);
     }
 
     /**

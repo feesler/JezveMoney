@@ -1,7 +1,6 @@
 import {
     TestComponent,
     assert,
-    hasFlag,
     query,
     queryAll,
     evaluate,
@@ -11,7 +10,6 @@ import {
     asyncMap,
 } from 'jezve-test';
 import { Button, Paginator } from 'jezvejs-test';
-import { IMPORT_COND_OP_FIELD_FLAG, ImportCondition } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -158,7 +156,14 @@ export class ImportRulesDialog extends TestComponent {
             const pageItems = filteredRules.slice(firstItem, lastItem);
             const hasItems = pageItems.length > 0;
 
-            res.items = pageItems.map((rule) => ImportRuleItem.render(rule));
+            res.items = pageItems.map((rule) => {
+                const strId = rule.id.toString();
+                const modelRule = model.rules.find((item) => item.id.toString() === strId);
+                return ImportRuleItem.render({
+                    ...rule,
+                    collapsed: modelRule?.collapsed ?? true,
+                });
+            });
 
             if (pagesCount > 1) {
                 res.paginator = {
@@ -356,6 +361,22 @@ export class ImportRulesDialog extends TestComponent {
         return this.checkState();
     }
 
+    async toggleExpandRule(index) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.items, ind);
+
+        assert(this.isListState(), 'Invalid state');
+
+        this.model.contextMenuVisible = false;
+        const rule = this.model.rules[ind];
+        rule.collapsed = !rule.collapsed;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.items[ind].toggleExpand());
+
+        return this.checkState(expected);
+    }
+
     async openContextMenu(index) {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.items, ind);
@@ -370,40 +391,12 @@ export class ImportRulesDialog extends TestComponent {
         return this.checkState(expected);
     }
 
-    ruleToModel(rule) {
-        const ruleConditions = rule.conditions.map((item) => {
-            const condition = {
-                fieldType: item.field_id,
-                operator: item.operator,
-                value: item.value,
-                isFieldValue: hasFlag(item.flags, IMPORT_COND_OP_FIELD_FLAG),
-            };
-
-            if (ImportCondition.isDateField(item.field_id)) {
-                condition.value = App.secondsToDateString(parseInt(condition.value, 10));
-            }
-
-            return condition;
-        });
-
-        const ruleActions = rule.actions.map((item) => ({
-            actionType: item.action_id,
-            value: item.value,
-        }));
-
-        return {
-            id: rule.id,
-            conditions: ruleConditions,
-            actions: ruleActions,
-        };
-    }
-
     async updateRule(index) {
         await this.openContextMenu(index);
 
         this.model.state = 'update';
         const ruleItem = App.state.rules.getItemByIndex(index);
-        this.model.rule = this.ruleToModel(ruleItem);
+        this.model.rule = ImportRuleForm.ruleToModel(ruleItem);
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
@@ -422,7 +415,7 @@ export class ImportRulesDialog extends TestComponent {
 
         this.model.state = 'create';
         const ruleItem = App.state.rules.getItemByIndex(index);
-        const { conditions, actions } = this.ruleToModel(ruleItem);
+        const { conditions, actions } = ImportRuleForm.ruleToModel(ruleItem);
         this.model.rule = {
             conditions,
             actions,

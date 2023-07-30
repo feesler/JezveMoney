@@ -11,3 +11,34 @@
   --list-item-selected-color: var(--trans-item-selected-color);
   --list-item-row-gap: var(--trans-item-row-gap);
 }
+
+.trans-item[data-type="1"] {
+  --transaction-color: var(--transaction-expense);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type="2"] {
+  --transaction-color: var(--transaction-income);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type="3"] {
+  --transaction-color: var(--transaction-transfer);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type="4"] {
+  --transaction-color: var(--transaction-debt);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type="5"] {
+  --transaction-color: var(--transaction-credit-limit);
+  --trans-item-amount-color: var(--transaction-color);
+}
+
+.trans-item[data-type] .list-item__content {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--transaction-color);
+}

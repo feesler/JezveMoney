@@ -110,84 +110,84 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '123.7801' },
-            { action: 'changeCategory', data: FOOD_CATEGORY },
-            { action: 'inputComment', data: 'buy' },
+            { action: Actions.inputDestAmount, data: '123.7801' },
+            { action: Actions.changeCategory, data: FOOD_CATEGORY },
+            { action: Actions.inputComment, data: 'buy' },
         ]);
 
         await Actions.createFromAccountAndSubmit(3, [
-            { action: 'changeDestCurrency', data: RUB },
-            { action: 'inputDestAmount', data: '7013.21' },
-            { action: 'inputSrcAmount', data: '100' },
-            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
+            { action: Actions.changeDestCurrency, data: RUB },
+            { action: Actions.inputDestAmount, data: '7013.21' },
+            { action: Actions.inputSrcAmount, data: '100' },
+            { action: Actions.changeCategory, data: TRANSPORT_CATEGORY },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'inputDestAmount', data: '0.01' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.inputDestAmount, data: '0.01' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeSrcAccount', data: CARD_RUB },
-            { action: 'inputDestAmount', data: '99.99' },
-            { action: 'selectDate', data: App.dates.monthAgo },
+            { action: Actions.changeSrcAccount, data: CARD_RUB },
+            { action: Actions.inputDestAmount, data: '99.99' },
+            { action: Actions.selectDate, data: App.dates.monthAgo },
         ]);
 
         // Check create transaction with schedule
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '1000' },
-            { action: 'toggleEnableRepeat' },
-            { action: 'selectDate', data: App.dates.weekAgo },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekendOffset' },
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.selectDate, data: App.dates.weekAgo },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekendOffset },
         ]);
 
         // Check create transaction with hidden account
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeSrcAccount', data: HIDDEN_ACC },
-            { action: 'inputDestAmount', data: '0.01' },
+            { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
+            { action: Actions.inputDestAmount, data: '0.01' },
         ]);
 
         // Try to submit expense with invalid destination amount
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '' },
+            { action: Actions.inputDestAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '-100' },
+            { action: Actions.inputDestAmount, data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '' },
-            { action: 'clickSrcResultBalance' },
+            { action: Actions.inputDestAmount, data: '' },
+            { action: Actions.clickSrcResultBalance },
         ]);
 
         // Try to submit expense with invalid source amount
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeDestCurrency', data: KRW },
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputSrcAmount', data: '' },
+            { action: Actions.changeDestCurrency, data: KRW },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputSrcAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeDestCurrency', data: KRW },
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputSrcAmount', data: '-100' },
+            { action: Actions.changeDestCurrency, data: KRW },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputSrcAmount, data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeDestCurrency', data: KRW },
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputSrcAmount', data: '' },
-            { action: 'clickExchRate' },
+            { action: Actions.changeDestCurrency, data: KRW },
+            { action: Actions.inputDestAmount, data: '1' },
+            { action: Actions.inputSrcAmount, data: '' },
+            { action: Actions.clickExchRate },
         ]);
 
         // Try to submit expense with invalid date
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: '' },
+            { action: Actions.inputDestAmount, data: '100' },
+            { action: Actions.inputDate, data: '' },
         ]);
     }
 
@@ -203,99 +203,99 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '10023.7801' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
-            { action: 'inputComment', data: 'some income' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '10023.7801' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.inputComment, data: 'some income' },
         ]);
 
         await Actions.createFromAccountAndSubmit(3, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeSourceCurrency', data: USD },
-            { action: 'inputSrcAmount', data: '7013.21' },
-            { action: 'inputDestAmount', data: '100' },
-            { action: 'changeCategory', data: INVEST_CATEGORY },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeSourceCurrency, data: USD },
+            { action: Actions.inputSrcAmount, data: '7013.21' },
+            { action: Actions.inputDestAmount, data: '100' },
+            { action: Actions.changeCategory, data: INVEST_CATEGORY },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '0.01' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
-            { action: 'changeCategory', data: INVEST_CATEGORY },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '0.01' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.weekAgo) },
+            { action: Actions.changeCategory, data: INVEST_CATEGORY },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeDestAccount', data: CARD_RUB },
-            { action: 'inputSrcAmount', data: '99.99' },
-            { action: 'selectDate', data: App.dates.monthAgo },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeDestAccount, data: CARD_RUB },
+            { action: Actions.inputSrcAmount, data: '99.99' },
+            { action: Actions.selectDate, data: App.dates.monthAgo },
         ]);
 
         // Check create transaction with schedule
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '10000' },
-            { action: 'toggleEnableRepeat' },
-            { action: 'selectDate', data: App.dates.monthAgo },
-            { action: 'selectEndDate', data: App.dates.yearAfter },
-            { action: 'changeIntervalType', data: INTERVAL_WEEK },
-            { action: 'selectWeekDayOffset', data: 4 },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '10000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.selectDate, data: App.dates.monthAgo },
+            { action: Actions.selectEndDate, data: App.dates.yearAfter },
+            { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
+            { action: Actions.selectWeekDayOffset, data: 4 },
         ]);
 
         // Check create transaction with hidden account
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeDestAccount', data: HIDDEN_ACC },
-            { action: 'inputSrcAmount', data: '0.01' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeDestAccount, data: HIDDEN_ACC },
+            { action: Actions.inputSrcAmount, data: '0.01' },
         ]);
 
         // Try to submit income with invalid source amount
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '-100' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '' },
-            { action: 'clickDestResultBalance' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '' },
+            { action: Actions.clickDestResultBalance },
         ]);
 
         // Try to submit income with invalid destination amount
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeSourceCurrency', data: KRW },
-            { action: 'inputSrcAmount', data: '1' },
-            { action: 'inputDestAmount', data: '' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeSourceCurrency, data: KRW },
+            { action: Actions.inputSrcAmount, data: '1' },
+            { action: Actions.inputDestAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeSourceCurrency', data: KRW },
-            { action: 'inputSrcAmount', data: '1' },
-            { action: 'inputDestAmount', data: '-100' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeSourceCurrency, data: KRW },
+            { action: Actions.inputSrcAmount, data: '1' },
+            { action: Actions.inputDestAmount, data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeSourceCurrency', data: KRW },
-            { action: 'inputSrcAmount', data: '1' },
-            { action: 'inputDestAmount', data: '' },
-            { action: 'clickExchRate' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeSourceCurrency, data: KRW },
+            { action: Actions.inputSrcAmount, data: '1' },
+            { action: Actions.inputDestAmount, data: '' },
+            { action: Actions.clickExchRate },
         ]);
 
         // Try to submit income with invalid date
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'inputSrcAmount', data: '100' },
-            { action: 'inputDate', data: '' },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '100' },
+            { action: Actions.inputDate, data: '' },
         ]);
     }
 
@@ -310,107 +310,107 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '1000' },
-            { action: 'inputComment', data: 'xxxx 1234 ц' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.inputComment, data: 'xxxx 1234 ц' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '11.4' },
-            { action: 'inputDestAmount', data: '10' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '11.4' },
+            { action: Actions.inputDestAmount, data: '10' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccount', data: ACC_RUB },
-            { action: 'changeDestAccount', data: ACC_EUR },
-            { action: 'inputSrcAmount', data: '5.0301' },
-            { action: 'inputDestAmount', data: '4.7614' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeSrcAccount, data: ACC_RUB },
+            { action: Actions.changeDestAccount, data: ACC_EUR },
+            { action: Actions.inputSrcAmount, data: '5.0301' },
+            { action: Actions.inputDestAmount, data: '4.7614' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '10' },
-            { action: 'inputDestAmount', data: '9.75' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeSrcAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '10' },
+            { action: Actions.inputDestAmount, data: '9.75' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_EUR },
-            { action: 'inputSrcAmount', data: '10' },
-            { action: 'inputDestAmount', data: '9.50' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_EUR },
+            { action: Actions.inputSrcAmount, data: '10' },
+            { action: Actions.inputDestAmount, data: '9.50' },
         ]);
 
         // Check create transaction with schedule
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '1000' },
-            { action: 'toggleEnableRepeat' },
-            { action: 'selectDate', data: App.dates.weekAgo },
-            { action: 'selectEndDate', data: App.dates.weekAfter },
-            { action: 'changeIntervalType', data: INTERVAL_DAY },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.selectDate, data: App.dates.weekAgo },
+            { action: Actions.selectEndDate, data: App.dates.weekAfter },
+            { action: Actions.changeIntervalType, data: INTERVAL_DAY },
         ]);
 
         // Check create transaction with hidden account
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccount', data: ACC_USD },
-            { action: 'changeDestAccount', data: HIDDEN_ACC },
-            { action: 'inputSrcAmount', data: '1' },
-            { action: 'inputDestAmount', data: '75' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeSrcAccount, data: ACC_USD },
+            { action: Actions.changeDestAccount, data: HIDDEN_ACC },
+            { action: Actions.inputSrcAmount, data: '1' },
+            { action: Actions.inputDestAmount, data: '75' },
         ]);
 
         // Try to submit transfer with invalid source amount
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '-100' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '-100' },
         ]);
 
         // Check invalidated source amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'inputSrcAmount', data: '' },
-            { action: 'clickDestResultBalance' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '' },
+            { action: Actions.clickDestResultBalance },
         ]);
 
         // Try to submit transfer with invalid destination amount
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '11.4' },
-            { action: 'inputDestAmount', data: '' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '11.4' },
+            { action: Actions.inputDestAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '11.4' },
-            { action: 'inputDestAmount', data: '-100' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '11.4' },
+            { action: Actions.inputDestAmount, data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '11.4' },
-            { action: 'inputDestAmount', data: '' },
-            { action: 'clickExchRate' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '11.4' },
+            { action: Actions.inputDestAmount, data: '' },
+            { action: Actions.clickExchRate },
         ]);
 
         // Try to submit transfer with invalid date
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '100' },
-            { action: 'inputDate', data: '' },
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.changeDestAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '100' },
+            { action: Actions.inputDate, data: '' },
         ]);
     }
 
@@ -427,127 +427,127 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '100' },
+            { action: Actions.inputSrcAmount, data: '100' },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'changeAccount', data: ACC_USD },
-            { action: 'swapSourceAndDest' },
-            { action: 'inputDestAmount', data: '100' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
+            { action: Actions.changeAccount, data: ACC_USD },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.inputDestAmount, data: '100' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'changeAccount', data: ACC_EUR },
-            { action: 'inputDestAmount', data: '100.0101' },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.changeAccount, data: ACC_EUR },
+            { action: Actions.inputDestAmount, data: '100.0101' },
         ]);
 
         await Actions.createFromPersonAndSubmit(1, [
-            { action: 'changeAccount', data: ACC_EUR },
-            { action: 'swapSourceAndDest' },
-            { action: 'inputDestAmount', data: '10' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.changeAccount, data: ACC_EUR },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.inputDestAmount, data: '10' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'toggleAccount' },
-            { action: 'inputDestAmount', data: '105' },
-            { action: 'selectDate', data: App.dates.yesterday },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.toggleAccount },
+            { action: Actions.inputDestAmount, data: '105' },
+            { action: Actions.selectDate, data: App.dates.yesterday },
         ]);
 
         await Actions.createFromPersonAndSubmit(1, [
-            { action: 'toggleAccount' },
-            { action: 'swapSourceAndDest' },
-            { action: 'changeAccount', data: ACC_EUR },
-            { action: 'inputDestAmount', data: '105' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.toggleAccount },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.changeAccount, data: ACC_EUR },
+            { action: Actions.inputDestAmount, data: '105' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'changeSourceCurrency', data: USD },
-            { action: 'inputSrcAmount', data: '10' },
-            { action: 'inputDestAmount', data: '650' },
+            { action: Actions.changeSourceCurrency, data: USD },
+            { action: Actions.inputSrcAmount, data: '10' },
+            { action: Actions.inputDestAmount, data: '650' },
         ]);
 
         await Actions.createFromPersonAndSubmit(1, [
-            { action: 'swapSourceAndDest' },
-            { action: 'changeDestCurrency', data: EUR },
-            { action: 'inputSrcAmount', data: '11.5' },
-            { action: 'inputDestAmount', data: '714' },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.changeDestCurrency, data: EUR },
+            { action: Actions.inputSrcAmount, data: '11.5' },
+            { action: Actions.inputDestAmount, data: '714' },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'toggleAccount' },
-            { action: 'changeSourceCurrency', data: USD },
-            { action: 'inputSrcAmount', data: '20' },
+            { action: Actions.toggleAccount },
+            { action: Actions.changeSourceCurrency, data: USD },
+            { action: Actions.inputSrcAmount, data: '20' },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'toggleAccount' },
-            { action: 'swapSourceAndDest' },
-            { action: 'changeDestCurrency', data: EUR },
-            { action: 'inputDestAmount', data: '22.75' },
+            { action: Actions.toggleAccount },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.changeDestCurrency, data: EUR },
+            { action: Actions.inputDestAmount, data: '22.75' },
         ]);
 
         // Check create transaction with schedule
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '1000' },
-            { action: 'toggleEnableRepeat' },
-            { action: 'selectDate', data: App.dates.monthAgo },
-            { action: 'selectStartDate', data: App.dates.monthAgo },
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.selectDate, data: App.dates.monthAgo },
+            { action: Actions.selectStartDate, data: App.dates.monthAgo },
         ]);
 
         // Check create transaction with hidden person
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'changePerson', data: HIDDEN_PERSON },
-            { action: 'inputSrcAmount', data: '0.01' },
+            { action: Actions.changePerson, data: HIDDEN_PERSON },
+            { action: Actions.inputSrcAmount, data: '0.01' },
         ]);
 
         // Check create transaction with hidden account
         await Actions.createFromPersonAndSubmit(1, [
-            { action: 'changeAccount', data: HIDDEN_ACC },
-            { action: 'inputSrcAmount', data: '105' },
+            { action: Actions.changeAccount, data: HIDDEN_ACC },
+            { action: Actions.inputSrcAmount, data: '105' },
         ]);
 
         // Try to submit debt with invalid destination amount
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'inputDestAmount', data: '' },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.inputDestAmount, data: '' },
         ]);
 
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'inputDestAmount', data: '-100' },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.inputDestAmount, data: '-100' },
         ]);
 
         // Check invalidated destination amount field is shown on submit
         await Actions.createFromAccountAndSubmit(0, [
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'inputDestAmount', data: '' },
-            { action: 'clickDestResultBalance' },
+            { action: Actions.changeTransactionType, data: DEBT },
+            { action: Actions.inputDestAmount, data: '' },
+            { action: Actions.clickDestResultBalance },
         ]);
 
         // Try to submit debt with invalid source amount
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '' },
+            { action: Actions.inputSrcAmount, data: '' },
         ]);
 
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '-200' },
+            { action: Actions.inputSrcAmount, data: '-200' },
         ]);
 
         // Check invalidated source amount field is shown on submit
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '' },
-            { action: 'clickSrcResultBalance' },
+            { action: Actions.inputSrcAmount, data: '' },
+            { action: Actions.clickSrcResultBalance },
         ]);
 
         // Try to submit debt with invalid date
         await Actions.createFromPersonAndSubmit(0, [
-            { action: 'inputSrcAmount', data: '100' },
-            { action: 'inputDate', data: '' },
+            { action: Actions.inputSrcAmount, data: '100' },
+            { action: Actions.inputDate, data: '' },
         ]);
     }
 
@@ -563,20 +563,20 @@ export class TransactionsStory extends TestStory {
         assert(index !== -1, 'Account not found');
 
         await Actions.createFromAccountAndSubmit(index, [
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'inputDestAmount', data: '10000' },
+            { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
+            { action: Actions.inputDestAmount, data: '10000' },
         ]);
 
         await Actions.createFromAccountAndSubmit(index, [
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'inputDestAmount', data: '-5000' },
+            { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
+            { action: Actions.inputDestAmount, data: '-5000' },
         ]);
 
         // Check create transaction with schedule
         await Actions.createFromAccountAndSubmit(index, [
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'inputDestAmount', data: '1000' },
-            { action: 'toggleEnableRepeat' },
+            { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
         ]);
     }
 
@@ -591,31 +591,31 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.updateAndSubmit(EXPENSE, 3, [
-            { action: 'inputDestAmount', data: '124.7701' },
-            { action: 'changeCategory', data: CAFE_CATEGORY },
+            { action: Actions.inputDestAmount, data: '124.7701' },
+            { action: Actions.changeCategory, data: CAFE_CATEGORY },
         ]);
 
         await Actions.updateAndSubmit(EXPENSE, 0, [
-            { action: 'changeDestCurrency', data: USD },
-            { action: 'inputDestAmount', data: '7065.30' },
-            { action: 'inputSrcAmount', data: '101' },
+            { action: Actions.changeDestCurrency, data: USD },
+            { action: Actions.inputDestAmount, data: '7065.30' },
+            { action: Actions.inputSrcAmount, data: '101' },
         ]);
 
         await Actions.updateAndSubmit(EXPENSE, 2, [
-            { action: 'inputDestAmount', data: '0.02' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
+            { action: Actions.inputDestAmount, data: '0.02' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         await Actions.updateAndSubmit(EXPENSE, 3, [
-            { action: 'changeSrcAccount', data: ACC_EUR },
-            { action: 'inputDestAmount', data: '99.9' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.changeSrcAccount, data: ACC_EUR },
+            { action: Actions.inputDestAmount, data: '99.9' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         // Check update transaction with hidden account
         await Actions.updateAndSubmit(EXPENSE, 4, [
-            { action: 'changeSrcAccount', data: HIDDEN_ACC },
-            { action: 'inputDestAmount', data: '99.9' },
+            { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
+            { action: Actions.inputDestAmount, data: '99.9' },
         ]);
     }
 
@@ -630,30 +630,30 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.updateAndSubmit(INCOME, 1, [
-            { action: 'inputSrcAmount', data: '100.001' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
-            { action: 'changeCategory', data: TAXES_CATEGORY },
+            { action: Actions.inputSrcAmount, data: '100.001' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.weekAgo) },
+            { action: Actions.changeCategory, data: TAXES_CATEGORY },
         ]);
 
         await Actions.updateAndSubmit(INCOME, 2, [
-            { action: 'inputSrcAmount', data: '0.02' },
+            { action: Actions.inputSrcAmount, data: '0.02' },
         ]);
 
         await Actions.updateAndSubmit(INCOME, 0, [
-            { action: 'changeSourceCurrency', data: USD },
-            { action: 'inputSrcAmount', data: '7065.30' },
-            { action: 'inputDestAmount', data: '101' },
+            { action: Actions.changeSourceCurrency, data: USD },
+            { action: Actions.inputSrcAmount, data: '7065.30' },
+            { action: Actions.inputDestAmount, data: '101' },
         ]);
 
         await Actions.updateAndSubmit(INCOME, 3, [
-            { action: 'changeDestAccount', data: ACC_EUR },
-            { action: 'inputSrcAmount', data: '99.9' },
+            { action: Actions.changeDestAccount, data: ACC_EUR },
+            { action: Actions.inputSrcAmount, data: '99.9' },
         ]);
 
         // Check update transaction with hidden account
         await Actions.updateAndSubmit(INCOME, 4, [
-            { action: 'changeDestAccount', data: HIDDEN_ACC },
-            { action: 'inputSrcAmount', data: '99.9' },
+            { action: Actions.changeDestAccount, data: HIDDEN_ACC },
+            { action: Actions.inputSrcAmount, data: '99.9' },
         ]);
     }
 
@@ -668,35 +668,35 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.updateAndSubmit(TRANSFER, 0, [
-            { action: 'changeDestAccount', data: ACC_3 },
-            { action: 'inputSrcAmount', data: '11' },
+            { action: Actions.changeDestAccount, data: ACC_3 },
+            { action: Actions.inputSrcAmount, data: '11' },
         ]);
 
         await Actions.updateAndSubmit(TRANSFER, 1, [
-            { action: 'changeSrcAccount', data: ACC_USD },
-            { action: 'inputSrcAmount', data: '100' },
-            { action: 'inputDestAmount', data: '97.55' },
+            { action: Actions.changeSrcAccount, data: ACC_USD },
+            { action: Actions.inputSrcAmount, data: '100' },
+            { action: Actions.inputDestAmount, data: '97.55' },
         ]);
 
         await Actions.updateAndSubmit(TRANSFER, 2, [
-            { action: 'changeSrcAccount', data: ACC_EUR },
-            { action: 'inputSrcAmount', data: '5.0301' },
+            { action: Actions.changeSrcAccount, data: ACC_EUR },
+            { action: Actions.inputSrcAmount, data: '5.0301' },
         ]);
 
         await Actions.updateAndSubmit(TRANSFER, 3, [
-            { action: 'changeSrcAccount', data: ACC_3 },
-            { action: 'inputSrcAmount', data: '50' },
-            { action: 'inputDestAmount', data: '0.82' },
+            { action: Actions.changeSrcAccount, data: ACC_3 },
+            { action: Actions.inputSrcAmount, data: '50' },
+            { action: Actions.inputDestAmount, data: '0.82' },
         ]);
 
         await Actions.updateAndSubmit(TRANSFER, 4, [
-            { action: 'inputSrcAmount', data: '1050.01' },
+            { action: Actions.inputSrcAmount, data: '1050.01' },
         ]);
 
         // Check update transaction with hidden account
         await Actions.updateAndSubmit(TRANSFER, 5, [
-            { action: 'changeSrcAccount', data: HIDDEN_ACC },
-            { action: 'inputSrcAmount', data: '1000' },
+            { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
+            { action: Actions.inputSrcAmount, data: '1000' },
         ]);
     }
 
@@ -713,50 +713,50 @@ export class TransactionsStory extends TestStory {
         } = App.scenario;
 
         await Actions.updateAndSubmit(DEBT, 0, [
-            { action: 'changePerson', data: MARIA },
-            { action: 'inputSrcAmount', data: '105' },
+            { action: Actions.changePerson, data: MARIA },
+            { action: Actions.inputSrcAmount, data: '105' },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 3, [
-            { action: 'changeAccount', data: ACC_RUB },
-            { action: 'inputSrcAmount', data: '105' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.now) },
+            { action: Actions.changeAccount, data: ACC_RUB },
+            { action: Actions.inputSrcAmount, data: '105' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.now) },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 4, [
-            { action: 'swapSourceAndDest' },
-            { action: 'changeSourceCurrency', data: USD },
-            { action: 'inputSrcAmount', data: '10' },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.changeSourceCurrency, data: USD },
+            { action: Actions.inputSrcAmount, data: '10' },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 1, [
-            { action: 'changeAccount', data: ACC_USD },
-            { action: 'swapSourceAndDest' },
-            { action: 'changeDestCurrency', data: USD },
-            { action: 'inputDestAmount', data: '200.0202' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.monthAgo) },
+            { action: Actions.changeAccount, data: ACC_USD },
+            { action: Actions.swapSourceAndDest },
+            { action: Actions.changeDestCurrency, data: USD },
+            { action: Actions.inputDestAmount, data: '200.0202' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.monthAgo) },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 6, [
-            { action: 'toggleAccount' },
-            { action: 'inputSrcAmount', data: '200' },
+            { action: Actions.toggleAccount },
+            { action: Actions.inputSrcAmount, data: '200' },
         ]);
 
         await Actions.updateAndSubmit(DEBT, 2, [
-            { action: 'inputSrcAmount', data: '1001' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
+            { action: Actions.inputSrcAmount, data: '1001' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.weekAgo) },
         ]);
 
         // Check update transaction with hidden person
         await Actions.updateAndSubmit(DEBT, 0, [
-            { action: 'changePerson', data: HIDDEN_PERSON },
-            { action: 'inputSrcAmount', data: '105' },
+            { action: Actions.changePerson, data: HIDDEN_PERSON },
+            { action: Actions.inputSrcAmount, data: '105' },
         ]);
 
         // Check update transaction with hidden account
         await Actions.updateAndSubmit(DEBT, 1, [
-            { action: 'changeAccount', data: HIDDEN_ACC },
-            { action: 'inputDestAmount', data: '105' },
+            { action: Actions.changeAccount, data: HIDDEN_ACC },
+            { action: Actions.inputDestAmount, data: '105' },
         ]);
     }
 
@@ -764,13 +764,13 @@ export class TransactionsStory extends TestStory {
         setBlock('Update credit limit transactions', 2);
 
         await Actions.updateAndSubmit(LIMIT_CHANGE, 0, [
-            { action: 'clickDestAmount' },
-            { action: 'inputDestAmount', data: '100000' },
+            { action: Actions.clickDestAmount },
+            { action: Actions.inputDestAmount, data: '100000' },
         ]);
         await Actions.updateAndSubmit(LIMIT_CHANGE, 1, [
-            { action: 'clickDestAmount' },
-            { action: 'inputDestAmount', data: '5000' },
-            { action: 'changeDestAccount', data: App.scenario.BTC_CREDIT },
+            { action: Actions.clickDestAmount },
+            { action: Actions.inputDestAmount, data: '5000' },
+            { action: Actions.changeDestAccount, data: App.scenario.BTC_CREDIT },
         ]);
     }
 
@@ -780,13 +780,13 @@ export class TransactionsStory extends TestStory {
         const { MARIA } = App.scenario;
 
         await Actions.updateFromMainViewAndSubmit(3, [
-            { action: 'changePerson', data: MARIA },
-            { action: 'inputSrcAmount', data: '105' },
+            { action: Actions.changePerson, data: MARIA },
+            { action: Actions.inputSrcAmount, data: '105' },
         ]);
 
         await Actions.updateFromMainViewAndSubmit(4, [
-            { action: 'inputDestAmount', data: '555' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.inputDestAmount, data: '555' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
     }
 
@@ -796,7 +796,7 @@ export class TransactionsStory extends TestStory {
         const { TRANSPORT_CATEGORY } = App.scenario;
 
         await Actions.duplicateAndSubmit(EXPENSE, 0, [
-            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
+            { action: Actions.changeCategory, data: TRANSPORT_CATEGORY },
         ]);
     }
 
@@ -804,7 +804,7 @@ export class TransactionsStory extends TestStory {
         setBlock('Duplicate transaction from main view', 1);
 
         await Actions.duplicateFromMainViewAndSubmit(0, [
-            { action: 'inputComment', data: 'Duplicate' },
+            { action: Actions.inputComment, data: 'Duplicate' },
         ]);
     }
 
@@ -902,32 +902,34 @@ export class TransactionsStory extends TestStory {
         const { CREDIT_CARD, CAFE_CATEGORY } = App.scenario;
 
         // Start from Expense type
-        await Actions.runActions([
-            // Select Expense category to check state on change type of transaction
-            { action: 'changeCategory', data: CAFE_CATEGORY },
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeTransactionType', data: EXPENSE },
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeTransactionType', data: EXPENSE },
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeTransactionType', data: DEBT },
-            // Disable account to check obtaining first visible account on switch to expense
-            { action: 'toggleAccount' },
-            { action: 'changeTransactionType', data: EXPENSE },
-            { action: 'changeSrcAccount', data: CREDIT_CARD },
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'changeTransactionType', data: DEBT },
-            { action: 'changeTransactionType', data: LIMIT_CHANGE },
-            { action: 'changeTransactionType', data: EXPENSE },
+        // Select Expense category to check state on change type of transaction
+        await Actions.changeCategory(CAFE_CATEGORY);
+        await App.scenario.runner.runGroup(Actions.changeTransactionType, [
+            INCOME,
+            EXPENSE,
+            TRANSFER,
+            EXPENSE,
+            DEBT,
+            INCOME,
+            TRANSFER,
+            INCOME,
+            DEBT,
+            TRANSFER,
+            DEBT,
+        ]);
+        // Disable account to check obtaining first visible account on switch to expense
+        await Actions.toggleAccount();
+        await Actions.changeTransactionType(EXPENSE);
+        await Actions.changeSrcAccount(CREDIT_CARD);
+        await App.scenario.runner.runGroup(Actions.changeTransactionType, [
+            LIMIT_CHANGE,
+            INCOME,
+            LIMIT_CHANGE,
+            TRANSFER,
+            LIMIT_CHANGE,
+            DEBT,
+            LIMIT_CHANGE,
+            EXPENSE,
         ]);
 
         // Show previously hidden account
@@ -1014,15 +1016,15 @@ export class TransactionsStory extends TestStory {
         const { CARD_RUB } = App.scenario;
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'inputDestAmount', data: '0.01' },
-            { action: 'inputDate', data: App.formatInputDate(App.dates.yesterday) },
+            { action: Actions.inputDestAmount, data: '0.01' },
+            { action: Actions.inputDate, data: App.formatInputDate(App.dates.yesterday) },
         ]);
 
         await Actions.createFromAccountAndSubmit(1, [
-            { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeDestAccount', data: CARD_RUB },
-            { action: 'inputSrcAmount', data: '99.99' },
-            { action: 'selectDate', data: App.dates.monthAgo },
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.changeDestAccount, data: CARD_RUB },
+            { action: Actions.inputSrcAmount, data: '99.99' },
+            { action: Actions.selectDate, data: App.dates.monthAgo },
         ]);
     }
 
@@ -1129,7 +1131,7 @@ export class TransactionsStory extends TestStory {
         // Only Debt must be available
         await App.scenario.runner.runGroup(checkAvailable, Transaction.basicTypes);
         // Check state of Debt transaction after swap source and destination
-        await Actions.runAction({ action: 'swapSourceAndDest' });
+        await Actions.swapSourceAndDest();
 
         // Remove person
         await api.person.del({ id: person1 });

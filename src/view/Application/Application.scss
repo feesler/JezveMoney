@@ -45,6 +45,13 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --popup-menu-backdrop-filter: blur(2px);
   --popupmenu-z-index: 9999;
 
+  /* Transaction colors */
+  --transaction-expense: #fa6767;
+  --transaction-income: #409c0b;
+  --transaction-transfer: #0d67a3;
+  --transaction-debt: #c1ce0f;
+  --transaction-credit-limit: #9370db;
+
   /* Chart colors */
   @for $i from 1 through length($colors) {
     --charts-color-#{$i}: #{list.nth($colors, $i)};
@@ -110,7 +117,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --list-item-text-color: #b0b0b0;
   --list-item-bg-color: var(--alt-bg-color);
   --list-item-alt-bg-color: #252525;
-  --list-item-disabled-bg-color: #292929;
+  --list-item-disabled-bg-color: #232323;
   --list-item-icon-fill: #888888;
 
   /* List item hover state */
@@ -930,6 +937,12 @@ svg * {
   --popup-bg: var(--main-bg-color);
   --popup-footer-padding: 2rem 1rem 1rem 1rem;
   --popup-content-padding: 0 1rem 1rem 1rem;
+  --popup-close-btn: var(--list-item-icon-fill);
+  --popup-close-btn-bg: none;
+  --popup-close-btn-hover: var(--list-item-hover-icon-fill);
+  --popup-close-btn-hover-bg: var(--icon-btn-hover-bg);
+  --popup-close-btn-active: var(--list-item-hover-icon-fill);
+  --popup-close-btn-active-bg: var(--icon-btn-active-bg);
 }
 
 .popup__content {

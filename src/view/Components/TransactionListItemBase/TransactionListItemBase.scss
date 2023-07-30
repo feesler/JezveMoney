@@ -1,11 +1,4 @@
 .trans-item-base {
-  --trans-item-amount-color: var(--accent-color-alt);
-  --trans-item-selected-color: var(--accent-color);
-  --trans-item-column-gap: 16px;
-  --trans-item-row-gap: 2px;
-  --trans-item-details-row-gap: 8px;
-  --trans-item-min-column-width: 130px;
-
   display: grid;
   align-items: stretch;
   row-gap: var(--trans-item-row-gap);

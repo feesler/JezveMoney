@@ -351,7 +351,7 @@ export class ReminderListView extends AppView {
         }
 
         if (this.items === null) {
-            this.loadReminders(res);
+            this.loadReminders({ model: res });
         }
 
         if (isUpcoming && res.filter.endDate) {
@@ -384,7 +384,7 @@ export class ReminderListView extends AppView {
         const res = this.cloneModel(model);
         const isUpcoming = (res.filter.state === REMINDER_UPCOMING);
 
-        this.loadReminders(res);
+        this.loadReminders({ model: res });
 
         const filteredItems = this.getFilteredItems(res);
         if (filteredItems.length > 0) {
@@ -426,16 +426,29 @@ export class ReminderListView extends AppView {
         return this.getSourceItems().data;
     }
 
-    loadReminders(model = this.model, state = App.state) {
+    loadReminders(options = {}) {
+        const {
+            model = this.model,
+            state = App.state,
+            keepState = false,
+        } = options;
+
+        const keepSelection = (keepState && model.listMode === 'select');
+        const selectedBefore = (keepSelection) ? this.getSelectedIds(model) : [];
+
         this.items = state.reminders.clone();
+        if (keepSelection) {
+            this.items.setData(
+                this.items.map((item) => ({
+                    ...item,
+                    selected: selectedBefore.includes(item.id),
+                })),
+            );
+        }
         this.items.sort();
 
-        this.loadUpcomingReminders(model, state);
-    }
-
-    loadUpcomingReminders(model = this.model, state = App.state) {
+        // Upcoming reminders
         const { filter, list } = model;
-
         const params = {
             page: list.page,
             range: list.range,
@@ -447,11 +460,26 @@ export class ReminderListView extends AppView {
             params.endDate = filter.endDate;
         }
 
-        const { items, pagination } = state.getUpcomingReminders(params);
+        const upcoming = state.getUpcomingReminders(params);
+        let { items } = upcoming;
+        if (keepSelection) {
+            items = items.map((item) => ({
+                ...item,
+                selected: selectedBefore.includes(item.id),
+            }));
+        }
         this.upcomingItems = RemindersList.create(items);
         this.upcomingItems.sort(false);
 
-        this.upcomingPagination = pagination;
+        this.upcomingPagination = upcoming.pagination;
+    }
+
+    getSelectedItems(model = this.model) {
+        return ReminderListView.getSelectedItems(model);
+    }
+
+    getSelectedIds(model = this.model) {
+        return this.getSelectedItems(model).map((item) => item.id);
     }
 
     currentPage(model = this.model) {
@@ -498,7 +526,7 @@ export class ReminderListView extends AppView {
         res.list.page = page;
         res.list.range = range;
 
-        this.loadReminders(res);
+        this.loadReminders({ model: res, keepState: true });
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
@@ -528,7 +556,7 @@ export class ReminderListView extends AppView {
 
         res.list.range = range;
 
-        this.loadReminders(res);
+        this.loadReminders({ model: res, keepState: true });
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(res.list.page, onPage, range, !isUpcoming);
@@ -1134,6 +1162,8 @@ export class ReminderListView extends AppView {
 
             this.checkState(expected);
         }
+
+        return true;
     }
 
     async selectAll() {

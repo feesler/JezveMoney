@@ -1,6 +1,6 @@
-import webpack from 'webpack';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
 const filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(filename);

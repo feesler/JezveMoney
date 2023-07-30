@@ -102,15 +102,19 @@ export const iterateRulesList = async () => {
     });
 };
 
+/** Click by 'toggle' button of specified import rule */
+export const toggleExpandRule = async (index) => {
+    await test(`Toggle expand rule [${index}]`, async () => {
+        await checkRulesDialog();
+        return App.view.toggleExpandRule(index);
+    });
+};
+
 /** Click by create import rule button */
 export const createRule = async () => {
     await test('Create rule', async () => {
         await checkRulesDialog();
-
-        await App.view.createRule();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
+        return App.view.createRule();
     });
 };
 
@@ -127,23 +131,17 @@ export const updateRule = async (index) => {
 
 /** Click by 'Duplicate' import rule button */
 export const duplicateRule = async (index) => {
-    const ind = parseInt(index, 10);
-    assert(!Number.isNaN(ind), 'Invalid rule index');
-
-    await test(`Update rule [${ind}]`, async () => {
+    await test(`Update rule [${index}]`, async () => {
         await checkRulesDialog();
-        return App.view.duplicateRule(ind);
+        return App.view.duplicateRule(index);
     });
 };
 
 /** Click by delete import rule button */
 export const deleteRule = async (index) => {
-    const ind = parseInt(index, 10);
-    assert(!Number.isNaN(ind), 'Invalid rule index');
-
-    await test(`Delete rule [${ind}]`, async () => {
+    await test(`Delete rule [${index}]`, async () => {
         await checkRulesDialog();
-        return App.view.deleteRule(ind);
+        return App.view.deleteRule(index);
     });
 };
 

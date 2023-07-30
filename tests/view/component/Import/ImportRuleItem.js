@@ -9,10 +9,63 @@ import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
-import { ImportCondition } from '../../../model/ImportCondition.js';
-import { ImportAction } from '../../../model/ImportAction.js';
 
 export class ImportRuleItem extends TestComponent {
+    static getExpectedState(model) {
+        const res = {
+            collapsed: model.collapsed,
+            propertyElem: { visible: true },
+            operatorElem: { visible: true },
+            valueElem: { visible: true },
+            infoElem: { visible: true },
+            menuBtn: { visible: true },
+            conditions: {},
+            actions: {},
+        };
+
+        if (model.id) {
+            res.ruleId = model.id.toString();
+        }
+
+        res.conditions.items = model.conditions.map(
+            (item) => ImportConditionItem.getExpectedState(item),
+        );
+
+        res.actions.items = model.actions.map(
+            (item) => ImportActionItem.getExpectedState(item),
+        );
+
+        return res;
+    }
+
+    /**
+     * Converts ImportRule object to model
+     * @param {ImportRule} rule item to convert
+     */
+    static ruleToModel(rule) {
+        return {
+            id: rule.id,
+            collapsed: rule?.collapsed ?? true,
+            conditions: rule.conditions.map((item) => (
+                ImportConditionItem.conditionToModel(item)
+            )),
+            actions: rule.actions.map((item) => (
+                ImportActionItem.actionToModel(item)
+            )),
+        };
+    }
+
+    /**
+     * Convert import rule object to expected state of component
+     * @param {Object} item - import rule object
+     */
+    static render(item) {
+        assert(item, 'Invalid parameters');
+
+        const model = this.ruleToModel(item);
+        return this.getExpectedState(model);
+    }
+
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -40,7 +93,7 @@ export class ImportRuleItem extends TestComponent {
 
             return {
                 ruleId: el.dataset.id,
-                collapsed: el.classList.contains('collapsible__expanded'),
+                collapsed: !el.classList.contains('collapsible__expanded'),
                 propertyElem: textElemState(propertyEl),
                 operatorElem: textElemState(operatorEl),
                 valueElem: textElemState(valueEl),
@@ -81,33 +134,6 @@ export class ImportRuleItem extends TestComponent {
         return res;
     }
 
-    static getExpectedState(model) {
-        const res = {
-            collapsed: model.collapsed,
-            propertyElem: { visible: true },
-            operatorElem: { visible: true },
-            valueElem: { visible: true },
-            infoElem: { visible: true },
-            menuBtn: { visible: true },
-            conditions: {},
-            actions: {},
-        };
-
-        if (model.id) {
-            res.ruleId = model.id.toString();
-        }
-
-        res.conditions.items = model.conditions.map(
-            (item) => ImportConditionItem.getExpectedState(item),
-        );
-
-        res.actions.items = model.actions.map(
-            (item) => ImportActionItem.getExpectedState(item),
-        );
-
-        return res;
-    }
-
     async toggleExpand() {
         assert(this.content.toggleBtn.elem, 'Toggle button not found');
         return click(this.content.toggleBtn.elem);
@@ -116,36 +142,5 @@ export class ImportRuleItem extends TestComponent {
     async openMenu() {
         assert(this.content.menuBtn.elem, 'Menu button not found');
         await click(this.content.menuBtn.elem);
-    }
-
-    /**
-     * Convert import rule object to expected state of component
-     * @param {Object} item - import rule object
-     */
-    static render(item) {
-        assert(item, 'Invalid parameters');
-
-        const res = {
-            ruleId: item.id.toString(),
-            propertyElem: { visible: true },
-            operatorElem: { visible: true },
-            valueElem: { visible: true },
-            infoElem: { visible: true },
-            menuBtn: { visible: true },
-            conditions: {},
-            actions: {},
-        };
-
-        res.conditions.items = item.conditions.data.map((condData) => {
-            const condition = new ImportCondition(condData);
-            return ImportConditionItem.render(condition);
-        });
-
-        res.actions.items = item.actions.data.map((actData) => {
-            const action = new ImportAction(actData);
-            return ImportActionItem.render(action);
-        });
-
-        return res;
     }
 }

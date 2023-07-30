@@ -8,9 +8,14 @@ import {
     re,
     isFunction,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import './Header.scss';
+
 import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
+
+import './Header.scss';
+import { Badge } from '../Badge/Badge.js';
+import { getApplicationURL } from '../../utils/utils.js';
 
 /* CSS classes */
 const SHOW_ACTIONS_CLASS = 'show-actions';
@@ -183,5 +188,29 @@ export class Header extends Component {
         }
 
         this.titleElem.textContent = title ?? '';
+    }
+
+    setRemindersCount(count) {
+        const showButton = count > 0;
+        if (!showButton) {
+            this.remindersBtn?.show(false);
+            return;
+        }
+
+        if (!this.remindersBtn) {
+            this.remindersBadge = Badge.create();
+            this.remindersBtn = Button.create({
+                id: 'remindersBtn',
+                type: 'link',
+                url: getApplicationURL('reminders'),
+                icon: 'notification',
+                title: this.remindersBadge.elem,
+                className: 'header-btn',
+            });
+            this.userBtn.before(this.remindersBtn.elem);
+        }
+
+        this.remindersBadge.setTitle(count);
+        this.remindersBtn.show(true);
     }
 }

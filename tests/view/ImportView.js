@@ -958,11 +958,22 @@ export class ImportView extends AppView {
         return true;
     }
 
+    async toggleExpandRule(index) {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.rulesDialog.toggleExpandRule(index));
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
+    }
+
     async createRule() {
         this.checkRulesListState();
 
         await this.performAction(() => this.rulesDialog.createRule());
-        return true;
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async updateRule(index) {
