@@ -45,6 +45,7 @@ export class ItemDetails extends Component {
     init() {
         this.closeBtn = CloseButton.create({
             small: false,
+            className: 'circle-btn',
             onClick: () => this.onClose(),
         });
 
