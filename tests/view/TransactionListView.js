@@ -463,12 +463,12 @@ export class TransactionListView extends AppView {
         return TransactionList.render(items, App.state, showDate);
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const sortMode = model.listMode === 'sort';
         const isItemsAvailable = (model.filtered.length > 0);
-        const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
+        const isAvailable = state.accounts.length > 0 || state.persons.length > 0;
         const { filtersVisible } = model;
         const selected = this.getSelectedItems(model);
         const showSelectItems = (
@@ -494,6 +494,7 @@ export class TransactionListView extends AppView {
         const list = this.getExpectedList(model);
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,

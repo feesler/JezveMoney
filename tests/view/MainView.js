@@ -67,6 +67,7 @@ export class MainView extends AppView {
         );
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             summaryWidget: {
                 accountsTab,
                 personsTab,

@@ -3,13 +3,27 @@ import {
     assert,
     query,
     queryAll,
-    prop,
     click,
-    asyncMap,
     evaluate,
 } from 'jezve-test';
+import { App } from '../../Application.js';
+import { REMINDER_SCHEDULED } from '../../model/Reminder.js';
 
 export class Header extends TestComponent {
+    static getExpectedState(state = App.state) {
+        const res = {};
+
+        const reminders = state.getReminders({ state: REMINDER_SCHEDULED });
+        if (reminders.length > 0) {
+            res.remindersBtn = {
+                visible: true,
+                counter: reminders.length.toString(),
+            };
+        }
+
+        return res;
+    }
+
     get userBtn() {
         return this.content.userBtn;
     }
@@ -26,36 +40,48 @@ export class Header extends TestComponent {
 
         assert(res.logo.elem, 'Logo element not found');
 
+        // Reminders counter button
+        res.remindersBtn = { elem: await query(this.elem, '#remindersBtn') };
+
+        // User button
         res.userBtn = { elem: await query(this.elem, '.header .user-btn') };
         assert(res.userBtn.elem, 'User button not found');
-
-        res.userBtn.title = await evaluate((btnEl) => (
-            btnEl.querySelector('.btn__content')?.textContent
-        ), res.userBtn.elem);
 
         res.userNav = { elem: await query('.user-navigation') };
         assert(res.userNav.elem, 'User navigation not found');
 
-        res.userNav.menuEl = await query(res.userNav.elem, '.nav-list');
-        if (res.userNav.menuEl) {
-            const menuLinks = await queryAll(res.userNav.menuEl, 'a.nav-item__link');
-            res.userNav.menuItems = await asyncMap(menuLinks, async (elem) => ({
-                elem,
-                href: await prop(elem, 'href'),
-            }));
+        [
+            res.remindersBtn.visible,
+            res.remindersBtn.counter,
+            res.userBtn.title,
+            res.userNav.menuItems,
+        ] = await evaluate((remBtn, userBtn, navListEl) => ([
+            !!remBtn && !remBtn.hidden,
+            remBtn?.querySelector('.badge')?.textContent,
+            userBtn?.querySelector('.btn__content')?.textContent,
+            Array.from(navListEl?.querySelectorAll('.nav-list a.nav-item__link'))
+                .map((el) => el?.href),
+        ]), res.remindersBtn.elem, res.userBtn.elem, res.userNav.elem);
 
-            res.userNav.menuItems.forEach((item) => {
-                if (item.href.endsWith('/profile/')) {
-                    res.userNav.profileBtn = item;
-                }
-                if (item.href.endsWith('/settings/')) {
-                    res.userNav.settingsBtn = item;
-                }
-                if (item.href.endsWith('/logout/')) {
-                    res.userNav.logoutBtn = item;
-                }
-            });
-        }
+        const menuLinks = await queryAll(res.userNav.elem, '.nav-list a.nav-item__link');
+        res.userNav.menuItems = res.userNav.menuItems.map((href, index) => {
+            const item = {
+                href,
+                elem: menuLinks[index],
+            };
+
+            if (href?.endsWith('/profile/')) {
+                res.userNav.profileBtn = item;
+            }
+            if (href?.endsWith('/settings/')) {
+                res.userNav.settingsBtn = item;
+            }
+            if (href?.endsWith('/logout/')) {
+                res.userNav.logoutBtn = item;
+            }
+
+            return item;
+        });
 
         return res;
     }

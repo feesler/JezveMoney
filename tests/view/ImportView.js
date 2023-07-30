@@ -199,7 +199,7 @@ export class ImportView extends AppView {
         return res;
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const showMenuItems = model.enabled && model.listMenuVisible;
@@ -208,6 +208,7 @@ export class ImportView extends AppView {
         const hasItems = this.items.length > 0;
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             notAvailMsg: { visible: !model.enabled },
             menuBtn: { visible: model.enabled },
             totalCounter: { visible: model.enabled },

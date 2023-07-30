@@ -172,7 +172,7 @@ export class StatisticsView extends AppView {
         return groupTypesMap[groupName];
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const { filtersVisible } = model;
         const {
             report,
@@ -195,6 +195,7 @@ export class StatisticsView extends AppView {
         }
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             typeMenu: {
                 visible: filtersVisible,
                 value: model.filter.type,

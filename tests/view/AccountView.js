@@ -213,7 +213,7 @@ export class AccountView extends AppView {
         return res;
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const account = this.getExpectedAccount(model);
         const accTile = Tile.renderAccount(account);
 
@@ -226,6 +226,7 @@ export class AccountView extends AppView {
         const isCreditCard = model.type === ACCOUNT_TYPE_CREDIT_CARD;
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             heading: { visible: true },
             tile: accTile,
             name: { value: model.name.toString(), visible: true },

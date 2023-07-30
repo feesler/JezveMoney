@@ -29,7 +29,7 @@ const listMenuSelector = '#listMenu';
 
 /** Scheduled transactions list view class */
 export class ScheduleView extends AppView {
-    static getExpectedState(model) {
+    static getExpectedState(model, state = App.state) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const itemsCount = App.view.items.length;
@@ -45,6 +45,7 @@ export class ScheduleView extends AppView {
         const list = this.getExpectedList(model);
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             totalCounter: { visible: true, value: itemsCount },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },

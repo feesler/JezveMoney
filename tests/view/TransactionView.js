@@ -23,6 +23,7 @@ export class TransactionView extends AppView {
 
     static getInitialState(options, state = App.state) {
         const res = {
+            header: this.getHeaderExpectedState(state),
             form: TransactionForm.getInitialState(
                 { ...options, formType: this.formType },
                 state,

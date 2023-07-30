@@ -82,8 +82,9 @@ export class PersonView extends AppView {
         return res;
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const res = {
+            header: this.getHeaderExpectedState(state),
             name: {
                 visible: true,
                 value: model.name.toString(),

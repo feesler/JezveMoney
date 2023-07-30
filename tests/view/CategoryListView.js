@@ -51,6 +51,7 @@ export class CategoryListView extends AppView {
         );
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

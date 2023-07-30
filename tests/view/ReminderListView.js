@@ -82,6 +82,7 @@ export class ReminderListView extends AppView {
         );
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             stateMenu: {
                 value: model.filter.state.toString(),
                 visible: filtersVisible,

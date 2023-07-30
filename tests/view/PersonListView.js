@@ -53,6 +53,7 @@ export class PersonListView extends AppView {
         const hiddenTiles = TilesList.renderHiddenPersons(state.persons, false, sortMode);
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

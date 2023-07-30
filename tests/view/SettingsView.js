@@ -131,7 +131,7 @@ export class SettingsView extends AppView {
         return res;
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const isMainTab = model.selectedTab === 'main';
         const isCurrenciesTab = model.selectedTab === 'currencies';
         const isRegionalTab = model.selectedTab === 'regional';
@@ -148,6 +148,7 @@ export class SettingsView extends AppView {
         );
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             localeSelect: {
                 visible: isMainTab,
                 value: model.locale,
