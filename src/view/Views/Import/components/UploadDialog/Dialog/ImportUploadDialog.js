@@ -314,10 +314,9 @@ export class ImportUploadDialog extends Component {
         }
 
         const children = [];
-        if (state.convertState === TPL_SELECT_STATE) {
-            const backButton = this.renderBackButton();
-            children.push(backButton);
-        }
+
+        const backButton = this.renderBackButton();
+        children.push(backButton);
 
         let title;
         if (state.convertState === TPL_SELECT_STATE) {

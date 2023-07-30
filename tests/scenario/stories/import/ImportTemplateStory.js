@@ -33,9 +33,6 @@ export class ImportTemplateStory extends TestStory {
     async run() {
         setBlock('Import templates', 1);
 
-        setBlock('Upload card CSV', 2);
-        await Actions.uploadFile(App.scenario.cardFile);
-
         await this.create();
         await this.update();
         await this.del();
@@ -50,6 +47,13 @@ export class ImportTemplateStory extends TestStory {
     // Create import template tests
     async create() {
         setBlock('Create import template', 2);
+
+        setBlock('Check navigation back to select file stage', 2);
+        await Actions.uploadFile(App.scenario.accountFile);
+        await Actions.backToSelectFile();
+
+        setBlock('Upload card CSV', 2);
+        await Actions.uploadFile(App.scenario.cardFile);
 
         setBlock('Verify template is not submitted without configured columns', 2);
         await Actions.inputTemplateName('Template_1');
@@ -116,6 +120,12 @@ export class ImportTemplateStory extends TestStory {
     // Update import template tests
     async update() {
         setBlock('Update import template', 2);
+
+        setBlock('Check navigation back to select file stage', 2);
+        await Actions.backToSelectFile();
+
+        setBlock('Upload card CSV', 2);
+        await Actions.uploadFile(App.scenario.cardFile);
 
         await Actions.selectTemplateByIndex(0);
         await Actions.updateTemplate();

@@ -6,7 +6,6 @@ import {
     prop,
     click,
     input,
-    isVisible,
     wait,
     waitForFunction,
     isNum,
@@ -96,6 +95,9 @@ export class ImportUploadDialog extends TestComponent {
             assert(res[child]?.elem, `Invalid structure of ImportUploadDialog: ${child} component not found`)
         ));
 
+        // 'Back' utton
+        res.backBtn = { elem: await query(this.elem, '.back-btn') };
+
         // Template select
         res.templateSelect.titleElem = await query(res.templateSelect.elem, '.template-select__title');
         // Template select context menu
@@ -123,7 +125,7 @@ export class ImportUploadDialog extends TestComponent {
             res.uploadProgress.visible,
             res.loadingIndicator.visible,
         ] = await evaluate(
-            (...elems) => elems.map((el) => el && !el.hidden),
+            (...elems) => elems.map((el) => !!el && !el.hidden),
             res.templateBlock.elem,
             res.templateForm.elem,
             res.uploadProgress.elem,
@@ -146,6 +148,7 @@ export class ImportUploadDialog extends TestComponent {
         [
             res.fileName,
             res.serverAddress,
+            res.backBtn.visible,
             res.templateSelect.title,
             res.tplNameInp.value,
             res.firstRowInp.value,
@@ -158,10 +161,12 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFormTitle.title,
             res.convertFeedback.title,
             res.convertFeedback.visible,
+            res.cancelTplBtn.disabled,
         ] = await evaluate(
             (
                 fileEl,
                 serverEl,
+                backBtn,
                 tplEl,
                 nameEl,
                 inpEl,
@@ -171,9 +176,11 @@ export class ImportUploadDialog extends TestComponent {
                 formFbEl,
                 titleEl,
                 convFbEL,
+                cancelBtn,
             ) => ([
                 fileEl.value,
                 serverEl.value,
+                !!backBtn && !backBtn.hidden,
                 tplEl.textContent,
                 nameEl.value,
                 inpEl.value,
@@ -186,9 +193,11 @@ export class ImportUploadDialog extends TestComponent {
                 titleEl?.textContent,
                 convFbEL?.textContent,
                 !!convFbEL && !convFbEL.hidden,
+                cancelBtn?.disabled,
             ]),
             res.fileNameElem.elem,
             res.serverAddressInput.elem,
+            res.backBtn.elem,
             res.templateSelect.titleElem,
             res.tplNameInp.elem,
             res.firstRowInp.elem,
@@ -198,6 +207,7 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFormFeedback.elem,
             res.tplFormTitle.elem,
             res.convertFeedback.elem,
+            res.cancelTplBtn.elem,
         );
 
         res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
@@ -386,7 +396,7 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    getExpectedState(model) {
+    getExpectedState(model = this.model) {
         const isBrowseState = model.state === BROWSE_FILE_STATE;
         const isLoadingState = model.state === LOADING_STATE;
         const isConvertState = model.state === CONVERT_STATE;
@@ -394,6 +404,7 @@ export class ImportUploadDialog extends TestComponent {
         const isDateFormatColumn = model.selectedColumn === 'date';
 
         const res = {
+            backBtn: { visible: isConvertState || isFormState },
             uploadFormBrowser: { visible: isBrowseState },
             isEncodeCheck: { visible: isBrowseState },
             serverAddressBlock: { visible: isBrowseState && model.useServerAddress },
@@ -827,9 +838,8 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async cancelTemplate() {
-        const visible = await isVisible(this.content.cancelTplBtn.elem, true);
-        const disabled = await prop(this.content.cancelTplBtn.elem, 'disabled');
-        assert(visible && !disabled, 'Cancel template button is invisible or disabled');
+        const { cancelTplBtn } = this.content;
+        assert(cancelTplBtn.visible && !cancelTplBtn.disabled, 'Cancel template button is invisible or disabled');
 
         this.model.state = CONVERT_STATE;
 
@@ -879,5 +889,23 @@ export class ImportUploadDialog extends TestComponent {
             await this.parse();
             return !this.model.uploadInProgress;
         });
+    }
+
+    /** Clicks on 'Back' button at upload dialog to return to select file stage */
+    async backToSelectFile() {
+        const isConvertState = this.model.state === CONVERT_STATE;
+        const isFormState = this.isTemplateFormState();
+        assert(isConvertState || isFormState, 'Invalid state');
+
+        const { backBtn } = this.content;
+        assert(backBtn.elem && backBtn.visible, 'Back button not available');
+
+        this.model.state = BROWSE_FILE_STATE;
+        this.model.filename = '';
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.backBtn.elem));
+
+        return this.checkState(expected);
     }
 }

@@ -129,6 +129,13 @@ export const cancelTemplate = async () => {
     });
 };
 
+/** Clicks on 'Back' button at upload dialog to return to select file stage */
+export const backToSelectFile = async () => {
+    await test('Cancel template', () => (
+        App.view.backToSelectFile()
+    ));
+};
+
 /** Creates template from specified props and submit */
 export const addTemplate = async (props) => {
     assert.isObject(props);

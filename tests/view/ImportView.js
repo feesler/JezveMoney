@@ -748,6 +748,15 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    /** Clicks on 'Back' button at upload dialog to return to select file stage */
+    async backToSelectFile() {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.backToSelectFile());
+
+        return this.checkState();
+    }
+
     /** Run action and wait until list finish to load */
     async waitForList(action) {
         const prevTime = this.model.renderTime;
