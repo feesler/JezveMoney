@@ -30,12 +30,7 @@ export const createList = (items, state) => {
         && (!endDate || item.date <= endDate)
     ));
 
-    const list = ReminderList.create(res);
-    if (stateFilter === REMINDER_UPCOMING) {
-        list.sortByDateAsc();
-    }
-
-    return list;
+    return res;
 };
 
 const upcomingId = (item, index) => ({
@@ -49,15 +44,31 @@ const reduceDeselectAll = (state) => ({
     items: state.items.map(reduceDeselectItem),
 });
 
-export const updateList = (state) => {
+export const updateList = (state, options = {}) => {
+    const keepSelection = options.keepState && state.listMode === 'select';
+    const selectedBefore = (keepSelection)
+        ? state.items.filter((item) => item.selected).map((item) => item.id)
+        : [];
+
     const result = state;
+    const stateFilter = getStateFilter(result);
     const { pagination } = result;
 
     const itemsSource = getItemsSource(state);
-    const items = createList(itemsSource, state);
-    result.items = items;
+    let items = createList(itemsSource, state);
+    if (keepSelection) {
+        items = items.map((item) => ({
+            ...item,
+            selected: selectedBefore.includes(item.id),
+        }));
+    }
 
-    const stateFilter = getStateFilter(result);
+    const list = ReminderList.create(items);
+    if (stateFilter === REMINDER_UPCOMING) {
+        list.sortByDateAsc();
+    }
+    result.items = list;
+
     if (stateFilter !== REMINDER_UPCOMING) {
         pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
     }
@@ -165,7 +176,7 @@ const slice = createSlice({
             ...state.pagination,
             range: (state.pagination.range ?? 0) + 1,
         },
-    }),
+    }, { keepState: true }),
 
     changePage: (state, page) => ({
         ...state,

@@ -9,6 +9,7 @@ const availFields = [
     'transaction_id',
     'createdate',
     'updatedate',
+    'selected',
 ];
 
 const commonTransactionFields = [
