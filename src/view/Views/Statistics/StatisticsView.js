@@ -288,6 +288,7 @@ class StatisticsView extends AppView {
             barWidth: 45,
             columnGap: 3,
             showPopupOnHover: true,
+            showPopupOnClick: true,
             animatePopup: true,
             activateOnClick: true,
             activateOnHover: true,
