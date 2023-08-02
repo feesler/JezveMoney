@@ -528,7 +528,7 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         this.model.filename = filename;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => input(this.content.serverAddressInput.elem, filename));
 
@@ -561,7 +561,7 @@ export class ImportUploadDialog extends TestComponent {
                 columns: {},
             });
         }
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(async () => {
             await click(this.content.serverUploadBtn.elem);
@@ -582,7 +582,7 @@ export class ImportUploadDialog extends TestComponent {
             this.model.initialAccount = App.state.accounts.getItem(template.account_id);
         }
         this.model.isValid = this.isValidTemplate();
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.templateDropDown.selectItem(val));
 
@@ -606,7 +606,7 @@ export class ImportUploadDialog extends TestComponent {
             date_locale: IMPORT_DATE_LOCALE,
             columns: {},
         });
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => click(this.content.createTplBtn.elem));
 
@@ -628,7 +628,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.convertFeedbackVisible = false;
         this.model.selectedColumn = 'accountAmount';
         this.model.template = App.state.templates.getItem(this.content.templateDropDown.value);
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.openTemplateMenu();
         await this.performAction(() => this.content.updateTplBtn.click());
@@ -662,7 +662,7 @@ export class ImportUploadDialog extends TestComponent {
             }
         }
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.openTemplateMenu();
         await this.performAction(() => this.content.deleteTplBtn.click());
@@ -682,7 +682,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.name = val;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => input(this.content.tplNameInp.elem, val));
 
@@ -697,7 +697,7 @@ export class ImportUploadDialog extends TestComponent {
         if (invalidColumn !== null) {
             this.model.selectedColumn = invalidColumn;
         }
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.columnSel.selectItem(name));
 
@@ -713,7 +713,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.date_locale = locale;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.dateFormatSel.selectItem(locale));
 
@@ -724,7 +724,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.first_row = parseInt(val, 10);
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => input(this.content.firstRowInp.elem, val.toString()));
 
@@ -737,7 +737,7 @@ export class ImportUploadDialog extends TestComponent {
         assert(!this.content.decFirstRowBtn.disabled, 'Decrease first row button is disabled');
 
         this.model.template.first_row -= 1;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => click(this.content.decFirstRowBtn.elem));
 
@@ -754,7 +754,7 @@ export class ImportUploadDialog extends TestComponent {
         } else {
             this.model.template.first_row += 1;
         }
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => click(this.content.incFirstRowBtn.elem));
 
@@ -770,7 +770,7 @@ export class ImportUploadDialog extends TestComponent {
             const account = App.state.getFirstAccount();
             this.model.template.account_id = account.id;
         }
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.tplAccountSwitch.toggle());
 
@@ -782,7 +782,7 @@ export class ImportUploadDialog extends TestComponent {
 
         const account = App.state.accounts.getItem(val);
         this.model.template.account_id = account.id;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.tplAccountSel.selectItem(val));
 
@@ -811,7 +811,7 @@ export class ImportUploadDialog extends TestComponent {
             }
         }
 
-        const expected = this.getExpectedState(this.model);
+        const expected = this.getExpectedState();
 
         assert(!disabled, 'Submit template button is disabled');
         await click(this.content.submitTplBtn.elem);
@@ -850,7 +850,7 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.model.isValid = this.isValidTemplate(template);
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => click(this.content.cancelTplBtn.elem));
 
@@ -859,7 +859,7 @@ export class ImportUploadDialog extends TestComponent {
 
     async selectAccount(val) {
         this.model.initialAccount = App.state.accounts.getItem(val);
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.initialAccount.selectItem(val));
 
