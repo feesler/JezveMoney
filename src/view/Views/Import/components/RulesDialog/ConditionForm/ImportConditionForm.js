@@ -5,10 +5,10 @@ import {
     asArray,
     Component,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
-import { Icon } from 'jezvejs/Icon';
 
 import { __ } from '../../../../../utils/utils.js';
 import { MAX_PRECISION } from '../../../../../utils/decimal.js';
@@ -144,16 +144,12 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Delete button
-        const delIcon = Icon.create({
+        this.delBtn = Button.create({
             icon: 'del',
-            className: 'btn__icon delete-icon',
+            className: 'icon-btn delete-btn',
+            onClick: () => this.onDelete(),
         });
-        this.delBtn = createElement('button', {
-            props: { className: 'btn icon-btn delete-btn', type: 'button' },
-            children: delIcon.elem,
-            events: { click: () => this.onDelete() },
-        });
-        this.controls = App.createContainer(CONTROLS_CLASS, this.delBtn);
+        this.controls = App.createContainer(CONTROLS_CLASS, this.delBtn.elem);
 
         this.elem = App.createContainer(FORM_CLASS, [
             this.container,

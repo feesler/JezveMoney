@@ -6,7 +6,7 @@ import {
     setEvents,
     removeEvents,
 } from 'jezvejs';
-import { Icon } from 'jezvejs/Icon';
+import { Button } from 'jezvejs/Button';
 import { Popup } from 'jezvejs/Popup';
 
 import { __ } from '../../../../../utils/utils.js';
@@ -27,7 +27,6 @@ const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
 const BACK_BTN_CLASS = 'btn back-btn circle-btn';
 const TPL_FORM_TITLE_CLASS = 'template-form-title';
-const BACK_ICON_CLASS = 'btn__icon';
 
 /** States */
 const UPLOAD_STATE = 1;
@@ -285,18 +284,6 @@ export class ImportUploadDialog extends Component {
         this.reset();
     }
 
-    renderBackButton() {
-        const icon = Icon.create({
-            icon: 'back',
-            className: BACK_ICON_CLASS,
-        });
-        return createElement('button', {
-            props: { className: BACK_BTN_CLASS },
-            children: icon.elem,
-            events: { click: () => this.setUploadState() },
-        });
-    }
-
     renderDialogTitle(state, prevState) {
         if (
             state.id === prevState.id
@@ -313,10 +300,11 @@ export class ImportUploadDialog extends Component {
             return;
         }
 
-        const children = [];
-
-        const backButton = this.renderBackButton();
-        children.push(backButton);
+        const backButton = Button.create({
+            icon: 'back',
+            className: BACK_BTN_CLASS,
+            onClick: () => this.setUploadState(),
+        });
 
         let title;
         if (state.convertState === TPL_SELECT_STATE) {
@@ -333,10 +321,10 @@ export class ImportUploadDialog extends Component {
                 textContent: title,
             },
         });
-        children.push(titleElem);
+
         const convertTitle = createElement('div', {
             props: { className: CONVERT_TITLE_CLASS },
-            children,
+            children: [backButton.elem, titleElem],
         });
 
         this.popup.setTitle(convertTitle);
