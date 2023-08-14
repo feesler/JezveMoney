@@ -1,5 +1,6 @@
 {
     "name": "henryfeesler/jezvemoney",
+    "type": "project",
     "version": "1.71.0",
     "description": "",
 	"config": {
