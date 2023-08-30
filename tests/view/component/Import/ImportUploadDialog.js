@@ -15,8 +15,8 @@ import {
 import {
     Checkbox,
     DropDown,
-    Button,
     Switch,
+    PopupMenu,
 } from 'jezvejs-test';
 import { App } from '../../../Application.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -32,6 +32,10 @@ export const UPDATE_TPL_STATE = 5;
 const TPL_FORM_STATES = [CREATE_TPL_STATE, UPDATE_TPL_STATE];
 
 export class ImportUploadDialog extends TestComponent {
+    get tplContextMenu() {
+        return this.content.tplContextMenu;
+    }
+
     async parseContent() {
         assert(this.elem, 'Invalid import upload dialog element');
 
@@ -101,17 +105,7 @@ export class ImportUploadDialog extends TestComponent {
         // Template select
         res.templateSelect.titleElem = await query(res.templateSelect.elem, '.template-select__title');
         // Template select context menu
-        res.tplContextMenu = { elem: await query(this.elem, '.popup-menu-list') };
-        if (res.tplContextMenu.elem) {
-            res.updateTplBtn = await Button.create(
-                this,
-                await query(res.tplContextMenu.elem, '.update-btn'),
-            );
-            res.deleteTplBtn = await Button.create(
-                this,
-                await query(res.tplContextMenu.elem, '.delete-btn'),
-            );
-        }
+        res.tplContextMenu = await PopupMenu.create(this, await query(this.elem, '.popup-menu-list'));
 
         res.uploadProgress = { elem: await query(this.elem, ':scope > .loading-indicator') };
         res.loadingIndicator = { elem: await query(this.elem, '.upload-form__converter > .loading-indicator') };
@@ -417,6 +411,15 @@ export class ImportUploadDialog extends TestComponent {
         res.tplSelectGroup = { visible: isConvertState };
         res.tplField = { visible: isConvertState };
         res.tplFeedback = { visible: isConvertState };
+
+        if (model.templateMenuVisible) {
+            res.tplContextMenu = {
+                visible: true,
+                ctxUpdateTemplateBtn: { visible: true },
+                ctxDeleteTemplateBtn: { visible: true },
+            };
+        }
+
         // Template form
         res.templateForm = { visible: isFormState };
         res.rawDataTable = { visible: isFormState };
@@ -631,7 +634,7 @@ export class ImportUploadDialog extends TestComponent {
         this.expectedState = this.getExpectedState();
 
         await this.openTemplateMenu();
-        await this.performAction(() => this.content.updateTplBtn.click());
+        await this.performAction(() => this.tplContextMenu.select('ctxUpdateTemplateBtn'));
 
         return this.checkState();
     }
@@ -665,7 +668,7 @@ export class ImportUploadDialog extends TestComponent {
         this.expectedState = this.getExpectedState();
 
         await this.openTemplateMenu();
-        await this.performAction(() => this.content.deleteTplBtn.click());
+        await this.performAction(() => this.tplContextMenu.select('ctxDeleteTemplateBtn'));
 
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
 

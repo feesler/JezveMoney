@@ -17,31 +17,27 @@ export class TemplateSelectContextMenu extends PopupMenu {
                 icon: 'update',
                 title: __('actions.update'),
                 className: UPDATE_BUTTON_CLASS,
-                onClick: (e) => e?.stopPropagation(),
+                onClick: (_, e) => e?.stopPropagation(),
             }, {
                 id: 'ctxDeleteTemplateBtn',
                 icon: 'del',
                 title: __('actions.delete'),
                 className: DEL_BUTTON_CLASS,
-                onClick: (e) => e?.stopPropagation(),
+                onClick: (_, e) => e?.stopPropagation(),
             }],
         });
-
-        this.state = {
-            showContextMenu: false,
-        };
     }
 
     getHostElement() {
         return document.querySelector('.template-select .menu-btn');
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }

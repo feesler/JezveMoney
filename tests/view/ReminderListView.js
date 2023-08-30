@@ -1012,8 +1012,8 @@ export class ReminderListView extends AppView {
 
         await this.performAction(async () => {
             await item.clickMenu();
-            const selector = (isUpcoming) ? '#ctxCancelBtn' : '#ctxDetailsBtn';
-            return wait(selector, { visible: true });
+            const itemId = (isUpcoming) ? 'ctxCancelBtn' : 'ctxDetailsBtn';
+            return wait(`[data-id="${itemId}"]`, { visible: true });
         });
 
         return this.checkState(expected);

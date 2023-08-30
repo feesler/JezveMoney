@@ -1,4 +1,4 @@
-import { show } from 'jezvejs';
+import { mapItems } from 'jezvejs/Menu';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../utils/utils.js';
@@ -14,7 +14,7 @@ export class TransactionListContextMenu extends PopupMenu {
                 id: 'ctxDetailsBtn',
                 type: 'link',
                 title: __('actions.openItem'),
-                onClick: (e) => e?.preventDefault(),
+                onClick: (_, e) => e?.preventDefault(),
             }, {
                 id: 'separator1',
                 type: 'separator',
@@ -41,6 +41,7 @@ export class TransactionListContextMenu extends PopupMenu {
         });
 
         this.state = {
+            ...this.state,
             contextItem: null,
             showContextMenu: false,
             showDetailsItem: false,
@@ -51,17 +52,17 @@ export class TransactionListContextMenu extends PopupMenu {
         return document.querySelector(`.trans-item[data-id="${itemId}"] .menu-btn`);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context value');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }
 
-        const itemId = state.contextItem;
+        const itemId = context.contextItem;
         const menuButton = this.getHostElement(itemId);
         if (!menuButton) {
             this.detach();
@@ -69,13 +70,45 @@ export class TransactionListContextMenu extends PopupMenu {
         }
 
         const { baseURL } = App;
-        const { items } = this;
 
-        items.ctxDetailsBtn.show(state.showDetailsItem);
-        show(items.separator1, state.showDetailsItem);
-        items.ctxDetailsBtn.setURL(`${baseURL}transactions/${itemId}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
-        items.ctxDuplicateBtn.setURL(`${baseURL}transactions/create?from=${itemId}`);
+        this.setState({
+            ...this.state,
+            showContextMenu: context.showContextMenu,
+            contextItem: context.contextItem,
+            showDetailsItem: context.showDetailsItem,
+            items: mapItems(this.state.items, (item) => {
+                if (item.id === 'ctxDetailsBtn') {
+                    return {
+                        ...item,
+                        url: `${baseURL}transactions/${itemId}`,
+                        hidden: !context.showDetailsItem,
+                    };
+                }
+
+                if (item.id === 'separator1') {
+                    return {
+                        ...item,
+                        hidden: !context.showDetailsItem,
+                    };
+                }
+
+                if (item.id === 'ctxUpdateBtn') {
+                    return {
+                        ...item,
+                        url: `${baseURL}transactions/update/${itemId}`,
+                    };
+                }
+
+                if (item.id === 'ctxDuplicateBtn') {
+                    return {
+                        ...item,
+                        url: `${baseURL}transactions/create?from=${itemId}`,
+                    };
+                }
+
+                return item;
+            }),
+        });
 
         this.attachAndShow(menuButton);
     }

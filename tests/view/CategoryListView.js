@@ -223,7 +223,7 @@ export class CategoryListView extends AppView {
                 isSortMode,
             ] = await evaluate((el, listEl) => ([
                 el.dataset.id,
-                el.closest('.tab-list')?.querySelector(`[data-value="${el.dataset.id}"] .link-menu-item__title`)?.textContent,
+                el.closest('.tab-list')?.querySelector(`[data-id="${el.dataset.id}"] .menu-item__content`)?.textContent,
                 el && !el.hidden,
                 parseInt(listEl.dataset.time, 10),
                 listEl.classList.contains('list_select'),
@@ -468,7 +468,7 @@ export class CategoryListView extends AppView {
 
         await this.performAction(async () => {
             await categoryItem.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);

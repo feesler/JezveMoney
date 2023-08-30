@@ -366,21 +366,16 @@ export class StatisticsView extends AppView {
         this.model.filter.type = types;
         const expected = this.getExpectedState();
 
-        if (types.length === 1) {
-            const [type] = types;
-            await this.waitForData(() => App.view.content.typeMenu.select(type));
-        } else {
-            // Select new types
-            for (const type of Transaction.availTypes) {
-                if (!typesBefore.includes(type) && types.includes(type)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
-                }
+        // Select new types
+        for (const type of Transaction.availTypes) {
+            if (!typesBefore.includes(type) && types.includes(type)) {
+                await this.waitForData(() => App.view.content.typeMenu.toggle(type));
             }
-            // Deselect previous types
-            for (const type of Transaction.availTypes) {
-                if (typesBefore.includes(type) && !types.includes(type)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
-                }
+        }
+        // Deselect previous types
+        for (const type of Transaction.availTypes) {
+            if (typesBefore.includes(type) && !types.includes(type)) {
+                await this.waitForData(() => App.view.content.typeMenu.toggle(type));
             }
         }
 

@@ -48,7 +48,7 @@ export class TransactionsWidget extends Widget {
         const item = this.content.transList.items[index];
         await this.performAction(async () => {
             await item.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return true;

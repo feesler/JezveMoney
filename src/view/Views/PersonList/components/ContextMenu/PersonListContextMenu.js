@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../utils/utils.js';
+
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { getExportURL } from '../../helpers.js';
 
@@ -9,42 +10,7 @@ export class PersonListContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                onClick: (e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-            }, {
-                id: 'ctxExportBtn',
-                type: 'link',
-                icon: 'export',
-                title: __('transactions.exportToCsv'),
-            }, {
-                id: 'ctxShowBtn',
-                icon: 'show',
-                title: __('actions.show'),
-            }, {
-                id: 'ctxHideBtn',
-                icon: 'hide',
-                title: __('actions.hide'),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
         });
-
-        this.state = {
-            contextItem: null,
-            showContextMenu: false,
-        };
     }
 
     getContextItem(state) {
@@ -55,16 +21,16 @@ export class PersonListContextMenu extends PopupMenu {
         return document.querySelector(`.tile[data-id="${itemId}"]`);
     }
 
-    render(state) {
-        if (!state) {
+    setContext(context) {
+        if (!context) {
             throw new Error('Invalid state');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }
-        const person = this.getContextItem(state);
+        const person = this.getContextItem(context);
         if (!person) {
             this.detach();
             return;
@@ -76,15 +42,44 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = App;
-        const { items } = this;
-        items.ctxDetailsBtn.setURL(`${baseURL}persons/${person.id}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
-
-        const exportURL = getExportURL(person.id);
-        items.ctxExportBtn.setURL(exportURL.toString());
-        items.ctxShowBtn.show(!person.isVisible());
-        items.ctxHideBtn.show(person.isVisible());
+        this.setState({
+            ...this.state,
+            items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('actions.openItem'),
+                url: getApplicationURL(`persons/${person.id}`),
+                onClick: (_, e) => e?.preventDefault(),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: __('actions.update'),
+                url: getApplicationURL(`persons/update/${person.id}`),
+            }, {
+                id: 'ctxExportBtn',
+                type: 'link',
+                icon: 'export',
+                title: __('transactions.exportToCsv'),
+                url: getExportURL(person.id),
+            }, {
+                id: 'ctxShowBtn',
+                icon: 'show',
+                title: __('actions.show'),
+                hidden: person.isVisible(),
+            }, {
+                id: 'ctxHideBtn',
+                icon: 'hide',
+                title: __('actions.hide'),
+                hidden: !person.isVisible(),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: __('actions.delete'),
+            }],
+        });
 
         this.attachAndShow(tile);
     }

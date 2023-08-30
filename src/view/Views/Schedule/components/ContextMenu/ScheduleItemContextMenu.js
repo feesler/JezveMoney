@@ -1,5 +1,5 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 /** Scheduled transactions list context menu component */
@@ -8,39 +8,7 @@ export class ScheduleItemContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                onClick: (e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-            }, {
-                id: 'ctxDuplicateBtn',
-                type: 'link',
-                icon: 'duplicate',
-                title: __('actions.duplicate'),
-            }, {
-                id: 'ctxFinishBtn',
-                title: __('schedule.finish'),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
         });
-
-        this.state = {
-            contextItem: null,
-            showContextMenu: false,
-        };
     }
 
     getContextItem(state) {
@@ -51,16 +19,16 @@ export class ScheduleItemContextMenu extends PopupMenu {
         return document.querySelector(`.schedule-item[data-id="${itemId}"] .menu-btn`);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }
-        const scheduleItem = this.getContextItem(state);
+        const scheduleItem = this.getContextItem(context);
         if (!scheduleItem) {
             this.detach();
             return;
@@ -72,11 +40,39 @@ export class ScheduleItemContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = App;
-        const { items } = this;
-        items.ctxDetailsBtn.setURL(`${baseURL}schedule/${scheduleItem.id}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}schedule/update/${scheduleItem.id}`);
-        items.ctxDuplicateBtn.setURL(`${baseURL}schedule/create?from=${scheduleItem.id}`);
+        this.setState({
+            ...this.state,
+            items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('actions.openItem'),
+                url: getApplicationURL(`schedule/${scheduleItem.id}`),
+                onClick: (_, e) => e?.preventDefault(),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: __('actions.update'),
+                url: getApplicationURL(`schedule/update/${scheduleItem.id}`),
+            }, {
+                id: 'ctxDuplicateBtn',
+                type: 'link',
+                icon: 'duplicate',
+                title: __('actions.duplicate'),
+                url: getApplicationURL(`schedule/create?from=${scheduleItem.id}`),
+            }, {
+                id: 'ctxFinishBtn',
+                title: __('schedule.finish'),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: __('actions.delete'),
+            }],
+        });
 
         this.attachAndShow(menuButton);
     }

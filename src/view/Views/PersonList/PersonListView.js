@@ -519,7 +519,7 @@ class PersonListView extends AppView {
             });
         }
 
-        this.contextMenu.setState({
+        this.contextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItem: state.contextItem,
         });
@@ -548,7 +548,7 @@ class PersonListView extends AppView {
             });
         }
 
-        this.menu.setState({
+        this.menu.setContext({
             listMode: state.listMode,
             showMenu: state.showMenu,
             items: state.items,

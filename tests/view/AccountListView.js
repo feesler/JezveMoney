@@ -354,7 +354,7 @@ export class AccountListView extends AppView {
         const tile = this.getTileByIndex(num);
         await this.performAction(async () => {
             await tile.click();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);

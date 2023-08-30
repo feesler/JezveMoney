@@ -544,7 +544,7 @@ class MainView extends AppView {
             });
         }
 
-        this.transactionContextMenu.setState({
+        this.transactionContextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItem: state.transactionContextItem,
             showDetailsItem: false,

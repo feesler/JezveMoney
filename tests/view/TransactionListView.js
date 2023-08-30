@@ -638,7 +638,7 @@ export class TransactionListView extends AppView {
 
         await this.performAction(async () => {
             await item.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);
@@ -773,7 +773,9 @@ export class TransactionListView extends AppView {
 
     async filterByType(value, directNavigate = false) {
         const newTypeSel = asArray(value);
-        const types = (newTypeSel.includes(0)) ? [] : newTypeSel;
+        const types = (newTypeSel.includes('all') || newTypeSel.includes(0))
+            ? []
+            : newTypeSel;
         types.sort();
 
         if (this.content.typeMenu.isSameSelected(types)) {
@@ -791,14 +793,9 @@ export class TransactionListView extends AppView {
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
-        } else if (types.length === 0) {
-            await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-        } else if (types.length === 1) {
-            const [type] = types;
-            await this.waitForList(() => App.view.content.typeMenu.select(type));
         } else {
             await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-            for (const type of newTypeSel) {
+            for (const type of types) {
                 await this.waitForList(() => App.view.content.typeMenu.toggle(type));
             }
         }

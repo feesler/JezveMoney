@@ -9,7 +9,7 @@ import {
     waitForFunction,
     asyncMap,
 } from 'jezve-test';
-import { Button, Paginator } from 'jezvejs-test';
+import { Paginator, PopupMenu } from 'jezvejs-test';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -20,6 +20,10 @@ import { __ } from '../../../model/locale.js';
 const ITEMS_ON_PAGE = 20;
 
 export class ImportRulesDialog extends TestComponent {
+    get contextMenu() {
+        return this.content.contextMenu;
+    }
+
     async parseContent() {
         assert(this.elem, 'Invalid import rules dialog element');
 
@@ -34,7 +38,6 @@ export class ImportRulesDialog extends TestComponent {
             searchField: await SearchInput.create(this, await query(this.elem, '.search-field')),
             clearSearchBtn: { elem: await query(this.elem, '.search-field .clear-btn') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
-            contextMenu: { elem: await query(this.elem, '.popup-menu-list') },
         };
 
         assert(
@@ -48,31 +51,15 @@ export class ImportRulesDialog extends TestComponent {
             'Failed to initialize import rules dialog',
         );
 
+        res.contextMenu = await PopupMenu.create(this, await query(this.elem, '.popup-menu-list'));
+
         [
-            res.contextMenu.itemId,
             res.rulesList.renderTime,
             res.header.title,
-        ] = await evaluate((menuEl, listEl, hdrEl) => {
-            const contextParent = menuEl?.closest('.rule-item');
-            const contextId = (contextParent)
-                ? parseInt(contextParent.dataset.id, 10)
-                : null;
-
-            return [
-                contextId,
-                listEl?.dataset?.time,
-                hdrEl?.textContent,
-            ];
-        }, res.contextMenu.elem, res.rulesList.elem, res.header.labelElem);
-
-        if (res.contextMenu.itemId) {
-            const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
-            res.updateBtn = await Button.create(this, updateBtnElem);
-            const duplicateBtnElem = await query(res.contextMenu.elem, '.duplicate-btn');
-            res.duplicateBtn = await Button.create(this, duplicateBtnElem);
-            const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');
-            res.deleteBtn = await Button.create(this, deleteBtnElem);
-        }
+        ] = await evaluate((listEl, hdrEl) => ([
+            listEl?.dataset?.time,
+            hdrEl?.textContent,
+        ]), res.rulesList.elem, res.header.labelElem);
 
         const listItems = await queryAll(res.rulesList.elem, '.rule-item');
         res.items = await asyncMap(
@@ -103,7 +90,7 @@ export class ImportRulesDialog extends TestComponent {
         res.filter = cont.searchField.value;
         res.rules = cont.items.map((item) => structuredClone(item.model));
 
-        res.contextMenuVisible = cont.contextMenu.visible;
+        res.contextMenuVisible = !!cont.contextMenu?.visible;
 
         res.pagination = {
             page: cont.paginator?.active ?? 1,
@@ -137,9 +124,14 @@ export class ImportRulesDialog extends TestComponent {
             rulesList: { visible: isList },
         };
 
-        res.contextMenu = {
-            visible: model.contextMenuVisible,
-        };
+        if (model.contextMenuVisible) {
+            res.contextMenu = {
+                visible: true,
+                ctxUpdateRuleBtn: { visible: true },
+                ctxDuplicateRuleBtn: { visible: true },
+                ctxDeleteRuleBtn: { visible: true },
+            };
+        }
 
         if (isList) {
             res.header.title = __('import.rules.listTitle', App.view.locale);
@@ -400,7 +392,7 @@ export class ImportRulesDialog extends TestComponent {
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.updateBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxUpdateRuleBtn'));
 
         await waitForFunction(async () => {
             await this.parse();
@@ -424,7 +416,7 @@ export class ImportRulesDialog extends TestComponent {
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.duplicateBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxDuplicateRuleBtn'));
 
         await waitForFunction(async () => {
             await this.parse();
@@ -440,7 +432,7 @@ export class ImportRulesDialog extends TestComponent {
         this.model.contextMenuVisible = false;
         let expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.deleteBtn.click());
+        await this.performAction(() => this.contextMenu.select('ctxDeleteRuleBtn'));
         await this.performAction(() => wait(this.content.ruleDeletePopupId, { visible: true }));
 
         this.checkState(expected);

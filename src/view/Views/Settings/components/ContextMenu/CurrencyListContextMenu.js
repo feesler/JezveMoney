@@ -14,11 +14,6 @@ export class CurrencyListContextMenu extends PopupMenu {
                 title: __('actions.delete'),
             }],
         });
-
-        this.state = {
-            contextItem: null,
-            showContextMenu: false,
-        };
     }
 
     getContextItem(state) {
@@ -29,17 +24,17 @@ export class CurrencyListContextMenu extends PopupMenu {
         return document.querySelector(`.currency-item[data-id="${itemId}"] .menu-btn`);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }
 
-        const item = this.getContextItem(state);
+        const item = this.getContextItem(context);
         if (!item) {
             this.detach();
             return;

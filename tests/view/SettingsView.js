@@ -326,7 +326,7 @@ export class SettingsView extends AppView {
         await this.performAction(async () => {
             const currencyItem = this.content.currenciesList.items[index];
             await currencyItem.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);

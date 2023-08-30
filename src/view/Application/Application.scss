@@ -977,15 +977,15 @@ svg * {
 }
 
 /* Link menu */
-.link-menu {
-  --link-menu-icon-color: var(--accent-color);
-  --link-menu-item-padding: 0;
-  --link-menu-selected-color: var(--main-text-color);
+.menu.link-menu {
+  --menu-item-icon-color: var(--accent-color);
+  --menu-item-padding: 0;
+  --menu-item-selected-text-color: var(--main-text-color);
 }
 
-.link-menu[multiple] {
-  --link-menu-selected-color: var(--accent-color);
-  --link-menu-selected-font-weight: 400;
+.menu.link-menu[multiple] {
+  --menu-item-selected-text-color: var(--accent-color);
+  --menu-item-selected-font-weight: 400;
 }
 
 /* Counters */
@@ -1068,12 +1068,12 @@ a.paginator-arrow:focus-visible {
   --tab-active-color: var(--accent-color-alt);
   --tab-selected-color: var(--main-text-color);
 
-  .link-menu-item {
+  > .menu .menu-item {
     border-bottom-width: 2px;
     text-decoration: none;
   }
 
-  .link-menu-item_selected {
+  > .menu .menu-item_selected {
     border-bottom-color: var(--accent-color-alt);
   }
 }

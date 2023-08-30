@@ -914,7 +914,7 @@ class TransactionListView extends AppView {
             });
         }
 
-        this.contextMenu.setState({
+        this.contextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItem: state.contextItem,
             showDetailsItem: true,
@@ -944,7 +944,7 @@ class TransactionListView extends AppView {
             });
         }
 
-        this.menu.setState({
+        this.menu.setContext({
             listMode: state.listMode,
             showMenu: state.showMenu,
             items: state.items,
