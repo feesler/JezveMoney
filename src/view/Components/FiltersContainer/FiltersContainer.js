@@ -2,6 +2,7 @@ import {
     isVisible,
     debounce,
     Component,
+    afterTransition,
 } from 'jezvejs';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -9,6 +10,7 @@ import { Offcanvas } from 'jezvejs/Offcanvas';
 import './FiltersContainer.scss';
 
 const RESIZE_DELAY = 200;
+const TRANSITION_END_TIMEOUT = 500;
 
 export class FiltersContainer extends Component {
     constructor(props) {
@@ -80,7 +82,12 @@ export class FiltersContainer extends Component {
     /** Hides filters Offcanvas */
     closeOffcanvas() {
         this.offcanvas.close();
-        this.collapsible.setContent(this.content);
+        afterTransition(this.offcanvas.elem, {
+            duration: TRANSITION_END_TIMEOUT,
+            target: this.offcanvas.elem,
+        }, () => {
+            this.collapsible.setContent(this.content);
+        });
     }
 
     /** Toggle show/hide filters */
