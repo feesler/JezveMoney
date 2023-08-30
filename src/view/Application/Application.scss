@@ -526,6 +526,7 @@ svg * {
   --btn-icon-size: calc(1.275rem + 0.3vw);
 
   width: var(--btn-size);
+  flex: 0 0 auto;
 }
 
 @media (min-width: 768px) {
