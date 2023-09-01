@@ -4,6 +4,13 @@ import { __, getSelectedItems } from '../../../../utils/utils.js';
 
 /** Import transactions list main menu component */
 export class ImportListMainMenu extends PopupMenu {
+    constructor(props = {}) {
+        super({
+            ...props,
+            multiple: true,
+        });
+    }
+
     setContext(context) {
         if (!context) {
             throw new Error('Invalid context');
@@ -23,8 +30,7 @@ export class ImportListMainMenu extends PopupMenu {
 
         this.setState({
             ...this.state,
-            multiple: true,
-            items: [{
+            items: this.createItems([{
                 id: 'createItemBtn',
                 icon: 'plus',
                 title: __('import.itemCreate'),
@@ -98,7 +104,7 @@ export class ImportListMainMenu extends PopupMenu {
                 title: __('import.checkSimilar'),
                 selected: context.checkSimilarEnabled,
                 hidden: !isListMode,
-            }],
+            }], this.state),
         });
     }
 }
