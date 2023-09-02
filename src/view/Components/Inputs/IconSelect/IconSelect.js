@@ -1,10 +1,13 @@
+import { getClassName } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 
 import { __ } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
 
-import { IconListItem } from './IconListItem.js';
 import './IconSelect.scss';
+
+/* CSS classes */
+const ICON_SELECT_CLASS = 'icon-select';
 
 /**
  * Icon select component
@@ -13,12 +16,8 @@ export class IconSelect extends DropDown {
     constructor(props = {}) {
         super({
             ...props,
-            components: {
-                ListItem: IconListItem,
-            },
+            className: getClassName(ICON_SELECT_CLASS, props.className),
         });
-
-        this.elem.classList.add('icon-select');
 
         this.initIcons();
     }
@@ -29,7 +28,7 @@ export class IconSelect extends DropDown {
         this.addItem({ id: 0, title: __('icons.byName.noIcon') });
         const items = icons.map((icon) => ({
             id: icon.id,
-            file: icon.file,
+            icon: icon.file,
             title: __(`icons.byName.${icon.name}`),
         }));
         this.append(items);

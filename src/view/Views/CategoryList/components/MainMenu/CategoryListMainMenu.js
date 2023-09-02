@@ -1,4 +1,3 @@
-import { show } from 'jezvejs';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import {
@@ -14,80 +13,65 @@ const CHECK_ITEM_CLASS = 'check-icon-item';
 
 /** Categories list main menu component */
 export class CategoryListMainMenu extends PopupMenu {
-    constructor(props) {
-        super({
-            ...props,
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('actions.select'),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('actions.sort'),
-            }, {
-                id: 'sortByNameBtn',
-                title: __('actions.sortByName'),
-                className: CHECK_ITEM_CLASS,
-            }, {
-                id: 'sortByDateBtn',
-                title: __('actions.sortByDate'),
-                className: CHECK_ITEM_CLASS,
-            }, {
-                id: 'selectAllBtn',
-                title: __('actions.selectAll'),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('actions.deselectAll'),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
-        });
-
-        this.state = {
-            listMode: 'list',
-            showMenu: false,
-            items: [],
-        };
-    }
-
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context');
         }
 
-        if (!state.showMenu) {
+        if (!context.showMenu) {
             this.hideMenu();
             return;
         }
 
-        const itemsCount = state.items.length;
-        const selArr = getSelectedItems(state.items);
+        const itemsCount = context.items.length;
+        const selArr = getSelectedItems(context.items);
         const selCount = selArr.length;
-        const isListMode = state.listMode === 'list';
-        const isSelectMode = state.listMode === 'select';
+        const isListMode = context.listMode === 'list';
+        const isSelectMode = context.listMode === 'select';
         const sortMode = getCategoriesSortMode();
 
-        const { items } = this;
-
-        items.selectModeBtn.show(isListMode && itemsCount > 0);
-        items.sortModeBtn.show(isListMode && itemsCount > 1);
-
-        items.sortByNameBtn.setIcon(getSortByNameIcon(sortMode));
-        items.sortByNameBtn.show(isListMode && itemsCount > 1);
-
-        items.sortByDateBtn.setIcon(getSortByDateIcon(sortMode));
-        items.sortByDateBtn.show(isListMode && itemsCount > 1);
-
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
-        show(items.separator2, isSelectMode);
-
-        items.deleteBtn.show(selCount > 0);
+        this.setState({
+            ...this.state,
+            items: [{
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: __('actions.select'),
+                hidden: !(isListMode && itemsCount > 0),
+            }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: __('actions.sort'),
+                hidden: !(isListMode && itemsCount > 1),
+            }, {
+                id: 'sortByNameBtn',
+                title: __('actions.sortByName'),
+                icon: getSortByNameIcon(sortMode),
+                className: CHECK_ITEM_CLASS,
+                hidden: !(isListMode && itemsCount > 1),
+            }, {
+                id: 'sortByDateBtn',
+                title: __('actions.sortByDate'),
+                icon: getSortByDateIcon(sortMode),
+                className: CHECK_ITEM_CLASS,
+                hidden: !(isListMode && itemsCount > 1),
+            }, {
+                id: 'selectAllBtn',
+                title: __('actions.selectAll'),
+                hidden: !(isSelectMode && itemsCount > 0 && selCount < itemsCount),
+            }, {
+                id: 'deselectAllBtn',
+                title: __('actions.deselectAll'),
+                hidden: !(isSelectMode && itemsCount > 0 && selCount > 0),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+                hidden: !isSelectMode,
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: __('actions.delete'),
+                hidden: !(selCount > 0),
+            }],
+        });
     }
 }

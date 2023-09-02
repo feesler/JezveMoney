@@ -463,12 +463,12 @@ export class TransactionListView extends AppView {
         return TransactionList.render(items, App.state, showDate);
     }
 
-    getExpectedState(model = this.model) {
+    getExpectedState(model = this.model, state = App.state) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const sortMode = model.listMode === 'sort';
         const isItemsAvailable = (model.filtered.length > 0);
-        const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
+        const isAvailable = state.accounts.length > 0 || state.persons.length > 0;
         const { filtersVisible } = model;
         const selected = this.getSelectedItems(model);
         const showSelectItems = (
@@ -494,6 +494,7 @@ export class TransactionListView extends AppView {
         const list = this.getExpectedList(model);
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,
@@ -637,7 +638,7 @@ export class TransactionListView extends AppView {
 
         await this.performAction(async () => {
             await item.clickMenu();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);
@@ -772,7 +773,9 @@ export class TransactionListView extends AppView {
 
     async filterByType(value, directNavigate = false) {
         const newTypeSel = asArray(value);
-        const types = (newTypeSel.includes(0)) ? [] : newTypeSel;
+        const types = (newTypeSel.includes('all') || newTypeSel.includes(0))
+            ? []
+            : newTypeSel;
         types.sort();
 
         if (this.content.typeMenu.isSameSelected(types)) {
@@ -790,14 +793,9 @@ export class TransactionListView extends AppView {
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
-        } else if (types.length === 0) {
-            await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-        } else if (types.length === 1) {
-            const [type] = types;
-            await this.waitForList(() => App.view.content.typeMenu.select(type));
         } else {
             await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-            for (const type of newTypeSel) {
+            for (const type of types) {
                 await this.waitForList(() => App.view.content.typeMenu.toggle(type));
             }
         }

@@ -1,4 +1,3 @@
-import { show } from 'jezvejs';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../../../utils/utils.js';
@@ -9,16 +8,57 @@ export class ImportListContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
+        });
+    }
+
+    getContextItem(state) {
+        return (state.contextItemIndex !== -1) ? state.items[state.contextItemIndex] : null;
+    }
+
+    getHostElement(itemId) {
+        return document.querySelector(`.import-item[data-id="${itemId}"] .menu-btn`);
+    }
+
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context value');
+        }
+
+        if (!context.showContextMenu) {
+            this.detach();
+            return;
+        }
+
+        const item = this.getContextItem(context);
+        if (!item) {
+            this.detach();
+            return;
+        }
+
+        const menuButton = this.getHostElement(item.id);
+        if (!menuButton) {
+            this.detach();
+            return;
+        }
+
+        const itemRestoreAvail = (
+            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
+        );
+
+        this.setState({
+            ...this.state,
             items: [{
                 id: 'ctxRestoreBtn',
                 title: __('import.itemRestore'),
                 className: 'warning-item',
+                hidden: !itemRestoreAvail,
             }, {
                 id: 'separator1',
                 type: 'separator',
+                hidden: !itemRestoreAvail,
             }, {
                 id: 'ctxEnableBtn',
-                title: __('actions.disable'),
+                title: (item.enabled) ? __('actions.disable') : __('actions.enable'),
             }, {
                 id: 'ctxUpdateBtn',
                 icon: 'update',
@@ -33,62 +73,6 @@ export class ImportListContextMenu extends PopupMenu {
                 title: __('actions.delete'),
             }],
         });
-
-        this.state = {
-            contextItemIndex: -1,
-            showContextMenu: false,
-            items: [],
-        };
-    }
-
-    getContextItem(state) {
-        return (state.contextItemIndex !== -1) ? state.items[state.contextItemIndex] : null;
-    }
-
-    getHostElement(itemId) {
-        return document.querySelector(`.import-item[data-id="${itemId}"] .menu-btn`);
-    }
-
-    render(state, prevState = {}) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
-        if (
-            (state.showContextMenu === prevState?.showContextMenu)
-            && (state.contextItemIndex === prevState?.contextItemIndex)
-            && (state.items === prevState?.items)
-        ) {
-            return;
-        }
-
-        if (!state.showContextMenu) {
-            this.detach();
-            return;
-        }
-
-        const item = this.getContextItem(state);
-        if (!item) {
-            this.detach();
-            return;
-        }
-
-        const menuButton = this.getHostElement(item.id);
-        if (!menuButton) {
-            this.detach();
-            return;
-        }
-
-        const { items } = this;
-
-        const itemRestoreAvail = (
-            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
-        );
-        items.ctxRestoreBtn.show(itemRestoreAvail);
-        show(items.separator1, itemRestoreAvail);
-
-        const title = (item.enabled) ? __('actions.disable') : __('actions.enable');
-        items.ctxEnableBtn.setTitle(title);
 
         this.attachAndShow(menuButton);
     }

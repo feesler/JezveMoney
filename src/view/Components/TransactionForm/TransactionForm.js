@@ -1859,7 +1859,7 @@ export class TransactionForm extends Component {
         this.swapBtn.enable(!state.submitStarted);
 
         // Type menu
-        this.typeMenu.setActive(transaction.type);
+        this.typeMenu.setSelection(transaction.type);
         this.typeMenu.setState((menuState) => ({
             ...menuState,
             showChangeLimit: (

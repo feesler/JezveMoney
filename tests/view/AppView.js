@@ -9,8 +9,13 @@ import {
 import { Header } from './component/Header.js';
 import { Navigation } from './component/Navigation.js';
 import { Notification } from './component/Notification.js';
+import { App } from '../Application.js';
 
 export class AppView extends TestView {
+    static getHeaderExpectedState(state = App.state) {
+        return Header.getExpectedState(state);
+    }
+
     isUserLoggedIn() {
         return this.content.header?.userBtn?.title?.length > 0;
     }
@@ -30,6 +35,10 @@ export class AppView extends TestView {
 
         const msgElem = await query('.popup.notification');
         this.content.notification = (msgElem) ? await Notification.create(this, msgElem) : null;
+    }
+
+    getHeaderExpectedState(state = App.state) {
+        return AppView.getHeaderExpectedState(state);
     }
 
     async closeNotification() {

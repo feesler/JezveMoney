@@ -32,9 +32,7 @@
     --btn-icon-color: var(--header-color);
     --btn-hover-title-color: var(--header-color);
     --btn-hover-icon-color: var(--header-color);
-  }
-
-  .btn__icon {
-    fill: var(--header-color);
+    --btn-hover-background: var(--header-hover-btn-bg-color);
+    --btn-active-background: var(--header-active-btn-bg-color);
   }
 }

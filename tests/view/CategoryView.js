@@ -14,7 +14,7 @@ import { Transaction } from '../model/Transaction.js';
 
 /** Create or update category test view */
 export class CategoryView extends AppView {
-    static getExpectedState(model) {
+    static getExpectedState(model, state = App.state) {
         const minParentItems = (model.isUpdate) ? 1 : 0;
         const showParent = App.state.categories.length > minParentItems;
         const topCategories = App.state.categories
@@ -24,6 +24,7 @@ export class CategoryView extends AppView {
         const availParentCategories = [{ id: '0' }, ...topCategories];
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             nameInput: {
                 visible: true,
                 value: model.name.toString(),

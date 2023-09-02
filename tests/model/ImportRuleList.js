@@ -11,12 +11,14 @@ export class ImportRuleList extends List {
         this.data = this.filter(
             (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
         );
+
+        return true;
     }
 
     deleteAccounts(accountIds) {
         const ids = asArray(accountIds);
         if (!ids.length) {
-            return;
+            return true;
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
@@ -49,12 +51,12 @@ export class ImportRuleList extends List {
             return res;
         });
 
-        this.deleteEmptyRules();
+        return this.deleteEmptyRules();
     }
 
     deletePersons(...ids) {
         if (!ids.length) {
-            return;
+            return true;
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
@@ -75,12 +77,12 @@ export class ImportRuleList extends List {
             return res;
         });
 
-        this.deleteEmptyRules();
+        return this.deleteEmptyRules();
     }
 
     deleteCategories(...ids) {
         if (!ids.length) {
-            return;
+            return true;
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
@@ -101,12 +103,12 @@ export class ImportRuleList extends List {
             return res;
         });
 
-        this.deleteEmptyRules();
+        return this.deleteEmptyRules();
     }
 
     deleteTemplate(...ids) {
         if (!ids.length) {
-            return;
+            return true;
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
@@ -128,7 +130,7 @@ export class ImportRuleList extends List {
             return res;
         });
 
-        this.deleteEmptyRules();
+        return this.deleteEmptyRules();
     }
 
     applyTo(transaction) {

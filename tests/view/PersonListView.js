@@ -53,6 +53,7 @@ export class PersonListView extends AppView {
         const hiddenTiles = TilesList.renderHiddenPersons(state.persons, false, sortMode);
 
         const res = {
+            header: this.getHeaderExpectedState(state),
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
@@ -357,7 +358,7 @@ export class PersonListView extends AppView {
         const tile = this.getTileByIndex(num);
         await this.performAction(async () => {
             await tile.click();
-            return wait('#ctxDeleteBtn', { visible: true });
+            return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
 
         return this.checkState(expected);

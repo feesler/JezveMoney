@@ -5,7 +5,7 @@ import {
     isFunction,
     Component,
 } from 'jezvejs';
-import { Icon } from 'jezvejs/Icon';
+import { Button } from 'jezvejs/Button';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 import './SearchInput.scss';
@@ -14,7 +14,6 @@ import './SearchInput.scss';
 const CONTAINER_CLASS = 'search-field input-group__input-outer';
 const INPUT_CLASS = 'input input-group__input';
 const INNER_BTN_CLASS = 'btn input-group__inner-btn';
-const BTN_ICON_CLASS = 'btn__icon';
 const CLEAR_BTN_CLASS = 'clear-btn';
 const SEARCH_BTN_CLASS = 'search-btn';
 
@@ -72,36 +71,21 @@ export class SearchInput extends Component {
             events: { input: (e) => this.onInput(e) },
         });
 
-        const clearIcon = Icon.create({
+        this.clearBtn = Button.create({
             icon: 'close-sm',
-            className: BTN_ICON_CLASS,
-        });
-        this.clearBtn = createElement('button', {
-            props: {
-                className: getClassName(INNER_BTN_CLASS, CLEAR_BTN_CLASS),
-                type: 'button',
-            },
-            children: clearIcon.elem,
-            events: { click: (e) => this.onClear(e) },
+            className: getClassName(INNER_BTN_CLASS, CLEAR_BTN_CLASS),
+            onClick: (e) => this.onClear(e),
         });
 
-        const searchIcon = Icon.create({
+        this.searchBtn = Button.create({
             icon: 'search',
-            className: BTN_ICON_CLASS,
-        });
-        this.searchBtn = createElement('button', {
-            props: {
-                className: getClassName(INNER_BTN_CLASS, SEARCH_BTN_CLASS),
-                type: 'button',
-                tabIndex: -1,
-            },
-            children: searchIcon.elem,
+            className: getClassName(INNER_BTN_CLASS, SEARCH_BTN_CLASS),
         });
 
         this.inputGroup = InputGroup.create({
             className: CONTAINER_CLASS,
             children: [
-                this.searchBtn,
+                this.searchBtn.elem,
                 this.input,
             ],
         });
@@ -134,9 +118,9 @@ export class SearchInput extends Component {
         this.input.value = value;
 
         if (value.length > 0) {
-            this.elem.append(this.clearBtn);
+            this.elem.append(this.clearBtn.elem);
         } else {
-            re(this.clearBtn);
+            re(this.clearBtn.elem);
         }
     }
 }

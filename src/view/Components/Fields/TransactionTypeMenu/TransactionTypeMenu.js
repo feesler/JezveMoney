@@ -1,5 +1,6 @@
-import { createElement } from 'jezvejs';
+import { getClassName } from 'jezvejs';
 import { LinkMenu } from 'jezvejs/LinkMenu';
+
 import { __ } from '../../../utils/utils.js';
 import {
     EXPENSE,
@@ -8,6 +9,8 @@ import {
     DEBT,
     LIMIT_CHANGE,
 } from '../../../Models/Transaction.js';
+
+import './TransactionTypeMenu.scss';
 
 const CONTAINER_CLASS = 'link-menu trtype-menu';
 
@@ -22,39 +25,46 @@ const defaultProps = {
  */
 export class TransactionTypeMenu extends LinkMenu {
     constructor(props = {}) {
-        super({
+        const menuProps = {
             ...defaultProps,
             ...props,
-        });
-    }
+            className: getClassName(CONTAINER_CLASS, props.className),
+        };
 
-    init() {
-        this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
-        this.setHandlers();
-        this.setUserProps();
-        this.setClassNames();
-
-        const items = [
-            { title: __('actions.showAll'), hidden: !this.props.showAll },
-            { value: EXPENSE, title: __('transactions.types.expense') },
-            { value: INCOME, title: __('transactions.types.income') },
-            { value: TRANSFER, title: __('transactions.types.transfer') },
-            { value: DEBT, title: __('transactions.types.debt') },
+        menuProps.defaultItemType = (menuProps.multiple) ? 'checkbox-link' : 'link';
+        menuProps.items = [
             {
-                value: LIMIT_CHANGE,
+                id: 'all',
+                selectable: false,
+                title: __('actions.showAll'),
+                hidden: !menuProps.showAll,
+            },
+            { id: EXPENSE, title: __('transactions.types.expense') },
+            { id: INCOME, title: __('transactions.types.income') },
+            { id: TRANSFER, title: __('transactions.types.transfer') },
+            { id: DEBT, title: __('transactions.types.debt') },
+            {
+                id: LIMIT_CHANGE,
                 title: __('transactions.types.creditLimit'),
-                hidden: !this.props.showChangeLimit,
+                hidden: !menuProps.showChangeLimit,
             },
         ];
 
-        this.setState({
-            ...this.state,
-            items,
-        });
+        super(menuProps);
     }
 
     getItemValue(elem) {
-        return parseInt(elem.dataset.value, 10);
+        return parseInt(elem.dataset.id, 10);
+    }
+
+    onItemClick(id, e) {
+        super.onItemClick(id, e);
+
+        if (id === 'all' && this.state.showAll) {
+            this.clearSelection();
+        }
+
+        this.sendChangeEvent();
     }
 
     getItemURL(item, state) {
@@ -65,13 +75,13 @@ export class TransactionTypeMenu extends LinkMenu {
         const param = (state.multiple) ? `${itemParam}[]` : itemParam;
 
         const url = new URL(state.url);
-        if (item.value) {
-            url.searchParams.set(param, item.value);
+        if (item.id !== 'all') {
+            url.searchParams.set(param, item.id);
         } else {
             url.searchParams.delete(param);
         }
 
-        if (item.value !== DEBT && !state.multiple) {
+        if (item.id !== DEBT && !state.multiple) {
             const accountId = url.searchParams.get('acc_id');
             if (accountId === '0') {
                 url.searchParams.delete('acc_id');
@@ -89,8 +99,8 @@ export class TransactionTypeMenu extends LinkMenu {
             items: state.items.map((item) => ({
                 ...item,
                 hidden: (
-                    (item.value === LIMIT_CHANGE && !state.showChangeLimit)
-                    || (!item.value && !state.showAll)
+                    (item.id === LIMIT_CHANGE && !state.showChangeLimit)
+                    || (item.id === 'all' && !state.showAll)
                 ),
             })),
         }, prevState);

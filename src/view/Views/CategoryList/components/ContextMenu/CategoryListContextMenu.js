@@ -1,5 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { __ } from '../../../../utils/utils.js';
+
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 /** Categories list context menu component */
@@ -8,33 +9,7 @@ export class CategoryListContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                onClick: (e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-            }, {
-                id: 'ctxAddSubcategoryBtn',
-                type: 'link',
-                title: __('categories.addSubcategory'),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
         });
-
-        this.state = {
-            contextItem: null,
-            showContextMenu: false,
-        };
     }
 
     getContextItem(state) {
@@ -46,16 +21,16 @@ export class CategoryListContextMenu extends PopupMenu {
         return document.querySelector(selector);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context value');
         }
 
-        if (!state.showContextMenu) {
+        if (!context.showContextMenu) {
             this.detach();
             return;
         }
-        const category = this.getContextItem(state);
+        const category = this.getContextItem(context);
         if (!category) {
             this.detach();
             return;
@@ -67,13 +42,34 @@ export class CategoryListContextMenu extends PopupMenu {
             return;
         }
 
-        const { baseURL } = App;
-        const { items } = this;
-        items.ctxDetailsBtn.setURL(`${baseURL}categories/${category.id}`);
-        items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${category.id}`);
-
-        items.ctxAddSubcategoryBtn.show(category.parent_id === 0);
-        items.ctxAddSubcategoryBtn.setURL(`${baseURL}categories/create/?parent_id=${category.id}`);
+        this.setState({
+            ...this.state,
+            items: [{
+                id: 'ctxDetailsBtn',
+                type: 'link',
+                title: __('actions.openItem'),
+                onClick: (_, e) => e?.preventDefault(),
+                url: getApplicationURL(`categories/${category.id}`),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: __('actions.update'),
+                url: getApplicationURL(`categories/update/${category.id}`),
+            }, {
+                id: 'ctxAddSubcategoryBtn',
+                type: 'link',
+                title: __('categories.addSubcategory'),
+                hidden: category.parent_id !== 0,
+                url: getApplicationURL(`categories/create/?parent_id=${category.id}`),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: __('actions.delete'),
+            }],
+        });
 
         this.attachAndShow(menuButton);
     }

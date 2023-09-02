@@ -1,8 +1,10 @@
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { readdir } from 'node:fs/promises';
 import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import Client from 'ssh2-sftp-client';
+import ProgressBar from 'progress';
 
 /* eslint-disable no-console */
 
@@ -32,10 +34,40 @@ const option = (process.argv.length > 2) ? process.argv[2] : null;
 const isFullDeploy = option?.toLowerCase() === 'full';
 
 let res = 1;
+let progress = null;
+
+const filterFiles = (source) => {
+    if (isFullDeploy) {
+        return true;
+    }
+
+    const relPath = source.startsWith(src) ? source.substring(src.length + 1) : source;
+    const relPathParts = relPath.split(/[\\/]/);
+    const firstPart = relPathParts[0].toLowerCase();
+
+    return (!skipList.includes(firstPart));
+};
+
 try {
+    // Obtain total count of files
+    const files = await readdir(src, { withFileTypes: true, recursive: true });
+
+    const total = files.reduce((prev, file) => {
+        const fullName = join(file.path, file.name);
+        const pass = filterFiles(fullName) && file.isFile();
+        return (prev + (pass ? 1 : 0));
+    }, 1);
+
+    progress = new ProgressBar('[:bar] :percent :file', {
+        total,
+        width: 20,
+    });
+
     await client.connect(config);
     client.on('upload', (info) => {
-        console.log(`Uploaded ${info.source}`);
+        progress.tick({
+            file: info.source.substring(src.length + 1),
+        });
     });
 
     if (isFullDeploy) {
@@ -55,14 +87,11 @@ try {
     console.log(`Deploy from: ${src} to: ${dest}`);
 
     await client.uploadDir(src, dest, {
-        filter: (source, isDir) => {
-            if (isFullDeploy) {
-                return true;
-            }
+        filter: filterFiles,
+    });
 
-            const relPath = source.startsWith(src) ? source.substring(src.length + 1) : source;
-            return (!isDir || !skipList.includes(relPath));
-        },
+    progress.tick({
+        file: 'Done',
     });
 
     if (isFullDeploy) {
@@ -81,11 +110,9 @@ try {
         throw new Error('Version check failed');
     }
 
-    console.log('Done');
-
     res = 0;
 } catch (e) {
-    console.log('Error: ', e.message);
+    progress?.interrupt(`Upload error: ${e.message}`);
 } finally {
     client.end();
     process.exit(res);

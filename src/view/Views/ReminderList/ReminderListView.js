@@ -152,10 +152,10 @@ class ReminderListView extends AppView {
             id: 'stateMenu',
             itemParam: 'state',
             items: [
-                { value: REMINDER_SCHEDULED, title: __('reminders.state.scheduled') },
-                { value: REMINDER_UPCOMING, title: __('reminders.state.upcoming') },
-                { value: REMINDER_CONFIRMED, title: __('reminders.state.submitted') },
-                { value: REMINDER_CANCELLED, title: __('reminders.state.cancelled') },
+                { id: REMINDER_SCHEDULED, title: __('reminders.state.scheduled') },
+                { id: REMINDER_UPCOMING, title: __('reminders.state.upcoming') },
+                { id: REMINDER_CONFIRMED, title: __('reminders.state.submitted') },
+                { id: REMINDER_CANCELLED, title: __('reminders.state.cancelled') },
             ],
             onChange: (value) => this.onSelectStateType(value),
         });
@@ -311,7 +311,7 @@ class ReminderListView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeStateFilter(value));
+        this.store.dispatch(actions.changeStateFilter(stateFilter));
 
         if (stateFilter === REMINDER_UPCOMING) {
             await this.requestUpcoming(this.getUpcomingRequestData());
@@ -713,7 +713,7 @@ class ReminderListView extends AppView {
             });
         }
 
-        this.contextMenu.setState({
+        this.contextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItem: state.contextItem,
             items: state.items,
@@ -741,7 +741,7 @@ class ReminderListView extends AppView {
             });
         }
 
-        this.menu.setState({
+        this.menu.setContext({
             listMode: state.listMode,
             showMenu: state.showMenu,
             items: state.items,

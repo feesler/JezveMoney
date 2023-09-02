@@ -65,7 +65,7 @@ class UserModel extends CachedTable
     {
         $bfPrefix = "\$2y\$10\$";
 
-        return $bfPrefix . substr(md5($str), 0, 21) . "\$";
+        return $bfPrefix . substr(md5($str), 0, 20) . "..";
     }
 
     /**

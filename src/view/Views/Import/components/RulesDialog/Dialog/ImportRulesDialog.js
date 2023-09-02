@@ -382,7 +382,7 @@ export class ImportRulesDialog extends Component {
             });
         }
 
-        this.contextMenu.setState({
+        this.contextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItem: state.contextItem,
         });

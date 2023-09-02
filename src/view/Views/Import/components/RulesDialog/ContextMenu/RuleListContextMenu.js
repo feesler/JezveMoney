@@ -14,6 +14,41 @@ export class RuleListContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
+        });
+    }
+
+    getContextItem(state) {
+        return App.model.rules.getItem(state.contextItem);
+    }
+
+    getHostElement(itemId) {
+        return document.querySelector(`.rule-item[data-id="${itemId}"] .menu-btn`);
+    }
+
+    setContext(context) {
+        if (!context) {
+            throw new Error('Invalid context value');
+        }
+
+        if (!context.showContextMenu) {
+            this.detach();
+            return;
+        }
+
+        const item = this.getContextItem(context);
+        if (!item) {
+            this.detach();
+            return;
+        }
+
+        const menuButton = this.getHostElement(item.id);
+        if (!menuButton) {
+            this.detach();
+            return;
+        }
+
+        this.setState({
+            ...this.state,
             items: [{
                 id: 'ctxUpdateRuleBtn',
                 icon: 'update',
@@ -31,42 +66,6 @@ export class RuleListContextMenu extends PopupMenu {
                 className: DEL_BUTTON_CLASS,
             }],
         });
-
-        this.state = {
-            contextItem: -1,
-            showContextMenu: false,
-        };
-    }
-
-    getContextItem(state) {
-        return App.model.rules.getItem(state.contextItem);
-    }
-
-    getHostElement(itemId) {
-        return document.querySelector(`.rule-item[data-id="${itemId}"] .menu-btn`);
-    }
-
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
-        if (!state.showContextMenu) {
-            this.detach();
-            return;
-        }
-
-        const item = this.getContextItem(state);
-        if (!item) {
-            this.detach();
-            return;
-        }
-
-        const menuButton = this.getHostElement(item.id);
-        if (!menuButton) {
-            this.detach();
-            return;
-        }
 
         this.attachAndShow(menuButton);
     }

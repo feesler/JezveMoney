@@ -729,7 +729,7 @@ class ImportView extends AppView {
         this.transactionDialog.show();
     }
 
-    renderContextMenu(state) {
+    renderContextMenu(state, prevState) {
         const index = state.contextItemIndex;
         const pageIndex = getPageIndex(index, state);
         const startPage = state.pagination.page;
@@ -750,7 +750,15 @@ class ImportView extends AppView {
             });
         }
 
-        this.contextMenu.setState({
+        if (
+            (state.showContextMenu === prevState?.showContextMenu)
+            && (state.contextItemIndex === prevState?.contextItemIndex)
+            && (state.items === prevState?.items)
+        ) {
+            return;
+        }
+
+        this.contextMenu.setContext({
             showContextMenu: state.showContextMenu,
             contextItemIndex: state.contextItemIndex,
             items: state.items,
@@ -777,9 +785,11 @@ class ImportView extends AppView {
             });
         }
 
-        this.menu.setState({
+        this.menu.setContext({
             listMode: state.listMode,
             showMenu: state.showMenu,
+            rulesEnabled: state.rulesEnabled,
+            checkSimilarEnabled: state.checkSimilarEnabled,
             items: state.items,
         });
 
@@ -851,7 +861,7 @@ class ImportView extends AppView {
         show(this.selectedCounter, isSelectMode);
         this.selectedCount.textContent = selectedItems.length;
 
-        this.renderContextMenu(state);
+        this.renderContextMenu(state, prevState);
         this.renderMenu(state);
     }
 }

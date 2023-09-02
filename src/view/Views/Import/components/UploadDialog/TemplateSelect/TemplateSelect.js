@@ -164,7 +164,7 @@ export class TemplateSelect extends Component {
             });
         }
 
-        this.contextMenu.setState({
+        this.contextMenu.setContext({
             showContextMenu: state.showMenu,
         });
     }

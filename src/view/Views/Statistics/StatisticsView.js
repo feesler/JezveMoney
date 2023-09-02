@@ -180,9 +180,9 @@ class StatisticsView extends AppView {
             id: 'reportMenu',
             itemParam: 'report',
             items: [
-                { value: 'category', title: __('statistics.reports.categories') },
-                { value: 'account', title: __('statistics.reports.accounts') },
-                { value: 'currency', title: __('statistics.reports.currencies') },
+                { id: 'category', title: __('statistics.reports.categories') },
+                { id: 'account', title: __('statistics.reports.accounts') },
+                { id: 'currency', title: __('statistics.reports.currencies') },
             ],
             onChange: (value) => this.onSelectReportType(value),
         });
@@ -228,7 +228,7 @@ class StatisticsView extends AppView {
             id: 'groupTypeMenu',
             itemParam: 'group',
             items: Object.values(groupTypes).map(({ name, title }) => ({
-                value: name,
+                id: name,
                 title,
             })),
             onChange: (value) => this.onSelectGroupType(value),
@@ -288,6 +288,7 @@ class StatisticsView extends AppView {
             barWidth: 45,
             columnGap: 3,
             showPopupOnHover: true,
+            showPopupOnClick: true,
             animatePopup: true,
             activateOnClick: true,
             activateOnHover: true,
@@ -712,7 +713,7 @@ class StatisticsView extends AppView {
         this.typeMenu.setSelection(state.form.type);
 
         const { report, group } = state.form;
-        this.reportMenu.setActive(report);
+        this.reportMenu.setSelection(report);
 
         show(this.accountsFilter, (report === 'account'));
         show(this.categoriesFilter, (report === 'category'));
@@ -725,7 +726,7 @@ class StatisticsView extends AppView {
             this.currencyDropDown.setSelection(state.form.curr_id);
         }
 
-        this.groupTypeMenu.setActive(group);
+        this.groupTypeMenu.setSelection(group);
 
         // Date range filter
         this.dateRangeFilter.setState((rangeState) => ({
