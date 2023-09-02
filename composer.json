@@ -1,7 +1,7 @@
 {
     "name": "henryfeesler/jezvemoney",
     "type": "project",
-    "version": "1.71.0",
+    "version": "1.72.0",
     "description": "",
     "config": {
         "vendor-dir": "vendor",
@@ -10,7 +10,7 @@
     "require": {
         "phpoffice/phpspreadsheet": "^1.29",
         "aura/accept": "^4.0",
-        "composer/semver": "^3.3.2"
+        "composer/semver": "^3.4.0"
     },
     "autoload": {
         "psr-4": {
