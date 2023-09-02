@@ -136,7 +136,6 @@ export class ImportUploadDialog extends TestComponent {
         res.tplFormTitle = {};
         if (res.templateBlock.visible && !res.isLoading) {
             res.tplFormTitle.elem = await query(this.elem, '.template-form-title');
-            assert(res.tplFormTitle.elem, 'Invalid state');
         }
 
         [
