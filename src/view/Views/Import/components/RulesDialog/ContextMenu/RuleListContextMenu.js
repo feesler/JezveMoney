@@ -47,25 +47,22 @@ export class RuleListContextMenu extends PopupMenu {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'ctxUpdateRuleBtn',
-                icon: 'update',
-                title: __('actions.update'),
-                className: UPDATE_BUTTON_CLASS,
-            }, {
-                id: 'ctxDuplicateRuleBtn',
-                icon: 'duplicate',
-                title: __('actions.duplicate'),
-                className: DUPLICATE_BUTTON_CLASS,
-            }, {
-                id: 'ctxDeleteRuleBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-                className: DEL_BUTTON_CLASS,
-            }],
-        });
+        this.setItems([{
+            id: 'ctxUpdateRuleBtn',
+            icon: 'update',
+            title: __('actions.update'),
+            className: UPDATE_BUTTON_CLASS,
+        }, {
+            id: 'ctxDuplicateRuleBtn',
+            icon: 'duplicate',
+            title: __('actions.duplicate'),
+            className: DUPLICATE_BUTTON_CLASS,
+        }, {
+            id: 'ctxDeleteRuleBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+            className: DEL_BUTTON_CLASS,
+        }]);
 
         this.attachAndShow(menuButton);
     }

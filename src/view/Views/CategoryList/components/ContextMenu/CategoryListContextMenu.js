@@ -42,34 +42,31 @@ export class CategoryListContextMenu extends PopupMenu {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                onClick: (_, e) => e?.preventDefault(),
-                url: getApplicationURL(`categories/${category.id}`),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-                url: getApplicationURL(`categories/update/${category.id}`),
-            }, {
-                id: 'ctxAddSubcategoryBtn',
-                type: 'link',
-                title: __('categories.addSubcategory'),
-                hidden: category.parent_id !== 0,
-                url: getApplicationURL(`categories/create/?parent_id=${category.id}`),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
-        });
+        this.setItems([{
+            id: 'ctxDetailsBtn',
+            type: 'link',
+            title: __('actions.openItem'),
+            onClick: (_, e) => e?.preventDefault(),
+            url: getApplicationURL(`categories/${category.id}`),
+        }, {
+            type: 'separator',
+        }, {
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: __('actions.update'),
+            url: getApplicationURL(`categories/update/${category.id}`),
+        }, {
+            id: 'ctxAddSubcategoryBtn',
+            type: 'link',
+            title: __('categories.addSubcategory'),
+            hidden: category.parent_id !== 0,
+            url: getApplicationURL(`categories/create/?parent_id=${category.id}`),
+        }, {
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+        }]);
 
         this.attachAndShow(menuButton);
     }

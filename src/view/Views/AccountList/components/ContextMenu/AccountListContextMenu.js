@@ -42,44 +42,41 @@ export class AccountListContextMenu extends PopupMenu {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                url: getApplicationURL(`accounts/${account.id}`),
-                onClick: (_, e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-                url: getApplicationURL(`accounts/update/${account.id}`),
-            }, {
-                id: 'ctxExportBtn',
-                type: 'link',
-                icon: 'export',
-                title: __('transactions.exportToCsv'),
-                url: getExportURL(account.id),
-            }, {
-                id: 'ctxShowBtn',
-                icon: 'show',
-                title: __('actions.show'),
-                hidden: account.isVisible(),
-            }, {
-                id: 'ctxHideBtn',
-                icon: 'hide',
-                title: __('actions.hide'),
-                hidden: !account.isVisible(),
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
-        });
+        this.setItems([{
+            id: 'ctxDetailsBtn',
+            type: 'link',
+            title: __('actions.openItem'),
+            url: getApplicationURL(`accounts/${account.id}`),
+            onClick: (_, e) => e?.preventDefault(),
+        }, {
+            type: 'separator',
+        }, {
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: __('actions.update'),
+            url: getApplicationURL(`accounts/update/${account.id}`),
+        }, {
+            id: 'ctxExportBtn',
+            type: 'link',
+            icon: 'export',
+            title: __('transactions.exportToCsv'),
+            url: getExportURL(account.id),
+        }, {
+            id: 'ctxShowBtn',
+            icon: 'show',
+            title: __('actions.show'),
+            hidden: account.isVisible(),
+        }, {
+            id: 'ctxHideBtn',
+            icon: 'hide',
+            title: __('actions.hide'),
+            hidden: !account.isVisible(),
+        }, {
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+        }]);
 
         this.attachAndShow(tile);
     }

@@ -36,63 +36,60 @@ export class PersonListMainMenu extends PopupMenu {
             ? getExportURL(getSelectedIds(context))
             : null;
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'selectModeBtn',
-                icon: 'select',
-                title: __('actions.select'),
-                hidden: !(isListMode && itemsCount > 0),
-            }, {
-                id: 'sortModeBtn',
-                icon: 'sort',
-                title: __('actions.sort'),
-                hidden: !showSortItems,
-            }, {
-                id: 'sortByNameBtn',
-                title: __('actions.sortByName'),
-                icon: getSortByNameIcon(sortMode),
-                hidden: !showSortItems,
-            }, {
-                id: 'sortByDateBtn',
-                title: __('actions.sortByDate'),
-                icon: getSortByDateIcon(sortMode),
-                hidden: !showSortItems,
-            }, {
-                id: 'selectAllBtn',
-                title: __('actions.selectAll'),
-                hidden: !(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount),
-            }, {
-                id: 'deselectAllBtn',
-                title: __('actions.deselectAll'),
-                hidden: !(isSelectMode && itemsCount > 0 && totalSelCount > 0),
-            }, {
-                id: 'separator2',
-                type: 'separator',
-                hidden: !isSelectMode,
-            }, {
-                id: 'exportBtn',
-                type: 'link',
-                icon: 'export',
-                title: __('transactions.exportToCsv'),
-                url: exportURL?.toString(),
-                hidden: !(isSelectMode && totalSelCount > 0),
-            }, {
-                id: 'showBtn',
-                icon: 'show',
-                title: __('actions.show'),
-                hidden: !(isSelectMode && hiddenSelCount > 0),
-            }, {
-                id: 'hideBtn',
-                icon: 'hide',
-                title: __('actions.hide'),
-                hidden: !(isSelectMode && selCount > 0),
-            }, {
-                id: 'deleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-                hidden: !(isSelectMode && totalSelCount > 0),
-            }],
-        });
+        this.setItems([{
+            id: 'selectModeBtn',
+            icon: 'select',
+            title: __('actions.select'),
+            hidden: !(isListMode && itemsCount > 0),
+        }, {
+            id: 'sortModeBtn',
+            icon: 'sort',
+            title: __('actions.sort'),
+            hidden: !showSortItems,
+        }, {
+            id: 'sortByNameBtn',
+            title: __('actions.sortByName'),
+            icon: getSortByNameIcon(sortMode),
+            hidden: !showSortItems,
+        }, {
+            id: 'sortByDateBtn',
+            title: __('actions.sortByDate'),
+            icon: getSortByDateIcon(sortMode),
+            hidden: !showSortItems,
+        }, {
+            id: 'selectAllBtn',
+            title: __('actions.selectAll'),
+            hidden: !(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount),
+        }, {
+            id: 'deselectAllBtn',
+            title: __('actions.deselectAll'),
+            hidden: !(isSelectMode && itemsCount > 0 && totalSelCount > 0),
+        }, {
+            id: 'separator2',
+            type: 'separator',
+            hidden: !isSelectMode,
+        }, {
+            id: 'exportBtn',
+            type: 'link',
+            icon: 'export',
+            title: __('transactions.exportToCsv'),
+            url: exportURL?.toString(),
+            hidden: !(isSelectMode && totalSelCount > 0),
+        }, {
+            id: 'showBtn',
+            icon: 'show',
+            title: __('actions.show'),
+            hidden: !(isSelectMode && hiddenSelCount > 0),
+        }, {
+            id: 'hideBtn',
+            icon: 'hide',
+            title: __('actions.hide'),
+            hidden: !(isSelectMode && selCount > 0),
+        }, {
+            id: 'deleteBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+            hidden: !(isSelectMode && totalSelCount > 0),
+        }]);
     }
 }
