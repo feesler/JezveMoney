@@ -2,6 +2,7 @@ import { asArray } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { __ } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
+import { actions, reducer } from './reducer.js';
 
 const defaultProps = {
     transactionType: null, // filter categories by type, null - show all
@@ -21,30 +22,35 @@ export class CategorySelect extends DropDown {
         super({
             ...defaultProps,
             ...props,
+            reducers: reducer,
         });
 
         this.elem.classList.add('dd_offset-group');
 
-        this.state = {
-            ...this.state,
-            transactionType: this.props.transactionType,
-            parentCategorySelect: this.props.parentCategorySelect,
-            exclude: this.props.exclude,
-        };
-
         this.initCategories();
+    }
+
+    getInitialState() {
+        const res = super.getInitialState();
+
+        res.transactionType = this.props.transactionType;
+        res.parentCategorySelect = this.props.parentCategorySelect;
+        res.exclude = this.props.exclude;
+
+        return res;
     }
 
     initCategories() {
         const { categories } = App.model;
-        const { transactionType, parentCategorySelect } = this.state;
-
-        this.removeAll();
+        const state = this.store.getState();
+        const { transactionType, parentCategorySelect } = state;
 
         const noCategoryTitle = (parentCategorySelect) ? 'categories.noParent' : 'categories.noCategory';
-        this.addItem({ id: 0, title: __(noCategoryTitle) });
+        const items = [
+            { id: 0, title: __(noCategoryTitle) },
+        ];
 
-        const excludeIds = asArray(this.state.exclude).map((id) => parseInt(id, 10));
+        const excludeIds = asArray(state.exclude).map((id) => parseInt(id, 10));
 
         categories.forEach((category) => {
             if (category.parent_id !== 0 || excludeIds.includes(category.id)) {
@@ -58,7 +64,7 @@ export class CategorySelect extends DropDown {
                 return;
             }
 
-            this.addItem({ id: category.id, title: category.name });
+            items.push({ id: category.id, title: category.name });
 
             if (parentCategorySelect) {
                 return;
@@ -69,12 +75,19 @@ export class CategorySelect extends DropDown {
             if (children.length === 0) {
                 return;
             }
-            const group = this.addGroup();
-            const groupItems = children.map((item) => (
-                { id: item.id, title: item.name, group }
-            ));
-            this.append(groupItems);
+
+            const group = `group_${category.id}`;
+            items.push({
+                id: group,
+                type: 'group',
+                items: children.map((item) => (
+                    { id: item.id, title: item.name, group }
+                )),
+            });
         });
+
+        this.removeAll();
+        this.append(items);
     }
 
     setType(transactionType) {
@@ -82,10 +95,7 @@ export class CategorySelect extends DropDown {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            transactionType,
-        });
+        this.store.dispatch(actions.setTrasactionType(transactionType));
 
         this.initCategories();
     }
