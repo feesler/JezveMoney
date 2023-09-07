@@ -40,39 +40,36 @@ export class ScheduleItemContextMenu extends PopupMenu {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                url: getApplicationURL(`schedule/${scheduleItem.id}`),
-                onClick: (_, e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('actions.update'),
-                url: getApplicationURL(`schedule/update/${scheduleItem.id}`),
-            }, {
-                id: 'ctxDuplicateBtn',
-                type: 'link',
-                icon: 'duplicate',
-                title: __('actions.duplicate'),
-                url: getApplicationURL(`schedule/create?from=${scheduleItem.id}`),
-            }, {
-                id: 'ctxFinishBtn',
-                title: __('schedule.finish'),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
-        });
+        this.setItems([{
+            id: 'ctxDetailsBtn',
+            type: 'link',
+            title: __('actions.openItem'),
+            url: getApplicationURL(`schedule/${scheduleItem.id}`),
+            onClick: (_, e) => e?.preventDefault(),
+        }, {
+            type: 'separator',
+        }, {
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: __('actions.update'),
+            url: getApplicationURL(`schedule/update/${scheduleItem.id}`),
+        }, {
+            id: 'ctxDuplicateBtn',
+            type: 'link',
+            icon: 'duplicate',
+            title: __('actions.duplicate'),
+            url: getApplicationURL(`schedule/create?from=${scheduleItem.id}`),
+        }, {
+            id: 'ctxFinishBtn',
+            title: __('schedule.finish'),
+        }, {
+            type: 'separator',
+        }, {
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+        }]);
 
         this.attachAndShow(menuButton);
     }

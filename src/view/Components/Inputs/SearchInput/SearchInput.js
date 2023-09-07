@@ -78,6 +78,7 @@ export class SearchInput extends Component {
         });
 
         this.searchBtn = Button.create({
+            type: 'static',
             icon: 'search',
             className: getClassName(INNER_BTN_CLASS, SEARCH_BTN_CLASS),
         });

@@ -242,6 +242,9 @@ function stepInterval(?int $timestamp, int $intervalType, int $step = 1)
     if (!$timestamp) {
         throw new \Error("Invalid timestamp");
     }
+    if ($intervalType === INTERVAL_NONE) {
+        return $timestamp;
+    }
     if (!isset(INTERVAL_DURATION_MAP[$intervalType])) {
         throw new \Error("Invalid interval type");
     }

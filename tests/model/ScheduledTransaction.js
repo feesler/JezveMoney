@@ -480,7 +480,9 @@ export class ScheduledTransaction {
         startDate = Math.max(start, startDate);
 
         if (this.interval_type === INTERVAL_NONE) {
-            endDate = startDate;
+            if (startDate < endDate) {
+                endDate = startDate;
+            }
         } else if (this.end_date) {
             const endTime = secondsToTime(this.end_date);
             endDate = Math.min(endTime, endDate);

@@ -5,6 +5,7 @@
   .dd__list {
     --menu-item-size: var(--dd-icon-item-size);
     --menu-item-icon-size: var(--dd-icon-item-size);
+    --menu-item-side-content-size: var(--dd-icon-item-size);
 
     box-sizing: content-box;
 
@@ -36,11 +37,16 @@
   }
 
   /* 'No icon' item */
-  .menu-list_left .menu-item__content:first-child {
+  .menu-list_left .menu-item__content:first-child,
+  .menu-list_right .menu-item__content:last-child {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
-    padding-left: 0;
+  }
+
+  .menu-list_left .menu-item__content:first-child::before,
+  .menu-list_right .menu-item__content:last-child::after {
+    width: 0;
   }
 }

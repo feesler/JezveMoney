@@ -2,12 +2,15 @@ import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../actions/reminder.js';
 import * as trActions from '../actions/transaction.js';
 import { App } from '../../Application.js';
+import * as ApiActions from '../actions/api/schedule.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
     REMINDER_UPCOMING,
 } from '../../model/Reminder.js';
+import { EXPENSE } from '../../model/Transaction.js';
+import { INTERVAL_NONE } from '../../common.js';
 
 export class RemindersStory extends TestStory {
     async beforeRun() {
@@ -38,6 +41,7 @@ export class RemindersStory extends TestStory {
         await this.upcoming();
         await this.confirmCancelled();
         await this.cancelConfirmed();
+        await this.noLongestInterval();
     }
 
     async list() {
@@ -224,5 +228,36 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_CANCELLED });
         await Actions.clearEndDateFilter();
         await Actions.clearAllFilters();
+    }
+
+    async noLongestInterval() {
+        setBlock('No longest interval test', 1);
+
+        await App.scenario.resetData({
+            schedule: true,
+        });
+
+        const {
+            ACC_RUB,
+            INVEST_CATEGORY,
+        } = App.scenario;
+
+        const data = {
+            type: EXPENSE,
+            src_id: ACC_RUB,
+            src_amount: 100000,
+            comment: 'One time expense',
+            category_id: INVEST_CATEGORY,
+            start_date: App.datesSec.weekAfter,
+            end_date: null,
+            interval_type: INTERVAL_NONE,
+            interval_step: 0,
+            interval_offset: 0,
+        };
+
+        await ApiActions.extractAndCreate(data);
+
+        await App.view.navigateToReminders();
+        await Actions.filterByState({ state: REMINDER_UPCOMING });
     }
 }

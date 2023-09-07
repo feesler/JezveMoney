@@ -195,7 +195,7 @@ export const stepInterval = (timestamp, intervalType, step = 1) => {
     assert(step >= 0, 'Invalid interval step');
 
     const dayStart = cutDate(timestamp);
-    if (step === 0) {
+    if (step === 0 || intervalType === INTERVAL_NONE) {
         return dayStart;
     }
 

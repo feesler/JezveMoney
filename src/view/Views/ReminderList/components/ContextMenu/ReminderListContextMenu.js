@@ -57,36 +57,33 @@ export class ReminderListContextMenu extends PopupMenu {
 
         const updateURL = getApplicationURL('transactions/create/', updateParams);
 
-        this.setState({
-            ...this.state,
-            items: [{
-                id: 'ctxDetailsBtn',
-                type: 'link',
-                title: __('actions.openItem'),
-                url: getApplicationURL(`reminders/${reminder.id}`),
-                hidden: (reminder.state === REMINDER_UPCOMING),
-                onClick: (_, e) => e?.preventDefault(),
-            }, {
-                type: 'separator',
-            }, {
-                id: 'ctxConfirmBtn',
-                icon: 'check',
-                title: __('reminders.confirm'),
-                hidden: (reminder.state === REMINDER_CONFIRMED),
-            }, {
-                id: 'ctxUpdateBtn',
-                type: 'link',
-                icon: 'update',
-                title: __('reminders.update'),
-                url: updateURL.toString(),
-                hidden: (reminder.state === REMINDER_CONFIRMED),
-            }, {
-                id: 'ctxCancelBtn',
-                icon: 'del',
-                title: __('reminders.cancel'),
-                hidden: (reminder.state === REMINDER_CANCELLED),
-            }],
-        });
+        this.setItems([{
+            id: 'ctxDetailsBtn',
+            type: 'link',
+            title: __('actions.openItem'),
+            url: getApplicationURL(`reminders/${reminder.id}`),
+            hidden: (reminder.state === REMINDER_UPCOMING),
+            onClick: (_, e) => e?.preventDefault(),
+        }, {
+            type: 'separator',
+        }, {
+            id: 'ctxConfirmBtn',
+            icon: 'check',
+            title: __('reminders.confirm'),
+            hidden: (reminder.state === REMINDER_CONFIRMED),
+        }, {
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: __('reminders.update'),
+            url: updateURL.toString(),
+            hidden: (reminder.state === REMINDER_CONFIRMED),
+        }, {
+            id: 'ctxCancelBtn',
+            icon: 'del',
+            title: __('reminders.cancel'),
+            hidden: (reminder.state === REMINDER_CANCELLED),
+        }]);
 
         this.attachAndShow(menuButton);
     }
