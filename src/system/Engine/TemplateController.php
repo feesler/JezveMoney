@@ -39,6 +39,7 @@ abstract class TemplateController extends Controller
         $this->cssArr = [];
 
         $this->setupLocales();
+        Application::getInstance()->updateReminders();
 
         $this->jsArr = [
             "polyfill/index.js",
