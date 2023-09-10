@@ -9,6 +9,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
 import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
@@ -43,6 +44,13 @@ export class Header extends Component {
             throw new Error('Invalid element specified');
         }
 
+        const logo = this.elem.querySelector('.header-logo');
+
+        this.menuButton = HeaderMenuButton.create({
+            onClick: () => this.onToggleNav(),
+        });
+        logo.after(this.menuButton.elem);
+
         this.navigationContent = document.querySelector('.main-navigation');
 
         const navList = this.navigationContent.querySelector('.nav-list');
@@ -56,8 +64,6 @@ export class Header extends Component {
             className: 'navigation main-navigation-offcanvas',
         });
 
-        this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
-        setEvents(this.navToggleBtn, { click: () => this.onToggleNav() });
         this.closeNavBtn = this.navigationContent.querySelector('.close-btn');
         setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
