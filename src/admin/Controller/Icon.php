@@ -35,6 +35,7 @@ class Icon extends AdminController
         ];
 
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "view" => [
                 "data" => $data["itemsData"],
             ],

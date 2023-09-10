@@ -35,6 +35,7 @@ class Currency extends AdminController
         $itemsData = $this->model->getData();
         $data["itemsData"] = $itemsData;
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "view" => [
                 "data" => $itemsData,
             ],

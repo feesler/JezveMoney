@@ -20,7 +20,7 @@ export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
 
 /** Returns URL instance for specified path and search params */
-export const getApplicationURL = (path, params = {}) => {
+export const getApplicationURL = (path = '', params = {}) => {
     const res = new URL(`${App.baseURL}${path}`);
 
     Object.entries(params ?? {}).forEach(([prop, value]) => {

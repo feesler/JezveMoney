@@ -37,6 +37,7 @@ class User extends AdminController
         }
         $data["itemsData"] = $itemsData;
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "view" => [
                 "data" => $itemsData,
             ],

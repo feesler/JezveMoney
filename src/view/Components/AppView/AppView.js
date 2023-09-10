@@ -1,7 +1,8 @@
 import { View } from 'jezvejs/View';
 
 import { App } from '../../Application/App.js';
-import { Header } from '../Header/Header.js';
+import { AppHeader } from '../AppHeader/AppHeader.js';
+import { __ } from '../../utils/utils.js';
 
 /**
  * Base View class
@@ -15,10 +16,7 @@ export class AppView extends View {
         App.setupTheme();
         App.updateTimeZone();
 
-        const headerElem = document.querySelector('.header');
-        this.header = (headerElem) ? Header.fromElement(headerElem) : null;
-
-        App.updateRemindersBadge();
+        this.initHeader();
     }
 
     /**
@@ -29,5 +27,20 @@ export class AppView extends View {
         if (message) {
             App.createNotification(message.title, message.type);
         }
+    }
+
+    initHeader() {
+        const pageWrapper = document.querySelector('.page_wrapper');
+        if (!pageWrapper) {
+            return;
+        }
+
+        this.header = AppHeader.create({
+            title: __('appName'),
+        });
+
+        pageWrapper.prepend(this.header.elem);
+
+        App.updateRemindersBadge();
     }
 }

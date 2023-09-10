@@ -1,56 +1,123 @@
 import {
-    ge,
     show,
-    Component,
     setEmptyClick,
     removeEmptyClick,
     setEvents,
     re,
     isFunction,
+    createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
+import { Header } from 'jezvejs/Header';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
+import { Icon } from 'jezvejs/Icon';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
 import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
 
-import './Header.scss';
+import './AppHeader.scss';
 import { Badge } from '../Badge/Badge.js';
 import { getApplicationURL } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
 
 /* CSS classes */
 const SHOW_ACTIONS_CLASS = 'show-actions';
 
+const defaultProps = {
+    title: null,
+};
+
 /**
  * Header component
  */
-export class Header extends Component {
-    constructor(props) {
-        super(props);
+export class AppHeader extends Header {
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         this.userNavEmptyClick = () => this.hideUserNavigation();
         this.onActionsShown = null;
 
-        if (this.elem) {
-            this.parse();
-        }
+        this.actionsContainer = null;
+        this.userName = App.model.profile?.name ?? null;
     }
 
     /**
-     * Parse DOM to obtain child elements and build state of component
+     * Component initialization
      */
-    parse() {
-        if (!this.elem) {
-            throw new Error('Invalid element specified');
-        }
+    init() {
+        this.logoTitle = createElement('span', {
+            props: {
+                className: 'header-logo__title',
+                textContent: this.props.title,
+            },
+        });
 
-        const logo = this.elem.querySelector('.header-logo');
+        this.logo = createElement('a', {
+            props: {
+                className: 'header-logo',
+                href: getApplicationURL(),
+                tabIndex: 1,
+            },
+            children: [
+                createElement('span', {
+                    props: { className: 'header-logo__icon' },
+                    children: Icon.create({
+                        icon: 'header-logo',
+                        className: 'logo-icon',
+                    }).elem,
+                }),
+                this.logoTitle,
+            ],
+        });
 
         this.menuButton = HeaderMenuButton.create({
             onClick: () => this.onToggleNav(),
         });
-        logo.after(this.menuButton.elem);
 
+        const loggedIn = App.isUserLoggedIn();
+
+        this.userBtn = Button.create({
+            id: 'userbtn',
+            className: 'header-btn user-btn',
+            tabIndex: 2,
+            icon: loggedIn ? 'user' : 'ellipsis',
+            title: (loggedIn && App.model.profile.name) ?? null,
+            onClick: (e) => this.showUserNavigation(e),
+        });
+
+        this.titleElem = createElement('div', {
+            props: { className: 'header-title' },
+        });
+        this.headerActions = createElement('div', {
+            props: { className: 'header__content header-actions' },
+            children: this.titleElem,
+        });
+
+        this.container = createElement('div', {
+            props: { className: 'header__container' },
+            events: {
+                transitionend: (e) => this.onContentTransitionEnd(e),
+            },
+            children: [
+                createElement('div', {
+                    props: { className: 'header__content main-header-content' },
+                    children: this.userBtn.elem,
+                }),
+                this.headerActions,
+            ],
+        });
+
+        this.state.content = [
+            this.logo,
+            this.container,
+        ];
+
+        super.init();
+
+        // Main menu
         this.navigationContent = document.querySelector('.main-navigation');
 
         const navList = this.navigationContent.querySelector('.nav-list');
@@ -67,25 +134,7 @@ export class Header extends Component {
         this.closeNavBtn = this.navigationContent.querySelector('.close-btn');
         setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
-        // Actions
-        this.container = this.elem.querySelector('.header__container');
-        setEvents(this.container, {
-            transitionend: (e) => this.onContentTransitionEnd(e),
-        });
-
-        this.headerActions = this.elem.querySelector('.header-actions');
-        this.titleElem = this.headerActions.querySelector('.header-title');
-
-        this.userBtn = ge('userbtn');
-        setEvents(this.userBtn, { click: (e) => this.showUserNavigation(e) });
-
-        this.actionsContainer = null;
-
-        this.userNameElem = this.userBtn.querySelector('.btn__content');
-        if (this.userNameElem) {
-            this.userName = this.userNameElem.textContent;
-        }
-
+        // User navigation Offcanvas
         this.userNavContent = document.querySelector('.user-navigation-content');
         this.userNavigation = Offcanvas.create({
             content: this.userNavContent,
@@ -168,6 +217,13 @@ export class Header extends Component {
     }
 
     /**
+     * Updates title of logo
+     */
+    setLogoTitle(title) {
+        this.logoTitle.textContent = title;
+    }
+
+    /**
      * Set new user name
      * @param {string} name - user name
      */
@@ -181,7 +237,8 @@ export class Header extends Component {
         }
 
         this.userName = name;
-        this.userNameElem.textContent = this.userName;
+        this.userBtn.setTitle(this.userName);
+
         this.navUserNameElem.textContent = this.userName;
     }
 
@@ -213,7 +270,7 @@ export class Header extends Component {
                 title: this.remindersBadge.elem,
                 className: 'header-btn',
             });
-            this.userBtn.before(this.remindersBtn.elem);
+            this.userBtn.elem.before(this.remindersBtn.elem);
         }
 
         this.remindersBadge.setTitle(count);

@@ -67,6 +67,10 @@ class Query extends AdminController
 
         $data["latestQueries"] = $this->getLatestQueries();
 
+        $data["appProps"] = [
+            "profile" => $this->getProfileData(),
+        ];
+
         $this->initResources("QueriesView");
         $this->render($data);
     }
