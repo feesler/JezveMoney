@@ -507,8 +507,8 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    isValidTemplate(template = this.model.template) {
-        return template?.isValid(this.parent.fileData);
+    isValidTemplate(template = this.model.template, state = App.state) {
+        return state.templates.isValidTemplate(template, this.parent.fileData);
     }
 
     async close() {
@@ -878,7 +878,7 @@ export class ImportUploadDialog extends TestComponent {
 
     /** Returns array of ImportTransaction */
     getExpectedUploadResult(importData) {
-        const tpl = new ImportTemplate(this.model.template);
+        const tpl = App.state.templates.getItem(this.model.selectedTemplateId);
 
         return tpl.applyTo(importData, this.model.initialAccount);
     }

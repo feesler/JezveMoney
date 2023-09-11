@@ -115,6 +115,20 @@ export class ImportTemplateStory extends TestStory {
         await Actions.selectTemplateByIndex(0);
         await Actions.selectTemplateByIndex(1);
         await Actions.selectTemplateByIndex(2);
+
+        setBlock('Verify template with existing name not submitted', 2);
+        await Actions.createTemplate();
+        await App.scenario.runner.runGroup(Actions.selectTemplateColumn, [
+            { column: 'accountAmount', index: 11 },
+            { column: 'transactionAmount', index: 9 },
+            { column: 'accountCurrency', index: 10 },
+            { column: 'transactionCurrency', index: 8 },
+            { column: 'date', index: 1 },
+            { column: 'comment', index: 2 },
+        ]);
+        await Actions.inputTemplateName('Template_1_2');
+        await Actions.submitTemplate();
+        await Actions.cancelTemplate();
     }
 
     // Update import template tests

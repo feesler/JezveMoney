@@ -481,6 +481,7 @@
             "deleteMessage": "Are you sure to delete this import template?",
             "name": "Name",
             "invalidName": "Input template name",
+            "existingName": "Template with the same name already exist",
             "firstRow": "First row",
             "invalidFirstRow": "Input row number",
             "setDefaultAccount": "Select main account",

@@ -109,13 +109,16 @@ export const submitTemplate = async () => {
         // Prepare expected content
         const expectedTpl = App.view.getExpectedTemplate();
         const uploadState = App.view.getUploadState();
-        if (uploadState === CREATE_TPL_STATE) {
-            App.state.createTemplate(expectedTpl);
-        } else {
-            App.state.updateTemplate(expectedTpl);
-        }
 
         await App.view.submitTemplate();
+
+        if (expectedTpl) {
+            if (uploadState === CREATE_TPL_STATE) {
+                App.state.createTemplate(expectedTpl);
+            } else {
+                App.state.updateTemplate(expectedTpl);
+            }
+        }
         // Check app state
         return App.state.fetchAndTest();
     });
