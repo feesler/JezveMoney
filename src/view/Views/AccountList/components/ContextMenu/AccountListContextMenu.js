@@ -1,8 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __, getApplicationURL, getExportURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
-import { getExportURL } from '../../helpers.js';
 
 /** Accounts list context menu component */
 export class AccountListContextMenu extends PopupMenu {
@@ -61,7 +60,7 @@ export class AccountListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'export',
             title: __('transactions.exportToCsv'),
-            url: getExportURL(account.id),
+            url: getExportURL({ accounts: [account.id] }),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',

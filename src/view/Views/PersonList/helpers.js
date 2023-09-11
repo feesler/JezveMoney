@@ -1,15 +1,4 @@
-import { asArray } from 'jezvejs';
 import { App } from '../../Application/App.js';
-
-/** Returns URL to export transaction of selected persons */
-export const getExportURL = (selectedIds) => {
-    const ids = asArray(selectedIds);
-    const res = new URL(`${App.baseURL}transactions/export/`);
-    ids.forEach((id) => {
-        res.searchParams.append('persons[]', id);
-    });
-    return res;
-};
 
 /** Returns array of selected visible persons */
 export const getVisibleSelectedItems = (state) => (

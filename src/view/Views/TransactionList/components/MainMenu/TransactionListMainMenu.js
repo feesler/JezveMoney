@@ -1,7 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getSelectedItems } from '../../../../utils/utils.js';
-import { getExportURL, getTransactionsGroupByDate } from '../../helpers.js';
+import { __, getExportURL, getSelectedItems } from '../../../../utils/utils.js';
+import { getTransactionsGroupByDate } from '../../helpers.js';
 
 /** Transactions list main menu component */
 export class TransactionListMainMenu extends PopupMenu {
@@ -23,7 +23,7 @@ export class TransactionListMainMenu extends PopupMenu {
         const groupByDate = getTransactionsGroupByDate() === 1;
 
         const exportURL = (itemsCount > 0)
-            ? getExportURL(context)
+            ? getExportURL(context.filter)
             : null;
 
         this.setItems([{
