@@ -99,6 +99,7 @@ class MainView extends AppView {
         this.loadElementsByIds([
             'contentContainer',
             'summaryWidget',
+            'chart',
         ]);
 
         // Loading indicator
@@ -225,16 +226,21 @@ class MainView extends AppView {
         }
 
         // Statistics widget
-        const chart = ge('chart');
-        if (chart) {
-            this.histogram = Histogram.create({
-                data: this.props.chartData,
-                height: 200,
-                renderXAxisLabel: (value) => App.formatDate(value),
-                renderYAxisLabel: (value) => formatNumberShort(value),
-            });
-            chart.append(this.histogram.elem);
-        }
+        this.histogram = Histogram.create({
+            data: this.props.chartData,
+            height: 200,
+            renderXAxisLabel: (value) => App.formatDate(value),
+            renderYAxisLabel: (value) => formatNumberShort(value),
+        });
+
+        this.statNoDataMessage = createElement('span', {
+            props: {
+                className: 'nodata-message',
+                textContent: __('statistics.noData'),
+            },
+        });
+
+        this.chart.append(this.statNoDataMessage, this.histogram.elem);
 
         this.subscribeToStore(this.store);
         this.stopLoading();
@@ -572,7 +578,18 @@ class MainView extends AppView {
             return;
         }
 
-        this.histogram?.setData(state.chartData);
+        const [value] = state.chartData?.values ?? [];
+        const dataSet = value?.data ?? [];
+        const noData = !dataSet.length && !state.chartData?.series?.length;
+
+        show(this.statNoDataMessage, state.chartData && noData);
+        show(this.histogram?.chartContainer, !noData);
+
+        const data = (noData)
+            ? { values: [], series: [] }
+            : state.chartData;
+
+        this.histogram?.setData(data);
     }
 
     /** Renders 'Set transaction category' dialog */
