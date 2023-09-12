@@ -295,14 +295,12 @@ export class TransactionForm extends Component {
 
         this.personContainer = AccountContainer.create({
             id: 'personContainer',
-            title: __('transactions.person'),
         });
         this.personTile = Tile.create({ id: 'personTile' });
         this.personContainer.tileBase.prepend(this.personTile.elem);
 
         const debtAccProps = {
             id: 'debtAccountContainer',
-            title: __('transactions.person'),
             accountToggler: true,
             onToggleAccount: () => this.toggleEnableAccount(),
             closeButton: true,
@@ -1658,16 +1656,18 @@ export class TransactionForm extends Component {
         this.debtAccountContainer.togglerButton.enable(!state.submitStarted);
 
         if (isTransaction) {
-            const srcResultTarget = __((debtType) ? 'transactions.person' : 'transactions.debtAccount');
-            const destResultTarget = __((debtType) ? 'transactions.debtAccount' : 'transactions.person');
-            this.srcResBalanceRow.setTitle(`${__('transactions.result')} (${srcResultTarget})`);
-            this.destResBalanceRow.setTitle(`${__('transactions.result')} (${destResultTarget})`);
+            this.srcResBalanceRow.setTitle(__('transactions.sourceResult'));
+            this.destResBalanceRow.setTitle(__('transactions.destResult'));
         }
 
         this.srcAmountRow.enableSelect(debtType);
         this.destAmountRow.enableSelect(!debtType);
 
         this.personIdInp.value = state.person.id;
+
+        const personTok = (debtType) ? 'sourcePerson' : 'destPerson';
+        const personLabel = __(`transactions.${personTok}`);
+        this.personContainer.setTitle(personLabel);
 
         const currencyModel = App.model.currency;
         const personAccountCurr = currencyModel.getItem(state.personAccount.curr_id);

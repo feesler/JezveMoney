@@ -880,19 +880,13 @@ export class TransactionForm extends TestComponent {
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
             if (isAvailable && isTransactionForm) {
-                const personTok = __('transactions.person', locale);
-                const accountTok = __('transactions.debtAccount', locale);
-
-                res.srcResBalanceRow.label = (debtType)
-                    ? `${resultBalanceTok} (${personTok})`
-                    : `${resultBalanceTok} (${accountTok})`;
-                res.destResBalanceRow.label = (debtType)
-                    ? `${resultBalanceTok} (${accountTok})`
-                    : `${resultBalanceTok} (${personTok})`;
+                res.srcResBalanceRow.label = `${__('transactions.sourceResult', locale)}`;
+                res.destResBalanceRow.label = `${__('transactions.destResult', locale)}`;
             }
 
             if (debtType) {
                 if (isAvailable) {
+                    res.personContainer.label = __('transactions.sourcePerson', locale);
                     res.personContainer.tile.title = (model.person) ? model.person.name : '';
                     res.personContainer.tile.subtitle = (model.srcAccount)
                         ? model.srcCurr.format(model.srcAccount.balance)
@@ -909,6 +903,7 @@ export class TransactionForm extends TestComponent {
                 }
             } else {
                 if (isAvailable) {
+                    res.personContainer.label = __('transactions.destPerson', locale);
                     res.personContainer.tile.title = (model.person) ? model.person.name : '';
                     res.personContainer.tile.subtitle = (model.destAccount)
                         ? model.destCurr.format(model.destAccount.balance)

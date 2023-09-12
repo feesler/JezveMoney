@@ -20,7 +20,6 @@ export class TileBlock extends TestComponent {
         const res = await evaluate((el) => ({
             label: el?.querySelector('.field__title span')?.textContent,
         }), this.elem);
-        assert(res.label, 'Tile block label not found');
 
         res.tile = await Tile.create(this.parent, await query(this.elem, '.tile'));
         assert(res.tile, 'Tile not found');

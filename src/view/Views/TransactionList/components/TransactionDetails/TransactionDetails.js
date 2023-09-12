@@ -1,6 +1,6 @@
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
-import { Transaction } from '../../../../Models/Transaction.js';
+import { DEBT, Transaction } from '../../../../Models/Transaction.js';
 import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
 
@@ -22,7 +22,7 @@ export class TransactionDetails extends ItemDetails {
     /** Component initialization */
     getContent() {
         this.sourceField = Field.create({
-            title: __('transactions.source'),
+            title: __('transactions.sourceAccount'),
             className: SOURCE_FIELD_CLASS,
         });
 
@@ -108,6 +108,32 @@ export class TransactionDetails extends ItemDetails {
         return category.name;
     }
 
+    getSourceLabel(state) {
+        const { item } = state;
+        const { profile, accounts } = App.model;
+        const account = accounts.getItem(item.src_id);
+        if (!account) {
+            return null;
+        }
+
+        return (item.type === DEBT && account.owner_id !== profile.owner_id)
+            ? __('transactions.sourcePerson')
+            : __('transactions.sourceAccount');
+    }
+
+    getDestLabel(state) {
+        const { item } = state;
+        const { profile, accounts } = App.model;
+        const account = accounts.getItem(item.dest_id);
+        if (!account) {
+            return null;
+        }
+
+        return (item.type === DEBT && account.owner_id !== profile.owner_id)
+            ? __('transactions.destPerson')
+            : __('transactions.destAccount');
+    }
+
     /**
      * Render specified state
      * @param {object} state - current state object
@@ -126,9 +152,11 @@ export class TransactionDetails extends ItemDetails {
         this.heading.setTitle(Transaction.getTypeTitle(item.type));
 
         this.sourceField.show(showSource);
+        this.sourceField.setTitle(this.getSourceLabel(state));
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
 
         this.destinationField.show(showDest);
+        this.destinationField.setTitle(this.getDestLabel(state));
         this.destinationField.setContent(this.getAccountOrPerson(item.dest_id));
 
         const srcAmount = currency.formatCurrency(item.src_amount, item.src_curr);

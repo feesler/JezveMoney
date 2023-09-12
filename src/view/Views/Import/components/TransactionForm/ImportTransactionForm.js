@@ -178,7 +178,6 @@ export class ImportTransactionForm extends Component {
         App.initPersonsList(this.personDropDown);
 
         this.personField = Field.create({
-            title: __('transactions.person'),
             content: this.personDropDown.elem,
             className: PERSON_FIELD_CLASS,
         });
@@ -621,6 +620,12 @@ export class ImportTransactionForm extends Component {
         this.transferAccountField.show(isTransfer);
 
         // Person field
+        if (transaction.type === 'debt_in') {
+            this.personField.setTitle(__('transactions.sourcePerson'));
+        } else if (transaction.type === 'debt_out') {
+            this.personField.setTitle(__('transactions.destPerson'));
+        }
+
         this.personDropDown.enable(transaction.enabled && isDebt);
         if (transaction.personId) {
             this.personDropDown.setSelection(transaction.personId);
