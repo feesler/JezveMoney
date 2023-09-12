@@ -1,9 +1,13 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getSortByDateIcon, getSortByNameIcon } from '../../../../utils/utils.js';
+import {
+    __,
+    getExportURL,
+    getSortByDateIcon,
+    getSortByNameIcon,
+} from '../../../../utils/utils.js';
 import {
     getAccountsSortMode,
-    getExportURL,
     getHiddenSelectedItems,
     getSelectedIds,
     getVisibleSelectedItems,
@@ -33,7 +37,7 @@ export class AccountListMainMenu extends PopupMenu {
         const showSortItems = isListMode && itemsCount > 1;
 
         const exportURL = (totalSelCount > 0)
-            ? getExportURL(getSelectedIds(context))
+            ? getExportURL({ accounts: getSelectedIds(context) })
             : null;
 
         this.setItems([{

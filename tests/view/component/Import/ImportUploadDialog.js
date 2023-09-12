@@ -248,22 +248,25 @@ export class ImportUploadDialog extends TestComponent {
             return null;
         }
 
-        const res = {
-            elem,
-            tplElem: await query(elem, '.raw-data-column__tpl'),
-            headerElem: await query(elem, '.raw-data-column__header'),
-            cellElems: await queryAll(elem, '.raw-data-column__cell'),
-        };
+        const res = await evaluate((el) => {
+            const tplPropsElems = Array.from(
+                el.querySelectorAll('.raw-data-column__tpl .raw-data-column__tpl-prop'),
+            );
+            const headerEl = el.querySelector('.raw-data-column__header');
+            const cellElems = Array.from(el.querySelectorAll('.raw-data-column__cell'));
 
-        res.cells = await asyncMap(res.cellElems, (cellElem) => prop(cellElem, 'textContent'));
+            const column = {
+                tplProperties: tplPropsElems.map((item) => item.textContent),
+                cells: cellElems.map((item) => item.textContent),
+            };
 
-        res.tplProperties = await asyncMap(
-            await queryAll(res.tplElem, '.raw-data-column__tpl-prop'),
-            (propElem) => prop(propElem, 'textContent'),
-        );
-        if (res.headerElem) {
-            res.title = await prop(res.headerElem, 'textContent');
-        }
+            if (headerEl) {
+                column.title = headerEl.textContent;
+            }
+
+            return column;
+        }, elem);
+        res.elem = elem;
 
         return res;
     }
@@ -507,8 +510,8 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    isValidTemplate(template = this.model.template) {
-        return template?.isValid(this.parent.fileData);
+    isValidTemplate(template = this.model.template, state = App.state) {
+        return state.templates.isValidTemplate(template, this.parent.fileData);
     }
 
     async close() {
@@ -878,7 +881,7 @@ export class ImportUploadDialog extends TestComponent {
 
     /** Returns array of ImportTransaction */
     getExpectedUploadResult(importData) {
-        const tpl = new ImportTemplate(this.model.template);
+        const tpl = App.state.templates.getItem(this.model.selectedTemplateId);
 
         return tpl.applyTo(importData, this.model.initialAccount);
     }

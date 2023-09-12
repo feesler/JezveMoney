@@ -55,8 +55,6 @@ class ScheduledTransactionModel extends CachedTable
         $this->offsetsModel = IntervalOffsetModel::getInstance();
         $this->reminderModel = ReminderModel::getInstance();
         TransactionModel::getInstance();
-
-        $this->updateAllReminders();
     }
 
     /**
@@ -1342,28 +1340,31 @@ class ScheduledTransactionModel extends CachedTable
 
     /**
      * Creates transaction reminders for period from last update
-     *
-     * @return bool
      */
     public function updateAllReminders()
     {
-        Model::runTransaction(function () {
+        if (!self::$user_id) {
+            return;
+        }
+
+        $range = $this->getRemindersDateRange();
+        $diff = getDateDiff($range["startDate"], $range["endDate"], INTERVAL_DAY);
+        if ($diff === 0) {
+            return;
+        }
+
+        Model::runTransaction(function () use ($range) {
             $userModel = UserModel::getInstance();
-
-            $params = $this->getRemindersDateRange();
-            $diff = getDateDiff($params["startDate"], $params["endDate"], INTERVAL_DAY);
-            if ($diff === 0) {
-                return;
-            }
-
             $userModel->setRemindersDate();
 
-            $params["state"] = REMINDER_SCHEDULED;
+            $params = [
+                "startDate" => $range["startDate"],
+                "endDate" => $range["endDate"],
+                "state" => REMINDER_SCHEDULED,
+            ];
             $reminders = $this->getAllExpectedReminders($params);
             $this->reminderModel->createMultiple($reminders);
         });
-
-        return true;
     }
 
     /**

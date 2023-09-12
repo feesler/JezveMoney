@@ -25,6 +25,10 @@ class ApiConsole extends AdminController
         $tplModel = ImportTemplateModel::getInstance();
         $data["tplColumns"] = $tplModel->getColumnTypes();
 
+        $data["appProps"] = [
+            "profile" => $this->getProfileData(),
+        ];
+
         $this->initResources("ApiConsoleView");
         $this->render($data);
     }

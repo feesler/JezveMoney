@@ -2783,6 +2783,11 @@ export class AppState {
             return false;
         }
 
+        const foundItem = this.templates.findByName(params.name);
+        if (foundItem && foundItem.id !== params.id) {
+            return false;
+        }
+
         if (params.account_id) {
             const account = this.accounts.getItem(params.account_id);
             if (!account || account.owner_id !== this.profile.owner_id) {

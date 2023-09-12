@@ -52,8 +52,8 @@ export class ImportTransactionItem extends CollapsibleListItem {
 
         const fields = [
             [__('transactions.type'), TYPE_FIELD_CLASS],
-            [__('transactions.debtAccount'), ACCOUNT_FIELD_CLASS],
-            [__('transactions.person'), PERSON_FIELD_CLASS],
+            [__('transactions.sourceAccount'), ACCOUNT_FIELD_CLASS],
+            [__('transactions.sourcePerson'), PERSON_FIELD_CLASS],
             [__('transactions.amount'), SRC_AMOUNT_FIELD_CLASS],
             [__('transactions.destAmount'), DEST_AMOUNT_FIELD_CLASS],
             [__('transactions.date'), DATE_FIELD_CLASS],
@@ -153,12 +153,19 @@ export class ImportTransactionItem extends CollapsibleListItem {
         // Person field
         this.personField.show(isDebt);
         if (isDebt) {
+            const personTitle = (item.type === 'debt_in')
+                ? __('transactions.sourcePerson')
+                : __('transactions.destPerson');
+            this.personField.setTitle(personTitle);
+
             const person = persons.getItem(item.personId);
             this.personField.setContent(person.name);
         }
 
         // Amount fields
-        const srcAmountLabel = (isDiff) ? __('transactions.sourceAmount') : __('transactions.amount');
+        const srcAmountLabel = (isDiff)
+            ? __('transactions.sourceAmount')
+            : __('transactions.amount');
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(item.sourceAmount, item.srcCurrId);
         this.srcAmountField.setContent(srcAmount);

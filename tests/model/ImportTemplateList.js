@@ -26,8 +26,36 @@ export class ImportTemplateList extends List {
         ));
     }
 
+    /** Searches for import template by name and returns result */
+    findByName(name, caseSens = false) {
+        let lookupName;
+
+        if (caseSens) {
+            lookupName = name;
+            return this.find((item) => item.name === lookupName);
+        }
+
+        lookupName = name.toLowerCase();
+        return this.find((item) => item.name.toLowerCase() === lookupName);
+    }
+
     /** Find valid template for data */
     findValidTemplate(data) {
         return this.find((template) => template.isValid(data));
+    }
+
+    /** Validates template for specified data and returns result */
+    isValidTemplate(template, data) {
+        const valid = template?.isValid(data);
+        if (!valid) {
+            return false;
+        }
+
+        const foundItem = this.findByName(template.name);
+        if (foundItem && foundItem.id !== template.id) {
+            return false;
+        }
+
+        return true;
     }
 }

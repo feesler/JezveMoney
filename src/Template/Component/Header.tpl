@@ -1,28 +1,3 @@
-<header class="header">
-    <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
-        <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-        <span class="header-logo__title"><?= __("appName") ?></span>
-    </a>
-    <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
-
-    <div class="header__container">
-        <div class="header__content main-header-content">
-            <button id="userbtn" class="btn header-btn user-btn" type="button" tabindex="2">
-                <?php if ($this->user_id != 0) {        ?>
-                    <?= svgIcon("user", "btn__icon") ?>
-                    <span class="btn__content"><?= e($this->user_name) ?></span>
-                <?php    } else {        ?>
-                    <?= svgIcon("ellipsis", "btn__icon") ?>
-                <?php    }        ?>
-            </button>
-        </div>
-
-        <div class="header__content header-actions">
-            <div class="header-title"></div>
-        </div>
-    </div>
-</header>
-
 <nav class="main-navigation navigation-content">
     <div class="navigation-controls">
         <button class="btn close-btn circle-btn"><?= svgIcon("back", "btn__icon") ?></button>

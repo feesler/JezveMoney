@@ -20,7 +20,7 @@ export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
 
 /** Returns URL instance for specified path and search params */
-export const getApplicationURL = (path, params = {}) => {
+export const getApplicationURL = (path = '', params = {}) => {
     const res = new URL(`${App.baseURL}${path}`);
 
     Object.entries(params ?? {}).forEach(([prop, value]) => {
@@ -34,6 +34,11 @@ export const getApplicationURL = (path, params = {}) => {
 
     return res;
 };
+
+/** Returns export transactions URL */
+export const getExportURL = (options) => (
+    getApplicationURL('transactions/export/', options)
+);
 
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {

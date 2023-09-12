@@ -111,6 +111,7 @@ class Balance extends AdminController
         $data["transactions"] = $transactions;
 
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "view" => [
                 "accounts" => $accounts,
                 "filter" => $filter,

@@ -36,6 +36,10 @@ class Main extends AdminController
             "latestDBVersion" => $this->dbVer->getLatestVersion(),
         ];
 
+        $data["appProps"] = [
+            "profile" => $this->getProfileData(),
+        ];
+
         $this->initResources("AdminMainView");
         $this->render($data);
     }

@@ -118,6 +118,8 @@ class ApiController extends Controller
         }
 
         $this->owner_id = $this->uMod->getOwner();
+
+        Application::getInstance()->updateReminders();
     }
 
 

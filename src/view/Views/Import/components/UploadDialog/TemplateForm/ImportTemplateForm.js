@@ -328,7 +328,7 @@ export class ImportTemplateForm extends Component {
         const { template } = this.state;
 
         const request = {
-            name: template.name,
+            name: template.name.trim(),
             type_id: template.type_id,
             account_id: template.account_id,
             first_row: template.first_row,
@@ -341,12 +341,26 @@ export class ImportTemplateForm extends Component {
             account_amount_col: template.columns.accountAmount,
         };
 
-        if (!template.name.length) {
+        if (!request.name.length) {
             this.setState({
                 ...this.state,
                 validation: {
                     ...this.state.validation,
-                    name: false,
+                    name: __('import.templates.invalidName'),
+                    valid: false,
+                },
+            });
+
+            return;
+        }
+
+        const foundItem = App.model.templates.findByName(template.name);
+        if (foundItem && foundItem.id !== template?.id) {
+            this.setState({
+                ...this.state,
+                validation: {
+                    ...this.state.validation,
+                    name: __('import.templates.existingName'),
                     valid: false,
                 },
             });
@@ -515,8 +529,9 @@ export class ImportTemplateForm extends Component {
         this.nameField.setState((nameState) => ({
             ...nameState,
             value: state.template?.name ?? '',
-            valid: validation.name,
+            valid: validation.name === true,
             disabled: state.listLoading,
+            feedbackMessage: validation.name ?? null,
         }));
 
         // Raw data table

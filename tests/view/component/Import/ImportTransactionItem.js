@@ -97,6 +97,11 @@ export class ImportTransactionItem extends TestComponent {
             res.transferAccountField.value = account.name;
         }
         if (res.personField.visible) {
+            const personTok = (model.type === 'debt_in')
+                ? 'transactions.sourcePerson'
+                : 'transactions.destPerson';
+            res.personField.title = __(personTok, App.view.locale);
+
             const person = state.persons.getItem(model.personId);
             res.personField.value = person.name;
         }

@@ -25,6 +25,7 @@ import {
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
+import { __ } from '../../../model/locale.js';
 
 const sourceTransactionTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -143,6 +144,10 @@ export class ImportTransactionForm extends TestComponent {
             res.transferAccountField.value = transferAccountId.toString();
         }
         if (!res.personField.disabled) {
+            const personTok = (model.type === 'debt_in')
+                ? 'transactions.sourcePerson'
+                : 'transactions.destPerson';
+            res.personField.title = __(personTok, App.view.locale);
             res.personField.value = model.personId.toString();
         }
 
