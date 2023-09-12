@@ -1,0 +1,46 @@
+/* Bar chart information popup */
+.chart__popup {
+  position: absolute;
+  border: 0 none;
+  border-radius: var(--default-border-radius);
+  box-shadow: var(--popup-menu-box-shadow);
+  backdrop-filter: var(--popup-menu-backdrop-filter);
+  padding: 8px;
+  white-space: nowrap;
+  background-color: var(--popup-menu-bg);
+  color: var(--main-text-color);
+}
+
+.chart-popup__content {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 4px;
+}
+
+.chart-popup__header {
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.chart-popup__series {
+  font-size: 0.75rem;
+}
+
+.chart-popup-list {
+  display: flex;
+  flex-flow: column nowrap;
+  list-style-position: inside;
+  list-style-type: disc;
+}
+
+.chart-popup-list__value {
+  position: relative;
+  left: -5px;
+  color: var(--main-text-color);
+}
+
+@for $i from 1 through 13 {
+  .chart-popup-list__item-cat-#{$i} {
+    color: var(--charts-color-#{$i});
+  }
+}

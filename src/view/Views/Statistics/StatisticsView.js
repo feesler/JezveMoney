@@ -1,7 +1,6 @@
 import 'jezvejs/style';
 import {
     createElement,
-    getClassName,
     show,
     asArray,
 } from 'jezvejs';
@@ -33,6 +32,7 @@ import { AccountList } from '../../Models/AccountList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
+import { ChartPopup } from '../../Components/ChartPopup/ChartPopup.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
 import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
@@ -48,14 +48,6 @@ import './StatisticsView.scss';
 
 /* CSS classes */
 const FILTER_HEADER_CLASS = 'filter-item__title';
-/* Chart popup */
-const POPUP_CONTENT_CLASS = 'chart-popup__content';
-const POPUP_HEADER_CLASS = 'chart-popup__header';
-const POPUP_SERIES_CLASS = 'chart-popup__series';
-const POPUP_LIST_CLASS = 'chart-popup-list';
-const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
-const POPUP_LIST_ITEM_CATEGORY_CLASS = 'chart-popup-list__item-cat-';
-const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 /* Chart legend */
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
@@ -72,7 +64,7 @@ class StatisticsView extends AppView {
     constructor(...args) {
         super(...args);
 
-        if (!('accountCurrency' in this.props)) {
+        if (!('chartCurrency' in this.props)) {
             throw new Error('Invalid Statistics view properties');
         }
 
@@ -84,7 +76,7 @@ class StatisticsView extends AppView {
         const { filter } = this.props;
 
         const initialState = {
-            accountCurrency: this.props.accountCurrency,
+            chartCurrency: this.props.chartCurrency,
             chartData: null,
             selectedColumn: null,
             pieChartInfo: null,
@@ -530,7 +522,7 @@ class StatisticsView extends AppView {
         const state = this.store.getState();
         return App.model.currency.formatCurrency(
             value,
-            state.accountCurrency,
+            state.chartCurrency,
         );
     }
 
@@ -538,58 +530,11 @@ class StatisticsView extends AppView {
         return `${normalize(value, 2)} %`;
     }
 
-    renderPopupListItem(item) {
-        const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
-        return createElement('li', {
-            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, categoryClass) },
-            children: createElement('span', {
-                props: {
-                    className: POPUP_LIST_VALUE_CLASS,
-                    textContent: this.formatValue(item.value),
-                },
-            }),
-        });
-    }
-
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
-        if (!target) {
-            return null;
-        }
-
-        const items = target.group ?? [target.item];
-        const listItems = [];
-        items.forEach((item) => {
-            if (
-                item.columnIndex !== target.item.columnIndex
-                || item.value === 0
-            ) {
-                return;
-            }
-
-            listItems.push(this.renderPopupListItem(item));
-        });
-
-        if (listItems.length === 0) {
-            return null;
-        }
-
-        const list = createElement('ul', {
-            props: { className: POPUP_LIST_CLASS },
-            children: listItems,
-        });
-        const headerTitle = Transaction.getTypeTitle(target.item.groupName);
-        const header = createElement('div', {
-            props: { className: POPUP_HEADER_CLASS, textContent: headerTitle },
-        });
-        const seriesTitle = this.renderDateLabel(target.series);
-        const series = createElement('div', {
-            props: { className: POPUP_SERIES_CLASS, textContent: seriesTitle },
-        });
-
-        return createElement('div', {
-            props: { className: POPUP_CONTENT_CLASS },
-            children: [header, series, list],
+        return ChartPopup.fromTarget(target, {
+            formatValue: (value) => this.formatValue(value),
+            renderDateLabel: (value) => this.renderDateLabel(value),
         });
     }
 
@@ -679,9 +624,9 @@ class StatisticsView extends AppView {
 
         App.model.userAccounts.forEach((account) => {
             const enable = (
-                state.accountCurrency === 0
+                state.chartCurrency === 0
                 || ids.length === 0
-                || account.curr_id === state.accountCurrency
+                || account.curr_id === state.chartCurrency
             );
             this.accountDropDown.enableItem(account.id, enable);
 

@@ -37,11 +37,7 @@
                                         <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                                     </a>
                                 </header>
-                                <div id="chart" class="widget_charts">
-                                    <?php if ($transactionsCount === 0) {    ?>
-                                        <span class="nodata-message"><?= __("statistics.noData") ?></span>
-                                    <?php    }        ?>
-                                </div>
+                                <div id="chart" class="widget_charts"></div>
                             </section>
                         <?php    }        ?>
                     </main>

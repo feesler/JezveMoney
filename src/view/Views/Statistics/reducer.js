@@ -71,7 +71,7 @@ const slice = createSlice({
                 ...state.form,
                 accounts,
             },
-            accountCurrency: account?.curr_id ?? 0,
+            chartCurrency: account?.curr_id ?? 0,
         };
     },
 

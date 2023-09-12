@@ -105,6 +105,8 @@
 
 .widget_charts {
   display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
   width: 100%;
 }
 

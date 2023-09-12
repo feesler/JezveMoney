@@ -26,20 +26,24 @@ import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategor
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
+
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { IconList } from '../../Models/IconList.js';
+
+import { ChartPopup } from '../../Components/ChartPopup/ChartPopup.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
+import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
+
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';
-import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
 
 /**
  * Main view
@@ -74,11 +78,15 @@ class MainView extends AppView {
                 hidden: PersonList.create(App.model.hiddenPersons),
                 showHidden: false,
             },
-            chartData: this.props.chartData,
             categoryDialog: {
                 show: false,
                 categoryId: 0,
                 type: 0,
+            },
+            statistics: {
+                chartData: this.props.chartData,
+                chartCurrency: this.props.chartCurrency,
+                request: { ...this.props.chartRequest },
             },
             loading: true,
             showContextMenu: false,
@@ -230,10 +238,24 @@ class MainView extends AppView {
             this.histogram = Histogram.create({
                 data: this.props.chartData,
                 height: 200,
+                showPopupOnHover: true,
+                showPopupOnClick: true,
+                animatePopup: true,
+                activateOnClick: true,
+                activateOnHover: true,
+                renderPopup: (target) => this.renderPopupContent(target),
                 renderXAxisLabel: (value) => App.formatDate(value),
                 renderYAxisLabel: (value) => formatNumberShort(value),
             });
-            chart.append(this.histogram.elem);
+
+            this.statNoDataMessage = createElement('span', {
+                props: {
+                    className: 'nodata-message',
+                    textContent: __('statistics.noData'),
+                },
+            });
+
+            chart.append(this.statNoDataMessage, this.histogram.elem);
         }
 
         this.subscribeToStore(this.store);
@@ -566,13 +588,66 @@ class MainView extends AppView {
         }));
     }
 
+    renderDateLabel(value) {
+        const state = this.store.getState();
+        const { group } = state.statistics?.request;
+
+        if (group === 'day' || group === 'week') {
+            return App.formatDate(value);
+        }
+
+        if (group === 'month') {
+            return App.formatDate(value, {
+                locales: App.dateFormatLocale,
+                options: { year: 'numeric', month: '2-digit' },
+            });
+        }
+
+        if (group === 'year') {
+            return App.formatDate(value, {
+                locales: App.dateFormatLocale,
+                options: { year: 'numeric' },
+            });
+        }
+
+        return null;
+    }
+
+    formatValue(value) {
+        const state = this.store.getState();
+        return App.model.currency.formatCurrency(
+            value,
+            state.statistics.chartCurrency,
+        );
+    }
+
+    /** Returns content of chart popup for specified target */
+    renderPopupContent(target) {
+        return ChartPopup.fromTarget(target, {
+            formatValue: (value) => this.formatValue(value),
+            renderDateLabel: (value) => this.renderDateLabel(value),
+        });
+    }
+
     /** Renders statistics widget */
     renderStatisticsWidget(state, prevState) {
-        if (state.chartData === prevState?.chartData) {
+        const { chartData } = state.statistics;
+        if (chartData === prevState?.statistics?.chartData) {
             return;
         }
 
-        this.histogram?.setData(state.chartData);
+        const [value] = chartData?.values ?? [];
+        const dataSet = value?.data ?? [];
+        const noData = !dataSet.length && !chartData?.series?.length;
+
+        show(this.statNoDataMessage, chartData && noData);
+        show(this.histogram?.chartContainer, !noData);
+
+        const data = (noData)
+            ? { values: [], series: [] }
+            : chartData;
+
+        this.histogram?.setData(data);
     }
 
     /** Renders 'Set transaction category' dialog */

@@ -63,13 +63,15 @@ class Main extends TemplateController
             throw new \Error("No currencies found");
         }
 
-        $data["statArr"] = $transMod->getHistogramSeries([
+        $chartRequest = [
             "report" => "currency",
             "curr_id" => $currencyId,
             "type" => EXPENSE,
             "group" => GROUP_BY_WEEK,
-            "limit" => 5
-        ]);
+            "limit" => 5,
+        ];
+        $chartFilter = (object)$chartRequest;
+        $chartFilter->group = TransactionModel::getHistogramGroupName($chartFilter->group);
 
         $iconModel = IconModel::getInstance();
 
@@ -87,7 +89,9 @@ class Main extends TemplateController
             "icons" => $iconModel->getData(),
             "view" => [
                 "transactions" => $transactions,
-                "chartData" => $data["statArr"]
+                "chartData" => $transMod->getHistogramSeries($chartRequest),
+                "chartCurrency" => $currencyId,
+                "chartRequest" => $chartFilter,
             ]
         ];
 
