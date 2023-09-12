@@ -57,7 +57,7 @@ class Statistics extends TemplateController
             "accounts" => $accMod->getData(["visibility" => "all"]),
             "categories" => $catMod->getData(),
             "view" => [
-                "accountCurrency" => $accCurr,
+                "chartCurrency" => $accCurr,
                 "groupTypes" => $groupTypes,
                 "filter" => $filterObj,
             ],
