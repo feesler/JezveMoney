@@ -112,6 +112,7 @@ export class AppHeader extends Header {
 
         this.state.content = [
             this.logo,
+            this.menuButton.elem,
             this.container,
         ];
 
