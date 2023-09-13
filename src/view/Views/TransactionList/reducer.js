@@ -163,6 +163,14 @@ const slice = createSlice({
         },
     }),
 
+    changeAmountFilter: (state, data) => ({
+        ...state,
+        form: {
+            ...state.form,
+            ...data,
+        },
+    }),
+
     toggleGroupByDate: (state) => ({
         ...state,
         groupByDate: !state.groupByDate,

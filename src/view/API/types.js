@@ -154,6 +154,8 @@ export const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
     accounts: isIntArray,
     persons: isIntArray,
     categories: isIntArray,
+    minAmount: isNum,
+    maxAmount: isNum,
     startDate: isInt,
     endDate: isInt,
     search: isString,

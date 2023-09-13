@@ -21,6 +21,7 @@ import {
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import { AmountRangeFilter } from './component/Fields/AmountRangeFilter.js';
 import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
 import { SearchInput } from './component/Fields/SearchInput.js';
@@ -29,6 +30,7 @@ import { Counter } from './component/Counter.js';
 import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
 import {
     dateToSeconds,
+    isValidValue,
     secondsToDate,
     shiftMonth,
 } from '../common.js';
@@ -94,6 +96,9 @@ export class TransactionListView extends AppView {
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
+
+        res.amountFilter = await AmountRangeFilter.create(this, await query('#amountFilter'));
+        assert(res.amountFilter, 'Amount filter not found');
 
         res.weekRangeBtn = { elem: await query('.field-header-btn[data-value="week"]') };
         res.monthRangeBtn = { elem: await query('.field-header-btn[data-value="month"]') };
@@ -177,6 +182,14 @@ export class TransactionListView extends AppView {
         if (dateRange?.endDate) {
             const endDate = new Date(App.parseDate(dateRange.endDate));
             res.filter.endDate = dateToSeconds(endDate);
+        }
+
+        const amountRange = cont.amountFilter.getSelectedRange();
+        if (isValidValue(amountRange?.minAmount)) {
+            res.filter.minAmount = parseFloat(amountRange.minAmount);
+        }
+        if (isValidValue(amountRange?.minAmount)) {
+            res.filter.maxAmount = parseFloat(amountRange.maxAmount);
         }
 
         res.filtered = res.data.applyFilter(res.filter);
@@ -341,6 +354,13 @@ export class TransactionListView extends AppView {
             params.endDate = model.filter.endDate;
         }
 
+        if (model.filter.minAmount) {
+            params.minAmount = model.filter.minAmount;
+        }
+        if (model.filter.maxAmount) {
+            params.maxAmount = model.filter.maxAmount;
+        }
+
         if (model.list.page !== 0) {
             params.page = model.list.page;
         }
@@ -486,6 +506,16 @@ export class TransactionListView extends AppView {
             endDateFmt = App.reformatDate(dateFmt);
         }
 
+        const minAmount = model.filter.minAmount ?? null;
+        const minAmountStr = (minAmount !== null && !Number.isNaN(minAmount))
+            ? minAmount.toString()
+            : '';
+
+        const maxAmount = model.filter.maxAmount ?? null;
+        const maxAmountStr = (maxAmount !== null && !Number.isNaN(maxAmount))
+            ? maxAmount.toString()
+            : '';
+
         const list = this.getExpectedList(model);
 
         const res = {
@@ -502,6 +532,13 @@ export class TransactionListView extends AppView {
                 value: {
                     startDate: startDateFmt,
                     endDate: endDateFmt,
+                },
+            },
+            amountFilter: {
+                visible: filtersVisible,
+                value: {
+                    minAmount: minAmountStr,
+                    maxAmount: maxAmountStr,
                 },
             },
             weekRangeBtn: { visible: filtersVisible },
@@ -1046,6 +1083,92 @@ export class TransactionListView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             await this.waitForList(() => this.content.dateFilter.clearEnd());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async inputMinAmountFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const minAmount = parseFloat(value);
+        if (this.model.filter.minAmount === minAmount) {
+            return true;
+        }
+
+        this.model.filter.minAmount = minAmount;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.amountFilter.inputMin(minAmount));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async inputMaxAmountFilter(value, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const maxAmount = parseFloat(value);
+        if (this.model.filter.maxAmount === maxAmount) {
+            return true;
+        }
+
+        this.model.filter.maxAmount = maxAmount;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.amountFilter.inputMax(maxAmount));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearMinAmountFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        delete this.model.filter.minAmount;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.amountFilter.clearMin());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async clearMaxAmountFilter(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        delete this.model.filter.maxAmount;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.amountFilter.clearMax());
         }
 
         return App.view.checkState(expected);

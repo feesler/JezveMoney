@@ -41,6 +41,10 @@
 
                                         <hr class="filters-separator">
 
+                                        <section id="amountFilter" class="filter-item amount-range-filter validation-block"></section>
+
+                                        <hr class="filters-separator">
+
                                         <section id="searchFilter" class="filter-item">
                                             <header class="filter-item__title"><?= __("filters.search") ?></header>
                                         </section>

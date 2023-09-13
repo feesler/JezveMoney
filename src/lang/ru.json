@@ -50,6 +50,7 @@
         "transactionType": "Тип",
         "accountsPersonsAndCategories": "Счета, люди и категории",
         "categories": "Категории",
+        "amountRange": "Сумма",
         "dateRange": "Период",
         "reminderState": "Состояние",
         "search": "Поиск"
@@ -63,6 +64,10 @@
         "forMonth": "За месяц",
         "forHalfYear": "За полгода",
         "invalidRange": "Введите корректный период"
+    },
+    "amountRange": {
+        "from": "От",
+        "to": "До"
     },
     "list": {
         "itemsCounter": "Элементов",

@@ -1794,6 +1794,14 @@ class TransactionModel extends SortableModel
             $filter["search"] = $request["search"];
         }
 
+        // Amount filter
+        if (isset($request["minAmount"]) && !is_null($request["minAmount"])) {
+            $filter["minAmount"] = floatval($request["minAmount"]);
+        }
+        if (isset($request["maxAmount"]) && !is_null($request["maxAmount"])) {
+            $filter["maxAmount"] = floatval($request["maxAmount"]);
+        }
+
         // Date range filter
         if (isset($request["startDate"]) && !is_null($request["startDate"])) {
             $filter["startDate"] = intval($request["startDate"]);
@@ -1921,6 +1929,23 @@ class TransactionModel extends SortableModel
             }
         }
 
+        // Amount range condition
+        $minAmount = $params["minAmount"] ?? null;
+        if (!is_null($minAmount)) {
+            $res[] = orJoin([
+                "src_amount >= " . qnull($minAmount),
+                "dest_amount >= " . qnull($minAmount),
+            ]);
+        }
+
+        $maxAmount = $params["maxAmount"] ?? null;
+        if (!is_null($maxAmount)) {
+            $res[] = orJoin([
+                "src_amount <= " . qnull($maxAmount),
+                "dest_amount <= " . qnull($maxAmount),
+            ]);
+        }
+
         // Date range condition
         if (isset($params["startDate"]) && !is_null($params["startDate"])) {
             $startDate = date("Y-m-d H:i:s", $params["startDate"]);
@@ -1944,6 +1969,8 @@ class TransactionModel extends SortableModel
      *     - 'persons' => (int|int[]) - array of persons to filter by. Default is empty
      *     - 'categories' => (int|int[]) - array of categories to filter by. Default is empty
      *     - 'search' => (string) - query string to search by comments. Default is empty
+     *     - 'minAmount' => (int) - minimal amount of transactions filter. Default is empty
+     *     - 'maxAmount' => (int) - maximum amount of transactions filter. Default is empty
      *     - 'startDate' => (string) - start date of transactions filter. Default is empty
      *     - 'endDate' => (string) - end date of transactions filter. Default is empty
      *     - 'desc' => (bool) - sort result descending

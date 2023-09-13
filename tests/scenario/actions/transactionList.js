@@ -429,6 +429,64 @@ export const clearEndDateFilter = async ({
     });
 };
 
+export const inputMinAmountFilter = async ({
+    value,
+    directNavigate = false,
+    iteratePages = true,
+}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test(`Input min. amount filter '${value}'`, async () => {
+        await App.view.inputMinAmountFilter(value, directNavigate);
+        return (iteratePages) ? App.view.iteratePages() : true;
+    });
+};
+
+export const inputMaxAmountFilter = async ({
+    value,
+    directNavigate = false,
+    iteratePages = true,
+}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test(`Input max. amount filter '${value}'`, async () => {
+        await App.view.inputMaxAmountFilter(value, directNavigate);
+        return (iteratePages) ? App.view.iteratePages() : true;
+    });
+};
+
+export const clearMinAmountFilter = async ({
+    directNavigate = false,
+    iteratePages = true,
+} = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear min amount', async () => {
+        await App.view.clearMinAmountFilter(directNavigate);
+        return (iteratePages) ? App.view.iteratePages() : true;
+    });
+};
+
+export const clearMaxAmountFilter = async ({
+    directNavigate = false,
+    iteratePages = true,
+} = {}) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Clear max amount', async () => {
+        await App.view.clearMaxAmountFilter(directNavigate);
+        return (iteratePages) ? App.view.iteratePages() : true;
+    });
+};
+
 export const search = async ({ text, directNavigate = false, iteratePages = true }) => {
     if (!directNavigate) {
         await checkNavigation();

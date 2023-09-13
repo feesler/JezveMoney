@@ -30,6 +30,8 @@ export class TransactionsListForm extends ApiRequestForm {
             { title: 'Account ids', name: 'accounts' },
             { title: 'Person ids', name: 'persons' },
             { title: 'Category ids', name: 'categories' },
+            { title: 'Min. amount', name: 'minAmount' },
+            { title: 'Max. amount', name: 'maxAmount' },
             { title: 'Start date', name: 'startDate' },
             { title: 'End date', name: 'endDate' },
             { title: 'Search request', name: 'search' },

@@ -50,6 +50,7 @@
         "transactionType": "Type",
         "accountsPersonsAndCategories": "Accounts, persons and categories",
         "categories": "Categories",
+        "amountRange": "Amount",
         "dateRange": "Date range",
         "reminderState": "State",
         "search": "Search"
@@ -63,6 +64,10 @@
         "forMonth": "For month",
         "forHalfYear": "For half a year",
         "invalidRange": "Input correct date range"
+    },
+    "amountRange": {
+        "from": "From",
+        "to": "To"
     },
     "list": {
         "itemsCounter": "Items",

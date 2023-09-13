@@ -22,6 +22,10 @@
   }
 }
 
+.amount-range-filter {
+  max-width: 400px;
+}
+
 /* Clear all filters button */
 .btn.clear-all-btn {
   --btn-title-color: var(--accent-color);

@@ -36,6 +36,7 @@ import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
+import { AmountRangeField } from '../../Components/Fields/AmountRangeField/AmountRangeField.js';
 import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -46,13 +47,15 @@ import { SearchInput } from '../../Components/Inputs/SearchInput/SearchInput.js'
 import { Heading } from '../../Components/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
-import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
 import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
+
 import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';
+import { FilterSelect } from './components/FilterSelect/FilterSelect.js';
+import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
 
 import { reducer, actions } from './reducer.js';
 import {
@@ -60,7 +63,7 @@ import {
     isSameSelection,
 } from './helpers.js';
 import './TransactionListView.scss';
-import { FilterSelect } from './components/FilterSelect/FilterSelect.js';
+import { normalize } from '../../utils/decimal.js';
 
 /* CSS classes */
 const FILTER_HEADER_CLASS = 'filter-item__title';
@@ -135,6 +138,7 @@ class TransactionListView extends AppView {
             'typeFilter',
             'accountsFilter',
             'dateFilter',
+            'amountFilter',
             'searchFilter',
             // Counters
             'itemsCount',
@@ -252,6 +256,16 @@ class TransactionListView extends AppView {
             onChange: (data) => this.changeDateFilter(data),
         });
         this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
+
+        // Amount filter
+        this.amountRangeFilter = AmountRangeField.create({
+            id: 'amountRange',
+            title: __('transactions.amount'),
+            minPlaceholder: __('amountRange.from'),
+            maxPlaceholder: __('amountRange.to'),
+            onChange: (data) => this.changeAmountFilter(data),
+        });
+        this.amountFilter.append(this.amountRangeFilter.elem);
 
         // Search input
         this.searchInput = SearchInput.create({
@@ -712,6 +726,27 @@ class TransactionListView extends AppView {
         this.requestTransactions(this.getRequestData());
     }
 
+    /** Amount range filter change handler */
+    changeAmountFilter(data) {
+        const { filter } = this.store.getState();
+        const minAmount = filter.minAmount ?? null;
+        const maxAmount = filter.maxAmount ?? null;
+        const newRange = {
+            minAmount: (data.minAmount) ? normalize(data.minAmount) : null,
+            maxAmount: (data.maxAmount) ? normalize(data.maxAmount) : null,
+        };
+
+        if (
+            minAmount === newRange.minAmount
+            && maxAmount === newRange.maxAmount
+        ) {
+            return;
+        }
+
+        this.store.dispatch(actions.changeAmountFilter(data));
+        this.requestTransactions(this.getRequestData());
+    }
+
     showWeekRange(e) {
         e.preventDefault();
 
@@ -930,6 +965,45 @@ class TransactionListView extends AppView {
         this.accountDropDown.setSelection(idsToSelect);
     }
 
+    /** Renders date range filter */
+    renderDateRangeFilter(state) {
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            form: {
+                ...rangeState.form,
+                startDate: state.form.startDate,
+                endDate: state.form.endDate,
+            },
+            filter: {
+                ...rangeState.filter,
+                startDate: dateStringToTime(state.form.startDate),
+                endDate: dateStringToTime(state.form.endDate),
+            },
+        }));
+
+        const dateFilterURL = this.getFilterURL(state, false);
+        const weekRange = getWeekRange();
+        dateFilterURL.searchParams.set('startDate', weekRange.startDate);
+        dateFilterURL.searchParams.set('endDate', weekRange.endDate);
+        this.weekRangeBtn.setURL(dateFilterURL.toString());
+
+        const monthRange = getMonthRange();
+        dateFilterURL.searchParams.set('startDate', monthRange.startDate);
+        this.monthRangeBtn.setURL(dateFilterURL.toString());
+
+        const halfYearRange = getHalfYearRange();
+        dateFilterURL.searchParams.set('startDate', halfYearRange.startDate);
+        this.halfYearRangeBtn.setURL(dateFilterURL.toString());
+    }
+
+    /** Renders amount range filter */
+    renderAmountRangeFilter(state) {
+        this.amountRangeFilter.setData({
+            minAmount: state.form.minAmount,
+            maxAmount: state.form.maxAmount,
+        });
+    }
+
     renderCategoryDialog(state, prevState) {
         if (state.categoryDialog === prevState?.categoryDialog) {
             return;
@@ -1016,35 +1090,8 @@ class TransactionListView extends AppView {
         this.typeMenu.setSelection(state.form.type);
 
         this.renderAccountsFilter(state);
-
-        // Date range filter
-        this.dateRangeFilter.setState((rangeState) => ({
-            ...rangeState,
-            form: {
-                ...rangeState.form,
-                startDate: state.form.startDate,
-                endDate: state.form.endDate,
-            },
-            filter: {
-                ...rangeState.filter,
-                startDate: dateStringToTime(state.form.startDate),
-                endDate: dateStringToTime(state.form.endDate),
-            },
-        }));
-
-        const dateFilterURL = this.getFilterURL(state, false);
-        const weekRange = getWeekRange();
-        dateFilterURL.searchParams.set('startDate', weekRange.startDate);
-        dateFilterURL.searchParams.set('endDate', weekRange.endDate);
-        this.weekRangeBtn.setURL(dateFilterURL.toString());
-
-        const monthRange = getMonthRange();
-        dateFilterURL.searchParams.set('startDate', monthRange.startDate);
-        this.monthRangeBtn.setURL(dateFilterURL.toString());
-
-        const halfYearRange = getHalfYearRange();
-        dateFilterURL.searchParams.set('startDate', halfYearRange.startDate);
-        this.halfYearRangeBtn.setURL(dateFilterURL.toString());
+        this.renderDateRangeFilter(state);
+        this.renderAmountRangeFilter(state);
 
         // Search form
         this.searchInput.value = state.form.search ?? '';
