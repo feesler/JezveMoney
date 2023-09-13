@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.74.2",
+    "version": "1.74.3",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -26,7 +26,8 @@
         "postbuild-dev": "npm-run-all install-backend",
         "build-tests": "npx webpack --progress -c ./config/webpack.tests.js",
         "build-all": "npm-run-all build build-tests",
-        "release": "npm-run-all update build update-composer deploy-full",
+        "commit-version": "node ./scripts/commit-version.js",
+        "release": "npm-run-all update build update-composer commit-version deploy-full",
         "ver-major": "npm version major",
         "ver-minor": "npm version minor",
         "ver-patch": "npm version patch",
