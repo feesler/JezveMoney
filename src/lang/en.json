@@ -48,7 +48,7 @@
     "filters": {
         "title": "Filters",
         "transactionType": "Type",
-        "accountsAndPersons": "Accounts and persons",
+        "accountsPersonsAndCategories": "Accounts, persons and categories",
         "categories": "Categories",
         "dateRange": "Date range",
         "reminderState": "State",

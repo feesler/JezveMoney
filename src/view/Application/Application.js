@@ -513,17 +513,20 @@ export class Application {
             idPrefix = '',
             group = null,
         } = options;
+        let {
+            groupId = null,
+        } = options;
 
-        const itemsGroup = (typeof group === 'string' && group.length > 0)
-            ? ddlist.addGroup({ title: group })
-            : null;
-        items.forEach(
-            (item) => ddlist.addItem({
-                id: `${idPrefix}${item.id}`,
-                title: item.name,
-                group: itemsGroup,
-            }),
-        );
+        if (typeof group === 'string' && group.length > 0) {
+            groupId = groupId ?? ddlist.generateGroupId();
+            ddlist.addGroup({ id: groupId, title: group });
+        }
+
+        items.forEach((item) => ddlist.addItem({
+            id: `${idPrefix}${item.id}`,
+            title: item.name,
+            group: groupId,
+        }));
     }
 
     appendAccounts(ddlist, options = {}) {

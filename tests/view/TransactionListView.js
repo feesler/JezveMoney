@@ -40,12 +40,8 @@ const categoryDialogSelector = '#selectCategoryDialog';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
-    get accDropDown() {
-        return this.content.accDropDown;
-    }
-
-    get categoryDropDown() {
-        return this.content.categoryDropDown;
+    get filterSelect() {
+        return this.content.filterSelect;
     }
 
     get listMenu() {
@@ -93,13 +89,7 @@ export class TransactionListView extends AppView {
         const accountsFilter = await query('#accountsFilter');
         const accountsFilterVisible = await isVisible(accountsFilter);
         if (accountsFilterVisible) {
-            res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
-        }
-
-        const categoriesFilter = await query('#categoriesFilter');
-        const categoriesFilterVisible = await isVisible(categoriesFilter);
-        if (categoriesFilterVisible) {
-            res.categoryDropDown = await DropDown.createFromChild(this, await query('#category_id'));
+            res.filterSelect = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
@@ -171,9 +161,9 @@ export class TransactionListView extends AppView {
 
         res.filter = {
             type: cont.typeMenu.value,
-            accounts: this.getDropDownFilter(cont.accDropDown, 'a'),
-            persons: this.getDropDownFilter(cont.accDropDown, 'p'),
-            categories: this.getDropDownFilter(cont.categoryDropDown),
+            accounts: this.getDropDownFilter(cont.filterSelect, 'a'),
+            persons: this.getDropDownFilter(cont.filterSelect, 'p'),
+            categories: this.getDropDownFilter(cont.filterSelect, 'c'),
             search: cont.searchForm.value,
             startDate: null,
             endDate: null,
@@ -442,10 +432,15 @@ export class TransactionListView extends AppView {
         return model.filter.persons.map((id) => `p${id}`);
     }
 
+    getCategoryPrefixedIds(model = this.model) {
+        return model.filter.categories.map((id) => `c${id}`);
+    }
+
     getPrefixedIds(model = this.model) {
         return [
             ...this.getAccountPrefixedIds(model),
             ...this.getPersonPrefixedIds(model),
+            ...this.getCategoryPrefixedIds(model),
         ];
     }
 
@@ -499,10 +494,7 @@ export class TransactionListView extends AppView {
                 value: model.filter.type,
                 visible: filtersVisible,
             },
-            accDropDown: {
-                visible: filtersVisible && isAvailable,
-            },
-            categoryDropDown: {
+            filterSelect: {
                 visible: filtersVisible && isAvailable,
             },
             dateFilter: {
@@ -579,13 +571,9 @@ export class TransactionListView extends AppView {
         }
 
         if (isAvailable) {
-            res.accDropDown.isMulti = true;
+            res.filterSelect.isMulti = true;
             const ids = this.getPrefixedIds(model);
-            res.accDropDown.selectedItems = ids.map((id) => ({ id }));
-
-            res.categoryDropDown.selectedItems = model.filter.categories.map(
-                (id) => ({ id: id.toString() }),
-            );
+            res.filterSelect.selectedItems = ids.map((id) => ({ id }));
         }
 
         if (isItemsAvailable) {
@@ -803,27 +791,23 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(dropDown, itemIds) {
-        assert(this.content[dropDown], 'Invalid component');
+    async setFilterSelection(itemIds) {
+        assert(this.filterSelect, 'Invalid component');
 
         const ids = asArray(itemIds);
-        const selection = this.content[dropDown].getSelectedValues();
+        const selection = this.filterSelect.getSelectedValues();
         if (selection.length > 0) {
-            await this.waitForList(() => this.content[dropDown].clearSelection());
+            await this.waitForList(() => this.filterSelect.clearSelection());
         }
         if (ids.length === 0) {
             return;
         }
 
         for (const id of ids) {
-            await this.waitForList(() => this.content[dropDown].selectItem(id));
+            await this.waitForList(() => this.filterSelect.selectItem(id));
         }
 
-        await this.performAction(() => this.content[dropDown].showList(false));
-    }
-
-    async setAccountsFilterSelection(itemIds) {
-        return this.setFilterSelection('accDropDown', itemIds);
+        await this.performAction(() => this.filterSelect.showList(false));
     }
 
     async filterByAccounts(ids, directNavigate = false) {
@@ -843,7 +827,7 @@ export class TransactionListView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             const selection = this.getPrefixedIds();
-            await this.setAccountsFilterSelection(selection);
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -866,7 +850,7 @@ export class TransactionListView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             const selection = this.getPrefixedIds();
-            await this.setAccountsFilterSelection(selection);
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -888,7 +872,8 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.setFilterSelection('categoryDropDown', categories);
+            const selection = this.getPrefixedIds();
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);

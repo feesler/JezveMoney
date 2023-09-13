@@ -29,15 +29,8 @@
                                         <hr class="filters-separator">
 
                                         <section id="accountsFilter" class="filter-item">
-                                            <header class="filter-item__title"><?= __("filters.accountsAndPersons") ?></header>
+                                            <header class="filter-item__title"><?= __("filters.accountsPersonsAndCategories") ?></header>
                                             <select id="acc_id" name="acc_id" multiple></select>
-                                        </section>
-
-                                        <hr class="filters-separator">
-
-                                        <section id="categoriesFilter" class="filter-item">
-                                            <header class="filter-item__title"><?= __("filters.categories") ?></header>
-                                            <select id="category_id" name="category_id" multiple></select>
                                         </section>
                                     </div>
 

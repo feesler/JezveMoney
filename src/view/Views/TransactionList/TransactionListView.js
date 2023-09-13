@@ -8,7 +8,6 @@ import {
     createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
-import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -37,7 +36,6 @@ import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
-import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
 import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -62,6 +60,7 @@ import {
     isSameSelection,
 } from './helpers.js';
 import './TransactionListView.scss';
+import { FilterSelect } from './components/FilterSelect/FilterSelect.js';
 
 /* CSS classes */
 const FILTER_HEADER_CLASS = 'filter-item__title';
@@ -135,7 +134,6 @@ class TransactionListView extends AppView {
             'filtersContainer',
             'typeFilter',
             'accountsFilter',
-            'categoriesFilter',
             'dateFilter',
             'searchFilter',
             // Counters
@@ -203,49 +201,13 @@ class TransactionListView extends AppView {
         if (!this.isAvailable()) {
             show(this.accountsFilter, false);
         } else {
-            this.accountDropDown = DropDown.create({
+            this.accountDropDown = FilterSelect.create({
                 elem: 'acc_id',
                 placeholder: __('typeToFilter'),
                 enableFilter: true,
                 noResultsMessage: __('notFound'),
                 onItemSelect: (obj) => this.onAccountChange(obj),
                 onChange: (obj) => this.onAccountChange(obj),
-                className: 'dd_fullwidth',
-            });
-
-            App.appendAccounts(this.accountDropDown, {
-                visible: true,
-                idPrefix: 'a',
-                group: __('accounts.listTitle'),
-            });
-            App.appendAccounts(this.accountDropDown, {
-                visible: false,
-                idPrefix: 'a',
-                group: __('accounts.hiddenListTitle'),
-            });
-            App.appendPersons(this.accountDropDown, {
-                visible: true,
-                idPrefix: 'p',
-                group: __('persons.listTitle'),
-            });
-            App.appendPersons(this.accountDropDown, {
-                visible: false,
-                idPrefix: 'p',
-                group: __('persons.hiddenListTitle'),
-            });
-        }
-
-        // Categories filter
-        if (!this.isAvailable()) {
-            show(this.categoriesFilter, false);
-        } else {
-            this.categoriesDropDown = CategorySelect.create({
-                elem: 'category_id',
-                placeholder: __('typeToFilter'),
-                enableFilter: true,
-                noResultsMessage: __('notFound'),
-                onItemSelect: (obj) => this.onCategoryChange(obj),
-                onChange: (obj) => this.onCategoryChange(obj),
                 className: 'dd_fullwidth',
             });
         }
@@ -605,18 +567,29 @@ class TransactionListView extends AppView {
     onAccountChange(selected) {
         const accountIds = [];
         const personIds = [];
+        const categoryIds = [];
+
         asArray(selected).forEach(({ id }) => {
-            const arr = (id.startsWith('a')) ? accountIds : personIds;
             const itemId = parseInt(id.substring(1), 10);
-            arr.push(itemId);
+            if (id.startsWith('a')) {
+                accountIds.push(itemId);
+            } else if (id.startsWith('p')) {
+                personIds.push(itemId);
+            } else if (id.startsWith('c')) {
+                categoryIds.push(itemId);
+            }
         });
 
         const state = this.store.getState();
         const filterAccounts = asArray(state.form.accounts);
         const filterPersons = asArray(state.form.persons);
+        const filterCategories = asArray(state.form.categories);
+
         const accountsChanged = !isSameSelection(accountIds, filterAccounts);
         const personsChanged = !isSameSelection(personIds, filterPersons);
-        if (!accountsChanged && !personsChanged) {
+        const categoriesChanged = !isSameSelection(categoryIds, filterCategories);
+
+        if (!accountsChanged && !personsChanged && !categoriesChanged) {
             return;
         }
 
@@ -626,23 +599,9 @@ class TransactionListView extends AppView {
         if (personsChanged) {
             this.store.dispatch(actions.changePersonsFilter(personIds));
         }
-
-        this.requestTransactions(this.getRequestData());
-    }
-
-    /**
-     * Categories filter change event handler
-     * @param {object} obj - selection object
-     */
-    onCategoryChange(selected) {
-        const state = this.store.getState();
-        const categoryIds = asArray(selected).map(({ id }) => parseInt(id, 10));
-        const filterCategories = asArray(state.form.categories);
-        if (isSameSelection(categoryIds, filterCategories)) {
-            return;
+        if (categoriesChanged) {
+            this.store.dispatch(actions.changeCategoriesFilter(categoryIds));
         }
-
-        this.store.dispatch(actions.changeCategoriesFilter(categoryIds));
 
         this.requestTransactions(this.getRequestData());
     }
@@ -965,18 +924,10 @@ class TransactionListView extends AppView {
         const idsToSelect = [
             ...asArray(state.form.accounts).map((id) => `a${id}`),
             ...asArray(state.form.persons).map((id) => `p${id}`),
+            ...asArray(state.form.categories).map((id) => `c${id}`),
         ];
 
         this.accountDropDown.setSelection(idsToSelect);
-    }
-
-    /** Render categories selection */
-    renderCategoriesFilter(state) {
-        if (!this.isAvailable()) {
-            return;
-        }
-
-        this.categoriesDropDown.setSelection(state.form.categories);
     }
 
     renderCategoryDialog(state, prevState) {
@@ -1065,7 +1016,6 @@ class TransactionListView extends AppView {
         this.typeMenu.setSelection(state.form.type);
 
         this.renderAccountsFilter(state);
-        this.renderCategoriesFilter(state);
 
         // Date range filter
         this.dateRangeFilter.setState((rangeState) => ({

@@ -48,7 +48,7 @@
     "filters": {
         "title": "Фильтры",
         "transactionType": "Тип",
-        "accountsAndPersons": "Счета и люди",
+        "accountsPersonsAndCategories": "Счета, люди и категории",
         "categories": "Категории",
         "dateRange": "Период",
         "reminderState": "Состояние",
