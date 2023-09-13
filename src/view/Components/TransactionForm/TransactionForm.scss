@@ -67,30 +67,37 @@
   column-gap: 1rem;
 }
 
-.weekday-select,
-.weekday-select[multiple] {
+.month-day-select {
+  flex-shrink: 0;
+}
+
+.menu.weekday-select,
+.menu.weekday-select[multiple] {
   --wds-item-size: 2rem;
-  --link-menu-border-width: 0;
-  --link-menu-color: var(--accent-color);
-  --link-menu-bg: var(--alt-bg-color);
-  --link-menu-active-bg: var(--accent-active-color);
-  --link-menu-active-color: #ffffff;
-  --link-menu-selected-color: #ffffff;
-  --link-menu-selected-bg: var(--accent-color);
-  --link-menu-hover-color: #ffffff;
-  --link-menu-hover-bg: var(--accent-color);
-  --link-menu-disabled-bg: var(--link-menu-disabled-color);
+  --menu-border-width: 0;
+  --menu-item-text-color: var(--accent-color);
+  --menu-item-background: var(--alt-bg-color);
+  --menu-item-active-background: var(--accent-active-color);
+  --menu-item-active-text-color: #ffffff;
+  --menu-item-selected-text-color: #ffffff;
+  --menu-item-selected-background: var(--accent-color);
+  --menu-item-hover-text-color: #ffffff;
+  --menu-item-hover-background: var(--accent-color);
 
   justify-content: space-between;
 
-  .link-menu-item,
-  .link-menu-item:visited {
+  .menu-item,
+  .menu-item:visited {
     justify-content: center;
     border-radius: 100vh;
     width: var(--wds-item-size);
     height: var(--wds-item-size);
     line-height: var(--wds-item-size);
     cursor: pointer;
+  }
+
+  .menu-item__content {
+    justify-content: center;
   }
 
   .checkbox__check {

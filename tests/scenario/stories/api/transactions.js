@@ -1018,6 +1018,16 @@ const filter = async () => {
         endDate: App.datesSec.weekAfter,
         search: '1',
     }, {
+        minAmount: 100,
+    }, {
+        maxAmount: 1000,
+    }, {
+        minAmount: 100,
+        maxAmount: 1000,
+    }, {
+        minAmount: 1000,
+        maxAmount: 100,
+    }, {
         search: 'la',
     }, {
         search: 'кк',

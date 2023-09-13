@@ -94,6 +94,15 @@ export class TransactionListStory extends TestStory {
         await Actions.selectMonthRangeFilter({ directNavigate, iteratePages: false });
         await Actions.selectHalfYearRangeFilter({ directNavigate, iteratePages: false });
 
+        await Actions.inputMinAmountFilter({ value: '100', directNavigate, iteratePages: false });
+        await Actions.inputMaxAmountFilter({ value: '1000', directNavigate, iteratePages: false });
+        await Actions.clearMinAmountFilter({ directNavigate, iteratePages: false });
+        await Actions.clearMaxAmountFilter({ directNavigate, iteratePages: false });
+        await Actions.inputMinAmountFilter({ value: '1000', directNavigate, iteratePages: false });
+        await Actions.inputMaxAmountFilter({ value: '100', directNavigate, iteratePages: false });
+        await Actions.clearMinAmountFilter({ directNavigate, iteratePages: false });
+        await Actions.clearMaxAmountFilter({ directNavigate, iteratePages: false });
+
         await Actions.search({ text: '1', directNavigate });
         await Actions.search({ text: 'la', directNavigate });
         await Actions.search({ text: 'кк', directNavigate });

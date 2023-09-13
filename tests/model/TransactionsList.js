@@ -367,6 +367,29 @@ export class TransactionsList extends SortableList {
         return TransactionsList.create(items);
     }
 
+    getItemsByAmount(list, min, max) {
+        if (!min && !max) {
+            return list;
+        }
+
+        const fMin = parseFloat(min) ?? null;
+        const fMax = parseFloat(max) ?? null;
+
+        return list.filter((item) => (
+            ((fMin === null) || (item.src_amount >= fMin) || (item.dest_amount >= fMin))
+            && ((fMax === null) || (item.src_amount <= fMax) || (item.dest_amount <= fMax))
+        ));
+    }
+
+    filterByAmount(min, max) {
+        const items = this.getItemsByAmount(this.data, min, max);
+        if (items === this.data) {
+            return this;
+        }
+
+        return TransactionsList.create(items);
+    }
+
     getItemsByQuery(list, query) {
         if (!query) {
             return list;
@@ -445,6 +468,9 @@ export class TransactionsList extends SortableList {
         }
         if ('startDate' in params || 'endDate' in params) {
             res = this.getItemsByDate(res, params.startDate, params.endDate);
+        }
+        if ('minAmount' in params || 'maxAmount' in params) {
+            res = this.getItemsByAmount(res, params.minAmount, params.maxAmount);
         }
         if ('search' in params) {
             res = this.getItemsByQuery(res, params.search);
