@@ -8,5 +8,14 @@
 
   .btn.input-group__inner-btn {
     --btn-icon-size: 24px;
+    --btn-disabled-background: none;
+    --btn-disabled-opacity: 0.3;
+  }
+}
+
+.number-input-group[disabled] {
+  .btn.input-group__inner-btn {
+    --btn-disabled-opacity: 1;
+    --btn-disabled-background: var(--input-disabled-bg);
   }
 }

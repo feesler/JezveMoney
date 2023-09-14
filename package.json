@@ -75,7 +75,7 @@
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
         "progress": "^2.0.3",
-        "sass": "^1.66.1",
+        "sass": "^1.67.0",
         "sass-loader": "^13.3.2",
         "shelljs": "^0.8.5",
         "ssh2-sftp-client": "^9.1.0",
@@ -92,7 +92,7 @@
     "dependencies": {
         "@babel/runtime": "^7.22.15",
         "core-js": "^3.32.2",
-        "jezvejs": "^1.113.3",
+        "jezvejs": "^1.113.5",
         "whatwg-fetch": "^3.6.19"
     }
 }
