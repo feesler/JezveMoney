@@ -80,5 +80,4 @@
 </div>
 
 <?php include(ICONS_PATH . "Common.tpl");    ?>
-<?php include(ICONS_PATH . "ModeSelector.tpl");    ?>
 <?php include(TPL_PATH . "Footer.tpl");    ?>
