@@ -34,6 +34,8 @@ export class Field extends Component {
         this.state = { ...this.props };
 
         this.init();
+        this.postInit();
+        this.render(this.state);
     }
 
     init() {
@@ -43,10 +45,11 @@ export class Field extends Component {
             props: { className: CONTAINER_CLASS },
             children: [this.titleElem, this.contentContainer],
         });
+    }
 
+    postInit() {
         this.setClassNames();
         this.setUserProps();
-        this.render(this.state);
     }
 
     setTitle(title) {
@@ -72,14 +75,15 @@ export class Field extends Component {
 
         removeChilds(this.titleElem);
 
-        if (!state.title) {
+        const title = state.title ?? null;
+        if (title === null) {
             return;
         }
 
-        if (typeof state.title === 'string') {
-            this.titleElem.textContent = state.title;
+        if (typeof title === 'string') {
+            this.titleElem.textContent = title;
         } else {
-            addChilds(this.titleElem, state.title);
+            addChilds(this.titleElem, title);
         }
     }
 
@@ -90,14 +94,15 @@ export class Field extends Component {
 
         removeChilds(this.contentContainer);
 
-        if (!state.content) {
+        const content = state.content ?? null;
+        if (content === null) {
             return;
         }
 
-        if (typeof state.content === 'string') {
-            this.contentContainer.textContent = state.content;
+        if (typeof content === 'string') {
+            this.contentContainer.textContent = content;
         } else {
-            addChilds(this.contentContainer, state.content);
+            addChilds(this.contentContainer, content);
         }
     }
 

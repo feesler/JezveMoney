@@ -98,7 +98,7 @@ export class ReminderListView extends AppView {
                 visible: filtersVisible,
             },
             totalCounter: { visible: true, value: filteredItems.length },
-            selectedCounter: { visible: selectMode, value: selected.length },
+            selectedCounter: { visible: selectMode },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: showMoreBtnVisible },
             paginator: { visible: showPaginator },
@@ -109,6 +109,10 @@ export class ReminderListView extends AppView {
             listModeBtn: { visible: !listMode },
             menuBtn: { visible: isItemsAvailable },
         };
+
+        if (selectMode) {
+            res.selectedCounter.value = selected.length;
+        }
 
         if (model.detailsItem) {
             res.itemInfo = ReminderDetails.getExpectedState(model.detailsItem, state);
@@ -232,7 +236,7 @@ export class ReminderListView extends AppView {
     async parseContent() {
         const res = {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
-            filtersContainer: { elem: await query('#filtersContainer') },
+            filtersContainer: { elem: await query('#filters') },
             clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),

@@ -56,6 +56,8 @@ class Reminders extends ListViewController
         ];
 
         $request = $this->model->getRequestFilters($_GET, $requestDefaults);
+        $request["filter"]["reminderState"] = $request["filter"]["state"];
+        unset($request["filter"]["state"]);
 
         // Obtain requested view mode
         $showDetails = false;

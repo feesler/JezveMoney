@@ -11,7 +11,7 @@ import { ReminderList } from '../../Models/ReminderList.js';
 import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../Models/Reminder.js';
 
 export const getStateFilter = (state) => (
-    state?.filter?.state ?? REMINDER_SCHEDULED
+    state?.filter?.reminderState ?? REMINDER_SCHEDULED
 );
 
 export const getItemsSource = (state) => (
@@ -153,15 +153,15 @@ const slice = createSlice({
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
 
-    changeStateFilter: (state, value) => updateList({
+    changeStateFilter: (state, reminderState) => updateList({
         ...state,
         form: {
             ...state.form,
-            state: value,
+            reminderState,
         },
         filter: {
             ...state.filter,
-            state: value,
+            reminderState,
         },
         pagination: {
             ...state.pagination,
@@ -203,10 +203,12 @@ const slice = createSlice({
     clearAllFilters: (state) => updateList({
         ...state,
         form: {
-            state: state.form.state,
+            ...state.form,
+            startDate: null,
+            endDate: null,
         },
         filter: {
-            state: state.filter.state,
+            ...state.filter,
             startDate: null,
             endDate: null,
         },

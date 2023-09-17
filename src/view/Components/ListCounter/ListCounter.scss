@@ -1,0 +1,13 @@
+/* List counter */
+.field.counter {
+  --field-title-font-size: 0.8rem;
+  --field-title-color: var(--dimmed-text-color);
+  --field-content-font-size: 0.9rem;
+  --field-title-margin: 0;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 12px;
+}

@@ -1,25 +1,14 @@
 import 'jezvejs/style';
-import {
-    asArray,
-    createElement,
-    isFunction,
-    show,
-} from 'jezvejs';
-
+import { asArray, isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
-import { LinkMenu } from 'jezvejs/LinkMenu';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import { Paginator } from 'jezvejs/Paginator';
-import { Spinner } from 'jezvejs/Spinner';
-import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
 import {
-    listData,
     __,
     getSelectedIds,
     getApplicationURL,
@@ -34,8 +23,6 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Schedule } from '../../Models/Schedule.js';
 import {
-    REMINDER_CANCELLED,
-    REMINDER_CONFIRMED,
     REMINDER_SCHEDULED,
     REMINDER_UPCOMING,
     Reminder,
@@ -43,14 +30,10 @@ import {
 import { ReminderList } from '../../Models/ReminderList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
-import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
-import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+import { ReminderFilters } from '../../Components/ReminderFilters/ReminderFilters.js';
+import { ReminderListGroup } from '../../Components/ReminderListGroup/ReminderListGroup.js';
 
-import { ReminderListItem } from './components/ReminderListItem/ReminderListItem.js';
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
 import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
 import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
@@ -62,12 +45,6 @@ import {
     updateList,
 } from './reducer.js';
 import './ReminderListView.scss';
-
-/* CSS classes */
-const FILTER_HEADER_CLASS = 'filter-item__title';
-const LIST_CLASS = 'reminder-list';
-const DETAILS_CLASS = 'reminder-list_details';
-const SELECT_MODE_CLASS = 'list_select';
 
 /**
  * Scheduled transaction reminders list view
@@ -124,12 +101,6 @@ class ReminderListView extends AppView {
     onStart() {
         this.loadElementsByIds([
             'contentHeader',
-            'filtersContainer',
-            'stateFilter',
-            'dateFilter',
-            'itemsCount',
-            'selectedCounter',
-            'selItemsCount',
             'heading',
             'contentContainer',
         ]);
@@ -143,87 +114,31 @@ class ReminderListView extends AppView {
             id: 'filtersBtn',
             className: 'circle-btn',
             icon: 'filter',
-            onClick: () => this.filters.toggle(),
+            onClick: () => this.filtersContainer.toggle(),
         });
         this.heading.actionsContainer.prepend(this.filtersBtn.elem);
 
-        // State filter
-        this.stateMenu = LinkMenu.create({
-            id: 'stateMenu',
-            itemParam: 'state',
-            items: [
-                { id: REMINDER_SCHEDULED, title: __('reminders.state.scheduled') },
-                { id: REMINDER_UPCOMING, title: __('reminders.state.upcoming') },
-                { id: REMINDER_CONFIRMED, title: __('reminders.state.submitted') },
-                { id: REMINDER_CANCELLED, title: __('reminders.state.cancelled') },
-            ],
-            onChange: (value) => this.onSelectStateType(value),
-        });
-        this.stateFilter.append(this.stateMenu.elem);
-
-        // Date range filter
-        this.dateRangeFilterTitle = createElement('span', {
-            props: { textContent: __('filters.dateRange') },
-        });
-        this.dateRangeHeader = createElement('header', {
-            props: { className: FILTER_HEADER_CLASS },
-            children: this.dateRangeFilterTitle,
+        this.filters = ReminderFilters.create({
+            id: 'filters',
+            stateFilterId: 'stateFilter',
+            dateRangeFilterId: 'dateFilter',
+            getURL: (state, keepPage) => this.getURL(state, keepPage),
+            onChangeReminderState: (range) => this.onChangeReminderState(range),
+            onChangeDateRange: (range) => this.changeDateFilter(range),
+            onApplyFilters: (e) => this.onApplyFilters(e),
+            onClearAllFilters: (e) => this.onClearAllFilters(e),
         });
 
-        this.dateRangeFilter = DateRangeInput.create({
-            id: 'dateFrm',
-            startPlaceholder: __('dateRange.from'),
-            endPlaceholder: __('dateRange.to'),
-            onChange: (data) => this.changeDateFilter(data),
+        this.filtersContainer = FiltersContainer.create({
+            content: this.filters.elem,
         });
-        this.dateFilter.append(this.dateRangeHeader, this.dateRangeFilter.elem);
-
-        // Controls
-        this.filtersControls = FormControls.create({
-            className: 'filters-controls',
-            submitTitle: __('actions.apply'),
-            onSubmitClick: () => this.filters.close(),
-            cancelTitle: __('actions.clearAll'),
-            cancelBtnClass: 'clear-all-btn',
-            onCancelClick: (e) => this.onClearAllFilters(e),
-        });
-        this.filtersContainer.append(this.filtersControls.elem);
-
-        this.filters = FiltersContainer.create({
-            content: this.filtersContainer,
-        });
-        this.contentHeader.prepend(this.filters.elem);
+        this.contentHeader.prepend(this.filtersContainer.elem);
 
         // Scheduled transaction reminder details
         this.itemInfo = Offcanvas.create({
             placement: 'right',
             className: 'reminder-item-details',
             onClosed: () => this.closeDetails(),
-        });
-
-        this.reminderList = ListContainer.create({
-            ItemComponent: ReminderListItem,
-            getItemProps: (item, state) => ({
-                item: Reminder.createExtended(item),
-                selected: item.selected,
-                listMode: state.listMode,
-                mode: state.mode,
-                showControls: (state.listMode === 'list'),
-            }),
-            isListChanged: (state, prevState) => (
-                state.items !== prevState.items
-                || state.mode !== prevState.mode
-                || state.listMode !== prevState.listMode
-                || state.showControls !== prevState.showControls
-            ),
-            className: LIST_CLASS,
-            itemSelector: ReminderListItem.selector,
-            selectModeClass: SELECT_MODE_CLASS,
-            placeholderClass: 'list-item_placeholder',
-            listMode: 'list',
-            PlaceholderComponent: NoDataMessage,
-            getPlaceholderProps: () => ({ title: __('reminders.noData') }),
-            onItemClick: (id, e) => this.onItemClick(id, e),
         });
 
         this.listModeBtn = Button.create({
@@ -242,40 +157,14 @@ class ReminderListView extends AppView {
             this.menuButton.elem,
         );
 
-        this.loadingIndicator = LoadingIndicator.create({
-            fixed: false,
+        this.listGroup = ReminderListGroup.create({
+            getURL: (...args) => this.getURL(...args),
+            onItemClick: (id, e) => this.onItemClick(id, e),
+            onShowMore: (e) => this.showMore(e),
+            onChangePage: (page) => this.onChangePage(page),
+            onToggleMode: (e) => this.onToggleMode(e),
         });
-
-        this.contentContainer.append(
-            this.reminderList.elem,
-            this.loadingIndicator.elem,
-        );
-
-        // List mode selected
-        const listHeader = document.querySelector('.list-header');
-        this.modeSelector = ToggleDetailsButton.create({
-            onClick: (e) => this.onToggleMode(e),
-        });
-        listHeader.append(this.modeSelector.elem);
-
-        // 'Show more' button
-        this.spinner = Spinner.create({ className: 'request-spinner' });
-        this.spinner.hide();
-        this.showMoreBtn = Button.create({
-            className: 'show-more-btn',
-            title: __('actions.showMore'),
-            onClick: (e) => this.showMore(e),
-        });
-
-        // Paginator
-        this.paginator = Paginator.create({
-            arrows: true,
-            breakLimit: 3,
-            onChange: (page) => this.onChangePage(page),
-        });
-
-        const listFooter = document.querySelector('.list-footer');
-        listFooter.append(this.showMoreBtn.elem, this.spinner.elem, this.paginator.elem);
+        this.contentContainer.append(this.listGroup.elem);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
@@ -303,7 +192,7 @@ class ReminderListView extends AppView {
      * Reminder state filter change callback
      * @param {string} value - selected state types
      */
-    async onSelectStateType(value) {
+    async onChangeReminderState(value) {
         const stateFilter = parseInt(value, 10);
         const state = this.store.getState();
         const currentStateFilter = getStateFilter(state);
@@ -396,6 +285,13 @@ class ReminderListView extends AppView {
         }
 
         this.setRenderTime();
+    }
+
+    /**
+     * Applies filters and close Offcanvas
+     */
+    onApplyFilters() {
+        this.filtersContainer.close();
     }
 
     /**
@@ -791,8 +687,8 @@ class ReminderListView extends AppView {
         const itemPart = (state.detailsId) ? state.detailsId : '';
         const params = {};
 
-        if (filter.state !== REMINDER_SCHEDULED) {
-            params.state = Reminder.getStateName(filter.state);
+        if (filter.reminderState !== REMINDER_SCHEDULED) {
+            params.reminderState = Reminder.getStateName(filter.reminderState);
         }
 
         if (filter.startDate) {
@@ -813,21 +709,6 @@ class ReminderListView extends AppView {
         return getApplicationURL(`reminders/${itemPart}`, params);
     }
 
-    /** Returns absolute index for relative index on current page */
-    getAbsoluteIndex(index, state) {
-        if (index === -1) {
-            return index;
-        }
-
-        const { pagination } = state;
-        if (!pagination) {
-            return index;
-        }
-
-        const firstItemIndex = (pagination.page - 1) * pagination.onPage;
-        return firstItemIndex + index;
-    }
-
     renderHistory(state, prevState) {
         if (
             state.detailsId === prevState?.detailsId
@@ -843,114 +724,18 @@ class ReminderListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    renderFilters(state, prevState) {
-        if (
-            state.filter === prevState?.filter
-            && state.form === prevState?.form
-            && state.form.startDate === prevState?.form?.startDate
-            && state.form.endDate === prevState?.form?.endDate
-        ) {
-            return;
-        }
-
-        const filterUrl = this.getURL(state, false);
-
-        // Reminder state filter
-        this.stateMenu.setURL(filterUrl);
-        this.stateMenu.setSelection(state.filter.state);
-
-        // Date range filter
-        this.dateRangeFilter.setState((rangeState) => ({
-            ...rangeState,
-            form: {
-                ...rangeState.form,
-                startDate: state.form.startDate,
-                endDate: state.form.endDate,
-            },
-            filter: {
-                ...rangeState.filter,
-                startDate: dateStringToTime(state.form.startDate),
-                endDate: dateStringToTime(state.form.endDate),
-            },
-        }));
-
-        // Controls
-        const { filter } = state;
-        const clearAllURLParams = {};
-
-        if (filter.state !== REMINDER_SCHEDULED) {
-            clearAllURLParams.state = Reminder.getStateName(filter.state);
-        }
-
-        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
-        this.filtersControls.setState((controlsState) => ({
-            ...controlsState,
-            cancelURL: clearAllURL.toString(),
+    renderFilters(state) {
+        this.filters.setState((filtersState) => ({
+            ...filtersState,
+            ...state,
         }));
     }
 
-    renderList(state, prevState) {
-        if (
-            state.items === prevState?.items
-            && state.filter === prevState?.filter
-            && state.mode === prevState?.mode
-            && state.listMode === prevState?.listMode
-            && state.pagination.page === prevState?.pagination?.page
-            && state.pagination.range === prevState?.pagination?.range
-            && state.pagination.pagesCount === prevState?.pagination?.pagesCount
-            && state.pagination.onPage === prevState?.pagination?.onPage
-            && state.loading === prevState?.loading
-            && state.isLoadingMore === prevState?.isLoadingMore
-            && state.renderTime === prevState?.renderTime
-        ) {
-            return;
-        }
-
-        // Counters
-        const itemsCount = state.items.length;
-        this.itemsCount.textContent = itemsCount;
-        const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? getSelectedIds(state.items) : [];
-        this.selItemsCount.textContent = selected.length;
-
-        // Paginator
-        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
-        const showPaginator = !isUpcoming && state.items.length > 0;
-        const range = state.pagination.range ?? 1;
-        const pageNum = state.pagination.page + range - 1;
-        if (showPaginator) {
-            this.paginator.setState((paginatorState) => ({
-                ...paginatorState,
-                url: this.getURL(state),
-                pagesCount: state.pagination.pagesCount,
-                pageNum,
-            }));
-        }
-        this.paginator.show(showPaginator);
-
-        // 'Show more' button
-        const loadingMore = state.loading && state.isLoadingMore;
-        this.showMoreBtn.show(
-            state.items.length > 0
-            && (!state.pagination.pagesCount || pageNum < state.pagination.pagesCount)
-            && !loadingMore,
-        );
-        this.spinner.show(loadingMore);
-
-        const firstItem = this.getAbsoluteIndex(0, state);
-        const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
-        const items = listData(state.items).slice(firstItem, lastItem);
-
-        // List of reminders
-        this.reminderList.setState((listState) => ({
+    renderList(state) {
+        this.listGroup.setState((listState) => ({
             ...listState,
-            items,
-            mode: state.mode,
-            listMode: state.listMode,
-            renderTime: state.renderTime,
+            ...state,
         }));
-        this.reminderList.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
     }
 
     render(state, prevState = {}) {
@@ -959,32 +744,11 @@ class ReminderListView extends AppView {
         }
 
         this.renderHistory(state, prevState);
-
-        if (state.loading && !state.isLoadingMore) {
-            this.loadingIndicator.show();
-        }
-
-        const isDetails = (state.mode === 'details');
-
-        const modeURL = this.getURL(state);
-        modeURL.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
-
-        this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((modeSelectorState) => ({
-            ...modeSelectorState,
-            details: isDetails,
-            url: modeURL.toString(),
-        }));
-
         this.renderFilters(state, prevState);
         this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);
         this.renderDetails(state, prevState);
-
-        if (!state.loading) {
-            this.loadingIndicator.hide();
-        }
     }
 }
 

@@ -21,8 +21,8 @@ export class ReminderListMainMenu extends PopupMenu {
         const isListMode = context.listMode === 'list';
         const isSelectMode = context.listMode === 'select';
 
-        const isConfirmed = context.filter.state === REMINDER_CONFIRMED;
-        const isCancelled = context.filter.state === REMINDER_CANCELLED;
+        const isConfirmed = context.filter.reminderState === REMINDER_CONFIRMED;
+        const isCancelled = context.filter.reminderState === REMINDER_CANCELLED;
 
         this.setItems([{
             id: 'selectModeBtn',

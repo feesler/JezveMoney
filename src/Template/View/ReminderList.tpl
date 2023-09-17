@@ -12,43 +12,8 @@
                             <div class="heading-actions"></div>
                         </header>
 
-                        <header id="contentHeader" class="content-header">
-                            <aside id="filtersContainer" class="filters-container">
-                                <header class="filters-heading">
-                                    <span class="filters-heading__title"><?= __("filters.title") ?></span>
-                                </header>
-
-                                <hr class="filters-separator">
-
-                                <div class="filters-list">
-                                    <div class="filters-row">
-                                        <section id="stateFilter" class="filter-item trans-type-filter">
-                                            <header class="filter-item__title"><?= __("filters.reminderState") ?></header>
-                                        </section>
-
-                                        <hr class="filters-separator">
-
-                                        <section id="dateFilter" class="filter-item date-range-filter validation-block"></section>
-                                    </div>
-                                </div>
-                            </aside>
-
-                            <header class="list-header">
-                                <div class="counters">
-                                    <div id="itemsCounter" class="counter">
-                                        <span class="counter__title"><?= __("list.itemsCounter") ?></span>
-                                        <span id="itemsCount" class="counter__value"></span>
-                                    </div>
-                                    <div id="selectedCounter" class="counter" hidden>
-                                        <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
-                                        <span id="selItemsCount" class="counter__value"></span>
-                                    </div>
-                                </div>
-                            </header>
-                        </header>
-
+                        <header id="contentHeader" class="content-header"></header>
                         <section id="contentContainer" class="list-container"></section>
-                        <footer class="list-footer"></footer>
                     </main>
 
                     <aside id="itemInfo" class="item-details" hidden></aside>
