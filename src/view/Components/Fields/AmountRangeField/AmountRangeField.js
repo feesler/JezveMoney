@@ -50,20 +50,25 @@ export class AmountRangeField extends Field {
         elem: ['id'],
     };
 
+    static getRangeState(data, state) {
+        const minAmount = (data.minAmount) ? normalize(data.minAmount) : null;
+        const maxAmount = (data.maxAmount) ? normalize(data.maxAmount) : null;
+
+        return {
+            ...state,
+            form: { minAmount, maxAmount },
+            filter: { minAmount, maxAmount },
+            validation: { ...defaultValidation },
+        };
+    }
+
     constructor(props = {}) {
-        super({
+        const fieldProps = {
             ...defaultProps,
             ...props,
-        });
-
-        this.state = {
-            ...this.props,
         };
-        this.state = this.getRangeState(this.props);
 
-        this.init();
-        this.postInit();
-        this.render(this.state);
+        super(AmountRangeField.getRangeState(fieldProps, fieldProps));
     }
 
     init() {
@@ -142,16 +147,8 @@ export class AmountRangeField extends Field {
         this.setUserProps();
     }
 
-    getRangeState(data) {
-        const minAmount = (data.minAmount) ? normalize(data.minAmount) : null;
-        const maxAmount = (data.maxAmount) ? normalize(data.maxAmount) : null;
-
-        return {
-            ...this.state,
-            form: { minAmount, maxAmount },
-            filter: { minAmount, maxAmount },
-            validation: { ...defaultValidation },
-        };
+    getRangeState(data, state = this.state) {
+        return AmountRangeField.getRangeState(data, state);
     }
 
     setData(data) {
