@@ -14,12 +14,6 @@
       flex: 1 1 auto;
     }
   }
-
-  &.popup_scroll-message .popup__message {
-    overflow-y: hidden;
-    display: flex;
-    flex-flow: row nowrap;
-  }
 }
 
 .rules-dialog {
