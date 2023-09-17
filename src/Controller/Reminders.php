@@ -51,7 +51,7 @@ class Reminders extends ListViewController
         $requestDefaults = [
             "page" => 1,
             "range" => 1,
-            "onPage" => 10,
+            "onPage" => DEFAULT_PAGE_LIMIT,
             "desc" => true,
         ];
 
