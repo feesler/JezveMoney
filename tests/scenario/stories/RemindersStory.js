@@ -37,6 +37,11 @@ export class RemindersStory extends TestStory {
         await this.confirmFromContextMenu();
         await this.cancelFromContextMenu();
         await this.updateAndConfirm();
+        await this.selectReminderDialog();
+        await this.selectReminder();
+        await this.removeReminder();
+        await this.dialogPagination();
+        await this.dialogFilters();
         await this.filters();
         await this.upcoming();
         await this.confirmCancelled();
@@ -132,6 +137,68 @@ export class RemindersStory extends TestStory {
         await Actions.updateFromContextMenu(0);
         await trActions.inputDate(App.formatInputDate(App.dates.yesterday));
         await trActions.submit();
+    }
+
+    async selectReminderDialog() {
+        setBlock('Open and close \'Select reminder\' dialog', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.openReminderDialog();
+        await trActions.closeReminderDialog();
+        await trActions.submit();
+    }
+
+    async selectReminder() {
+        setBlock('Select reminder to confirm', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.openReminderDialog();
+        await trActions.selectReminderByIndex(1);
+        await trActions.submit();
+    }
+
+    async removeReminder() {
+        setBlock('Remove reminder', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.removeReminder();
+        await trActions.submit();
+    }
+
+    async dialogPagination() {
+        setBlock('\'Select reminder\' dialog pagination', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.openReminderDialog();
+
+        await trActions.goToRemindersLastPage();
+        await trActions.goToRemindersPrevPage();
+        await trActions.goToRemindersNextPage();
+        await trActions.goToRemindersFirstPage();
+
+        await trActions.showMoreReminders();
+        await trActions.goToRemindersFirstPage();
+        await trActions.showMoreReminders();
+    }
+
+    async dialogFilters() {
+        setBlock('\'Select reminder\' dialog filters', 1);
+
+        await Actions.updateFromContextMenu(0);
+        await trActions.openReminderDialog();
+
+        await trActions.filterRemindersByState(REMINDER_CONFIRMED);
+        await trActions.filterRemindersByState(REMINDER_UPCOMING);
+        await trActions.filterRemindersByState(REMINDER_CANCELLED);
+        await trActions.filterRemindersByState(REMINDER_SCHEDULED);
+
+        await trActions.selectRemindersEndDateFilter(App.dates.monthAfter);
+        await trActions.selectRemindersStartDateFilter(App.dates.weekAfter);
+        await trActions.clearRemindersEndDateFilter();
+        await trActions.clearRemindersStartDateFilter();
+        await trActions.selectRemindersStartDateFilter(App.dates.monthAgo);
+        await trActions.selectRemindersEndDateFilter(App.dates.tomorrow);
+        await trActions.clearAllRemindersFilters();
     }
 
     async detailsMode() {

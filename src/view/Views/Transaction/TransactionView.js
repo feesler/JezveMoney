@@ -1,7 +1,11 @@
 import 'jezvejs/style';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
+
 import { __ } from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+import { API } from '../../API/index.js';
+
 import {
     EXPENSE,
     INCOME,
@@ -9,18 +13,20 @@ import {
     TRANSFER,
     Transaction,
 } from '../../Models/Transaction.js';
-import { App } from '../../Application/App.js';
-import { AppView } from '../../Components/AppView/AppView.js';
-import { API } from '../../API/index.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { IconList } from '../../Models/IconList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { Schedule } from '../../Models/Schedule.js';
+import { ReminderList } from '../../Models/ReminderList.js';
+
+import { AppView } from '../../Components/AppView/AppView.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionForm } from '../../Components/TransactionForm/TransactionForm.js';
+
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './TransactionView.scss';
@@ -43,6 +49,8 @@ class TransactionView extends AppView {
         App.loadModel(PersonList, 'persons', App.props.persons);
         App.loadModel(IconList, 'icons', App.props.icons);
         App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
+        App.loadModel(ReminderList, 'reminders', App.props.reminders);
         App.initCategoriesModel();
 
         const accountModel = App.model.accounts;

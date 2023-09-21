@@ -13,6 +13,7 @@ const getContentState = (state) => ({
     ...state,
     icon: (state.details) ? LIST_ICON : DETAILS_ICON,
     title: (state.details) ? __('transactions.showMain') : __('transactions.showDetails'),
+    value: (state.details) ? 'details' : 'classic',
 });
 
 const defaultProps = {
@@ -37,5 +38,11 @@ export class ToggleDetailsButton extends Button {
         const newState = isFunction(state) ? state(this.state) : state;
 
         super.setState(getContentState(newState));
+    }
+
+    render(state, prevState = {}) {
+        super.render(state, prevState);
+
+        this.elem.dataset.value = state.value;
     }
 }

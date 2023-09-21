@@ -12,6 +12,7 @@ use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\ReminderModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -189,7 +190,10 @@ class Transactions extends ListViewController
 
         $userAccounts = $this->accModel->getUserAccounts();
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
+
         $iconModel = IconModel::getInstance();
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+        $reminderModel = ReminderModel::getInstance();
 
         $fromTransaction = isset($_GET["from"]) ? intval($_GET["from"]) : 0;
         $bySchedule = isset($_GET["schedule_id"]);
@@ -203,7 +207,6 @@ class Transactions extends ListViewController
 
             unset($tr["id"]);
         } elseif ($fromReminder) {
-            $reminderModel = ReminderModel::getInstance();
             if ($bySchedule) {
                 $reminderDate = isset($_GET["reminder_date"])
                     ? intval($_GET["reminder_date"])
@@ -351,6 +354,8 @@ class Transactions extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "schedule" => $scheduleModel->getData(),
+            "reminders" => $reminderModel->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,
@@ -381,6 +386,8 @@ class Transactions extends ListViewController
         ];
 
         $iconModel = IconModel::getInstance();
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+        $reminderModel = ReminderModel::getInstance();
 
         $trans_id = intval($this->actionParam);
         $tr = $this->getTransactionData($trans_id);
@@ -399,6 +406,8 @@ class Transactions extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "schedule" => $scheduleModel->getData(),
+            "reminders" => $reminderModel->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,

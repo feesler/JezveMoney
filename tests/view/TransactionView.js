@@ -104,12 +104,7 @@ export class TransactionView extends AppView {
             res.id = cont.id;
         }
 
-        res.form = cont.form.model;
-
-        const viewURL = new URL(this.location);
-        res.reminderId = viewURL.searchParams.get('reminder_id');
-        res.scheduleId = viewURL.searchParams.get('schedule_id');
-        res.reminderDate = viewURL.searchParams.get('reminder_date');
+        res.form = structuredClone(cont.form.model);
 
         return res;
     }
@@ -127,7 +122,7 @@ export class TransactionView extends AppView {
     }
 
     getExpectedTransaction() {
-        const { form } = this.model;
+        const form = this.form.model;
         const { repeatEnabled } = form;
 
         const res = {
@@ -140,7 +135,10 @@ export class TransactionView extends AppView {
             comment: form.comment,
         };
 
-        if (repeatEnabled && !this.model.reminderId && !this.model.scheduleId) {
+        const reminderId = parseInt(form.reminderId, 10);
+        const scheduleId = parseInt(form.scheduleId, 10);
+
+        if (repeatEnabled && !reminderId && !scheduleId) {
             res.start_date = App.dateStringToSeconds(form.startDate);
             res.end_date = App.dateStringToSeconds(form.endDate);
             res.interval_type = parseInt(form.intervalType, 10);
@@ -171,11 +169,11 @@ export class TransactionView extends AppView {
             options: App.dateFormatOptions,
         });
 
-        if (this.model.reminderId) {
-            res.reminder_id = parseInt(this.model.reminderId, 10);
-        } else if (this.model.scheduleId) {
-            res.schedule_id = parseInt(this.model.scheduleId, 10);
-            res.reminder_date = parseInt(this.model.reminderDate, 10);
+        if (reminderId !== 0) {
+            res.reminder_id = reminderId;
+        } else if (scheduleId !== 0) {
+            res.schedule_id = scheduleId;
+            res.reminder_date = parseInt(form.reminderDate, 10);
         }
 
         return res;
@@ -218,8 +216,76 @@ export class TransactionView extends AppView {
         return this.form.cancel();
     }
 
+    async openReminderDialog() {
+        return this.form.openReminderDialog();
+    }
+
+    async closeReminderDialog() {
+        return this.form.closeReminderDialog();
+    }
+
+    async selectReminderByIndex(index) {
+        return this.form.selectReminderByIndex(index);
+    }
+
+    async removeReminder() {
+        return this.form.removeReminder();
+    }
+
     async inputStartDate(val) {
         return this.form.inputStartDate(val);
+    }
+
+    async clearAllRemindersFilters(val) {
+        return this.form.clearAllRemindersFilters(val);
+    }
+
+    async filterRemindersByState(val) {
+        return this.form.filterRemindersByState(val);
+    }
+
+    async selectRemindersStartDateFilter(val) {
+        return this.form.selectRemindersStartDateFilter(val);
+    }
+
+    async selectRemindersEndDateFilter(val) {
+        return this.form.selectRemindersEndDateFilter(val);
+    }
+
+    async clearRemindersStartDateFilter() {
+        return this.form.clearRemindersStartDateFilter();
+    }
+
+    async clearRemindersEndDateFilter() {
+        return this.form.clearRemindersEndDateFilter();
+    }
+
+    async goToRemindersFirstPage() {
+        return this.form.goToRemindersFirstPage();
+    }
+
+    async goToRemindersLastPage() {
+        return this.form.goToRemindersLastPage();
+    }
+
+    async goToRemindersPrevPage() {
+        return this.form.goToRemindersPrevPage();
+    }
+
+    async goToRemindersNextPage() {
+        return this.form.goToRemindersNextPage();
+    }
+
+    async showMoreReminders() {
+        return this.form.showMoreReminders();
+    }
+
+    async setRemindersClassicMode() {
+        return this.form.setRemindersClassicMode();
+    }
+
+    async setRemindersDetailsMode() {
+        return this.form.setRemindersDetailsMode();
     }
 
     async selectStartDate(val) {

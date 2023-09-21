@@ -62,6 +62,9 @@ export class ReminderListItem extends ListItem {
             throw new Error('Invalid transaction object');
         }
 
+        this.elem.setAttribute('data-id', item.id ?? 0);
+        this.elem.setAttribute('data-schedule-id', item.schedule_id);
+        this.elem.setAttribute('data-date', item.date);
         this.elem.setAttribute('data-type', item.type);
     }
 }

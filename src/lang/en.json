@@ -232,6 +232,8 @@
         "showDetails": "Show details",
         "groupByDate": "Group by date",
         "exportToCsv": "Export to CSV",
+        "reminder": "Reminder",
+        "selectReminder": "Select reminder",
         "errors": {
             "create": "Fail to create new transaction",
             "update": "Fail to update transaction",

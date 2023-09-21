@@ -1164,6 +1164,24 @@ const slice = createSlice({
         },
     }),
 
+    selectReminder: (state, reminder) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            ...reminder,
+        },
+    }),
+
+    removeReminder: (state) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            reminder_id: null,
+            schedule_id: null,
+            reminder_date: null,
+        },
+    }),
+
     scheduleRangeChange: (state, range) => ({
         ...state,
         transaction: {

@@ -1947,9 +1947,10 @@ export class AppState {
 
             const item = this.transactions.getItemByIndex(ind);
 
-            const reminderId = itemData.reminder_id ?? 0;
-            const scheduleId = itemData.schedule_id ?? 0;
-            if (reminderId) {
+            const reminderId = parseInt(itemData.reminder_id ?? 0, 10);
+            const scheduleId = parseInt(itemData.schedule_id ?? 0, 10);
+
+            if (reminderId !== 0) {
                 const reminderResult = this.confirmReminder({
                     id: reminderId,
                     transaction_id: item.id,
@@ -1957,7 +1958,7 @@ export class AppState {
                 if (!reminderResult) {
                     return false;
                 }
-            } else if (scheduleId) {
+            } else if (scheduleId !== 0) {
                 const reminderResult = this.confirmUpcomingReminder({
                     schedule_id: itemData.schedule_id,
                     date: itemData.reminder_date,

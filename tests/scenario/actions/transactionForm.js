@@ -6,6 +6,7 @@ import {
 import { App } from '../../Application.js';
 import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 import { Transaction } from '../../model/Transaction.js';
+import { Reminder } from '../../model/Reminder.js';
 
 export const inputStartDate = async (value) => {
     await test(`Input schedule start date '${value}'`, () => (
@@ -259,5 +260,115 @@ export const inputComment = async (value) => {
 export const changeTransactionType = async (type) => {
     await test(`Change type to ${Transaction.typeToString(type)}`, () => (
         App.view.changeTransactionType(type)
+    ));
+};
+
+export const openReminderDialog = async () => {
+    await test('Open \'Select reminder\' dialog', () => (
+        App.view.openReminderDialog()
+    ));
+};
+
+export const closeReminderDialog = async () => {
+    await test('Close \'Select reminder\' dialog', () => (
+        App.view.closeReminderDialog()
+    ));
+};
+
+export const selectReminderByIndex = async (index) => {
+    await test(`Select reminder by index [${index}]`, () => (
+        App.view.selectReminderByIndex(index)
+    ));
+};
+
+export const removeReminder = async () => {
+    await test('Remove reminder', () => (
+        App.view.removeReminder()
+    ));
+};
+
+export const clearAllRemindersFilters = async () => {
+    await test('Clear all filters', () => (
+        App.view.clearAllRemindersFilters()
+    ));
+};
+
+export const filterRemindersByState = async (state) => {
+    const stateType = parseInt(state, 10);
+    const stateName = Reminder.stateNames[stateType];
+    assert(stateName, 'Invalid reminder state');
+
+    await test(`Filter reminders by state '${stateName}'`, () => (
+        App.view.filterRemindersByState(state)
+    ));
+};
+
+export const selectRemindersStartDateFilter = async (date) => {
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select reminders start date filter (${dateFmt})`, () => (
+        App.view.selectRemindersStartDateFilter(date)
+    ));
+};
+
+export const selectRemindersEndDateFilter = async (date) => {
+    const dateFmt = App.reformatDate(date);
+
+    await test(`Select reminders end date filter (${dateFmt})`, () => (
+        App.view.selectRemindersEndDateFilter(date)
+    ));
+};
+
+export const clearRemindersStartDateFilter = async () => {
+    await test('Clear reminders start date filter', () => (
+        App.view.clearRemindersStartDateFilter()
+    ));
+};
+
+export const clearRemindersEndDateFilter = async () => {
+    await test('Clear reminders end date filter', () => (
+        App.view.clearRemindersEndDateFilter()
+    ));
+};
+
+export const goToRemindersFirstPage = async () => {
+    await test('Navigate to reminders first page', () => (
+        App.view.goToRemindersFirstPage()
+    ));
+};
+
+export const goToRemindersLastPage = async () => {
+    await test('Navigate to reminders last page', () => (
+        App.view.goToRemindersLastPage()
+    ));
+};
+
+export const goToRemindersPrevPage = async () => {
+    await test('Navigate to reminders previous page', () => (
+        App.view.goToRemindersPrevPage()
+    ));
+};
+
+export const goToRemindersNextPage = async () => {
+    await test('Navigate to reminders next page', () => (
+        App.view.goToRemindersNextPage()
+    ));
+};
+
+export const showMoreReminders = async () => {
+    await test('Show more reminders', () => (
+        App.view.showMoreReminders()
+    ));
+};
+
+export const setRemindersClassicMode = async () => {
+    await test('Set reminders list classic mode', () => (
+        App.view.setRemindersClassicMode()
+    ));
+};
+
+export const setRemindersDetailsMode = async () => {
+    await test('Set reminders list details mode', () => (
+        App.view.setRemindersDetailsMode()
     ));
 };

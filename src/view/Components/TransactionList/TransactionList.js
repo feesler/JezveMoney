@@ -21,7 +21,7 @@ const defaultProps = {
     sortGroup: 'transactions',
     PlaceholderComponent: NoDataMessage,
     getPlaceholderProps: () => ({ title: __('transactions.noData') }),
-    mode: 'classic',
+    mode: 'classic', // 'classic' or 'details'
     showControls: true,
     showDate: true,
     ascending: false,
