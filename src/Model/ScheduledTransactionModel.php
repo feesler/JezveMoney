@@ -532,7 +532,7 @@ class ScheduledTransactionModel extends CachedTable
             return false;
         }
 
-        if (is_null($this->affectedItems)) {
+        if (!is_array($this->affectedItems)) {
             $this->affectedItems = [];
         }
 
@@ -553,7 +553,7 @@ class ScheduledTransactionModel extends CachedTable
     {
         $res = $this->validateParams($params);
 
-        if (is_null($this->intervalOffsets)) {
+        if (!is_array($this->intervalOffsets)) {
             $this->intervalOffsets = [];
         }
         $this->intervalOffsets[] = $res["interval_offset"];
