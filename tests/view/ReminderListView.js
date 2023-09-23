@@ -77,7 +77,7 @@ export class ReminderListView extends AppView {
         const showPaginator = !isUpcoming && isItemsAvailable;
         const showMoreBtnVisible = (
             isItemsAvailable
-            && (!model.list.pages || pageNum < model.list.pages)
+            && (isUpcoming || !model.list.pages || pageNum < model.list.pages)
             && !model.isLoadingMore
         );
 
@@ -241,8 +241,8 @@ export class ReminderListView extends AppView {
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (

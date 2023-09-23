@@ -49,10 +49,9 @@ export class SelectReminderDialog extends TestComponent {
         const list = this.getExpectedList(model);
 
         const showPaginator = !isUpcoming && isItemsAvailable;
-
         const showMoreBtnVisible = (
             isItemsAvailable
-            && (!model.list.pages || pageNum < model.list.pages)
+            && (isUpcoming || !model.list.pages || pageNum < model.list.pages)
             && !model.isLoadingMore
         );
 
@@ -183,8 +182,8 @@ export class SelectReminderDialog extends TestComponent {
             filtersContainer: { elem: await query(this.elem, '.filters-container') },
             clearFiltersBtn: { elem: await query(this.elem, '.filters-controls .clear-all-btn') },
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query(this.elem, '.items-counter')),
+            selectedCounter: await Counter.create(this, await query(this.elem, '.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (
@@ -192,22 +191,25 @@ export class SelectReminderDialog extends TestComponent {
         ));
 
         // Reminder state filter
-        res.stateMenu = await LinkMenu.create(this, await query('#stateMenu'));
+        const stateMenuEl = await query(this.elem, '.trans-type-filter .menu');
+        res.stateMenu = await LinkMenu.create(this, stateMenuEl);
+        assert(res.stateMenu, 'Reminder state filter not found');
 
         // Date range filter
-        res.dateFilter = await DatePickerFilter.create(this, await query('#dateFrm'));
+        const dateRangeEl = await query(this.elem, '.date-range-filter .date-range-input');
+        res.dateFilter = await DatePickerFilter.create(this, dateRangeEl);
         assert(res.dateFilter, 'Date filter not found');
 
-        res.modeSelector = await Button.create(this, await query('.mode-selector'));
-        res.showMoreBtn = { elem: await query('.show-more-btn') };
-        res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
-        res.paginator = await Paginator.create(this, await query('.paginator'));
+        res.modeSelector = await Button.create(this, await query(this.elem, '.mode-selector'));
+        res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
+        res.showMoreSpinner = { elem: await query(this.elem, '.list-footer .request-spinner') };
+        res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
 
         const listContainer = await query(this.elem, '.list-container');
         assert(listContainer, 'List container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
-        const listElem = await query('.reminder-list');
+        const listElem = await query(this.elem, '.reminder-list');
         assert(listElem, 'Reminders list element not found');
         res.remindersList = await TransactionRemindersList.create(this, listElem);
 
@@ -263,13 +265,9 @@ export class SelectReminderDialog extends TestComponent {
             const activePage = (paginatorVisible)
                 ? cont.paginator.active
                 : range;
-            const page = activePage - range + 1;
-
-            res.list = {
-                page,
-                items,
-                range,
-            };
+            res.list.page = activePage - range + 1;
+            res.list.range = range;
+            res.list.items = items;
 
             if (paginatorVisible) {
                 res.list.pages = cont.paginator.pages;
@@ -317,6 +315,8 @@ export class SelectReminderDialog extends TestComponent {
 
             if (!isUpcoming) {
                 res.list.pages = filteredItems.expectedPages();
+            } else {
+                res.list.pages = 1;
             }
         } else {
             res.list = {
@@ -348,21 +348,9 @@ export class SelectReminderDialog extends TestComponent {
         const {
             model = this.model,
             state = App.state,
-            keepState = false,
         } = options;
 
-        const keepSelection = (keepState && model.listMode === 'select');
-        const selectedBefore = (keepSelection) ? this.getSelectedIds(model) : [];
-
         this.items = state.reminders.clone();
-        if (keepSelection) {
-            this.items.setData(
-                this.items.map((item) => ({
-                    ...item,
-                    selected: selectedBefore.includes(item.id),
-                })),
-            );
-        }
         this.items.sort();
 
         // Upcoming reminders
@@ -379,14 +367,7 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         const upcoming = state.getUpcomingReminders(params);
-        let { items } = upcoming;
-        if (keepSelection) {
-            items = items.map((item) => ({
-                ...item,
-                selected: selectedBefore.includes(item.id),
-            }));
-        }
-        this.upcomingItems = RemindersList.create(items);
+        this.upcomingItems = RemindersList.create(upcoming.items);
         this.upcomingItems.sort(false);
 
         this.upcomingPagination = upcoming.pagination;

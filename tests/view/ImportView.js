@@ -1287,6 +1287,13 @@ export class ImportView extends AppView {
             savedItem.setModified(true);
         }
 
+        if (savedItem.reminderSelected()) {
+            this.items.forEach((item) => {
+                if (item.isSameRemiderSelected(savedItem)) {
+                    item.removeReminder();
+                }
+            });
+        }
         this.items[this.formIndex] = savedItem;
 
         const itemsOnPage = App.config.importTransactionsOnPage;

@@ -11,7 +11,6 @@ import {
     DEFAULT_PAGE_LIMIT,
     __,
     dateStringToTime,
-    formatDateRange,
 } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
 import { App } from '../../../../Application/App.js';
@@ -27,6 +26,7 @@ import {
     actions,
     getStateFilter,
     updateList,
+    getInitialState,
 } from './reducer.js';
 import './SelectReminderDialog.scss';
 
@@ -44,6 +44,7 @@ const defaultProps = {
     pagination: {
         onPage: DEFAULT_PAGE_LIMIT,
         page: 1,
+        pages: 0,
         range: 1,
     },
     onChange: null,
@@ -68,20 +69,7 @@ export class SelectReminderDialog extends Component {
             },
         });
 
-        const { filter } = this.props;
-        const initialState = updateList({
-            ...this.props,
-            form: {
-                ...filter,
-                ...formatDateRange(filter),
-            },
-            upcomingItems: null,
-            loading: false,
-            isLoadingMore: false,
-            listMode: 'list',
-            renderTime: null,
-        });
-
+        const initialState = updateList(getInitialState(this.props));
         this.store = createStore(reducer, { initialState });
 
         this.init();
@@ -170,18 +158,14 @@ export class SelectReminderDialog extends Component {
         this.setRenderTime();
     }
 
+    /** Updates dialog state */
+    update() {
+        this.store.dispatch(actions.update());
+    }
+
     /** Reset dialog state */
     reset() {
-        const filter = this.props.filter ?? {};
-
-        this.setState({
-            ...this.state,
-            filter,
-            form: {
-                ...filter,
-                ...formatDateRange(filter),
-            },
-        });
+        this.store.dispatch(actions.reset(this.props));
     }
 
     startLoading(isLoadingMore = false) {
@@ -201,7 +185,13 @@ export class SelectReminderDialog extends Component {
      * Shows/hides dialog
      */
     show(value = true) {
+        this.update();
         this.dialog.show(value);
+    }
+
+    /** Hides dialog */
+    hide() {
+        this.dialog.hide();
     }
 
     /**

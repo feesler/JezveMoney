@@ -58,6 +58,25 @@ const findSimilarTransaction = (transactions, reference) => {
     return res ?? null;
 };
 
+/** Returns true if both items has the same reminder selected */
+const isSameRemiderSelected = (a, b) => (
+    (
+        !!a.reminderId
+        && a.reminderId === b.reminderId
+    ) || (
+        !!a.scheduleId
+        && a.scheduleId === b.scheduleId
+        && a.reminderDate === b.reminderDate
+    )
+);
+
+/** Removes reminder from item if the same reminder is selected by reference item */
+const removeSameReminder = (item, ref) => (
+    isSameRemiderSelected(item, ref)
+        ? item.removeReminder()
+        : item
+);
+
 /** Updates list state */
 const getPagination = (state) => {
     const { items, pagination } = state;
@@ -295,14 +314,15 @@ const slice = createSlice({
             savedItem = savedItem.setModified(true);
         }
 
+        const items = (isAppend) ? [...state.items, savedItem] : state.items;
         const newState = {
             ...state,
             items: (
-                (isAppend)
-                    ? [...state.items, savedItem]
-                    : state.items.map((item, ind) => (
-                        (ind === state.activeItemIndex) ? savedItem : item
-                    ))
+                items.map((item, ind) => (
+                    (ind === state.activeItemIndex)
+                        ? savedItem
+                        : removeSameReminder(item, savedItem)
+                ))
             ),
             lastId: (isAppend) ? (state.lastId + 1) : state.lastId,
             form: null,

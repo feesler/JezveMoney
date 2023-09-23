@@ -8,6 +8,7 @@ import {
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { ImportView } from '../../../view/ImportView.js';
+import { Reminder } from '../../../model/Reminder.js';
 
 /** Reexport import templates and import rules runners */
 export * from './templates.js';
@@ -330,6 +331,20 @@ export const runFormAction = async (action) => {
         changeCategory: 'Change category',
         inputComment: 'Input comment',
         toggleOriginalData: 'Toggle expand/collapse original data',
+        openReminderDialog: 'Open \'Select reminder\' dialog',
+        closeReminderDialog: 'Close \'Select reminder\' dialog',
+        selectReminderByIndex: 'Close \'Select reminder\' dialog',
+        removeReminder: 'Remove reminder',
+        clearAllRemindersFilters: 'Clear all filters',
+        clearRemindersStartDateFilter: 'Clear reminders start date filter',
+        clearRemindersEndDateFilter: 'Clear reminders end date filter',
+        goToRemindersFirstPage: 'Navigate to reminders first page',
+        goToRemindersLastPage: 'Navigate to reminders last page',
+        goToRemindersPrevPage: 'Navigate to reminders previous page',
+        goToRemindersNextPage: 'Navigate to reminders next page',
+        showMoreReminders: 'Show more reminders',
+        setRemindersClassicMode: 'Set reminders list classic mode',
+        setRemindersDetailsMode: 'Set reminders list details mode',
     };
 
     let descr;
@@ -354,6 +369,20 @@ export const runFormAction = async (action) => {
         assert(category, `Category (${action.data}) not found`);
 
         descr = `${actDescr[action.action]} to '${category.name}'`;
+    } else if (action.action === 'selectReminderByIndex') {
+        descr = `Select reminder by index [${action.data}]`;
+    } else if (action.action === 'filterRemindersByState') {
+        const stateType = parseInt(action.data, 10);
+        const stateName = Reminder.stateNames[stateType];
+        assert(stateName, 'Invalid reminder state');
+
+        descr = `Filter reminders by state '${stateName}'`;
+    } else if (action.action === 'selectRemindersStartDateFilter') {
+        const dateFmt = App.reformatDate(action.data);
+        descr = `Select reminders start date filter (${dateFmt})`;
+    } else if (action.action === 'selectRemindersEndDateFilter') {
+        const dateFmt = App.reformatDate(action.data);
+        descr = `Select reminders end date filter (${dateFmt})`;
     } else if (typeof action.data !== 'undefined') {
         descr = `${actDescr[action.action]} '${action.data}'`;
     } else {

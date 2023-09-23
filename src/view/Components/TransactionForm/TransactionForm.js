@@ -55,7 +55,7 @@ import { FormControls } from '../FormControls/FormControls.js';
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
-import { ReminderField } from './components/ReminderField/ReminderField.js';
+import { ReminderField } from '../Fields/ReminderField/ReminderField.js';
 
 import {
     actions,
@@ -1849,7 +1849,8 @@ export class TransactionForm extends Component {
             this.props.type !== 'transaction'
             || !(App.model.schedule?.length > 0)
         ) {
-            this.reminderField?.hide();
+            this.reminderField?.elem?.remove();
+            this.reminderField = null;
             return;
         }
 
@@ -1861,6 +1862,11 @@ export class TransactionForm extends Component {
             && transaction.reminder_date === prevTransaction?.reminder_date
         ) {
             return;
+        }
+
+        if (!this.reminderField) {
+            this.createReminderField();
+            this.commentRow.elem.after(this.reminderField.elem);
         }
 
         this.reminderField.setState((fieldState) => ({

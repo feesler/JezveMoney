@@ -1614,13 +1614,7 @@ export class TransactionForm extends TestComponent {
         res.reminderId = reminder?.reminder_id ?? 0;
         res.scheduleId = reminder?.schedule_id ?? 0;
         res.reminderDate = reminder?.reminder_date ?? 0;
-
         res.reminderDialogVisible = cont.reminderDialog.visible;
-        /*
-        if (res.reminderDialogVisible) {
-            res.reminderDialog = structuredClone(cont.reminderDialog.model);
-        }
-        */
 
         // Schedule
         res.repeatEnabled = cont.repeatSwitch.checked;

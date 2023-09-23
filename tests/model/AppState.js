@@ -1947,8 +1947,8 @@ export class AppState {
 
             const item = this.transactions.getItemByIndex(ind);
 
-            const reminderId = parseInt(itemData.reminder_id ?? 0, 10);
-            const scheduleId = parseInt(itemData.schedule_id ?? 0, 10);
+            const reminderId = (itemData.reminder_id) ? parseInt(itemData.reminder_id, 10) : 0;
+            const scheduleId = (itemData.schedule_id) ? parseInt(itemData.schedule_id, 10) : 0;
 
             if (reminderId !== 0) {
                 const reminderResult = this.confirmReminder({

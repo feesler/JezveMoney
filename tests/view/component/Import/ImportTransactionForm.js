@@ -26,6 +26,9 @@ import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
 import { __ } from '../../../model/locale.js';
+import { ReminderField } from '../Fields/ReminderField.js';
+import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
+import { REMINDER_SCHEDULED } from '../../../model/Reminder.js';
 
 const sourceTransactionTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -115,6 +118,8 @@ export class ImportTransactionForm extends TestComponent {
                 disabled: false,
                 visible: true,
             },
+            reminderField: null,
+            reminderDialog: {},
         };
 
         if (!res.typeField.disabled) {
@@ -149,6 +154,28 @@ export class ImportTransactionForm extends TestComponent {
                 : 'transactions.destPerson';
             res.personField.title = __(personTok, App.view.locale);
             res.personField.value = model.personId.toString();
+        }
+
+        // Reminder field
+        const remindersAvailable = App.state.schedule.length > 0;
+        const reminderId = parseInt(model.reminderId, 10);
+        const scheduleId = parseInt(model.scheduleId, 10);
+
+        if (remindersAvailable) {
+            res.reminderField = {
+                visible: true,
+                closeBtn: {
+                    visible: !!(reminderId || scheduleId),
+                },
+                selectBtn: {
+                    visible: true,
+                },
+                value: {
+                    reminder_id: (model.reminderId ?? 0).toString(),
+                    schedule_id: (model.scheduleId ?? 0).toString(),
+                    reminder_date: (model.reminderDate ?? 0).toString(),
+                },
+            };
         }
 
         if (model.imported) {
@@ -193,6 +220,10 @@ export class ImportTransactionForm extends TestComponent {
         this.mainAccount = mainAccount;
 
         this.model = {};
+    }
+
+    get reminderDialog() {
+        return this.content.reminderDialog;
     }
 
     async parseField(elem) {
@@ -257,7 +288,15 @@ export class ImportTransactionForm extends TestComponent {
     }
 
     async parseContent() {
-        const res = {};
+        const res = {
+            reminderDialog: { elem: await query('.popup.select-reminder-dialog') },
+        };
+
+        [
+            res.reminderDialog.visible,
+        ] = await evaluate((reminderDialogEl) => ([
+            reminderDialogEl && !reminderDialogEl.hidden,
+        ]), res.reminderDialog.elem);
 
         [
             res.typeField,
@@ -271,6 +310,11 @@ export class ImportTransactionForm extends TestComponent {
         ] = await asyncMap(fieldSelectors, async (selector) => (
             this.parseField(await query(this.elem, selector))
         ));
+
+        res.reminderField = await ReminderField.create(this, await query('.reminder-field'));
+        if (res.reminderDialog.visible) {
+            res.reminderDialog = await SelectReminderDialog.create(this, res.reminderDialog.elem);
+        }
 
         res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.saveBtn = await query(this.elem, '.submit-btn');
@@ -370,6 +414,13 @@ export class ImportTransactionForm extends TestComponent {
         res.date = cont.dateField.value;
         res.categoryId = parseInt(cont.categoryField.value, 10);
         res.comment = cont.commentField.value;
+
+        // Reminder
+        const reminder = cont.reminderField?.value;
+        res.reminderId = reminder?.reminder_id ?? 0;
+        res.scheduleId = reminder?.schedule_id ?? 0;
+        res.reminderDate = reminder?.reminder_date ?? 0;
+        res.reminderDialogVisible = cont.reminderDialog.visible;
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
@@ -488,6 +539,17 @@ export class ImportTransactionForm extends TestComponent {
             : null;
         res.category_id = model.categoryId;
         res.comment = model.comment;
+
+        const reminderId = (model.reminderId) ? parseInt(model.reminderId, 10) : 0;
+        const scheduleId = (model.scheduleId) ? parseInt(model.scheduleId, 10) : 0;
+        if (reminderId !== 0) {
+            res.reminder_id = reminderId;
+            res.schedule_id = 0;
+            res.reminder_date = 0;
+        } else if (scheduleId !== 0) {
+            res.schedule_id = scheduleId;
+            res.reminder_date = parseInt(model.reminderDate, 10);
+        }
 
         return res;
     }
@@ -849,6 +911,187 @@ export class ImportTransactionForm extends TestComponent {
         const expected = this.getExpectedState();
 
         await this.performAction(() => input(this.content.commentField.inputElem, value));
+
+        return this.checkState(expected);
+    }
+
+    async openReminderDialog() {
+        assert(this.content.reminderField?.content?.visible, 'Reminder field not available');
+
+        this.model.reminderDialogVisible = true;
+
+        const dialogModel = {
+            filter: {
+                state: REMINDER_SCHEDULED,
+                startDate: null,
+                endDate: null,
+            },
+            list: {
+                page: 1,
+                range: 1,
+                pages: 0,
+                items: [],
+            },
+            filtersVisible: false,
+        };
+
+        const filteredItems = SelectReminderDialog.getFilteredItems(dialogModel);
+        const reminders = SelectReminderDialog.getExpectedList(dialogModel);
+        dialogModel.list.items = reminders.items;
+        dialogModel.list.page = (reminders.items.length > 0) ? 1 : 0;
+        dialogModel.list.pages = filteredItems.expectedPages();
+        this.model.reminderDialog = dialogModel;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.reminderField.selectReminder());
+        await this.reminderDialog.waitForLoad();
+
+        return this.checkState(expected);
+    }
+
+    async closeReminderDialog() {
+        assert(this.reminderDialog?.content?.visible, 'Reminder dialog not visible');
+
+        this.model.reminderDialogVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.close());
+
+        return this.checkState(expected);
+    }
+
+    async selectReminderByIndex(index) {
+        const item = this.reminderDialog.getItemByIndex(index);
+
+        this.model.reminderDialogVisible = false;
+        this.model.reminderId = item?.id ?? 0;
+        this.model.scheduleId = item?.schedule_id ?? 0;
+        this.model.reminderDate = item?.date ?? 0;
+        this.model.isReminder = true;
+
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.selectItemByIndex(index));
+
+        return this.checkState(expected);
+    }
+
+    async removeReminder() {
+        assert(this.content.reminderField?.content?.visible, 'Reminder field not available');
+
+        this.model.reminderId = 0;
+        this.model.scheduleId = 0;
+        this.model.reminderDate = 0;
+        this.model.isReminder = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.reminderField.removeReminder());
+
+        return this.checkState(expected);
+    }
+
+    async filterRemindersByState(state) {
+        assert(this.reminderDialog?.content?.visible, 'Reminder field not available');
+
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.filterByState(state));
+
+        return this.checkState(expected);
+    }
+
+    async selectRemindersStartDateFilter(value) {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.selectStartDateFilter(value));
+
+        return this.checkState(expected);
+    }
+
+    async selectRemindersEndDateFilter(value) {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.selectEndDateFilter(value));
+
+        return this.checkState(expected);
+    }
+
+    async clearRemindersStartDateFilter() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.clearStartDateFilter());
+
+        return this.checkState(expected);
+    }
+
+    async clearRemindersEndDateFilter() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.clearEndDateFilter());
+
+        return this.checkState(expected);
+    }
+
+    async clearAllRemindersFilters() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.clearAllFilters());
+
+        return this.checkState(expected);
+    }
+
+    async goToRemindersFirstPage() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.goToFirstPage());
+
+        return this.checkState(expected);
+    }
+
+    async goToRemindersLastPage() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.goToLastPage());
+
+        return this.checkState(expected);
+    }
+
+    async goToRemindersPrevPage() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.goToPrevPage());
+
+        return this.checkState(expected);
+    }
+
+    async goToRemindersNextPage() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.goToNextPage());
+
+        return this.checkState(expected);
+    }
+
+    async showMoreReminders() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.showMore());
+
+        return this.checkState(expected);
+    }
+
+    async setRemindersClassicMode() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.setClassicMode());
+
+        return this.checkState(expected);
+    }
+
+    async setRemindersDetailsMode() {
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.reminderDialog.setDetailsMode());
 
         return this.checkState(expected);
     }

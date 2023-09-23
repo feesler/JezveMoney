@@ -2,16 +2,16 @@ import { createElement, getClassName, isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 
-import { App } from '../../../../Application/App.js';
-import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../Application/App.js';
+import { __ } from '../../../utils/utils.js';
 
-import { Reminder } from '../../../../Models/Reminder.js';
+import { Reminder } from '../../../Models/Reminder.js';
 
-import { Field } from '../../../Fields/Field/Field.js';
-import { ReminderListItem } from '../../../ReminderListItem/ReminderListItem.js';
+import { Field } from '../Field/Field.js';
+import { ReminderListItem } from '../../ReminderListItem/ReminderListItem.js';
+import { SelectReminderDialog } from '../../TransactionForm/components/SelectReminderDialog/SelectReminderDialog.js';
 
 import './ReminderField.scss';
-import { SelectReminderDialog } from '../SelectReminderDialog/SelectReminderDialog.js';
 
 /* CSS classes */
 const FIELD_CLASS = 'field reminder-field';

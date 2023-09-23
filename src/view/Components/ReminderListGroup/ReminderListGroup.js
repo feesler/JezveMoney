@@ -24,6 +24,8 @@ import './ReminderListGroup.scss';
 const LIST_CLASS = 'reminder-list';
 const DETAILS_CLASS = 'reminder-list_details';
 const SELECT_MODE_CLASS = 'list_select';
+const ITEMS_COUNTER_CLASS = 'items-counter';
+const SELECTED_COUNTER_CLASS = 'selected-counter';
 
 const defaultProps = {
     items: [],
@@ -102,12 +104,12 @@ export class ReminderListGroup extends Component {
         // List header
         // Counters
         this.itemsCounter = ListCounter.create({
-            id: 'itemsCounter',
             title: __('list.itemsCounter'),
+            className: ITEMS_COUNTER_CLASS,
         });
         this.selectedCounter = ListCounter.create({
-            id: 'selectedCounter',
             title: __('list.selectedItemsCounter'),
+            className: SELECTED_COUNTER_CLASS,
         });
 
         this.counters = createElement('div', {
