@@ -6,6 +6,7 @@ import {
     dateStringToTime,
     getCurrencyPrecision,
     __,
+    cutTime,
 } from '../utils/utils.js';
 import { App } from '../Application/App.js';
 import {
@@ -73,6 +74,9 @@ const defaultProps = {
     date: null,
     categoryId: 0,
     comment: '',
+    reminderId: 0,
+    scheduleId: 0,
+    reminderDate: 0,
 };
 
 export class ImportTransaction {
@@ -743,6 +747,30 @@ export class ImportTransaction {
         });
     }
 
+    /** Sets reminder */
+    setReminder(reminder) {
+        if (!reminder) {
+            throw new Error('Invalid reminder');
+        }
+
+        return new ImportTransaction({
+            ...structuredClone(this),
+            scheduleId: reminder.schedule_id,
+            reminderDate: reminder.reminder_date,
+            reminderId: reminder.reminder_id,
+        });
+    }
+
+    /** Removed reminder */
+    removeReminder() {
+        return new ImportTransaction({
+            ...structuredClone(this),
+            reminderId: null,
+            scheduleId: null,
+            reminderDate: null,
+        });
+    }
+
     /** Return transaction object */
     getData() {
         const { accounts, persons } = App.model;
@@ -754,9 +782,12 @@ export class ImportTransaction {
             type: ImportTransaction.getTargetType(this.type),
             src_curr: this.srcCurrId,
             dest_curr: this.destCurrId,
-            date: dateStringToTime(this.date),
+            date: cutTime(dateStringToTime(this.date)),
             category_id: this.categoryId,
             comment: this.comment,
+            reminder_id: this.reminderId,
+            schedule_id: this.scheduleId,
+            reminder_date: this.reminderDate,
         };
 
         if (this.type === 'expense') {

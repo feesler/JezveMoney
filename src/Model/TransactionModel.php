@@ -588,10 +588,11 @@ class TransactionModel extends SortableModel
             }
 
             $reminderId = 0;
+            $scheduleId = 0;
             if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
                 $reminder = array_shift($this->confirmReminders);
-                $reminderId = $reminder["reminder_id"];
-                $scheduleId = $reminder["schedule_id"];
+                $reminderId = intval($reminder["reminder_id"]);
+                $scheduleId = intval($reminder["schedule_id"]);
                 if ($reminderId !== 0) {
                     $reminderModel->confirm($reminderId, [
                         "transaction_id" => $item_id,
@@ -608,7 +609,7 @@ class TransactionModel extends SortableModel
 
             if (is_array($this->requestedItems) && count($this->requestedItems) > 0) {
                 $scheduleItemParams = array_shift($this->requestedItems);
-                $scheduleId = (!is_null($scheduleItemParams) && $reminderId === 0)
+                $scheduleId = (!is_null($scheduleItemParams) && $reminderId === 0 && $scheduleId === 0)
                     ? $scheduleModel->create($scheduleItemParams)
                     : 0;
 

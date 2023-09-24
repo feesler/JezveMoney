@@ -55,6 +55,7 @@ import { FormControls } from '../FormControls/FormControls.js';
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
+import { ReminderField } from '../Fields/ReminderField/ReminderField.js';
 
 import {
     actions,
@@ -247,6 +248,8 @@ export class TransactionForm extends Component {
     }
 
     init() {
+        const isTransaction = this.props.type === 'transaction';
+
         // Not available message
         this.notAvailMsg = createElement('span', {
             props: {
@@ -438,7 +441,7 @@ export class TransactionForm extends Component {
         ];
 
         // Date field
-        if (this.props.type === 'transaction') {
+        if (isTransaction) {
             this.dateRow = DateInputField.create({
                 id: 'dateRow',
                 title: __('transactions.date'),
@@ -483,6 +486,11 @@ export class TransactionForm extends Component {
         children.push(this.categoryRow.elem, this.commentRow.elem);
 
         // Schedule fields
+        if (isTransaction && App.model.schedule?.length > 0) {
+            this.createReminderField();
+            children.push(this.reminderField.elem);
+        }
+
         const scheduleFields = this.createScheduleFields();
         children.push(...scheduleFields);
 
@@ -541,6 +549,16 @@ export class TransactionForm extends Component {
             if (state !== prevState) {
                 this.render(state, prevState);
             }
+        });
+    }
+
+    /** Creates reminder field */
+    createReminderField() {
+        this.reminderField = ReminderField.create({
+            title: __('transactions.reminder'),
+            className: 'form-row',
+            onSelect: (reminder) => this.onSelectReminder(reminder),
+            onRemove: () => this.onRemoveReminder(),
         });
     }
 
@@ -1072,6 +1090,20 @@ export class TransactionForm extends Component {
         const offset = (month.id * 100) + dayIndex;
 
         this.store.dispatch(actions.intervalOffsetChange(offset));
+        this.notifyChanged();
+    }
+
+    onSelectReminder(reminder) {
+        if (!reminder) {
+            return;
+        }
+
+        this.store.dispatch(actions.selectReminder(reminder));
+        this.notifyChanged();
+    }
+
+    onRemoveReminder() {
+        this.store.dispatch(actions.removeReminder());
         this.notifyChanged();
     }
 
@@ -1812,6 +1844,40 @@ export class TransactionForm extends Component {
         this.monthSelect.show(isRepeat && isYearInterval);
     }
 
+    renderReminder(state, prevState) {
+        if (
+            this.props.type !== 'transaction'
+            || !(App.model.schedule?.length > 0)
+        ) {
+            this.reminderField?.elem?.remove();
+            this.reminderField = null;
+            return;
+        }
+
+        const { transaction } = state;
+        const prevTransaction = prevState?.transaction;
+        if (
+            transaction.reminder_id === prevTransaction?.reminder_id
+            && transaction.schedule_id === prevTransaction?.schedule_id
+            && transaction.reminder_date === prevTransaction?.reminder_date
+        ) {
+            return;
+        }
+
+        if (!this.reminderField) {
+            this.createReminderField();
+            this.commentRow.elem.after(this.reminderField.elem);
+        }
+
+        this.reminderField.setState((fieldState) => ({
+            ...fieldState,
+            reminder_id: transaction.reminder_id,
+            schedule_id: transaction.schedule_id,
+            reminder_date: transaction.reminder_date,
+        }));
+        this.reminderField.show();
+    }
+
     renderTime(state) {
         this.elem.dataset.time = state?.renderTime ?? '';
     }
@@ -2056,6 +2122,8 @@ export class TransactionForm extends Component {
             value: state.form.comment,
             disabled: state.submitStarted,
         }));
+
+        this.renderReminder(state, prevState);
 
         // 'Repeat transaction' Switch field
         const isConfirmReminder = transaction.reminder_id || transaction.schedule_id;

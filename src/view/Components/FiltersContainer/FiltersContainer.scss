@@ -92,6 +92,7 @@
 /* Filters inside Offcanvas */
 .filters-offcanvas {
   --offcanvas-bg: var(--semitrans-bg-color);
+  --offcanvas-z: 5000;
 
   width: 100%;
 

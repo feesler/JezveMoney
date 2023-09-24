@@ -67,7 +67,7 @@ class Reminder extends ApiListController
     public function upcoming()
     {
         $requestDefaults = [
-            "onPage" => 10,
+            "onPage" => DEFAULT_PAGE_LIMIT,
             "page" => 1,
             "range" => 1,
         ];

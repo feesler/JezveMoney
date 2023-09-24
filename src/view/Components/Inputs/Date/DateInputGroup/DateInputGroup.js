@@ -61,6 +61,15 @@ export class DateInputGroup extends InputGroup {
         super.init();
     }
 
+    enable(value = true) {
+        const disabled = !value;
+        if (this.state.disabled === disabled) {
+            return;
+        }
+
+        this.setState({ ...this.state, disabled });
+    }
+
     renderInput(state, prevState) {
         if (state.value !== this.input.value) {
             this.input.value = state.value;
@@ -74,12 +83,13 @@ export class DateInputGroup extends InputGroup {
     }
 
     render(state, prevState = {}) {
-        super.render(state, prevState);
+        super.enable(!state.disabled);
 
         this.renderInput(state, prevState);
 
         if (this.clearBtn) {
             this.clearBtn.show(state.clearButton && state.value.length > 0);
+            this.clearBtn.enable(!state.disabled);
         }
 
         this.datePickerBtn.enable(!state.disabled);

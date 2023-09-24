@@ -25,6 +25,8 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { ImportRuleList } from '../../Models/ImportRuleList.js';
 import { ImportTemplateList } from '../../Models/ImportTemplateList.js';
+import { Schedule } from '../../Models/Schedule.js';
+import { ReminderList } from '../../Models/ReminderList.js';
 
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -70,6 +72,7 @@ class ImportView extends AppView {
             rulesCheck: () => this.onToggleEnableRules(),
             rulesBtn: () => this.onRulesClick(),
             similarCheck: () => this.onToggleCheckSimilar(),
+            remindersCheck: () => this.onToggleCheckReminders(),
         };
 
         this.contextMenuActions = {
@@ -89,6 +92,8 @@ class ImportView extends AppView {
         App.initCategoriesModel();
         App.loadModel(ImportRuleList, 'rules', App.props.rules);
         App.loadModel(ImportTemplateList, 'templates', App.props.templates);
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
+        App.loadModel(ReminderList, 'reminders', App.props.reminders);
 
         const { userAccounts } = App.model;
         const mainAccount = userAccounts.getItemByIndex(0);
@@ -103,6 +108,7 @@ class ImportView extends AppView {
             mainAccount,
             rulesEnabled: true,
             checkSimilarEnabled: true,
+            checkRemindersEnabled: true,
             showContextMenu: false,
             contextItemIndex: -1,
             listMode: 'list',
@@ -116,7 +122,7 @@ class ImportView extends AppView {
      * View initialization
      */
     onStart() {
-        if (App.model.accounts.length === 0) {
+        if (App.model.userAccounts.length === 0) {
             return;
         }
 
@@ -597,11 +603,31 @@ class ImportView extends AppView {
         this.submitProgressIndicator.textContent = `${this.submitDone} / ${this.submitTotal}`;
     }
 
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                reminders: {},
+                profile: {},
+            },
+        };
+    }
+
+    getNextChunkRequest() {
+        const request = {
+            data: this.submitQueue.pop(),
+        };
+
+        return (this.submitQueue.length === 0)
+            ? this.prepareRequest(request)
+            : request;
+    }
+
     async submitChunk() {
         try {
-            const chunk = this.submitQueue.pop();
-            await API.transaction.create({ data: chunk });
-            this.onSubmitResult();
+            const request = this.getNextChunkRequest();
+            const result = await API.transaction.create(request);
+            this.onSubmitResult(result);
         } catch (e) {
             this.submitProgress.hide();
             App.createErrorNotification(e.message);
@@ -611,7 +637,7 @@ class ImportView extends AppView {
     /**
      * Successfull submit response handler
      */
-    onSubmitResult() {
+    onSubmitResult(response) {
         this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
         this.renderSubmitProgress();
 
@@ -620,9 +646,22 @@ class ImportView extends AppView {
             return;
         }
 
+        this.updateModelsFromResponse(response);
+
         this.removeAllItems();
         this.submitProgress.hide();
         App.createSuccessNotification(__('import.successMessage'));
+    }
+
+    getRemindersFromResponse(response) {
+        return response?.data?.state?.reminders?.data;
+    }
+
+    updateModelsFromResponse(response) {
+        const reminders = this.getRemindersFromResponse(response);
+        App.model.reminders.setData(reminders);
+
+        App.updateProfileFromResponse(response);
     }
 
     /** Apply rules to imported items */
@@ -646,6 +685,12 @@ class ImportView extends AppView {
         } else {
             this.disableCheckSimilar();
         }
+    }
+
+    /** 'Check suitable reminders' checkbox 'change' event handler */
+    onToggleCheckReminders() {
+        this.store.dispatch(actions.toggleCheckReminders());
+        this.setRenderTime();
     }
 
     /** Rules button 'click' event handler */
@@ -791,6 +836,7 @@ class ImportView extends AppView {
             showMenu: state.showMenu,
             rulesEnabled: state.rulesEnabled,
             checkSimilarEnabled: state.checkSimilarEnabled,
+            checkRemindersEnabled: state.checkRemindersEnabled,
             items: state.items,
         });
 
@@ -842,6 +888,10 @@ class ImportView extends AppView {
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
+        }
+
+        if (App.model.userAccounts.length === 0) {
+            return;
         }
 
         this.renderList(state, prevState);

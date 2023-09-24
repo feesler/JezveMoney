@@ -49,7 +49,7 @@ class Schedule extends ListViewController
         ];
 
         $requestDefaults = [
-            "onPage" => 10,
+            "onPage" => DEFAULT_PAGE_LIMIT,
             "page" => 1,
             "range" => 1,
             "desc" => true

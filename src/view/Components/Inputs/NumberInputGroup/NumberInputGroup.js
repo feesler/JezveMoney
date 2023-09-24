@@ -139,6 +139,15 @@ export class NumberInputGroup extends InputGroup {
         }
     }
 
+    enable(value = true) {
+        const disabled = !value;
+        if (this.state.disabled === disabled) {
+            return;
+        }
+
+        this.setState({ ...this.state, disabled });
+    }
+
     setValue(value) {
         if (this.state.value === value) {
             return;
@@ -160,7 +169,7 @@ export class NumberInputGroup extends InputGroup {
     }
 
     render(state, prevState = {}) {
-        super.render(state, prevState);
+        super.enable(!state.disabled);
 
         this.renderInput(state, prevState);
 

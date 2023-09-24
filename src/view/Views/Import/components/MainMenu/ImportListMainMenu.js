@@ -102,6 +102,12 @@ export class ImportListMainMenu extends PopupMenu {
             title: __('import.checkSimilar'),
             selected: context.checkSimilarEnabled,
             hidden: !isListMode,
+        }, {
+            id: 'remindersCheck',
+            type: 'checkbox',
+            title: __('import.checkReminders'),
+            selected: context.checkRemindersEnabled,
+            hidden: !isListMode,
         }]);
     }
 }

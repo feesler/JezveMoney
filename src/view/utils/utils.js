@@ -19,6 +19,8 @@ export const SORT_BY_NAME_ASC = 3;
 export const SORT_BY_NAME_DESC = 4;
 export const SORT_MANUALLY = 5;
 
+export const DEFAULT_PAGE_LIMIT = 10;
+
 /** Returns URL instance for specified path and search params */
 export const getApplicationURL = (path = '', params = {}) => {
     const res = new URL(`${App.baseURL}${path}`);

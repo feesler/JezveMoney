@@ -9,8 +9,8 @@ export class Counter extends TestComponent {
             if (!el?.classList?.contains('counter')) {
                 return null;
             }
-            const titleEl = el.querySelector('.counter__title');
-            const valueEl = el.querySelector('.counter__value');
+            const titleEl = el.firstElementChild;
+            const valueEl = titleEl?.nextElementSibling;
 
             return {
                 title: titleEl?.textContent,

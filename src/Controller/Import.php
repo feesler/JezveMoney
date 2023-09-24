@@ -10,6 +10,8 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
+use JezveMoney\App\Model\ReminderModel;
+use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 
 /**
@@ -42,11 +44,14 @@ class Import extends TemplateController
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
         $userCurrModel = UserCurrencyModel::getInstance();
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+        $reminderModel = ReminderModel::getInstance();
 
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
 
-        $accounts = $accMod->getData(["visibility" => "all"]);
-        $importAvailable = count($accounts) > 0;
+        $userAccounts = $accMod->getUserAccounts();
+        $accounts = $accMod->getData(["visibility" => "all", "owner" => "all"]);
+        $importAvailable = count($userAccounts) > 0;
 
         $data = [
             "titleString" => __("appName") . " | " . __("import.listTitle"),
@@ -75,6 +80,8 @@ class Import extends TemplateController
             "userCurrencies" => $userCurrModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "schedule" => $scheduleModel->getData(),
+            "reminders" => $reminderModel->getData(),
             "rules" => $data["importRules"],
             "templates" => $data["importTemplates"]
         ];

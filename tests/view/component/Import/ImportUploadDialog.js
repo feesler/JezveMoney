@@ -455,7 +455,7 @@ export class ImportUploadDialog extends TestComponent {
             res.firstRowInp = { value: firstRow.toString() };
 
             res.decFirstRowBtn = {
-                visible: firstRow > 1,
+                visible: true,
                 disabled: (firstRow === '' || firstRow <= 1),
             };
             res.incFirstRowBtn = {

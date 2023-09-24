@@ -1,9 +1,9 @@
 import { getClassName } from 'jezvejs';
 
-import { Reminder } from '../../../../Models/Reminder.js';
+import { Reminder } from '../../Models/Reminder.js';
 
-import { TransactionListItemBase } from '../../../../Components/TransactionListItemBase/TransactionListItemBase.js';
-import { ListItem } from '../../../../Components/ListItem/ListItem.js';
+import { ListItem } from '../ListItem/ListItem.js';
+import { TransactionListItemBase } from '../TransactionListItemBase/TransactionListItemBase.js';
 
 import './ReminderListItem.scss';
 
@@ -11,6 +11,7 @@ import './ReminderListItem.scss';
 const ITEM_CLASS = 'reminder-item';
 
 const defaultProps = {
+    mode: 'classic', // 'classic' or 'details'
 };
 
 /**
@@ -61,6 +62,9 @@ export class ReminderListItem extends ListItem {
             throw new Error('Invalid transaction object');
         }
 
+        this.elem.setAttribute('data-id', item.id ?? 0);
+        this.elem.setAttribute('data-schedule-id', item.schedule_id);
+        this.elem.setAttribute('data-date', item.date);
         this.elem.setAttribute('data-type', item.type);
     }
 }

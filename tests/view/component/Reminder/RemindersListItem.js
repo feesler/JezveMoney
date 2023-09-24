@@ -20,6 +20,8 @@ export class RemindersListItem extends TestComponent {
             const detailsMode = !!elem.querySelector('.trans-item-base_details');
             const item = {
                 id: elem.dataset.id,
+                scheduleId: elem.dataset.scheduleId,
+                reminderDate: elem.dataset.date,
                 type: parseInt(elem.dataset.type, 10),
                 selected: elem.classList.contains('list-item_selected'),
                 detailsMode,
@@ -89,6 +91,14 @@ export class RemindersListItem extends TestComponent {
 
     get id() {
         return this.content.id;
+    }
+
+    get scheduleId() {
+        return this.content.scheduleId;
+    }
+
+    get reminderDate() {
+        return this.content.reminderDate;
     }
 
     async click() {

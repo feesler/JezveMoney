@@ -377,10 +377,15 @@ class MySqlDB
 
         $this->insert_id = null;
         $this->affected = null;
+        $res = false;
 
         wlog("Query: " . $query);
 
-        $res = mysqli_query(self::$conn, $query);
+        try {
+            $res = mysqli_query(self::$conn, $query);
+        } catch (\Exception $e) {
+            wlog("rawQ() error: " . $e->getMessage());
+        }
 
         $this->errno = mysqli_errno(self::$conn);
         $this->errorMessage = mysqli_error(self::$conn);

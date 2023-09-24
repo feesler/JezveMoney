@@ -4,6 +4,12 @@ import { App } from '../../../Application.js';
 import { api } from '../../../model/api.js';
 import { testLocales } from '../../actions/locale.js';
 import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
+import {
+    REMINDER_CANCELLED,
+    REMINDER_CONFIRMED,
+    REMINDER_SCHEDULED,
+    REMINDER_UPCOMING,
+} from '../../../model/Reminder.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {
@@ -13,6 +19,7 @@ export class ImportListStory extends TestStory {
             persons: true,
             categories: true,
             transactions: true,
+            schedule: true,
             importtpl: true,
             importrules: true,
         });
@@ -20,6 +27,8 @@ export class ImportListStory extends TestStory {
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
         await App.scenario.createCategories();
+        await App.scenario.createTransactions();
+        await App.scenario.createScheduledTransactions();
         await App.scenario.createCsvFiles();
         await App.scenario.createImportRules();
         await App.scenario.createImportTemplates();
@@ -43,6 +52,7 @@ export class ImportListStory extends TestStory {
         await this.listModes();
         await this.duplicate();
         await this.checkSimilar();
+        await this.reminders();
         await this.enableDisableRules();
         await this.del();
         await this.submit();
@@ -315,6 +325,130 @@ export class ImportListStory extends TestStory {
         await Actions.selectAllItems();
         await Actions.enableSelectedItems(false);
         await Actions.submit();
+    }
+
+    async reminders() {
+        setBlock('Reminders', 1);
+
+        await this.checkReminders();
+        await this.selectReminder();
+        await this.updateReminder();
+        await this.removeReminder();
+        await this.remindersDialogPagination();
+        await this.remindersDialogFilters();
+    }
+
+    async resetTransactions() {
+        await App.scenario.resetData({ transactions: true });
+        await App.view.navigateToImport();
+    }
+
+    async checkReminders() {
+        setBlock('Check suitable reminders', 1);
+
+        const { accountFile } = App.scenario;
+
+        setBlock('Upload with enabled option', 2);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.submit();
+        await this.resetTransactions();
+
+        setBlock('Upload with disabled option', 2);
+        await Actions.enableCheckReminders(false);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.submit();
+        await this.resetTransactions();
+
+        setBlock('Enable option after upload', 2);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.enableCheckReminders(false);
+        await Actions.submit();
+        await this.resetTransactions();
+    }
+
+    async selectReminder() {
+        setBlock('Select reminder to confirm', 1);
+
+        await Actions.createItemAndSave([
+            { action: 'inputDestAmount', data: '100' },
+            { action: 'openReminderDialog' },
+            { action: 'selectReminderByIndex', data: 0 },
+        ]);
+        await Actions.createItemAndSave([
+            { action: 'inputDestAmount', data: '101' },
+            { action: 'openReminderDialog' },
+            { action: 'selectReminderByIndex', data: 0 },
+        ]);
+        await Actions.submit();
+    }
+
+    async updateReminder() {
+        setBlock('Update reminder', 1);
+
+        await Actions.createItemAndSave([
+            { action: 'inputDestAmount', data: '200' },
+            { action: 'openReminderDialog' },
+            { action: 'selectReminderByIndex', data: 0 },
+        ]);
+        await Actions.updateItemAndSave({
+            pos: 0,
+            action: [
+                { action: 'openReminderDialog' },
+                { action: 'selectReminderByIndex', data: 1 },
+            ],
+        });
+        await Actions.submit();
+    }
+
+    async removeReminder() {
+        setBlock('Remove reminder', 1);
+
+        await Actions.createItemAndSave([
+            { action: 'inputDestAmount', data: '300' },
+            { action: 'openReminderDialog' },
+            { action: 'selectReminderByIndex', data: 0 },
+            { action: 'removeReminder' },
+        ]);
+        await Actions.submit();
+    }
+
+    async remindersDialogPagination() {
+        setBlock('\'Select reminder\' dialog pagination', 1);
+
+        await Actions.addItem([
+            { action: 'openReminderDialog' },
+            { action: 'goToRemindersLastPage' },
+            { action: 'goToRemindersPrevPage' },
+            { action: 'goToRemindersNextPage' },
+            { action: 'goToRemindersFirstPage' },
+            { action: 'showMoreReminders' },
+            { action: 'goToRemindersFirstPage' },
+            { action: 'showMoreReminders' },
+        ]);
+        await Actions.cancelItem();
+    }
+
+    async remindersDialogFilters() {
+        setBlock('\'Select reminder\' dialog filters', 1);
+
+        await Actions.addItem([
+            { action: 'openReminderDialog' },
+            { action: 'filterRemindersByState', data: REMINDER_CONFIRMED },
+            { action: 'filterRemindersByState', data: REMINDER_UPCOMING },
+            { action: 'filterRemindersByState', data: REMINDER_CANCELLED },
+            { action: 'filterRemindersByState', data: REMINDER_SCHEDULED },
+            { action: 'selectRemindersEndDateFilter', data: App.dates.monthAfter },
+            { action: 'selectRemindersStartDateFilter', data: App.dates.weekAfter },
+            { action: 'clearRemindersEndDateFilter' },
+            { action: 'clearRemindersStartDateFilter' },
+            { action: 'selectRemindersStartDateFilter', data: App.dates.monthAgo },
+            { action: 'selectRemindersEndDateFilter', data: App.dates.tomorrow },
+            { action: 'clearAllRemindersFilters' },
+        ]);
+        await Actions.cancelItem();
     }
 
     async formOrigDataCollapsible() {

@@ -115,6 +115,24 @@ export class ImportTransaction {
         return (this.src_curr !== this.dest_curr);
     }
 
+    reminderSelected() {
+        return !!this.reminder_id || !!this.schedule_id;
+    }
+
+    /** Returns true if both items has the same reminder selected */
+    isSameRemiderSelected(ref) {
+        return (
+            (
+                !!this.reminder_id
+                && this.reminder_id === ref.reminder_id
+            ) || (
+                !!this.schedule_id
+                && this.schedule_id === ref.schedule_id
+                && this.reminder_date === ref.reminder_date
+            )
+        );
+    }
+
     /** Enable/disable transaction */
     enable(value = true) {
         this.enabled = !!value;
@@ -149,6 +167,9 @@ export class ImportTransaction {
             'date',
             'category_id',
             'comment',
+            'reminder_id',
+            'schedule_id',
+            'reminder_date',
         ];
 
         return (
@@ -450,6 +471,24 @@ export class ImportTransaction {
         this.comment = value;
     }
 
+    /** Sets reminder */
+    setReminder(reminder) {
+        if (!reminder) {
+            throw new Error('Invalid reminder');
+        }
+
+        this.reminder_id = reminder.reminder_id ?? 0;
+        this.schedule_id = reminder.schedule_id ?? 0;
+        this.reminder_date = reminder.reminder_date ?? 0;
+    }
+
+    /** Removed reminder */
+    removeReminder() {
+        this.reminder_id = 0;
+        this.schedule_id = 0;
+        this.reminder_date = 0;
+    }
+
     restoreOriginal() {
         assert(this.original, 'Original data not found');
 
@@ -554,6 +593,15 @@ export class ImportTransaction {
 
             res.src_amount = normalize(Math.abs(this.src_amount), srcPrecision);
             res.dest_amount = normalize(Math.abs(this.dest_amount), destPrecision);
+        }
+
+        const reminderId = (this.reminder_id) ? parseInt(this.reminder_id, 10) : 0;
+        const scheduleId = (this.schedule_id) ? parseInt(this.schedule_id, 10) : 0;
+        if (reminderId !== 0) {
+            res.reminder_id = reminderId;
+        } else if (scheduleId !== 0) {
+            res.schedule_id = scheduleId;
+            res.reminder_date = parseInt(this.reminder_date, 10);
         }
 
         return res;

@@ -51,11 +51,13 @@ class Reminders extends ListViewController
         $requestDefaults = [
             "page" => 1,
             "range" => 1,
-            "onPage" => 10,
+            "onPage" => DEFAULT_PAGE_LIMIT,
             "desc" => true,
         ];
 
         $request = $this->model->getRequestFilters($_GET, $requestDefaults);
+        $request["filter"]["reminderState"] = $request["filter"]["state"];
+        unset($request["filter"]["state"]);
 
         // Obtain requested view mode
         $showDetails = false;

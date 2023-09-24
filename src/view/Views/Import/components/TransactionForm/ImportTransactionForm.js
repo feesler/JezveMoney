@@ -23,6 +23,7 @@ import { Field } from '../../../../Components/Fields/Field/Field.js';
 import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
 import { AmountInputField } from '../../../../Components/Fields/AmountInputField/AmountInputField.js';
 import { DateInputField } from '../../../../Components/Fields/DateInputField/DateInputField.js';
+import { ReminderField } from '../../../../Components/Fields/ReminderField/ReminderField.js';
 import { CategorySelect } from '../../../../Components/Inputs/CategorySelect/CategorySelect.js';
 import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
 import { FormControls } from '../../../../Components/FormControls/FormControls.js';
@@ -44,6 +45,7 @@ const PERSON_FIELD_CLASS = 'form-row person-field';
 const DATE_FIELD_CLASS = 'form-row date-field';
 const CATEGORY_FIELD_CLASS = 'form-row category-field';
 const COMMENT_FIELD_CLASS = 'form-row comment-field';
+const REMINDER_FIELD_CLASS = 'form-row reminder-field';
 
 const validateDateOptions = {
     fixShortYear: false,
@@ -252,6 +254,16 @@ export class ImportTransactionForm extends Component {
         });
     }
 
+    /** Creates reminder field */
+    createReminderField() {
+        this.reminderField = ReminderField.create({
+            title: __('transactions.reminder'),
+            className: REMINDER_FIELD_CLASS,
+            onSelect: (reminder) => this.onSelectReminder(reminder),
+            onRemove: () => this.onRemoveReminder(),
+        });
+    }
+
     initContainer(className, children) {
         this.elem = createElement('form', {
             props: { className },
@@ -406,6 +418,25 @@ export class ImportTransactionForm extends Component {
         });
     }
 
+    onSelectReminder(reminder) {
+        if (!reminder) {
+            return;
+        }
+        const { transaction } = this.state;
+        this.setState({
+            ...this.state,
+            transaction: transaction.setReminder(reminder),
+        });
+    }
+
+    onRemoveReminder() {
+        const { transaction } = this.state;
+        this.setState({
+            ...this.state,
+            transaction: transaction.removeReminder(),
+        });
+    }
+
     validateAmount(value) {
         const amount = parseFloat(fixFloat(value));
         return (!Number.isNaN(amount) && amount > 0);
@@ -542,7 +573,7 @@ export class ImportTransactionForm extends Component {
             return;
         }
 
-        const { transaction } = state;
+        const transaction = new ImportTransaction(state.transaction);
         const isDiff = transaction.isDiff();
         const realType = transTypeMap[transaction.type];
         if (!realType) {
@@ -652,6 +683,39 @@ export class ImportTransactionForm extends Component {
             value: transaction.comment,
             disabled: !transaction.enabled,
         }));
+
+        this.renderReminder(state, prevState);
+    }
+
+    renderReminder(state, prevState) {
+        if (App.model.schedule.length === 0) {
+            this.reminderField?.elem?.remove();
+            this.reminderField = null;
+            return;
+        }
+
+        const { transaction } = state;
+        const prevTransaction = prevState?.transaction;
+        if (
+            transaction.reminderId === prevTransaction?.reminderId
+            && transaction.scheduleId === prevTransaction?.scheduleId
+            && transaction.reminderDate === prevTransaction?.reminderDate
+        ) {
+            return;
+        }
+
+        if (!this.reminderField) {
+            this.createReminderField();
+            this.commentField.elem.after(this.reminderField.elem);
+        }
+
+        this.reminderField.setState((fieldState) => ({
+            ...fieldState,
+            reminder_id: transaction.reminderId,
+            schedule_id: transaction.scheduleId,
+            reminder_date: transaction.reminderDate,
+        }));
+        this.reminderField.show();
     }
 
     /** Render component */
