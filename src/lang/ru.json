@@ -472,6 +472,7 @@
         "checkSimilar": "Искать похожие транзакции",
         "similarFound": "Найдена похожая транзакция: ",
         "openSimilar": "открыть в новой вкладке",
+        "checkReminders": "Искать подходящие напоминания",
         "selectFile": "Выбрать файл",
         "selectFileDescription": "или перетащите его на этот диалог",
         "cp1251Encoding": "Кодировка CP-1251",

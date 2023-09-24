@@ -472,6 +472,7 @@
         "checkSimilar": "Check similar transactions",
         "similarFound": "Similar transaction found: ",
         "openSimilar": "open in new tab",
+        "checkReminders": "Confirm suitable reminders",
         "selectFile": "Select file",
         "selectFileDescription": "or simply drop it to this dialog",
         "cp1251Encoding": "CP-1251 encoding",

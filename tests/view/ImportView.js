@@ -18,13 +18,14 @@ import { AppView } from './AppView.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
-import { findSimilarTransaction } from '../model/import.js';
+import { findSimilarTransaction, findSuitableReminder } from '../model/import.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { Counter } from './component/Counter.js';
 import { fixFloat } from '../common.js';
 import { __ } from '../model/locale.js';
+import { Reminder } from '../model/Reminder.js';
 
 const defaultPagination = {
     page: 1,
@@ -180,9 +181,13 @@ export class ImportView extends AppView {
 
             const similarCheck = cont.listMenu?.findItemById('similarCheck');
             res.checkSimilarEnabled = similarCheck?.checked ?? true;
+
+            const remindersCheck = cont.listMenu?.findItemById('remindersCheck');
+            res.checkRemindersEnabled = remindersCheck?.checked ?? true;
         } else {
             res.rulesEnabled = false;
             res.checkSimilarEnabled = false;
+            res.checkRemindersEnabled = false;
         }
 
         res.renderTime = cont.renderTime;
@@ -274,6 +279,7 @@ export class ImportView extends AppView {
                 deleteAllBtn: { visible: showMenuItems, disabled: !hasItems },
                 rulesCheck: { checked: model.rulesEnabled, visible: showListItems },
                 similarCheck: { checked: model.checkSimilarEnabled, visible: showListItems },
+                remindersCheck: { checked: model.checkRemindersEnabled, visible: showListItems },
                 rulesBtn: { visible: showListItems },
             };
         }
@@ -360,6 +366,10 @@ export class ImportView extends AppView {
 
     get checkSimilarEnabled() {
         return this.model.checkSimilarEnabled;
+    }
+
+    get checkRemindersEnabled() {
+        return this.model.checkRemindersEnabled;
     }
 
     isRulesState() {
@@ -519,6 +529,54 @@ export class ImportView extends AppView {
         this.expectedState.itemsList.items = expectedList.items;
 
         await this.waitForList(() => this.listMenu.select('similarCheck'));
+
+        return this.checkState();
+    }
+
+    async enableCheckReminders(value) {
+        this.checkMainState();
+
+        const enable = !!value;
+        assert(
+            enable !== this.checkRemindersEnabled,
+            enable ? 'Already enabled' : 'Already disabled',
+        );
+
+        await this.openListMenu();
+
+        const reminders = App.state.reminders.map((item) => (
+            Reminder.createExtended(item, App.state)
+        ));
+
+        this.model.checkRemindersEnabled = enable;
+        this.model.listMenuVisible = false;
+        this.items.forEach((item) => {
+            if (!item.original || item.modifiedByUser) {
+                return;
+            }
+
+            if (enable) {
+                const reminder = findSuitableReminder(item, reminders);
+                if (!reminder) {
+                    return;
+                }
+
+                reminder.picked = true;
+                item.setReminder({
+                    reminder_id: reminder.id,
+                    schedule_id: reminder.schedule_id,
+                    reminder_date: reminder.date,
+                });
+            } else {
+                item.removeReminder();
+            }
+        });
+
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.waitForList(() => this.listMenu.select('remindersCheck'));
 
         return this.checkState();
     }
@@ -780,8 +838,26 @@ export class ImportView extends AppView {
         const expectedUpload = this.uploadDialog.getExpectedUploadResult(importData);
         const isValid = expectedUpload != null;
         if (isValid) {
+            const reminders = (this.checkRemindersEnabled)
+                ? App.state.reminders.map((item) => (
+                    Reminder.createExtended(item, App.state)
+                ))
+                : [];
+
             const skipList = [];
             expectedUpload.forEach((item) => {
+                if (this.checkRemindersEnabled) {
+                    const reminder = findSuitableReminder(item, reminders);
+                    if (reminder) {
+                        reminder.picked = true;
+                        item.setReminder({
+                            reminder_id: reminder.id,
+                            schedule_id: reminder.schedule_id,
+                            reminder_date: reminder.date,
+                        });
+                    }
+                }
+
                 // Apply rules if enabled
                 if (this.rulesEnabled) {
                     App.state.rules.applyTo(item);

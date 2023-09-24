@@ -1,6 +1,7 @@
 import { createSlice } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import { ImportTransaction } from '../../Models/ImportTransaction.js';
+import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
 
 /** Returns page number and relative index of specified absolute index */
 export const getPageIndex = (index, state) => {
@@ -58,6 +59,11 @@ const findSimilarTransaction = (transactions, reference) => {
     return res ?? null;
 };
 
+/** Returns array of extended reminders */
+const getExtendedReminders = () => (
+    App.model.reminders.map((item) => Reminder.createExtended(item))
+);
+
 /** Returns true if both items has the same reminder selected */
 const isSameRemiderSelected = (a, b) => (
     (
@@ -75,6 +81,45 @@ const removeSameReminder = (item, ref) => (
     isSameRemiderSelected(item, ref)
         ? item.removeReminder()
         : item
+);
+
+/** Returns true if specified reminder is suitable for transaction */
+const isSuitableReminder = (item, reminder) => {
+    if (!item || reminder?.state !== REMINDER_SCHEDULED) {
+        return false;
+    }
+
+    // Check date, source and destination accounts
+    if (
+        item.type !== reminder.type
+        || item.src_id !== reminder.src_id
+        || item.dest_id !== reminder.dest_id
+        || item.date !== reminder.date
+    ) {
+        return false;
+    }
+
+    // Check amounts
+    // Source and destination amount can be swapped
+    const refSrcAmount = Math.abs(reminder.src_amount);
+    const refDestAmount = Math.abs(reminder.dest_amount);
+    if (
+        (item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
+        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)
+    ) {
+        return false;
+    }
+
+    return true;
+};
+
+/** Returns first suitable reminder for specified transaction */
+const findSuitableReminder = (transaction, reminders) => (
+    reminders.find((item) => (
+        item
+        && !item.picked
+        && isSuitableReminder(transaction, item)
+    )) ?? null
 );
 
 /** Updates list state */
@@ -122,16 +167,34 @@ const slice = createSlice({
             throw new Error('Invalid data');
         }
 
+        const reminders = getExtendedReminders();
         const newState = {
             ...state,
             items: [
                 ...state.items,
-                ...data.map((item, index) => (
-                    ImportTransaction.fromImportData({
+                ...data.map((item, index) => {
+                    let transaction = ImportTransaction.fromImportData({
                         ...item,
                         id: state.lastId + index + 1,
-                    })
-                )),
+                    });
+
+                    if (!state.checkRemindersEnabled) {
+                        return transaction;
+                    }
+
+                    const itemData = transaction.getData();
+                    const reminder = findSuitableReminder(itemData, reminders);
+                    if (reminder) {
+                        reminder.picked = true;
+                        transaction = transaction.setReminder({
+                            reminder_id: reminder.id,
+                            schedule_id: reminder.schedule_id,
+                            reminder_date: reminder.date,
+                        });
+                    }
+
+                    return transaction;
+                }),
             ],
             lastId: state.lastId + data.length,
         };
@@ -447,6 +510,38 @@ const slice = createSlice({
         checkSimilarEnabled: !state.checkSimilarEnabled,
         contextItemIndex: -1,
     }),
+
+    toggleCheckReminders: (state) => {
+        const reminders = getExtendedReminders();
+        const checkRemindersEnabled = !state.checkRemindersEnabled;
+
+        return {
+            ...state,
+            checkRemindersEnabled,
+            contextItemIndex: -1,
+            items: state.items.map((item) => {
+                if (!item.originalData || item.modifiedByUser) {
+                    return item;
+                }
+
+                if (!checkRemindersEnabled) {
+                    return item.removeReminder();
+                }
+
+                const reminder = findSuitableReminder(item.getData(), reminders);
+                if (!reminder) {
+                    return item;
+                }
+
+                reminder.picked = true;
+                return item.setReminder({
+                    reminder_id: reminder.id,
+                    schedule_id: reminder.schedule_id,
+                    reminder_date: reminder.date,
+                });
+            }),
+        };
+    },
 
     changeItemPosition: (state, { fromIndex, toIndex }) => {
         if (fromIndex === -1 || toIndex === -1) {

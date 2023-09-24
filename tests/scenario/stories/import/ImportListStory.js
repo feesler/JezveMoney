@@ -330,11 +330,43 @@ export class ImportListStory extends TestStory {
     async reminders() {
         setBlock('Reminders', 1);
 
+        await this.checkReminders();
         await this.selectReminder();
         await this.updateReminder();
         await this.removeReminder();
         await this.remindersDialogPagination();
         await this.remindersDialogFilters();
+    }
+
+    async resetTransactions() {
+        await App.scenario.resetData({ transactions: true });
+        await App.view.navigateToImport();
+    }
+
+    async checkReminders() {
+        setBlock('Check suitable reminders', 1);
+
+        const { accountFile } = App.scenario;
+
+        setBlock('Upload with enabled option', 2);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.submit();
+        await this.resetTransactions();
+
+        setBlock('Upload with disabled option', 2);
+        await Actions.enableCheckReminders(false);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.submit();
+        await this.resetTransactions();
+
+        setBlock('Enable option after upload', 2);
+        await Actions.uploadFile(accountFile);
+        await Actions.submitUploaded(accountFile);
+        await Actions.enableCheckReminders(false);
+        await Actions.submit();
+        await this.resetTransactions();
     }
 
     async selectReminder() {

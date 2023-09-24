@@ -1,6 +1,8 @@
 import { assert, formatDate } from 'jezve-test';
 import { createCSV } from '../common.js';
 import { App } from '../Application.js';
+import { REMINDER_SCHEDULED } from './Reminder.js';
+import { ImportTransaction } from './ImportTransaction.js';
 
 /** Returns data formatted in 'ru' locale */
 const formatRuCsvDate = (date) => (
@@ -201,3 +203,45 @@ export const getCurrencyPrecision = (id) => {
 
     return currency.precision;
 };
+
+/** Returns true if specified reminder is suitable for transaction */
+const isSuitableReminder = (item, reminder) => {
+    if (!item || reminder?.state !== REMINDER_SCHEDULED) {
+        return false;
+    }
+
+    // Check date, source and destination accounts
+    const type = (typeof item.type === 'string')
+        ? ImportTransaction.typeFromString(item.type)
+        : item.type;
+    if (
+        type !== reminder.type
+        || item.src_id !== reminder.src_id
+        || item.dest_id !== reminder.dest_id
+        || item.date !== reminder.date
+    ) {
+        return false;
+    }
+
+    // Check amounts
+    // Source and destination amount can be swapped
+    const refSrcAmount = Math.abs(reminder.src_amount);
+    const refDestAmount = Math.abs(reminder.dest_amount);
+    if (
+        (item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
+        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)
+    ) {
+        return false;
+    }
+
+    return true;
+};
+
+/** Returns first suitable reminder for specified transaction */
+export const findSuitableReminder = (transaction, reminders) => (
+    reminders.find((item) => (
+        item
+        && !item.picked
+        && isSuitableReminder(transaction, item)
+    )) ?? null
+);

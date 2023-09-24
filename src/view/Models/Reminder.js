@@ -18,7 +18,6 @@ const commonTransactionFields = [
     'dest_id',
     'src_curr',
     'dest_curr',
-    'dest_curr',
     'src_amount',
     'dest_amount',
     'category_id',

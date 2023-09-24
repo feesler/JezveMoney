@@ -72,6 +72,7 @@ class ImportView extends AppView {
             rulesCheck: () => this.onToggleEnableRules(),
             rulesBtn: () => this.onRulesClick(),
             similarCheck: () => this.onToggleCheckSimilar(),
+            remindersCheck: () => this.onToggleCheckReminders(),
         };
 
         this.contextMenuActions = {
@@ -107,6 +108,7 @@ class ImportView extends AppView {
             mainAccount,
             rulesEnabled: true,
             checkSimilarEnabled: true,
+            checkRemindersEnabled: true,
             showContextMenu: false,
             contextItemIndex: -1,
             listMode: 'list',
@@ -685,6 +687,12 @@ class ImportView extends AppView {
         }
     }
 
+    /** 'Check suitable reminders' checkbox 'change' event handler */
+    onToggleCheckReminders() {
+        this.store.dispatch(actions.toggleCheckReminders());
+        this.setRenderTime();
+    }
+
     /** Rules button 'click' event handler */
     onRulesClick() {
         const state = this.store.getState();
@@ -828,6 +836,7 @@ class ImportView extends AppView {
             showMenu: state.showMenu,
             rulesEnabled: state.rulesEnabled,
             checkSimilarEnabled: state.checkSimilarEnabled,
+            checkRemindersEnabled: state.checkRemindersEnabled,
             items: state.items,
         });
 

@@ -75,13 +75,13 @@ export const createScheduledTransactions = async () => {
     }, {
         type: INCOME,
         dest_id: ACC_RUB,
-        dest_amount: 1000.50,
+        dest_amount: 100000,
         comment: 'Salary',
-        start_date: App.datesSec.now,
+        start_date: App.datesSec.monthAgo,
         end_date: null,
         interval_type: INTERVAL_MONTH,
         interval_step: 1,
-        interval_offset: 20,
+        interval_offset: App.dates.now.getDate() - 1,
     }, {
         type: INCOME,
         dest_id: ACC_RUB,

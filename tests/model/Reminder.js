@@ -56,6 +56,18 @@ export class Reminder {
         return this.availStates.includes(state);
     }
 
+    /**
+     * Creates new extended reminder
+     *
+     * @param {Object} props reminder props object
+     */
+    static createExtended(props, state) {
+        const reminder = new this(props);
+        reminder.extend(state);
+
+        return reminder;
+    }
+
     constructor(data) {
         assert.isObject(data, 'Invalid props');
 

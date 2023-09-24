@@ -229,7 +229,7 @@ export const enableRules = async (value = true) => {
     });
 };
 
-/** Enable/disable check similar transactions option */
+/** Enable/disable 'Check similar transactions' option */
 export const enableCheckSimilar = async (value = true) => {
     const enable = !!value;
     const act = enable ? 'Enable' : 'Disable';
@@ -237,6 +237,17 @@ export const enableCheckSimilar = async (value = true) => {
     await test(`${act} check similar transactions`, async () => {
         await checkNavigation();
         return App.view.enableCheckSimilar(enable);
+    });
+};
+
+/** Enable/disable 'Check suitable reminders' option */
+export const enableCheckReminders = async (value = true) => {
+    const enable = !!value;
+    const act = enable ? 'Enable' : 'Disable';
+
+    await test(`${act} check suitable reminders`, async () => {
+        await checkNavigation();
+        return App.view.enableCheckReminders(enable);
     });
 };
 

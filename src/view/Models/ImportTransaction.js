@@ -6,6 +6,7 @@ import {
     dateStringToTime,
     getCurrencyPrecision,
     __,
+    cutTime,
 } from '../utils/utils.js';
 import { App } from '../Application/App.js';
 import {
@@ -781,7 +782,7 @@ export class ImportTransaction {
             type: ImportTransaction.getTargetType(this.type),
             src_curr: this.srcCurrId,
             dest_curr: this.destCurrId,
-            date: dateStringToTime(this.date),
+            date: cutTime(dateStringToTime(this.date)),
             category_id: this.categoryId,
             comment: this.comment,
             reminder_id: this.reminderId,
