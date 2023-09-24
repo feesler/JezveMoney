@@ -8,14 +8,14 @@ import { AppView } from './AppView.js';
 import { MainView } from './MainView.js';
 import { RegisterView } from './RegisterView.js';
 import { App } from '../Application.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 
 /** Log in view class */
 export class LoginView extends AppView {
     async parseContent() {
         const res = {
-            loginInp: await InputRow.create(this, await query('#loginField')),
-            passwordInp: await InputRow.create(this, await query('#passwordField')),
+            loginInp: await InputField.create(this, await query('#loginField')),
+            passwordInp: await InputField.create(this, await query('#passwordField')),
             submitBtn: await query('.form-controls .submit-btn'),
             registerLink: await query('.form-controls .alter-link'),
         };

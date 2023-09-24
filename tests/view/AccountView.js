@@ -10,7 +10,7 @@ import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tiles/Tile.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
@@ -47,15 +47,15 @@ export class AccountView extends AppView {
 
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
-        res.name = await InputRow.create(this, await query('#nameField'));
+        res.name = await InputField.create(this, await query('#nameField'));
         assert(res.name, 'Account name input not found');
 
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
-        res.balance = await InputRow.create(this, await query('#initBalanceField'));
+        res.balance = await InputField.create(this, await query('#initBalanceField'));
         assert(res.name, 'Account balance input not found');
 
-        res.limit = await InputRow.create(this, await query('#initLimitField'));
+        res.limit = await InputField.create(this, await query('#initLimitField'));
         assert(res.limit, 'Credit limit field not found');
 
         res.flagsInp = await query('#flags');

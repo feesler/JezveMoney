@@ -8,7 +8,7 @@ import {
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 
-export class InputRow extends TestComponent {
+export class InputField extends TestComponent {
     async parseContent() {
         const valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
         assert(valueInput, 'Input element not found');
@@ -60,6 +60,10 @@ export class InputRow extends TestComponent {
         }
 
         return res;
+    }
+
+    get visible() {
+        return this.content.visible;
     }
 
     get value() {

@@ -4,9 +4,9 @@ import {
     query,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
-import { InputRow } from './InputRow.js';
+import { InputField } from './InputField.js';
 
-export class DatePickerRow extends InputRow {
+export class DatePickerField extends InputField {
     async parseContent() {
         const res = await super.parseContent();
 

@@ -7,7 +7,7 @@ import {
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
 import { Transaction } from '../model/Transaction.js';
@@ -73,7 +73,7 @@ export class CategoryView extends AppView {
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
-        res.nameInput = await InputRow.create(this, await query('#nameField'));
+        res.nameInput = await InputField.create(this, await query('#nameField'));
         assert(res.nameInput, 'Category name input not found');
 
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));

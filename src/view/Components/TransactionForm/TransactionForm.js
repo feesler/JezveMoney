@@ -337,19 +337,19 @@ export class TransactionForm extends Component {
         });
         this.destContainer.infoBlock.append(this.destAmountInfo.elem);
 
-        this.srcResBalanceInfo = TileInfoItem.create({
-            id: 'srcResBalanceInfo',
+        this.srcResultInfo = TileInfoItem.create({
+            id: 'srcResultInfo',
             label: __('transactions.result'),
             onClick: () => this.store.dispatch(actions.sourceResultClick()),
         });
-        this.sourceContainer.infoBlock.append(this.srcResBalanceInfo.elem);
+        this.sourceContainer.infoBlock.append(this.srcResultInfo.elem);
 
-        this.destResBalanceInfo = TileInfoItem.create({
-            id: 'destResBalanceInfo',
+        this.destResultInfo = TileInfoItem.create({
+            id: 'destResultInfo',
             label: __('transactions.result'),
             onClick: () => this.store.dispatch(actions.destResultClick()),
         });
-        this.destContainer.infoBlock.append(this.destResBalanceInfo.elem);
+        this.destContainer.infoBlock.append(this.destResultInfo.elem);
 
         this.exchangeInfo = TileInfoItem.create({
             id: 'exchangeInfo',
@@ -359,8 +359,8 @@ export class TransactionForm extends Component {
         this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
 
         // Source amount field
-        this.srcAmountRow = AmountInputField.create({
-            id: 'srcAmountRow',
+        this.srcAmountField = AmountInputField.create({
+            id: 'srcAmountField',
             title: __('transactions.sourceAmount'),
             feedbackMessage: __('transactions.invalidAmount'),
             validate: true,
@@ -370,8 +370,8 @@ export class TransactionForm extends Component {
         });
 
         // Destination amount field
-        this.destAmountRow = AmountInputField.create({
-            id: 'destAmountRow',
+        this.destAmountField = AmountInputField.create({
+            id: 'destAmountField',
             title: __('transactions.destAmount'),
             feedbackMessage: __('transactions.invalidAmount'),
             validate: true,
@@ -381,22 +381,22 @@ export class TransactionForm extends Component {
         });
 
         // Source result field
-        this.srcResBalanceRow = AmountInputField.create({
-            id: 'srcResBalanceRow',
+        this.srcResultField = AmountInputField.create({
+            id: 'srcResultField',
             title: __('transactions.result'),
             className: 'form-row',
             onInput: (e) => this.onSourceResultInput(e),
         });
-        this.srcResBalanceRow.hide();
+        this.srcResultField.hide();
 
         // Destination result field
-        this.destResBalanceRow = AmountInputField.create({
-            id: 'destResBalanceRow',
+        this.destResultField = AmountInputField.create({
+            id: 'destResultField',
             title: __('transactions.result'),
             className: 'form-row',
             onInput: (e) => this.onDestResultInput(e),
         });
-        this.destResBalanceRow.hide();
+        this.destResultField.hide();
 
         // Exchange rate field
         this.exchangeInput = DecimalInput.create({
@@ -414,8 +414,8 @@ export class TransactionForm extends Component {
             onClick: () => this.onToggleExchange(),
         });
 
-        this.exchangeRow = Field.create({
-            id: 'exchangeRow',
+        this.exchangeField = Field.create({
+            id: 'exchangeField',
             htmlFor: 'exchangeInput',
             title: __('transactions.exchangeRate'),
             className: 'form-row',
@@ -428,22 +428,22 @@ export class TransactionForm extends Component {
                 }).elem,
             ],
         });
-        this.exchangeRow.hide();
+        this.exchangeField.hide();
 
         const children = [
             this.typeMenu.elem,
             this.accountsSection,
-            this.srcAmountRow.elem,
-            this.destAmountRow.elem,
-            this.exchangeRow.elem,
-            this.srcResBalanceRow.elem,
-            this.destResBalanceRow.elem,
+            this.srcAmountField.elem,
+            this.destAmountField.elem,
+            this.exchangeField.elem,
+            this.srcResultField.elem,
+            this.destResultField.elem,
         ];
 
         // Date field
         if (isTransaction) {
-            this.dateRow = DateInputField.create({
-                id: 'dateRow',
+            this.dateField = DateInputField.create({
+                id: 'dateField',
                 title: __('transactions.date'),
                 feedbackMessage: __('transactions.invalidDate'),
                 className: 'form-row',
@@ -452,7 +452,7 @@ export class TransactionForm extends Component {
                 onInput: (e) => this.onDateInput(e),
                 onDateSelect: (e) => this.onDateSelect(e),
             });
-            children.push(this.dateRow.elem);
+            children.push(this.dateField.elem);
         }
 
         // Category field
@@ -465,8 +465,8 @@ export class TransactionForm extends Component {
             onChange: (category) => this.onCategoryChanged(category),
         });
 
-        this.categoryRow = Field.create({
-            id: 'categoryRow',
+        this.categoryField = Field.create({
+            id: 'categoryField',
             htmlFor: 'categorySelect',
             title: __('transactions.category'),
             className: 'form-row',
@@ -474,8 +474,8 @@ export class TransactionForm extends Component {
         });
 
         // Comment field
-        this.commentRow = InputField.create({
-            id: 'commentRow',
+        this.commentField = InputField.create({
+            id: 'commentField',
             inputId: 'commentInput',
             name: 'comment',
             title: __('transactions.comment'),
@@ -483,7 +483,7 @@ export class TransactionForm extends Component {
             onInput: (e) => this.onCommentInput(e),
         });
 
-        children.push(this.categoryRow.elem, this.commentRow.elem);
+        children.push(this.categoryField.elem, this.commentField.elem);
 
         // Schedule fields
         if (isTransaction && App.model.schedule?.length > 0) {
@@ -591,8 +591,8 @@ export class TransactionForm extends Component {
             onChange: (value) => this.onIntervalStepChanged(value),
         });
 
-        this.intervalStepRow = Field.create({
-            id: 'intervalStepRow',
+        this.intervalStepField = Field.create({
+            id: 'intervalStepField',
             htmlFor: 'intervalStepInput',
             title: __('schedule.intervalStep'),
             className: 'interval-step-field',
@@ -646,7 +646,7 @@ export class TransactionForm extends Component {
             props: { className: 'form-fields-row' },
             children: [
                 this.intervalTypeRow.elem,
-                this.intervalStepRow.elem,
+                this.intervalStepField.elem,
             ],
         });
 
@@ -848,7 +848,7 @@ export class TransactionForm extends Component {
      */
     srcAmountSwitch(options) {
         this.commonSwitch(
-            this.srcAmountRow.elem,
+            this.srcAmountField.elem,
             this.srcAmountInfo,
             options,
         );
@@ -860,7 +860,7 @@ export class TransactionForm extends Component {
      */
     destAmountSwitch(options) {
         this.commonSwitch(
-            this.destAmountRow.elem,
+            this.destAmountField.elem,
             this.destAmountInfo,
             options,
         );
@@ -872,8 +872,8 @@ export class TransactionForm extends Component {
      */
     resBalanceSwitch(options) {
         this.commonSwitch(
-            this.srcResBalanceRow.elem,
-            this.srcResBalanceInfo,
+            this.srcResultField.elem,
+            this.srcResultInfo,
             options,
         );
     }
@@ -884,8 +884,8 @@ export class TransactionForm extends Component {
      */
     resBalanceDestSwitch(options) {
         this.commonSwitch(
-            this.destResBalanceRow.elem,
-            this.destResBalanceInfo,
+            this.destResultField.elem,
+            this.destResultInfo,
             options,
         );
     }
@@ -896,7 +896,7 @@ export class TransactionForm extends Component {
      */
     exchRateSwitch(options) {
         this.commonSwitch(
-            this.exchangeRow.elem,
+            this.exchangeField.elem,
             this.exchangeInfo,
             options,
         );
@@ -1025,7 +1025,7 @@ export class TransactionForm extends Component {
      */
     onDateSelect(date) {
         this.store.dispatch(actions.dateChange(App.formatInputDate(date)));
-        this.dateRow.datePicker.hide();
+        this.dateField.datePicker.hide();
         this.notifyChanged();
     }
 
@@ -1370,17 +1370,17 @@ export class TransactionForm extends Component {
         addChilds(this.sourceContainer.infoBlock, [
             this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
-            this.srcResBalanceInfo.elem,
+            this.srcResultInfo.elem,
             this.exchangeInfo.elem,
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(__('transactions.result'));
-            this.destResBalanceRow.setTitle(__('transactions.result'));
+            this.srcResultField.setTitle(__('transactions.result'));
+            this.destResultField.setTitle(__('transactions.result'));
         }
 
-        this.srcAmountRow.enableSelect(false);
-        this.destAmountRow.enableSelect(true);
+        this.srcAmountField.enableSelect(false);
+        this.destAmountField.enableSelect(true);
     }
 
     renderIncome(state) {
@@ -1421,17 +1421,17 @@ export class TransactionForm extends Component {
         addChilds(this.destContainer.infoBlock, [
             this.srcAmountInfo.elem,
             this.destAmountInfo.elem,
-            this.destResBalanceInfo.elem,
+            this.destResultInfo.elem,
             this.exchangeInfo.elem,
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(__('transactions.result'));
-            this.destResBalanceRow.setTitle(__('transactions.result'));
+            this.srcResultField.setTitle(__('transactions.result'));
+            this.destResultField.setTitle(__('transactions.result'));
         }
 
-        this.srcAmountRow.enableSelect(true);
-        this.destAmountRow.enableSelect(false);
+        this.srcAmountField.enableSelect(true);
+        this.destAmountField.enableSelect(false);
     }
 
     renderTransfer(state) {
@@ -1497,21 +1497,21 @@ export class TransactionForm extends Component {
 
         addChilds(this.sourceContainer.infoBlock, [
             this.srcAmountInfo.elem,
-            this.srcResBalanceInfo.elem,
+            this.srcResultInfo.elem,
             this.exchangeInfo.elem,
         ]);
         addChilds(this.destContainer.infoBlock, [
             this.destAmountInfo.elem,
-            this.destResBalanceInfo.elem,
+            this.destResultInfo.elem,
         ]);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(`${__('transactions.result')} (${__('transactions.source')})`);
-            this.destResBalanceRow.setTitle(`${__('transactions.result')} (${__('transactions.destination')})`);
+            this.srcResultField.setTitle(`${__('transactions.result')} (${__('transactions.source')})`);
+            this.destResultField.setTitle(`${__('transactions.result')} (${__('transactions.destination')})`);
         }
 
-        this.srcAmountRow.enableSelect(false);
-        this.destAmountRow.enableSelect(false);
+        this.srcAmountField.enableSelect(false);
+        this.destAmountField.enableSelect(false);
     }
 
     renderDebt(state) {
@@ -1659,12 +1659,12 @@ export class TransactionForm extends Component {
 
         addChilds(this.personContainer.infoBlock, [
             this.srcAmountInfo.elem,
-            (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
+            (debtType) ? this.srcResultInfo.elem : this.destResultInfo.elem,
             (debtType) ? this.exchangeInfo.elem : this.destAmountInfo.elem,
         ]);
 
         addChilds(this.debtAccountContainer.infoBlock, [
-            (debtType) ? this.destResBalanceInfo.elem : this.srcResBalanceInfo.elem,
+            (debtType) ? this.destResultInfo.elem : this.srcResultInfo.elem,
             (debtType) ? this.destAmountInfo.elem : this.exchangeInfo.elem,
         ]);
 
@@ -1688,12 +1688,12 @@ export class TransactionForm extends Component {
         this.debtAccountContainer.togglerButton.enable(!state.submitStarted);
 
         if (isTransaction) {
-            this.srcResBalanceRow.setTitle(__('transactions.sourceResult'));
-            this.destResBalanceRow.setTitle(__('transactions.destResult'));
+            this.srcResultField.setTitle(__('transactions.sourceResult'));
+            this.destResultField.setTitle(__('transactions.destResult'));
         }
 
-        this.srcAmountRow.enableSelect(debtType);
-        this.destAmountRow.enableSelect(!debtType);
+        this.srcAmountField.enableSelect(debtType);
+        this.destAmountField.enableSelect(!debtType);
 
         this.personIdInp.value = state.person.id;
 
@@ -1746,15 +1746,15 @@ export class TransactionForm extends Component {
 
         addChilds(this.destContainer.infoBlock, [
             this.destAmountInfo.elem,
-            this.destResBalanceInfo.elem,
+            this.destResultInfo.elem,
         ]);
 
         if (isTransaction) {
-            this.destResBalanceRow.setTitle(__('transactions.result'));
+            this.destResultField.setTitle(__('transactions.result'));
         }
 
-        this.srcAmountRow.enableSelect(false);
-        this.destAmountRow.enableSelect(false);
+        this.srcAmountField.enableSelect(false);
+        this.destAmountField.enableSelect(false);
     }
 
     renderScheduleFields(state, prevState) {
@@ -1866,7 +1866,7 @@ export class TransactionForm extends Component {
 
         if (!this.reminderField) {
             this.createReminderField();
-            this.commentRow.elem.after(this.reminderField.elem);
+            this.commentField.elem.after(this.reminderField.elem);
         }
 
         this.reminderField.setState((fieldState) => ({
@@ -1949,17 +1949,17 @@ export class TransactionForm extends Component {
                 this.renderLimitChange(state);
             }
         } else {
-            this.srcAmountRow.hide();
-            this.destAmountRow.hide();
-            this.srcResBalanceRow.hide();
-            this.destResBalanceRow.hide();
-            this.exchangeRow.hide();
+            this.srcAmountField.hide();
+            this.destAmountField.hide();
+            this.srcResultField.hide();
+            this.destResultField.hide();
+            this.exchangeField.hide();
         }
 
         // Date field
         if (isTransaction) {
-            this.dateRow.show(state.isAvailable);
-            this.dateRow.setState((dateState) => ({
+            this.dateField.show(state.isAvailable);
+            this.dateField.setState((dateState) => ({
                 ...dateState,
                 value: state.form.date,
                 date: transaction.date,
@@ -1969,12 +1969,12 @@ export class TransactionForm extends Component {
         }
 
         if (state.isAvailable !== prevState?.isAvailable) {
-            this.categoryRow.show(state.isAvailable);
-            this.commentRow.show(state.isAvailable);
+            this.categoryField.show(state.isAvailable);
+            this.commentField.show(state.isAvailable);
 
             this.repeatSwitchField.show(state.isAvailable);
             this.dateRangeField.show(state.isAvailable);
-            this.intervalStepRow.show(state.isAvailable);
+            this.intervalStepField.show(state.isAvailable);
             this.intervalTypeRow.show(state.isAvailable);
             this.weekDayField.show(state.isAvailable);
             this.daySelectField.show(state.isAvailable);
@@ -2016,16 +2016,16 @@ export class TransactionForm extends Component {
             this.destAmountInfo.enable(!state.submitStarted);
         }
 
-        if (this.srcResBalanceInfo) {
+        if (this.srcResultInfo) {
             const title = srcCurrency.formatValue(state.form.fSourceResult);
-            this.srcResBalanceInfo.setTitle(title);
-            this.srcResBalanceInfo.enable(!state.submitStarted);
+            this.srcResultInfo.setTitle(title);
+            this.srcResultInfo.enable(!state.submitStarted);
         }
 
-        if (this.destResBalanceInfo) {
+        if (this.destResultInfo) {
             const title = destCurrency.formatValue(state.form.fDestResult);
-            this.destResBalanceInfo.setTitle(title);
-            this.destResBalanceInfo.enable(!state.submitStarted);
+            this.destResultInfo.setTitle(title);
+            this.destResultInfo.enable(!state.submitStarted);
         }
 
         // Source account
@@ -2056,7 +2056,7 @@ export class TransactionForm extends Component {
             || (transaction.type === DEBT && transaction.debtType)
         );
 
-        this.srcAmountRow.setState((srcAmountState) => ({
+        this.srcAmountField.setState((srcAmountState) => ({
             ...srcAmountState,
             title: sourceAmountLbl,
             value: state.form.sourceAmount,
@@ -2075,7 +2075,7 @@ export class TransactionForm extends Component {
             || (transaction.type === DEBT && !transaction.debtType)
         );
 
-        this.destAmountRow.setState((destAmountState) => ({
+        this.destAmountField.setState((destAmountState) => ({
             ...destAmountState,
             title: destAmountLbl,
             value: state.form.destAmount,
@@ -2096,7 +2096,7 @@ export class TransactionForm extends Component {
         this.renderExchangeRate(state);
 
         // Source result field
-        this.srcResBalanceRow.setState((srcResultState) => ({
+        this.srcResultField.setState((srcResultState) => ({
             ...srcResultState,
             value: state.form.sourceResult,
             disabled: state.submitStarted,
@@ -2104,7 +2104,7 @@ export class TransactionForm extends Component {
         }));
 
         // Destination result field
-        this.destResBalanceRow.setState((destResultState) => ({
+        this.destResultField.setState((destResultState) => ({
             ...destResultState,
             value: state.form.destResult,
             disabled: state.submitStarted,
@@ -2117,7 +2117,7 @@ export class TransactionForm extends Component {
         this.categorySelect.enable(!state.submitStarted);
 
         // Comment field
-        this.commentRow.setState((commentState) => ({
+        this.commentField.setState((commentState) => ({
             ...commentState,
             value: state.form.comment,
             disabled: state.submitStarted,

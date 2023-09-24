@@ -12,7 +12,7 @@ import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 
 // Profile view class
 export class ProfileView extends AppView {
@@ -43,7 +43,7 @@ export class ProfileView extends AppView {
         res.changeNamePopup = {
             elem: await query('#chname_popup'),
             content: await query('#changename'),
-            newNameInp: await InputRow.create(this, await query('#nameField')),
+            newNameInp: await InputField.create(this, await query('#nameField')),
         };
 
         if (res.changeNamePopup.elem) {
@@ -54,8 +54,8 @@ export class ProfileView extends AppView {
         res.changePassPopup = {
             elem: await query('#chpass_popup'),
             content: await query('#changepass'),
-            oldPassInp: await InputRow.create(this, await query('#oldPassField')),
-            newPassInp: await InputRow.create(this, await query('#newPassField')),
+            oldPassInp: await InputField.create(this, await query('#oldPassField')),
+            newPassInp: await InputField.create(this, await query('#newPassField')),
         };
 
         if (res.changePassPopup.elem) {

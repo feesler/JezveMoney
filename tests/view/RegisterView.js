@@ -7,15 +7,15 @@ import {
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 
 /** Registration view class */
 export class RegisterView extends AppView {
     async parseContent() {
         const res = {
-            loginInp: await InputRow.create(this, await query('#loginField')),
-            nameInp: await InputRow.create(this, await query('#nameField')),
-            passwordInp: await InputRow.create(this, await query('#passwordField')),
+            loginInp: await InputField.create(this, await query('#loginField')),
+            nameInp: await InputField.create(this, await query('#nameField')),
+            passwordInp: await InputField.create(this, await query('#passwordField')),
             submitBtn: await query('.form-controls .submit-btn'),
             loginLink: await query('.form-controls .alter-link'),
         };
