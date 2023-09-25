@@ -185,8 +185,8 @@ export class CategoryListView extends AppView {
             createBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (

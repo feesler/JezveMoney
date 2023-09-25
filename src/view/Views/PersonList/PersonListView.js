@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     asArray,
+    createElement,
     insertAfter,
     isFunction,
     show,
@@ -10,6 +11,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { createStore } from 'jezvejs/Store';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 
+// Application
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -25,17 +27,22 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { PersonList } from '../../Models/PersonList.js';
 
+// Common components
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Heading } from '../../Components/Heading/Heading.js';
-import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
+import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+
+// Local components
 import { PersonListContextMenu } from './components/ContextMenu/PersonListContextMenu.js';
 import { PersonListMainMenu } from './components/MainMenu/PersonListMainMenu.js';
+import { PersonDetails } from './components/PersonDetails/PersonDetails.js';
 
 import { actions, createList, reducer } from './reducer.js';
 import { getPersonsSortMode, getSelectedIds } from './helpers.js';
@@ -121,11 +128,6 @@ class PersonListView extends AppView {
         };
 
         this.loadElementsByIds([
-            'contentHeader',
-            'itemsCount',
-            'hiddenCount',
-            'selectedCounter',
-            'selItemsCount',
             'heading',
             'contentContainer',
             'hiddenTilesHeading',
@@ -145,12 +147,44 @@ class PersonListView extends AppView {
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.hiddenCounter = ListCounter.create({
+            title: __('list.hiddenItemsCounter'),
+            className: 'hidden-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.hiddenCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        this.contentHeader = createElement('header', {
+            props: { className: 'content-header' },
+            children: counters,
+        });
+        this.contentContainer.before(this.contentHeader);
+
+        // Visible persons
         this.visibleTiles = SortableListContainer.create({
             ...listProps,
             sortGroup: 'visiblePersons',
         });
         this.contentContainer.prepend(this.visibleTiles.elem);
 
+        // Hidden persons
         this.hiddenTiles = SortableListContainer.create({
             ...listProps,
             sortGroup: 'hiddenPersons',
@@ -607,16 +641,26 @@ class PersonListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    renderList(state) {
-        // Counters
-        const itemsCount = state.items.visible.length + state.items.hidden.length;
-        this.itemsCount.textContent = itemsCount;
-        this.hiddenCount.textContent = state.items.hidden.length;
-        const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? getSelectedIds(state) : [];
-        this.selItemsCount.textContent = selected.length;
+    renderCounters(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.listMode === prevState?.listMode
+        ) {
+            return;
+        }
 
+        const itemsCount = state.items.visible.length + state.items.hidden.length;
+        const hiddenCount = state.items.hidden.length;
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? getSelectedIds(state) : [];
+
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.hiddenCounter.setContent(hiddenCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+    }
+
+    renderList(state) {
         // Visible persons
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
@@ -648,6 +692,7 @@ class PersonListView extends AppView {
             this.loadingIndicator.show();
         }
 
+        this.renderCounters(state, prevState);
         this.renderList(state);
         this.renderContextMenu(state);
         this.renderMenu(state);

@@ -53,19 +53,6 @@
 
                                 <hr class="filters-separator">
                             </aside>
-
-                            <header class="list-header">
-                                <div class="counters">
-                                    <div id="itemsCounter" class="counter">
-                                        <span class="counter__title"><?= __("list.itemsCounter") ?></span>
-                                        <span id="itemsCount" class="counter__value"></span>
-                                    </div>
-                                    <div id="selectedCounter" class="counter" hidden>
-                                        <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
-                                        <span id="selItemsCount" class="counter__value"></span>
-                                    </div>
-                                </div>
-                            </header>
                         </header>
 
                         <section class="list-container"></section>

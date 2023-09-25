@@ -13,11 +13,13 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/AppView/AppView.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
@@ -28,10 +30,14 @@ import { ImportTemplateList } from '../../Models/ImportTemplateList.js';
 import { Schedule } from '../../Models/Schedule.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
+// Common components
 import { Heading } from '../../Components/Heading/Heading.js';
+import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
+
+// Local components
 import { ImportRulesDialog } from './components/RulesDialog/Dialog/ImportRulesDialog.js';
+import { ImportUploadDialog } from './components/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportListContextMenu } from './components/ContextMenu/ImportListContextMenu.js';
 import { ImportTransactionList } from './components/List/ImportTransactionList.js';
 import { ImportListMainMenu } from './components/MainMenu/ImportListMainMenu.js';
@@ -128,12 +134,9 @@ class ImportView extends AppView {
 
         this.loadElementsByIds([
             'heading',
+            'contentHeader',
             'dataHeaderControls',
             'submitBtn',
-            'itemsCount',
-            'enabledCount',
-            'selectedCounter',
-            'selectedCount',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -173,6 +176,32 @@ class ImportView extends AppView {
             onClick: (e) => this.showMenu(e),
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
+
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.enabledCounter = ListCounter.create({
+            title: __('list.enabledItemsCounter'),
+            className: 'enabled-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.enabledCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        this.contentHeader.append(counters);
 
         // List
         this.list = ImportTransactionList.create({
@@ -845,6 +874,36 @@ class ImportView extends AppView {
         }
     }
 
+    renderListHeader(state, prevState) {
+        if (
+            state.items === prevState.items
+            && state.listMode === prevState.listMode
+            && state.mainAccount?.id === prevState.mainAccount?.id
+        ) {
+            return;
+        }
+
+        const enabledList = this.getEnabledItems(state);
+        const itemsCount = state.items.length;
+        const enabledCount = enabledList.length;
+        const isSelectMode = (state.listMode === 'select');
+        const isListMode = (state.listMode === 'list');
+        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
+
+        // Counters
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.enabledCounter.setContent(enabledCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+
+        // Main account select
+        this.accountDropDown.setSelection(state.mainAccount.id);
+        this.accountDropDown.enable(isListMode);
+
+        // Submit button
+        enable(this.submitBtn, (enabledList.length > 0 && isListMode));
+    }
+
     renderList(state, prevState) {
         if (
             state.items === prevState.items
@@ -894,24 +953,9 @@ class ImportView extends AppView {
             return;
         }
 
+        this.renderListHeader(state, prevState);
         this.renderList(state, prevState);
         this.renderTransactionFormDialog(state);
-
-        const isSelectMode = (state.listMode === 'select');
-        const isListMode = (state.listMode === 'list');
-        const enabledList = this.getEnabledItems(state);
-        const selectedItems = (isSelectMode) ? getSelectedItems(state.items) : [];
-
-        this.accountDropDown.setSelection(state.mainAccount.id);
-        this.accountDropDown.enable(isListMode);
-
-        enable(this.submitBtn, (enabledList.length > 0 && isListMode));
-        this.enabledCount.textContent = enabledList.length;
-        this.itemsCount.textContent = state.items.length;
-
-        show(this.selectedCounter, isSelectMode);
-        this.selectedCount.textContent = selectedItems.length;
-
         this.renderContextMenu(state, prevState);
         this.renderMenu(state);
     }

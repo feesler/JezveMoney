@@ -11,22 +11,6 @@
                             <h1><?= __("persons.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
-                        <header id="contentHeader" class="content-header">
-                            <div class="counters">
-                                <div id="itemsCounter" class="counter">
-                                    <span class="counter__title"><?= __("list.itemsCounter") ?></span>
-                                    <span id="itemsCount" class="counter__value"></span>
-                                </div>
-                                <div id="hiddenCounter" class="counter">
-                                    <span class="counter__title"><?= __("list.hiddenItemsCounter") ?></span>
-                                    <span id="hiddenCount" class="counter__value"></span>
-                                </div>
-                                <div id="selectedCounter" class="counter" hidden>
-                                    <span class="counter__title"><?= __("list.selectedItemsCounter") ?></span>
-                                    <span id="selItemsCount" class="counter__value"></span>
-                                </div>
-                            </div>
-                        </header>
                         <section id="contentContainer" class="content-container">
                             <div id="hiddenTilesHeading" class="heading" hidden>
                                 <h1><?= __("list.hiddenItemsCounter") ?></h1>

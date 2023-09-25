@@ -148,9 +148,9 @@ export class AccountListView extends AppView {
             addBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            hiddenCounter: await Counter.create(this, await query('.hidden-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (

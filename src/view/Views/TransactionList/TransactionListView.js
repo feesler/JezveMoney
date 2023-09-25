@@ -14,6 +14,7 @@ import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import {
     __,
     cutDate,
@@ -26,33 +27,38 @@ import {
     getWeekRange,
     timeToDate,
 } from '../../utils/utils.js';
+import { normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/AppView/AppView.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
+// Common components
 import { AmountRangeField } from '../../Components/Fields/AmountRangeField/AmountRangeField.js';
-import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
+import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { Heading } from '../../Components/Heading/Heading.js';
+import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import { SearchInput } from '../../Components/Inputs/SearchInput/SearchInput.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
 import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
 import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
 import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
 
+// Local components
 import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';
 import { FilterSelect } from './components/FilterSelect/FilterSelect.js';
 import { TransactionDetails } from './components/TransactionDetails/TransactionDetails.js';
@@ -63,7 +69,6 @@ import {
     isSameSelection,
 } from './helpers.js';
 import './TransactionListView.scss';
-import { normalize } from '../../utils/decimal.js';
 
 /* CSS classes */
 const FILTER_HEADER_CLASS = 'filter-item__title';
@@ -140,10 +145,6 @@ class TransactionListView extends AppView {
             'dateFilter',
             'amountFilter',
             'searchFilter',
-            // Counters
-            'itemsCount',
-            'selectedCounter',
-            'selItemsCount',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -281,12 +282,36 @@ class TransactionListView extends AppView {
         });
         this.listContainer.append(this.loadingIndicator.elem);
 
-        // List mode selected
-        const listHeader = document.querySelector('.list-header');
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        // Toggle details mode button
         this.modeSelector = ToggleDetailsButton.create({
             onClick: (e) => this.onToggleMode(e),
         });
-        listHeader.append(this.modeSelector.elem);
+
+        const listHeader = createElement('div', {
+            props: { className: 'list-header' },
+            children: [counters, this.modeSelector.elem],
+        });
+
+        this.contentHeader.append(listHeader);
 
         // Transactions list
         const listContainer = document.querySelector('.list-container');
@@ -950,6 +975,21 @@ class TransactionListView extends AppView {
         }
     }
 
+    renderFilters(state, prevState) {
+        this.renderTypeFilter(state, prevState);
+        this.renderAccountsFilter(state, prevState);
+        this.renderDateRangeFilter(state, prevState);
+        this.renderAmountRangeFilter(state, prevState);
+        this.renderSearchForm(state, prevState);
+    }
+
+    renderTypeFilter(state) {
+        const filterURL = this.getFilterURL(state, false);
+
+        this.typeMenu.setURL(filterURL);
+        this.typeMenu.setSelection(state.form.type);
+    }
+
     /** Render accounts and persons selection */
     renderAccountsFilter(state) {
         if (!this.isAvailable()) {
@@ -1002,6 +1042,10 @@ class TransactionListView extends AppView {
             minAmount: state.form.minAmount,
             maxAmount: state.form.maxAmount,
         });
+    }
+
+    renderSearchForm(state) {
+        this.searchInput.value = state.form.search ?? '';
     }
 
     renderCategoryDialog(state, prevState) {
@@ -1076,30 +1120,56 @@ class TransactionListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    render(state, prevState = {}) {
-        this.renderHistory(state, prevState);
-
-        const loadingMore = state.loading && state.isLoadingMore;
-        if (state.loading && !state.isLoadingMore) {
-            this.loadingIndicator.show();
+    renderCounters(state, prevState) {
+        if (
+            state.items === prevState.items
+            && state.listMode === prevState.listMode
+            && state.pagination?.total === prevState.pagination?.total
+        ) {
+            return;
         }
 
-        const filterURL = this.getFilterURL(state, false);
+        const itemsCount = state.pagination.total;
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
 
-        this.typeMenu.setURL(filterURL);
-        this.typeMenu.setSelection(state.form.type);
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+    }
 
-        this.renderAccountsFilter(state);
-        this.renderDateRangeFilter(state);
-        this.renderAmountRangeFilter(state);
+    renderToggleDetailsButton(state) {
+        const details = (state.mode === 'details');
+        const modeURL = this.getFilterURL(state);
+        modeURL.searchParams.set('mode', (details) ? 'classic' : 'details');
 
-        // Search form
-        this.searchInput.value = state.form.search ?? '';
+        this.modeSelector.show(state.items.length > 0);
+        this.modeSelector.setState((modeSelectorState) => ({
+            ...modeSelectorState,
+            details,
+            url: modeURL.toString(),
+        }));
+    }
 
-        // Render list
-        const groupByDate = getTransactionsGroupByDate() === 1;
+    renderList(state, prevState) {
+        if (
+            state.items === prevState.items
+            && state.mode === prevState.mode
+            && state.listMode === prevState.listMode
+            && state.groupByDate === prevState.groupByDate
+            && state.pagination.page === prevState.pagination?.page
+            && state.pagination.range === prevState.pagination?.range
+            && state.pagination.pagesCount === prevState.pagination?.pagesCount
+            && state.pagination.onPage === prevState.pagination?.onPage
+            && state.loading === prevState.loading
+            && state.isLoadingMore === prevState.isLoadingMore
+            && state.renderTime === prevState.renderTime
+        ) {
+            return;
+        }
+
         let listItems = null;
-        if (groupByDate) {
+        if (state.groupByDate) {
             let prevDate = null;
             const groups = [];
             let group = null;
@@ -1131,52 +1201,52 @@ class TransactionListView extends AppView {
             mode: state.mode,
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
-            showDate: !groupByDate,
+            showDate: !state.groupByDate,
             items: listItems,
             renderTime: state.renderTime,
         }));
+    }
 
-        // Counters
-        const isSelectMode = (state.listMode === 'select');
-        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
-        this.itemsCount.textContent = state.pagination.total;
-        show(this.selectedCounter, isSelectMode);
-        this.selItemsCount.textContent = selected.length;
-
-        // Paginator
+    renderListFooter(state) {
+        const loadingMore = state.loading && state.isLoadingMore;
         const range = state.pagination.range ?? 1;
         const pageNum = state.pagination.page + range - 1;
-        if (this.paginator) {
-            this.paginator.show(state.items.length > 0);
-            this.paginator.setState((paginatorState) => ({
-                ...paginatorState,
-                url: filterURL.toString(),
-                pagesCount: state.pagination.pagesCount,
-                pageNum,
-            }));
-        }
+        const filterURL = this.getFilterURL(state, false);
 
+        // Paginator
+        this.paginator.show(state.items.length > 0);
+        this.paginator.setState((paginatorState) => ({
+            ...paginatorState,
+            url: filterURL.toString(),
+            pagesCount: state.pagination.pagesCount,
+            pageNum,
+        }));
+
+        // 'Show more' button
         this.showMoreBtn.show(
             state.items.length > 0
             && pageNum < state.pagination.pagesCount
             && !loadingMore,
         );
+
+        // Loading more spinner
         this.spinner.show(loadingMore);
+    }
 
-        const isDetails = (state.mode === 'details');
+    render(state, prevState = {}) {
+        this.renderHistory(state, prevState);
 
-        const modeURL = this.getFilterURL(state);
-        modeURL.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
+        if (state.loading && !state.isLoadingMore) {
+            this.loadingIndicator.show();
+        }
 
-        this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((modeSelectorState) => ({
-            ...modeSelectorState,
-            details: isDetails,
-            url: modeURL.toString(),
-        }));
-
-        this.renderContextMenu(state);
-        this.renderMenu(state);
+        this.renderFilters(state, prevState);
+        this.renderCounters(state, prevState);
+        this.renderToggleDetailsButton(state, prevState);
+        this.renderList(state, prevState);
+        this.renderListFooter(state, prevState);
+        this.renderContextMenu(state, prevState);
+        this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
         this.renderCategoryDialog(state, prevState);
 
