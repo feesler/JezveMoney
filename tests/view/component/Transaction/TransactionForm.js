@@ -1299,7 +1299,8 @@ export class TransactionForm extends TestComponent {
 
         res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
 
-        res.repeatSwitch = await Switch.create(this, await query(this.elem, '#repeatSwitch'));
+        const repeatSwitchEl = await query(this.elem, '.repeat-switch-field');
+        res.repeatSwitch = await Switch.create(this, repeatSwitchEl);
 
         res.reminderField = await ReminderField.create(this, await query('.reminder-field'));
         if (res.reminderDialog.visible) {

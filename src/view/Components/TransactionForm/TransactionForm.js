@@ -13,7 +13,6 @@ import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { InputGroup } from 'jezvejs/InputGroup';
-import { Switch } from 'jezvejs/Switch';
 import { createStore } from 'jezvejs/Store';
 
 import {
@@ -52,10 +51,11 @@ import { NumberInputGroup } from '../Inputs/NumberInputGroup/NumberInputGroup.js
 import { Tile } from '../Tile/Tile.js';
 import { AccountTile } from '../AccountTile/AccountTile.js';
 import { FormControls } from '../FormControls/FormControls.js';
+import { ReminderField } from '../Fields/ReminderField/ReminderField.js';
+import { SwitchField } from '../Fields/SwitchField/SwitchField.js';
 
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
-import { ReminderField } from '../Fields/ReminderField/ReminderField.js';
 
 import {
     actions,
@@ -607,17 +607,10 @@ export class TransactionForm extends Component {
         });
 
         // Repeat transaction field
-        this.repeatSwitch = Switch.create({
-            id: 'repeatSwitch',
+        this.repeatSwitchField = SwitchField.create({
+            label: __('schedule.repeat'),
+            className: 'repeat-switch-field form-row',
             onChange: (checked) => this.onRepeatChanged(checked),
-        });
-
-        this.repeatSwitchField = Field.create({
-            id: 'repeatSwitchField',
-            htmlFor: 'repeatSwitch',
-            title: __('schedule.repeat'),
-            className: 'horizontal-field form-row',
-            content: this.repeatSwitch.elem,
         });
 
         // Interval type field
@@ -2130,8 +2123,8 @@ export class TransactionForm extends Component {
         this.repeatSwitchField.show(!isConfirmReminder);
         const intervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = (intervalType !== INTERVAL_NONE);
-        this.repeatSwitch.check(isRepeat);
-        this.repeatSwitch.enable(!state.submitStarted);
+        this.repeatSwitchField.check(isRepeat);
+        this.repeatSwitchField.enable(!state.submitStarted);
 
         // Schedule fields
         this.renderScheduleFields(state, prevState);

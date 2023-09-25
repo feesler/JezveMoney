@@ -76,7 +76,7 @@ export class ImportUploadDialog extends TestComponent {
             decFirstRowBtn: { elem: await query('#firstRowField .input-group__inner-btn') },
             incFirstRowBtn: { elem: await query('#firstRowField .input-group__input + .input-group__inner-btn') },
             // Template account field
-            tplAccountSwitch: await Switch.create(this, await query(this.elem, '#tplAccountSwitch')),
+            tplAccountSwitch: await Switch.create(this, await query(this.elem, '#tplAccountSwitchField')),
             tplAccountField: { elem: await query('#tplAccountField') },
             tplAccountSel: await DropDown.create(this, await query('#tplAccountField .dd__container')),
             // Template column field

@@ -1,29 +1,16 @@
-import { getClassNames } from 'jezvejs';
-import { Switch } from 'jezvejs/Switch';
-
 import { __ } from '../../../utils/utils.js';
 import { DARK_THEME } from '../../../Application/Application.js';
 import { App } from '../../../Application/App.js';
-import { Field } from '../Field/Field.js';
-
-/* CSS classes */
-const FIELD_CLASS = 'horizontal-field';
+import { SwitchField } from '../SwitchField/SwitchField.js';
 
 /** Dark theme toggle switch field component */
-export class ThemeSwitchField extends Field {
+export class ThemeSwitchField extends SwitchField {
     constructor(props = {}) {
-        const currentTheme = App.getCurrentTheme();
-
-        const themeSwitch = Switch.create({
-            checked: currentTheme === DARK_THEME,
-            onChange: (checked) => App.setTheme(checked),
-        });
-
         super({
             ...props,
-            className: getClassNames(FIELD_CLASS, props.className),
-            title: __('settings.darkTheme'),
-            content: themeSwitch.elem,
+            checked: App.getCurrentTheme() === DARK_THEME,
+            label: __('settings.darkTheme'),
+            onChange: (checked) => App.setTheme(checked),
         });
     }
 }

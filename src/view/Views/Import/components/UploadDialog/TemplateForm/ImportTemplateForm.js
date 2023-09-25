@@ -8,7 +8,6 @@ import {
     createElement,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
-import { Switch } from 'jezvejs/Switch';
 
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
@@ -18,8 +17,10 @@ import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTem
 import { DateFormatSelect } from '../../../../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { InputField } from '../../../../../Components/Fields/InputField/InputField.js';
 import { NumberInputGroup } from '../../../../../Components/Inputs/NumberInputGroup/NumberInputGroup.js';
-import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
+import { SwitchField } from '../../../../../Components/Fields/SwitchField/SwitchField.js';
+
+import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 
 import './ImportTemplateForm.scss';
 
@@ -80,7 +81,6 @@ export class ImportTemplateForm extends Component {
             'templateForm',
             'firstRowField',
             'tplAccountSwitchField',
-            'tplAccountSwitch',
             'tplAccountField',
             'columnField',
             'dateFormatField',
@@ -119,7 +119,7 @@ export class ImportTemplateForm extends Component {
         this.dateFormatField.append(this.dateFormatSelect.elem);
 
         // Template default account
-        this.tplAccountSwitch = Switch.fromElement(this.tplAccountSwitch, {
+        this.tplAccountSwitchField = SwitchField.fromElement(this.tplAccountSwitchField, {
             onChange: () => this.onTemplateAccountToggle(),
         });
 
@@ -565,7 +565,7 @@ export class ImportTemplateForm extends Component {
         App.setValidation(this.firstRowField, validation.firstRow);
 
         const useTplAccount = state.template.account_id !== 0;
-        this.tplAccountSwitch.check(useTplAccount);
+        this.tplAccountSwitchField.check(useTplAccount);
         show(this.tplAccountField, useTplAccount);
         if (state.template.account_id !== 0) {
             this.tplAccountDropDown.setSelection(state.template.account_id);
