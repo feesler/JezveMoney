@@ -51,6 +51,7 @@ import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
 import { REMINDER_SCHEDULED } from '../../../model/Reminder.js';
+import { getCurrencyPrecision } from '../../../model/import.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';
@@ -1705,21 +1706,40 @@ export class TransactionForm extends TestComponent {
     }
 
     getExpectedSourceAmount(model = this.model) {
-        return (model.type === LIMIT_CHANGE) ? Math.abs(model.fSrcAmount) : model.fSrcAmount;
+        const precision = getCurrencyPrecision(model.src_curr_id);
+        const amount = (model.type === LIMIT_CHANGE)
+            ? Math.abs(model.fSrcAmount)
+            : model.fSrcAmount;
+        return normalize(amount, precision);
     }
 
     getExpectedDestAmount(model = this.model) {
-        return (model.type === LIMIT_CHANGE) ? Math.abs(model.fDestAmount) : model.fDestAmount;
+        const precision = getCurrencyPrecision(model.dest_curr_id);
+        const amount = (model.type === LIMIT_CHANGE)
+            ? Math.abs(model.fDestAmount)
+            : model.fDestAmount;
+        return normalize(amount, precision);
     }
 
     getExpectedTransaction() {
-        const res = {};
+        if (!this.isValid()) {
+            return null;
+        }
+
+        const res = {
+            type: this.model.type,
+            src_amount: this.getExpectedSourceAmount(),
+            dest_amount: this.getExpectedDestAmount(),
+            src_curr: this.model.src_curr_id,
+            dest_curr: this.model.dest_curr_id,
+            category_id: this.model.categoryId,
+            comment: this.model.comment,
+        };
 
         if (this.model.isUpdate) {
             res.id = this.model.id;
         }
 
-        res.type = this.model.type;
         if (res.type === DEBT) {
             res.person_id = this.model.person.id;
             res.acc_id = this.model.noAccount ? 0 : this.model.account.id;
@@ -1729,20 +1749,47 @@ export class TransactionForm extends TestComponent {
             res.src_id = (increaseLimit) ? 0 : this.model.destAccount.id;
             res.dest_id = (increaseLimit) ? this.model.destAccount.id : 0;
         } else {
-            res.src_id = (this.model.srcAccount) ? this.model.srcAccount.id : 0;
-            res.dest_id = (this.model.destAccount) ? this.model.destAccount.id : 0;
+            res.src_id = this.model.srcAccount?.id ?? 0;
+            res.dest_id = this.model.destAccount?.id ?? 0;
         }
 
-        res.src_amount = this.getExpectedSourceAmount();
-        res.dest_amount = this.getExpectedDestAmount();
-        res.src_curr = this.model.src_curr_id;
-        res.dest_curr = this.model.dest_curr_id;
-        res.date = dateStringToSeconds(this.model.date, {
-            locales: this.appState().getDateFormatLocale(),
-            options: App.dateFormatOptions,
-        });
-        res.category_id = this.model.categoryId;
-        res.comment = this.model.comment;
+        if (this.isTransactionForm()) {
+            res.date = dateStringToSeconds(this.model.date, {
+                locales: this.appState().getDateFormatLocale(),
+                options: App.dateFormatOptions,
+            });
+        }
+
+        const reminderId = parseInt(this.model.reminderId, 10);
+        const scheduleId = parseInt(this.model.scheduleId, 10);
+        const { repeatEnabled } = this.model;
+
+        if (
+            this.isScheduleItemForm()
+            || (repeatEnabled && !reminderId && !scheduleId)
+        ) {
+            res.start_date = App.dateStringToSeconds(this.model.startDate);
+            res.end_date = App.dateStringToSeconds(this.model.endDate);
+
+            res.interval_type = (repeatEnabled)
+                ? parseInt(this.model.intervalType, 10)
+                : INTERVAL_NONE;
+
+            res.interval_step = (repeatEnabled)
+                ? parseInt(this.model.intervalStep, 10)
+                : 0;
+
+            res.interval_offset = (repeatEnabled)
+                ? asArray(this.model.intervalOffset).map((item) => parseInt(item, 10))
+                : [];
+        }
+
+        if (reminderId !== 0) {
+            res.reminder_id = reminderId;
+        } else if (scheduleId !== 0) {
+            res.schedule_id = scheduleId;
+            res.reminder_date = parseInt(this.model.reminderDate, 10);
+        }
 
         return res;
     }

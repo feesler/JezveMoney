@@ -74,7 +74,7 @@ export const submit = async () => {
         assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
         const validInput = App.view.isValid();
-        const expectedTransaction = (validInput) ? App.view.getExpectedTransaction() : null;
+        const expectedTransaction = App.view.getExpectedTransaction();
 
         await App.view.submit();
 

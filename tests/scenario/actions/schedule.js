@@ -50,7 +50,7 @@ export const submit = async () => {
         assert.instanceOf(App.view, ScheduleItemView, 'Invalid view');
 
         const validInput = App.view.isValid();
-        const expectedItem = (validInput) ? App.view.getExpectedScheduledTransaction() : null;
+        const expectedItem = App.view.getExpectedTransaction();
 
         await App.view.submit();
 
