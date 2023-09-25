@@ -684,6 +684,7 @@ svg * {
   flex-flow: row wrap;
   gap: var(--tile-gap);
   max-width: var(--section-width);
+  margin-top: 0.25rem;
 }
 
 /* Total list */
