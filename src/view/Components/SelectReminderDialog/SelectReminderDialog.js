@@ -11,15 +11,15 @@ import {
     DEFAULT_PAGE_LIMIT,
     __,
     dateStringToTime,
-} from '../../../../utils/utils.js';
-import { API } from '../../../../API/index.js';
-import { App } from '../../../../Application/App.js';
+} from '../../utils/utils.js';
+import { API } from '../../API/index.js';
+import { App } from '../../Application/App.js';
 
-import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../../../Models/Reminder.js';
+import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../Models/Reminder.js';
 
-import { FiltersContainer } from '../../../FiltersContainer/FiltersContainer.js';
-import { ReminderFilters } from '../../../ReminderFilters/ReminderFilters.js';
-import { ReminderListGroup } from '../../../ReminderListGroup/ReminderListGroup.js';
+import { FiltersContainer } from '../FiltersContainer/FiltersContainer.js';
+import { ReminderFilters } from '../ReminderFilters/ReminderFilters.js';
+import { ReminderListGroup } from '../ReminderListGroup/ReminderListGroup.js';
 
 import {
     reducer,

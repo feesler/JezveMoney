@@ -9,7 +9,7 @@ import { Reminder } from '../../../Models/Reminder.js';
 
 import { Field } from '../Field/Field.js';
 import { ReminderListItem } from '../../ReminderListItem/ReminderListItem.js';
-import { SelectReminderDialog } from '../../TransactionForm/components/SelectReminderDialog/SelectReminderDialog.js';
+import { SelectReminderDialog } from '../../SelectReminderDialog/SelectReminderDialog.js';
 
 import './ReminderField.scss';
 

@@ -5,11 +5,11 @@ import {
     reduceSelectItem,
     reduceToggleItem,
     formatDateRange,
-} from '../../../../utils/utils.js';
-import { App } from '../../../../Application/App.js';
-import { ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
-import { ReminderList } from '../../../../Models/ReminderList.js';
-import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../../../Models/Reminder.js';
+} from '../../utils/utils.js';
+import { App } from '../../Application/App.js';
+import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
+import { ReminderList } from '../../Models/ReminderList.js';
+import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../Models/Reminder.js';
 
 /** Returns initial state object */
 export const getInitialState = (props = {}) => ({
