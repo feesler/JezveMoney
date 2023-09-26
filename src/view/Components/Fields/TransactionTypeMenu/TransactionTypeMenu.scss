@@ -14,7 +14,8 @@
   --menu-item-selected-checkbox-icon-color: var(--accent-color);
 
   /* 'Show all' item */
-  .menu-list_left .menu-item__content:first-child {
-    padding-left: 0;
+  .menu-list_left .menu-item__content:first-child::before,
+  .menu-list_right .menu-item__content:last-child::after {
+    width: 0;
   }
 }
