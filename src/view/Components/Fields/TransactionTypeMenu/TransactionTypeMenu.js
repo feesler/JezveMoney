@@ -81,7 +81,7 @@ export class TransactionTypeMenu extends LinkMenu {
             url.searchParams.delete(param);
         }
 
-        if (item.id !== DEBT && !state.multiple) {
+        if (item.id !== DEBT.toString() && !state.multiple) {
             const accountId = url.searchParams.get('acc_id');
             if (accountId === '0') {
                 url.searchParams.delete('acc_id');
@@ -94,12 +94,14 @@ export class TransactionTypeMenu extends LinkMenu {
     }
 
     render(state, prevState = {}) {
+        const strLimit = LIMIT_CHANGE.toString();
+
         super.render({
             ...state,
             items: state.items.map((item) => ({
                 ...item,
                 hidden: (
-                    (item.id === LIMIT_CHANGE && !state.showChangeLimit)
+                    (item.id === strLimit && !state.showChangeLimit)
                     || (item.id === 'all' && !state.showAll)
                 ),
             })),

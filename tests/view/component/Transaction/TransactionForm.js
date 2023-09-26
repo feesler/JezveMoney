@@ -52,6 +52,7 @@ import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
 import { REMINDER_SCHEDULED } from '../../../model/Reminder.js';
 import { getCurrencyPrecision } from '../../../model/import.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';
@@ -482,8 +483,47 @@ export class TransactionForm extends TestComponent {
         const { isAvailable, isDiffCurr } = model;
         const { locale } = App.view;
 
+        const allowCreditLimit = (
+            model.srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD
+            || model.destAccount?.type === ACCOUNT_TYPE_CREDIT_CARD
+        );
+
         const res = {
-            typeMenu: { value: model.type },
+            typeMenu: {
+                value: model.type,
+                items: [
+                    {
+                        id: 'all',
+                        title: __('actions.showAll', locale),
+                        hidden: true,
+                    },
+                    {
+                        id: EXPENSE.toString(),
+                        title: __('transactions.types.expense', locale),
+                        hidden: false,
+                    },
+                    {
+                        id: INCOME.toString(),
+                        title: __('transactions.types.income', locale),
+                        hidden: false,
+                    },
+                    {
+                        id: TRANSFER.toString(),
+                        title: __('transactions.types.transfer', locale),
+                        hidden: false,
+                    },
+                    {
+                        id: DEBT.toString(),
+                        title: __('transactions.types.debt', locale),
+                        hidden: false,
+                    },
+                    {
+                        id: LIMIT_CHANGE.toString(),
+                        title: __('transactions.types.creditLimit', locale),
+                        hidden: !allowCreditLimit,
+                    },
+                ],
+            },
             personContainer: {
                 tile: {},
                 visible: isAvailable && isDebt,
