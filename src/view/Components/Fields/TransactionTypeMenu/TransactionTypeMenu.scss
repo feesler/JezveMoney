@@ -18,4 +18,12 @@
   .menu-list_right .menu-item__content:last-child::after {
     width: 0;
   }
+
+  .menu-item_active.menu-item_selected {
+    color: var(--menu-item-selected-text-color);
+
+    .menu-item__content {
+      color: var(--menu-item-selected-text-color);
+    }
+  }
 }
