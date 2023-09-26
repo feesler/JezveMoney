@@ -1156,6 +1156,10 @@ a.paginator-arrow:focus-visible {
     color: var(--accent-hover-color);
   }
 
+  .menu .menu-item:hover {
+    color: var(--main-text-color);
+  }
+
   .btn.link-btn:hover {
     text-decoration: underline;
   }
