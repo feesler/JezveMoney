@@ -12,6 +12,7 @@ import {
     getSelectedIds,
     getVisibleSelectedItems,
 } from '../../helpers.js';
+import { App } from '../../../../Application/App.js';
 
 /** Persons list main menu component */
 export class PersonListMainMenu extends PopupMenu {
@@ -35,9 +36,13 @@ export class PersonListMainMenu extends PopupMenu {
         const isSelectMode = context.listMode === 'select';
         const sortMode = getPersonsSortMode();
         const showSortItems = isListMode && itemsCount > 1;
+        const exportOptions = {
+            dateLocale: App.dateFormatLocale,
+            numberLocale: App.decimalFormatLocale,
+        };
 
         const exportURL = (totalSelCount > 0)
-            ? getExportURL({ persons: getSelectedIds(context) })
+            ? getExportURL({ ...exportOptions, persons: getSelectedIds(context) })
             : null;
 
         this.setItems([{

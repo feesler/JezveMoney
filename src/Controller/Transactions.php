@@ -2,6 +2,9 @@
 
 namespace JezveMoney\App\Controller;
 
+use DateTimeZone;
+use IntlDateFormatter;
+use NumberFormatter;
 use JezveMoney\App\API\Factory\TransactionsFactory;
 use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
@@ -421,7 +424,6 @@ class Transactions extends ListViewController
         $this->render($data);
     }
 
-
     /**
      * Short alias for Coordinate::stringFromColumnIndex() method
      *
@@ -449,6 +451,23 @@ class Transactions extends ListViewController
             "page" => 1,
             "range" => 1,
         ];
+
+        $dateFormatLocale = strtolower($_GET["dateLocale"] ?? DEFAULT_DATE_LOCALE);
+        $numberFormatLocale = strtolower($_GET["numberLocale"] ?? DEFAULT_NUMBER_LOCALE);
+
+        $dateFormatter = new IntlDateFormatter(
+            $dateFormatLocale,
+            IntlDateFormatter::SHORT,
+            IntlDateFormatter::NONE,
+            new DateTimeZone('UTC'),
+            null,
+            getDateFormatPattern($dateFormatLocale),
+        );
+
+        $numberFormatter = new NumberFormatter(
+            $numberFormatLocale,
+            NumberFormatter::DECIMAL,
+        );
 
         $request = $this->model->getRequestFilters($_GET, $requestDefaults, true);
 
@@ -500,26 +519,42 @@ class Transactions extends ListViewController
 
             $sheet->setCellValue(
                 $colStr["src_amount"] . $row_ind,
-                $currMod->format($transaction->src_amount, $transaction->src_curr)
+                $currMod->format(
+                    $transaction->src_amount,
+                    $transaction->src_curr,
+                    $numberFormatter,
+                ),
             );
 
             $sheet->setCellValue(
                 $colStr["dest_amount"] . $row_ind,
-                $currMod->format($transaction->dest_amount, $transaction->dest_curr)
+                $currMod->format(
+                    $transaction->dest_amount,
+                    $transaction->dest_curr,
+                    $numberFormatter,
+                )
             );
 
             $sheet->setCellValue(
                 $colStr["src_result"] . $row_ind,
-                $currMod->format($transaction->src_result, $transaction->src_curr)
+                $currMod->format(
+                    $transaction->src_result,
+                    $transaction->src_curr,
+                    $numberFormatter,
+                )
             );
 
             $sheet->setCellValue(
                 $colStr["dest_result"] . $row_ind,
-                $currMod->format($transaction->dest_result, $transaction->dest_curr)
+                $currMod->format(
+                    $transaction->dest_result,
+                    $transaction->dest_curr,
+                    $numberFormatter,
+                )
             );
 
             if ($writerType == "Csv") {
-                $dateFmt = date("d.m.Y", $transaction->date);
+                $dateFmt = $dateFormatter->format($transaction->date);
             } else {
                 $dateFmt = Date::PHPToExcel($transaction->date);
             }

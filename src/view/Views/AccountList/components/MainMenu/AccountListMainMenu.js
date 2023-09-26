@@ -12,6 +12,7 @@ import {
     getSelectedIds,
     getVisibleSelectedItems,
 } from '../../helpers.js';
+import { App } from '../../../../Application/App.js';
 
 /** Accounts list main menu component */
 export class AccountListMainMenu extends PopupMenu {
@@ -35,9 +36,13 @@ export class AccountListMainMenu extends PopupMenu {
         const isSelectMode = context.listMode === 'select';
         const sortMode = getAccountsSortMode();
         const showSortItems = isListMode && itemsCount > 1;
+        const exportOptions = {
+            dateLocale: App.dateFormatLocale,
+            numberLocale: App.decimalFormatLocale,
+        };
 
         const exportURL = (totalSelCount > 0)
-            ? getExportURL({ accounts: getSelectedIds(context) })
+            ? getExportURL({ ...exportOptions, accounts: getSelectedIds(context) })
             : null;
 
         this.setItems([{

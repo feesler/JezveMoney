@@ -6,6 +6,30 @@ const WEEKS_IN_YEAR = 52;
 const MAX_DAYS_IN_MONTH = 31;
 const MAX_DAYS_IN_YEAR = 366;
 
+const DATE_FORMAT_PATTERNS = [
+    "ru" => "dd.MM.yyyy",
+    "lt" => "yyyy-MM-dd",
+    "fr" => "dd/MM/yyyy",
+    "ar" => "dyyyy/M/",
+    "es" => "d/M/yy",
+    "zh" => "yyyy/M/d",
+    "hr" => "dd. MM. yyyy.",
+    "uk" => "dd.MM.yy",
+    "nl" => "dd-MM-yyyy",
+    "en" => "M/d/yy",
+    "fi" => "d.M.yyyy",
+    "hu" => "yyyy. MM. dd.",
+    "it" => "dd/MM/yy",
+    "ja" => "yyyy/MM/dd",
+    "ko" => "yy. MM. dd.",
+    "ms" => "d/MM/yy",
+    "pl" => "d.MM.yyyy",
+    "sr" => "d.MM.yy.",
+    "sk" => "d. MM. yyyy.",
+    "sl" => "d. MM. yy",
+    "te" => "dd-MM-yy",
+];
+
 // Date interval types
 define("INTERVAL_NONE", 0);
 define("INTERVAL_DAY", 1);
@@ -27,6 +51,18 @@ const INTERVAL_DAYS_MAP = [
     INTERVAL_MONTH => 30,
     INTERVAL_YEAR => 365,
 ];
+
+/**
+ * Returns date format string for specified locale
+ *
+ * @param string $locale
+ *
+ * @return string
+ */
+function getDateFormatPattern(string $locale)
+{
+    return DATE_FORMAT_PATTERNS[strtolower($locale)] ?? DATE_FORMAT_PATTERNS[DEFAULT_DATE_LOCALE];
+}
 
 /**
  * Returns timestamp for the start of day

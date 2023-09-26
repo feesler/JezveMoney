@@ -29,8 +29,6 @@ import { SortableList } from './SortableList.js';
 const WEEKS_IN_YEAR = 52;
 const MS_IN_DAY = 86400000;
 
-const defaultExportDateLocale = 'ru';
-
 const availFilters = ['type', 'accounts', 'persons', 'categories', 'startDate', 'endDate', 'search'];
 const arrayFilters = ['type', 'accounts', 'persons', 'categories'];
 
@@ -631,7 +629,10 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            App.formatDate(secondsToDate(transaction.date), { locales: defaultExportDateLocale }),
+            App.formatDate(
+                secondsToDate(transaction.date),
+                { locales: App.state.getDateFormatLocale() },
+            ),
             transaction.comment,
         ]);
 

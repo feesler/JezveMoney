@@ -41,6 +41,11 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
+        const exportOptions = {
+            dateLocale: App.dateFormatLocale,
+            numberLocale: App.decimalFormatLocale,
+        };
+
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
@@ -60,7 +65,7 @@ export class PersonListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'export',
             title: __('transactions.exportToCsv'),
-            url: getExportURL({ persons: [person.id] }),
+            url: getExportURL({ ...exportOptions, persons: [person.id] }),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',

@@ -41,6 +41,11 @@ export class AccountListContextMenu extends PopupMenu {
             return;
         }
 
+        const exportOptions = {
+            dateLocale: App.dateFormatLocale,
+            numberLocale: App.decimalFormatLocale,
+        };
+
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
@@ -60,7 +65,7 @@ export class AccountListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'export',
             title: __('transactions.exportToCsv'),
-            url: getExportURL({ accounts: [account.id] }),
+            url: getExportURL({ ...exportOptions, accounts: [account.id] }),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',
