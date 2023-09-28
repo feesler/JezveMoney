@@ -27,7 +27,7 @@ import {
     getWeekRange,
     timeToDate,
 } from '../../utils/utils.js';
-import { normalize } from '../../utils/decimal.js';
+import { MAX_PRECISION, normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { API } from '../../API/index.js';
@@ -769,8 +769,8 @@ class TransactionListView extends AppView {
         const minAmount = filter.minAmount ?? null;
         const maxAmount = filter.maxAmount ?? null;
         const newRange = {
-            minAmount: (data.minAmount) ? normalize(data.minAmount) : null,
-            maxAmount: (data.maxAmount) ? normalize(data.maxAmount) : null,
+            minAmount: (data.minAmount) ? normalize(data.minAmount, MAX_PRECISION) : null,
+            maxAmount: (data.maxAmount) ? normalize(data.maxAmount, MAX_PRECISION) : null,
         };
 
         if (

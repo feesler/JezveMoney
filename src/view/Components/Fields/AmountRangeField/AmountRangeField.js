@@ -7,7 +7,7 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { InputGroup } from 'jezvejs/InputGroup';
 
 import { __ } from '../../../utils/utils.js';
-import { normalize } from '../../../utils/decimal.js';
+import { MAX_PRECISION, normalize } from '../../../utils/decimal.js';
 import { App } from '../../../Application/App.js';
 
 import { Field } from '../Field/Field.js';
@@ -51,8 +51,8 @@ export class AmountRangeField extends Field {
     };
 
     static getRangeState(data, state) {
-        const minAmount = (data.minAmount) ? normalize(data.minAmount) : null;
-        const maxAmount = (data.maxAmount) ? normalize(data.maxAmount) : null;
+        const minAmount = (data.minAmount) ? normalize(data.minAmount, MAX_PRECISION) : null;
+        const maxAmount = (data.maxAmount) ? normalize(data.maxAmount, MAX_PRECISION) : null;
 
         return {
             ...state,
@@ -76,6 +76,7 @@ export class AmountRangeField extends Field {
         this.minInput = DecimalInput.create({
             className: 'input input-group__input',
             placeholder: this.state.minPlaceholder,
+            digits: MAX_PRECISION,
             onInput: (e) => this.onMinAmountInput(e),
         });
         this.minClearBtn = CloseButton.create({
@@ -94,6 +95,7 @@ export class AmountRangeField extends Field {
         this.maxInput = DecimalInput.create({
             className: 'input input-group__input',
             placeholder: this.state.maxPlaceholder,
+            digits: MAX_PRECISION,
             onInput: (e) => this.onMaxAmountInput(e),
         });
         this.maxClearBtn = CloseButton.create({

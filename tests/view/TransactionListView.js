@@ -29,10 +29,12 @@ import { Counter } from './component/Counter.js';
 import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
 import { ExportDialog } from './component/ExportDialog.js';
 import {
+    MAX_PRECISION,
     dateToSeconds,
     isValidValue,
     secondsToDate,
     shiftMonth,
+    trimToDigitsLimit,
 } from '../common.js';
 import { __ } from '../model/locale.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
@@ -1109,7 +1111,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        const minAmount = parseFloat(value);
+        const minAmount = trimToDigitsLimit(value, MAX_PRECISION);
         if (this.model.filter.minAmount === minAmount) {
             return true;
         }
@@ -1133,7 +1135,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        const maxAmount = parseFloat(value);
+        const maxAmount = trimToDigitsLimit(value, MAX_PRECISION);
         if (this.model.filter.maxAmount === maxAmount) {
             return true;
         }
