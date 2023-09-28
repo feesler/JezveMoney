@@ -63,8 +63,6 @@ export class SetCategoryDialog extends Component {
         }
 
         this.elem = this.dialog.elem;
-
-        this.reset();
     }
 
     /** Reset dialog state */
