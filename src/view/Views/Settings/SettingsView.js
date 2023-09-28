@@ -10,21 +10,26 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
+// Application
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 
+// Common components
 import { Heading } from '../../Components/Heading/Heading.js';
 import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { DateFormatSelect } from '../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+import { NumberFormatSelect } from '../../Components/Inputs/NumberFormatSelect/NumberFormatSelect.js';
 
+// Local components
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
@@ -172,16 +177,9 @@ class SettingsView extends AppView {
         });
         this.dateFormatContainer.append(this.dateFormatSelect.elem);
 
-        // Decimal format
-        this.decimalFormatSelect = DropDown.create({
+        // Numbers format
+        this.decimalFormatSelect = NumberFormatSelect.create({
             onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
-            data: [
-                { id: 'ru', title: '1 234 567,89' },
-                { id: 'es', title: '1.234.567,89' },
-                { id: 'en', title: '1,234,567.89' },
-                { id: 'de-ch', title: '1’234’567.89' },
-                { id: 'hi', title: '12,34,567.345' },
-            ],
         });
         this.decimalFormatContainer.append(this.decimalFormatSelect.elem);
 
