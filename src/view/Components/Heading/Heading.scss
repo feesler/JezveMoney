@@ -5,11 +5,13 @@
   padding: 10px 0 0 0;
   column-gap: 24px;
   color: var(--main-text-color);
+  margin-bottom: 4px;
 
   h1 {
     font-size: 1.4rem;
     font-weight: 300;
-    line-height: 32px;
+    height: 40px;
+    line-height: 40px;
     vertical-align: middle;
   }
 }
@@ -19,6 +21,7 @@
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-end;
+  align-self: flex-end;
   flex: 1 1 auto;
   column-gap: 18px;
   z-index: 1001;

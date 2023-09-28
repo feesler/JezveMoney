@@ -1,14 +1,5 @@
 .upload-popup {
   --popup-max-width: 600px;
-
-  .popup__header {
-    padding-bottom: 0;
-    column-gap: 12px;
-
-    .close-btn {
-      flex-shrink: 0;
-    }
-  }
 }
 
 .upload-dialog {

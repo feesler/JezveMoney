@@ -3,6 +3,14 @@
   display: flex;
   flex-flow: column nowrap;
 
+  .heading {
+    padding: 6px 0 0 0;
+  }
+
+  .heading-actions {
+    margin-right: -4px;
+  }
+
   .field {
     margin: var(--form-field-margin);
   }
