@@ -33,6 +33,21 @@ const slice = createSlice({
             : state
     ),
 
+    showExportDialog: (state, persons) => ({
+        ...state,
+        showExportDialog: true,
+        exportFilter: { persons },
+        showMenu: false,
+        showContextMenu: false,
+        contextItem: null,
+    }),
+
+    hideExportDialog: (state) => ({
+        ...state,
+        showExportDialog: false,
+        exportFilter: null,
+    }),
+
     itemDetailsLoaded: (state, item) => (
         (state.detailsId !== item?.id)
             ? state

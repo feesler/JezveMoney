@@ -42,6 +42,7 @@ import { CategoryList } from '../../Models/CategoryList.js';
 // Common components
 import { AmountRangeField } from '../../Components/Fields/AmountRangeField/AmountRangeField.js';
 import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { ExportDialog } from '../../Components/ExportDialog/ExportDialog.js';
 import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { FormControls } from '../../Components/FormControls/FormControls.js';
@@ -88,6 +89,7 @@ class TransactionListView extends AppView {
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
             setCategoryBtn: () => this.showCategoryDialog(),
+            exportBtn: () => this.showExportDialog(),
             deleteBtn: () => this.confirmDelete(),
             groupByDateBtn: () => this.toggleGroupByDate(),
         };
@@ -119,6 +121,8 @@ class TransactionListView extends AppView {
                 categoryId: 0,
                 type: 0,
             },
+            showExportDialog: false,
+            exportFilter: null,
             renderTime: Date.now(),
         };
 
@@ -404,6 +408,14 @@ class TransactionListView extends AppView {
 
     closeDetails() {
         this.store.dispatch(actions.closeDetails());
+    }
+
+    showExportDialog() {
+        this.store.dispatch(actions.showExportDialog());
+    }
+
+    hideExportDialog() {
+        this.store.dispatch(actions.hideExportDialog());
     }
 
     showContextMenu(itemId) {
@@ -1233,6 +1245,28 @@ class TransactionListView extends AppView {
         this.spinner.show(loadingMore);
     }
 
+    renderExportDialog(state, prevState) {
+        if (state.showExportDialog === prevState?.showExportDialog) {
+            return;
+        }
+
+        if (!state.showExportDialog) {
+            this.exportDialog?.hide();
+            return;
+        }
+
+        if (!this.exportDialog) {
+            this.exportDialog = ExportDialog.create({
+                filter: state.exportFilter,
+                onCancel: () => this.hideExportDialog(),
+            });
+        } else {
+            this.exportDialog.setFilter(state.exportFilter);
+        }
+
+        this.exportDialog.show();
+    }
+
     render(state, prevState = {}) {
         this.renderHistory(state, prevState);
 
@@ -1249,6 +1283,7 @@ class TransactionListView extends AppView {
         this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
         this.renderCategoryDialog(state, prevState);
+        this.renderExportDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

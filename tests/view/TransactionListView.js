@@ -10,7 +10,6 @@ import {
     baseUrl,
     isVisible,
     wait,
-    httpReq,
 } from 'jezve-test';
 import {
     Button,
@@ -28,6 +27,7 @@ import { SearchInput } from './component/Fields/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { Counter } from './component/Counter.js';
 import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
+import { ExportDialog } from './component/ExportDialog.js';
 import {
     dateToSeconds,
     isValidValue,
@@ -39,6 +39,7 @@ import { TransactionDetails } from './component/Transaction/TransactionDetails.j
 
 const listMenuSelector = '#listMenu';
 const categoryDialogSelector = '#selectCategoryDialog';
+const exportDialogSelector = '.export-dialog';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -52,6 +53,10 @@ export class TransactionListView extends AppView {
 
     get contextMenu() {
         return this.content.contextMenu;
+    }
+
+    get exportDialog() {
+        return this.content.exportDialog;
     }
 
     async parseContent() {
@@ -131,6 +136,15 @@ export class TransactionListView extends AppView {
             this,
             await query(categoryDialogSelector),
         );
+
+        // Export dialog
+        const exportDialogVisible = await evaluate((selector) => {
+            const dialogEl = document.querySelector(selector);
+            return dialogEl && !dialogEl.hidden;
+        }, exportDialogSelector);
+        if (exportDialogVisible) {
+            res.exportDialog = await ExportDialog.create(this, await query(exportDialogSelector));
+        }
 
         return res;
     }
@@ -1564,16 +1578,15 @@ export class TransactionListView extends AppView {
     async exportTransactions() {
         await this.openListMenu();
 
-        const exportBtn = this.listMenu.findItemById('exportBtn');
-        const downloadURL = exportBtn.link;
-        assert(downloadURL, 'Invalid export URL');
+        await this.performAction(() => this.listMenu.select('exportBtn'));
+        await this.performAction(() => wait(exportDialogSelector, { visible: true }));
 
-        const exportResp = await httpReq('GET', downloadURL);
-        assert(exportResp?.status === 200, 'Invalid response');
+        const res = await this.exportDialog.download();
 
-        await this.closeListMenu();
+        await this.performAction(() => this.exportDialog.close());
+        await this.setListMode();
 
-        return exportResp.body;
+        return res;
     }
 
     // Check all transactions have same type, otherwise show only categories with type 'Any'

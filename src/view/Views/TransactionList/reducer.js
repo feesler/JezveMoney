@@ -29,6 +29,21 @@ const slice = createSlice({
             : state
     ),
 
+    showExportDialog: (state) => ({
+        ...state,
+        showExportDialog: true,
+        exportFilter: { ...state.filter },
+        showMenu: false,
+        showContextMenu: false,
+        contextItem: null,
+    }),
+
+    hideExportDialog: (state) => ({
+        ...state,
+        showExportDialog: false,
+        exportFilter: null,
+    }),
+
     showMenu: (state) => (
         (state.showMenu)
             ? state

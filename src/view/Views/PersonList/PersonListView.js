@@ -34,6 +34,7 @@ import { PersonList } from '../../Models/PersonList.js';
 // Common components
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { ExportDialog } from '../../Components/ExportDialog/ExportDialog.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
 import { Tile } from '../../Components/Tile/Tile.js';
@@ -62,6 +63,7 @@ class PersonListView extends AppView {
             sortByDateBtn: () => this.toggleSortByDate(),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
+            exportBtn: () => this.showExportDialog(),
             showBtn: () => this.showItems(true),
             hideBtn: () => this.showItems(false),
             deleteBtn: () => this.confirmDelete(),
@@ -69,6 +71,7 @@ class PersonListView extends AppView {
 
         this.contextMenuActions = {
             ctxDetailsBtn: () => this.showDetails(),
+            ctxExportBtn: () => this.showExportDialog(),
             ctxShowBtn: () => this.showItems(),
             ctxHideBtn: () => this.showItems(false),
             ctxDeleteBtn: () => this.confirmDelete(),
@@ -95,6 +98,8 @@ class PersonListView extends AppView {
             sortMode,
             showContextMenu: false,
             contextItem: null,
+            showExportDialog: false,
+            exportFilter: null,
             renderTime: Date.now(),
         };
 
@@ -269,6 +274,20 @@ class PersonListView extends AppView {
 
     closeDetails() {
         this.store.dispatch(actions.closeDetails());
+    }
+
+    showExportDialog() {
+        const state = this.store.getState();
+        const ids = this.getContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.store.dispatch(actions.showExportDialog(ids));
+    }
+
+    hideExportDialog() {
+        this.store.dispatch(actions.hideExportDialog());
     }
 
     showContextMenu(itemId) {
@@ -681,6 +700,28 @@ class PersonListView extends AppView {
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
     }
 
+    renderExportDialog(state, prevState) {
+        if (state.showExportDialog === prevState?.showExportDialog) {
+            return;
+        }
+
+        if (!state.showExportDialog) {
+            this.exportDialog?.hide();
+            return;
+        }
+
+        if (!this.exportDialog) {
+            this.exportDialog = ExportDialog.create({
+                filter: state.exportFilter,
+                onCancel: () => this.hideExportDialog(),
+            });
+        } else {
+            this.exportDialog.setFilter(state.exportFilter);
+        }
+
+        this.exportDialog.show();
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -693,10 +734,11 @@ class PersonListView extends AppView {
         }
 
         this.renderCounters(state, prevState);
-        this.renderList(state);
-        this.renderContextMenu(state);
-        this.renderMenu(state);
+        this.renderList(state, prevState);
+        this.renderContextMenu(state, prevState);
+        this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
+        this.renderExportDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

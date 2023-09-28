@@ -1,6 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL, getExportURL } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 /** Persons list context menu component */
@@ -41,11 +41,6 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
-        const exportOptions = {
-            dateLocale: App.dateFormatLocale,
-            numberLocale: App.decimalFormatLocale,
-        };
-
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
@@ -62,10 +57,8 @@ export class PersonListContextMenu extends PopupMenu {
             url: getApplicationURL(`persons/update/${person.id}`),
         }, {
             id: 'ctxExportBtn',
-            type: 'link',
             icon: 'export',
-            title: __('transactions.exportToCsv'),
-            url: getExportURL({ ...exportOptions, persons: [person.id] }),
+            title: __('export.menuTitle'),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',

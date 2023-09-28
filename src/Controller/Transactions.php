@@ -471,8 +471,9 @@ class Transactions extends ListViewController
 
         $request = $this->model->getRequestFilters($_GET, $requestDefaults, true);
 
-        $writerType = "Csv";
-        $exportFileName = "Exported_" . date("d.m.Y") . "." . strtolower($writerType);
+        $fileFormat = strtolower($_GET["fileFormat"] ?? "csv");
+        $writerType = ($fileFormat === "xlsx") ? "Xlsx" : "Csv";
+        $exportFileName = "Exported_" . date("d.m.Y") . "." . $fileFormat;
 
         $writer = IOFactory::createWriter($spreadsheet, $writerType);
         if ($writer instanceof \PhpOffice\PhpSpreadsheet\Writer\Csv) {

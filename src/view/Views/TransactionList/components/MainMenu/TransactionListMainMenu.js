@@ -1,8 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getExportURL, getSelectedItems } from '../../../../utils/utils.js';
+import { __, getSelectedItems } from '../../../../utils/utils.js';
 import { getTransactionsGroupByDate } from '../../helpers.js';
-import { App } from '../../../../Application/App.js';
 
 /** Transactions list main menu component */
 export class TransactionListMainMenu extends PopupMenu {
@@ -22,14 +21,6 @@ export class TransactionListMainMenu extends PopupMenu {
         const selectedItems = getSelectedItems(context.items);
         const selCount = selectedItems.length;
         const groupByDate = getTransactionsGroupByDate() === 1;
-        const exportOptions = {
-            dateLocale: App.dateFormatLocale,
-            numberLocale: App.decimalFormatLocale,
-        };
-
-        const exportURL = (itemsCount > 0)
-            ? getExportURL({ ...exportOptions, ...context.filter })
-            : null;
 
         this.setItems([{
             id: 'selectModeBtn',
@@ -59,10 +50,8 @@ export class TransactionListMainMenu extends PopupMenu {
             hidden: !isSelectMode,
         }, {
             id: 'exportBtn',
-            type: 'link',
             icon: 'export',
-            title: __('transactions.exportToCsv'),
-            url: exportURL?.toString(),
+            title: __('export.menuTitle'),
             hidden: !(itemsCount > 0),
         }, {
             id: 'setCategoryBtn',

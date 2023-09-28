@@ -2,17 +2,14 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import {
     __,
-    getExportURL,
     getSortByDateIcon,
     getSortByNameIcon,
 } from '../../../../utils/utils.js';
 import {
     getAccountsSortMode,
     getHiddenSelectedItems,
-    getSelectedIds,
     getVisibleSelectedItems,
 } from '../../helpers.js';
-import { App } from '../../../../Application/App.js';
 
 /** Accounts list main menu component */
 export class AccountListMainMenu extends PopupMenu {
@@ -36,14 +33,6 @@ export class AccountListMainMenu extends PopupMenu {
         const isSelectMode = context.listMode === 'select';
         const sortMode = getAccountsSortMode();
         const showSortItems = isListMode && itemsCount > 1;
-        const exportOptions = {
-            dateLocale: App.dateFormatLocale,
-            numberLocale: App.decimalFormatLocale,
-        };
-
-        const exportURL = (totalSelCount > 0)
-            ? getExportURL({ ...exportOptions, accounts: getSelectedIds(context) })
-            : null;
 
         this.setItems([{
             id: 'selectModeBtn',
@@ -79,10 +68,8 @@ export class AccountListMainMenu extends PopupMenu {
             hidden: !isSelectMode,
         }, {
             id: 'exportBtn',
-            type: 'link',
             icon: 'export',
-            title: __('transactions.exportToCsv'),
-            url: exportURL?.toString(),
+            title: __('export.menuTitle'),
             hidden: !(isSelectMode && totalSelCount > 0),
         }, {
             id: 'showBtn',
