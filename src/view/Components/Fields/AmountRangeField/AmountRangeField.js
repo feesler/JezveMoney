@@ -74,7 +74,7 @@ export class AmountRangeField extends Field {
     init() {
         // Minimum amount
         this.minInput = DecimalInput.create({
-            className: 'input input-group__input right-align-text',
+            className: 'input input-group__input',
             placeholder: this.state.minPlaceholder,
             onInput: (e) => this.onMinAmountInput(e),
         });
@@ -92,7 +92,7 @@ export class AmountRangeField extends Field {
 
         // Maximum amount
         this.maxInput = DecimalInput.create({
-            className: 'input input-group__input right-align-text',
+            className: 'input input-group__input',
             placeholder: this.state.maxPlaceholder,
             onInput: (e) => this.onMaxAmountInput(e),
         });
