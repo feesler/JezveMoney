@@ -5,10 +5,27 @@
 
   .heading {
     padding: 6px 0 0 0;
-  }
 
-  .heading-actions {
-    margin-right: -4px;
+    .heading-actions {
+      margin-right: -4px;
+    }
+
+    .close-btn {
+      --btn-size: 32px;
+      --btn-icon-size: 24px;
+      --btn-border-radius: 100vh;
+      --btn-icon-color: var(--popup-close-btn);
+      --btn-background: var(--popup-close-btn-bg);
+      --btn-hover-icon-color: var(--popup-close-btn-hover);
+      --btn-hover-background: var(--popup-close-btn-hover-bg);
+      --btn-active-icon-color: var(--popup-close-btn-active);
+      --btn-active-background: var(--popup-close-btn-active-bg);
+      --btn-padding: 4px;
+
+      margin-left: auto;
+      align-self: flex-end;
+      flex: 0 0 auto;
+    }
   }
 
   .field {

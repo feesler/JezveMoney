@@ -928,7 +928,9 @@ svg * {
 }
 
 /* Popup */
-.popup {
+.popup,
+.list-item-details,
+.filters-container {
   --popup-text: var(--main-text-color);
   --popup-bg: var(--main-bg-color);
   --popup-header-padding: 6px 12px 12px 12px;
