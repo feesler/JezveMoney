@@ -1,9 +1,9 @@
 <nav class="main-navigation navigation-content">
     <div class="navigation-controls">
-        <button class="btn close-btn circle-btn"><?= svgIcon("back", "btn__icon") ?></button>
+        <button class="btn close-btn circle-btn"><?= useIcon("back", "btn__icon") ?></button>
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>admin/">
-                <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
+                <span class="header-logo__icon"><?= useIcon("header-logo", "logo-icon") ?></span>
                 <span class="header-logo__title">Admin</span>
             </a>
         </div>
@@ -24,10 +24,10 @@
 <div class="user-navigation-content" hidden>
     <div class="user-navigation-controls">
         <div class="btn header-btn user-btn">
-            <?= svgIcon("user", "btn__icon") ?>
+            <?= useIcon("user", "btn__icon") ?>
             <span class="btn__content"><?= e($this->user_name) ?></span>
         </div>
-        <button class="btn close-btn circle-btn right-align" tabindex="3"><?= svgIcon("close", "btn__icon") ?></button>
+        <button class="btn close-btn circle-btn right-align" tabindex="3"><?= useIcon("close", "btn__icon") ?></button>
     </div>
 
     <?php if ($this->user_id != 0) {        ?>
