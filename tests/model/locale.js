@@ -77,3 +77,10 @@ export const __ = (token, locale = 'en', ...args) => {
 
     return formatTokenString(tokenString, ...args);
 };
+
+/** Returns string for Accept-Language HTTP header */
+export const getAcceptLanguageHeader = (locale = 'en') => (
+    (locale === 'ru')
+        ? 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
+        : 'en-US,en'
+);

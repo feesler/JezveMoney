@@ -8,8 +8,7 @@ import {
     httpReq,
 } from 'jezve-test';
 import { Button, DropDown } from 'jezvejs-test';
-import { __ } from '../../model/locale.js';
-import { App } from '../../Application.js';
+import { __, getAcceptLanguageHeader } from '../../model/locale.js';
 
 const selectComponents = {
     fileFormatSelect: '.file-format-select',
@@ -129,7 +128,14 @@ export class ExportDialog extends TestComponent {
     async download() {
         assert(this.downloadBtn?.elem, 'Close button not found');
 
-        const response = await httpReq('GET', this.downloadBtn.link);
+        const response = await httpReq(
+            'GET',
+            this.downloadBtn.link,
+            null,
+            {
+                'Accept-Language': getAcceptLanguageHeader(App.view.locale),
+            },
+        );
         assert(response?.status === 200, 'Invalid response');
 
         return response.body;

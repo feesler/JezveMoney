@@ -613,13 +613,13 @@ export class TransactionsList extends SortableList {
     exportToCSV() {
         const header = [
             'ID',
-            'Type',
-            'Source amount',
-            'Destination amount',
-            'Source result',
-            'Destination result',
-            'Date',
-            'Comment',
+            __('transactions.type'),
+            __('transactions.sourceAmount'),
+            __('transactions.destAmount'),
+            __('transactions.sourceResult'),
+            __('transactions.destResult'),
+            __('transactions.date'),
+            __('transactions.comment'),
         ];
 
         const data = this.map((transaction) => [
