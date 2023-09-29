@@ -5,6 +5,7 @@ export const config = {
     apiTestUser: { login: 'apitest', password: '123', name: 'API Tester' },
     newUser: { login: 'newuser', name: 'Newbie', password: '12345' },
 
+    logsLocale: 'en',
     transactionsOnPage: 10,
     latestTransactions: 5,
     importTransactionsOnPage: 20,

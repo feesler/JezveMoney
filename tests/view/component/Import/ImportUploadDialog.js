@@ -224,8 +224,8 @@ export class ImportUploadDialog extends TestComponent {
         if (res.isLoading) {
             res.state = LOADING_STATE;
         } else if (res.templateBlock.visible) {
-            const createTplTitle = __('import.templates.create', App.view.locale);
-            const updateTplTitle = __('import.templates.update', App.view.locale);
+            const createTplTitle = __('import.templates.create');
+            const updateTplTitle = __('import.templates.update');
 
             if (formVisible && res.tplFormTitle.title === createTplTitle) {
                 res.state = CREATE_TPL_STATE;
@@ -310,12 +310,12 @@ export class ImportUploadDialog extends TestComponent {
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
                 const propTitleMap = {
-                    accountAmount: __('import.templates.columns.accountAmount', App.view.locale),
-                    transactionAmount: __('import.templates.columns.transactionAmount', App.view.locale),
-                    accountCurrency: __('import.templates.columns.accountCurrency', App.view.locale),
-                    transactionCurrency: __('import.templates.columns.transactionCurrency', App.view.locale),
-                    date: __('import.templates.columns.date', App.view.locale),
-                    comment: __('import.templates.columns.comment', App.view.locale),
+                    accountAmount: __('import.templates.columns.accountAmount'),
+                    transactionAmount: __('import.templates.columns.transactionAmount'),
+                    accountCurrency: __('import.templates.columns.accountCurrency'),
+                    transactionCurrency: __('import.templates.columns.transactionCurrency'),
+                    date: __('import.templates.columns.date'),
+                    comment: __('import.templates.columns.comment'),
                 };
 
                 cont.columns.forEach((column, ind) => {

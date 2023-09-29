@@ -10,14 +10,14 @@ import { __ } from '../../../model/locale.js';
 export class OriginalImportData extends TestComponent {
     getLabelsMap() {
         return {
-            mainAccount: __('import.mainAccount', App.view.locale),
-            template: __('import.templates.title', App.view.locale),
-            accountAmount: __('import.templates.columns.accountAmount', App.view.locale),
-            transactionAmount: __('import.templates.columns.transactionAmount', App.view.locale),
-            accountCurrency: __('import.templates.columns.accountCurrency', App.view.locale),
-            transactionCurrency: __('import.templates.columns.transactionCurrency', App.view.locale),
-            date: __('import.templates.columns.date', App.view.locale),
-            comment: __('import.templates.columns.comment', App.view.locale),
+            mainAccount: __('import.mainAccount'),
+            template: __('import.templates.title'),
+            accountAmount: __('import.templates.columns.accountAmount'),
+            transactionAmount: __('import.templates.columns.transactionAmount'),
+            accountCurrency: __('import.templates.columns.accountCurrency'),
+            transactionCurrency: __('import.templates.columns.transactionCurrency'),
+            date: __('import.templates.columns.date'),
+            comment: __('import.templates.columns.comment'),
         };
     }
 

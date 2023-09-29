@@ -65,7 +65,7 @@ export class AccountDetails extends TestComponent {
             },
             visibilityField: {
                 visible: true,
-                value: __(visibilityToken, App.view.locale),
+                value: __(visibilityToken),
             },
             transactionsField: {
                 value: itemTransactions.length.toString(),

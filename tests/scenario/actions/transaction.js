@@ -102,8 +102,9 @@ export const submit = async () => {
 export const update = async (type, pos) => {
     const index = parseInt(pos, 10);
     assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
 
-    await test(`Initial state of update ${Transaction.typeToString(type)} view [${index}]`, async () => {
+    await test(`Initial state of update ${typeStr} view [${index}]`, async () => {
         await App.view.navigateToTransactions();
         await App.view.filterByType(type);
 
@@ -149,8 +150,9 @@ export const updateFromMainView = async (pos) => {
 export const duplicate = async (type, pos) => {
     const index = parseInt(pos, 10);
     assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
 
-    await test(`Initial state of duplicate ${Transaction.typeToString(type)} view [${index}]`, async () => {
+    await test(`Initial state of duplicate ${typeStr} view [${index}]`, async () => {
         await App.view.navigateToTransactions();
         await App.view.filterByType(type);
 
@@ -325,8 +327,9 @@ export const del = async (type, transactions) => {
 export const delFromUpdate = async (type, pos) => {
     const ind = parseInt(pos, 10);
     assert(!Number.isNaN(ind) && ind >= 0, 'Position of transaction not specified');
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
 
-    setBlock(`Delete ${Transaction.typeToString(type)} from update view [${ind}]`, 2);
+    setBlock(`Delete ${typeStr} from update view [${ind}]`, 2);
 
     const expectedState = App.state.clone();
     const id = expectedState.transactions.filterByType(type).indexesToIds(ind);
@@ -406,7 +409,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            notification: { success: false, message: __('transactions.errors.update', App.view.locale) },
+            notification: { success: false, message: __('transactions.errors.update') },
         };
         App.view.checkState();
         await App.view.closeNotification();
@@ -417,19 +420,19 @@ export const securityTests = async () => {
 
 /** Check navigation to create transaction with person account */
 export const createFromPersonAccount = async ({ type, accountId }) => {
-    const typeString = Transaction.typeToString(type);
+    const typeString = Transaction.typeToString(type, App.config.logsLocale);
     await test(`Create ${typeString} transaction from person account`, async () => {
         const account = App.state.accounts.getItem(accountId);
         assert(account, `Account ${accountId} not found`);
         assert(account.owner_id !== App.owner_id, 'Account of person is expected');
 
-        const requestType = typeString.toLowerCase();
+        const requestType = Transaction.getTypeName(type);
         const requestURL = `${baseUrl()}transactions/create/?acc_id=${accountId}&type=${requestType}`;
         await goTo(requestURL);
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            notification: { success: false, message: __('transactions.errors.create', App.view.locale) },
+            notification: { success: false, message: __('transactions.errors.create') },
         };
         App.view.checkState();
         await App.view.closeNotification();
@@ -440,7 +443,8 @@ export const createFromPersonAccount = async ({ type, accountId }) => {
 
 /** Navigate to create transaction view and check form availability according to current state */
 export const checkTransactionAvailable = async (type, directNavigate = false) => {
-    await test(`${Transaction.typeToString(type)} transaction availability`, async () => {
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
+    await test(`Availability of ${typeStr} transaction`, async () => {
         if (!directNavigate) {
             await App.view.navigateToTransactions();
             await App.view.goToCreateTransaction();

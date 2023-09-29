@@ -152,7 +152,7 @@ export class ImportTransactionForm extends TestComponent {
             const personTok = (model.type === 'debt_in')
                 ? 'transactions.sourcePerson'
                 : 'transactions.destPerson';
-            res.personField.title = __(personTok, App.view.locale);
+            res.personField.title = __(personTok);
             res.personField.value = model.personId.toString();
         }
 

@@ -22,7 +22,7 @@ const selectComponents = {
 export class ExportDialog extends TestComponent {
     static getExpectedState(model) {
         const res = {
-            title: __('export.dialogTitle', App.view.locale),
+            title: __('export.dialogTitle'),
             fileFormatSelect: {
                 visible: true,
                 value: model.fileFormat,
@@ -37,7 +37,7 @@ export class ExportDialog extends TestComponent {
             },
             downloadBtn: {
                 visible: true,
-                title: __('export.download', App.view.locale),
+                title: __('export.download'),
             },
         };
 
@@ -133,7 +133,7 @@ export class ExportDialog extends TestComponent {
             this.downloadBtn.link,
             null,
             {
-                'Accept-Language': getAcceptLanguageHeader(App.view.locale),
+                'Accept-Language': getAcceptLanguageHeader(),
             },
         );
         assert(response?.status === 200, 'Invalid response');

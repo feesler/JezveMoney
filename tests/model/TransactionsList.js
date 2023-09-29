@@ -25,6 +25,7 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
+import { __ } from './locale.js';
 
 const WEEKS_IN_YEAR = 52;
 const MS_IN_DAY = 86400000;

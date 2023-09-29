@@ -23,7 +23,7 @@ export class ImportActionItem extends TestComponent {
             const transactionType = ImportTransaction.getTypeById(model.value);
             assert(transactionType, `Unknown transaction type: '${model.value}'`);
 
-            value = __(transactionType.titleToken, App.view.locale);
+            value = __(transactionType.titleToken);
         } else if (ImportAction.isAccountValue(actionType.id)) {
             const account = App.state.accounts.getItem(model.value);
             assert(account, `Account not found: '${model.value}'`);
@@ -99,13 +99,13 @@ export class ImportActionItem extends TestComponent {
         const res = {};
 
         const actionName = cont.typeTitle.value;
-        const actionType = ImportAction.findActionByName(actionName, App.view.locale);
+        const actionType = ImportAction.findActionByName(actionName);
         assert(actionType, `Unknown action: '${actionName}'`);
         res.actionType = actionType.id;
 
         const { value } = cont.valueTitle;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
-            const transactionType = ImportTransaction.findTypeByName(value, App.view.locale);
+            const transactionType = ImportTransaction.findTypeByName(value);
             assert(transactionType, `Unknown transaction type: '${value}'`);
 
             res.value = transactionType.id;

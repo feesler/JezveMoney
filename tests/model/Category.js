@@ -1,6 +1,7 @@
 import { assert } from 'jezve-test';
 import { __ } from './locale.js';
 import { Transaction } from './Transaction.js';
+import { App } from '../Application.js';
 
 /** Category model */
 export class Category {
@@ -12,13 +13,15 @@ export class Category {
 
     static getTypeString(type) {
         return (type !== 0)
-            ? Transaction.typeToString(type).toLowerCase()
+            ? Transaction.getTypeName(type)
             : 'any';
     }
 
     /** Return title string for specified transaction type */
-    static typeToString(value, locale = 'en') {
-        return (value !== 0) ? Transaction.typeToString(value, locale) : __('transactions.types.any', locale);
+    static typeToString(value, locale = App.view.locale) {
+        return (value !== 0)
+            ? Transaction.typeToString(value, locale)
+            : __('transactions.types.any', locale);
     }
 
     constructor(data) {

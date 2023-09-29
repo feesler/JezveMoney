@@ -43,7 +43,7 @@ export const getAccountTypeName = (value) => {
     const type = parseInt(value, 10);
     assert.isString(accountTypes[type], `Invalid account type: ${value}`);
 
-    return __(accountTypes[type], App.view.locale);
+    return __(accountTypes[type]);
 };
 
 export class AccountsList extends SortableList {

@@ -1,6 +1,7 @@
 import { assert } from 'jezve-test';
 import enTokens from '../../src/lang/en.json' assert { type: 'json' };
 import ruTokens from '../../src/lang/ru.json' assert { type: 'json' };
+import { App } from '../Application.js';
 
 export const tokensMap = {
     en: enTokens,
@@ -47,7 +48,7 @@ const formatTokenString = (value, ...args) => (
 );
 
 /** Returns not formatted token string for specified path */
-const getTokenString = (token, locale = 'en') => {
+const getTokenString = (token, locale = App.view.locale) => {
     assert.isString(locale, 'Invalid locale');
 
     const localeTokens = tokensMap[locale];
@@ -66,12 +67,12 @@ const getTokenString = (token, locale = 'en') => {
 };
 
 /** Returns true if specified token is exists */
-export const hasToken = (token, locale = 'en') => (
+export const hasToken = (token, locale = App.view.locale) => (
     typeof getTokenString(token, locale) === 'string'
 );
 
 /* eslint-disable-next-line no-underscore-dangle */
-export const __ = (token, locale = 'en', ...args) => {
+export const __ = (token, locale = App.view.locale, ...args) => {
     const tokenString = getTokenString(token, locale);
     assert.isString(tokenString, `Token '${token}' not found`);
 
@@ -79,7 +80,7 @@ export const __ = (token, locale = 'en', ...args) => {
 };
 
 /** Returns string for Accept-Language HTTP header */
-export const getAcceptLanguageHeader = (locale = 'en') => (
+export const getAcceptLanguageHeader = (locale = App.view.locale) => (
     (locale === 'ru')
         ? 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
         : 'en-US,en'

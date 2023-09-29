@@ -26,7 +26,7 @@ export class PersonDetails extends TestComponent {
         const debtAccounts = this.filterPersonDebts(person.accounts);
         const debtValue = (debtAccounts.length)
             ? debtAccounts.join('\n')
-            : __('persons.noDebts', App.view.locale);
+            : __('persons.noDebts');
 
         const hidden = state.persons.isHidden(person);
         const visibilityToken = (hidden) ? 'item.hidden' : 'item.visible';
@@ -46,7 +46,7 @@ export class PersonDetails extends TestComponent {
             },
             visibilityField: {
                 visible: true,
-                value: __(visibilityToken, App.view.locale),
+                value: __(visibilityToken),
             },
             transactionsField: {
                 value: itemTransactions.length.toString(),

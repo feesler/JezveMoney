@@ -120,7 +120,7 @@ export class ScheduleListItem extends TestComponent {
 
     static renderEndDate(item) {
         if (!item.end_date) {
-            return __('schedule.noEndDate', App.view.locale);
+            return __('schedule.noEndDate');
         }
 
         return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));

@@ -28,7 +28,7 @@ export const checkInitialState = async () => {
 export const filterByType = async (type) => {
     const types = asArray(type);
     assert(types.length > 0, 'Invalid transaction type filter');
-    const typeNames = types.map((item) => Transaction.typeToString(item));
+    const typeNames = types.map((item) => Transaction.typeToString(item, App.config.logsLocale));
 
     await checkNavigation();
     await test(`Filter by transaction types: [${typeNames}]`, () => App.view.filterByType(type));

@@ -292,7 +292,7 @@ export class ScheduledTransaction {
 
     renderInterval() {
         if (this.interval_type === INTERVAL_NONE) {
-            return __('schedule.item.noRepeat', App.view.locale);
+            return __('schedule.item.noRepeat');
         }
 
         const renderSteps = (this.interval_step > 1);
@@ -304,14 +304,14 @@ export class ScheduledTransaction {
 
         return (renderSteps)
             ? __(token, App.view.locale, this.interval_step)
-            : __(token, App.view.locale);
+            : __(token);
     }
 
     renderWeekOffset(offset) {
         const intervalOffsets = asArray(offset).sort((a, b) => a - b);
         if (intervalOffsets.length === 1) {
             const token = weekOffsetTokens[offset];
-            return (token) ? __(token, App.view.locale) : '';
+            return (token) ? __(token) : '';
         }
 
         const date = new Date();

@@ -85,12 +85,12 @@ export class TransactionDetails extends TestComponent {
         const category = state.categories.getItem(item.category_id);
         const categoryTitle = (category)
             ? category.name
-            : __('categories.noCategory', App.view.locale);
+            : __('categories.noCategory');
 
         const res = {
             title: {
                 visible: true,
-                value: Transaction.typeToString(item.type, App.view.locale),
+                value: Transaction.typeToString(item.type),
             },
             sourceField: {
                 visible: showSource,

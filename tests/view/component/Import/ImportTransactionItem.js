@@ -56,7 +56,7 @@ export class ImportTransactionItem extends TestComponent {
             enabled: model.enabled,
             typeField: {
                 visible: true,
-                value: __(transactionType.titleToken, App.view.locale),
+                value: __(transactionType.titleToken),
             },
             srcAmountField: {
                 visible: true,
@@ -100,7 +100,7 @@ export class ImportTransactionItem extends TestComponent {
             const personTok = (model.type === 'debt_in')
                 ? 'transactions.sourcePerson'
                 : 'transactions.destPerson';
-            res.personField.title = __(personTok, App.view.locale);
+            res.personField.title = __(personTok);
 
             const person = state.persons.getItem(model.personId);
             res.personField.value = person.name;

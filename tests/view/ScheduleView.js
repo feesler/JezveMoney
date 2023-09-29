@@ -101,8 +101,8 @@ export class ScheduleView extends AppView {
             };
 
             res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', App.view.locale)
-                : __('transactions.showDetails', App.view.locale);
+                ? __('transactions.showMain')
+                : __('transactions.showDetails');
         }
 
         return res;
