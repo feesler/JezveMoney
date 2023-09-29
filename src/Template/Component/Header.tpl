@@ -4,7 +4,7 @@
         <div class="navigation-logo">
             <a class="header-logo" href="<?= BASEURL ?>">
                 <span class="header-logo__icon"><?= useIcon("header-logo", "logo-icon") ?></span>
-                <span class="header-logo__title"><?= __("appName") ?></span>
+                <span class="header-logo__title">Jezve<b>Money</b></span>
             </a>
         </div>
     </div>

@@ -51,8 +51,9 @@ export class AppHeader extends Header {
         this.logoTitle = createElement('span', {
             props: {
                 className: 'header-logo__title',
-                textContent: this.props.title,
+                textContent: 'Jezve',
             },
+            children: createElement('b', { props: { textContent: 'Money' } })
         });
 
         this.logo = createElement('a', {

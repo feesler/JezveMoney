@@ -35,10 +35,14 @@
     height: var(--login-logo-size);
     line-height: var(--login-logo-size);
     font-size: var(--login-logo-font-size);
-    font-weight: normal;
+    font-weight: 200;
     color: #ffffff;
     white-space: nowrap;
     margin: 0 0 0 12px;
+
+    b {
+      font-weight: 400;
+    }
   }
 }
 
