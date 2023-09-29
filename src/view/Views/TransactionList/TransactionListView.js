@@ -21,6 +21,7 @@ import {
     dateStringToTime,
     formatDateRange,
     getApplicationURL,
+    getContextIds,
     getHalfYearRange,
     getMonthRange,
     getSelectedItems,
@@ -427,7 +428,8 @@ class TransactionListView extends AppView {
     }
 
     showCategoryDialog() {
-        const ids = this.getContextIds();
+        const state = this.store.getState();
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -469,16 +471,6 @@ class TransactionListView extends AppView {
     /** Update render time */
     setRenderTime() {
         this.store.dispatch(actions.setRenderTime());
-    }
-
-    getContextIds() {
-        const state = this.store.getState();
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        const selected = getSelectedItems(state.items);
-        return selected.map((item) => item.id);
     }
 
     getListRequest(state) {
@@ -669,7 +661,7 @@ class TransactionListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -696,7 +688,8 @@ class TransactionListView extends AppView {
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        const ids = this.getContextIds();
+        const state = this.store.getState();
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }

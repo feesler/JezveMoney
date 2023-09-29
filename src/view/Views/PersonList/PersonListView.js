@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    asArray,
     createElement,
     insertAfter,
     isFunction,
@@ -21,6 +20,7 @@ import {
     SORT_MANUALLY,
     __,
     getApplicationURL,
+    getHideableContextIds,
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
@@ -278,7 +278,7 @@ class PersonListView extends AppView {
 
     showExportDialog() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -327,21 +327,13 @@ class PersonListView extends AppView {
         this.store.dispatch(actions.stopLoading());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state);
-    }
-
     async showItems(value = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -371,7 +363,7 @@ class PersonListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -545,7 +537,7 @@ class PersonListView extends AppView {
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }

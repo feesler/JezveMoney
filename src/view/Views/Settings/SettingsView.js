@@ -1,8 +1,5 @@
 import 'jezvejs/style';
-import {
-    asArray,
-    isFunction,
-} from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -11,7 +8,7 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 // Application
-import { __ } from '../../utils/utils.js';
+import { __, getContextIds } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/AppView/AppView.js';
 import { API } from '../../API/index.js';
@@ -274,23 +271,6 @@ class SettingsView extends AppView {
         this.setRenderTime();
     }
 
-    getSelectedItems(state) {
-        return state.userCurrencies.filter((item) => item.selected);
-    }
-
-    getSelectedIds(state) {
-        const selArr = this.getSelectedItems(state);
-        return selArr.map((item) => item.id);
-    }
-
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return this.getSelectedIds(state);
-    }
-
     onCurrencySelect(selection) {
         this.sendCreateRequest({ curr_id: selection.id, flags: 0 });
     }
@@ -413,7 +393,7 @@ class SettingsView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state, 'userCurrencies');
         if (ids.length === 0) {
             return;
         }

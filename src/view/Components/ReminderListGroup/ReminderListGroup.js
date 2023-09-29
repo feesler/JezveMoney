@@ -8,7 +8,7 @@ import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Spinner } from 'jezvejs/Spinner';
 
-import { __, getSelectedIds, listData } from '../../utils/utils.js';
+import { __, getSelectedItems, listData } from '../../utils/utils.js';
 
 import { REMINDER_UPCOMING, Reminder } from '../../Models/Reminder.js';
 
@@ -231,7 +231,7 @@ export class ReminderListGroup extends Component {
 
         const itemsCount = state.items.length;
         const isSelectMode = (state.listMode === 'select');
-        const selected = (isSelectMode) ? getSelectedIds(state.items) : [];
+        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
 
         this.itemsCounter.setContent(itemsCount.toString());
         this.selectedCounter.show(isSelectMode);

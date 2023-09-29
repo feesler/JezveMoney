@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { asArray, isFunction } from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -10,10 +10,10 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/AppView/AppView.js';
 import {
     __,
-    getSelectedIds,
     getApplicationURL,
     dateStringToTime,
     formatDateRange,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
@@ -383,14 +383,6 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state.items);
-    }
-
     async requestList(options = {}) {
         const { keepState = false } = options;
 
@@ -443,7 +435,7 @@ class ReminderListView extends AppView {
     }
 
     getRequestData(state) {
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (getStateFilter(state) !== REMINDER_UPCOMING) {
             return { id: ids };
         }
@@ -547,7 +539,7 @@ class ReminderListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -575,7 +567,7 @@ class ReminderListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }

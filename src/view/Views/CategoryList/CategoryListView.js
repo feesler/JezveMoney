@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    asArray,
     createElement,
     insertAfter,
     isFunction,
@@ -26,6 +25,7 @@ import {
     __,
     getSelectedIds,
     getApplicationURL,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
@@ -330,21 +330,13 @@ class CategoryListView extends AppView {
         this.store.dispatch(actions.stopLoading());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state.items);
-    }
-
     async deleteItems(removeChild = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -528,7 +520,7 @@ class CategoryListView extends AppView {
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -660,7 +652,7 @@ class CategoryListView extends AppView {
 
         const itemsCount = state.items.length;
         const isSelectMode = (state.listMode === 'select');
-        const selected = (isSelectMode) ? getSelectedIds(state.items) : [];
+        const selected = (isSelectMode) ? getSelectedIds(state) : [];
 
         this.itemsCounter.setContent(itemsCount.toString());
         this.selectedCounter.show(isSelectMode);

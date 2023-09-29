@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    asArray,
     createElement,
     insertAfter,
     isFunction,
@@ -22,6 +21,7 @@ import {
     __,
     getSelectedItems,
     getApplicationURL,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
@@ -360,26 +360,13 @@ class ScheduleView extends AppView {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    getSelectedIds(state) {
-        const selArr = getSelectedItems(state.items);
-        return selArr.map((item) => item.id);
-    }
-
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return this.getSelectedIds(state);
-    }
-
     async deleteItems() {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -465,7 +452,7 @@ class ScheduleView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -491,7 +478,7 @@ class ScheduleView extends AppView {
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
