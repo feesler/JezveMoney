@@ -1,5 +1,5 @@
 .login-layer {
-  --login-logo-size: 54px;
+  --login-logo-size: 100px;
   --login-logo-font-size: 26px;
 
   justify-content: flex-start;
@@ -21,7 +21,6 @@
 .login-logo {
   display: flex;
   flex-flow: row nowrap;
-  padding: 24px 0;
 
   .logo {
     width: var(--login-logo-size);
