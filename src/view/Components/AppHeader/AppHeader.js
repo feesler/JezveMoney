@@ -53,7 +53,7 @@ export class AppHeader extends Header {
                 className: 'header-logo__title',
                 textContent: 'Jezve',
             },
-            children: createElement('b', { props: { textContent: 'Money' } })
+            children: createElement('b', { props: { textContent: 'Money' } }),
         });
 
         this.logo = createElement('a', {
