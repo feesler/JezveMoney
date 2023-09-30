@@ -1,15 +1,20 @@
 /* Mode selector */
-.btn.mode-selector {
-  --btn-title-color: var(--accent-color);
-  --btn-icon-color: var(--accent-color);
-  --btn-hover-icon-color: var(--accent-color);
-  --btn-hover-title-color: var(--accent-hover-color);
-}
+.menu.mode-selector {
+  --menu-item-text-color: var(--accent-color);
+  --menu-item-background: var(--alt-bg-color);
+  --menu-item-active-background: var(--accent-active-color);
+  --menu-item-active-text-color: #ffffff;
+  --menu-item-active-icon-color: #ffffff;
+  --menu-item-selected-text-color: #ffffff;
+  --menu-item-selected-icon-color: #ffffff;
+  --menu-item-selected-background: var(--accent-color);
+  --menu-item-hover-text-color: #ffffff;
+  --menu-item-hover-icon-color: #ffffff;
+  --menu-item-hover-background: var(--accent-color);
+  --menu-item-side-content-size: 2rem;
+  --menu-column-gap: 0;
 
-@media (hover: hover) {
-  .mode-selector:hover {
-    .btn__content {
-      text-decoration: underline;
-    }
+  .menu-item__content {
+    display: none;
   }
 }

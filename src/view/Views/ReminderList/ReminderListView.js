@@ -162,7 +162,7 @@ class ReminderListView extends AppView {
             onItemClick: (id, e) => this.onItemClick(id, e),
             onShowMore: (e) => this.showMore(e),
             onChangePage: (page) => this.onChangePage(page),
-            onToggleMode: (e) => this.onToggleMode(e),
+            onChangeMode: (mode) => this.onChangeMode(mode),
         });
         this.contentContainer.append(this.listGroup.elem);
 
@@ -314,8 +314,11 @@ class ReminderListView extends AppView {
         this.setRenderTime();
     }
 
-    onToggleMode(e) {
-        e.preventDefault();
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
 
         this.store.dispatch(actions.toggleMode());
         this.setRenderTime();

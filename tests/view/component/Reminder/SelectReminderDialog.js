@@ -17,7 +17,6 @@ import {
 import { Counter } from '../Counter.js';
 import { dateToSeconds } from '../../../common.js';
 import { RemindersList } from '../../../model/RemindersList.js';
-import { __ } from '../../../model/locale.js';
 
 /**
  * Select reminder dialog test component
@@ -93,9 +92,7 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         if (isItemsAvailable) {
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain')
-                : __('transactions.showDetails');
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         return res;
@@ -200,7 +197,7 @@ export class SelectReminderDialog extends TestComponent {
         res.dateFilter = await DatePickerFilter.create(this, dateRangeEl);
         assert(res.dateFilter, 'Date filter not found');
 
-        res.modeSelector = await Button.create(this, await query(this.elem, '.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query(this.elem, '.mode-selector'));
         res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
         res.showMoreSpinner = { elem: await query(this.elem, '.list-footer .request-spinner') };
         res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
@@ -215,11 +212,9 @@ export class SelectReminderDialog extends TestComponent {
 
         [
             res.header.title,
-            res.modeSelector.content.value,
-        ] = await evaluate((hdrEl, modSelBtn) => ([
+        ] = await evaluate((hdrEl) => ([
             hdrEl?.querySelector('label')?.textContent,
-            modSelBtn?.dataset?.value,
-        ]), res.header.elem, res.modeSelector.elem);
+        ]), res.header.elem);
 
         return res;
     }
@@ -753,9 +748,10 @@ export class SelectReminderDialog extends TestComponent {
         await this.closeFilters();
 
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.modeSelector.click());
+        await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
 
         return this.checkState(expected);
     }

@@ -18,7 +18,6 @@ import {
     PopupMenu,
 } from 'jezvejs-test';
 import { App } from '../Application.js';
-import { __ } from '../model/locale.js';
 import { RemindersList } from '../model/RemindersList.js';
 import { AppView } from './AppView.js';
 import { Counter } from './component/Counter.js';
@@ -172,9 +171,7 @@ export class ReminderListView extends AppView {
         }
 
         if (isItemsAvailable) {
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain')
-                : __('transactions.showDetails');
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         return res;
@@ -272,7 +269,7 @@ export class ReminderListView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
-        res.modeSelector = await Button.create(this, await query('.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
         res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
         res.paginator = await Paginator.create(this, await query('.paginator'));
@@ -363,9 +360,8 @@ export class ReminderListView extends AppView {
             res.list.pages = this.upcomingPagination?.pagesCount;
         }
 
-        if (cont.modeSelector?.link) {
-            const modeURL = new URL(cont.modeSelector.link);
-            res.detailsMode = !this.hasDetailsModeParam(modeURL);
+        if (cont.modeSelector?.value) {
+            res.detailsMode = cont.modeSelector.value === 'details';
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = this.hasDetailsModeParam(locURL);
@@ -1100,12 +1096,13 @@ export class ReminderListView extends AppView {
         }
 
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
         if (directNavigate) {
             await this.goToExpectedURL();
         } else {
-            await this.waitForList(() => this.content.modeSelector.click());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
         }
 
         return App.view.checkState(expected);

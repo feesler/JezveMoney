@@ -14,6 +14,7 @@ import {
 import {
     Button,
     DropDown,
+    LinkMenu,
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
@@ -36,7 +37,6 @@ import {
     shiftMonth,
     trimToDigitsLimit,
 } from '../common.js';
-import { __ } from '../model/locale.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
 
 const listMenuSelector = '#listMenu';
@@ -118,7 +118,7 @@ export class TransactionListView extends AppView {
         assert(listContainer, 'List container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
-        res.modeSelector = await Button.create(this, await query('.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
         res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
@@ -233,9 +233,8 @@ export class TransactionListView extends AppView {
             };
         }
 
-        if (cont.modeSelector?.link) {
-            const modeURL = new URL(cont.modeSelector.link);
-            res.detailsMode = !this.hasDetailsModeParam(modeURL);
+        if (cont.modeSelector?.value) {
+            res.detailsMode = cont.modeSelector.value === 'details';
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = this.hasDetailsModeParam(locURL);
@@ -647,9 +646,7 @@ export class TransactionListView extends AppView {
                 active: pageNum,
             };
 
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', model.locale)
-                : __('transactions.showDetails', model.locale);
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         // Set category dialog
@@ -1245,12 +1242,13 @@ export class TransactionListView extends AppView {
             await this.closeFilters();
         }
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.click());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
         }
 
         return App.view.checkState(expected);

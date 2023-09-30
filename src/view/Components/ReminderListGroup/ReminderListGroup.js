@@ -36,7 +36,7 @@ const defaultProps = {
     getURL: null,
     onShowMore: null,
     onChangePage: null,
-    onToggleMode: null,
+    onChangeMode: null,
 };
 
 /**
@@ -122,7 +122,7 @@ export class ReminderListGroup extends Component {
 
         // List mode selected
         this.modeSelector = ToggleDetailsButton.create({
-            onClick: (e) => this.onToggleMode(e),
+            onChange: (value) => this.onChangeMode(value),
         });
 
         this.header = createElement('header', {
@@ -215,9 +215,9 @@ export class ReminderListGroup extends Component {
     }
 
     /** Toggle mode button 'click' event handler */
-    onToggleMode(e) {
-        if (isFunction(this.props.onToggleMode)) {
-            this.props.onToggleMode(e);
+    onChangeMode(value) {
+        if (isFunction(this.props.onChangeMode)) {
+            this.props.onChangeMode(value);
         }
     }
 
@@ -246,21 +246,11 @@ export class ReminderListGroup extends Component {
             return;
         }
 
-        const props = {
-            details: (state.mode === 'details'),
-        };
-
         if (this.useURL) {
-            const modeURL = this.getURL(state);
-            modeURL.searchParams.set('mode', (props.details) ? 'classic' : 'details');
-            props.url = modeURL.toString();
+            this.modeSelector.setURL(this.getURL(state));
         }
-
+        this.modeSelector.setSelection(state.mode);
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((btnState) => ({
-            ...btnState,
-            ...props,
-        }));
     }
 
     renderPaginator(state, prevState) {

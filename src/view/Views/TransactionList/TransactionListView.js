@@ -308,7 +308,7 @@ class TransactionListView extends AppView {
 
         // Toggle details mode button
         this.modeSelector = ToggleDetailsButton.create({
-            onClick: (e) => this.onToggleMode(e),
+            onChange: (mode) => this.onChangeMode(mode),
         });
 
         const listHeader = createElement('div', {
@@ -823,8 +823,11 @@ class TransactionListView extends AppView {
         });
     }
 
-    onToggleMode(e) {
-        e.preventDefault();
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
 
         this.store.dispatch(actions.toggleMode());
         this.setRenderTime();
@@ -1143,17 +1146,17 @@ class TransactionListView extends AppView {
         this.selectedCounter.setContent(selected.length.toString());
     }
 
-    renderToggleDetailsButton(state) {
-        const details = (state.mode === 'details');
-        const modeURL = this.getFilterURL(state);
-        modeURL.searchParams.set('mode', (details) ? 'classic' : 'details');
+    renderModeSelector(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.mode === prevState?.mode
+        ) {
+            return;
+        }
 
+        this.modeSelector.setURL(this.getFilterURL(state));
+        this.modeSelector.setSelection(state.mode);
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((modeSelectorState) => ({
-            ...modeSelectorState,
-            details,
-            url: modeURL.toString(),
-        }));
     }
 
     renderList(state, prevState) {
@@ -1269,7 +1272,7 @@ class TransactionListView extends AppView {
 
         this.renderFilters(state, prevState);
         this.renderCounters(state, prevState);
-        this.renderToggleDetailsButton(state, prevState);
+        this.renderModeSelector(state, prevState);
         this.renderList(state, prevState);
         this.renderListFooter(state, prevState);
         this.renderContextMenu(state, prevState);

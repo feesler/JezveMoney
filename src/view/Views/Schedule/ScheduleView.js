@@ -162,7 +162,7 @@ class ScheduleView extends AppView {
 
         // Toggle details mode button
         this.modeSelector = ToggleDetailsButton.create({
-            onClick: (e) => this.onToggleMode(e),
+            onChange: (mode) => this.onChangeMode(mode),
         });
 
         const contentHeader = createElement('header', {
@@ -282,8 +282,11 @@ class ScheduleView extends AppView {
         this.setRenderTime();
     }
 
-    onToggleMode(e) {
-        e.preventDefault();
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
 
         this.store.dispatch(actions.toggleMode());
         this.setRenderTime();
@@ -641,17 +644,17 @@ class ScheduleView extends AppView {
         this.selectedCounter.setContent(selected.length.toString());
     }
 
-    renderToggleDetailsButton(state) {
-        const details = (state.mode === 'details');
-        const modeURL = this.getURL(state);
-        modeURL.searchParams.set('mode', (details) ? 'classic' : 'details');
+    renderModeSelector(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.mode === prevState?.mode
+        ) {
+            return;
+        }
 
+        this.modeSelector.setURL(this.getURL(state));
+        this.modeSelector.setSelection(state.mode);
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((modeSelectorState) => ({
-            ...modeSelectorState,
-            details,
-            url: modeURL.toString(),
-        }));
     }
 
     renderList(state, prevState) {
@@ -719,7 +722,7 @@ class ScheduleView extends AppView {
         }
 
         this.renderCounters(state, prevState);
-        this.renderToggleDetailsButton(state, prevState);
+        this.renderModeSelector(state, prevState);
         this.renderList(state, prevState);
         this.renderContextMenu(state, prevState);
         this.renderMenu(state, prevState);
