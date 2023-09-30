@@ -17,7 +17,7 @@ import { createStore } from 'jezvejs/Store';
 import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -31,9 +31,9 @@ import { Schedule } from '../../Models/Schedule.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
 // Common components
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 
 // Local components
 import { ImportRulesDialog } from './components/RulesDialog/Dialog/ImportRulesDialog.js';

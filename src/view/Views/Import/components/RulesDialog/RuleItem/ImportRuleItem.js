@@ -15,7 +15,7 @@ import { ImportActionList } from '../../../../../Models/ImportActionList.js';
 
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
-import { CollapsibleListItem } from '../../../../../Components/CollapsibleListItem/CollapsibleListItem.js';
+import { CollapsibleListItem } from '../../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';
 
 import './ImportRuleItem.scss';
 

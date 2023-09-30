@@ -7,7 +7,7 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
     getApplicationURL,
@@ -29,10 +29,10 @@ import {
 } from '../../Models/Reminder.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { ReminderFilters } from '../../Components/ReminderFilters/ReminderFilters.js';
-import { ReminderListGroup } from '../../Components/ReminderListGroup/ReminderListGroup.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
+import { ReminderFilters } from '../../Components/Reminder/ReminderFilters/ReminderFilters.js';
+import { ReminderListGroup } from '../../Components/Reminder/ReminderListGroup/ReminderListGroup.js';
 
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
 import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';

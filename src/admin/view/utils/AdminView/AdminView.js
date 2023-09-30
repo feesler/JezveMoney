@@ -1,4 +1,4 @@
-import { AppView } from '../../../../view/Components/AppView/AppView.js';
+import { AppView } from '../../../../view/Components/Layout/AppView/AppView.js';
 
 /**
  * Base Admin view

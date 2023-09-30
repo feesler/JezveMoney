@@ -6,9 +6,9 @@ import {
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { App } from '../../../../Application/App.js';
-import { LoadingIndicator } from '../../../../Components/LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import './ProfileDialog.scss';
-import { FormControls } from '../../../../Components/FormControls/FormControls.js';
+import { FormControls } from '../../../../Components/Form/FormControls/FormControls.js';
 import { __ } from '../../../../utils/utils.js';
 
 /* CSS classes */

@@ -5,13 +5,13 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { __, parseCookies, setCookie } from '../../utils/utils.js';
 
-import { Field } from '../../Components/Fields/Field/Field.js';
-import { InputField } from '../../Components/Fields/InputField/InputField.js';
-import { PasswordField } from '../../Components/Fields/PasswordField/PasswordField.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { Field } from '../../Components/Common/Field/Field.js';
+import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
+import { PasswordField } from '../../Components/Form/Fields/PasswordField/PasswordField.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './LoginView.scss';

@@ -7,7 +7,7 @@ import { AdminListView } from '../../utils/AdminListView/AdminListView.js';
 
 import { CURRENCY_SIGN_BEFORE_VALUE, CURRENCY_FORMAT_TRAILING_ZEROS } from '../../../../view/Models/Currency.js';
 
-import '../../../../view/Components/Fields/Field/Field.scss';
+import '../../../../view/Components/Common/Field/Field.scss';
 import '../../../../view/Application/Application.scss';
 import '../../utils/AdminView/AdminView.scss';
 

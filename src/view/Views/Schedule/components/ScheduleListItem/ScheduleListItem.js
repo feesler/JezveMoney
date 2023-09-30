@@ -8,9 +8,9 @@ import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { INTERVAL_NONE, ScheduledTransaction } from '../../../../Models/ScheduledTransaction.js';
 
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { TransactionListItemBase } from '../../../../Components/TransactionListItemBase/TransactionListItemBase.js';
-import { ListItem } from '../../../../Components/ListItem/ListItem.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { TransactionListItemBase } from '../../../../Components/Transaction/TransactionListItemBase/TransactionListItemBase.js';
+import { ListItem } from '../../../../Components/List/ListItem/ListItem.js';
 
 import './ScheduleListItem.scss';
 

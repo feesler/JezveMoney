@@ -14,11 +14,11 @@ import { createStore } from 'jezvejs/Store';
 import { __, listData } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 
-import { ConfirmDialog } from '../../../../../Components/ConfirmDialog/ConfirmDialog.js';
-import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
-import { SearchInput } from '../../../../../Components/Inputs/SearchInput/SearchInput.js';
+import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { SearchInput } from '../../../../../Components/Form/Inputs/SearchInput/SearchInput.js';
 import { RuleListContextMenu } from '../ContextMenu/RuleListContextMenu.js';
-import { NoDataMessage } from '../../../../../Components/NoDataMessage/NoDataMessage.js';
+import { NoDataMessage } from '../../../../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 

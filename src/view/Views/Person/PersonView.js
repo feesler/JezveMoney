@@ -8,15 +8,15 @@ import { createStore } from 'jezvejs/Store';
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 import { PersonList } from '../../Models/PersonList.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { InputField } from '../../Components/Fields/InputField/InputField.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './PersonView.scss';

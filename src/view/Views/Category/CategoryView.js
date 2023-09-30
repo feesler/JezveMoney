@@ -12,17 +12,17 @@ import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
-import { InputField } from '../../Components/Fields/InputField/InputField.js';
-import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { CategorySelect } from '../../Components/Category/CategorySelect/CategorySelect.js';
+import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
+import { DeleteCategoryDialog } from '../../Components/Category/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './CategoryView.scss';

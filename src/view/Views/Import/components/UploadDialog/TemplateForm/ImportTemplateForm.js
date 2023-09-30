@@ -14,11 +14,11 @@ import { App } from '../../../../../Application/App.js';
 
 import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTemplate.js';
 
-import { DateFormatSelect } from '../../../../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
-import { InputField } from '../../../../../Components/Fields/InputField/InputField.js';
-import { NumberInputGroup } from '../../../../../Components/Inputs/NumberInputGroup/NumberInputGroup.js';
-import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
-import { SwitchField } from '../../../../../Components/Fields/SwitchField/SwitchField.js';
+import { DateFormatSelect } from '../../../../../Components/Form/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
+import { InputField } from '../../../../../Components/Form/Fields/InputField/InputField.js';
+import { NumberInputGroup } from '../../../../../Components/Form/Inputs/NumberInputGroup/NumberInputGroup.js';
+import { FormControls } from '../../../../../Components/Form/FormControls/FormControls.js';
+import { SwitchField } from '../../../../../Components/Form/Fields/SwitchField/SwitchField.js';
 
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 

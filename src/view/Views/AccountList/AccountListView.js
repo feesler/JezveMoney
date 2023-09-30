@@ -13,7 +13,7 @@ import { createStore } from 'jezvejs/Store';
 // Application
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -33,13 +33,13 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { IconList } from '../../Models/IconList.js';
 
 // Common components
-import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { ExportDialog } from '../../Components/ExportDialog/ExportDialog.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 
 // Local components
 import { AccountDetails } from './components/AccountDetails/AccountDetails.js';

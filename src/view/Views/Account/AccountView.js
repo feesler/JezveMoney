@@ -12,7 +12,7 @@ import { createStore } from 'jezvejs/Store';
 import { getCurrencyPrecision, __ } from '../../utils/utils.js';
 import { normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 import { IconList } from '../../Models/IconList.js';
@@ -21,17 +21,17 @@ import { AccountList } from '../../Models/AccountList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { InputField } from '../../Components/Fields/InputField/InputField.js';
-import { AmountInputField } from '../../Components/Fields/AmountInputField/AmountInputField.js';
-import { IconSelect } from '../../Components/Inputs/IconSelect/IconSelect.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
+import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
+import { AmountInputField } from '../../Components/Form/Fields/AmountInputField/AmountInputField.js';
+import { IconSelect } from '../../Components/Form/Inputs/IconSelect/IconSelect.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './AccountView.scss';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 /**
  * Create/update account view

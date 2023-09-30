@@ -18,7 +18,7 @@ import {
     TPL_CREATE_STATE,
     TPL_UPDATE_STATE,
 } from '../TemplateManager/ImportTemplateManager.js';
-import { LoadingIndicator } from '../../../../../Components/LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import './ImportUploadDialog.scss';
 
 /** CSS classes */

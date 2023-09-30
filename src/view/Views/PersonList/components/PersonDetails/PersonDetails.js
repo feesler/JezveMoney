@@ -2,8 +2,8 @@ import { createElement } from 'jezvejs';
 
 import { __, formatPersonDebts, getApplicationURL } from '../../../../utils/utils.js';
 
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
 const DEBTS_FIELD_CLASS = 'debts-field';

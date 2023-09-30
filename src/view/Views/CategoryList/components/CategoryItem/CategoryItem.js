@@ -3,7 +3,7 @@ import { ListContainer } from 'jezvejs/ListContainer';
 
 import { listData } from '../../../../utils/utils.js';
 
-import { CollapsibleListItem } from '../../../../Components/CollapsibleListItem/CollapsibleListItem.js';
+import { CollapsibleListItem } from '../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';
 
 import './CategoryItem.scss';
 

@@ -15,7 +15,7 @@ import { createStore } from 'jezvejs/Store';
 // Application
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     listData,
     __,
@@ -34,12 +34,12 @@ import { Schedule } from '../../Models/Schedule.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 
 // Common components
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
-import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+import { ToggleDetailsButton } from '../../Components/List/ToggleDetailsButton/ToggleDetailsButton.js';
 
 // Local components
 import { ScheduleItemContextMenu } from './components/ContextMenu/ScheduleItemContextMenu.js';

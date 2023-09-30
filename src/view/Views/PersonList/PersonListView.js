@@ -24,7 +24,7 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 // Models
@@ -32,13 +32,13 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { PersonList } from '../../Models/PersonList.js';
 
 // Common components
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ExportDialog } from '../../Components/ExportDialog/ExportDialog.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
-import { Tile } from '../../Components/Tile/Tile.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { Tile } from '../../Components/Common/Tile/Tile.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 
 // Local components
 import { PersonListContextMenu } from './components/ContextMenu/PersonListContextMenu.js';

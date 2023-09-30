@@ -11,7 +11,7 @@ import {
 import { Popup } from 'jezvejs/Popup';
 
 import { App } from '../../../../view/Application/App.js';
-import { ConfirmDialog } from '../../../../view/Components/ConfirmDialog/ConfirmDialog.js';
+import { ConfirmDialog } from '../../../../view/Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from '../AdminView/AdminView.js';
 
 /**

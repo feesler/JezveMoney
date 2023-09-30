@@ -5,7 +5,7 @@ import {
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { API } from '../../../../API/index.js';
-import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
+import { InputField } from '../../../../Components/Form/Fields/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */

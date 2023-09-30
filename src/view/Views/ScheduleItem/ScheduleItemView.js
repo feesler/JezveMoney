@@ -6,7 +6,7 @@ import { __ } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 import { AccountList } from '../../Models/AccountList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -15,9 +15,9 @@ import { IconList } from '../../Models/IconList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { TransactionForm } from '../../Components/TransactionForm/TransactionForm.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { TransactionForm } from '../../Components/Transaction/TransactionForm/TransactionForm.js';
 
 import { actions, reducer } from './reducer.js';
 import './ScheduleItemView.scss';

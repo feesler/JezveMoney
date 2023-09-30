@@ -9,7 +9,7 @@ import { MenuButton } from 'jezvejs/MenuButton';
 
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
-import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
+import { ToggleButton } from '../../../../../Components/Common/ToggleButton/ToggleButton.js';
 import { TemplateSelectContextMenu } from '../TemplateContextMenu/TemplateSelectContextMenu.js';
 import './TemplateSelect.scss';
 

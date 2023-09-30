@@ -22,10 +22,10 @@ import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { Schedule } from '../../Models/Schedule.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
-import { AppView } from '../../Components/AppView/AppView.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { TransactionForm } from '../../Components/TransactionForm/TransactionForm.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { TransactionForm } from '../../Components/Transaction/TransactionForm/TransactionForm.js';
 
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';

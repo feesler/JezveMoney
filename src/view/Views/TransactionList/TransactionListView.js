@@ -32,7 +32,7 @@ import { MAX_PRECISION, normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { API } from '../../API/index.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -41,24 +41,24 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
 // Common components
-import { AmountRangeField } from '../../Components/Fields/AmountRangeField/AmountRangeField.js';
-import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
-import { ExportDialog } from '../../Components/ExportDialog/ExportDialog.js';
-import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
-import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ListCounter } from '../../Components/ListCounter/ListCounter.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import { SearchInput } from '../../Components/Inputs/SearchInput/SearchInput.js';
-import { TransactionListGroup } from '../../Components/TransactionListGroup/TransactionListGroup.js';
-import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
-import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
-import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
-import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
+import { AmountRangeField } from '../../Components/Form/Fields/AmountRangeField/AmountRangeField.js';
+import { DateRangeInput } from '../../Components/Form/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
+import { FieldHeaderButton } from '../../Components/Form/Fields/FieldHeaderButton/FieldHeaderButton.js';
+import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { TransactionTypeMenu } from '../../Components/Form/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { TransactionList } from '../../Components/Transaction/TransactionList/TransactionList.js';
+import { SearchInput } from '../../Components/Form/Inputs/SearchInput/SearchInput.js';
+import { TransactionListGroup } from '../../Components/Transaction/TransactionListGroup/TransactionListGroup.js';
+import { TransactionListItem } from '../../Components/Transaction/TransactionListItem/TransactionListItem.js';
+import { SetCategoryDialog } from '../../Components/Category/SetCategoryDialog/SetCategoryDialog.js';
+import { ToggleDetailsButton } from '../../Components/List/ToggleDetailsButton/ToggleDetailsButton.js';
+import { TransactionListContextMenu } from '../../Components/Transaction/TransactionListContextMenu/TransactionListContextMenu.js';
 
 // Local components
 import { TransactionListMainMenu } from './components/MainMenu/TransactionListMainMenu.js';

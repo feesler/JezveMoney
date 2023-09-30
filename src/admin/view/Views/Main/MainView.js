@@ -5,7 +5,7 @@ import '../../../../view/Application/Application.scss';
 import { AdminView } from '../../utils/AdminView/AdminView.js';
 import '../../utils/AdminView/AdminView.scss';
 import { apiPost } from '../../../../view/API/index.js';
-import { SwitchField } from '../../../../view/Components/Fields/SwitchField/SwitchField.js';
+import { SwitchField } from '../../../../view/Components/Form/Fields/SwitchField/SwitchField.js';
 
 /**
  * Admin main view

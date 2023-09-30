@@ -5,8 +5,8 @@ import { App } from '../../../../Application/App.js';
 
 import { ImportTransaction, typeNames } from '../../../../Models/ImportTransaction.js';
 
-import { CollapsibleListItem } from '../../../../Components/CollapsibleListItem/CollapsibleListItem.js';
-import { Field } from '../../../../Components/Fields/Field/Field.js';
+import { CollapsibleListItem } from '../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 

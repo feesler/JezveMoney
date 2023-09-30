@@ -10,7 +10,7 @@ import { TabList } from 'jezvejs/TabList';
 // Application
 import { __, getContextIds } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 // Models
@@ -18,13 +18,13 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 
 // Common components
-import { Heading } from '../../Components/Heading/Heading.js';
-import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
-import { DateFormatSelect } from '../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
-import { NumberFormatSelect } from '../../Components/Inputs/NumberFormatSelect/NumberFormatSelect.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { LocaleSelectField } from '../../Components/Form/Fields/LocaleSelectField/LocaleSelectField.js';
+import { ThemeSwitchField } from '../../Components/Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
+import { DateFormatSelect } from '../../Components/Form/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+import { NumberFormatSelect } from '../../Components/Form/Inputs/NumberFormatSelect/NumberFormatSelect.js';
 
 // Local components
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
