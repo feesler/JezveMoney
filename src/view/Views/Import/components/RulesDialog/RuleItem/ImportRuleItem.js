@@ -26,6 +26,7 @@ const defaultProps = {
     collapsed: true,
     showControls: true,
     toggleButton: true,
+    animated: true,
 };
 
 /**
@@ -84,12 +85,14 @@ export class ImportRuleItem extends CollapsibleListItem {
         });
         this.actionsContainer = App.createContainer('rule-item__actions');
 
-        this.setCollapsibleContent([
+        this.ruleContent = App.createContainer('rule-item__content', [
             this.conditionsHeader,
             this.conditionsContainer,
             this.actionsHeader,
             this.actionsContainer,
         ]);
+
+        this.setCollapsibleContent(this.ruleContent);
     }
 
     /** Toggle expand/collapse button 'click' event handler */

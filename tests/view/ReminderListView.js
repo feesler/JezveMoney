@@ -246,6 +246,10 @@ export class ReminderListView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
+        [res.filtersAnimation] = await evaluate(() => ([
+            document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
+        ]));
+
         res.heading = { elem: await query('.heading > h1') };
         assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
@@ -302,6 +306,7 @@ export class ReminderListView extends AppView {
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible: cont.contextMenu?.visible,
             filtersVisible: cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 
@@ -736,6 +741,24 @@ export class ReminderListView extends AppView {
         return App.view.waitForLoad();
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -744,7 +767,7 @@ export class ReminderListView extends AppView {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -759,9 +782,9 @@ export class ReminderListView extends AppView {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);

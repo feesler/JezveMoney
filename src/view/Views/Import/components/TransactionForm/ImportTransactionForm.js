@@ -531,6 +531,7 @@ export class ImportTransactionForm extends Component {
         if (!this.collapse) {
             this.collapse = Collapsible.create({
                 toggleOnClick: false,
+                animated: true,
                 header: null,
             });
 

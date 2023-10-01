@@ -78,6 +78,10 @@ export class TransactionListView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
+        [res.filtersAnimation] = await evaluate(() => ([
+            document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
+        ]));
+
         // Main menu
         res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
 
@@ -174,7 +178,8 @@ export class TransactionListView extends AppView {
             listMode: (cont.transList) ? cont.transList.listMode : 'list',
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible: cont.contextMenu?.visible,
-            filtersVisible: cont.filtersContainer.visible,
+            filtersVisible: !!cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
             groupByDate: App.state.getGroupByDate(),
             data: App.state.transactions.clone(),
             detailsItem: this.getDetailsItem(this.getDetailsId()),
@@ -755,6 +760,24 @@ export class TransactionListView extends AppView {
         return this.changeListMode('sort');
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -763,7 +786,7 @@ export class TransactionListView extends AppView {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -778,9 +801,9 @@ export class TransactionListView extends AppView {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);

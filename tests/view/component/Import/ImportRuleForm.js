@@ -6,6 +6,7 @@ import {
     prop,
     click,
     asyncMap,
+    waitForFunction,
 } from 'jezve-test';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -303,6 +304,13 @@ export class ImportRuleForm extends TestComponent {
         }
 
         await this.performAction(() => this.content.conditionsList.toggle());
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.content.conditionsList.animated
+                && !this.content.conditionsList.collapsed
+            );
+        });
     }
 
     /** Search for first condition field type not used in rule */
@@ -619,6 +627,13 @@ export class ImportRuleForm extends TestComponent {
         }
 
         await this.performAction(() => this.content.actionsList.toggle());
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.content.actionsList.animated
+                && !this.content.actionsList.collapsed
+            );
+        });
     }
 
     async addAction() {

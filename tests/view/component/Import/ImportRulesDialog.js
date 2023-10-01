@@ -362,9 +362,18 @@ export class ImportRulesDialog extends TestComponent {
         this.model.contextMenuVisible = false;
         const rule = this.model.rules[ind];
         rule.collapsed = !rule.collapsed;
+        const expectedCollapsed = rule.collapsed;
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.items[ind].toggleExpand());
+        await waitForFunction(async () => {
+            await this.parse();
+            const targetRule = this.model.rules[ind];
+            return (
+                !targetRule.animated
+                && targetRule.collapsed === expectedCollapsed
+            );
+        });
 
         return this.checkState(expected);
     }

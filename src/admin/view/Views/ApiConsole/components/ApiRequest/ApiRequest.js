@@ -87,6 +87,7 @@ export class ApiRequest extends Component {
 
             this.requestContainer = Collapsible.create({
                 className: REQUEST_CONTAINER_CLASS,
+                animated: true,
                 header: titleElem,
                 content: bodyElem,
             });
@@ -131,6 +132,7 @@ export class ApiRequest extends Component {
         const resultClassName = (response.result) ? RESPONSE_OK_CLASS : RESPONSE_FAIL_CLASS;
         this.resultContainer = Collapsible.create({
             className: [RESPONSE_CONTAINER_CLASS, resultClassName],
+            animated: true,
             header: titleEl,
         });
         if (response.rawResult) {

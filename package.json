@@ -54,7 +54,7 @@
         "astroturf": "^1.2.0",
         "autoprefixer": "^9.8.8",
         "babel-loader": "^8.3.0",
-        "browserslist": "^4.21.11",
+        "browserslist": "^4.22.1",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^5.2.7",
         "css-minimizer-webpack-plugin": "^3.4.1",
@@ -92,7 +92,7 @@
     "dependencies": {
         "@babel/runtime": "^7.23.1",
         "core-js": "^3.32.2",
-        "jezvejs": "^1.114.0",
+        "jezvejs": "^1.114.1",
         "whatwg-fetch": "^3.6.19"
     }
 }

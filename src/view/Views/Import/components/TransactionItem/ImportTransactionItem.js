@@ -43,6 +43,7 @@ export class ImportTransactionItem extends CollapsibleListItem {
             item: new ImportTransaction(props.item),
             className: getClassName(CONTAINER_CLASS, props.className),
             toggleOnClick: false,
+            animated: true,
         });
     }
 

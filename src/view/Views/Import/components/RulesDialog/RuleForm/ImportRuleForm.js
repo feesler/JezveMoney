@@ -106,6 +106,7 @@ export class ImportRuleForm extends Component {
 
         this.conditionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
+            animated: true,
             header: [
                 createElement('label', { props: { textContent: __('import.conditions.title') } }),
                 this.createCondBtn.elem,
@@ -143,6 +144,7 @@ export class ImportRuleForm extends Component {
 
         this.actionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
+            animated: true,
             header: [
                 createElement('label', { props: { textContent: __('import.actions.title') } }),
                 this.createActionBtn.elem,

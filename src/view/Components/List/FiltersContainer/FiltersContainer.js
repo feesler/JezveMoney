@@ -33,6 +33,7 @@ export class FiltersContainer extends Component {
         this.collapsible = Collapsible.create({
             header: null,
             content: this.content,
+            animated: true,
             className: 'filters-collapsible',
         });
 

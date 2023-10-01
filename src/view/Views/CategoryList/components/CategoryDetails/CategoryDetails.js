@@ -49,6 +49,7 @@ export class CategoryDetails extends ItemDetails {
 
         this.subcategoriesList = Collapsible.create({
             className: SUBCATEGORIES_LIST_CLASS,
+            animated: true,
             header: this.toggleSubcategoriesBtn,
             onStateChange: (exp) => this.onToggleSubcategories(exp),
         });

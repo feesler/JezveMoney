@@ -8,6 +8,7 @@ const defaultProps = {
     content: null,
     toggleButton: false,
     toggleOnClick: false,
+    animated: false,
 };
 
 /**
@@ -27,6 +28,7 @@ export class CollapsibleListItem extends ListItem {
         this.collapsible = Collapsible.create({
             content: this.props.content,
             toggleOnClick: this.props.toggleOnClick,
+            animated: this.props.animated,
             header: this.contentElem,
         });
         this.elem = this.collapsible.elem;

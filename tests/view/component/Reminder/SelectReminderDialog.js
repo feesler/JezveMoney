@@ -187,6 +187,10 @@ export class SelectReminderDialog extends TestComponent {
             assert(res[child]?.elem, `Invalid structure of dialog: '${child}' component not found`)
         ));
 
+        [res.filtersAnimation] = await evaluate((el) => ([
+            el.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
+        ]), this.elem);
+
         // Reminder state filter
         const stateMenuEl = await query(this.elem, '.trans-type-filter .menu');
         res.stateMenu = await LinkMenu.create(this, stateMenuEl);
@@ -233,6 +237,7 @@ export class SelectReminderDialog extends TestComponent {
             },
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
             filtersVisible: cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
         };
 
         const reminderState = parseInt(cont.stateMenu.value, 10);
@@ -561,6 +566,24 @@ export class SelectReminderDialog extends TestComponent {
         await this.content.closeBtn.click();
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -569,7 +592,7 @@ export class SelectReminderDialog extends TestComponent {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -584,9 +607,9 @@ export class SelectReminderDialog extends TestComponent {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);

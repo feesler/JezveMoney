@@ -6,6 +6,7 @@ import {
     assert,
     asyncMap,
     evaluate,
+    waitForFunction,
 } from 'jezve-test';
 import { Collapsible, DropDown } from 'jezvejs-test';
 import {
@@ -436,6 +437,7 @@ export class ImportTransactionForm extends TestComponent {
 
         res.imported = cont.toggleBtn.visible;
         res.origDataCollapsed = !!cont.origDataCollapsible?.collapsed;
+        res.origDataAnimation = !!cont.origDataCollapsible?.animationInProgress;
         if (cont.originalData && res.imported) {
             res.original = {
                 ...cont.originalData.model,
@@ -1104,13 +1106,31 @@ export class ImportTransactionForm extends TestComponent {
         return click(this.content.cancelBtn);
     }
 
+    async waitForAnimation(action) {
+        const expectedCollapsed = this.model.origDataCollapsed;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.origDataAnimation
+                && this.model.origDataCollapsed === expectedCollapsed
+            );
+        });
+
+        await this.parse();
+    }
+
     async toggleOriginalData() {
         assert(this.content.toggleBtn.visible, 'Toggle button not visible');
 
         this.model.origDataCollapsed = !this.model.origDataCollapsed;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.toggleBtn.elem));
+        await this.waitForAnimation(() => click(this.content.toggleBtn.elem));
 
         return this.checkState(expected);
     }
