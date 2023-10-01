@@ -25,10 +25,14 @@
   flex: 1 1 auto;
   column-gap: 18px;
   z-index: 1001;
+  height: 40px;
+  line-height: 40px;
 }
 
 .header .heading-actions {
   margin-right: 9px;
+  height: var(--header-size);
+  line-height: var(--header-size);
 
   .btn {
     --btn-title-color: var(--header-color);
