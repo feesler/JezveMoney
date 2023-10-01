@@ -15,6 +15,7 @@ import { FormControls } from '../../Components/Form/FormControls/FormControls.js
 
 import { actions, reducer } from './reducer.js';
 import './LoginView.scss';
+import { Logo } from '../../Components/Common/Logo/Logo.js';
 
 /**
  * User log in view
@@ -44,8 +45,16 @@ class LoginView extends AppView {
      */
     onStart() {
         this.loadElementsByIds([
+            'logoContainer',
             'formContainer',
         ]);
+
+        this.logo = Logo.create({
+            className: 'login-logo',
+            icon: 'logo_u',
+            type: 'static',
+        });
+        this.logoContainer.append(this.logo.elem);
 
         // Form title
         this.titleElem = createElement('h1', { props: { textContent: __('login.title') } });

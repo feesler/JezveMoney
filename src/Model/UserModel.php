@@ -341,6 +341,20 @@ class UserModel extends CachedTable
     }
 
     /**
+     * Returns access of currently logged in user or 0 if no user logged in
+     *
+     * @return int
+     */
+    public function getAccess()
+    {
+        if (!$this->currentUser) {
+            return 0;
+        }
+
+        return $this->currentUser->access;
+    }
+
+    /**
      * Returns reminders update date
      *
      * @return int|null

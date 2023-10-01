@@ -1,0 +1,28 @@
+/* Application logo */
+.btn.logo {
+  --logo-size: 100px;
+  --logo-color: #ffffff;
+
+  /* Button */
+  --btn-size: var(--logo-size);
+  --btn-title-color: var(--logo-color);
+  --btn-hover-title-color: var(--logo-color);
+  --btn-focus-title-color: var(--logo-color);
+  --btn-active-title-color: var(--logo-color);
+  --btn-font-size: 26px;
+  --btn-font-weight: 200;
+  --btn-icon-color: var(--logo-color);
+  --btn-hover-icon-color: var(--logo-color);
+  --btn-active-icon-color: var(--logo-color);
+  --btn-focus-icon-color: var(--logo-color);
+  --btn-icon-size: var(--logo-size);
+
+  text-decoration: none;
+  flex-shrink: 0;
+
+  .btn__content {
+    b {
+      font-weight: 400;
+    }
+  }
+}

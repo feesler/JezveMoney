@@ -1,0 +1,65 @@
+/* Left side navigation */
+.navigation {
+  --offcanvas-bg: var(--alt-bg-color);
+
+  z-index: 2110;
+}
+
+.navigation .offcanvas__content {
+  display: flex;
+  height: 100%;
+}
+
+.navigation + .offcanvas__bg {
+  z-index: 2100;
+}
+
+.navigation-content {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.navigation-controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 0 12px;
+  background-color: var(--header-bg-color);
+
+  /* Close navigation button */
+  .btn.close-btn {
+    --btn-size: 32px;
+    --btn-icon-size: 24px;
+    --btn-padding: 4px;
+    --btn-icon-color: var(--list-item-icon-fill);
+
+    margin-left: -4px;
+  }
+}
+
+/* Link to main page with logo */
+.navigation-content .logo.header-logo {
+  display: flex;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .navigation {
+    width: 200px;
+    z-index: 1000;
+  }
+
+  .navigation-content {
+    width: 100%;
+    margin: 50px 0 0 0;
+  }
+
+  .navigation.offcanvas_closed {
+    transform: translateX(0);
+  }
+
+  .offcanvas__bg,
+  .navigation-controls {
+    display: none;
+  }
+}

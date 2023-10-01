@@ -1,8 +1,4 @@
 import {
-    show,
-    setEmptyClick,
-    removeEmptyClick,
-    setEvents,
     re,
     isFunction,
     createElement,
@@ -10,14 +6,14 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Header } from 'jezvejs/Header';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
-import { Icon } from 'jezvejs/Icon';
-import { Offcanvas } from 'jezvejs/Offcanvas';
 
 import { App } from '../../../Application/App.js';
 import { getApplicationURL } from '../../../utils/utils.js';
 
 import { Badge } from '../../Common/Badge/Badge.js';
-import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
+import { Logo } from '../../Common/Logo/Logo.js';
+import { AppNavigation } from '../AppNavigation/AppNavigation.js';
+import { UserNavigation } from '../UserNavigation/UserNavigation.js';
 
 import './AppHeader.scss';
 
@@ -38,7 +34,6 @@ export class AppHeader extends Header {
             ...props,
         });
 
-        this.userNavEmptyClick = () => this.hideUserNavigation();
         this.onActionsShown = null;
 
         this.actionsContainer = null;
@@ -49,30 +44,9 @@ export class AppHeader extends Header {
      * Component initialization
      */
     init() {
-        this.logoTitle = createElement('span', {
-            props: {
-                className: 'header-logo__title',
-                textContent: 'Jezve',
-            },
-            children: createElement('b', { props: { textContent: 'Money' } }),
-        });
-
-        this.logo = createElement('a', {
-            props: {
-                className: 'header-logo',
-                href: getApplicationURL(),
-                tabIndex: 1,
-            },
-            children: [
-                createElement('span', {
-                    props: { className: 'header-logo__icon' },
-                    children: Icon.create({
-                        icon: 'header-logo',
-                        className: 'logo-icon',
-                    }).elem,
-                }),
-                this.logoTitle,
-            ],
+        this.logo = Logo.create({
+            className: 'header-logo',
+            tabIndex: 1,
         });
 
         this.menuButton = HeaderMenuButton.create({
@@ -113,7 +87,7 @@ export class AppHeader extends Header {
         });
 
         this.state.content = [
-            this.logo,
+            this.logo.elem,
             this.menuButton.elem,
             this.container,
         ];
@@ -121,36 +95,10 @@ export class AppHeader extends Header {
         super.init();
 
         // Main menu
-        this.navigationContent = document.querySelector('.main-navigation');
-
-        const navList = this.navigationContent.querySelector('.nav-list');
-        if (!navList) {
-            this.navigationMenu = NavigationMenu.create();
-            this.navigationContent.append(this.navigationMenu.elem);
-        }
-
-        this.navigation = Offcanvas.create({
-            content: this.navigationContent,
-            className: 'navigation main-navigation-offcanvas',
-        });
-
-        this.closeNavBtn = this.navigationContent.querySelector('.close-btn');
-        setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
+        this.navigation = AppNavigation.create();
 
         // User navigation Offcanvas
-        this.userNavContent = document.querySelector('.user-navigation-content');
-        this.userNavigation = Offcanvas.create({
-            content: this.userNavContent,
-            placement: 'right',
-            className: 'user-navigation',
-            onOpened: () => this.onUserNavigationOpened(),
-            onClosed: () => this.onUserNavigationClosed(),
-        });
-        show(this.userNavContent, false);
-
-        this.navUserNameElem = this.userNavContent.querySelector('.user-btn .btn__content');
-        this.closeUserNavBtn = this.userNavContent.querySelector('.close-btn');
-        setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
+        this.userNavigation = UserNavigation.create();
     }
 
     onContentTransitionEnd() {
@@ -187,43 +135,21 @@ export class AppHeader extends Header {
 
     /** Show navigation */
     onToggleNav() {
-        this.hideUserNavigation();
-        this.navigation?.open();
-    }
-
-    /** Hide navigation */
-    hideNavigation() {
-        this.navigation?.close();
+        this.userNavigation.close();
+        this.navigation.open();
     }
 
     /** Show user navigation */
     showUserNavigation() {
-        this.hideNavigation();
-        show(this.userNavContent, true);
+        this.navigation.close();
         this.userNavigation.open();
-    }
-
-    /** Hide user navigation */
-    hideUserNavigation() {
-        this.userNavigation.close();
-    }
-
-    /** User navigation 'opened' event handler */
-    onUserNavigationOpened() {
-        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
-    }
-
-    /** User navigation 'closed' event handler */
-    onUserNavigationClosed() {
-        show(this.userNavContent, false);
-        removeEmptyClick(this.userNavEmptyClick);
     }
 
     /**
      * Updates title of logo
      */
     setLogoTitle(title) {
-        this.logoTitle.textContent = title;
+        this.logo.setTitle(title);
     }
 
     /**
@@ -241,8 +167,7 @@ export class AppHeader extends Header {
 
         this.userName = name;
         this.userBtn.setTitle(this.userName);
-
-        this.navUserNameElem.textContent = this.userName;
+        this.userNavigation.setUserName(this.userName);
     }
 
     setTitle(title = null) {

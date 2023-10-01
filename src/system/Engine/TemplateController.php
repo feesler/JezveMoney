@@ -25,6 +25,7 @@ abstract class TemplateController extends Controller
     protected $user_name = null;
     protected $user_id = 0;
     protected $owner_id = 0;
+    protected $access = 0;
     protected $locale = null;
     protected $locales = [];
 
@@ -159,6 +160,7 @@ abstract class TemplateController extends Controller
         // Get name of user person
         if ($this->user_id) {
             $this->owner_id = $this->uMod->getOwner();
+            $this->access = $this->uMod->getAccess();
 
             $this->personMod = PersonModel::getInstance();
             $personObj = $this->personMod->getItem($this->owner_id);
@@ -200,6 +202,7 @@ abstract class TemplateController extends Controller
         return [
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,
+            "access" => $this->access,
             "name" => $this->user_name,
             "settings" => $this->getSettings(),
             "remindersCount" => $reminderModel->getScheduledCount(),

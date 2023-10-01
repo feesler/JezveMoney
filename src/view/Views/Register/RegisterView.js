@@ -6,8 +6,6 @@ import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
-import { LocaleSelectField } from '../../Components/Form/Fields/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitchField } from '../../Components/Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
 import { PasswordField } from '../../Components/Form/Fields/PasswordField/PasswordField.js';
 import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
@@ -46,10 +44,6 @@ class RegisterView extends AppView {
         this.loadElementsByIds([
             'formContainer',
         ]);
-
-        this.localeField = LocaleSelectField.create();
-        this.themeField = ThemeSwitchField.create();
-        this.header.userNavContent.append(this.localeField.elem, this.themeField.elem);
 
         // Form title
         this.titleElem = createElement('h1', { props: { textContent: __('registration.title') } });

@@ -6,10 +6,12 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 
-import { __ } from '../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
 
 import { Badge } from '../../Common/Badge/Badge.js';
+
+import './NavigationMenu.scss';
 
 /* CSS classes */
 const MENU_CLASS = 'nav-list';
@@ -17,19 +19,6 @@ const ITEM_CLASS = 'nav-item';
 const ITEM_LINK_CLASS = 'nav-item__link';
 const CREATE_BTN_CLASS = 'nav-item__icon-btn';
 const SEPARATOR_CLASS = 'nav-separator';
-
-const menuItems = [
-    { url: 'accounts/', titleToken: 'accounts.listTitle', createButton: 'accounts/create/' },
-    { url: 'persons/', titleToken: 'persons.listTitle', createButton: 'persons/create/' },
-    { url: 'categories/', titleToken: 'categories.listTitle', createButton: 'categories/create/' },
-    { url: 'transactions/', titleToken: 'transactions.listTitle', createButton: 'transactions/create/' },
-    { url: 'schedule/', titleToken: 'schedule.listTitle', createButton: 'schedule/create/' },
-    { url: 'reminders/', titleToken: 'reminders.listTitle' },
-    { url: 'statistics/', titleToken: 'statistics.title' },
-    { url: 'import/', titleToken: 'import.listTitle' },
-    { type: 'separator' },
-    { url: 'about/', titleToken: 'about.title', loggedOut: true },
-];
 
 /**
  * Navigation menu component
@@ -40,7 +29,6 @@ export class NavigationMenu extends Component {
 
         this.state = {
             ...this.props,
-            items: menuItems,
         };
 
         this.init();
@@ -75,16 +63,18 @@ export class NavigationMenu extends Component {
             return this.renderSeparator();
         }
 
-        const { baseURL } = App;
-
-        const linkElem = createElement('a', {
+        const content = (item.content) ?? createElement('a', {
             props: {
                 className: ITEM_LINK_CLASS,
-                href: `${baseURL}${item.url}`,
-                textContent: __(item.titleToken),
+                href: getApplicationURL(item.url),
+                textContent: (
+                    (item.titleToken)
+                        ? __(item.titleToken)
+                        : item.title
+                ),
             },
         });
-        const children = [linkElem];
+        const children = [content];
 
         if (item.badge) {
             const badge = Badge.create({
@@ -96,7 +86,7 @@ export class NavigationMenu extends Component {
         if (item.createButton) {
             const createBtn = Button.create({
                 type: 'link',
-                url: `${baseURL}${item.createButton}`,
+                url: getApplicationURL(item.createButton),
                 icon: 'plus-light',
                 className: CREATE_BTN_CLASS,
             });
