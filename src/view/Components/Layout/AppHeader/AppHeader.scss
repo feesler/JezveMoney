@@ -14,6 +14,7 @@
   position: fixed;
   overflow: hidden;
   height: var(--header-size);
+  padding: 0 0 0 8px;
   top: 0;
   left: 0;
   width: 100%;
@@ -123,7 +124,7 @@
 /* Navigation toggle button */
 .btn.header-menu-btn {
   --btn-border-radius: 100vh;
-  --btn-padding: 13px;
+  --btn-padding: 4px;
   --btn-icon-size: 24px;
   --btn-icon-color: var(--header-color);
   --btn-active-background: #4e4e4e;
@@ -135,6 +136,7 @@
 /* Desktop */
 @media (min-width: 768px) {
   .header {
+    padding: 0;
     z-index: 2010;
   }
 
