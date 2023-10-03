@@ -6,8 +6,8 @@ import { App } from '../../../../Application/App.js';
 
 import { Category } from '../../../../Models/Category.js';
 
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
 const PARENT_FIELD_CLASS = 'parent-field';
@@ -49,6 +49,7 @@ export class CategoryDetails extends ItemDetails {
 
         this.subcategoriesList = Collapsible.create({
             className: SUBCATEGORIES_LIST_CLASS,
+            animated: true,
             header: this.toggleSubcategoriesBtn,
             onStateChange: (exp) => this.onToggleSubcategories(exp),
         });

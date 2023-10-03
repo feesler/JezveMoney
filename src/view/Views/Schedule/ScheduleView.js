@@ -1,11 +1,9 @@
 import 'jezvejs/style';
 import {
-    asArray,
+    createElement,
     insertAfter,
     isFunction,
-    show,
 } from 'jezvejs';
-
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -14,17 +12,20 @@ import { Spinner } from 'jezvejs/Spinner';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     listData,
     __,
     getSelectedItems,
     getApplicationURL,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
@@ -32,12 +33,15 @@ import { CategoryList } from '../../Models/CategoryList.js';
 import { Schedule } from '../../Models/Schedule.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
-import { ToggleDetailsButton } from '../../Components/ToggleDetailsButton/ToggleDetailsButton.js';
+// Common components
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+import { ToggleDetailsButton } from '../../Components/List/ToggleDetailsButton/ToggleDetailsButton.js';
 
+// Local components
 import { ScheduleItemContextMenu } from './components/ContextMenu/ScheduleItemContextMenu.js';
 import { ScheduleMainMenu } from './components/MainMenu/ScheduleMainMenu.js';
 import { ScheduleListItem } from './components/ScheduleListItem/ScheduleListItem.js';
@@ -113,10 +117,6 @@ class ScheduleView extends AppView {
      */
     onStart() {
         this.loadElementsByIds([
-            'contentHeader',
-            'itemsCount',
-            'selectedCounter',
-            'selItemsCount',
             'heading',
             'contentContainer',
         ]);
@@ -141,6 +141,40 @@ class ScheduleView extends AppView {
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        // Toggle details mode button
+        this.modeSelector = ToggleDetailsButton.create({
+            onChange: (mode) => this.onChangeMode(mode),
+        });
+
+        const contentHeader = createElement('header', {
+            props: { className: 'content-header' },
+            children: createElement('div', {
+                props: { className: 'list-header' },
+                children: [counters, this.modeSelector.elem],
+            }),
+        });
+        this.contentContainer.before(contentHeader);
+
+        // Schedule list
         this.scheduleList = ListContainer.create({
             ItemComponent: ScheduleListItem,
             getItemProps: (item, state) => ({
@@ -189,13 +223,6 @@ class ScheduleView extends AppView {
             this.scheduleList.elem,
             this.loadingIndicator.elem,
         );
-
-        // List mode selected
-        const listHeader = document.querySelector('.list-header');
-        this.modeSelector = ToggleDetailsButton.create({
-            onClick: (e) => this.onToggleMode(e),
-        });
-        listHeader.append(this.modeSelector.elem);
 
         // 'Show more' button
         this.spinner = Spinner.create({ className: 'request-spinner' });
@@ -255,8 +282,11 @@ class ScheduleView extends AppView {
         this.setRenderTime();
     }
 
-    onToggleMode(e) {
-        e.preventDefault();
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
 
         this.store.dispatch(actions.toggleMode());
         this.setRenderTime();
@@ -333,26 +363,13 @@ class ScheduleView extends AppView {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    getSelectedIds(state) {
-        const selArr = getSelectedItems(state.items);
-        return selArr.map((item) => item.id);
-    }
-
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return this.getSelectedIds(state);
-    }
-
     async deleteItems() {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -438,7 +455,7 @@ class ScheduleView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -464,7 +481,7 @@ class ScheduleView extends AppView {
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -610,6 +627,36 @@ class ScheduleView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
+    renderCounters(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.listMode === prevState?.listMode
+        ) {
+            return;
+        }
+
+        const itemsCount = state.items.length;
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
+
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+    }
+
+    renderModeSelector(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.mode === prevState?.mode
+        ) {
+            return;
+        }
+
+        this.modeSelector.setURL(this.getURL(state));
+        this.modeSelector.setSelection(state.mode);
+        this.modeSelector.show(state.items.length > 0);
+    }
+
     renderList(state, prevState) {
         if (
             state.items === prevState?.items
@@ -625,14 +672,6 @@ class ScheduleView extends AppView {
         ) {
             return;
         }
-
-        // Counters
-        const itemsCount = state.items.length;
-        this.itemsCount.textContent = itemsCount;
-        const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
-        this.selItemsCount.textContent = selected.length;
 
         // Paginator
         const range = state.pagination.range ?? 1;
@@ -682,21 +721,11 @@ class ScheduleView extends AppView {
             this.loadingIndicator.show();
         }
 
-        const isDetails = (state.mode === 'details');
-
-        const modeURL = this.getURL(state);
-        modeURL.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
-
-        this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setState((modeSelectorState) => ({
-            ...modeSelectorState,
-            details: isDetails,
-            url: modeURL.toString(),
-        }));
-
+        this.renderCounters(state, prevState);
+        this.renderModeSelector(state, prevState);
         this.renderList(state, prevState);
-        this.renderContextMenu(state);
-        this.renderMenu(state);
+        this.renderContextMenu(state, prevState);
+        this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
 
         if (!state.loading) {

@@ -2,14 +2,12 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import {
     __,
-    getExportURL,
     getSortByDateIcon,
     getSortByNameIcon,
 } from '../../../../utils/utils.js';
 import {
     getPersonsSortMode,
     getHiddenSelectedItems,
-    getSelectedIds,
     getVisibleSelectedItems,
 } from '../../helpers.js';
 
@@ -35,10 +33,6 @@ export class PersonListMainMenu extends PopupMenu {
         const isSelectMode = context.listMode === 'select';
         const sortMode = getPersonsSortMode();
         const showSortItems = isListMode && itemsCount > 1;
-
-        const exportURL = (totalSelCount > 0)
-            ? getExportURL({ persons: getSelectedIds(context) })
-            : null;
 
         this.setItems([{
             id: 'selectModeBtn',
@@ -74,10 +68,8 @@ export class PersonListMainMenu extends PopupMenu {
             hidden: !isSelectMode,
         }, {
             id: 'exportBtn',
-            type: 'link',
             icon: 'export',
-            title: __('transactions.exportToCsv'),
-            url: exportURL?.toString(),
+            title: __('export.menuTitle'),
             hidden: !(isSelectMode && totalSelCount > 0),
         }, {
             id: 'showBtn',

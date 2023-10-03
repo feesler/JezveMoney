@@ -1,6 +1,6 @@
 import 'jezvejs/style';
 import {
-    asArray,
+    createElement,
     insertAfter,
     isFunction,
     show,
@@ -11,9 +11,10 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { TabList } from 'jezvejs/TabList';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -24,19 +25,25 @@ import {
     __,
     getSelectedIds,
     getApplicationURL,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { availTransTypes } from '../../Models/Transaction.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { DeleteCategoryDialog } from '../../Components/DeleteCategoryDialog/DeleteCategoryDialog.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+// Common components
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { DeleteCategoryDialog } from '../../Components/Category/DeleteCategoryDialog/DeleteCategoryDialog.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { CategoryDetails } from './components/CategoryDetails/CategoryDetails.js';
+
+// Local components
+import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryListContextMenu } from './components/ContextMenu/CategoryListContextMenu.js';
 import { CategoryListMainMenu } from './components/MainMenu/CategoryListMainMenu.js';
 
@@ -122,16 +129,13 @@ class CategoryListView extends AppView {
             childContainerSelector: '.category-item__children',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
             getPlaceholderProps: () => ({ title: __('categories.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),
         };
 
         this.loadElementsByIds([
-            'contentHeader',
-            'itemsCount',
-            'selectedCounter',
-            'selItemsCount',
             'heading',
             'contentContainer',
             'itemInfo',
@@ -150,9 +154,33 @@ class CategoryListView extends AppView {
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
-        this.sections = {};
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        this.contentHeader = createElement('header', {
+            props: { className: 'content-header' },
+            children: counters,
+        });
+        this.contentContainer.before(this.contentHeader);
 
         // Tabs
+        this.sections = {};
         this.tabs = TabList.create({
             items: this.transTypes.map((type) => {
                 const key = Category.getTypeString(type);
@@ -303,21 +331,13 @@ class CategoryListView extends AppView {
         this.store.dispatch(actions.stopLoading());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state.items);
-    }
-
     async deleteItems(removeChild = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -501,7 +521,7 @@ class CategoryListView extends AppView {
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -623,6 +643,23 @@ class CategoryListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
+    renderCounters(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.listMode === prevState?.listMode
+        ) {
+            return;
+        }
+
+        const itemsCount = state.items.length;
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? getSelectedIds(state) : [];
+
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+    }
+
     renderList(state, prevState) {
         if (
             state.items === prevState?.items
@@ -631,14 +668,6 @@ class CategoryListView extends AppView {
         ) {
             return;
         }
-
-        // Counters
-        const itemsCount = state.items.length;
-        this.itemsCount.textContent = itemsCount;
-        const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? getSelectedIds(state.items) : [];
-        this.selItemsCount.textContent = selected.length;
 
         const categories = CategoryList.create(state.items);
         categories.sortBy(state.sortMode);
@@ -676,6 +705,7 @@ class CategoryListView extends AppView {
             this.loadingIndicator.show();
         }
 
+        this.renderCounters(state, prevState);
         this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);

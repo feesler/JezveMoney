@@ -1,7 +1,7 @@
 import { createElement, Component, asArray } from 'jezvejs';
 
-import { InputField } from '../../../../../../../../view/Components/Fields/InputField/InputField.js';
-import { FormControls } from '../../../../../../../../view/Components/FormControls/FormControls.js';
+import { InputField } from '../../../../../../../../view/Components/Form/Fields/InputField/InputField.js';
+import { FormControls } from '../../../../../../../../view/Components/Form/FormControls/FormControls.js';
 import { OptionalInputField } from '../../../Fields/OptionalInputField/OptionalInputField.js';
 import { ReturnStateField } from '../../../Fields/ReturnStateField/ReturnStateField.js';
 

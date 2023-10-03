@@ -5,8 +5,8 @@ import { App } from '../../../../Application/App.js';
 
 import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
 const TYPE_FIELD_CLASS = 'type-field';

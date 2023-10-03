@@ -79,7 +79,7 @@ export const register = async ({ login, name, password }) => {
 
     if (validInput) {
         App.view.expectedState = {
-            notification: { success: true, message: __('registration.registeredMessage', App.view.locale) },
+            notification: { success: true, message: __('registration.registeredMessage') },
         };
 
         await test('User registration', () => App.view.checkState());
@@ -105,7 +105,7 @@ export const resetData = async (options = {}) => {
     await App.view.resetData(options);
 
     App.view.expectedState = {
-        notification: { success: true, message: __('profile.resetMessage', App.view.locale) },
+        notification: { success: true, message: __('profile.resetMessage') },
     };
     await test('Reset data', () => App.view.checkState());
 
@@ -136,7 +136,7 @@ export const changeName = async (newName) => {
             if (nameChanged) {
                 App.view.expectedState.notification = {
                     success: true,
-                    message: __('profile.nameChangedMessage', App.view.locale),
+                    message: __('profile.nameChangedMessage'),
                 };
             }
 
@@ -164,7 +164,7 @@ export const changePass = async ({ oldPassword, newPassword }) => {
         await App.view.changePassword(oldPassword, newPassword);
         if (validInput) {
             App.view.expectedState = {
-                notification: { success: true, message: __('profile.passwordChangedMessage', App.view.locale) },
+                notification: { success: true, message: __('profile.passwordChangedMessage') },
             };
 
             App.view.checkState();
@@ -187,7 +187,7 @@ export const deleteProfile = async () => {
 
     await App.view.deleteProfile();
     App.view.expectedState = {
-        notification: { success: true, message: __('profile.deletedMessage', App.view.locale) },
+        notification: { success: true, message: __('profile.deletedMessage') },
     };
     await test('Delete profile', () => App.view.checkState());
 

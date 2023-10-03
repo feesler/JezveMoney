@@ -1,0 +1,73 @@
+/* List item details base */
+.list-item-details {
+  display: flex;
+  flex-flow: column nowrap;
+
+  .heading {
+    padding: 6px 0 0 0;
+
+    .heading-actions {
+      margin-right: -4px;
+    }
+
+    .close-btn {
+      --btn-size: 32px;
+      --btn-icon-size: 24px;
+      --btn-border-radius: 100vh;
+      --btn-icon-color: var(--popup-close-btn);
+      --btn-background: var(--popup-close-btn-bg);
+      --btn-hover-icon-color: var(--popup-close-btn-hover);
+      --btn-hover-background: var(--popup-close-btn-hover-bg);
+      --btn-active-icon-color: var(--popup-close-btn-active);
+      --btn-active-background: var(--popup-close-btn-active-bg);
+      --btn-padding: 4px;
+
+      margin-left: auto;
+      align-self: flex-end;
+      flex: 0 0 auto;
+    }
+  }
+
+  .field {
+    margin: var(--form-field-margin);
+  }
+
+  .field__title {
+    color: var(--dimmed-text-color);
+  }
+
+  .inline-field {
+    flex-flow: row wrap;
+    align-items: baseline;
+    column-gap: 2rem;
+  }
+
+  .subcategories-field,
+  .trans-count-field {
+    margin-bottom: 0;
+  }
+
+  .subcategories-list,
+  .transactions-link {
+    margin: var(--form-field-margin);
+    margin-top: 0;
+  }
+
+  .subcategories-list {
+    .collapsible-header {
+      align-items: flex-start;
+    }
+
+    .link-btn {
+      padding: 0;
+    }
+
+    .collapsible-content {
+      flex-flow: column nowrap;
+    }
+  }
+}
+
+.vhidden {
+  visibility: hidden;
+}

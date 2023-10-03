@@ -25,11 +25,10 @@ import {
 } from './Transaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
 import { SortableList } from './SortableList.js';
+import { __ } from './locale.js';
 
 const WEEKS_IN_YEAR = 52;
 const MS_IN_DAY = 86400000;
-
-const defaultExportDateLocale = 'ru';
 
 const availFilters = ['type', 'accounts', 'persons', 'categories', 'startDate', 'endDate', 'search'];
 const arrayFilters = ['type', 'accounts', 'persons', 'categories'];
@@ -615,13 +614,13 @@ export class TransactionsList extends SortableList {
     exportToCSV() {
         const header = [
             'ID',
-            'Type',
-            'Source amount',
-            'Destination amount',
-            'Source result',
-            'Destination result',
-            'Date',
-            'Comment',
+            __('transactions.type'),
+            __('transactions.sourceAmount'),
+            __('transactions.destAmount'),
+            __('transactions.sourceResult'),
+            __('transactions.destResult'),
+            __('transactions.date'),
+            __('transactions.comment'),
         ];
 
         const data = this.map((transaction) => [
@@ -631,7 +630,10 @@ export class TransactionsList extends SortableList {
             App.currency.format(transaction.dest_curr, transaction.dest_amount),
             App.currency.format(transaction.src_curr, transaction.src_result),
             App.currency.format(transaction.dest_curr, transaction.dest_result),
-            App.formatDate(secondsToDate(transaction.date), { locales: defaultExportDateLocale }),
+            App.formatDate(
+                secondsToDate(transaction.date),
+                { locales: App.state.getDateFormatLocale() },
+            ),
             transaction.comment,
         ]);
 

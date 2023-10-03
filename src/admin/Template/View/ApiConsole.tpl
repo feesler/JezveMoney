@@ -2,7 +2,6 @@
 
 <div class="page">
     <div class="page_wrapper">
-        <?php include(ADMIN_TPL_PATH . "Component/Header.tpl");    ?>
         <div id="apiMenu" class="navigation navigation_closed">
             <nav id="apiMenuContent" class="navigation-content">
                 <div id="apiMenuControls" class="navigation-controls">

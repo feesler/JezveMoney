@@ -5,7 +5,6 @@ import {
     navigation,
     waitForFunction,
     click,
-    httpReq,
     asArray,
     goTo,
     baseUrl,
@@ -25,8 +24,10 @@ import {
     SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
     SORT_MANUALLY,
 } from '../common.js';
+import { ExportDialog } from './component/ExportDialog.js';
 
 const listMenuSelector = '#listMenu';
+const exportDialogSelector = '.export-dialog';
 
 /** List of accounts view class */
 export class AccountListView extends AppView {
@@ -143,14 +144,18 @@ export class AccountListView extends AppView {
         return this.content.contextMenu;
     }
 
+    get exportDialog() {
+        return this.content.exportDialog;
+    }
+
     async parseContent() {
         const res = {
             addBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            hiddenCounter: await Counter.create(this, await query('.hidden-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (
@@ -176,6 +181,15 @@ export class AccountListView extends AppView {
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         res.itemInfo = await AccountDetails.create(this, await query('#itemInfo .list-item-details'));
+
+        // Export dialog
+        const exportDialogVisible = await evaluate((selector) => {
+            const dialogEl = document.querySelector(selector);
+            return dialogEl && !dialogEl.hidden;
+        }, exportDialogSelector);
+        if (exportDialogVisible) {
+            res.exportDialog = await ExportDialog.create(this, await query(exportDialogSelector));
+        }
 
         res.renderTime = await prop(res.tiles.elem, 'dataset.time');
 
@@ -583,15 +597,14 @@ export class AccountListView extends AppView {
         await this.selectAccounts(acc);
         await this.openListMenu();
 
-        const exportBtn = this.listMenu.findItemById('exportBtn');
-        const downloadURL = exportBtn.link;
-        assert(downloadURL, 'Invalid export URL');
+        await this.performAction(() => this.listMenu.select('exportBtn'));
+        await this.performAction(() => wait(exportDialogSelector, { visible: true }));
 
-        const exportResp = await httpReq('GET', downloadURL);
-        assert(exportResp?.status === 200, 'Invalid response');
+        const res = await this.exportDialog.download();
 
+        await this.performAction(() => this.exportDialog.close());
         await this.setListMode();
 
-        return exportResp.body;
+        return res;
     }
 }

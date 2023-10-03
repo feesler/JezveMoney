@@ -44,12 +44,12 @@ export class ReminderDetails extends TestComponent {
         const category = state.categories.getItem(reminder.category_id);
         const categoryTitle = (category)
             ? category.name
-            : __('categories.noCategory', App.view.locale);
+            : __('categories.noCategory');
 
         const res = {
             title: {
                 visible: true,
-                value: Transaction.typeToString(reminder.type, App.view.locale),
+                value: Transaction.typeToString(reminder.type),
             },
             sourceField: {
                 visible: showSource,

@@ -1,0 +1,69 @@
+.popup.select-reminder-dialog {
+  --popup-min-width: 300px;
+  --popup-max-width: 1200px;
+
+  .popup__wrapper {
+    position: relative;
+    align-items: flex-start;
+  }
+
+  .filters-row {
+    flex-flow: column nowrap;
+  }
+
+  /* Dialog heading */
+  .dialog-header {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    column-gap: 24px;
+
+    label {
+      height: 40px;
+      line-height: 40px;
+      font-size: 1.4rem;
+      font-weight: 300;
+      margin: 0;
+    }
+
+    /* Toggle filters button */
+    .filters-btn {
+      --btn-icon-color: var(--list-item-icon-fill);
+      --btn-hover-icon-color: var(--list-item-hover-icon-fill);
+
+      margin-left: auto;
+      align-self: flex-end;
+    }
+  }
+
+  /* List container */
+  .list-container {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    padding-bottom: var(--content-padding-bottom);
+  }
+
+  /* List item */
+  .reminder-item {
+    cursor: pointer;
+  }
+
+  .list-item__content {
+    padding: 8px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .popup.select-reminder-dialog {
+    .popup__wrapper {
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+
+    .list-container {
+      padding-bottom: 0;
+    }
+  }
+}

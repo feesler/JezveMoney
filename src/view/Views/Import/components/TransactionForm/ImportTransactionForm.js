@@ -19,14 +19,14 @@ import { App } from '../../../../Application/App.js';
 import { transTypeMap, typeNames, ImportTransaction } from '../../../../Models/ImportTransaction.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
 
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { InputField } from '../../../../Components/Fields/InputField/InputField.js';
-import { AmountInputField } from '../../../../Components/Fields/AmountInputField/AmountInputField.js';
-import { DateInputField } from '../../../../Components/Fields/DateInputField/DateInputField.js';
-import { ReminderField } from '../../../../Components/Fields/ReminderField/ReminderField.js';
-import { CategorySelect } from '../../../../Components/Inputs/CategorySelect/CategorySelect.js';
-import { ToggleButton } from '../../../../Components/ToggleButton/ToggleButton.js';
-import { FormControls } from '../../../../Components/FormControls/FormControls.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { InputField } from '../../../../Components/Form/Fields/InputField/InputField.js';
+import { AmountInputField } from '../../../../Components/Form/Fields/AmountInputField/AmountInputField.js';
+import { DateInputField } from '../../../../Components/Form/Fields/DateInputField/DateInputField.js';
+import { ReminderField } from '../../../../Components/Reminder/ReminderField/ReminderField.js';
+import { CategorySelect } from '../../../../Components/Category/CategorySelect/CategorySelect.js';
+import { ToggleButton } from '../../../../Components/Common/ToggleButton/ToggleButton.js';
+import { FormControls } from '../../../../Components/Form/FormControls/FormControls.js';
 
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
@@ -531,6 +531,7 @@ export class ImportTransactionForm extends Component {
         if (!this.collapse) {
             this.collapse = Collapsible.create({
                 toggleOnClick: false,
+                animated: true,
                 header: null,
             });
 

@@ -6,7 +6,6 @@ import {
     evaluate,
     asyncMap,
 } from 'jezve-test';
-import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { TransactionListItem } from './TransactionListItem.js';
 import { TransactionListGroup } from './TransactionListGroup.js';
@@ -110,7 +109,7 @@ export class TransactionList extends TestComponent {
         assert.isArray(transactions, 'Invalid data');
 
         const res = {
-            title: __('transactions.listTitle', App.view.locale),
+            title: __('transactions.listTitle'),
             transList: this.render(transactions, state, true),
         };
 

@@ -21,9 +21,9 @@ import { ImportCondition } from '../../../../../Models/ImportCondition.js';
 import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
 import { ImportActionList } from '../../../../../Models/ImportActionList.js';
 
-import { ToggleButton } from '../../../../../Components/ToggleButton/ToggleButton.js';
-import { FormControls } from '../../../../../Components/FormControls/FormControls.js';
-import { NoDataMessage } from '../../../../../Components/NoDataMessage/NoDataMessage.js';
+import { ToggleButton } from '../../../../../Components/Common/ToggleButton/ToggleButton.js';
+import { FormControls } from '../../../../../Components/Form/FormControls/FormControls.js';
+import { NoDataMessage } from '../../../../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 
@@ -106,6 +106,7 @@ export class ImportRuleForm extends Component {
 
         this.conditionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
+            animated: true,
             header: [
                 createElement('label', { props: { textContent: __('import.conditions.title') } }),
                 this.createCondBtn.elem,
@@ -143,6 +144,7 @@ export class ImportRuleForm extends Component {
 
         this.actionsCollapse = Collapsible.create({
             className: COLLAPSE_CLASS,
+            animated: true,
             header: [
                 createElement('label', { props: { textContent: __('import.actions.title') } }),
                 this.createActionBtn.elem,

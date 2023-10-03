@@ -94,6 +94,7 @@ export class ImportRuleItem extends TestComponent {
             return {
                 ruleId: el.dataset.id,
                 collapsed: !el.classList.contains('collapsible__expanded'),
+                animated: !!el.classList.contains('collapsible_animated'),
                 propertyElem: textElemState(propertyEl),
                 operatorElem: textElemState(operatorEl),
                 valueElem: textElemState(valueEl),
@@ -123,6 +124,7 @@ export class ImportRuleItem extends TestComponent {
         const res = {
             id: parseInt(cont.ruleId, 10),
             collapsed: cont.collapsed,
+            animated: cont.animated,
             conditions: cont.conditions.content.items.map(
                 (item) => structuredClone(item.model),
             ),

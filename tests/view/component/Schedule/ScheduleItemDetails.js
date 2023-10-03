@@ -76,7 +76,7 @@ export class ScheduleItemDetails extends TestComponent {
 
     static renderEndDate(item) {
         if (!item.end_date) {
-            return __('schedule.noEndDate', App.view.locale);
+            return __('schedule.noEndDate');
         }
 
         return __('schedule.item.end', App.view.locale, App.secondsToDateString(item.end_date));
@@ -99,21 +99,21 @@ export class ScheduleItemDetails extends TestComponent {
         const category = state.categories.getItem(item.category_id);
         const categoryTitle = (category)
             ? category.name
-            : __('categories.noCategory', App.view.locale);
+            : __('categories.noCategory');
 
         const res = {
             title: {
                 visible: true,
-                value: Transaction.typeToString(item.type, App.view.locale),
+                value: Transaction.typeToString(item.type),
             },
             startDateField: {
                 visible: true,
-                title: __(startDateToken, App.view.locale),
+                title: __(startDateToken),
                 value: App.secondsToDateString(item.start_date),
             },
             endDateField: {
                 visible: item.interval_type !== INTERVAL_NONE,
-                title: __('schedule.endDate', App.view.locale),
+                title: __('schedule.endDate'),
                 value: this.renderEndDate(item),
             },
             intervalField: {

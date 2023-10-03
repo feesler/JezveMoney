@@ -4,16 +4,11 @@ import {
     query,
     prop,
     navigation,
-    asArray,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { dateStringToSeconds } from '../common.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import {
-    DEBT,
-    LIMIT_CHANGE,
-} from '../model/Transaction.js';
+import { LIMIT_CHANGE } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { TRANSACTION_FORM, TransactionForm } from './component/Transaction/TransactionForm.js';
 
@@ -122,61 +117,7 @@ export class TransactionView extends AppView {
     }
 
     getExpectedTransaction() {
-        const form = this.form.model;
-        const { repeatEnabled } = form;
-
-        const res = {
-            type: form.type,
-            src_amount: this.getExpectedSourceAmount(form),
-            dest_amount: this.getExpectedDestAmount(form),
-            src_curr: form.src_curr_id,
-            dest_curr: form.dest_curr_id,
-            category_id: form.categoryId,
-            comment: form.comment,
-        };
-
-        const reminderId = parseInt(form.reminderId, 10);
-        const scheduleId = parseInt(form.scheduleId, 10);
-
-        if (repeatEnabled && !reminderId && !scheduleId) {
-            res.start_date = App.dateStringToSeconds(form.startDate);
-            res.end_date = App.dateStringToSeconds(form.endDate);
-            res.interval_type = parseInt(form.intervalType, 10);
-            res.interval_step = parseInt(form.intervalStep, 10);
-            res.interval_offset = asArray(form.intervalOffset)
-                .map((item) => parseInt(item, 10));
-        }
-
-        if (form.isUpdate) {
-            res.id = form.id;
-        }
-
-        if (res.type === DEBT) {
-            res.person_id = form.person.id;
-            res.acc_id = form.noAccount ? 0 : form.account.id;
-            res.op = form.debtType ? 1 : 2;
-        } else if (res.type === LIMIT_CHANGE) {
-            const increaseLimit = form.fDestAmount > 0;
-            res.src_id = (increaseLimit) ? 0 : form.destAccount.id;
-            res.dest_id = (increaseLimit) ? form.destAccount.id : 0;
-        } else {
-            res.src_id = (form.srcAccount) ? form.srcAccount.id : 0;
-            res.dest_id = (form.destAccount) ? form.destAccount.id : 0;
-        }
-
-        res.date = dateStringToSeconds(form.date, {
-            locales: this.appState().getDateFormatLocale(),
-            options: App.dateFormatOptions,
-        });
-
-        if (reminderId !== 0) {
-            res.reminder_id = reminderId;
-        } else if (scheduleId !== 0) {
-            res.schedule_id = scheduleId;
-            res.reminder_date = parseInt(form.reminderDate, 10);
-        }
-
-        return res;
+        return this.form.getExpectedTransaction();
     }
 
     getExpectedState() {

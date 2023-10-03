@@ -24,7 +24,7 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
@@ -32,15 +32,15 @@ import { AccountList } from '../../Models/AccountList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
-import { ChartPopup } from '../../Components/ChartPopup/ChartPopup.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { CategorySelect } from '../../Components/Inputs/CategorySelect/CategorySelect.js';
-import { FieldHeaderButton } from '../../Components/Fields/FieldHeaderButton/FieldHeaderButton.js';
-import { DateRangeInput } from '../../Components/Inputs/Date/DateRangeInput/DateRangeInput.js';
-import { TransactionTypeMenu } from '../../Components/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
-import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { FormControls } from '../../Components/FormControls/FormControls.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { CategorySelect } from '../../Components/Category/CategorySelect/CategorySelect.js';
+import { FieldHeaderButton } from '../../Components/Form/Fields/FieldHeaderButton/FieldHeaderButton.js';
+import { DateRangeInput } from '../../Components/Form/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { TransactionTypeMenu } from '../../Components/Form/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
+import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 
 import { isSameSelection, actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';

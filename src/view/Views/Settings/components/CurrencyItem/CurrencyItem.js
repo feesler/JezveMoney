@@ -2,7 +2,7 @@ import { createElement, getClassName } from 'jezvejs';
 
 import { App } from '../../../../Application/App.js';
 
-import { ListItem } from '../../../../Components/ListItem/ListItem.js';
+import { ListItem } from '../../../../Components/List/ListItem/ListItem.js';
 
 import './CurrencyItem.scss';
 

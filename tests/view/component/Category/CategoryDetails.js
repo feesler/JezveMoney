@@ -29,7 +29,7 @@ export class CategoryDetails extends TestComponent {
         assert(category, 'Invalid category');
 
         const parent = state.categories.getItem(category.parent_id);
-        const parentTitle = (parent) ? parent.name : __('categories.noParent', App.view.locale);
+        const parentTitle = (parent) ? parent.name : __('categories.noParent');
         const subcategories = state.categories.findByParent(category.id);
         const itemTransactions = state.transactions.applyFilter({
             categories: category.id,
@@ -46,7 +46,7 @@ export class CategoryDetails extends TestComponent {
             },
             typeField: {
                 visible: true,
-                value: Category.typeToString(category.type, App.view.locale),
+                value: Category.typeToString(category.type),
             },
             subcategoriesField: {
                 value: subcategories.length.toString(),

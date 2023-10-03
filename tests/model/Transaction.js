@@ -49,8 +49,23 @@ export class Transaction {
 
     static basicTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
 
-    /** Return string for specified type of transaction */
-    static typeToString(type, locale = 'en') {
+    /** Returns name string for specified type of transaction */
+    static getTypeName(type) {
+        const typesMap = {
+            [EXPENSE]: 'expense',
+            [INCOME]: 'income',
+            [TRANSFER]: 'transfer',
+            [DEBT]: 'debt',
+            [LIMIT_CHANGE]: 'limit',
+        };
+
+        assert(type && (type in typesMap), `Unknown transaction type ${type}`);
+
+        return typesMap[type];
+    }
+
+    /** Returns localized string for specified type of transaction */
+    static typeToString(type, locale = App.view.locale) {
         const typesMap = {
             [EXPENSE]: 'transactions.types.expense',
             [INCOME]: 'transactions.types.income',

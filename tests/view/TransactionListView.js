@@ -10,11 +10,11 @@ import {
     baseUrl,
     isVisible,
     wait,
-    httpReq,
 } from 'jezve-test';
 import {
     Button,
     DropDown,
+    LinkMenu,
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
@@ -28,17 +28,20 @@ import { SearchInput } from './component/Fields/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { Counter } from './component/Counter.js';
 import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
+import { ExportDialog } from './component/ExportDialog.js';
 import {
+    MAX_PRECISION,
     dateToSeconds,
     isValidValue,
     secondsToDate,
     shiftMonth,
+    trimToDigitsLimit,
 } from '../common.js';
-import { __ } from '../model/locale.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
 
 const listMenuSelector = '#listMenu';
 const categoryDialogSelector = '#selectCategoryDialog';
+const exportDialogSelector = '.export-dialog';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -54,6 +57,10 @@ export class TransactionListView extends AppView {
         return this.content.contextMenu;
     }
 
+    get exportDialog() {
+        return this.content.exportDialog;
+    }
+
     async parseContent() {
         const res = {
             createBtn: await Button.create(this, await query('#createBtn')),
@@ -63,13 +70,17 @@ export class TransactionListView extends AppView {
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
+
+        [res.filtersAnimation] = await evaluate(() => ([
+            document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
+        ]));
 
         // Main menu
         res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
@@ -111,7 +122,7 @@ export class TransactionListView extends AppView {
         assert(listContainer, 'List container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
-        res.modeSelector = await Button.create(this, await query('.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
         res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
@@ -131,6 +142,15 @@ export class TransactionListView extends AppView {
             this,
             await query(categoryDialogSelector),
         );
+
+        // Export dialog
+        const exportDialogVisible = await evaluate((selector) => {
+            const dialogEl = document.querySelector(selector);
+            return dialogEl && !dialogEl.hidden;
+        }, exportDialogSelector);
+        if (exportDialogVisible) {
+            res.exportDialog = await ExportDialog.create(this, await query(exportDialogSelector));
+        }
 
         return res;
     }
@@ -158,7 +178,8 @@ export class TransactionListView extends AppView {
             listMode: (cont.transList) ? cont.transList.listMode : 'list',
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible: cont.contextMenu?.visible,
-            filtersVisible: cont.filtersContainer.visible,
+            filtersVisible: !!cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
             groupByDate: App.state.getGroupByDate(),
             data: App.state.transactions.clone(),
             detailsItem: this.getDetailsItem(this.getDetailsId()),
@@ -217,9 +238,8 @@ export class TransactionListView extends AppView {
             };
         }
 
-        if (cont.modeSelector?.link) {
-            const modeURL = new URL(cont.modeSelector.link);
-            res.detailsMode = !this.hasDetailsModeParam(modeURL);
+        if (cont.modeSelector?.value) {
+            res.detailsMode = cont.modeSelector.value === 'details';
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = this.hasDetailsModeParam(locURL);
@@ -631,9 +651,7 @@ export class TransactionListView extends AppView {
                 active: pageNum,
             };
 
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', model.locale)
-                : __('transactions.showDetails', model.locale);
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         // Set category dialog
@@ -742,6 +760,24 @@ export class TransactionListView extends AppView {
         return this.changeListMode('sort');
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -750,7 +786,7 @@ export class TransactionListView extends AppView {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -765,9 +801,9 @@ export class TransactionListView extends AppView {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);
@@ -1095,7 +1131,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        const minAmount = parseFloat(value);
+        const minAmount = trimToDigitsLimit(value, MAX_PRECISION);
         if (this.model.filter.minAmount === minAmount) {
             return true;
         }
@@ -1119,7 +1155,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
-        const maxAmount = parseFloat(value);
+        const maxAmount = trimToDigitsLimit(value, MAX_PRECISION);
         if (this.model.filter.maxAmount === maxAmount) {
             return true;
         }
@@ -1229,12 +1265,13 @@ export class TransactionListView extends AppView {
             await this.closeFilters();
         }
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.click());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
         }
 
         return App.view.checkState(expected);
@@ -1564,16 +1601,15 @@ export class TransactionListView extends AppView {
     async exportTransactions() {
         await this.openListMenu();
 
-        const exportBtn = this.listMenu.findItemById('exportBtn');
-        const downloadURL = exportBtn.link;
-        assert(downloadURL, 'Invalid export URL');
+        await this.performAction(() => this.listMenu.select('exportBtn'));
+        await this.performAction(() => wait(exportDialogSelector, { visible: true }));
 
-        const exportResp = await httpReq('GET', downloadURL);
-        assert(exportResp?.status === 200, 'Invalid response');
+        const res = await this.exportDialog.download();
 
-        await this.closeListMenu();
+        await this.performAction(() => this.exportDialog.close());
+        await this.setListMode();
 
-        return exportResp.body;
+        return res;
     }
 
     // Check all transactions have same type, otherwise show only categories with type 'Any'

@@ -226,10 +226,11 @@ class CurrencyModel extends CachedTable
      *
      * @param float $value value to format
      * @param int $curr_id currency id
+     * @param \NumberFormatter|null $formatter
      *
      * @return string|null
      */
-    public function format(float $value, int $curr_id)
+    public function format(float $value, int $curr_id, ?\NumberFormatter $formatter = null)
     {
         $currObj = $this->getItem($curr_id);
         if (!$currObj) {
@@ -244,6 +245,7 @@ class CurrencyModel extends CachedTable
         $settingsModel = UserSettingsModel::getInstance();
 
         $valueFmt = valFormat($value, [
+            "formatter" => $formatter,
             "precision" => $currObj->precision,
             "trailingZeros" => ($currObj->flags & $zerosFlag) === $zerosFlag,
             "decimalSeparator" => $settingsModel->getDecimalSeparator(),

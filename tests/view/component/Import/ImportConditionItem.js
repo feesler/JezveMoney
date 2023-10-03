@@ -109,20 +109,20 @@ export class ImportConditionItem extends TestComponent {
 
         // Condition field type
         const fieldName = cont.propertyTitle.value;
-        const field = ImportCondition.findFieldTypeByName(fieldName, App.view.locale);
+        const field = ImportCondition.findFieldTypeByName(fieldName);
         assert(field, `Invalid property title: '${fieldName}'`);
         res.fieldType = field.id;
 
         // Condition operator
         const operatorName = cont.operatorTitle.value;
-        const operator = ImportCondition.findOperatorByName(operatorName, App.view.locale);
+        const operator = ImportCondition.findOperatorByName(operatorName);
         assert(operator, `Invalid operator title: '${operatorName}'`);
         res.operator = operator.id;
 
         // Condition value
         if (cont.valuePropTitle.elem) {
             const valuePropName = cont.valuePropTitle.value;
-            const valueProp = ImportCondition.findFieldTypeByName(valuePropName, App.view.locale);
+            const valueProp = ImportCondition.findFieldTypeByName(valuePropName);
             assert(valueProp, `Invalid value property: '${valuePropName}'`);
 
             res.isFieldValue = true;

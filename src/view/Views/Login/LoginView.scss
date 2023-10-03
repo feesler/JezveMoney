@@ -1,7 +1,4 @@
 .login-layer {
-  --login-logo-size: 54px;
-  --login-logo-font-size: 26px;
-
   justify-content: flex-start;
   background-color: var(--main-bg-color);
 
@@ -18,29 +15,10 @@
   background-color: #006cbd;
 }
 
-.login-logo {
-  display: flex;
-  flex-flow: row nowrap;
-  padding: 24px 0;
+.logo.login-logo {
+  --btn-content-padding: 0 0 0 12px;
 
-  .logo {
-    width: var(--login-logo-size);
-  }
-
-  .logo-icon {
-    width: var(--login-logo-size);
-    height: var(--login-logo-size);
-  }
-
-  .title {
-    height: var(--login-logo-size);
-    line-height: var(--login-logo-size);
-    font-size: var(--login-logo-font-size);
-    font-weight: normal;
-    color: #ffffff;
-    white-space: nowrap;
-    margin: 0 0 0 12px;
-  }
+  cursor: auto;
 }
 
 .form-container {
@@ -56,7 +34,7 @@
 
 @media screen and (min-width: 576px) {
   .login-layer {
-    --login-logo-size: 62px;
+    --login-logo-size: 100px;
     --login-logo-font-size: 32px;
   }
 }

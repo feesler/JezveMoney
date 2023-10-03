@@ -1,5 +1,6 @@
 import {
     DAYS_IN_WEEK,
+    asArray,
     isDate,
     isObject,
     parseDateString,
@@ -324,10 +325,18 @@ export const getSelectedItems = (list) => (
     list.filter((item) => item?.selected)
 );
 
+export const listData = (list) => (Array.isArray(list) ? list : list?.data);
+
 /** Returns array of ids of selected items */
-export const getSelectedIds = (list) => (
-    getSelectedItems(list).map((item) => item.id)
+export const getSelectedIds = (state, listName = 'items') => (
+    getSelectedItems(listData(state[listName])).map((item) => item.id)
 );
+
+/** Returns array of ids of selected items */
+export const getHideableSelectedIds = (state, listName = 'items') => ([
+    ...getSelectedItems(state[listName].visible),
+    ...getSelectedItems(state[listName].hidden),
+].map((item) => item.id));
 
 export const getSortByNameIcon = (sortMode) => {
     if (sortMode === SORT_BY_NAME_ASC) {
@@ -343,4 +352,24 @@ export const getSortByDateIcon = (sortMode) => {
     return (sortMode === SORT_BY_CREATEDATE_DESC) ? 'sort-desc' : null;
 };
 
-export const listData = (list) => (Array.isArray(list) ? list : list?.data);
+/** Returns array of selected items or current context menu item */
+export const getContextIds = (state, listName = 'items') => {
+    if (!state) {
+        throw new Error('Invalid state');
+    }
+
+    return (state.listMode === 'list')
+        ? asArray(state.contextItem)
+        : getSelectedIds(state, listName);
+};
+
+/** Returns array of selected items or current context menu item */
+export const getHideableContextIds = (state, listName = 'items') => {
+    if (!state) {
+        throw new Error('Invalid state');
+    }
+
+    return (state.listMode === 'list')
+        ? asArray(state.contextItem)
+        : getHideableSelectedIds(state, listName);
+};

@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.76.0",
+    "version": "1.77.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -43,8 +43,8 @@
     "author": "Henry Feesler",
     "license": "ISC",
     "devDependencies": {
-        "@babel/cli": "^7.22.15",
-        "@babel/core": "^7.22.20",
+        "@babel/cli": "^7.23.0",
+        "@babel/core": "^7.23.0",
         "@babel/eslint-parser": "^7.22.15",
         "@babel/plugin-proposal-class-properties": "^7.18.6",
         "@babel/plugin-syntax-import-assertions": "^7.22.5",
@@ -54,7 +54,7 @@
         "astroturf": "^1.2.0",
         "autoprefixer": "^9.8.8",
         "babel-loader": "^8.3.0",
-        "browserslist": "^4.21.11",
+        "browserslist": "^4.22.1",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^5.2.7",
         "css-minimizer-webpack-plugin": "^3.4.1",
@@ -90,9 +90,9 @@
         "webpack-merge": "^5.9.0"
     },
     "dependencies": {
-        "@babel/runtime": "^7.22.15",
-        "core-js": "^3.32.2",
-        "jezvejs": "^1.113.6",
+        "@babel/runtime": "^7.23.1",
+        "core-js": "^3.33.0",
+        "jezvejs": "^1.115.0",
         "whatwg-fetch": "^3.6.19"
     }
 }

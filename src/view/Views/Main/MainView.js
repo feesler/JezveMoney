@@ -22,10 +22,10 @@ import {
     listData,
     __,
 } from '../../utils/utils.js';
-import { SetCategoryDialog } from '../../Components/SetCategoryDialog/SetCategoryDialog.js';
+import { SetCategoryDialog } from '../../Components/Category/SetCategoryDialog/SetCategoryDialog.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
@@ -33,14 +33,14 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { IconList } from '../../Models/IconList.js';
 
-import { ChartPopup } from '../../Components/ChartPopup/ChartPopup.js';
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { Tile } from '../../Components/Tile/Tile.js';
-import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
+import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { Tile } from '../../Components/Common/Tile/Tile.js';
+import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
 import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
-import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import { TransactionListContextMenu } from '../../Components/TransactionListContextMenu/TransactionListContextMenu.js';
+import { TransactionList } from '../../Components/Transaction/TransactionList/TransactionList.js';
+import { TransactionListContextMenu } from '../../Components/Transaction/TransactionListContextMenu/TransactionListContextMenu.js';
 
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';

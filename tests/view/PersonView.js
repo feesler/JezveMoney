@@ -7,7 +7,7 @@ import {
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { InputRow } from './component/Fields/InputRow.js';
+import { InputField } from './component/Fields/InputField.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
@@ -32,7 +32,7 @@ export class PersonView extends AppView {
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
-        res.name = await InputRow.create(this, await query('#nameField'));
+        res.name = await InputField.create(this, await query('#nameField'));
         assert(res.name, 'Person name input not found');
 
         res.flagsInp = await query('#flags');

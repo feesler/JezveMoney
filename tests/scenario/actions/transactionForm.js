@@ -258,7 +258,7 @@ export const inputComment = async (value) => {
 };
 
 export const changeTransactionType = async (type) => {
-    await test(`Change type to ${Transaction.typeToString(type)}`, () => (
+    await test(`Change type to ${Transaction.typeToString(type, App.config.logsLocale)}`, () => (
         App.view.changeTransactionType(type)
     ));
 };

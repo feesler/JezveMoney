@@ -1,6 +1,6 @@
 import 'jezvejs/style';
 import {
-    asArray,
+    createElement,
     insertAfter,
     isFunction,
     show,
@@ -10,9 +10,10 @@ import { MenuButton } from 'jezvejs/MenuButton';
 import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     listData,
     SORT_BY_CREATEDATE_ASC,
@@ -22,18 +23,25 @@ import {
     SORT_MANUALLY,
     __,
     getApplicationURL,
+    getHideableContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
-import { CurrencyList } from '../../Models/CurrencyList.js';
+// Models
 import { AccountList } from '../../Models/AccountList.js';
+import { CurrencyList } from '../../Models/CurrencyList.js';
 import { IconList } from '../../Models/IconList.js';
 
-import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { Heading } from '../../Components/Heading/Heading.js';
-import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+// Common components
+import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
+import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
+import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+
+// Local components
 import { AccountDetails } from './components/AccountDetails/AccountDetails.js';
 import { AccountListContextMenu } from './components/ContextMenu/AccountListContextMenu.js';
 import { AccountListMainMenu } from './components/MainMenu/AccountListMainMenu.js';
@@ -56,6 +64,7 @@ class AccountListView extends AppView {
             sortByDateBtn: () => this.toggleSortByDate(),
             selectAllBtn: () => this.selectAll(),
             deselectAllBtn: () => this.deselectAll(),
+            exportBtn: () => this.showExportDialog(),
             showBtn: () => this.showItems(true),
             hideBtn: () => this.showItems(false),
             deleteBtn: () => this.confirmDelete(),
@@ -63,6 +72,7 @@ class AccountListView extends AppView {
 
         this.contextMenuActions = {
             ctxDetailsBtn: () => this.showDetails(),
+            ctxExportBtn: () => this.showExportDialog(),
             ctxShowBtn: () => this.showItems(),
             ctxHideBtn: () => this.showItems(false),
             ctxDeleteBtn: () => this.confirmDelete(),
@@ -90,6 +100,8 @@ class AccountListView extends AppView {
             sortMode,
             showContextMenu: false,
             contextItem: null,
+            showExportDialog: false,
+            exportFilter: null,
             renderTime: Date.now(),
         };
 
@@ -116,17 +128,14 @@ class AccountListView extends AppView {
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
+            vertical: false,
             getPlaceholderProps: () => ({ title: __('accounts.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         };
 
         this.loadElementsByIds([
-            'contentHeader',
-            'itemsCount',
-            'hiddenCount',
-            'selectedCounter',
-            'selItemsCount',
             'heading',
             'contentContainer',
             'hiddenTilesHeading',
@@ -146,12 +155,44 @@ class AccountListView extends AppView {
         });
         this.heading.actionsContainer.prepend(this.createBtn.elem);
 
+        // List header
+        // Counters
+        this.itemsCounter = ListCounter.create({
+            title: __('list.itemsCounter'),
+            className: 'items-counter',
+        });
+        this.hiddenCounter = ListCounter.create({
+            title: __('list.hiddenItemsCounter'),
+            className: 'hidden-counter',
+        });
+        this.selectedCounter = ListCounter.create({
+            title: __('list.selectedItemsCounter'),
+            className: 'selected-counter',
+        });
+
+        const counters = createElement('div', {
+            props: { className: 'counters' },
+            children: [
+                this.itemsCounter.elem,
+                this.hiddenCounter.elem,
+                this.selectedCounter.elem,
+            ],
+        });
+
+        this.contentHeader = createElement('header', {
+            props: { className: 'content-header' },
+            children: counters,
+        });
+        this.contentContainer.before(this.contentHeader);
+
+        // Visible accounts
         this.visibleTiles = SortableListContainer.create({
             ...listProps,
             sortGroup: 'visibleAccounts',
         });
         this.contentContainer.prepend(this.visibleTiles.elem);
 
+        // Hidden accounts
         this.hiddenTiles = SortableListContainer.create({
             ...listProps,
             sortGroup: 'hiddenAccounts',
@@ -230,12 +271,25 @@ class AccountListView extends AppView {
 
     showDetails() {
         this.store.dispatch(actions.showDetails());
-
         this.requestItem();
     }
 
     closeDetails() {
         this.store.dispatch(actions.closeDetails());
+    }
+
+    showExportDialog() {
+        const state = this.store.getState();
+        const ids = getHideableContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.store.dispatch(actions.showExportDialog(ids));
+    }
+
+    hideExportDialog() {
+        this.store.dispatch(actions.hideExportDialog());
     }
 
     showContextMenu(itemId) {
@@ -275,21 +329,13 @@ class AccountListView extends AppView {
         this.store.dispatch(actions.stopLoading());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state);
-    }
-
     async showItems(value = true) {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -319,7 +365,7 @@ class AccountListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -495,7 +541,7 @@ class AccountListView extends AppView {
      */
     confirmDelete() {
         const state = this.store.getState();
-        const ids = this.getContextIds(state);
+        const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -610,16 +656,26 @@ class AccountListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    renderList(state) {
-        // Counters
-        const itemsCount = state.items.visible.length + state.items.hidden.length;
-        this.itemsCount.textContent = itemsCount;
-        this.hiddenCount.textContent = state.items.hidden.length;
-        const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
-        const selected = (isSelectMode) ? getSelectedIds(state) : [];
-        this.selItemsCount.textContent = selected.length;
+    renderCounters(state, prevState) {
+        if (
+            state.items === prevState?.items
+            && state.listMode === prevState?.listMode
+        ) {
+            return;
+        }
 
+        const itemsCount = state.items.visible.length + state.items.hidden.length;
+        const hiddenCount = state.items.hidden.length;
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? getSelectedIds(state) : [];
+
+        this.itemsCounter.setContent(itemsCount.toString());
+        this.hiddenCounter.setContent(hiddenCount.toString());
+        this.selectedCounter.show(isSelectMode);
+        this.selectedCounter.setContent(selected.length.toString());
+    }
+
+    renderList(state) {
         // Visible accounts
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
@@ -640,6 +696,28 @@ class AccountListView extends AppView {
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
     }
 
+    renderExportDialog(state, prevState) {
+        if (state.showExportDialog === prevState?.showExportDialog) {
+            return;
+        }
+
+        if (!state.showExportDialog) {
+            this.exportDialog?.hide();
+            return;
+        }
+
+        if (!this.exportDialog) {
+            this.exportDialog = ExportDialog.create({
+                filter: state.exportFilter,
+                onCancel: () => this.hideExportDialog(),
+            });
+        } else {
+            this.exportDialog.setFilter(state.exportFilter);
+        }
+
+        this.exportDialog.show();
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -651,10 +729,12 @@ class AccountListView extends AppView {
             this.loadingIndicator.show();
         }
 
-        this.renderList(state);
-        this.renderContextMenu(state);
-        this.renderMenu(state);
+        this.renderCounters(state, prevState);
+        this.renderList(state, prevState);
+        this.renderContextMenu(state, prevState);
+        this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
+        this.renderExportDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

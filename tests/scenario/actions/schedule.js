@@ -50,7 +50,7 @@ export const submit = async () => {
         assert.instanceOf(App.view, ScheduleItemView, 'Invalid view');
 
         const validInput = App.view.isValid();
-        const expectedItem = (validInput) ? App.view.getExpectedScheduledTransaction() : null;
+        const expectedItem = App.view.getExpectedTransaction();
 
         await App.view.submit();
 
@@ -291,7 +291,7 @@ export const securityTests = async () => {
         App.view.expectedState = {
             notification: {
                 success: false,
-                message: __('schedule.errors.update', App.view.locale),
+                message: __('schedule.errors.update'),
             },
         };
         App.view.checkState();
@@ -303,7 +303,8 @@ export const securityTests = async () => {
 
 /** Navigate to create transaction view and check form availability according to current state */
 export const checkTransactionAvailable = async (type, directNavigate = false) => {
-    await test(`${Transaction.typeToString(type)} scheduled transaction availability`, async () => {
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
+    await test(`Availability of scheduled ${typeStr} transaction`, async () => {
         if (!directNavigate) {
             await checkNavigation();
             await App.view.goToCreateNewItem();

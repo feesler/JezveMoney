@@ -1,8 +1,5 @@
 import 'jezvejs/style';
-import {
-    asArray,
-    isFunction,
-} from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -10,21 +7,26 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
-import { __ } from '../../utils/utils.js';
+// Application
+import { __, getContextIds } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { LocaleSelectField } from '../../Components/Fields/LocaleSelectField/LocaleSelectField.js';
-import { ThemeSwitchField } from '../../Components/Fields/ThemeSwitchField/ThemeSwitchField.js';
-import { DateFormatSelect } from '../../Components/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { NoDataMessage } from '../../Components/NoDataMessage/NoDataMessage.js';
+// Common components
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { LocaleSelectField } from '../../Components/Form/Fields/LocaleSelectField/LocaleSelectField.js';
+import { ThemeSwitchField } from '../../Components/Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
+import { DateFormatSelect } from '../../Components/Form/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
+import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+import { NumberFormatSelect } from '../../Components/Form/Inputs/NumberFormatSelect/NumberFormatSelect.js';
 
+// Local components
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
@@ -156,6 +158,7 @@ class SettingsView extends AppView {
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
             getPlaceholderProps: () => ({ title: __('settings.currencies.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
@@ -172,16 +175,9 @@ class SettingsView extends AppView {
         });
         this.dateFormatContainer.append(this.dateFormatSelect.elem);
 
-        // Decimal format
-        this.decimalFormatSelect = DropDown.create({
+        // Numbers format
+        this.decimalFormatSelect = NumberFormatSelect.create({
             onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
-            data: [
-                { id: 'ru', title: '1 234 567,89' },
-                { id: 'es', title: '1.234.567,89' },
-                { id: 'en', title: '1,234,567.89' },
-                { id: 'de-ch', title: '1’234’567.89' },
-                { id: 'hi', title: '12,34,567.345' },
-            ],
         });
         this.decimalFormatContainer.append(this.decimalFormatSelect.elem);
 
@@ -274,23 +270,6 @@ class SettingsView extends AppView {
     setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
         this.setRenderTime();
-    }
-
-    getSelectedItems(state) {
-        return state.userCurrencies.filter((item) => item.selected);
-    }
-
-    getSelectedIds(state) {
-        const selArr = this.getSelectedItems(state);
-        return selArr.map((item) => item.id);
-    }
-
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return this.getSelectedIds(state);
     }
 
     onCurrencySelect(selection) {
@@ -415,7 +394,7 @@ class SettingsView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state, 'userCurrencies');
         if (ids.length === 0) {
             return;
         }

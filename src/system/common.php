@@ -158,18 +158,22 @@ function valFormat(mixed $val, array $options = [])
 
     $val = floatval($val);
 
+    $formatter = $options["formatter"] ?? null;
     $precision = $options["precision"] ?? 0;
     $trailingZeros = $options["trailingZeros"] ?? false;
     $decimalSeparator = $options["decimalSeparator"] ?? ".";
     $thousandsSeparator = $options["thousandsSeparator"] ?? " ";
 
-    if (strval(round($val)) !== strval($val) && $trailingZeros) {
-        $nf = number_format($val, $precision, $decimalSeparator, $thousandsSeparator);
-    } else {
-        $nf = number_format($val, 0, "", $thousandsSeparator);
+    $addTrailingZeros = strval(round($val)) !== strval($val) && $trailingZeros;
+    $fractionDigits = ($addTrailingZeros) ? $precision : 0;
+    $decimalSeparator = ($addTrailingZeros) ? $decimalSeparator : "";
+
+    if ($formatter) {
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $fractionDigits);
+        return $formatter->format($val);
     }
 
-    return $nf;
+    return number_format($val, $fractionDigits, $decimalSeparator, $thousandsSeparator);
 }
 
 /**

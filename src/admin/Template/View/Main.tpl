@@ -2,8 +2,6 @@
 
 <div class="page">
     <div class="page_wrapper">
-        <?php include(ADMIN_TPL_PATH . "Component/Header.tpl");    ?>
-
         <div class="container">
             <div class="content">
                 <div class="content_wrap admin_cont_wrap">
@@ -12,13 +10,11 @@
                             <h2><?= __("settings.main") ?></h2>
                         </header>
                         <div id="mainContainer">
-                            <div id="enableLogsField" class="field form-row horizontal-field">
-                                <span class="field__title">Enable logs</span>
-                                <label id="enableLogsSwitch" class="switch">
-                                    <input type="checkbox" <?= checked($enableLogs) ?>>
-                                    <div class="switch-slider"></div>
-                                </label>
-                            </div>
+                            <label id="enableLogsField" class="switch switch-field form-row">
+                                <input type="checkbox" <?= checked($enableLogs) ?>>
+                                <div class="switch-slider"></div>
+                                <span class="switch__label">Enable logs</span>
+                            </label>
 
                             <hr class="form-separator">
 

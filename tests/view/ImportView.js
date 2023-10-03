@@ -58,9 +58,6 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            enabledCounter: await Counter.create(this, await query('#enabledCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
             submitBtn: { elem: await query('#submitBtn') },
         };
 
@@ -95,6 +92,11 @@ export class ImportView extends AppView {
         res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
         assert(res.mainAccountSelect, 'Invalid structure of import view');
         const mainAccountId = res.mainAccountSelect.value;
+
+        // Counters
+        res.totalCounter = await Counter.create(this, await query('.items-counter'));
+        res.enabledCounter = await Counter.create(this, await query('.enabled-counter'));
+        res.selectedCounter = await Counter.create(this, await query('.selected-counter'));
 
         // Import list
         const rowsContainer = await query('.import-list');
@@ -216,9 +218,6 @@ export class ImportView extends AppView {
             header: this.getHeaderExpectedState(state),
             notAvailMsg: { visible: !model.enabled },
             menuBtn: { visible: model.enabled },
-            totalCounter: { visible: model.enabled },
-            enabledCounter: { visible: model.enabled },
-            selectedCounter: { visible: model.enabled && selectMode },
             submitBtn: { visible: model.enabled },
         };
 
@@ -237,9 +236,18 @@ export class ImportView extends AppView {
         res.listModeBtn = { visible: !listMode };
 
         // Counters
-        res.totalCounter.value = this.items.length;
-        res.enabledCounter.value = enabledItems.length;
-        res.selectedCounter.value = selectedItems.length;
+        res.totalCounter = {
+            visible: true,
+            value: this.items.length,
+        };
+        res.enabledCounter = {
+            visible: true,
+            value: enabledItems.length,
+        };
+        res.selectedCounter = {
+            visible: selectMode,
+            value: selectedItems.length,
+        };
 
         res.mainAccountSelect = {
             value: model.mainAccount.toString(),

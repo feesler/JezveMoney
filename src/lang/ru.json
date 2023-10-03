@@ -231,7 +231,6 @@
         "showMain": "Основное",
         "showDetails": "Детали",
         "groupByDate": "Группировать по дате",
-        "exportToCsv": "Экспортировать в CSV",
         "reminder": "Напоминание",
         "selectReminder": "Выбрать напоминание",
         "errors": {
@@ -524,6 +523,14 @@
             "invalidAccountAmount": "Не удалось сконвертировать данные. Некорректное значение суммы в валюте счёта.",
             "invalidTransactionAmount": "Не удалось сконвертировать данные. Некорректное значение суммы в валюте транзакции."
         }
+    },
+    "export": {
+        "menuTitle": "Экспортировать...",
+        "dialogTitle": "Экспорт",
+        "fileFormat": "Формат файла",
+        "dateLocale": "Формат даты",
+        "numberLocale": "Формат чисел",
+        "download": "Загрузить"
     },
     "profile": {
         "title": "Профиль",

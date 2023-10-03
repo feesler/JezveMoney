@@ -21,7 +21,7 @@ import {
     IMPORT_ACTION_SET_CATEGORY,
 } from '../../../../../Models/ImportAction.js';
 
-import { CategorySelect } from '../../../../../Components/Inputs/CategorySelect/CategorySelect.js';
+import { CategorySelect } from '../../../../../Components/Category/CategorySelect/CategorySelect.js';
 
 import './ImportActionForm.scss';
 

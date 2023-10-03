@@ -13,6 +13,7 @@ import {
 } from 'jezve-test';
 import {
     Button,
+    LinkMenu,
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
@@ -22,7 +23,6 @@ import { Counter } from './component/Counter.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { ScheduleItemDetails } from './component/Schedule/ScheduleItemDetails.js';
 import { ScheduleList } from './component/Schedule/ScheduleList.js';
-import { __ } from '../model/locale.js';
 import { ScheduledTransactionsList } from '../model/ScheduledTransactionsList.js';
 
 const listMenuSelector = '#listMenu';
@@ -100,9 +100,7 @@ export class ScheduleView extends AppView {
                 active: pageNum,
             };
 
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', App.view.locale)
-                : __('transactions.showDetails', App.view.locale);
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         return res;
@@ -153,8 +151,8 @@ export class ScheduleView extends AppView {
             createBtn: await Button.create(this, await query('#createBtn')),
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            totalCounter: await Counter.create(this, await query('#itemsCounter')),
-            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
+            totalCounter: await Counter.create(this, await query('.items-counter')),
+            selectedCounter: await Counter.create(this, await query('.selected-counter')),
         };
 
         Object.keys(res).forEach((child) => (
@@ -179,7 +177,7 @@ export class ScheduleView extends AppView {
             }, res.contextMenu.elem);
         }
 
-        res.modeSelector = await Button.create(this, await query('.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
         res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
         res.paginator = await Paginator.create(this, await query('.paginator'));
@@ -239,9 +237,8 @@ export class ScheduleView extends AppView {
             };
         }
 
-        if (cont.modeSelector?.link) {
-            const modeURL = new URL(cont.modeSelector.link);
-            res.detailsMode = !this.hasDetailsModeParam(modeURL);
+        if (cont.modeSelector?.value) {
+            res.detailsMode = cont.modeSelector.value === 'details';
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = this.hasDetailsModeParam(locURL);
@@ -567,12 +564,13 @@ export class ScheduleView extends AppView {
         assert(this.content.modeSelector, 'Mode toggler button not available');
 
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.click());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
         }
 
         return App.view.checkState(expected);

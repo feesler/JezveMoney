@@ -17,7 +17,6 @@ import {
 import { Counter } from '../Counter.js';
 import { dateToSeconds } from '../../../common.js';
 import { RemindersList } from '../../../model/RemindersList.js';
-import { __ } from '../../../model/locale.js';
 
 /**
  * Select reminder dialog test component
@@ -93,9 +92,7 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         if (isItemsAvailable) {
-            res.modeSelector.title = (model.detailsMode)
-                ? __('transactions.showMain', App.view.locale)
-                : __('transactions.showDetails', App.view.locale);
+            res.modeSelector.value = (model.detailsMode) ? 'details' : 'classic';
         }
 
         return res;
@@ -190,6 +187,10 @@ export class SelectReminderDialog extends TestComponent {
             assert(res[child]?.elem, `Invalid structure of dialog: '${child}' component not found`)
         ));
 
+        [res.filtersAnimation] = await evaluate((el) => ([
+            el.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
+        ]), this.elem);
+
         // Reminder state filter
         const stateMenuEl = await query(this.elem, '.trans-type-filter .menu');
         res.stateMenu = await LinkMenu.create(this, stateMenuEl);
@@ -200,7 +201,7 @@ export class SelectReminderDialog extends TestComponent {
         res.dateFilter = await DatePickerFilter.create(this, dateRangeEl);
         assert(res.dateFilter, 'Date filter not found');
 
-        res.modeSelector = await Button.create(this, await query(this.elem, '.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query(this.elem, '.mode-selector'));
         res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
         res.showMoreSpinner = { elem: await query(this.elem, '.list-footer .request-spinner') };
         res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
@@ -215,11 +216,9 @@ export class SelectReminderDialog extends TestComponent {
 
         [
             res.header.title,
-            res.modeSelector.content.value,
-        ] = await evaluate((hdrEl, modSelBtn) => ([
+        ] = await evaluate((hdrEl) => ([
             hdrEl?.querySelector('label')?.textContent,
-            modSelBtn?.dataset?.value,
-        ]), res.header.elem, res.modeSelector.elem);
+        ]), res.header.elem);
 
         return res;
     }
@@ -238,6 +237,7 @@ export class SelectReminderDialog extends TestComponent {
             },
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
             filtersVisible: cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
         };
 
         const reminderState = parseInt(cont.stateMenu.value, 10);
@@ -566,6 +566,24 @@ export class SelectReminderDialog extends TestComponent {
         await this.content.closeBtn.click();
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -574,7 +592,7 @@ export class SelectReminderDialog extends TestComponent {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -589,9 +607,9 @@ export class SelectReminderDialog extends TestComponent {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);
@@ -753,9 +771,10 @@ export class SelectReminderDialog extends TestComponent {
         await this.closeFilters();
 
         this.model.detailsMode = !this.model.detailsMode;
+        const mode = (this.model.detailsMode) ? 'details' : 'classic';
         const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.modeSelector.click());
+        await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
 
         return this.checkState(expected);
     }

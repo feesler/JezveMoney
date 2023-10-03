@@ -1,8 +1,8 @@
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { DEBT, Transaction } from '../../../../Models/Transaction.js';
-import { Field } from '../../../../Components/Fields/Field/Field.js';
-import { ItemDetails } from '../../../../Components/ItemDetails/ItemDetails.js';
+import { Field } from '../../../../Components/Common/Field/Field.js';
+import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
 const SOURCE_FIELD_CLASS = 'source-field';

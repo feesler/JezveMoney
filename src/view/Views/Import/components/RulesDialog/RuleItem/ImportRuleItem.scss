@@ -41,16 +41,19 @@
   }
 
   .collapsible-content {
-    display: flex;
     flex-flow: column nowrap;
-    height: 0;
     padding: 0;
-    overflow-y: auto;
+    overflow: hidden;
     border: 0 none;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     color: var(--text-color-3);
     background-color: var(--list-item-alt-bg-color);
+    transition: all 0.2s ease;
+  }
+
+  .rule-item__content {
+    padding: 8px;
   }
 }
 
@@ -108,8 +111,6 @@
 
 /* Rule item content */
 .rule-item.collapsible__expanded > .collapsible-content {
-  height: auto;
-  padding: 8px;
   margin: 0 1px;
 }
 

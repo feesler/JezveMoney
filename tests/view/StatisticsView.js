@@ -3,11 +3,10 @@ import {
     asArray,
     query,
     queryAll,
-    prop,
     click,
-    isVisible,
     waitForFunction,
     isObject,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, LinkMenu, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -34,27 +33,54 @@ export class StatisticsView extends AppView {
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             typeMenu: await TransactionTypeMenu.create(this, await query('.trtype-menu')),
             reportMenu: await LinkMenu.create(this, await query('#reportMenu')),
+            accountsDropDown: null,
+            categoryDropDown: null,
+            currencyDropDown: null,
+            chart: {
+                elem: await query('.histogram'),
+                bars: [],
+            },
         };
 
+        assert(res.chart.elem, 'Invalid statistics view structure');
         assert(res.titleEl, 'Wrong statistics view structure');
 
-        res.title = await prop(res.titleEl, 'textContent');
+        const bars = await queryAll(res.chart.elem, '.histogram__bar');
 
-        res.accountsDropDown = null;
-        const accountsFilter = await query('#accountsFilter');
-        if (await isVisible(accountsFilter)) {
+        [
+            res.title,
+            res.filtersAnimation,
+            res.accountsFilterVisible,
+            res.categoriesFilterVisible,
+            res.currencyFilterVisible,
+            res.chart.renderTime,
+            res.chart.heights,
+        ] = await evaluate((titleEl, chartEl, ...barElems) => {
+            const filtersEl = document.querySelector('.filters-collapsible');
+            const accountsFilter = document.querySelector('#accountsFilter');
+            const categoriesFilter = document.querySelector('#categoriesFilter');
+            const currencyFilter = document.querySelector('#currencyFilter');
+
+            return [
+                titleEl?.textContent ?? null,
+                filtersEl?.classList?.contains('collapsible_animated') ?? false,
+                accountsFilter && !accountsFilter.hidden,
+                categoriesFilter && !categoriesFilter.hidden,
+                currencyFilter && !currencyFilter.hidden,
+                chartEl.dataset.time,
+                barElems.map((el) => el?.attributes?.height?.nodeValue),
+            ];
+        }, res.titleEl, res.chart.elem, ...bars);
+
+        if (res.accountsFilterVisible) {
             res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
-        res.categoryDropDown = null;
-        const categoriesFilter = await query('#categoriesFilter');
-        if (await isVisible(categoriesFilter)) {
+        if (res.categoriesFilterVisible) {
             res.categoryDropDown = await DropDown.createFromChild(this, await query('#category_id'));
         }
 
-        res.currencyDropDown = null;
-        const currencyFilter = await query('#currencyFilter');
-        if (await isVisible(currencyFilter)) {
+        if (res.currencyFilterVisible) {
             res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
 
@@ -67,25 +93,15 @@ export class StatisticsView extends AppView {
         res.monthRangeBtn = { elem: await query('.field-header-btn[data-value="month"]') };
         res.halfYearRangeBtn = { elem: await query('.field-header-btn[data-value="halfyear"]') };
 
-        res.chart = {
-            elem: await query('.histogram'),
-            bars: [],
-        };
-        assert(res.chart, 'Invalid statistics view structure');
-
-        res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
         res.chartContainer = { elem: await query(res.chart.elem, '.chart__horizontal') };
 
         res.loadingIndicator = { elem: await query('.stat-histogram .loading-indicator') };
         res.noDataMessage = { elem: await query('.stat-histogram .nodata-message') };
 
-        const bars = await queryAll(res.chart.elem, '.histogram__bar');
-        for (const bar of bars) {
-            res.chart.bars.push({
-                elem: bar,
-                height: await prop(bar, 'attributes.height.nodeValue'),
-            });
-        }
+        res.chart.bars = bars.map((elem, index) => ({
+            elem,
+            height: res.chart.heights[index],
+        }));
 
         return res;
     }
@@ -100,6 +116,7 @@ export class StatisticsView extends AppView {
         const res = {
             locale: cont.locale,
             filtersVisible: cont.filtersContainer.visible,
+            filtersAnimation: !!cont.filtersAnimation,
         };
 
         res.filter = {
@@ -321,6 +338,24 @@ export class StatisticsView extends AppView {
         await this.parse();
     }
 
+    async waitForAnimation(action) {
+        const expectedVisibility = this.model.filtersVisible;
+
+        await this.parse();
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.filtersAnimation
+                && this.model.filtersVisible === expectedVisibility
+            );
+        });
+
+        await this.parse();
+    }
+
     async openFilters() {
         if (this.model.filtersVisible) {
             return true;
@@ -329,7 +364,7 @@ export class StatisticsView extends AppView {
         this.model.filtersVisible = true;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.content.filtersBtn.click());
 
         return this.checkState(expected);
     }
@@ -344,9 +379,9 @@ export class StatisticsView extends AppView {
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.performAction(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
         } else {
-            await this.performAction(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.content.filtersBtn.click());
         }
 
         return this.checkState(expected);

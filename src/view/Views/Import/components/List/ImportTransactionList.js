@@ -3,7 +3,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { __ } from '../../../../utils/utils.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
-import { NoDataMessage } from '../../../../Components/NoDataMessage/NoDataMessage.js';
+import { NoDataMessage } from '../../../../Components/Common/NoDataMessage/NoDataMessage.js';
 import './ImportTransactionList.scss';
 
 /* CSS classes */
@@ -41,6 +41,7 @@ export class ImportTransactionList extends ListContainer {
             selector: state.itemSortSelector,
             placeholderClass: 'import-item__placeholder',
             copyWidth: true,
+            animated: true,
             handles: [{ query: 'div' }, { query: 'label' }],
         });
     }

@@ -7,6 +7,7 @@ import {
     isFunction,
     getLocaleDateFormat,
     isValidDateString,
+    hasFlag,
 } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 
@@ -26,6 +27,8 @@ export const DEFAULT_LOCALE = 'en';
 /** Theme constants */
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
+
+const ADMIN_FLAG = 1;
 
 /** Application class */
 export class Application {
@@ -129,6 +132,10 @@ export class Application {
 
     isUserLoggedIn() {
         return !!this.model.profile?.user_id;
+    }
+
+    isAdminUser() {
+        return hasFlag(this.model.profile?.access ?? 0, ADMIN_FLAG);
     }
 
     isValidDateString(value, params = {}) {

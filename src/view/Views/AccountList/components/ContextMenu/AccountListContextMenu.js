@@ -1,6 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL, getExportURL } from '../../../../utils/utils.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 /** Accounts list context menu component */
@@ -57,10 +57,8 @@ export class AccountListContextMenu extends PopupMenu {
             url: getApplicationURL(`accounts/update/${account.id}`),
         }, {
             id: 'ctxExportBtn',
-            type: 'link',
             icon: 'export',
-            title: __('transactions.exportToCsv'),
-            url: getExportURL({ accounts: [account.id] }),
+            title: __('export.menuTitle'),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',

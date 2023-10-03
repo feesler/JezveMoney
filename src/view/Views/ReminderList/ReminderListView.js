@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { asArray, isFunction } from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -7,13 +7,13 @@ import { createStore } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { AppView } from '../../Components/AppView/AppView.js';
+import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
-    getSelectedIds,
     getApplicationURL,
     dateStringToTime,
     formatDateRange,
+    getContextIds,
 } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 
@@ -29,10 +29,10 @@ import {
 } from '../../Models/Reminder.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
-import { Heading } from '../../Components/Heading/Heading.js';
-import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
-import { ReminderFilters } from '../../Components/ReminderFilters/ReminderFilters.js';
-import { ReminderListGroup } from '../../Components/ReminderListGroup/ReminderListGroup.js';
+import { Heading } from '../../Components/Layout/Heading/Heading.js';
+import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
+import { ReminderFilters } from '../../Components/Reminder/ReminderFilters/ReminderFilters.js';
+import { ReminderListGroup } from '../../Components/Reminder/ReminderListGroup/ReminderListGroup.js';
 
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
 import { ReminderListContextMenu } from './components/ContextMenu/ReminderListContextMenu.js';
@@ -162,7 +162,7 @@ class ReminderListView extends AppView {
             onItemClick: (id, e) => this.onItemClick(id, e),
             onShowMore: (e) => this.showMore(e),
             onChangePage: (page) => this.onChangePage(page),
-            onToggleMode: (e) => this.onToggleMode(e),
+            onChangeMode: (mode) => this.onChangeMode(mode),
         });
         this.contentContainer.append(this.listGroup.elem);
 
@@ -314,8 +314,11 @@ class ReminderListView extends AppView {
         this.setRenderTime();
     }
 
-    onToggleMode(e) {
-        e.preventDefault();
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
 
         this.store.dispatch(actions.toggleMode());
         this.setRenderTime();
@@ -383,14 +386,6 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    getContextIds(state) {
-        if (state.listMode === 'list') {
-            return asArray(state.contextItem);
-        }
-
-        return getSelectedIds(state.items);
-    }
-
     async requestList(options = {}) {
         const { keepState = false } = options;
 
@@ -443,7 +438,7 @@ class ReminderListView extends AppView {
     }
 
     getRequestData(state) {
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (getStateFilter(state) !== REMINDER_UPCOMING) {
             return { id: ids };
         }
@@ -547,7 +542,7 @@ class ReminderListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -575,7 +570,7 @@ class ReminderListView extends AppView {
             return;
         }
 
-        const ids = this.getContextIds(state);
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }

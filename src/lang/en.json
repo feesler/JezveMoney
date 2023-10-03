@@ -231,7 +231,6 @@
         "showMain": "Show main",
         "showDetails": "Show details",
         "groupByDate": "Group by date",
-        "exportToCsv": "Export to CSV",
         "reminder": "Reminder",
         "selectReminder": "Select reminder",
         "errors": {
@@ -524,6 +523,14 @@
             "invalidAccountAmount": "Failed to convert data. Invalid account amount value.",
             "invalidTransactionAmount": "Failed to convert data. Invalid transaction amount value."
         }
+    },
+    "export": {
+        "menuTitle": "Export...",
+        "dialogTitle": "Export",
+        "fileFormat": "File format",
+        "dateLocale": "Date format",
+        "numberLocale": "Number format",
+        "download": "Download"
     },
     "profile": {
         "title": "Profile",

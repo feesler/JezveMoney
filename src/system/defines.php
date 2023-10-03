@@ -21,6 +21,8 @@ define("PROD_HOST", "jezvemoney.ru");
 define("LOCAL_DEV_HOST", "testsrv");
 
 define("DEFAULT_LOCALE", "en");
+define("DEFAULT_DATE_LOCALE", "en");
+define("DEFAULT_NUMBER_LOCALE", "en");
 
 define("MAX_LOG_SIZE", 1024 * 1024);
 define("MAX_LOG_FILES", 10);

@@ -49,13 +49,11 @@
                 <label for="firstRowInp" class="field__title"><?= __("import.templates.firstRow") ?></label>
             </div>
 
-            <div id="tplAccountSwitchField" class="field form-row horizontal-field">
-                <span class="field__title"><?= __("import.templates.setDefaultAccount") ?></span>
-                <label id="tplAccountSwitch" class="switch">
-                    <input type="checkbox">
-                    <div class="switch-slider"></div>
-                </label>
-            </div>
+            <label id="tplAccountSwitchField" class="switch switch-field form-row">
+                <input type="checkbox">
+                <div class="switch-slider"></div>
+                <span class="switch__label"><?= __("import.templates.setDefaultAccount") ?></span>
+            </label>
 
             <div id="tplAccountField" class="field form-row tpl-account-field" hidden>
                 <label class="field__title"><?= __("import.templates.defaultAccount") ?></label>

@@ -247,7 +247,7 @@ export const filterByType = async ({ type, directNavigate = false, iteratePages 
     }
 
     const types = asArray(type).filter((item) => Transaction.availTypes.includes(item));
-    const names = types.map((item) => Transaction.typeToString(item));
+    const names = types.map((item) => Transaction.typeToString(item, App.config.logsLocale));
 
     const descr = (types.length)
         ? `Filter by [${names.join()}]`
