@@ -41,6 +41,7 @@ export class ImportTransactionList extends ListContainer {
             selector: state.itemSortSelector,
             placeholderClass: 'import-item__placeholder',
             copyWidth: true,
+            animated: true,
             handles: [{ query: 'div' }, { query: 'label' }],
         });
     }

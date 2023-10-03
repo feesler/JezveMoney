@@ -129,6 +129,7 @@ class CategoryListView extends AppView {
             childContainerSelector: '.category-item__children',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
             getPlaceholderProps: () => ({ title: __('categories.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onTreeSort: (...args) => this.sendChangePosRequest(...args),

@@ -678,6 +678,13 @@ svg * {
   }
 }
 
+/* List animation */
+.tile.animated,
+.list-item.animated {
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
 /* Tiles list */
 .tiles {
   display: flex;

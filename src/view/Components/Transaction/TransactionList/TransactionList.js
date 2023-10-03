@@ -27,6 +27,7 @@ const defaultProps = {
     ascending: false,
     onSort: null,
     onItemClick: null,
+    animated: true,
 };
 
 /**

@@ -158,6 +158,7 @@ class SettingsView extends AppView {
             placeholderClass: 'currency-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
             getPlaceholderProps: () => ({ title: __('settings.currencies.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),

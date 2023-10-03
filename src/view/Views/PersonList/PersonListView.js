@@ -127,6 +127,8 @@ class PersonListView extends AppView {
             placeholderClass: 'tile_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            animated: true,
+            vertical: false,
             getPlaceholderProps: () => ({ title: __('persons.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
