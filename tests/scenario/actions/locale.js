@@ -1,4 +1,9 @@
-import { assert, isObject, test } from 'jezve-test';
+import {
+    assert,
+    isObject,
+    setBlock,
+    test,
+} from 'jezve-test';
 import { App } from '../../Application.js';
 import { tokensMap } from '../../model/locale.js';
 import { AccountListView } from '../../view/AccountListView.js';
@@ -205,6 +210,7 @@ export const testLocales = async (action) => {
     const remainLocales = locales.filter((locale) => locale !== initialLocale);
 
     for (const locale of remainLocales) {
+        setBlock(`Locale: '${locale}'`, 2);
         await changeLocale(locale);
         await action(locale);
     }

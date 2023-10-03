@@ -135,14 +135,14 @@ export class StatisticsStory extends TestStory {
     async locales() {
         setBlock('Statistics view locales', 1);
 
-        await testLocales((locale) => this.checkLocale(locale));
-        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
-        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
+        const localeActions = () => this.checkLocale();
+
+        await testLocales(localeActions);
+        await testDateLocales(['es', 'ko'], localeActions);
+        await testDecimalLocales(['es', 'hi'], localeActions);
     }
 
-    async checkLocale(locale) {
-        setBlock(`Locale: '${locale}'`, 1);
-
+    async checkLocale() {
         await Actions.selectStartDateFilter(App.datesFmt.monthAgo);
         await Actions.clearStartDateFilter();
     }

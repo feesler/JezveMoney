@@ -1,4 +1,9 @@
-import { test, assert, asArray } from 'jezve-test';
+import {
+    test,
+    assert,
+    asArray,
+    setBlock,
+} from 'jezve-test';
 import { App } from '../../Application.js';
 import { SettingsView } from '../../view/SettingsView.js';
 
@@ -84,6 +89,7 @@ export const testDateLocales = async (locales, action) => {
     const remainLocales = locales.filter((locale) => locale !== initialLocale);
 
     for (const locale of remainLocales) {
+        setBlock(`Date locale: '${locale}'`, 2);
         await selectDateLocale(locale);
         await action(locale);
     }
@@ -97,6 +103,7 @@ export const testDecimalLocales = async (locales, action) => {
     const remainLocales = locales.filter((locale) => locale !== initialLocale);
 
     for (const locale of remainLocales) {
+        setBlock(`Number locale: '${locale}'`, 2);
         await selectDecimalLocale(locale);
         await action(locale);
     }

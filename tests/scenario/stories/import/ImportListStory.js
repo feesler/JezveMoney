@@ -752,14 +752,14 @@ export class ImportListStory extends TestStory {
     async locales() {
         setBlock('Import view locales', 1);
 
-        await testLocales((locale) => this.checkLocale(locale));
-        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
-        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
+        const localeActions = () => this.checkLocale();
+
+        await testLocales(localeActions);
+        await testDateLocales(['es', 'ko'], localeActions);
+        await testDecimalLocales(['es', 'hi'], localeActions);
     }
 
-    async checkLocale(locale) {
-        setBlock(`Locale: '${locale}'`, 1);
-
+    async checkLocale() {
         const { cardFile, ACC_RUB } = App.scenario;
 
         setBlock('Create transaction', 2);
@@ -767,7 +767,6 @@ export class ImportListStory extends TestStory {
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },
         ]);
-        await Actions.submit();
 
         setBlock('Upload file', 2);
         await Actions.uploadFile(cardFile);

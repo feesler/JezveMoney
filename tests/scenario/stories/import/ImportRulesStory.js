@@ -601,15 +601,15 @@ export class ImportRulesStory extends TestStory {
     async locales() {
         setBlock('Import rules locales', 1);
 
-        await testLocales((locale) => this.checkLocale(locale));
-        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
-        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
+        const localeActions = () => this.checkLocale();
+
+        await testLocales(localeActions);
+        await testDateLocales(['es', 'ko'], localeActions);
+        await testDecimalLocales(['es', 'hi'], localeActions);
     }
 
-    async checkLocale(locale) {
-        setBlock(`Locale: '${locale}'`, 1);
-
-        const date = (locale === 'en')
+    async checkLocale() {
+        const date = (App.view.locale === 'en')
             ? App.datesFmt.weekAgo
             : App.datesFmt.now;
 

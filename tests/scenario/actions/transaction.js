@@ -208,7 +208,8 @@ export const createFromPersonAndSubmit = async (pos, actions) => {
 };
 
 export const updateAndSubmit = async (type, pos, actions) => {
-    setBlock(`Update ${Transaction.typeToString(type)} [${pos}]`, 2);
+    const typeStr = Transaction.typeToString(type, App.config.logsLocale);
+    setBlock(`Update ${typeStr} [${pos}]`, 2);
 
     await update(type, pos);
     await App.scenario.runner.runTasks(actions);
