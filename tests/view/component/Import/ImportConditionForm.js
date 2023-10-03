@@ -2,7 +2,6 @@ import {
     TestComponent,
     assert,
     query,
-    hasClass,
     click,
     input,
     evaluate,
@@ -137,6 +136,15 @@ export class ImportConditionForm extends TestComponent {
         };
 
         [
+            res.fieldValueCheck.content.visible,
+            res.deleteBtn.visible,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => (el && !el.hidden)),
+            res.fieldValueCheck.elem,
+            res.deleteBtn.elem,
+        );
+
+        [
             res.fieldTypeField,
             res.operatorField,
             res.amountField,
@@ -168,27 +176,24 @@ export class ImportConditionForm extends TestComponent {
         return res;
     }
 
-    async parseField(el) {
-        const elem = await el;
+    async parseField(fieldElem) {
+        const elem = await fieldElem;
         assert(elem, 'Invalid field element');
 
-        let res;
+        const res = await evaluate((el) => ({
+            dropDown: el?.classList?.contains('dd__container'),
+            visible: el && !el.hidden,
+            disabled: el.disabled,
+            value: el.value,
+        }), elem);
 
-        const isDropDown = await hasClass(elem, 'dd__container');
-        if (isDropDown) {
-            const dropDown = await DropDown.create(this, elem);
-            assert(dropDown, 'Invalid structure of field element');
+        if (res.dropDown) {
+            res.dropDown = await DropDown.create(this, elem);
+            assert(res.dropDown, 'Invalid structure of field element');
 
-            res = {
-                dropDown,
-                disabled: dropDown.disabled,
-                value: dropDown.value,
-            };
+            res.disabled = res.dropDown.disabled;
+            res.value = res.dropDown.value;
         } else {
-            res = await evaluate((inputEl) => ({
-                disabled: inputEl.disabled,
-                value: inputEl.value,
-            }), elem);
             res.inputElem = elem;
         }
 
