@@ -1,0 +1,70 @@
+.white-theme {
+  /* Text colors */
+  --main-text-color: #000000;
+  --dimmed-text-color: #a7a7a7;
+  --hl-text-color: #000000;
+  --text-color-2: #202020;
+  --text-color-3: #202020;
+  --text-color-4: #404040;
+  --text-color-5: #b0b0b0;
+  --text-color-6: #a0a0a0;
+
+  /* Background colors */
+  --main-bg-color: #ffffff;
+  --semitrans-bg-color: #ffffff66;
+  --alt-bg-color: #f0f0f0;
+  --bg-color-2: #f2f2f2;
+  --bg-color-3: #e7e7e7;
+  --bg-color-4: #b0b0b0;
+  --bg-color-5: #d0d0d0;
+
+  /* Disabled colors */
+  --disabled-color-1: #eeeeee;
+
+  /* Borders */
+  --border-color-1: #888888;
+  --border-color-2: #b0b0b0;
+  --border-color-3: #c0c0c0;
+
+  /* List separator */
+  --list-separator-color: #ebebeb;
+
+  /* Header */
+  --header-bg-color: #404040;
+  --header-hover-btn-bg-color: #606060;
+
+  /* Navigation menus */
+  --nav-menu-separator-color: #c0c0c0;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
+  --icon-btn-hover-bg: #dddddd;
+  --icon-btn-active-bg: var(--bg-color-4);
+
+  /* Inputs */
+  --input-bg-color: #f2f2f2;
+  --input-border-color: #b0b0b0;
+  --active-input-border-color: var(--accent-color-alt);
+
+  /* Disabled inputs */
+  --input-disabled-bg: var(--disabled-color-1);
+  --input-disabled-border: #dddddd;
+  --input-disabled-color: var(--text-color-5);
+
+  /* List item */
+  --list-item-text-color: #808080;
+  --list-item-bg-color: var(--alt-bg-color);
+  --list-item-alt-bg-color: #f5f5f5;
+  --list-item-disabled-bg-color: #e8e8e8;
+  --list-item-icon-fill: #a7a7a7;
+
+  /* List item hover state */
+  --list-item-hover-bg-color: #e5e5e5;
+  --list-item-hover-icon-fill: #808080;
+
+  /* Popup menu */
+  --popup-menu-border: #b0b0b0;
+  --popup-menu-bg: #ffffffeb;
+  --popup-menu-box-shadow: 0 0 10px 0 #00000080;
+}
