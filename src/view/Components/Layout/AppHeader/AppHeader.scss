@@ -92,6 +92,8 @@
 
 /* User button */
 .btn.user-btn {
+  --btn-padding: 0 1rem 0 0.5rem;
+
   .btn__content {
     display: none;
   }
