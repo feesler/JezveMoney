@@ -826,7 +826,7 @@ svg * {
 }
 
 .popup__title {
-  height: 40px;
+  min-height: 40px;
   line-height: 40px;
   font-weight: 300;
   font-size: 1.4rem;
