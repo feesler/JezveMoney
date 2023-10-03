@@ -66,6 +66,7 @@ class AdminApiConsoleView extends AdminView {
         });
 
         this.activeForm = null;
+        this.creators = {};
 
         this.defaultSubmitHandler = (e) => this.onFormSubmit(e);
     }
@@ -151,32 +152,26 @@ class AdminApiConsoleView extends AdminView {
 
     /** Initialization of forms for State API controller */
     initCommonForms() {
-        const readStateForm = ApiRequestForm.create({
+        this.creators.readStateForm = () => ApiRequestForm.create({
             id: 'readStateForm',
             title: 'Read state',
             action: this.getRequestURL('state'),
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const mainStateForm = ApiRequestForm.create({
+        this.creators.mainStateForm = () => ApiRequestForm.create({
             id: 'mainStateForm',
             title: 'Read main state',
             action: this.getRequestURL('state/main'),
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const dbVersionForm = ApiRequestForm.create({
+        this.creators.dbVersionForm = () => ApiRequestForm.create({
             id: 'dbVersionForm',
             title: 'Read DB version',
             action: this.getRequestURL('state/version'),
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            readStateForm.elem,
-            mainStateForm.elem,
-            dbVersionForm.elem,
-        );
     }
 
     getRequestURL(apiMethod) {
@@ -185,12 +180,12 @@ class AdminApiConsoleView extends AdminView {
 
     /** Initialization of forms for Account API controller */
     initAccountForms() {
-        const listForm = AccountsListForm.create({
+        this.creators.listAccForm = () => AccountsListForm.create({
             id: 'listAccForm',
             onSubmit: this.getVerifyHandler(apiTypes.isAccountsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readAccForm = () => ItemIdsForm.create({
             id: 'readAccForm',
             title: 'Read accounts by ids',
             onSubmit: (e) => (
@@ -198,20 +193,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = AccountForm.create({
+        this.creators.createAccForm = () => AccountForm.create({
             id: 'createAccForm',
             title: 'Create account',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = AccountForm.create({
+        this.creators.updateAccForm = () => AccountForm.create({
             id: 'updateAccForm',
             title: 'Update account',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const showForm = ItemIdsForm.create({
+        this.creators.showAccForm = () => ItemIdsForm.create({
             id: 'showAccForm',
             title: 'Show accounts',
             method: 'post',
@@ -220,7 +215,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const hideForm = ItemIdsForm.create({
+        this.creators.hideAccForm = () => ItemIdsForm.create({
             id: 'hideAccForm',
             title: 'Hide accounts',
             method: 'post',
@@ -229,7 +224,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delAccForm = () => ItemIdsForm.create({
             id: 'delAccForm',
             title: 'Delete accounts',
             method: 'post',
@@ -238,34 +233,23 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const setPosForm = SetPositionForm.create({
+        this.creators.setAccPosForm = () => SetPositionForm.create({
             id: 'setAccPosForm',
             title: 'Set position of account',
             returnStateField: true,
             action: this.getRequestURL('account/setpos'),
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            showForm.elem,
-            hideForm.elem,
-            delForm.elem,
-            setPosForm.elem,
-        );
     }
 
     /** Initialization of forms for Person API controller */
     initPersonForms() {
-        const listForm = PersonsListForm.create({
+        this.creators.listPersonsForm = () => PersonsListForm.create({
             id: 'listPersonsForm',
             onSubmit: this.getVerifyHandler(apiTypes.isPersonsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readPersonForm = () => ItemIdsForm.create({
             id: 'readPersonForm',
             title: 'Read persons by ids',
             onSubmit: (e) => (
@@ -273,20 +257,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = PersonForm.create({
+        this.creators.createPersonForm = () => PersonForm.create({
             id: 'createPersonForm',
             title: 'Create person',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = PersonForm.create({
+        this.creators.updatePersonForm = () => PersonForm.create({
             id: 'updatePersonForm',
             title: 'Update person',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const showForm = ItemIdsForm.create({
+        this.creators.showPersonForm = () => ItemIdsForm.create({
             id: 'showPersonForm',
             title: 'Show persons',
             method: 'post',
@@ -295,7 +279,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const hideForm = ItemIdsForm.create({
+        this.creators.hidePersonForm = () => ItemIdsForm.create({
             id: 'hidePersonForm',
             title: 'Hide persons',
             method: 'post',
@@ -304,7 +288,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delPersonForm = () => ItemIdsForm.create({
             id: 'delPersonForm',
             title: 'Delete persons',
             method: 'post',
@@ -313,34 +297,23 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const setPosForm = SetPositionForm.create({
+        this.creators.setPersonPosForm = () => SetPositionForm.create({
             id: 'setPersonPosForm',
             title: 'Set position of person',
             returnStateField: true,
             action: this.getRequestURL('person/setpos'),
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            showForm.elem,
-            hideForm.elem,
-            delForm.elem,
-            setPosForm.elem,
-        );
     }
 
     /** Initialization of forms for Category API controller */
     initCategoryForms() {
-        const listForm = CategoriesListForm.create({
+        this.creators.listCategoriesForm = () => CategoriesListForm.create({
             id: 'listCategoriesForm',
             onSubmit: this.getVerifyHandler(apiTypes.isCategoriesArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readCategoryForm = () => ItemIdsForm.create({
             id: 'readCategoryForm',
             title: 'Read categories by ids',
             onSubmit: (e) => (
@@ -348,20 +321,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = CategoryForm.create({
+        this.creators.createCategoryForm = () => CategoryForm.create({
             id: 'createCategoryForm',
             title: 'Create category',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = CategoryForm.create({
+        this.creators.updateCategoryForm = () => CategoryForm.create({
             id: 'updateCategoryForm',
             title: 'Update category',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delCategoryForm = () => ItemIdsForm.create({
             id: 'delCategoryForm',
             title: 'Delete categories',
             method: 'post',
@@ -377,7 +350,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onDeleteCategoriesSubmit(e),
         });
 
-        const setPosForm = SetPositionForm.create({
+        this.creators.setCategoryPosForm = () => SetPositionForm.create({
             id: 'setCategoryPosForm',
             title: 'Set position of category',
             additionalFields: [
@@ -391,25 +364,16 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('category/setpos'),
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-            setPosForm.elem,
-        );
     }
 
     /** Initialization of forms for Transaction API controller */
     initTransactionForms() {
-        const listForm = TransactionsListForm.create({
+        this.creators.listTrForm = () => TransactionsListForm.create({
             id: 'listTrForm',
             onSubmit: (e) => this.onListTransactionSubmit(e),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readTrForm = () => ItemIdsForm.create({
             id: 'readTrForm',
             title: 'Read transactions by ids',
             onSubmit: (e) => (
@@ -417,27 +381,27 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = TransactionForm.create({
+        this.creators.createTrForm = () => TransactionForm.create({
             id: 'createTrForm',
             title: 'Create transaction',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const createDebtForm = TransactionForm.create({
+        this.creators.createDebtForm = () => TransactionForm.create({
             id: 'createDebtForm',
             title: 'Create debt',
             isDebt: true,
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = TransactionForm.create({
+        this.creators.updateTrForm = () => TransactionForm.create({
             id: 'updateTrForm',
             title: 'Update transaction',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const updateDebtForm = TransactionForm.create({
+        this.creators.updateDebtForm = () => TransactionForm.create({
             id: 'updateDebtForm',
             title: 'Update debt',
             isUpdate: true,
@@ -445,7 +409,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delTrForm = () => ItemIdsForm.create({
             id: 'delTrForm',
             title: 'Delete transactions',
             method: 'post',
@@ -454,12 +418,12 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const setCategoryForm = SetTransactionCategoryForm.create({
+        this.creators.setTrCategoryForm = () => SetTransactionCategoryForm.create({
             id: 'setTrCategoryForm',
             onSubmit: (e) => this.onSetCategorySubmit(e),
         });
 
-        const setPosForm = SetPositionForm.create({
+        this.creators.setTrPosForm = () => SetPositionForm.create({
             id: 'setTrPosForm',
             title: 'Set position of transaction',
             returnStateField: true,
@@ -467,34 +431,21 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const statisticsForm = StatisticsForm.create({
+        this.creators.statisticsForm = () => StatisticsForm.create({
             id: 'statisticsForm',
             onSubmit: (e) => this.onStatisticsSubmit(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            createDebtForm.elem,
-            updateForm.elem,
-            updateDebtForm.elem,
-            delForm.elem,
-            setPosForm.elem,
-            setCategoryForm.elem,
-            statisticsForm.elem,
-        );
     }
 
     /** Initialization of forms for Scheduled Transaction API controller */
     initScheduledTransactionForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listScheduledTrForm = () => ApiRequestForm.create({
             id: 'listScheduledTrForm',
             action: this.getRequestURL('schedule/list'),
             onSubmit: this.getVerifyHandler(apiTypes.isScheduledTransactionsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readScheduledTrForm = () => ItemIdsForm.create({
             id: 'readScheduledTrForm',
             title: 'Read scheduled transactions by ids',
             onSubmit: (e) => (
@@ -502,27 +453,27 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = ScheduledTransactionForm.create({
+        this.creators.createScheduledTrForm = () => ScheduledTransactionForm.create({
             id: 'createScheduledTrForm',
             title: 'Create scheduled transaction',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const createDebtForm = ScheduledTransactionForm.create({
+        this.creators.createScheduledDebtForm = () => ScheduledTransactionForm.create({
             id: 'createScheduledDebtForm',
             title: 'Create scheduled debt',
             isDebt: true,
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = ScheduledTransactionForm.create({
+        this.creators.updateScheduledTrForm = () => ScheduledTransactionForm.create({
             id: 'updateScheduledTrForm',
             title: 'Update scheduled transaction',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const updateDebtForm = ScheduledTransactionForm.create({
+        this.creators.updateScheduledDebtForm = () => ScheduledTransactionForm.create({
             id: 'updateScheduledDebtForm',
             title: 'Update scheduled debt',
             isUpdate: true,
@@ -530,7 +481,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delScheduledTrForm = () => ItemIdsForm.create({
             id: 'delScheduledTrForm',
             title: 'Delete scheduled transactions',
             method: 'post',
@@ -539,7 +490,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const finishForm = ItemIdsForm.create({
+        this.creators.finishScheduledTrForm = () => ItemIdsForm.create({
             id: 'finishScheduledTrForm',
             title: 'Finish scheduled transactions',
             method: 'post',
@@ -547,35 +498,24 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('schedule/finish'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            createDebtForm.elem,
-            updateForm.elem,
-            updateDebtForm.elem,
-            delForm.elem,
-            finishForm.elem,
-        );
     }
 
     /** Initialization of forms for Reminder API controller */
     initRemindersForms() {
-        const listForm = RemindersListForm.create({
+        this.creators.listReminderForm = () => RemindersListForm.create({
             id: 'listReminderForm',
             title: 'List reminders',
             onSubmit: this.getVerifyHandler(apiTypes.isRemindersArray),
         });
 
-        const upcomingForm = UpcomingRemindersListForm.create({
+        this.creators.upcomingRemindersForm = () => UpcomingRemindersListForm.create({
             id: 'upcomingRemindersForm',
             title: 'Upcoming reminders',
             action: this.getRequestURL('reminder/upcoming'),
             onSubmit: this.getVerifyHandler(apiTypes.isUpcomingRemindersList),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readReminderForm = () => ItemIdsForm.create({
             id: 'readReminderForm',
             title: 'Read reminders by ids',
             onSubmit: (e) => (
@@ -583,7 +523,7 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const confirmForm = ApiRequestForm.create({
+        this.creators.confirmReminderForm = () => ApiRequestForm.create({
             id: 'confirmReminderForm',
             title: 'Confirm reminder',
             method: 'post',
@@ -598,7 +538,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const cancelForm = ApiRequestForm.create({
+        this.creators.cancelReminderForm = () => ApiRequestForm.create({
             id: 'cancelReminderForm',
             title: 'Cancel reminder',
             method: 'post',
@@ -609,26 +549,18 @@ class AdminApiConsoleView extends AdminView {
             returnStateField: true,
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            upcomingForm.elem,
-            confirmForm.elem,
-            cancelForm.elem,
-        );
     }
 
     /** Initialization of forms for Import template API controller */
     initTemplateForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listTplForm = () => ApiRequestForm.create({
             id: 'listTplForm',
             title: 'List import templates',
             action: this.getRequestURL('importtpl/list/'),
             onSubmit: this.getVerifyHandler(apiTypes.isTemplatesArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readTplForm = () => ItemIdsForm.create({
             id: 'readTplForm',
             title: 'Read templates by ids',
             onSubmit: (e) => (
@@ -636,20 +568,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = ImportTemplateForm.create({
+        this.creators.createTplForm = () => ImportTemplateForm.create({
             id: 'createTplForm',
             title: 'Create import template',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = ImportTemplateForm.create({
+        this.creators.updateTplForm = () => ImportTemplateForm.create({
             id: 'updateTplForm',
             title: 'Update import template',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delTplForm = () => ItemIdsForm.create({
             id: 'delTplForm',
             title: 'Delete import templates',
             method: 'post',
@@ -657,19 +589,11 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importtpl/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for Import rules API controller */
     initRuleForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listRuleForm = () => ApiRequestForm.create({
             id: 'listRuleForm',
             title: 'List import rules',
             action: this.getRequestURL('importrule/list/'),
@@ -688,7 +612,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isImportRulesArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readRuleForm = () => ItemIdsForm.create({
             id: 'readRuleForm',
             title: 'Read import rules by ids',
             onSubmit: (e) => (
@@ -696,20 +620,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = ImportRuleForm.create({
+        this.creators.createRuleForm = () => ImportRuleForm.create({
             id: 'createRuleForm',
             title: 'Create import rule',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = ImportRuleForm.create({
+        this.creators.updateRuleForm = () => ImportRuleForm.create({
             id: 'updateRuleForm',
             title: 'Update import rule',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delRuleForm = () => ItemIdsForm.create({
             id: 'delRuleForm',
             title: 'Delete import rules',
             method: 'post',
@@ -717,19 +641,11 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importrule/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for Import conditions API controller */
     initConditionForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listCondForm = () => ApiRequestForm.create({
             id: 'listCondForm',
             title: 'List import conditions',
             action: this.getRequestURL('importcond/list/'),
@@ -746,7 +662,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isConditionsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readCondForm = () => ItemIdsForm.create({
             id: 'readCondForm',
             title: 'Read import conditions by ids',
             onSubmit: (e) => (
@@ -754,20 +670,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = ImportConditionForm.create({
+        this.creators.createCondForm = () => ImportConditionForm.create({
             id: 'createCondForm',
             title: 'Create import condition',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = ImportConditionForm.create({
+        this.creators.updateCondForm = () => ImportConditionForm.create({
             id: 'updateCondForm',
             title: 'Update import condition',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delCondForm = () => ItemIdsForm.create({
             id: 'delCondForm',
             title: 'Delete import conditions',
             method: 'post',
@@ -775,19 +691,11 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importcond/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for Import actions API controller */
     initActionForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listActForm = () => ApiRequestForm.create({
             id: 'listActForm',
             title: 'List import actions',
             action: this.getRequestURL('importaction/list/'),
@@ -804,7 +712,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isActionsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readActForm = () => ItemIdsForm.create({
             id: 'readActForm',
             title: 'Read import actions by ids',
             onSubmit: (e) => (
@@ -812,20 +720,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = ImportActionForm.create({
+        this.creators.createActForm = () => ImportActionForm.create({
             id: 'createActForm',
             title: 'Create import action',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = ImportActionForm.create({
+        this.creators.updateActForm = () => ImportActionForm.create({
             id: 'updateActForm',
             title: 'Update import action',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delActForm = () => ItemIdsForm.create({
             id: 'delActForm',
             title: 'Delete import actions',
             method: 'post',
@@ -833,26 +741,18 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importaction/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for Currency API controller */
     initCurrencyForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listCurrForm = () => ApiRequestForm.create({
             id: 'listCurrForm',
             title: 'List currencies',
             action: this.getRequestURL('currency/list/'),
             onSubmit: this.getVerifyHandler(apiTypes.isCurrenciesArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readCurrForm = () => ItemIdsForm.create({
             id: 'readCurrForm',
             title: 'Read currencies by ids',
             onSubmit: (e) => (
@@ -860,20 +760,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = CurrencyForm.create({
+        this.creators.createCurrForm = () => CurrencyForm.create({
             id: 'createCurrForm',
             title: 'Create currency',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = CurrencyForm.create({
+        this.creators.updateCurrForm = () => CurrencyForm.create({
             id: 'updateCurrForm',
             title: 'Update currency',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delCurrForm = () => ItemIdsForm.create({
             id: 'delCurrForm',
             title: 'Delete currencies',
             method: 'post',
@@ -881,26 +781,18 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('currency/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for Icon API controller */
     initIconForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listIconForm = () => ApiRequestForm.create({
             id: 'listIconForm',
             title: 'List icons',
             action: this.getRequestURL('icon/list/'),
             onSubmit: this.getVerifyHandler(apiTypes.isIconsArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readIconForm = () => ItemIdsForm.create({
             id: 'readIconForm',
             title: 'Read icons by ids',
             onSubmit: (e) => (
@@ -908,20 +800,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = IconForm.create({
+        this.creators.createIconForm = () => IconForm.create({
             id: 'createIconForm',
             title: 'Create icon',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = IconForm.create({
+        this.creators.updateIconForm = () => IconForm.create({
             id: 'updateIconForm',
             title: 'Update icon',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delIconForm = () => ItemIdsForm.create({
             id: 'delIconForm',
             title: 'Delete icons',
             method: 'post',
@@ -929,19 +821,11 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('icon/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-        );
     }
 
     /** Initialization of forms for User API controller */
     initUserForms() {
-        const loginForm = ApiRequestForm.create({
+        this.creators.loginForm = () => ApiRequestForm.create({
             id: 'loginForm',
             title: 'Login',
             action: this.getRequestURL('login/'),
@@ -953,7 +837,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const logoutForm = ApiRequestForm.create({
+        this.creators.logoutForm = () => ApiRequestForm.create({
             id: 'logoutForm',
             title: 'Log out',
             action: this.getRequestURL('logout'),
@@ -961,7 +845,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const registerForm = ApiRequestForm.create({
+        this.creators.registerForm = () => ApiRequestForm.create({
             id: 'registerForm',
             title: 'Registration',
             action: this.getRequestURL('register/'),
@@ -973,17 +857,11 @@ class AdminApiConsoleView extends AdminView {
             ],
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            loginForm.elem,
-            logoutForm.elem,
-            registerForm.elem,
-        );
     }
 
     /** Initialization of forms for User Currencies API controller */
     initUserCurrencyForms() {
-        const listForm = ApiRequestForm.create({
+        this.creators.listUserCurrencyForm = () => ApiRequestForm.create({
             id: 'listUserCurrencyForm',
             title: 'List currencies',
             action: this.getRequestURL('usercurrency/list/'),
@@ -993,7 +871,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.getVerifyHandler(apiTypes.isUserCurrenciesArray),
         });
 
-        const readForm = ItemIdsForm.create({
+        this.creators.readUserCurrencyForm = () => ItemIdsForm.create({
             id: 'readUserCurrencyForm',
             title: 'Read user currencies by ids',
             onSubmit: (e) => (
@@ -1001,20 +879,20 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
-        const createForm = UserCurrencyForm.create({
+        this.creators.createUserCurrencyForm = () => UserCurrencyForm.create({
             id: 'createUserCurrencyForm',
             title: 'Create user currency',
             onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
         });
 
-        const updateForm = UserCurrencyForm.create({
+        this.creators.updateUserCurrencyForm = () => UserCurrencyForm.create({
             id: 'updateUserCurrencyForm',
             title: 'Update user currency',
             isUpdate: true,
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const delForm = ItemIdsForm.create({
+        this.creators.delUserCurrencyForm = () => ItemIdsForm.create({
             id: 'delUserCurrencyForm',
             title: 'Delete user currencies',
             method: 'post',
@@ -1023,34 +901,25 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
 
-        const setPosForm = SetPositionForm.create({
+        this.creators.setUserCurrencyPosForm = () => SetPositionForm.create({
             id: 'setUserCurrencyPosForm',
             title: 'Set position of user currency',
             returnStateField: true,
             action: this.getRequestURL('usercurrency/setpos'),
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            listForm.elem,
-            readForm.elem,
-            createForm.elem,
-            updateForm.elem,
-            delForm.elem,
-            setPosForm.elem,
-        );
     }
 
     /** Initialization of forms for Profile API controller */
     initProfileForms() {
-        const readForm = ApiRequestForm.create({
+        this.creators.readProfileForm = () => ApiRequestForm.create({
             id: 'readProfileForm',
             title: 'Read profile',
             action: this.getRequestURL('profile/read'),
             onSubmit: this.getVerifyHandler(apiTypes.isProfile),
         });
 
-        const changeNameForm = ApiRequestForm.create({
+        this.creators.changeNameForm = () => ApiRequestForm.create({
             id: 'changeNameForm',
             title: 'Change name',
             action: this.getRequestURL('profile/changename'),
@@ -1061,7 +930,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const changePwdForm = ApiRequestForm.create({
+        this.creators.changePwdForm = () => ApiRequestForm.create({
             id: 'changePwdForm',
             title: 'Change password',
             action: this.getRequestURL('profile/changepass'),
@@ -1073,7 +942,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: this.defaultSubmitHandler,
         });
 
-        const updateSettingsForm = ApiRequestForm.create({
+        this.creators.updateSettingsForm = () => ApiRequestForm.create({
             id: 'updateSettingsForm',
             title: 'Update settings',
             action: this.getRequestURL('profile/updateSettings'),
@@ -1085,7 +954,7 @@ class AdminApiConsoleView extends AdminView {
             onSubmit: (e) => this.onUpdateSettingsSubmit(e),
         });
 
-        const resetForm = ApiRequestForm.create({
+        this.creators.resetForm = () => ApiRequestForm.create({
             id: 'resetForm',
             title: 'Reset data',
             action: this.getRequestURL('profile/reset'),
@@ -1139,14 +1008,6 @@ class AdminApiConsoleView extends AdminView {
             ],
             onSubmit: this.defaultSubmitHandler,
         });
-
-        this.formsContainer.append(
-            readForm.elem,
-            changeNameForm.elem,
-            changePwdForm.elem,
-            updateSettingsForm.elem,
-            resetForm.elem,
-        );
     }
 
     /**
@@ -1166,14 +1027,25 @@ class AdminApiConsoleView extends AdminView {
             return;
         }
 
-        const newForm = ge(viewTarget);
-        if (newForm) {
-            if (this.activeForm) {
-                this.activeForm.classList.remove('active');
+        let newForm = ge(viewTarget);
+        if (!newForm) {
+            const creator = this.creators[viewTarget];
+            if (!isFunction(creator)) {
+                return;
             }
-            newForm.classList.add('active');
-            this.activeForm = newForm;
+            ({ elem: newForm } = creator());
+            this.formsContainer.append(newForm);
         }
+
+        if (!newForm) {
+            return;
+        }
+
+        if (this.activeForm) {
+            this.activeForm.classList.remove('active');
+        }
+        newForm.classList.add('active');
+        this.activeForm = newForm;
     }
 
     /** Show API methods menu */
