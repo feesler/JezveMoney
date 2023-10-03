@@ -277,7 +277,6 @@ svg * {
 .content-header {
   display: flex;
   flex-flow: column nowrap;
-  row-gap: 9px;
   position: sticky;
   top: var(--header-size);
   z-index: 1000;

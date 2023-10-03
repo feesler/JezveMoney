@@ -178,7 +178,6 @@ export class SelectReminderDialog extends TestComponent {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query(this.elem, '.filters-container') },
             clearFiltersBtn: { elem: await query(this.elem, '.filters-controls .clear-all-btn') },
-            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             totalCounter: await Counter.create(this, await query(this.elem, '.items-counter')),
             selectedCounter: await Counter.create(this, await query(this.elem, '.selected-counter')),
         };
@@ -186,6 +185,8 @@ export class SelectReminderDialog extends TestComponent {
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of dialog: '${child}' component not found`)
         ));
+
+        res.closeFiltersBtn = { elem: await query('.filters-offcanvas .close-btn') };
 
         [res.filtersAnimation] = await evaluate((el) => ([
             el.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),

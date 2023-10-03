@@ -10,9 +10,6 @@
                             <h1><?= __("reminders.listTitle") ?></h1>
                             <div class="heading-actions"></div>
                         </header>
-
-                        <header id="contentHeader" class="content-header"></header>
-                        <section id="contentContainer" class="list-container"></section>
                     </main>
 
                     <aside id="itemInfo" class="item-details" hidden></aside>

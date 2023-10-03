@@ -30,7 +30,7 @@ export class StatisticsView extends AppView {
             titleEl: await query('.content_wrap > .heading > h1'),
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
-            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
+            closeFiltersBtn: { elem: await query('.filters-offcanvas .close-btn') },
             typeMenu: await TransactionTypeMenu.create(this, await query('.trtype-menu')),
             reportMenu: await LinkMenu.create(this, await query('#reportMenu')),
             accountsDropDown: null,

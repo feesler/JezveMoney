@@ -40,7 +40,6 @@ export class FiltersContainer extends Component {
         this.heading = this.content.querySelector('.filters-heading');
 
         this.closeBtn = CloseButton.create({
-            id: 'closeFiltersBtn',
             small: false,
             className: 'circle-btn',
             onClick: () => this.closeOffcanvas(),

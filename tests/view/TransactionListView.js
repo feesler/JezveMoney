@@ -67,7 +67,6 @@ export class TransactionListView extends AppView {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
             clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
-            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
             totalCounter: await Counter.create(this, await query('.items-counter')),
@@ -77,6 +76,8 @@ export class TransactionListView extends AppView {
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
+
+        res.closeFiltersBtn = { elem: await query('.filters-offcanvas .close-btn') };
 
         [res.filtersAnimation] = await evaluate(() => ([
             document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
