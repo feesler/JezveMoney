@@ -59,13 +59,11 @@ export class TransactionTypeMenu extends LinkMenu {
     }
 
     onItemClick(id, e) {
-        super.onItemClick(id, e);
-
         if (id === 'all' && this.state.showAll) {
             this.clearSelection();
         }
 
-        this.sendChangeEvent();
+        super.onItemClick(id, e);
     }
 
     getItemURL(item, state) {
