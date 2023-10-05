@@ -298,6 +298,7 @@ class State extends ApiController
             throw new \Error("Person not found");
         }
         $res->login = $user->login;
+        $res->access = $user->access;
         $res->user_id = $this->user_id;
         $res->owner_id = $this->owner_id;
         $res->name = $person->name;

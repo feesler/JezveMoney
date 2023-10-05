@@ -1,7 +1,6 @@
 import {
     createElement,
     isFunction,
-    show,
     Component,
     setEvents,
     removeEvents,
@@ -9,8 +8,14 @@ import {
 import { Button } from 'jezvejs/Button';
 import { Popup } from 'jezvejs/Popup';
 
+// Application
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
+
+// Common components
+import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+
+// Local components
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import {
     ImportTemplateManager,
@@ -18,10 +23,11 @@ import {
     TPL_CREATE_STATE,
     TPL_UPDATE_STATE,
 } from '../TemplateManager/ImportTemplateManager.js';
-import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+
 import './ImportUploadDialog.scss';
 
 /** CSS classes */
+const DIALOG_CLASS = 'upload-dialog';
 const UPLOAD_POPUP_CLASS = 'upload-popup';
 const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
@@ -73,6 +79,7 @@ export class ImportUploadDialog extends Component {
             onUploadError: (message) => this.onUploadError(message),
             onUploaded: (data, filename) => this.onUploaded(data, filename),
         });
+
         this.tplManager = ImportTemplateManager.create({
             elem: 'templateBlock',
             mainAccount: this.state.mainAccount,
@@ -80,6 +87,17 @@ export class ImportUploadDialog extends Component {
             onUpdate: () => this.onTemplateUpdate(),
             onAccountChange: (account) => this.onAccountChange(account),
             onSubmit: () => this.onSubmit(),
+        });
+
+        this.uploadProgress = LoadingIndicator.create({ fixed: false });
+
+        this.elem = createElement('div', {
+            props: { id: 'uploadDialog', className: DIALOG_CLASS },
+            children: [
+                this.uploader.elem,
+                this.tplManager.elem,
+                this.uploadProgress.elem,
+            ],
         });
 
         this.popup = Popup.create({
@@ -90,10 +108,6 @@ export class ImportUploadDialog extends Component {
             onClose: () => this.onClose(),
             className: UPLOAD_POPUP_CLASS,
         });
-        show(this.elem, true);
-
-        this.uploadProgress = LoadingIndicator.create({ fixed: false });
-        this.elem.append(this.uploadProgress.elem);
 
         this.setUploadState();
     }

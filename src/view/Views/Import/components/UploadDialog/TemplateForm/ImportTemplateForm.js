@@ -1,5 +1,4 @@
 import {
-    ge,
     isFunction,
     show,
     enable,
@@ -9,22 +8,36 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 
+// Application
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
 
+// Models
 import { ImportTemplate, templateColumns } from '../../../../../Models/ImportTemplate.js';
 
+// Common components
+import { Field } from '../../../../../Components/Common/Field/Field.js';
 import { DateFormatSelect } from '../../../../../Components/Form/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
 import { InputField } from '../../../../../Components/Form/Fields/InputField/InputField.js';
 import { NumberInputGroup } from '../../../../../Components/Form/Inputs/NumberInputGroup/NumberInputGroup.js';
 import { FormControls } from '../../../../../Components/Form/FormControls/FormControls.js';
 import { SwitchField } from '../../../../../Components/Form/Fields/SwitchField/SwitchField.js';
 
+// Local components
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 
 import './ImportTemplateForm.scss';
 
 /** CSS classes */
+const SECTION_CLASS = 'template-form';
+const FIRST_ROW_FIELD_CLASS = 'form-row first-row-field validation-block';
+const FORM_ROW_CLASS = 'form-row';
+const ACCOUNT_FIELD_CLASS = 'form-row tpl-account-field';
+const COLUMN_FIELD_CLASS = 'form-row validation-block';
+const DATE_FORMAT_FIELD_CLASS = 'form-row tpl-date-format-field';
+const FIELDS_ROW_CLASS = 'form-fields-row';
+const DATA_FIELD_CLASS = 'form-row raw-data-field';
+const FEEDBACK_CLASS = 'feedback';
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
 const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
 
@@ -77,52 +90,27 @@ export class ImportTemplateForm extends Component {
     }
 
     init() {
-        const elemIds = [
-            'templateForm',
-            'firstRowField',
-            'tplAccountSwitchField',
-            'tplAccountField',
-            'columnField',
-            'dateFormatField',
-            'rawDataTable',
-            'tplFormFeedback',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize upload file dialog');
-            }
-        });
-
         // Name field
         this.nameField = InputField.create({
             id: 'nameField',
             inputId: 'tplNameInp',
-            className: 'form-row',
+            className: FORM_ROW_CLASS,
             name: 'name',
             title: __('import.templates.name'),
             validate: true,
             feedbackMessage: __('import.templates.invalidName'),
             onInput: (e) => this.onTemplateNameInput(e),
         });
-        this.templateForm.prepend(this.nameField.elem);
 
-        this.columnDropDown = DropDown.create({
-            elem: 'columnSel',
-            onChange: (column) => this.onColumnChange(column),
-        });
-
-        // Date format field
-        this.dateFormatSelect = DateFormatSelect.create({
-            onItemSelect: (sel) => this.onDateFormatSelect(sel),
-        });
-        this.dateFormatField.append(this.dateFormatSelect.elem);
-
-        // Template default account
-        this.tplAccountSwitchField = SwitchField.fromElement(this.tplAccountSwitchField, {
+        // Default account Switch field
+        this.tplAccountSwitchField = SwitchField.create({
+            id: 'tplAccountSwitchField',
+            label: __('import.templates.setDefaultAccount'),
+            className: FORM_ROW_CLASS,
             onChange: () => this.onTemplateAccountToggle(),
         });
 
+        // Default account select
         this.tplAccountDropDown = DropDown.create({
             className: 'dd_fullwidth',
             enableFilter: true,
@@ -130,9 +118,16 @@ export class ImportTemplateForm extends Component {
             onChange: (account) => this.onTemplateAccountChange(account),
         });
         App.initAccountsList(this.tplAccountDropDown);
-        this.tplAccountField.append(this.tplAccountDropDown.elem);
 
-        // First row field
+        // Default account field
+        this.tplAccountField = Field.create({
+            id: 'tplAccountField',
+            title: __('import.templates.defaultAccount'),
+            className: ACCOUNT_FIELD_CLASS,
+            content: this.tplAccountDropDown.elem,
+        });
+
+        // First row input group
         this.firstRowGroup = NumberInputGroup.create({
             digits: 0,
             allowNegative: false,
@@ -142,6 +137,7 @@ export class ImportTemplateForm extends Component {
             onChange: (value) => this.onFirstRowChange(value),
         });
 
+        // First row feedback element
         const firstRowFeedback = createElement('div', {
             props: {
                 className: 'feedback invalid-feedback',
@@ -149,7 +145,67 @@ export class ImportTemplateForm extends Component {
             },
         });
 
-        this.firstRowField.append(this.firstRowGroup.elem, firstRowFeedback);
+        // First row field
+        this.firstRowField = Field.create({
+            id: 'firstRowField',
+            title: __('import.templates.firstRow'),
+            className: FIRST_ROW_FIELD_CLASS,
+            content: [
+                this.firstRowGroup.elem,
+                firstRowFeedback,
+            ],
+        });
+
+        // Column select
+        this.columnDropDown = DropDown.create({
+            id: 'columnSel',
+            data: Object.entries(App.props.tplColumnTypes).map(
+                ([id, { title }]) => ({ id, title }),
+            ),
+            onChange: (column) => this.onColumnChange(column),
+        });
+        // Column field
+        this.columnField = Field.create({
+            id: 'columnField',
+            title: __('import.templates.column'),
+            className: COLUMN_FIELD_CLASS,
+            content: this.columnDropDown.elem,
+        });
+
+        // Date format select
+        this.dateFormatSelect = DateFormatSelect.create({
+            onItemSelect: (sel) => this.onDateFormatSelect(sel),
+        });
+        // Date format field
+        this.dateFormatField = Field.create({
+            id: 'dateFormatField',
+            title: __('import.templates.dateFormat'),
+            className: DATE_FORMAT_FIELD_CLASS,
+            content: this.dateFormatSelect.elem,
+        });
+        this.dateFormatField.hide();
+
+        // Column and date format fields row
+        const columnDateGroup = createElement('div', {
+            props: { className: FIELDS_ROW_CLASS },
+            children: [
+                this.columnField.elem,
+                this.dateFormatField.elem,
+            ],
+        });
+
+        // Data table field
+        this.rawDataTable = Field.create({
+            id: 'rawDataTable',
+            title: __('import.templates.columnsMap'),
+            className: DATA_FIELD_CLASS,
+        });
+
+        // Feedback element
+        this.tplFormFeedback = createElement('div', {
+            props: { id: 'tplFormFeedback', className: FEEDBACK_CLASS },
+        });
+        show(this.tplFormFeedback, false);
 
         // Submit controls
         this.controls = FormControls.create({
@@ -161,11 +217,21 @@ export class ImportTemplateForm extends Component {
             onCancelClick: () => this.onCancel(),
         });
 
-        this.templateForm.append(this.controls.elem);
+        this.elem = createElement('section', {
+            props: { id: 'templateForm', className: SECTION_CLASS },
+            children: [
+                this.nameField.elem,
+                this.firstRowField.elem,
+                this.tplAccountSwitchField.elem,
+                this.tplAccountField.elem,
+                columnDateGroup,
+                this.rawDataTable.elem,
+                this.tplFormFeedback,
+                this.controls.elem,
+            ],
+        });
 
         this.reset();
-
-        this.elem = this.templateForm;
     }
 
     /** Reset component state */
@@ -550,7 +616,7 @@ export class ImportTemplateForm extends Component {
             onSelectColumn: (index) => this.onDataColumnClick(index),
         });
 
-        this.rawDataTable.append(dataTable.elem);
+        this.rawDataTable.setContent(dataTable.elem);
         dataTable.scrollLeft = scrollLeft;
 
         re(this.dataTable?.elem);
@@ -562,17 +628,17 @@ export class ImportTemplateForm extends Component {
         }));
 
         enable(this.decFirstRowBtn, state.template.first_row > 1);
-        App.setValidation(this.firstRowField, validation.firstRow);
+        App.setValidation(this.firstRowField.elem, validation.firstRow);
 
         const useTplAccount = state.template.account_id !== 0;
         this.tplAccountSwitchField.check(useTplAccount);
-        show(this.tplAccountField, useTplAccount);
+        this.tplAccountField.show(useTplAccount);
         if (state.template.account_id !== 0) {
             this.tplAccountDropDown.setSelection(state.template.account_id);
         }
 
         const { selectedColumn } = state;
-        show(this.dateFormatField, selectedColumn === 'date');
+        this.dateFormatField.show(selectedColumn === 'date');
         this.dateFormatSelect.setSelection(state.template.date_locale);
 
         if (typeof validation.column === 'string') {

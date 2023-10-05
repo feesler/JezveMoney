@@ -1,7 +1,7 @@
 @use "sass:list";
 
-@use 'theme/dark';
-@use 'theme/white';
+@use "theme/dark";
+@use "theme/white";
 
 $colors: #20a0ff, #ff0077, #00d647, #e2de00, #00b74a, #ff8700, #db0058, #086ca2,
   #ffba00, #ff3900, #dc0055, #00b64f, #dcf900;
@@ -508,12 +508,15 @@ svg * {
   color: var(--invalid-feedback-color);
 }
 
-.validation-block.invalid-block .invalid-feedback {
-  display: block;
-}
+.validation-block.invalid-block {
+  .input,
+  .input-group__input-outer {
+    border-color: var(--invalid-input-border-color);
+  }
 
-.validation-block.invalid-block .input {
-  border-color: var(--invalid-input-border-color);
+  .invalid-feedback {
+    display: block;
+  }
 }
 
 /* No data message for lists & etc. */

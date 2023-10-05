@@ -118,22 +118,26 @@ export class ImportView extends AppView {
         }
 
         const transactionFormDialog = await query(transactionPopupId);
-        res.transactionForm = await ImportTransactionForm.create(
-            this,
-            transactionFormDialog,
-            mainAccountId,
-        );
-
         const uploadDialogPopup = await query(this.uploadPopupId);
         const rulesDialogPopup = await query(this.rulesPopupId);
 
         const [
+            transactionFormVisible,
             uploadDialogVisible,
             rulesDialogVisible,
-        ] = await evaluate((uploadDialog, rulesDialog) => ([
-            uploadDialog && !uploadDialog.hidden,
-            rulesDialog && !rulesDialog.hidden,
-        ]), uploadDialogPopup, rulesDialogPopup);
+        ] = await evaluate((...elems) => (
+            elems.map((el) => (!!el && !el.hidden))
+        ), transactionFormDialog, uploadDialogPopup, rulesDialogPopup);
+
+        if (transactionFormVisible) {
+            res.transactionForm = await ImportTransactionForm.create(
+                this,
+                transactionFormDialog,
+                mainAccountId,
+            );
+        } else {
+            res.transactionForm = { elem: null };
+        }
 
         if (uploadDialogVisible) {
             res.uploadDialog = await ImportUploadDialog.create(this, uploadDialogPopup);
@@ -199,7 +203,7 @@ export class ImportView extends AppView {
             ? cont.itemsList.getPagination()
             : { ...defaultPagination };
         res.contextItemIndex = (res.enabled) ? cont.contextMenu?.content?.itemIndex : -1;
-        res.contextMenuVisible = res.enabled && cont.contextMenu?.visible;
+        res.contextMenuVisible = res.enabled && !!cont.contextMenu?.visible;
 
         res.submitInProgress = res.enabled && cont.submitProgress.visible;
 
@@ -445,9 +449,12 @@ export class ImportView extends AppView {
         await this.performAction(async () => {
             const item = this.itemsList.getItem(pos.rangeIndex);
             await item.clickMenu();
-            await wait('#contextMenu', { visible: true });
-            await this.parse();
         });
+        await waitForFunction(async () => {
+            await this.parse();
+            return !!this.model.contextMenuVisible;
+        });
+        await this.parse();
 
         return this.checkState(expected);
     }
@@ -597,6 +604,10 @@ export class ImportView extends AppView {
 
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
+        await waitForFunction(async () => {
+            await this.parse();
+            return !!this.uploadDialog?.isBrowseFileState();
+        });
 
         return this.checkState();
     }
@@ -821,6 +832,14 @@ export class ImportView extends AppView {
         await this.performAction(() => this.uploadDialog.backToSelectFile());
 
         return this.checkState();
+    }
+
+    /** Waits for specified state of view */
+    async waitForState(state) {
+        return waitForFunction(async () => {
+            await this.parse();
+            return (this.model.state === state);
+        });
     }
 
     /** Run action and wait until list finish to load */
@@ -1399,6 +1418,7 @@ export class ImportView extends AppView {
         this.expectedState.itemsList.items = expectedList.items;
 
         await saveAction();
+        await this.waitForState('main');
 
         return this.checkState();
     }
@@ -1412,6 +1432,7 @@ export class ImportView extends AppView {
         this.expectedState.itemsList.items = expectedList.items;
 
         await this.runFormAction({ action: 'clickCancel' });
+        await this.waitForState('main');
 
         return this.checkState();
     }

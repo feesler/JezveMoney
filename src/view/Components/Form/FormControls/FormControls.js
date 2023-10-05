@@ -15,10 +15,12 @@ const SPINNER_CLASS = 'request-spinner';
 
 const defaultProps = {
     id: undefined,
+    submitId: undefined,
     submitTitle: 'Submit',
     submitBtnClass: SUBMIT_BTN_CLASS,
     submitBtnType: 'submit',
     onSubmitClick: null,
+    cancelBtn: true,
     cancelTitle: 'Cancel',
     cancelURL: undefined,
     cancelBtnClass: CANCEL_BTN_CLASS,
@@ -54,27 +56,31 @@ export class FormControls extends Component {
 
     init() {
         this.submitBtn = Button.create({
+            id: this.props.submitId,
             type: this.props.submitBtnType,
             className: this.props.submitBtnClass,
             onClick: (e) => this.props?.onSubmitClick?.(e),
         });
+        const children = [this.submitBtn.elem];
 
-        this.cancelBtn = Button.create({
-            type: this.props.cancelBtnType,
-            className: this.props.cancelBtnClass,
-            onClick: (e) => this.props?.onCancelClick?.(e),
-        });
+        if (this.props.cancelBtn) {
+            this.cancelBtn = Button.create({
+                type: this.props.cancelBtnType,
+                className: this.props.cancelBtnClass,
+                onClick: (e) => this.props?.onCancelClick?.(e),
+            });
+            children.push(this.cancelBtn.elem);
+        }
 
-        this.spinner = Spinner.create({ className: SPINNER_CLASS });
-        this.spinner.hide();
+        if (this.props.showSpinner) {
+            this.spinner = Spinner.create({ className: SPINNER_CLASS });
+            this.spinner.hide();
+            children.push(this.spinner.elem);
+        }
 
         this.elem = createElement('div', {
             props: { className: CONTROLS_CLASS },
-            children: [
-                this.submitBtn.elem,
-                this.cancelBtn.elem,
-                this.spinner.elem,
-            ],
+            children,
         });
 
         addChilds(this.elem, this.props.controls);
@@ -113,14 +119,18 @@ export class FormControls extends Component {
         }));
         this.submitBtn.enable(!state.loading);
 
-        this.cancelBtn.setState((btnState) => ({
-            ...btnState,
-            title: state.cancelTitle,
-            url: state.cancelURL,
-            disabled: state.disabled,
-        }));
-        this.cancelBtn.show(state.cancelTitle && !state.loading);
+        if (this.cancelBtn && state.cancelBtn) {
+            this.cancelBtn.setState((btnState) => ({
+                ...btnState,
+                title: state.cancelTitle,
+                url: state.cancelURL,
+                disabled: state.disabled,
+            }));
+            this.cancelBtn.show(state.cancelTitle && !state.loading);
+        }
 
-        this.spinner.show(state.showSpinner && state.loading);
+        if (this.spinner && state.showSpinner) {
+            this.spinner.show(state.loading);
+        }
     }
 }

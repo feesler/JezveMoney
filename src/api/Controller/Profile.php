@@ -53,6 +53,7 @@ class Profile extends ApiController
             "user_id" => $this->user_id,
             "owner_id" => $this->owner_id,
             "login" => $userObj->login,
+            "access" => $userObj->access,
             "name" => $pObj->name,
             "settings" => $settings->getUserData(),
         ]);

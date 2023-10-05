@@ -50,23 +50,12 @@ class Import extends TemplateController
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
 
         $userAccounts = $accMod->getUserAccounts();
-        $accounts = $accMod->getData(["visibility" => "all", "owner" => "all"]);
         $importAvailable = count($userAccounts) > 0;
 
         $data = [
             "titleString" => __("appName") . " | " . __("import.listTitle"),
-            "accounts" => $accounts,
-            "testerUser" => $this->uMod->isTester($this->user_id),
             "importAvailable" => $importAvailable,
             "importNotAvailableMessage" => __("import.noAccountsMessage"),
-            "importTemplates" => $this->templateModel->getData(),
-            "tplColumnTypes" => $this->templateModel->getColumnTypes(),
-            "importRules" => $this->ruleModel->getData(["extended" => true]),
-            "uploadBtn" => [
-                "id" => "uploadBtn",
-                "classNames" => "circle-btn",
-                "icon" => "import",
-            ],
         ];
 
         if (!$importAvailable) {
@@ -75,15 +64,16 @@ class Import extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $data["accounts"],
+            "accounts" => $accMod->getData(["visibility" => "all", "owner" => "all"]),
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
             "schedule" => $scheduleModel->getData(),
             "reminders" => $reminderModel->getData(),
-            "rules" => $data["importRules"],
-            "templates" => $data["importTemplates"]
+            "rules" => $this->ruleModel->getData(["extended" => true]),
+            "templates" => $this->templateModel->getData(),
+            "tplColumnTypes" => $this->templateModel->getColumnTypes(),
         ];
 
         $this->initResources("ImportView");
