@@ -2,45 +2,6 @@
   --piechart-width: 400px;
 }
 
-/* Filters */
-.trans-type-filter {
-  max-width: 450px;
-}
-
-.report-type-filter,
-.group-type-filter {
-  max-width: 300px;
-
-  .link-menu {
-    flex-flow: row nowrap;
-  }
-}
-
-.accounts-filter {
-  flex-shrink: 0;
-}
-
-.currency-filter {
-  flex-grow: 0;
-}
-
-.date-range-filter {
-  max-width: 400px;
-
-  .filter-item__title {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 1.5rem;
-  }
-}
-
-/* Filters inside Collapsible container */
-.filters-collapsible {
-  .submit-btn {
-    display: none;
-  }
-}
-
 /* Statistics view histogram chart */
 .stat-histogram {
   position: relative;

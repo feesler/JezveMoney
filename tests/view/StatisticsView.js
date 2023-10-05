@@ -73,15 +73,18 @@ export class StatisticsView extends AppView {
         }, res.titleEl, res.chart.elem, ...bars);
 
         if (res.accountsFilterVisible) {
-            res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
+            const dropDownEl = await query('#accountsFilter .dd__container');
+            res.accountsDropDown = await DropDown.create(this, dropDownEl);
         }
 
         if (res.categoriesFilterVisible) {
-            res.categoryDropDown = await DropDown.createFromChild(this, await query('#category_id'));
+            const dropDownEl = await query('#categoriesFilter .dd__container');
+            res.categoryDropDown = await DropDown.create(this, dropDownEl);
         }
 
         if (res.currencyFilterVisible) {
-            res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
+            const dropDownEl = await query('#currencyFilter .dd__container');
+            res.currencyDropDown = await DropDown.create(this, dropDownEl);
         }
 
         res.groupTypeMenu = await LinkMenu.create(this, await query('#groupTypeMenu'));
