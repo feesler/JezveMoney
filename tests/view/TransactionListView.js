@@ -103,7 +103,8 @@ export class TransactionListView extends AppView {
         const accountsFilter = await query('#accountsFilter');
         const accountsFilterVisible = await isVisible(accountsFilter);
         if (accountsFilterVisible) {
-            res.filterSelect = await DropDown.createFromChild(this, await query('#acc_id'));
+            const filterSelectEl = await query('#accountsFilter .dd__container');
+            res.filterSelect = await DropDown.create(this, filterSelectEl);
         }
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
