@@ -7,6 +7,7 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
 import { App } from '../../../../view/Application/App.js';
+import { __ } from '../../../../view/utils/utils.js';
 
 import { ThemeSwitchField } from '../../../../view/Components/Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { NavigationMenu } from '../../../../view/Components/Layout/NavigationMenu/NavigationMenu.js';
@@ -61,17 +62,20 @@ export class AdminUserNavigation extends UserNavigation {
         this.themeField = ThemeSwitchField.create();
 
         const menuItems = [
-            { content: this.themeField.elem },
-            { type: 'separator' },
-            { url: 'profile/', titleToken: 'profile.title' },
-            { url: 'settings/', titleToken: 'settings.title' },
-            { url: 'logout/', titleToken: 'actions.logout' },
-            { type: 'separator' },
-            { url: '', title: 'Back' },
+            { id: 'theme', content: this.themeField.elem },
+            { id: 'separator1', type: 'separator' },
+            { id: 'profile', url: 'profile/', title: __('profile.title') },
+            { id: 'settings', url: 'settings/', title: __('settings.title') },
+            { id: 'logout', url: 'logout/', title: __('actions.logout') },
+            { id: 'separator1', type: 'separator' },
+            { id: 'back', url: '', title: 'Back' },
         ];
 
         this.menu = NavigationMenu.create({
-            items: menuItems,
+            items: menuItems.map((item) => ({
+                ...item,
+                selectable: false,
+            })),
         });
 
         this.elem = createElement('nav', {
