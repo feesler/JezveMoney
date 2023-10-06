@@ -13,6 +13,27 @@ const checkNavigation = async () => {
     }
 };
 
+export const showMainTab = async (directNavigate) => {
+    await test(`Show main settings tab. direct: ${directNavigate}`, async () => {
+        await checkNavigation();
+        return App.view.showMainTab(directNavigate);
+    });
+};
+
+export const showUserCurrenciesTab = async (directNavigate) => {
+    await test(`Show user currencies tab. direct: ${directNavigate}`, async () => {
+        await checkNavigation();
+        return App.view.showUserCurrenciesTab(directNavigate);
+    });
+};
+
+export const showRegionalTab = async (directNavigate) => {
+    await test(`Show regional settings tab. direct: ${directNavigate}`, async () => {
+        await checkNavigation();
+        return App.view.showRegionalTab(directNavigate);
+    });
+};
+
 export const addCurrencyById = async (id) => {
     const currency = App.currency.getItem(id);
     assert(currency, `Invalid currency id: ${id}`);

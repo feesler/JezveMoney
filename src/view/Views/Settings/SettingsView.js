@@ -8,7 +8,7 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 // Application
-import { __, getContextIds } from '../../utils/utils.js';
+import { __, getApplicationURL, getContextIds } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
@@ -183,26 +183,35 @@ class SettingsView extends AppView {
 
         // Tabs
         this.tabs = TabList.create({
+            useURLParam: false,
+            onChange: (item) => this.onChangeTab(item),
             items: [{
-                id: 'main',
-                value: 'main',
+                id: 'index',
+                value: 'index',
                 title: __('settings.main'),
                 content: this.mainTab,
+                url: getApplicationURL('settings/'),
             }, {
                 id: 'currencies',
                 value: 'currencies',
                 title: __('settings.currencies.title'),
                 content: this.userCurrenciesTab,
+                url: getApplicationURL('settings/currencies/'),
             }, {
                 id: 'regional',
                 value: 'regional',
                 title: __('settings.regional'),
                 content: this.regionalTab,
+                url: getApplicationURL('settings/regional/'),
             }],
         });
         this.tabsContainer.append(this.tabs.elem);
 
         this.subscribeToStore(this.store);
+    }
+
+    onChangeTab(item) {
+        this.store.dispatch(actions.changeTab(item?.id));
     }
 
     showMenu() {
@@ -566,21 +575,49 @@ class SettingsView extends AppView {
         this.decimalFormatContainer.dataset.time = state.dateRenderTime;
     }
 
+    renderTabList(state, prevState) {
+        if (state.action === prevState.action) {
+            return;
+        }
+
+        this.tabs.setState((tabState) => ({
+            ...tabState,
+            selectedId: state.action,
+        }));
+    }
+
+    getViewTitle() {
+        return `${__('appName')} | ${__('settings.title')}`;
+    }
+
+    replaceHistory(state) {
+        const { baseURL } = App;
+        const action = (state.action?.toLowerCase() ?? null);
+        const urlAction = (action && action !== 'index') ? `${action}/` : '';
+        const url = `${baseURL}settings/${urlAction}`;
+
+        const title = this.getViewTitle(state);
+        window.history.replaceState({}, title, url);
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
 
+        this.replaceHistory(state);
+
         if (state.loading) {
             this.loadingIndicator.show();
         }
 
+        this.renderTabList(state, prevState);
         this.renderUserCurrenciesSelect(state, prevState);
         this.renderUserCurrenciesList(state, prevState);
-        this.renderContextMenu(state);
-        this.renderMenu(state);
-        this.renderDateFormat(state);
-        this.renderDecimalFormat(state);
+        this.renderContextMenu(state, prevState);
+        this.renderMenu(state, prevState);
+        this.renderDateFormat(state, prevState);
+        this.renderDecimalFormat(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();
