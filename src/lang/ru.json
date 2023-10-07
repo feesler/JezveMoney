@@ -286,6 +286,7 @@
         "parent": "Родительская категория",
         "noParent": "Нет",
         "transactionType": "Тип транзакции",
+        "color": "Цвет",
         "childCount": "Подкатегорий:",
         "showChildren": "Показать",
         "hideChildren": "Скрыть",

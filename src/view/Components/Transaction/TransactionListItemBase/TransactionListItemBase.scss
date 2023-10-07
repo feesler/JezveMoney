@@ -74,7 +74,8 @@
   border-radius: 100vh;
   font-size: 0.75rem;
   white-space: nowrap;
-  background-color: var(--btn-bg);
+  background-color: var(--trans-item-category-color, var(--btn-bg));
+  color: var(--trans-item-category-text, var(--list-item-text-color));
 }
 
 .trans-item-base__comment {

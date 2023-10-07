@@ -6,6 +6,7 @@ import { availTransTypes, Transaction } from './Transaction.js';
 const availFields = [
     'id',
     'name',
+    'color',
     'parent_id',
     'type',
     'createdate',

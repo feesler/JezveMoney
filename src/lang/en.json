@@ -286,6 +286,7 @@
         "parent": "Parent category",
         "noParent": "No parent",
         "transactionType": "Transaction type",
+        "color": "Color",
         "childCount": "Subcategories:",
         "showChildren": "Show",
         "hideChildren": "Hide",

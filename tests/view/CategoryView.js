@@ -30,6 +30,10 @@ export class CategoryView extends AppView {
                 value: model.name.toString(),
                 isInvalid: model.invalidated ?? false,
             },
+            colorInput: {
+                visible: true,
+                value: model.color.toString(),
+            },
             parentSelect: {
                 visible: showParent,
                 value: model.parent_id.toString(),
@@ -76,6 +80,9 @@ export class CategoryView extends AppView {
         res.nameInput = await InputField.create(this, await query('#nameField'));
         assert(res.nameInput, 'Category name input not found');
 
+        res.colorInput = await InputField.create(this, await query('#colorField'));
+        assert(res.colorInput, 'Category color input not found');
+
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));
         res.typeSelect = await DropDown.createFromChild(this, await query('#type'));
 
@@ -98,6 +105,7 @@ export class CategoryView extends AppView {
             locale: cont.locale,
             isUpdate: cont.isUpdate,
             name: cont.nameInput.value,
+            color: cont.colorInput.value,
             parent_id: parseInt(cont.parentSelect.value, 10),
             type: parseInt(cont.typeSelect.value, 10),
             invalidated: cont.nameInput.isInvalid,
@@ -113,6 +121,7 @@ export class CategoryView extends AppView {
     getExpectedCategory(model = this.model) {
         const res = {
             name: model.name,
+            color: model.color,
             parent_id: model.parent_id,
             type: model.type,
         };
@@ -163,6 +172,15 @@ export class CategoryView extends AppView {
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.nameInput.input(val));
+
+        return this.checkState(expected);
+    }
+
+    async inputColor(val) {
+        this.model.color = val.toString();
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.colorInput.input(val));
 
         return this.checkState(expected);
     }

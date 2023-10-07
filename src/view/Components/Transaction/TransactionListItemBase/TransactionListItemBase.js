@@ -6,6 +6,7 @@ import {
 } from 'jezvejs';
 
 import { __ } from '../../../utils/utils.js';
+import { getContrastColor } from '../../../utils/color.js';
 import { App } from '../../../Application/App.js';
 
 import {
@@ -41,6 +42,9 @@ const RESULT_FIELD_CLASS = 'trans-item-base__result-field';
 const DATE_FIELD_CLASS = 'trans-item-base__date-field';
 const CATEGORY_FIELD_CLASS = 'trans-item-base__category-field';
 const COMMENT_FIELD_CLASS = 'trans-item-base__comment-field';
+
+const CATEGORY_COLOR_PROP = '--trans-item-category-color';
+const CATEGORY_TEXT_PROP = '--trans-item-category-text';
 
 const defaultProps = {
     item: null,
@@ -329,19 +333,12 @@ export class TransactionListItemBase extends Component {
             : `${sign}${srcAmountFmt}`;
     }
 
-    getCategoryTitle(state) {
+    getCategory(state) {
         const { item } = state;
-        if (item.category_id === 0) {
-            return null;
-        }
 
-        const { categories } = App.model;
-        const category = categories.getItem(item.category_id);
-        if (!category) {
-            throw new Error('Invalid category');
-        }
-
-        return category.name;
+        return (item.category_id === 0)
+            ? null
+            : App.model.categories.getItem(item.category_id);
     }
 
     renderClassic(state) {
@@ -358,9 +355,16 @@ export class TransactionListItemBase extends Component {
         }
         show(this.dateElem, state.showDate);
 
-        const categoryTitle = this.getCategoryTitle(state);
-        show(this.categoryElem, !!categoryTitle);
-        this.categoryElem.textContent = categoryTitle;
+        const category = this.getCategory(state);
+        show(this.categoryElem, !!category);
+        this.categoryElem.textContent = category?.name ?? '';
+
+        if (category) {
+            this.categoryElem.style.setProperty(CATEGORY_COLOR_PROP, category.color);
+
+            const textColor = getContrastColor(category.color, ['#f0f0f0', '#101010']);
+            this.categoryElem.style.setProperty(CATEGORY_TEXT_PROP, textColor);
+        }
 
         this.commentElem.textContent = item.comment;
         this.commentElem.setAttribute('title', item.comment);
@@ -431,9 +435,9 @@ export class TransactionListItemBase extends Component {
         this.dateField.show(state.showDate);
 
         // Category field
-        const categoryTitle = this.getCategoryTitle(state);
-        this.categoryField.show(!!categoryTitle);
-        this.categoryField.setContent(categoryTitle);
+        const category = this.getCategory(state);
+        this.categoryField.show(!!category);
+        this.categoryField.setContent(category?.name ?? '');
 
         // Comment
         const hasComment = item.comment.length > 0;

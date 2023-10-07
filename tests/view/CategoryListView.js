@@ -163,7 +163,7 @@ export class CategoryListView extends AppView {
                 ? selectedType
                 : Math.min(selectedType, item.type);
         }, null);
-        model.selectedType = Category.getTypeString(type);
+        model.selectedType = (type) ? Category.getTypeString(type) : null;
 
         return this.getExpectedState(model, state);
     }

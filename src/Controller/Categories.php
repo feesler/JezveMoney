@@ -85,6 +85,7 @@ class Categories extends ListViewController
         $category = new \stdClass();
         $category->id = 0;
         $category->name = "";
+        $category->color = "#023047";
         $category->parent_id = $parent_id;
         $category->type = $type;
 

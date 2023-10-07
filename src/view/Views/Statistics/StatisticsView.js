@@ -44,8 +44,10 @@ import './StatisticsView.scss';
 
 /* CSS classes */
 const LEGEND_LIST_CLASS = 'chart__legend-list';
-const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
+const LEGEND_ITEM_CLASS = 'chart-legend__item';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
+
+const CATEGORY_COLOR_PROP = '--category-color';
 
 const defaultProps = {
     filter: {},
@@ -436,6 +438,18 @@ class StatisticsView extends AppView {
         throw new Error('Invalid state');
     }
 
+    getDataCategoryColor(value) {
+        const categoryId = parseInt(value, 10);
+        const state = this.store.getState();
+
+        if (state.filter.report === 'category' && categoryId !== 0) {
+            const category = App.model.categories.getItem(categoryId);
+            return category.color;
+        }
+
+        return null;
+    }
+
     renderLegendContent(categories) {
         if (!Array.isArray(categories) || categories.length === 0) {
             return null;
@@ -443,17 +457,24 @@ class StatisticsView extends AppView {
 
         return createElement('ul', {
             props: { className: LEGEND_LIST_CLASS },
-            children: categories.map((category, index) => createElement('li', {
-                props: {
-                    className: `${LEGEND_ITEM_CAT_CLASS}${index + 1}`,
-                },
-                children: createElement('span', {
-                    props: {
-                        className: LEGEND_ITEM_TITLE_CLASS,
-                        textContent: this.getDataCategoryName(category),
-                    },
-                }),
-            })),
+            children: categories.map((category) => {
+                const item = createElement('li', {
+                    props: { className: LEGEND_ITEM_CLASS },
+                    children: createElement('span', {
+                        props: {
+                            className: LEGEND_ITEM_TITLE_CLASS,
+                            textContent: this.getDataCategoryName(category),
+                        },
+                    }),
+                });
+
+                const color = this.getDataCategoryColor(category);
+                if (color !== null) {
+                    item.style.setProperty(CATEGORY_COLOR_PROP, color);
+                }
+
+                return item;
+            }),
         });
     }
 

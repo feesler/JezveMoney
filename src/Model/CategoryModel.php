@@ -79,6 +79,19 @@ class CategoryModel extends SortableModel
             }
         }
 
+        if (isset($params["color"])) {
+            if (!is_string($params["color"]) || strlen($params["color"]) !== 7) {
+                throw new \Error("Invalid color specified");
+            }
+
+            $requestedColor = strtolower($params["color"]);
+            $res["color"] = colorToInt($requestedColor);
+            $resColor = intToColor($res["color"]);
+            if ($requestedColor !== $resColor) {
+                throw new \Error("Invalid color specified");
+            }
+        }
+
         $parent = null;
         $res["parent_id"] = (isset($params["parent_id"])) ? intval($params["parent_id"]) : 0;
         if ($res["parent_id"] !== 0) {
@@ -189,8 +202,11 @@ class CategoryModel extends SortableModel
             throw new \Error("Item not found");
         }
 
-        // Set same transaction type for children categories
-        $assignments = ["type" => $item->type];
+        // Set same transaction type and color for children categories
+        $assignments = [
+            "type" => $item->type,
+            "color" => colorToInt($item->color),
+        ];
         // In case current item is subcategory then set same parent category for
         // children categories to avoid third level of nesting
         if ($item->parent_id !== 0) {

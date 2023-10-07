@@ -10,7 +10,7 @@ import { DropDown } from 'jezvejs-test';
 
 export class InputField extends TestComponent {
     async parseContent() {
-        const valueInput = await query(this.elem, 'input[type="text"],input[type="password"]');
+        const valueInput = await query(this.elem, 'input[type="text"],input[type="password"],input[type="color"]');
         assert(valueInput, 'Input element not found');
 
         const btn = await query(this.elem, '.input-group__btn');

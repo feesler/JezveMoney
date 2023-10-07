@@ -9,14 +9,6 @@ import {
 } from '../common.js';
 
 export class CategoryList extends SortableList {
-/*
-    setData(data) {
-        super.setData(data);
-
-        this.sortByParent();
-    }
-    */
-
     /**
      * Create list item from specified object
      * @param {Object} obj
@@ -39,27 +31,9 @@ export class CategoryList extends SortableList {
             return false;
         }
 
-        const children = this.findByParent(id);
-
-        if (category.parent_id !== parentId) {
-            if (!this.update({ ...category, parent_id: parentId })) {
-                return false;
-            }
-
-            if (!children.every((item) => this.update({ ...item, parent_id: parentId }))) {
-                return false;
-            }
-        }
-
         if (!this.updatePos(id, pos)) {
             return false;
         }
-
-        if (!children.every((item, index) => this.updatePos(item.id, pos + index + 1))) {
-            return false;
-        }
-
-        this.sortByParent();
 
         return true;
     }

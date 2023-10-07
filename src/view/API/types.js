@@ -464,6 +464,7 @@ export const isPersonsArray = isArrayOf(isPerson);
 export const isCategory = (obj) => verifyObject(obj, {
     id: isInt,
     name: isString,
+    color: isString,
     parent_id: isInt,
     type: isInt,
     pos: isInt,

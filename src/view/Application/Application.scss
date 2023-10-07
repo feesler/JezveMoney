@@ -998,13 +998,13 @@ a.paginator-arrow:focus-visible {
     --historgam-active-bar-color: var(--charts-active-color-#{$i});
   }
 
-  .chart-legend__item-cat-#{$i} {
-    color: var(--charts-color-#{$i});
-  }
-
   .pie__sector-#{$i} {
     fill: var(--charts-color-#{$i});
   }
+}
+
+.chart-legend__item {
+  color: var(--category-color);
 }
 
 @media (hover: hover) {

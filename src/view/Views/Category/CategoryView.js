@@ -88,6 +88,19 @@ class CategoryView extends AppView {
         this.createParentCategorySelect();
         this.createTransactionTypeSelect();
 
+        // Color field
+        this.colorField = InputField.create({
+            id: 'colorField',
+            inputId: 'colorInp',
+            type: 'color',
+            name: 'color',
+            className: 'form-row',
+            title: __('categories.color'),
+            disableAutoProps: false,
+            onInput: (e) => this.onColorInput(e),
+        });
+        this.nameField.elem.after(this.colorField.elem);
+
         // Controls
         this.submitControls = FormControls.create({
             id: 'submitControls',
@@ -156,6 +169,12 @@ class CategoryView extends AppView {
         this.store.dispatch(actions.changeName(value));
     }
 
+    /** Color input event handler */
+    onColorInput(e) {
+        const { value } = e.target;
+        this.store.dispatch(actions.changeColor(value));
+    }
+
     /** Parent category select event handler */
     onParentSelect(category) {
         if (!category) {
@@ -220,6 +239,7 @@ class CategoryView extends AppView {
         const isUpdate = state.original.id;
         const data = {
             name: state.data.name,
+            color: state.data.color,
             parent_id: state.data.parent_id,
             type: state.data.type,
         };
@@ -318,6 +338,13 @@ class CategoryView extends AppView {
             value: state.data.name,
             valid: isValidName,
             feedbackMessage: (isValidName) ? '' : state.validation.name,
+            disabled: state.submitStarted,
+        }));
+
+        // Color field
+        this.colorField.setState((colorState) => ({
+            ...colorState,
+            value: state.data.color,
             disabled: state.submitStarted,
         }));
 
