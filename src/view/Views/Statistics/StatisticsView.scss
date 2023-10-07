@@ -96,21 +96,3 @@
     color: var(--dimmed-text-color);
   }
 }
-
-@for $i from 1 through 13 {
-  .chart-legend__item-cat-#{$i} {
-    color: var(--charts-color-#{$i});
-  }
-
-  .pie__sector-#{$i} {
-    fill: var(--charts-color-#{$i});
-  }
-}
-
-@media (hover: hover) {
-  @for $i from 1 through 13 {
-    .pie__sector-#{$i}:hover {
-      fill: var(--charts-active-color-#{$i});
-    }
-  }
-}

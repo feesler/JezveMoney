@@ -2,11 +2,7 @@
 
 @use "theme/dark";
 @use "theme/white";
-
-$colors: #20a0ff, #ff0077, #00d647, #e2de00, #00b74a, #ff8700, #db0058, #086ca2,
-  #ffba00, #ff3900, #dc0055, #00b64f, #dcf900;
-$active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
-  #3c9dd1, #ffcb40, #ff6b40, #ee3b80, #37da7e, #e6fc3f;
+@use "colors";
 
 :root {
   --neutral-color: #888888;
@@ -56,9 +52,9 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
   --transaction-credit-limit: #9370db;
 
   /* Chart colors */
-  @for $i from 1 through length($colors) {
-    --charts-color-#{$i}: #{list.nth($colors, $i)};
-    --charts-active-color-#{$i}: #{list.nth($active-colors, $i)};
+  @for $i from 1 through length(colors.$colors) {
+    --charts-color-#{$i}: #{list.nth(colors.$colors, $i)};
+    --charts-active-color-#{$i}: #{list.nth(colors.$active-colors, $i)};
   }
 }
 
@@ -991,17 +987,31 @@ a.paginator-arrow:focus-visible {
   --chart-text-size: 1rem;
 }
 
-@for $i from 1 through length($colors) {
+@for $i from 1 through length(colors.$colors) {
   .histogram_column-#{$i} {
     --historgam-bar-color: var(--charts-color-#{$i});
     --historgam-active-bar-color: var(--charts-active-color-#{$i});
   }
-}
 
-@for $i from 1 through length($colors) {
   .chart_stacked .histogram_category-#{$i} {
     --historgam-bar-color: var(--charts-color-#{$i});
     --historgam-active-bar-color: var(--charts-active-color-#{$i});
+  }
+
+  .chart-legend__item-cat-#{$i} {
+    color: var(--charts-color-#{$i});
+  }
+
+  .pie__sector-#{$i} {
+    fill: var(--charts-color-#{$i});
+  }
+}
+
+@media (hover: hover) {
+  @for $i from 1 through length(colors.$colors) {
+    .pie__sector-#{$i}:hover {
+      fill: var(--charts-active-color-#{$i});
+    }
   }
 }
 

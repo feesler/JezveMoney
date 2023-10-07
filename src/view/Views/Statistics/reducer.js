@@ -6,6 +6,7 @@ import { formatDateRange } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 
 const SECTOR_OFFSET = 10;
+const COLORS_COUNT = 23;
 
 // Utils
 export const isSameSelection = (a, b) => (
@@ -20,7 +21,11 @@ const pieChartInfoFromSector = (sector) => ({
 
 const pieChartInfoFromChartItem = (item) => ({
     value: item.value,
-    category: item.categoryIndex + 1,
+    category: (
+        (item.categoryIndex + 1 > COLORS_COUNT)
+            ? (item.columnIndex + 1)
+            : (item.categoryIndex + 1)
+    ),
     categoryId: item.category,
 });
 

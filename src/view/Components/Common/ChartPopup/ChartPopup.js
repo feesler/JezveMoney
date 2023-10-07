@@ -86,9 +86,10 @@ export class ChartPopup extends Component {
     }
 
     renderPopupListItem(item) {
+        const columnClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.columnIndex + 1}`;
         const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
         return createElement('li', {
-            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, categoryClass) },
+            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, columnClass, categoryClass) },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
