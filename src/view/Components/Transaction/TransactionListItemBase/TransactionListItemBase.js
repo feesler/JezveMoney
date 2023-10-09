@@ -3,10 +3,10 @@ import {
     removeChilds,
     show,
     Component,
+    getContrastColor,
 } from 'jezvejs';
 
 import { __ } from '../../../utils/utils.js';
-import { getContrastColor } from '../../../utils/color.js';
 import { App } from '../../../Application/App.js';
 
 import {
