@@ -16,7 +16,7 @@ const defaultProps = {
     selected: false,
     listMode: 'list',
     showControls: false,
-    animated: true,
+    animated: false,
 };
 
 /**
