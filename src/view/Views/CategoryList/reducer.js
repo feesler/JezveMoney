@@ -1,9 +1,12 @@
+import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 
 import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
+import { availTransTypes } from '../../Models/Transaction.js';
+import { ANY_TYPE } from './helpers.js';
 
 /** Prepare data from categories list model for list component */
 export const createItemsFromModel = () => {
@@ -14,8 +17,25 @@ export const createItemsFromModel = () => {
 // Reducers
 const reduceDeselectAll = (state) => ({
     ...state,
-    items: state.items.map(reduceDeselectItem),
+    items: CategoryList.create(state.items.map(reduceDeselectItem)),
 });
+
+export const selectAvailableType = (state) => {
+    const types = [
+        ...asArray(state.selectedType),
+        ...Object.keys(availTransTypes).map((type) => parseInt(type, 10)),
+        ANY_TYPE,
+    ];
+
+    const selectedType = types.find((type) => {
+        const typeItems = state.items.findByType(type);
+        return typeItems?.length > 0;
+    }) ?? null;
+
+    return (state.selectedType === selectedType)
+        ? state
+        : { ...state, selectedType };
+};
 
 const slice = createSlice({
     showDetails: (state) => ({
@@ -65,12 +85,12 @@ const slice = createSlice({
 
     toggleSelectItem: (state, itemId) => ({
         ...state,
-        items: state.items.map(reduceToggleItem(itemId)),
+        items: CategoryList.create(state.items.map(reduceToggleItem(itemId))),
     }),
 
     selectAllItems: (state) => ({
         ...state,
-        items: state.items.map(reduceSelectItem),
+        items: CategoryList.create(state.items.map(reduceSelectItem)),
     }),
 
     deselectAllItems: (state) => reduceDeselectAll(state),
@@ -84,10 +104,17 @@ const slice = createSlice({
             ...state,
             listMode,
             contextItem: null,
+            showContextMenu: false,
+            showMenu: false,
         };
 
         return (listMode === 'list') ? reduceDeselectAll(newState) : newState;
     },
+
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
 
     startLoading: (state) => (
         (state.loading)
@@ -101,13 +128,25 @@ const slice = createSlice({
             : state
     ),
 
+    selectType: (state, selectedType) => (
+        (state.selectedType === selectedType)
+            ? state
+            : selectAvailableType({
+                ...state,
+                selectedType,
+                contextItem: null,
+                showContextMenu: false,
+                showMenu: false,
+            })
+    ),
+
     changeSortMode: (state, sortMode) => (
         (state.sortMode === sortMode)
             ? state
             : { ...state, sortMode }
     ),
 
-    listRequestLoaded: (state, keepState) => ({
+    listRequestLoaded: (state, keepState) => selectAvailableType({
         ...state,
         items: createItemsFromModel(),
         listMode: (keepState) ? state.listMode : 'list',

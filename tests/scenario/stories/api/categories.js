@@ -93,6 +93,12 @@ const createInvalid = async () => {
         parent_id: 0,
         type: 0,
     }, {
+        // Try to create category with existing color
+        name: 'Colors',
+        color: COLOR_2,
+        parent_id: 0,
+        type: EXPENSE,
+    }, {
         // Try to create sub category with invalid type
         name: 'Subcategory',
         color: COLOR_8,
@@ -284,6 +290,8 @@ const updateInvalid = async () => {
         { id: FOOD_CATEGORY, name: 'Transpost' },
         // Try to submit category with empty name
         { id: FOOD_CATEGORY, name: '' },
+        // Try to update color of category with one already in use
+        { id: FOOD_CATEGORY, color: COLOR_10 },
         // Try to submit category with invalid parent
         { id: FOOD_CATEGORY, parent_id: -1 },
         // Try to submit category with itself as parent

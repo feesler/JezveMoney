@@ -35,6 +35,7 @@ export class InputField extends TestComponent {
             return {
                 label: el.querySelector('label')?.textContent,
                 value: inputEl.value,
+                disabled: inputEl.disabled,
                 validationEnabled,
                 isInvalid,
                 feedbackText,

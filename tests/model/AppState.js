@@ -1499,6 +1499,11 @@ export class AppState {
             return false;
         }
 
+        // Transaction type of subcategory must be the same as parent
+        if (parent && parent.type !== params.type) {
+            return false;
+        }
+
         if (
             (typeof params.color !== 'string')
             || (params.color.length !== 7)
@@ -1508,9 +1513,12 @@ export class AppState {
             return false;
         }
 
-        // Transaction type of subcategory must be the same as parent
-        if (parent && parent.type !== params.type) {
-            return false;
+        // Check no top-level categories with same color
+        if (parent === null) {
+            const colorItems = this.categories.findByColor(params.color);
+            if (colorItems?.length > 0 && colorItems[0].id !== params.id) {
+                return false;
+            }
         }
 
         return true;
@@ -1733,6 +1741,10 @@ export class AppState {
         });
 
         return res;
+    }
+
+    getNextCategoryColor() {
+        return this.categories.getNextColor();
     }
 
     /**

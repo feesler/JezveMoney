@@ -37,6 +37,7 @@ class CategoryView extends AppView {
         const initialState = {
             validation: {
                 name: true,
+                color: true,
                 valid: true,
             },
             submitStarted: false,
@@ -96,6 +97,8 @@ class CategoryView extends AppView {
             name: 'color',
             className: 'form-row',
             title: __('categories.color'),
+            validate: true,
+            feedbackMessage: __('categories.existingColor'),
             disableAutoProps: false,
             onInput: (e) => this.onColorInput(e),
         });
@@ -202,7 +205,8 @@ class CategoryView extends AppView {
             return;
         }
 
-        const { name } = state.data;
+        const { name, color } = state.data;
+
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('categories.invalidName')));
             this.nameField.focus();
@@ -212,6 +216,14 @@ class CategoryView extends AppView {
                 this.store.dispatch(actions.invalidateNameField(__('categories.existingName')));
                 this.nameField.focus();
             }
+        }
+
+        const colorItems = App.model.categories.findByColor(color);
+        if (
+            colorItems?.length > 0
+            && state.original.id !== colorItems[0].id
+        ) {
+            this.store.dispatch(actions.invalidateColorField());
         }
 
         const { validation } = this.store.getState();
@@ -331,6 +343,8 @@ class CategoryView extends AppView {
             this.deleteBtn.enable(!state.submitStarted);
         }
 
+        const parentId = parseInt(state.data.parent_id, 10);
+
         // Name field
         const isValidName = (state.validation.name === true);
         this.nameField.setState((nameState) => ({
@@ -345,7 +359,8 @@ class CategoryView extends AppView {
         this.colorField.setState((colorState) => ({
             ...colorState,
             value: state.data.color,
-            disabled: state.submitStarted,
+            valid: state.validation.color,
+            disabled: (state.submitStarted || parentId !== 0),
         }));
 
         // Parent category field
@@ -358,8 +373,6 @@ class CategoryView extends AppView {
         this.parentSelect.enable(!state.submitStarted);
 
         // Transaction type field
-        const parentId = parseInt(state.data.parent_id, 10);
-
         this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted && parentId === 0);
 

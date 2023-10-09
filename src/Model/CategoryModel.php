@@ -11,6 +11,26 @@ use function JezveMoney\Core\inSetCondition;
 
 define("NO_CATEGORY", 0);
 
+const AVAIL_COLORS = [
+    "#5f0f40",
+    "#9a031e",
+    "#fb8b24",
+    "#e36414",
+    "#0f4c5c",
+    "#390099",
+    "#55dde0",
+    "#ffbe0b",
+    "#fd8a09",
+    "#fb5607",
+    "#fd2b3b",
+    "#ff006e",
+    "#c11cad",
+    "#a22acd",
+    "#8338ec",
+    "#3a86ff",
+    "#4c91ff",
+];
+
 /**
  * Transaction category model
  */
@@ -79,19 +99,6 @@ class CategoryModel extends SortableModel
             }
         }
 
-        if (isset($params["color"])) {
-            if (!is_string($params["color"]) || strlen($params["color"]) !== 7) {
-                throw new \Error("Invalid color specified");
-            }
-
-            $requestedColor = strtolower($params["color"]);
-            $res["color"] = colorToInt($requestedColor);
-            $resColor = intToColor($res["color"]);
-            if ($requestedColor !== $resColor) {
-                throw new \Error("Invalid color specified");
-            }
-        }
-
         $parent = null;
         $res["parent_id"] = (isset($params["parent_id"])) ? intval($params["parent_id"]) : 0;
         if ($res["parent_id"] !== 0) {
@@ -116,6 +123,29 @@ class CategoryModel extends SortableModel
         }
         if (!is_null($parent) && $parent->type !== $res["type"]) {
             throw new \Error("Transaction type of child category must be the same as parent");
+        }
+
+        if (isset($params["color"])) {
+            if (!is_string($params["color"]) || strlen($params["color"]) !== 7) {
+                throw new \Error("Invalid color specified");
+            }
+
+            $requestedColor = strtolower($params["color"]);
+            $res["color"] = colorToInt($requestedColor);
+            $resColor = intToColor($res["color"]);
+            if ($requestedColor !== $resColor) {
+                throw new \Error("Invalid color specified");
+            }
+
+            if (is_null($parent)) {
+                $colorItems = $this->findByColor($res["color"]);
+                if (
+                    count($colorItems) > 0
+                    && $colorItems[0]->id !== $item_id
+                ) {
+                    throw new \Error("Item with same color already exists");
+                }
+            }
         }
 
         if ($this->isSameItemExist($res, $item_id)) {
@@ -379,6 +409,7 @@ class CategoryModel extends SortableModel
      *
      * @param array $params options array:
      *     - 'parent_id' => (int) - filter categories by parent. Returns all if not set
+     *     - 'color' => (int) - filter categories by color
      *     - 'returnIds' => (bool) - if true returns array of ids. Otherwise returns array of CategoryItem
      *
      * @return int[]|CategoryItem[]
@@ -391,10 +422,14 @@ class CategoryModel extends SortableModel
         }
 
         $returnIds = isset($params["returnIds"]) ? $params["returnIds"] : false;
+        $colorFilter = isset($params["color"]) ? intToColor(intval($params["color"])) : null;
         $parentFilter = isset($params["parent_id"]) ? intval($params["parent_id"]) : null;
 
         foreach ($this->cache as $item) {
             if (!is_null($parentFilter) && $item->parent_id !== $parentFilter) {
+                continue;
+            }
+            if (!is_null($colorFilter) && $item->color !== $colorFilter) {
                 continue;
             }
 
@@ -414,6 +449,19 @@ class CategoryModel extends SortableModel
     public function findByParent(int $parentId = 0)
     {
         return $this->getData(["parent_id" => $parentId]);
+    }
+
+    /**
+     * Returns array of categories with specified color
+     *
+     * @param int $color color to find
+     * @param int $parentId parent category id, default is 0
+     *
+     * @return array
+     */
+    public function findByColor(int $color, int $parentId = 0)
+    {
+        return $this->getData(["color" => $color, "parent_id" => $parentId]);
     }
 
     /**
@@ -443,6 +491,53 @@ class CategoryModel extends SortableModel
                 (!$caseSens && strtolower($item->name) == $name)
             ) {
                 return $item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns array of colors used by top level categories of current user
+     *
+     * @return string[]
+     */
+    public function getUsedColors()
+    {
+        $res = [];
+        $items = $this->findByParent();
+        foreach ($items as $item) {
+            if (!in_array($item->color, $res)) {
+                $res[] = $item->color;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * Returns array of all colors
+     *
+     * @return string[]
+     */
+    public function getAvailableColors()
+    {
+        return AVAIL_COLORS;
+    }
+
+    /**
+     * Returns next available color for new category
+     *
+     * @return string|null
+     */
+    public function getNextColor()
+    {
+        $usedColors = $this->getUsedColors();
+        $availColors = $this->getAvailableColors();
+
+        foreach ($availColors as $color) {
+            if (!in_array($color, $usedColors)) {
+                return $color;
             }
         }
 

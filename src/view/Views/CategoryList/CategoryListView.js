@@ -47,15 +47,18 @@ import { CategoryItem } from './components/CategoryItem/CategoryItem.js';
 import { CategoryListContextMenu } from './components/ContextMenu/CategoryListContextMenu.js';
 import { CategoryListMainMenu } from './components/MainMenu/CategoryListMainMenu.js';
 
-import { actions, createItemsFromModel, reducer } from './reducer.js';
-import { getCategoriesSortMode } from './helpers.js';
+import {
+    actions,
+    createItemsFromModel,
+    reducer,
+    selectAvailableType,
+} from './reducer.js';
+import { ANY_TYPE, getCategoriesSortMode } from './helpers.js';
 import './CategoryListView.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'list_select';
 const SORT_MODE_CLASS = 'list_sort';
-
-const ANY_TYPE = 0;
 
 /**
  * List of persons view
@@ -85,10 +88,11 @@ class CategoryListView extends AppView {
         const { settings } = App.model.profile;
         const sortMode = settings.sort_categories;
 
-        const initialState = {
+        const initialState = selectAvailableType({
             ...this.props,
             detailsItem: null,
             items: createItemsFromModel(),
+            selectedType: null,
             loading: false,
             listMode: 'list',
             showMenu: false,
@@ -96,7 +100,7 @@ class CategoryListView extends AppView {
             showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
-        };
+        });
 
         this.transTypes = [
             ...Object.keys(availTransTypes).map((type) => parseInt(type, 10)),
@@ -182,6 +186,7 @@ class CategoryListView extends AppView {
         // Tabs
         this.sections = {};
         this.tabs = TabList.create({
+            onChange: (item) => this.onChangeType(item),
             items: this.transTypes.map((type) => {
                 const key = Category.getTypeString(type);
                 const section = {
@@ -236,6 +241,11 @@ class CategoryListView extends AppView {
 
     hideMenu() {
         this.store.dispatch(actions.hideMenu());
+    }
+
+    onChangeType(selected) {
+        const type = Category.getTypeByString(selected?.id);
+        this.store.dispatch(actions.selectType(type));
     }
 
     onMenuClick(item) {
@@ -304,14 +314,17 @@ class CategoryListView extends AppView {
 
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.setRenderTime();
     }
 
     selectAll() {
         this.store.dispatch(actions.selectAllItems());
+        this.setRenderTime();
     }
 
     deselectAll() {
         this.store.dispatch(actions.deselectAllItems());
+        this.setRenderTime();
     }
 
     async setListMode(listMode) {
@@ -320,7 +333,13 @@ class CategoryListView extends AppView {
         const state = this.store.getState();
         if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
             await this.requestSortMode(SORT_MANUALLY);
+        } else {
+            this.setRenderTime();
         }
+    }
+
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
     }
 
     startLoading() {
@@ -354,6 +373,7 @@ class CategoryListView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     async requestList(options = {}) {
@@ -370,6 +390,7 @@ class CategoryListView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     getListRequest() {
@@ -467,6 +488,7 @@ class CategoryListView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -516,6 +538,7 @@ class CategoryListView extends AppView {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /** Show person(s) delete confirmation popup */
@@ -665,6 +688,8 @@ class CategoryListView extends AppView {
             state.items === prevState?.items
             && state.listMode === prevState?.listMode
             && state.sortMode === prevState?.sortMode
+            && state.selectedType === prevState?.selectedType
+            && state.renderTime === prevState?.renderTime
         ) {
             return;
         }
@@ -692,6 +717,12 @@ class CategoryListView extends AppView {
 
             this.tabs.showItem(key, typeCategories.length > 0);
         });
+
+        this.tabs.setState((tabsState) => ({
+            ...tabsState,
+            selectedId: Category.getTypeString(state.selectedType),
+        }));
+        this.tabs.elem.dataset.time = state.renderTime;
     }
 
     render(state, prevState = {}) {

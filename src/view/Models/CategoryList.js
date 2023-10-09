@@ -26,6 +26,11 @@ export class CategoryList extends List {
         return this.filter((item) => item.parent_id === id);
     }
 
+    /** Returns array of categories for specified transaction type */
+    findByType(type) {
+        return this.filter((item) => item.type === type);
+    }
+
     /** Search category with specified name */
     findByName(name, caseSens = false) {
         if (typeof name !== 'string' || name.length === 0) {
@@ -38,6 +43,12 @@ export class CategoryList extends List {
                 ? (person.name === lookupName)
                 : (person.name.toLowerCase() === lookupName)
         ));
+    }
+
+    /** Returns array of items with specified color */
+    findByColor(color, parentId = 0) {
+        const categoryId = parseInt(parentId, 10);
+        return this.filter((item) => (item.color === color && item.parent_id === categoryId));
     }
 
     sortBy(sortMode) {

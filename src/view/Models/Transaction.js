@@ -15,6 +15,14 @@ export const availTransTypes = {
     [LIMIT_CHANGE]: 'limit',
 };
 
+const transTypeStrings = {
+    expense: EXPENSE,
+    income: INCOME,
+    transfer: TRANSFER,
+    debt: DEBT,
+    limit: LIMIT_CHANGE,
+};
+
 const transTitles = {
     [EXPENSE]: __('transactions.types.expense'),
     [INCOME]: __('transactions.types.income'),
@@ -42,5 +50,10 @@ export class Transaction {
         }
 
         return transTitles[type];
+    }
+
+    /** Returns type of transaction for specified string */
+    static getTypeByString(value) {
+        return transTypeStrings[value] ?? null;
     }
 }

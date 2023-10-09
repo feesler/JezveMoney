@@ -36,6 +36,11 @@ export class Category extends ListItem {
         return [0, ...Object.keys(availTransTypes)];
     }
 
+    /** Returns type of transaction for specified string */
+    static getTypeByString(value) {
+        return (value !== 'any') ? Transaction.getTypeByString(value) : 0;
+    }
+
     /**
      * Check specified field name is available
      * @param {string} field - field name to check

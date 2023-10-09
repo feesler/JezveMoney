@@ -82,10 +82,14 @@ class Categories extends ListViewController
             ? intval($_GET["type"])
             : ($parentCategory->type ?? 0);
 
+        $color = ($parentCategory)
+            ? $parentCategory->color
+            : $this->model->getNextColor();
+
         $category = new \stdClass();
         $category->id = 0;
         $category->name = "";
-        $category->color = "#023047";
+        $category->color = $color;
         $category->parent_id = $parent_id;
         $category->type = $type;
 

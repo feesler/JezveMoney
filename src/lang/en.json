@@ -283,6 +283,7 @@
         "name": "Name",
         "invalidName": "Input name",
         "existingName": "Category with this name already exist",
+        "existingColor": "This color is already used by another category",
         "parent": "Parent category",
         "noParent": "No parent",
         "transactionType": "Transaction type",

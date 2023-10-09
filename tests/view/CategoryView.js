@@ -4,6 +4,7 @@ import {
     prop,
     navigation,
     click,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -32,7 +33,9 @@ export class CategoryView extends AppView {
             },
             colorInput: {
                 visible: true,
+                disabled: model.parent_id !== 0,
                 value: model.color.toString(),
+                isInvalid: model.colorInvalidated ?? false,
             },
             parentSelect: {
                 visible: showParent,
@@ -109,6 +112,7 @@ export class CategoryView extends AppView {
             parent_id: parseInt(cont.parentSelect.value, 10),
             type: parseInt(cont.typeSelect.value, 10),
             invalidated: cont.nameInput.isInvalid,
+            colorInvalidated: cont.colorInput.isInvalid,
         };
 
         if (res.isUpdate) {
@@ -142,9 +146,20 @@ export class CategoryView extends AppView {
         if (this.model.name.length === 0) {
             return false;
         }
-        // Check same name exists
+
+        // Check no categories with the same name
         const category = App.state.categories.findByName(this.model.name);
-        return !category || this.model.id === category.id;
+        if (category && this.model.id !== category.id) {
+            return false;
+        }
+
+        // Check color not used by other category
+        const colorItems = App.state.categories.findByColor(this.model.color);
+        if (colorItems?.length > 0 && this.model.id !== colorItems[0].id) {
+            return false;
+        }
+
+        return true;
     }
 
     async clickDeleteButton() {
@@ -178,9 +193,21 @@ export class CategoryView extends AppView {
 
     async inputColor(val) {
         this.model.color = val.toString();
+        this.model.colorInvalidated = false;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.colorInput.input(val));
+        await this.performAction(() => (
+            evaluate((el, value) => {
+                const input = el;
+                input.value = value.toString();
+                const event = new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                });
+
+                input.dispatchEvent(event);
+            }, this.content.colorInput.content.valueInput, val)
+        ));
 
         return this.checkState(expected);
     }
@@ -195,6 +222,7 @@ export class CategoryView extends AppView {
         this.model.parent_id = categoryId;
         if (categoryId !== 0) {
             this.model.type = category.type;
+            this.model.color = category.color;
         }
         const expected = this.getExpectedState();
 

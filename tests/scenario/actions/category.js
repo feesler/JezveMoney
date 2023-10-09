@@ -31,7 +31,7 @@ export const create = async () => {
         const expected = CategoryView.getExpectedState({
             locale: App.view.locale,
             name: '',
-            color: '#023047',
+            color: App.state.getNextCategoryColor(),
             parent_id: 0,
             type: 0,
             isUpdate: false,
@@ -88,7 +88,7 @@ export const addSubcategory = async (id) => {
         const expected = CategoryView.getExpectedState({
             locale: App.view.locale,
             name: '',
-            color: '#023047',
+            color: category.color,
             parent_id: category.id,
             type: category.type,
             isUpdate: false,
