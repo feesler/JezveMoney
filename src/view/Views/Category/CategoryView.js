@@ -20,6 +20,7 @@ import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Category/CategorySelect/CategorySelect.js';
+import { ColorField } from '../../Components/Form/Fields/ColorField/ColorField.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
 import { DeleteCategoryDialog } from '../../Components/Category/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
@@ -90,7 +91,7 @@ class CategoryView extends AppView {
         this.createTransactionTypeSelect();
 
         // Color field
-        this.colorField = InputField.create({
+        this.colorField = ColorField.create({
             id: 'colorField',
             inputId: 'colorInp',
             type: 'color',
