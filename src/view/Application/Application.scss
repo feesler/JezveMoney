@@ -987,31 +987,40 @@ a.paginator-arrow:focus-visible {
   --chart-text-size: 1rem;
 }
 
+.histogram__bar {
+  --historgam-bar-color: var(--category-color);
+  --historgam-active-bar-color: var(--category-active-color);
+}
+
 @for $i from 1 through length(colors.$colors) {
-  .histogram_column-#{$i} {
-    --historgam-bar-color: var(--charts-color-#{$i});
-    --historgam-active-bar-color: var(--charts-active-color-#{$i});
-  }
-
-  .chart_stacked .histogram_category-#{$i} {
-    --historgam-bar-color: var(--charts-color-#{$i});
-    --historgam-active-bar-color: var(--charts-active-color-#{$i});
-  }
-
+  .histogram_column-#{$i},
+  .chart_stacked .histogram_category-ind-#{$i},
+  .legend-item-#{$i},
   .pie__sector-#{$i} {
-    fill: var(--charts-color-#{$i});
+    --category-color: var(--charts-color-#{$i});
+    --category-active-color: var(--charts-active-color-#{$i});
+  }
+}
+
+.categories-report {
+  .chart_stacked .histogram_category-0,
+  .chart-popup-list__item-cat-0 {
+    --category-color: var(--charts-color-1);
+    --category-active-color: var(--charts-active-color-1);
   }
 }
 
 .chart-legend__item {
-  color: var(--category-color);
+  color: var(--category-color, var(--charts-color-1));
+}
+
+.pie__sector {
+  fill: var(--category-color, var(--charts-color-1));
 }
 
 @media (hover: hover) {
-  @for $i from 1 through length(colors.$colors) {
-    .pie__sector-#{$i}:hover {
-      fill: var(--charts-active-color-#{$i});
-    }
+  .pie__sector:hover {
+    fill: var(--category-active-color, var(--charts-active-color-1));
   }
 }
 

@@ -3,6 +3,11 @@ import {
     createElement,
     show,
     asArray,
+    rgbToHSL,
+    hslToRGB,
+    rgbToColor,
+    MAX_LIGHTNESS,
+    getClassName,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { Button } from 'jezvejs/Button';
@@ -46,8 +51,6 @@ import './StatisticsView.scss';
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CLASS = 'chart-legend__item';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
-
-const CATEGORY_COLOR_PROP = '--category-color';
 
 const defaultProps = {
     filter: {},
@@ -100,6 +103,8 @@ class StatisticsView extends AppView {
      * View initialization
      */
     onStart() {
+        this.createColorStyle();
+
         this.loadElementsByIds([
             'heading',
             'contentHeader',
@@ -205,6 +210,31 @@ class StatisticsView extends AppView {
         }
 
         this.requestData(this.getRequestData());
+    }
+
+    createColorStyle() {
+        const ACTIVE_LIGHTNESS_STEP = 15;
+        const activeColors = {};
+
+        const rules = App.model.categories.map((item) => {
+            if (!activeColors[item.color]) {
+                const hsl = rgbToHSL(item.color);
+                const lighten = (hsl.lightness + ACTIVE_LIGHTNESS_STEP <= MAX_LIGHTNESS);
+                hsl.lightness += ((lighten) ? 1 : -1) * ACTIVE_LIGHTNESS_STEP;
+                activeColors[item.color] = rgbToColor(hslToRGB(hsl));
+            }
+
+            return `.categories-report .chart_stacked .histogram_category-${item.id},
+            .categories-report .pie__sector-${item.id},
+            .categories-report .legend-item-${item.id},
+            .categories-report .chart-popup-list__item-cat-${item.id} {
+                --category-color: ${item.color};
+                --category-active-color: ${activeColors[item.color]};
+            }`;
+        });
+
+        const style = createElement('style', { props: { textContent: rules.join('') } });
+        document.body.appendChild(style);
     }
 
     /** Set loading state and render view */
@@ -398,7 +428,9 @@ class StatisticsView extends AppView {
 
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
+        const state = this.store.getState();
         return ChartPopup.fromTarget(target, {
+            reportType: state.filter?.report,
             formatValue: (value) => this.formatValue(value),
             renderDateLabel: (value) => this.renderDateLabel(value),
         });
@@ -438,28 +470,25 @@ class StatisticsView extends AppView {
         throw new Error('Invalid state');
     }
 
-    getDataCategoryColor(value) {
-        const categoryId = parseInt(value, 10);
-        const state = this.store.getState();
-
-        if (state.filter.report === 'category' && categoryId !== 0) {
-            const category = App.model.categories.getItem(categoryId);
-            return category.color;
-        }
-
-        return null;
-    }
-
     renderLegendContent(categories) {
         if (!Array.isArray(categories) || categories.length === 0) {
             return null;
         }
 
+        const state = this.store.getState();
+        const categoryReport = (state.filter.report === 'category');
+
         return createElement('ul', {
             props: { className: LEGEND_LIST_CLASS },
-            children: categories.map((category) => {
+            children: categories.map((category, index) => {
+                const id = (categoryReport) ? category : (index + 1);
                 const item = createElement('li', {
-                    props: { className: LEGEND_ITEM_CLASS },
+                    props: {
+                        className: getClassName(
+                            LEGEND_ITEM_CLASS,
+                            `legend-item-${id}`,
+                        ),
+                    },
                     children: createElement('span', {
                         props: {
                             className: LEGEND_ITEM_TITLE_CLASS,
@@ -467,11 +496,6 @@ class StatisticsView extends AppView {
                         },
                     }),
                 });
-
-                const color = this.getDataCategoryColor(category);
-                if (color !== null) {
-                    item.style.setProperty(CATEGORY_COLOR_PROP, color);
-                }
 
                 return item;
             }),
@@ -515,7 +539,10 @@ class StatisticsView extends AppView {
     }
 
     renderHistogram(state, prevState = {}) {
-        if (state.chartData === prevState.chartData) {
+        if (
+            state.chartData === prevState.chartData
+            && state.filter?.report === prevState.filter?.report
+        ) {
             return;
         }
 
@@ -531,6 +558,8 @@ class StatisticsView extends AppView {
         data.stacked = this.isStackedData(state.filter);
 
         this.histogram.setData(data);
+
+        this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }
 
     renderPieChart(state) {
@@ -541,6 +570,7 @@ class StatisticsView extends AppView {
 
         this.pieChart.setData(state.selectedColumn.items);
         this.pieChart.show();
+        this.pieChart.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }
 
     renderPieChartHeader(state, prevState = {}) {

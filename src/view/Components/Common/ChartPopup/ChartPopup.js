@@ -6,6 +6,7 @@ import {
     removeChilds,
 } from 'jezvejs';
 
+import { COLORS_COUNT } from '../../../utils/utils.js';
 import { Transaction } from '../../../Models/Transaction.js';
 
 import './ChartPopup.scss';
@@ -22,6 +23,7 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 const defaultProps = {
     formatValue: null,
     renderDateLabel: null,
+    reportType: null,
 };
 
 /**
@@ -85,11 +87,18 @@ export class ChartPopup extends Component {
             : value;
     }
 
-    renderPopupListItem(item) {
-        const columnClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.columnIndex + 1}`;
-        const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
+    renderPopupListItem(item, state) {
+        let { category } = item;
+        if (state.reportType !== 'category') {
+            category = (item.categoryIndex + 1 > COLORS_COUNT)
+                ? (item.columnIndex + 1)
+                : (item.categoryIndex + 1);
+        }
+
+        const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${category}`;
+
         return createElement('li', {
-            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, columnClass, categoryClass) },
+            props: { className: getClassName(POPUP_LIST_ITEM_CLASS, categoryClass) },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
@@ -104,7 +113,7 @@ export class ChartPopup extends Component {
             throw new Error('Invalid state');
         }
 
-        const listItems = state.items.map((item) => this.renderPopupListItem(item));
+        const listItems = state.items.map((item) => this.renderPopupListItem(item, state));
         removeChilds(this.list);
         this.list.append(...listItems);
 

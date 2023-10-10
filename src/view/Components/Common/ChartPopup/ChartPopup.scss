@@ -41,8 +41,12 @@
   color: var(--main-text-color);
 }
 
+.chart-popup-list__item {
+  color: var(--category-color);
+}
+
 @for $i from 1 through length(colors.$colors) {
   .chart-popup-list__item-cat-#{$i} {
-    color: var(--charts-color-#{$i});
+    --category-color: var(--charts-color-#{$i});
   }
 }
