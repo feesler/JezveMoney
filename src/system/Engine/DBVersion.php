@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 32);
+define("DB_VERSION", 33);
 
 /**
  * Database version manager class
@@ -24,6 +24,7 @@ class DBVersion
         "admin_query",
         "currency",
         "dbver",
+        "colors",
         "icon",
         "import_act",
         "import_cond",
@@ -69,6 +70,7 @@ class DBVersion
             $this->createUsersTable();
             $this->createUserSettingsTable();
             $this->createUserCurrencyTable();
+            $this->createColorsTable();
             $this->createIconTable();
             $this->createImportTemplateTable();
             $this->createImportRuleTable();
@@ -1071,6 +1073,88 @@ class DBVersion
     }
 
     /**
+     * Creates database version 33
+     *
+     * @return int
+     */
+    private function version33()
+    {
+        $this->createColorsTable();
+
+        $initialColors = [
+            "#5f0f40",
+            "#9a031e",
+            "#fb8b24",
+            "#e36414",
+            "#0f4c5c",
+            "#390099",
+            "#55dde0",
+            "#ffbe0b",
+            "#fd8a09",
+            "#fb5607",
+            "#fd2b3b",
+            "#ff006e",
+            "#c11cad",
+            "#a22acd",
+            "#8338ec",
+            "#3a86ff",
+            "#4c91ff",
+        ];
+
+        $data = [];
+        foreach ($initialColors as $color) {
+            $now = date("Y-m-d H:i:s");
+            $data[] = [
+                "id" => null,
+                "value" => colorToInt($color),
+                "type" => 0,
+                "createdate" => $now,
+                "updatedate" => $now,
+            ];
+        }
+        if (!$this->dbClient->insertMultipleQ("colors", $data)) {
+            throw new \Error("insertMultipleQ failed");
+        }
+
+        // Set colors of categories from predefined values
+        $users = [];
+        $qResult = $this->dbClient->selectQ("id", "users", null, null, "id ASC");
+        while ($row = $this->dbClient->fetchRow($qResult)) {
+            $users[] = intval($row["id"]);
+        }
+
+        foreach ($users as $user_id) {
+            $categories = [];
+            $qResult = $this->dbClient->selectQ(
+                "id",
+                "categories",
+                ["user_id=" . qnull($user_id), "parent_id=" . qnull(0)],
+                null,
+                "id ASC",
+            );
+            while ($row = $this->dbClient->fetchRow($qResult)) {
+                $categories[] = intval($row["id"]);
+            }
+
+            $index = 0;
+            foreach ($categories as $category_id) {
+                $res = $this->dbClient->updateQ(
+                    "categories",
+                    ["color" => colorToInt($initialColors[$index])],
+                    orJoin(["id=" . qnull($category_id), "parent_id=" . qnull($category_id)]),
+                );
+                if (!$res) {
+                    throw new \Error("Failed to update table 'categories'");
+                }
+
+                $index++;
+            }
+        }
+
+        return 33;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1461,6 +1545,37 @@ class DBVersion
                 "updatedate" => "DATETIME NOT NULL",
                 "PRIMARY KEY (`id`)",
                 "INDEX `user_id` (`user_id`)",
+            ],
+            TABLE_OPTIONS,
+        );
+        if (!$res) {
+            throw new \Error("Failed to create table '$tableName'");
+        }
+    }
+
+    /**
+     * Creates colors table
+     */
+    private function createColorsTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "colors";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            [
+                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
+                "value" => "INT(11) NOT NULL DEFAULT '0'",
+                "type" => "INT(11) NOT NULL DEFAULT '0'",
+                "createdate" => "DATETIME NOT NULL",
+                "updatedate" => "DATETIME NOT NULL",
+                "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,
         );

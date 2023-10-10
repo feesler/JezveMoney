@@ -13,6 +13,7 @@ use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\ColorModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\ImportActionModel;
@@ -29,6 +30,7 @@ class State extends ApiController
 {
     protected static $dataRequestMap = [
         "currency" => "getCurrencies",
+        "colors" => "getColors",
         "icons" => "getIcons",
         "accounts" => "getAccounts",
         "persons" => "getPersons",
@@ -78,6 +80,18 @@ class State extends ApiController
     protected function getCurrencies(array $options = [])
     {
         return $this->getList(CurrencyModel::getInstance(), $options);
+    }
+
+    /**
+     * Returns colors data for specified request
+     *
+     * @param array $options
+     *
+     * @return object
+     */
+    protected function getColors(array $options = [])
+    {
+        return $this->getList(ColorModel::getInstance(), $options);
     }
 
     /**

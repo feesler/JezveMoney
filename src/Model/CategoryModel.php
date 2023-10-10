@@ -11,26 +11,6 @@ use function JezveMoney\Core\inSetCondition;
 
 define("NO_CATEGORY", 0);
 
-const AVAIL_COLORS = [
-    "#5f0f40",
-    "#9a031e",
-    "#fb8b24",
-    "#e36414",
-    "#0f4c5c",
-    "#390099",
-    "#55dde0",
-    "#ffbe0b",
-    "#fd8a09",
-    "#fb5607",
-    "#fd2b3b",
-    "#ff006e",
-    "#c11cad",
-    "#a22acd",
-    "#8338ec",
-    "#3a86ff",
-    "#4c91ff",
-];
-
 /**
  * Transaction category model
  */
@@ -522,7 +502,14 @@ class CategoryModel extends SortableModel
      */
     public function getAvailableColors()
     {
-        return AVAIL_COLORS;
+        $colorModel = ColorModel::getInstance();
+        $items = $colorModel->getData();
+        $res = [];
+        foreach ($items as $item) {
+            $res[] = $item->value;
+        }
+
+        return $res;
     }
 
     /**

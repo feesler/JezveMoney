@@ -478,6 +478,18 @@ export const isCategory = (obj) => verifyObject(obj, {
 /** Verify object is array of categories */
 export const isCategoriesArray = isArrayOf(isCategory);
 
+/** Verify object is color */
+export const isColor = (obj) => verifyObject(obj, {
+    id: isInt,
+    value: isString,
+    type: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is array of colors */
+export const isColorsArray = isArrayOf(isColor);
+
 /** Verify object is user settings */
 export const isSettings = (obj) => verifyObject(obj, {
     sort_accounts: isInt,

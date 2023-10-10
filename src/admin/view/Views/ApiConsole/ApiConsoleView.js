@@ -46,6 +46,7 @@ import { ImportConditionForm } from './components/Forms/ImportConditions/ImportC
 import { ImportActionForm } from './components/Forms/ImportActions/ImportActionForm.js';
 import { CurrencyForm } from './components/Forms/Currencies/CurrencyForm.js';
 import { IconForm } from './components/Forms/Icons/IconForm.js';
+import { ColorForm } from './components/Forms/Colors/ColorForm.js';
 import { UserCurrencyForm } from './components/Forms/UserCurrencies/UserCurrencyForm.js';
 
 import './ApiConsoleView.scss';
@@ -125,6 +126,7 @@ class AdminApiConsoleView extends AdminView {
         this.initActionForms();
         this.initCurrencyForms();
         this.initIconForms();
+        this.initColorForms();
         this.initUserForms();
         this.initUserCurrencyForms();
         this.initProfileForms();
@@ -779,6 +781,46 @@ class AdminApiConsoleView extends AdminView {
             method: 'post',
             returnStateField: true,
             action: this.getRequestURL('currency/delete'),
+            onSubmit: (e) => this.onSubmitItemIds(e),
+        });
+    }
+
+    /** Initialization of forms for Color API controller */
+    initColorForms() {
+        this.creators.listColorForm = () => ApiRequestForm.create({
+            id: 'listColorForm',
+            title: 'List colors',
+            action: this.getRequestURL('color/list/'),
+            onSubmit: this.getVerifyHandler(apiTypes.isColorsArray),
+        });
+
+        this.creators.readColorForm = () => ItemIdsForm.create({
+            id: 'readColorForm',
+            title: 'Read colors by ids',
+            onSubmit: (e) => (
+                this.onReadItemsSubmit(e, 'color/', apiTypes.isColorsArray)
+            ),
+        });
+
+        this.creators.createColorForm = () => ColorForm.create({
+            id: 'createColorForm',
+            title: 'Create color',
+            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+        });
+
+        this.creators.updateColorForm = () => ColorForm.create({
+            id: 'updateColorForm',
+            title: 'Update color',
+            isUpdate: true,
+            onSubmit: this.defaultSubmitHandler,
+        });
+
+        this.creators.delColorForm = () => ItemIdsForm.create({
+            id: 'delColorForm',
+            title: 'Delete colors',
+            method: 'post',
+            returnStateField: true,
+            action: this.getRequestURL('color/delete'),
             onSubmit: (e) => this.onSubmitItemIds(e),
         });
     }

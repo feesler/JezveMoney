@@ -480,6 +480,14 @@ export class AppState {
         return res;
     }
 
+    getColors() {
+        const res = {
+            data: this.getNoDatesList(App.colors.data),
+        };
+
+        return res;
+    }
+
     getIcons() {
         const res = {
             data: this.getNoDatesList(App.icons.data),
@@ -1743,8 +1751,13 @@ export class AppState {
         return res;
     }
 
+    getAvailableColors() {
+        return App.colors.map((item) => item.value);
+    }
+
     getNextCategoryColor() {
-        return this.categories.getNextColor();
+        const availColors = this.getAvailableColors();
+        return this.categories.getNextColor(availColors);
     }
 
     /**

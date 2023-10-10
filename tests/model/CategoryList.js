@@ -8,26 +8,6 @@ import {
     SORT_MANUALLY,
 } from '../common.js';
 
-const availColors = [
-    '#5f0f40',
-    '#9a031e',
-    '#fb8b24',
-    '#e36414',
-    '#0f4c5c',
-    '#390099',
-    '#55dde0',
-    '#ffbe0b',
-    '#fd8a09',
-    '#fb5607',
-    '#fd2b3b',
-    '#ff006e',
-    '#c11cad',
-    '#a22acd',
-    '#8338ec',
-    '#3a86ff',
-    '#4c91ff',
-];
-
 export class CategoryList extends SortableList {
     /**
      * Create list item from specified object
@@ -137,7 +117,7 @@ export class CategoryList extends SortableList {
         return res;
     }
 
-    getNextColor() {
+    getNextColor(availColors) {
         const usedColors = this.getUsedColors();
         const res = availColors.find((color) => !usedColors.includes(color));
         return res ?? null;
