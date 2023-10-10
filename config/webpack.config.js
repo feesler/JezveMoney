@@ -136,10 +136,6 @@ export default {
             import: './src/admin/view/Views/Logs/LogsView.js',
             filename: 'admin/view/js/[name].js',
         },
-        QueriesView: {
-            import: './src/admin/view/Views/Queries/QueriesView.js',
-            filename: 'admin/view/js/[name].js',
-        },
         AdminTestsView: {
             import: './src/admin/view/Views/Tests/TestsView.js',
             filename: 'admin/view/js/[name].js',

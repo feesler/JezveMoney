@@ -20,7 +20,6 @@ const menuItems = [
     { id: 'currency', url: 'admin/currency/', title: 'Currencies' },
     { id: 'color', url: 'admin/color/', title: 'Colors' },
     { id: 'icon', url: 'admin/icon/', title: 'Icons' },
-    { id: 'query', url: 'admin/query/', title: 'Queries' },
     { id: 'log', url: 'admin/log/', title: 'Logs' },
     { id: 'balance', url: 'admin/balance/', title: 'Balance' },
     { id: 'tests', url: 'admin/tests/', title: 'Tests' },
