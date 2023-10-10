@@ -58,6 +58,7 @@ export class CategoriesStory extends TestStory {
         await Actions.create();
         await Actions.inputName('Food');
         await Actions.selectType(EXPENSE);
+        await Actions.inputColor('#289c26');
         await Actions.submit();
 
         await Actions.create();
@@ -84,6 +85,16 @@ export class CategoriesStory extends TestStory {
         await Actions.inputName('Transpost');
         await Actions.submit();
 
+        setBlock('Create category with used color', 2);
+        await Actions.create();
+        await Actions.inputName('New category');
+        await Actions.inputColor('#289c26');
+        await Actions.submit();
+
+        setBlock('Submit category after invalid color', 2);
+        await Actions.inputColor('#777777');
+        await Actions.submit();
+
         [
             App.scenario.FOOD_CATEGORY,
             App.scenario.INVEST_CATEGORY,
@@ -95,6 +106,7 @@ export class CategoriesStory extends TestStory {
             true,
         );
 
+        setBlock('Create child categories', 2);
         await Actions.create();
         await Actions.inputName('Cafe');
         await Actions.selectParentCategory(App.scenario.FOOD_CATEGORY);
@@ -140,6 +152,15 @@ export class CategoriesStory extends TestStory {
         setBlock('Update category with existing name', 2);
         await Actions.updateById(FOOD_CATEGORY);
         await Actions.inputName('Transpost');
+        await Actions.submit();
+
+        setBlock('Update category with used color', 2);
+        await Actions.updateById(INVEST_CATEGORY);
+        await Actions.inputColor('#289c26');
+        await Actions.submit();
+
+        setBlock('Submit category after invalid color', 2);
+        await Actions.inputColor('#555555');
         await Actions.submit();
     }
 

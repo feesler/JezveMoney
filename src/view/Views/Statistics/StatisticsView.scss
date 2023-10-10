@@ -2,46 +2,6 @@
   --piechart-width: 400px;
 }
 
-/* Filters */
-.trans-type-filter {
-  max-width: 450px;
-}
-
-.report-type-filter,
-.group-type-filter {
-  max-width: 300px;
-
-  .link-menu {
-    flex-flow: row nowrap;
-  }
-}
-
-.accounts-filter {
-  flex-shrink: 0;
-}
-
-.currency-filter {
-  width: 100px;
-  flex-grow: 0;
-}
-
-.date-range-filter {
-  max-width: 400px;
-
-  .filter-item__title {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 1.5rem;
-  }
-}
-
-/* Filters inside Collapsible container */
-.filters-collapsible {
-  .submit-btn {
-    display: none;
-  }
-}
-
 /* Statistics view histogram chart */
 .stat-histogram {
   position: relative;
@@ -134,23 +94,5 @@
   .piechart-info__value {
     font-size: 1rem;
     color: var(--dimmed-text-color);
-  }
-}
-
-@for $i from 1 through 13 {
-  .chart-legend__item-cat-#{$i} {
-    color: var(--charts-color-#{$i});
-  }
-
-  .pie__sector-#{$i} {
-    fill: var(--charts-color-#{$i});
-  }
-}
-
-@media (hover: hover) {
-  @for $i from 1 through 13 {
-    .pie__sector-#{$i}:hover {
-      fill: var(--charts-active-color-#{$i});
-    }
   }
 }

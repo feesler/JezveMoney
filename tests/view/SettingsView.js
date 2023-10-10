@@ -8,6 +8,8 @@ import {
     wait,
     asArray,
     navigation,
+    goTo,
+    baseUrl,
 } from 'jezve-test';
 import {
     Button,
@@ -19,6 +21,9 @@ import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { CurrenciesList } from './component/Currency/CurrenciesList.js';
 
+const MAIN_TAB_ID = 'index';
+const CURRENCIES_TAB_ID = 'currencies';
+const REGIONAL_TAB_ID = 'regional';
 const listMenuSelector = '#listMenu';
 
 /** Settings view class */
@@ -132,9 +137,9 @@ export class SettingsView extends AppView {
     }
 
     getExpectedState(model = this.model, state = App.state) {
-        const isMainTab = model.selectedTab === 'main';
-        const isCurrenciesTab = model.selectedTab === 'currencies';
-        const isRegionalTab = model.selectedTab === 'regional';
+        const isMainTab = model.selectedTab === MAIN_TAB_ID;
+        const isCurrenciesTab = model.selectedTab === CURRENCIES_TAB_ID;
+        const isRegionalTab = model.selectedTab === REGIONAL_TAB_ID;
 
         const currenciesCount = model.currenciesList.items.length;
         const selectedCurrencies = this.getSelectedCurrencies(model);
@@ -197,6 +202,14 @@ export class SettingsView extends AppView {
         }
 
         return res;
+    }
+
+    getExpectedURL(model = this.model) {
+        const selectedTab = model.selectedTab.toLowerCase();
+        const path = (selectedTab === MAIN_TAB_ID) ? '' : `${selectedTab}/`;
+        const res = new URL(`${baseUrl()}settings/${path}`);
+
+        return res.toString();
     }
 
     getSelectedCurrencies(model = this.model) {
@@ -280,7 +293,7 @@ export class SettingsView extends AppView {
         await this.parse();
     }
 
-    async showTabById(tabId) {
+    async showTabById(tabId, directNavigate = false) {
         if (this.model.selectedTab === tabId) {
             return true;
         }
@@ -288,21 +301,25 @@ export class SettingsView extends AppView {
         this.model.selectedTab = tabId;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.tabs.selectTabById(tabId));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.tabs.selectTabById(tabId));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async showMainTab() {
-        return this.showTabById('main');
+    async showMainTab(directNavigate = false) {
+        return this.showTabById(MAIN_TAB_ID, directNavigate);
     }
 
-    async showUserCurrenciesTab() {
-        return this.showTabById('currencies');
+    async showUserCurrenciesTab(directNavigate) {
+        return this.showTabById(CURRENCIES_TAB_ID, directNavigate);
     }
 
-    async showRegionalTab() {
-        return this.showTabById('regional');
+    async showRegionalTab(directNavigate) {
+        return this.showTabById(REGIONAL_TAB_ID, directNavigate);
     }
 
     async changeLocale(value) {

@@ -112,6 +112,10 @@ export default {
             import: './src/admin/view/Views/Currency/CurrencyView.js',
             filename: 'admin/view/js/[name].js',
         },
+        AdminColorView: {
+            import: './src/admin/view/Views/Color/ColorView.js',
+            filename: 'admin/view/js/[name].js',
+        },
         AdminIconView: {
             import: './src/admin/view/Views/Icon/IconView.js',
             filename: 'admin/view/js/[name].js',

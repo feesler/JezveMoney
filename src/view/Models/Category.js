@@ -6,6 +6,7 @@ import { availTransTypes, Transaction } from './Transaction.js';
 const availFields = [
     'id',
     'name',
+    'color',
     'parent_id',
     'type',
     'createdate',
@@ -33,6 +34,11 @@ export class Category extends ListItem {
 
     static getAvailTypes() {
         return [0, ...Object.keys(availTransTypes)];
+    }
+
+    /** Returns type of transaction for specified string */
+    static getTypeByString(value) {
+        return (value !== 'any') ? Transaction.getTypeByString(value) : 0;
     }
 
     /**

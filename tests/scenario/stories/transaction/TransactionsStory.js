@@ -1005,14 +1005,14 @@ export class TransactionsStory extends TestStory {
     async locales() {
         setBlock('Transaction view locales', 1);
 
-        await testLocales((locale) => this.checkLocale(locale));
-        await testDateLocales(['es', 'ko'], (locale) => this.checkLocale(locale));
-        await testDecimalLocales(['es', 'hi'], (locale) => this.checkLocale(locale));
+        const localeActions = () => this.checkLocale();
+
+        await testLocales(localeActions);
+        await testDateLocales(['es', 'ko'], localeActions);
+        await testDecimalLocales(['es', 'hi'], localeActions);
     }
 
-    async checkLocale(locale) {
-        setBlock(`Locale: '${locale}'`, 1);
-
+    async checkLocale() {
         const { CARD_RUB } = App.scenario;
 
         await Actions.createFromAccountAndSubmit(1, [

@@ -1,27 +1,41 @@
 import {
-    ge,
     isFunction,
     show,
     enable,
     Component,
-    setEvents,
-    insertAfter,
+    createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 
+// Application
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
 import { API } from '../../../../../API/index.js';
+
+// Models
 import { ImportTemplateError } from '../../../../../Models/Error/ImportTemplateError.js';
 import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../../../Models/ImportTemplate.js';
+
+// Common components
 import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
+import { Field } from '../../../../../Components/Common/Field/Field.js';
+import { FormControls } from '../../../../../Components/Form/FormControls/FormControls.js';
+
+// Locale components
 import { ImportTemplateForm } from '../TemplateForm/ImportTemplateForm.js';
 import { TemplateSelect } from '../TemplateSelect/TemplateSelect.js';
+
 import './ImportTemplateManager.scss';
 
 /** CSS classes */
+const SECTION_CLASS = 'upload-form__converter';
+const FILE_NAME_CLASS = 'converter__file';
+const CREATE_BTN_CLASS = 'create-btn circle-btn';
+const SELECT_GROUP_CLASS = 'converter__select-group';
+const TPL_FIELD_CLASS = 'template-field';
+const FEEDBACK_CLASS = 'feedback';
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
 const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
 
@@ -66,39 +80,50 @@ export class ImportTemplateManager extends Component {
     }
 
     init() {
-        const elemIds = [
-            'tplSelectGroup',
-            'tplFilename',
-            'tplField',
-            'tplFieldHeader',
-            'tplFeedback',
-            'columnField',
-            'initialAccField',
-            'uploadControls',
-            'submitUploadedBtn',
-            'convertFeedback',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize upload file dialog');
-            }
+        // File name element
+        this.tplFilename = createElement('div', {
+            props: { id: 'tplFilename', className: FILE_NAME_CLASS },
         });
 
+        // Create template button
+        this.createTplBtn = Button.create({
+            id: 'createTplBtn',
+            className: CREATE_BTN_CLASS,
+            icon: 'plus',
+            onClick: () => this.onCreateTemplateClick(),
+        });
+
+        // Template select
         this.templateSelect = TemplateSelect.create({
             onChange: (tpl) => this.onTemplateChange(tpl),
             onUpdate: () => this.onUpdateTemplate(),
             onDelete: () => this.onDeleteTemplate(),
         });
-        insertAfter(this.templateSelect.elem, this.tplFieldHeader);
 
-        this.createTplBtn = Button.create({
-            id: 'createTplBtn',
-            className: 'create-btn circle-btn',
-            icon: 'plus',
-            onClick: () => this.onCreateTemplateClick(),
+        // Feedback element
+        this.tplFeedback = createElement('div', {
+            props: { id: 'tplFeedback', className: FEEDBACK_CLASS },
         });
-        this.tplFieldHeader.append(this.createTplBtn.elem);
+        show(this.tplFeedback, false);
+
+        // Template field
+        this.templateField = Field.create({
+            id: 'tplField',
+            className: TPL_FIELD_CLASS,
+            title: [
+                createElement('span', { props: { textContent: __('import.templates.title') } }),
+                this.createTplBtn.elem,
+            ],
+            content: [
+                this.templateSelect.elem,
+                this.tplFeedback,
+            ],
+        });
+
+        this.tplSelectGroup = createElement('section', {
+            props: { id: 'tplSelectGroup', className: SELECT_GROUP_CLASS },
+            children: this.templateField.elem,
+        });
 
         // Template form
         this.templateForm = ImportTemplateForm.create({
@@ -110,9 +135,9 @@ export class ImportTemplateManager extends Component {
             onCancel: () => this.onCancelTemplate(),
         });
 
-        // Main account
+        // Main account select
         this.accountDropDown = DropDown.create({
-            elem: 'initialAccount',
+            id: 'initialAccount',
             enableFilter: true,
             noResultsMessage: __('notFound'),
             onChange: (account) => this.onAccountChange(account),
@@ -120,10 +145,45 @@ export class ImportTemplateManager extends Component {
         App.initAccountsList(this.accountDropDown);
         this.accountDropDown.setSelection(this.state.mainAccount.id);
 
-        setEvents(this.submitUploadedBtn, { click: () => this.onSubmit() });
+        // Main account field
+        this.initialAccField = Field.create({
+            id: 'initialAccField',
+            title: __('import.mainAccount'),
+            content: this.accountDropDown.elem,
+        });
+        this.initialAccField.hide();
+
+        // Convert feedback element
+        this.convertFeedback = createElement('div', {
+            props: { id: 'convertFeedback', className: FEEDBACK_CLASS },
+        });
+        show(this.convertFeedback, false);
+
+        // Controls
+        this.controls = FormControls.create({
+            id: 'uploadControls',
+            submitId: 'submitUploadedBtn',
+            submitTitle: __('import.convertDone'),
+            onSubmitClick: (e) => this.onSubmit(e),
+            cancelBtn: false,
+        });
+        this.controls.hide();
 
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
-        this.elem.append(this.loadingIndicator.elem);
+
+        this.elem = createElement('section', {
+            props: { id: 'templateBlock', className: SECTION_CLASS },
+            children: [
+                this.tplFilename,
+                this.tplSelectGroup,
+                this.templateForm.elem,
+                this.initialAccField.elem,
+                this.convertFeedback,
+                this.controls.elem,
+                this.loadingIndicator.elem,
+            ],
+        });
+        show(this.elem, false);
 
         this.reset();
     }
@@ -649,8 +709,12 @@ export class ImportTemplateManager extends Component {
         const uploadEnabled = state.id === TPL_SELECT_STATE && validation.valid;
         this.accountDropDown.enable(uploadEnabled);
         this.accountDropDown.setSelection(state.mainAccount.id);
-        show(this.initialAccField, uploadEnabled);
-        enable(this.submitUploadedBtn, uploadEnabled);
-        show(this.uploadControls, uploadEnabled);
+        this.initialAccField.show(uploadEnabled);
+
+        this.controls.setState((controlsState) => ({
+            ...controlsState,
+            disabled: !uploadEnabled,
+        }));
+        this.controls.show(uploadEnabled);
     }
 }

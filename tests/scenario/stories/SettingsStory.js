@@ -13,7 +13,21 @@ export class SettingsStory extends TestStory {
     async run() {
         setBlock('Settings tests', 1);
 
+        await this.tabsNavigation(false);
+        await this.tabsNavigation(true);
         await this.userCurrencies();
+    }
+
+    async tabsNavigation(directNavigate) {
+        if (directNavigate) {
+            setBlock('Tabs navigation: direct navigation by URL', 1);
+        } else {
+            setBlock('Tabs navigation: manual navigation', 1);
+        }
+
+        await Actions.showUserCurrenciesTab(directNavigate);
+        await Actions.showRegionalTab(directNavigate);
+        await Actions.showMainTab(directNavigate);
     }
 
     async userCurrencies() {

@@ -7,6 +7,7 @@ class CategoryItem
     public $id = 0;
     public $user_id = 0;
     public $name = null;
+    public $color = null;
     public $parent_id = 0;
     public $type = 0;
     public $pos = 0;
@@ -31,6 +32,7 @@ class CategoryItem
         $res->user_id = intval($row["user_id"]);
         $res->parent_id = intval($row["parent_id"]);
         $res->name = $row["name"];
+        $res->color = intToColor($row["color"]);
         $res->type = intval($row["type"]);
         $res->pos = intval($row["pos"]);
         $res->createdate = strtotime($row["createdate"]);

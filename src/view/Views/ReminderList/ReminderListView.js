@@ -30,8 +30,6 @@ import {
 import { ReminderList } from '../../Models/ReminderList.js';
 
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
-import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
-import { ReminderFilters } from '../../Components/Reminder/ReminderFilters/ReminderFilters.js';
 import { ReminderListGroup } from '../../Components/Reminder/ReminderListGroup/ReminderListGroup.js';
 
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -100,9 +98,7 @@ class ReminderListView extends AppView {
      */
     onStart() {
         this.loadElementsByIds([
-            'contentHeader',
             'heading',
-            'contentContainer',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -114,25 +110,9 @@ class ReminderListView extends AppView {
             id: 'filtersBtn',
             className: 'circle-btn',
             icon: 'filter',
-            onClick: () => this.filtersContainer.toggle(),
+            onClick: () => this.listGroup?.toggleFilters(),
         });
         this.heading.actionsContainer.prepend(this.filtersBtn.elem);
-
-        this.filters = ReminderFilters.create({
-            id: 'filters',
-            stateFilterId: 'stateFilter',
-            dateRangeFilterId: 'dateFilter',
-            getURL: (state, keepPage) => this.getURL(state, keepPage),
-            onChangeReminderState: (range) => this.onChangeReminderState(range),
-            onChangeDateRange: (range) => this.changeDateFilter(range),
-            onApplyFilters: (e) => this.onApplyFilters(e),
-            onClearAllFilters: (e) => this.onClearAllFilters(e),
-        });
-
-        this.filtersContainer = FiltersContainer.create({
-            content: this.filters.elem,
-        });
-        this.contentHeader.prepend(this.filtersContainer.elem);
 
         // Scheduled transaction reminder details
         this.itemInfo = Offcanvas.create({
@@ -158,13 +138,19 @@ class ReminderListView extends AppView {
         );
 
         this.listGroup = ReminderListGroup.create({
+            stateFilterId: 'stateFilter',
+            dateRangeFilterId: 'dateFilter',
+            onChangeReminderState: (range) => this.onChangeReminderState(range),
+            onChangeDateRange: (range) => this.changeDateFilter(range),
+            onApplyFilters: (e) => this.onApplyFilters(e),
+            onClearAllFilters: (e) => this.onClearAllFilters(e),
             getURL: (...args) => this.getURL(...args),
             onItemClick: (id, e) => this.onItemClick(id, e),
             onShowMore: (e) => this.showMore(e),
             onChangePage: (page) => this.onChangePage(page),
             onChangeMode: (mode) => this.onChangeMode(mode),
         });
-        this.contentContainer.append(this.listGroup.elem);
+        this.heading.elem.after(this.listGroup.elem);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
@@ -285,13 +271,6 @@ class ReminderListView extends AppView {
         }
 
         this.setRenderTime();
-    }
-
-    /**
-     * Applies filters and close Offcanvas
-     */
-    onApplyFilters() {
-        this.filtersContainer.close();
     }
 
     /**
@@ -719,13 +698,6 @@ class ReminderListView extends AppView {
         window.history.replaceState({}, pageTitle, url);
     }
 
-    renderFilters(state) {
-        this.filters.setState((filtersState) => ({
-            ...filtersState,
-            ...state,
-        }));
-    }
-
     renderList(state) {
         this.listGroup.setState((listState) => ({
             ...listState,
@@ -739,7 +711,6 @@ class ReminderListView extends AppView {
         }
 
         this.renderHistory(state, prevState);
-        this.renderFilters(state, prevState);
         this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);

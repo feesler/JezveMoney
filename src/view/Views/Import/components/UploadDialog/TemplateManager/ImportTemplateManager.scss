@@ -21,28 +21,28 @@
   /* Import template field */
   .template-field {
     width: 100%;
-  }
-}
 
-/* Template field header */
-.template-field__header {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  width: 100%;
+    /* Template field header */
+    .field__title {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      width: 100%;
 
-  label {
-    font-size: 16px;
-    font-weight: 100;
-    margin-right: 18px;
-    margin-bottom: 0;
-    margin-left: 0;
-  }
+      > span {
+        font-size: 16px;
+        font-weight: 100;
+        margin-right: 18px;
+        margin-bottom: 0;
+        margin-left: 0;
+      }
 
-  .create-btn {
-    --btn-icon-color: var(--list-item-icon-fill);
+      .create-btn {
+        --btn-icon-color: var(--list-item-icon-fill);
+      }
+    }
   }
 }
 

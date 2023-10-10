@@ -22,6 +22,8 @@ export const SORT_MANUALLY = 5;
 
 export const DEFAULT_PAGE_LIMIT = 10;
 
+export const COLORS_COUNT = 23;
+
 /** Returns URL instance for specified path and search params */
 export const getApplicationURL = (path = '', params = {}) => {
     const res = new URL(`${App.baseURL}${path}`);

@@ -11,6 +11,7 @@ $router->setRoutes([
     "main" => "Main",
     "balance" => "Balance",
     "currency" => "Currency",
+    "color" => "Color",
     "icon" => "Icon",
     "query" => "Query",
     "log" => "Logs",

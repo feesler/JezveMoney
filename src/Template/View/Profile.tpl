@@ -57,63 +57,7 @@
 </div>
 
 <div id="reset" class="profile-form-container" hidden>
-    <form method="post" action="<?= BASEURL ?>profile/reset/">
-        <div class="column-container">
-            <label id="resetAllCheck" class="checkbox">
-                <input type="checkbox">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.all") ?></span>
-            </label>
-
-            <label id="accountsCheck" class="checkbox">
-                <input type="checkbox" name="accounts">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.accounts") ?></span>
-            </label>
-
-            <label id="personsCheck" class="checkbox">
-                <input type="checkbox" name="persons">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.persons") ?></span>
-            </label>
-
-            <label id="categoriesCheck" class="checkbox">
-                <input type="checkbox" name="categories">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.categories") ?></span>
-            </label>
-
-            <label id="transactionsCheck" class="checkbox">
-                <input type="checkbox" name="transactions">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.transactions") ?></span>
-            </label>
-
-            <label id="keepBalanceCheck" class="checkbox suboption" disabled>
-                <input type="checkbox" name="keepbalance">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.keepBalance") ?></span>
-            </label>
-
-            <label id="scheduleCheck" class="checkbox">
-                <input type="checkbox" name="schedule">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.schedule") ?></span>
-            </label>
-
-            <label id="importTplCheck" class="checkbox">
-                <input type="checkbox" name="importtpl">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.importTemplates") ?></span>
-            </label>
-
-            <label id="importRulesCheck" class="checkbox">
-                <input type="checkbox" name="importrules">
-                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
-                <span class="checkbox__label"><?= __("profile.reset.importRules") ?></span>
-            </label>
-        </div>
-    </form>
+    <form method="post" action="<?= BASEURL ?>profile/reset/"></form>
 </div>
 
 <?php include(ICONS_PATH . "Common.tpl");    ?>

@@ -2,6 +2,19 @@ import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { EXPENSE, INCOME } from '../../../model/Transaction.js';
 import * as Actions from '../../actions/api/category.js';
+import {
+    COLOR_1,
+    COLOR_10,
+    COLOR_11,
+    COLOR_2,
+    COLOR_3,
+    COLOR_4,
+    COLOR_5,
+    COLOR_6,
+    COLOR_7,
+    COLOR_8,
+    COLOR_9,
+} from '../../data/colors.js';
 
 const create = async () => {
     setBlock('Create categories', 2);
@@ -9,26 +22,31 @@ const create = async () => {
     const data = {
         FOOD_CATEGORY: {
             name: 'Food',
+            color: COLOR_1,
             parent_id: 0,
             type: EXPENSE,
         },
         INVEST_CATEGORY: {
             name: 'Investments',
+            color: COLOR_2,
             parent_id: 0,
             type: INCOME,
         },
         TAXES_CATEGORY: {
             name: 'Taxes',
+            color: COLOR_3,
             parent_id: 0,
             type: 0,
         },
         TRANSPORT_CATEGORY: {
             name: 'Transpost',
+            color: COLOR_4,
             parent_id: 0,
             type: EXPENSE,
         },
         SHOP_CATEGORY: {
             name: 'Shop',
+            color: COLOR_5,
             parent_id: 0,
             type: EXPENSE,
         },
@@ -43,6 +61,7 @@ const createWithChainedRequest = async () => {
     const data = {
         SCV_CHAINED_CATEGORY: {
             name: 'Services chained',
+            color: COLOR_6,
             parent_id: 0,
             type: EXPENSE,
             returnState: {
@@ -51,6 +70,7 @@ const createWithChainedRequest = async () => {
         },
         BEAUTY_CHAINED_CATEGORY: {
             name: 'Beauty chained',
+            color: COLOR_7,
             parent_id: 0,
             type: EXPENSE,
             returnState: {
@@ -69,17 +89,28 @@ const createInvalid = async () => {
     const data = [{
         // Try to create category with existing name
         name: 'Food',
+        color: COLOR_8,
         parent_id: 0,
         type: 0,
     }, {
+        // Try to create category with existing color
+        name: 'Colors',
+        color: COLOR_2,
+        parent_id: 0,
+        type: EXPENSE,
+    }, {
         // Try to create sub category with invalid type
         name: 'Subcategory',
+        color: COLOR_8,
         parent_id: App.scenario.FOOD_CATEGORY,
         type: 0,
     }, {
         // Invalid data tests
         name: 'Investments',
         parent_id: 0,
+    }, {
+        name: 'Colors',
+        color: null,
     }, {
         name: 'Taxes',
         type: 0,
@@ -97,21 +128,25 @@ const createMultiple = async () => {
     const data = {
         CAFE_CATEGORY: {
             name: 'Cafe',
+            color: COLOR_1,
             parent_id: App.scenario.FOOD_CATEGORY,
             type: EXPENSE,
         },
         BIKE_CATEGORY: {
             name: 'Bike rent',
+            color: COLOR_4,
             parent_id: App.scenario.TRANSPORT_CATEGORY,
             type: EXPENSE,
         },
         LEARN_CATEGORY: {
             name: 'Learning',
+            color: COLOR_8,
             parent_id: 0,
             type: EXPENSE,
         },
         OTHER_CATEGORY: {
             name: 'Other',
+            color: COLOR_9,
             parent_id: 0,
             type: 0,
         },
@@ -127,11 +162,13 @@ const createMultipleWithChainedRequest = async () => {
         data: {
             MULTI_CHAINED_CATEGORY_1: {
                 name: 'Multi chained 1',
+                color: COLOR_10,
                 parent_id: 0,
                 type: EXPENSE,
             },
             MULTI_CHAINED_CATEGORY_2: {
                 name: 'Multi chained 2',
+                color: COLOR_11,
                 parent_id: 0,
                 type: EXPENSE,
             },
@@ -212,6 +249,7 @@ const update = async () => {
         { id: TAXES_CATEGORY, parent_id: INVEST_CATEGORY },
         { id: INVEST_CATEGORY, type: EXPENSE },
         { id: FOOD_CATEGORY, parent_id: SHOP_CATEGORY },
+        { id: INVEST_CATEGORY, color: COLOR_1 },
     ];
 
     return App.scenario.runner.runGroup(Actions.update, data);
@@ -252,6 +290,8 @@ const updateInvalid = async () => {
         { id: FOOD_CATEGORY, name: 'Transpost' },
         // Try to submit category with empty name
         { id: FOOD_CATEGORY, name: '' },
+        // Try to update color of category with one already in use
+        { id: FOOD_CATEGORY, color: COLOR_10 },
         // Try to submit category with invalid parent
         { id: FOOD_CATEGORY, parent_id: -1 },
         // Try to submit category with itself as parent
@@ -260,6 +300,8 @@ const updateInvalid = async () => {
         { id: FOOD_CATEGORY, type: 100 },
         // Try to submit category with transaction type different than parent
         { id: CAFE_CATEGORY, type: INCOME },
+        // Try to submit category with color different than parent
+        { id: CAFE_CATEGORY, color: COLOR_1 },
     ];
 
     return App.scenario.runner.runGroup(Actions.update, data);

@@ -27,6 +27,7 @@ export class CollapsibleListItem extends ListItem {
 
         this.collapsible = Collapsible.create({
             content: this.props.content,
+            collapsed: this.props.collapsed,
             toggleOnClick: this.props.toggleOnClick,
             animated: this.props.animated,
             header: this.contentElem,

@@ -1,16 +1,27 @@
 import {
-    ge,
     show,
     isFunction,
     Component,
-    setEvents,
+    createElement,
 } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { __ } from '../../../../../utils/utils.js';
+import { Input } from 'jezvejs/Input';
+import { InputGroup } from 'jezvejs/InputGroup';
+
+import { __, getApplicationURL } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
+import { App } from '../../../../../Application/App.js';
 
 /** CSS classes */
+const SECTION_CLASS = 'upload-form__browser';
+const FORM_CONTAINER_CLASS = 'upload-form__inner';
+const FORM_CLASS = 'upload-form';
+const FILE_BROWSER_CLASS = 'upload-form__file';
+const FILE_BUTTON_CLASS = 'browse-btn';
+const FORM_DESCR_CLASS = 'upload-form__descr';
 const FILE_NAME_CLASS = 'upload-form__filename';
+const OPTIONS_CONTAINER_CLASS = 'upload-form__options';
 
 /**
  * ImportFileUploader component
@@ -22,21 +33,124 @@ export class ImportFileUploader extends Component {
         this.state = {
             filename: null,
             isEncoded: true,
+            useServer: false,
         };
 
-        this.formElem = ge('fileimportfrm');
-        this.inputElem = ge('fileInp');
-        this.filenameElem = this.elem.querySelector(`.${FILE_NAME_CLASS}`);
-        this.isEncodeCheck = Checkbox.fromElement(ge('isEncodeCheck'), {
-            onChange: (checked) => this.onCheckEncode(checked),
+        this.init();
+    }
+
+    init() {
+        const useServer = (App.isAdminUser() || App.isTesterUser());
+
+        // Select file button
+        this.fileButton = Button.create({
+            className: FILE_BUTTON_CLASS,
+            title: __('import.selectFile'),
         });
-        if (!this.formElem || !this.inputElem || !this.filenameElem || !this.isEncodeCheck) {
-            throw new Error('Failed to initialize import file uploader');
+
+        this.inputElem = createElement('input', {
+            props: { id: 'fileInp', type: 'file' },
+            events: { change: () => this.onChangeUploadFile() },
+        });
+
+        this.fileBrowser = createElement('label', {
+            props: { id: 'fileBrowser', className: FILE_BROWSER_CLASS },
+            children: [
+                this.inputElem,
+                this.fileButton.elem,
+            ],
+        });
+
+        // File name label
+        this.filenameElem = createElement('div', {
+            props: { className: FILE_NAME_CLASS },
+        });
+
+        // Upload file form
+        this.formElem = createElement('form', {
+            props: {
+                id: 'fileimportfrm',
+                className: FORM_CLASS,
+                method: 'post',
+                encoding: 'multipart/form-data',
+                action: getApplicationURL('api/import/upload'),
+            },
+            children: [
+                this.fileBrowser,
+                createElement('div', {
+                    props: {
+                        className: FORM_DESCR_CLASS,
+                        textContent: __('import.selectFileDescription'),
+                    },
+                }),
+                this.filenameElem,
+            ],
+        });
+        const formContent = [this.formElem];
+
+        // Address on server input group
+        if (useServer) {
+            this.serverAddressInput = Input.create({
+                id: 'serverAddress',
+                className: 'input-group__input',
+                onInput: () => this.onInputServerAddress(),
+            });
+
+            this.serverUploadBtn = Button.create({
+                id: 'serverUploadBtn',
+                className: 'submit-btn input-group__btn',
+                title: __('import.upload'),
+                onClick: () => this.uploadFromServer(),
+            });
+
+            this.serverAddressBlock = InputGroup.create({
+                id: 'serverAddressBlock',
+                children: [
+                    this.serverAddressInput.elem,
+                    this.serverUploadBtn.elem,
+                ],
+            });
+            this.serverAddressBlock.hide();
+            formContent.push(this.serverAddressBlock.elem);
         }
 
-        setEvents(this.inputElem, { change: () => this.onChangeUploadFile() });
+        this.formContainer = createElement('div', {
+            props: { className: FORM_CONTAINER_CLASS },
+            children: formContent,
+        });
 
-        this.initUploadExtras();
+        // Encoding checkbox
+        this.isEncodeCheck = Checkbox.create({
+            id: 'isEncodeCheck',
+            label: __('import.cp1251Encoding'),
+            checked: true,
+            onChange: (checked) => this.onCheckEncode(checked),
+        });
+        const optionsContent = [this.isEncodeCheck.elem];
+
+        // 'Use address on server' checkbox
+        if (useServer) {
+            this.useServerCheck = Checkbox.create({
+                id: 'useServerCheck',
+                label: __('import.useServer'),
+                onChange: (checked) => this.onCheckServer(checked),
+            });
+            optionsContent.push(this.useServerCheck.elem);
+        }
+
+        // Options container
+        this.optionsContainer = createElement('div', {
+            props: { className: OPTIONS_CONTAINER_CLASS },
+            children: optionsContent,
+        });
+
+        this.elem = createElement('section', {
+            props: { id: 'fileBlock', className: SECTION_CLASS },
+            children: [
+                this.formContainer,
+                this.optionsContainer,
+            ],
+        });
     }
 
     onCheckEncode(checked) {
@@ -123,32 +237,6 @@ export class ImportFileUploader extends Component {
         });
     }
 
-    /** Setup extra controls of file upload dialog */
-    initUploadExtras() {
-        this.useServerCheck = Checkbox.fromElement(ge('useServerCheck'), {
-            onChange: (checked) => this.onCheckServer(checked),
-        });
-        this.serverAddressBlock = ge('serverAddressBlock');
-        this.serverAddressInput = ge('serverAddress');
-        this.uploadBtn = ge('serverUploadBtn');
-        if (
-            !this.useServerCheck
-            || !this.serverAddressBlock
-            || !this.serverAddressInput
-            || !this.uploadBtn
-        ) {
-            return;
-        }
-
-        setEvents(this.serverAddressInput, { input: () => this.onInputServerAddress() });
-        setEvents(this.uploadBtn, { click: () => this.uploadFromServer() });
-
-        this.state = {
-            ...this.state,
-            useServer: false,
-        };
-    }
-
     /** Use server checkbox 'change' event handler */
     onCheckServer(useServer) {
         this.setUseServerAddress(useServer);
@@ -208,16 +296,9 @@ export class ImportFileUploader extends Component {
         if (this.useServerCheck) {
             this.useServerCheck.check(state.useServer);
 
-            show(this.serverAddressBlock, state.useServer);
-            if (state.useServer) {
-                show(this.formElem, false);
-                show(this.serverAddressBlock, true);
-                this.serverAddressInput.value = state.filename;
-            } else {
-                show(this.formElem, true);
-                show(this.serverAddressBlock, false);
-                this.serverAddressInput.value = '';
-            }
+            this.serverAddressBlock.show(state.useServer);
+            show(this.formElem, !state.useServer);
+            this.serverAddressInput.value = (state.useServer) ? state.filename : '';
         }
     }
 }

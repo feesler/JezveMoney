@@ -10,6 +10,7 @@ $router->setNamespace("JezveMoney\\App\\API\\Controller");
 $router->setRoutes([
     "currency" => "Currency",
     "usercurrency" => "UserCurrency",
+    "color" => "Color",
     "icon" => "Icon",
     "import" => "Import",
     "importtpl" => "ImportTemplate",

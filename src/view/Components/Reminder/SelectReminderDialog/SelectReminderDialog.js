@@ -17,8 +17,6 @@ import { App } from '../../../Application/App.js';
 
 import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../../Models/Reminder.js';
 
-import { FiltersContainer } from '../../List/FiltersContainer/FiltersContainer.js';
-import { ReminderFilters } from '../ReminderFilters/ReminderFilters.js';
 import { ReminderListGroup } from '../ReminderListGroup/ReminderListGroup.js';
 
 import {
@@ -86,7 +84,7 @@ export class SelectReminderDialog extends Component {
             id: 'filtersBtn',
             className: 'filters-btn circle-btn',
             icon: 'filter',
-            onClick: () => this.filtersContainer.toggle(),
+            onClick: () => this.listGroup?.toggleFilters(),
         });
 
         // Header
@@ -98,36 +96,18 @@ export class SelectReminderDialog extends Component {
             ],
         });
 
-        this.filters = ReminderFilters.create({
-            id: 'filters',
+        this.listGroup = ReminderListGroup.create({
+            filtersId: 'filters',
             stateFilterId: 'stateFilter',
             dateRangeFilterId: 'dateFilter',
+            showControls: false,
             onChangeReminderState: (range) => this.onChangeReminderState(range),
             onChangeDateRange: (range) => this.onChangeDateRange(range),
-            onApplyFilters: (e) => this.onApplyFilters(e),
             onClearAllFilters: (e) => this.onClearAllFilters(e),
-        });
-
-        this.filtersContainer = FiltersContainer.create({
-            content: this.filters.elem,
-        });
-
-        this.listGroup = ReminderListGroup.create({
-            showControls: false,
             onItemClick: (id, e) => this.onItemClick(id, e),
             onShowMore: (e) => this.showMore(e),
             onChangePage: (page) => this.onChangePage(page),
             onToggleMode: (e) => this.onToggleMode(e),
-        });
-
-        this.container = createElement('div', {
-            props: {
-                className: 'list-container',
-            },
-            children: [
-                this.filtersContainer.elem,
-                this.listGroup.elem,
-            ],
         });
 
         this.dialog = Popup.create({
@@ -136,7 +116,7 @@ export class SelectReminderDialog extends Component {
             className: DIALOG_CLASS,
             closeButton: true,
             onClose: () => this.onCancel(),
-            content: this.container,
+            content: this.listGroup.elem,
         });
         if (!this.dialog) {
             throw new Error('Failed to create dialog');
@@ -240,11 +220,6 @@ export class SelectReminderDialog extends Component {
         }
 
         this.setRenderTime();
-    }
-
-    /** Applies filters and closes Offcanvas */
-    onApplyFilters() {
-        this.filtersContainer.close();
     }
 
     /**
@@ -381,13 +356,6 @@ export class SelectReminderDialog extends Component {
         this.setRenderTime();
     }
 
-    renderFilters(state) {
-        this.filters.setState((filtersState) => ({
-            ...filtersState,
-            ...state,
-        }));
-    }
-
     renderList(state) {
         this.listGroup.setState((listState) => ({
             ...listState,
@@ -401,7 +369,6 @@ export class SelectReminderDialog extends Component {
             throw new Error('Invalid state');
         }
 
-        this.renderFilters(state, prevState);
         this.renderList(state, prevState);
     }
 }

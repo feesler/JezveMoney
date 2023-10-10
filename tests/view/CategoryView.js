@@ -4,6 +4,7 @@ import {
     prop,
     navigation,
     click,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -29,6 +30,12 @@ export class CategoryView extends AppView {
                 visible: true,
                 value: model.name.toString(),
                 isInvalid: model.invalidated ?? false,
+            },
+            colorInput: {
+                visible: true,
+                disabled: model.parent_id !== 0,
+                value: model.color.toString(),
+                isInvalid: model.colorInvalidated ?? false,
             },
             parentSelect: {
                 visible: showParent,
@@ -76,6 +83,9 @@ export class CategoryView extends AppView {
         res.nameInput = await InputField.create(this, await query('#nameField'));
         assert(res.nameInput, 'Category name input not found');
 
+        res.colorInput = await InputField.create(this, await query('#colorField'));
+        assert(res.colorInput, 'Category color input not found');
+
         res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));
         res.typeSelect = await DropDown.createFromChild(this, await query('#type'));
 
@@ -98,9 +108,11 @@ export class CategoryView extends AppView {
             locale: cont.locale,
             isUpdate: cont.isUpdate,
             name: cont.nameInput.value,
+            color: cont.colorInput.value,
             parent_id: parseInt(cont.parentSelect.value, 10),
             type: parseInt(cont.typeSelect.value, 10),
             invalidated: cont.nameInput.isInvalid,
+            colorInvalidated: cont.colorInput.isInvalid,
         };
 
         if (res.isUpdate) {
@@ -113,6 +125,7 @@ export class CategoryView extends AppView {
     getExpectedCategory(model = this.model) {
         const res = {
             name: model.name,
+            color: model.color,
             parent_id: model.parent_id,
             type: model.type,
         };
@@ -133,9 +146,20 @@ export class CategoryView extends AppView {
         if (this.model.name.length === 0) {
             return false;
         }
-        // Check same name exists
+
+        // Check no categories with the same name
         const category = App.state.categories.findByName(this.model.name);
-        return !category || this.model.id === category.id;
+        if (category && this.model.id !== category.id) {
+            return false;
+        }
+
+        // Check color not used by other category
+        const colorItems = App.state.categories.findByColor(this.model.color);
+        if (colorItems?.length > 0 && this.model.id !== colorItems[0].id) {
+            return false;
+        }
+
+        return true;
     }
 
     async clickDeleteButton() {
@@ -167,6 +191,27 @@ export class CategoryView extends AppView {
         return this.checkState(expected);
     }
 
+    async inputColor(val) {
+        this.model.color = val.toString();
+        this.model.colorInvalidated = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => (
+            evaluate((el, value) => {
+                const input = el;
+                input.value = value.toString();
+                const event = new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                });
+
+                input.dispatchEvent(event);
+            }, this.content.colorInput.content.valueInput, val)
+        ));
+
+        return this.checkState(expected);
+    }
+
     async selectParentCategory(val) {
         const categoryId = parseInt(val, 10);
         const category = App.state.categories.getItem(categoryId);
@@ -177,6 +222,7 @@ export class CategoryView extends AppView {
         this.model.parent_id = categoryId;
         if (categoryId !== 0) {
             this.model.type = category.type;
+            this.model.color = category.color;
         }
         const expected = this.getExpectedState();
 

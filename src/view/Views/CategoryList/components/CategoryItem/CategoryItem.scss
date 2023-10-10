@@ -26,6 +26,7 @@
     flex-flow: row nowrap;
     align-items: center;
     padding: 8px;
+    border-left: 2px solid var(--category-color, transparent);
   }
 }
 

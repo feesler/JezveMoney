@@ -13,6 +13,7 @@ import * as categoryActions from '../../actions/api/category.js';
 import * as transactionActions from '../../actions/api/transaction.js';
 import * as scheduleActions from '../../actions/api/schedule.js';
 import { INTERVAL_DAY } from '../../../common.js';
+import { COLOR_1 } from '../../data/colors.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);
@@ -52,6 +53,7 @@ const prepareTests = async () => {
         App.scenario.API_USER_CATEGORY,
     ] = await App.scenario.runner.runGroup(categoryActions.create, [{
         name: 'API user Category',
+        color: COLOR_1,
         type: EXPENSE,
     }]);
     assert(App.scenario.API_USER_CATEGORY, 'Failed to create category');

@@ -480,6 +480,14 @@ export class AppState {
         return res;
     }
 
+    getColors() {
+        const res = {
+            data: this.getNoDatesList(App.colors.data),
+        };
+
+        return res;
+    }
+
     getIcons() {
         const res = {
             data: this.getNoDatesList(App.icons.data),
@@ -1488,7 +1496,7 @@ export class AppState {
             parent = this.categories.getItem(params.parent_id);
             if (
                 !parent
-                || parent.parent_id !== 0
+                || (parent.parent_id !== 0)
                 || (params.id && parent.id === params.id)
             ) {
                 return false;
@@ -1502,6 +1510,23 @@ export class AppState {
         // Transaction type of subcategory must be the same as parent
         if (parent && parent.type !== params.type) {
             return false;
+        }
+
+        if (
+            (typeof params.color !== 'string')
+            || (params.color.length !== 7)
+            || !params.color.startsWith('#')
+            || Number.isNaN(parseInt(params.color.substring(1), 16))
+        ) {
+            return false;
+        }
+
+        // Check no top-level categories with same color
+        if (parent === null) {
+            const colorItems = this.categories.findByColor(params.color);
+            if (colorItems?.length > 0 && colorItems[0].id !== params.id) {
+                return false;
+            }
         }
 
         return true;
@@ -1548,10 +1573,11 @@ export class AppState {
 
         const children = this.categories.findByParent(expItem.id);
         children.forEach((item) => {
-            // Update transaction type of children categories
+            // Update transaction type and color of children categories
             const category = {
                 ...item,
                 type: expItem.type,
+                color: expItem.color,
             };
             // In case current item is subcategory then set same parent category for
             // children categories to avoid third level of nesting
@@ -1623,7 +1649,27 @@ export class AppState {
             return false;
         }
 
+        const origItem = this.categories.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const children = this.categories.findByParent(id);
+
+        const parentId = params.parent_id ?? 0;
+        if (origItem.parent_id !== parentId) {
+            const updItem = structuredClone(origItem);
+            updItem.parent_id = parentId;
+            if (!this.updateCategory(updItem)) {
+                return false;
+            }
+        }
+
         if (!this.categories.setPos(id, pos, params.parent_id)) {
+            return false;
+        }
+
+        if (!children.every((item, index) => this.categories.updatePos(item.id, pos + index + 1))) {
             return false;
         }
 
@@ -1703,6 +1749,15 @@ export class AppState {
         });
 
         return res;
+    }
+
+    getAvailableColors() {
+        return App.colors.map((item) => item.value);
+    }
+
+    getNextCategoryColor() {
+        const availColors = this.getAvailableColors();
+        return this.categories.getNextColor(availColors);
     }
 
     /**

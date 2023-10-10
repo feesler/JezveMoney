@@ -29,6 +29,7 @@ export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
 
 const ADMIN_FLAG = 1;
+const TESTER_FLAG = 2;
 
 /** Application class */
 export class Application {
@@ -136,6 +137,10 @@ export class Application {
 
     isAdminUser() {
         return hasFlag(this.model.profile?.access ?? 0, ADMIN_FLAG);
+    }
+
+    isTesterUser() {
+        return hasFlag(this.model.profile?.access ?? 0, TESTER_FLAG);
     }
 
     isValidDateString(value, params = {}) {

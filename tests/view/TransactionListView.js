@@ -67,7 +67,6 @@ export class TransactionListView extends AppView {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
             clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
-            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
             totalCounter: await Counter.create(this, await query('.items-counter')),
@@ -77,6 +76,8 @@ export class TransactionListView extends AppView {
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
+
+        res.closeFiltersBtn = { elem: await query('.filters-offcanvas .close-btn') };
 
         [res.filtersAnimation] = await evaluate(() => ([
             document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
@@ -102,7 +103,8 @@ export class TransactionListView extends AppView {
         const accountsFilter = await query('#accountsFilter');
         const accountsFilterVisible = await isVisible(accountsFilter);
         if (accountsFilterVisible) {
-            res.filterSelect = await DropDown.createFromChild(this, await query('#acc_id'));
+            const filterSelectEl = await query('#accountsFilter .dd__container');
+            res.filterSelect = await DropDown.create(this, filterSelectEl);
         }
 
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));

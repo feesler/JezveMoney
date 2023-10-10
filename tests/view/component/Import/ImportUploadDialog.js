@@ -92,14 +92,14 @@ export class ImportUploadDialog extends TestComponent {
             cancelTplBtn: { elem: await query('#templateForm .form-controls .cancel-btn') },
             tplFormFeedback: { elem: await query('#tplFormFeedback') },
             convertFeedback: { elem: await query('#convertFeedback') },
-            initialAccount: await DropDown.createFromChild(this, await query('#initialAccount')),
+            initialAccount: await DropDown.create(this, await query('#initialAccField .dd__container')),
             submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },
         };
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of ImportUploadDialog: ${child} component not found`)
         ));
 
-        // 'Back' utton
+        // 'Back' button
         res.backBtn = { elem: await query(this.elem, '.back-btn') };
 
         // Template select
@@ -118,27 +118,7 @@ export class ImportUploadDialog extends TestComponent {
             res.templateForm.visible,
             res.uploadProgress.visible,
             res.loadingIndicator.visible,
-        ] = await evaluate(
-            (...elems) => elems.map((el) => !!el && !el.hidden),
-            res.templateBlock.elem,
-            res.templateForm.elem,
-            res.uploadProgress.elem,
-            res.loadingIndicator.elem,
-        );
-
-        const formVisible = res.templateForm.visible;
-
-        res.isLoading = (
-            res.uploadProgress.visible
-            || (res.templateBlock.visible && res.loadingIndicator.visible)
-        );
-
-        res.tplFormTitle = {};
-        if (res.templateBlock.visible && !res.isLoading) {
-            res.tplFormTitle.elem = await query(this.elem, '.template-form-title');
-        }
-
-        [
+            res.isLoading,
             res.fileName,
             res.serverAddress,
             res.backBtn.visible,
@@ -151,12 +131,17 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFeedback.isValid,
             res.tplFormFeedback.title,
             res.tplFormFeedback.isValid,
-            res.tplFormTitle.title,
+            res.tplFormTitle,
             res.convertFeedback.title,
             res.convertFeedback.visible,
             res.cancelTplBtn.disabled,
         ] = await evaluate(
             (
+                el,
+                tplBlockEl,
+                tplFormEl,
+                uplProgressEl,
+                loadingEl,
                 fileEl,
                 serverEl,
                 backBtn,
@@ -167,27 +152,51 @@ export class ImportUploadDialog extends TestComponent {
                 incBtn,
                 fbEl,
                 formFbEl,
-                titleEl,
                 convFbEL,
                 cancelBtn,
-            ) => ([
-                fileEl.value,
-                serverEl.value,
-                !!backBtn && !backBtn.hidden,
-                tplEl.textContent,
-                nameEl.value,
-                inpEl.value,
-                decBtn.disabled,
-                incBtn.disabled,
-                fbEl.textContent,
-                fbEl.classList.contains('valid-feedback'),
-                formFbEl.textContent,
-                formFbEl.classList.contains('valid-feedback'),
-                titleEl?.textContent,
-                convFbEL?.textContent,
-                !!convFbEL && !convFbEL.hidden,
-                cancelBtn?.disabled,
-            ]),
+            ) => {
+                const templateBlockVisible = !!tplBlockEl && !tplBlockEl.hidden;
+                const templateFormVisible = !!tplFormEl && !tplFormEl.hidden;
+                const uploadProgressVisible = !!uplProgressEl && !uplProgressEl.hidden;
+                const loadingVisible = !!loadingEl && !loadingEl.hidden;
+                const isLoading = (
+                    uploadProgressVisible
+                    || (templateBlockVisible && loadingVisible)
+                );
+
+                const tplFormTitleEl = (templateBlockVisible && !isLoading)
+                    ? el.querySelector('.template-form-title')
+                    : null;
+
+                return [
+                    templateBlockVisible,
+                    templateFormVisible,
+                    uploadProgressVisible,
+                    loadingVisible,
+                    isLoading,
+                    fileEl.value,
+                    serverEl.value,
+                    !!backBtn && !backBtn.hidden,
+                    tplEl.textContent,
+                    nameEl.value,
+                    inpEl.value,
+                    decBtn.disabled,
+                    incBtn.disabled,
+                    fbEl.textContent,
+                    fbEl.classList.contains('valid-feedback'),
+                    formFbEl.textContent,
+                    formFbEl.classList.contains('valid-feedback'),
+                    tplFormTitleEl?.textContent,
+                    convFbEL?.textContent,
+                    !!convFbEL && !convFbEL.hidden,
+                    cancelBtn?.disabled,
+                ];
+            },
+            this.elem,
+            res.templateBlock.elem,
+            res.templateForm.elem,
+            res.uploadProgress.elem,
+            res.loadingIndicator.elem,
             res.fileNameElem.elem,
             res.serverAddressInput.elem,
             res.backBtn.elem,
@@ -198,7 +207,6 @@ export class ImportUploadDialog extends TestComponent {
             res.incFirstRowBtn.elem,
             res.tplFeedback.elem,
             res.tplFormFeedback.elem,
-            res.tplFormTitle.elem,
             res.convertFeedback.elem,
             res.cancelTplBtn.elem,
         );
@@ -207,6 +215,8 @@ export class ImportUploadDialog extends TestComponent {
         res.isTplLoading = res.templateDropDown.disabled;
 
         res.columns = null;
+
+        const formVisible = res.templateForm.visible;
         if (formVisible && !res.isLoading) {
             res.columns = await asyncMap(
                 await queryAll(res.rawDataTable.elem, '.raw-data-table__data .raw-data-column'),
@@ -227,9 +237,9 @@ export class ImportUploadDialog extends TestComponent {
             const createTplTitle = __('import.templates.create');
             const updateTplTitle = __('import.templates.update');
 
-            if (formVisible && res.tplFormTitle.title === createTplTitle) {
+            if (formVisible && res.tplFormTitle === createTplTitle) {
                 res.state = CREATE_TPL_STATE;
-            } else if (formVisible && res.tplFormTitle.title === updateTplTitle) {
+            } else if (formVisible && res.tplFormTitle === updateTplTitle) {
                 res.state = UPDATE_TPL_STATE;
             } else {
                 res.state = CONVERT_STATE;
@@ -347,6 +357,10 @@ export class ImportUploadDialog extends TestComponent {
         assert(res.initialAccount, 'Initial account not found');
 
         return res;
+    }
+
+    isBrowseFileState(model = this.model) {
+        return model.state === BROWSE_FILE_STATE;
     }
 
     assertStateId(state) {

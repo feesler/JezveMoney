@@ -19,6 +19,8 @@ class Settings extends TemplateController
      */
     public function index()
     {
+        $availActions = ["main", "currencies", "regional"];
+
         $this->template = new Template(VIEW_TPL_PATH . "Settings.tpl");
         $data = [];
 
@@ -31,6 +33,9 @@ class Settings extends TemplateController
         $userCurrModel = UserCurrencyModel::getInstance();
 
         $viewProps = [];
+        if (in_array($this->action, $availActions)) {
+            $viewProps["action"] = $this->action;
+        }
 
         $data["appProps"] = [
             "profile" => $profileInfo,
@@ -41,6 +46,24 @@ class Settings extends TemplateController
 
         $this->initResources("SettingsView");
         $this->render($data);
+    }
+
+    /**
+     * /settings/currencies/ route handler
+     * Renders currencies tab at settings view
+     */
+    public function currencies()
+    {
+        $this->index();
+    }
+
+    /**
+     * /settings/regional/ route handler
+     * Renders regional settings tab at settings view
+     */
+    public function regional()
+    {
+        $this->index();
     }
 
     /**

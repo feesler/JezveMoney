@@ -12,11 +12,13 @@ const CONTAINER_CLASS = 'category-item';
 const TITLE_CLASS = 'category-item__title';
 const CHILD_CONTAINER_CLASS = 'category-item__children categories-list';
 
+const CATEGORY_COLOR_PROP = '--category-color';
+
 const defaultProps = {
     selected: false,
     listMode: 'list',
     showControls: false,
-    animated: true,
+    animated: false,
 };
 
 /**
@@ -99,5 +101,7 @@ export class CategoryItem extends CollapsibleListItem {
         super.render(state, prevState);
 
         this.renderChildren(state, prevState);
+
+        this.elem.style.setProperty(CATEGORY_COLOR_PROP, state.item.color);
     }
 }

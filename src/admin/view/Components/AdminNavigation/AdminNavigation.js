@@ -17,14 +17,15 @@ const LOGO_CLASS = 'header-logo';
 const BACK_BTN_CLASS = 'close-btn circle-btn';
 
 const menuItems = [
-    { url: 'admin/currency/', title: 'Currencies' },
-    { url: 'admin/icon/', title: 'Icons' },
-    { url: 'admin/query/', title: 'Queries' },
-    { url: 'admin/log/', title: 'Logs' },
-    { url: 'admin/balance/', title: 'Balance' },
-    { url: 'admin/tests/', title: 'Tests' },
-    { url: 'admin/apiconsole/', title: 'API console' },
-    { url: 'admin/user/', title: 'Users' },
+    { id: 'currency', url: 'admin/currency/', title: 'Currencies' },
+    { id: 'color', url: 'admin/color/', title: 'Colors' },
+    { id: 'icon', url: 'admin/icon/', title: 'Icons' },
+    { id: 'query', url: 'admin/query/', title: 'Queries' },
+    { id: 'log', url: 'admin/log/', title: 'Logs' },
+    { id: 'balance', url: 'admin/balance/', title: 'Balance' },
+    { id: 'tests', url: 'admin/tests/', title: 'Tests' },
+    { id: 'apiconsole', url: 'admin/apiconsole/', title: 'API console' },
+    { id: 'user', url: 'admin/user/', title: 'Users' },
 ];
 
 /**

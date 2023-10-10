@@ -70,31 +70,34 @@ export class CategoryListView extends AppView {
             };
         });
 
-        res.sections = transTypes.map((type) => {
-            const typeItems = categories.filter((item) => item.type === type);
-            const items = CategoryList.create(typeItems);
-            items.sortBy(sortMode);
+        res.sections = (categories.length > 0)
+            ? transTypes.map((type) => {
+                const typeItems = categories.filter((item) => item.type === type);
+                const items = CategoryList.create(typeItems);
+                items.sortBy(sortMode);
 
-            const mainCategories = items.findByParent(0);
-            const expectedItems = mainCategories.flatMap((item) => {
-                const children = items.findByParent(item.id);
-                return [item, ...children];
-            });
+                const mainCategories = items.findByParent(0);
+                const expectedItems = mainCategories.flatMap((item) => {
+                    const children = items.findByParent(item.id);
+                    return [item, ...children];
+                });
 
-            const typeStr = Category.getTypeString(type);
-            const visible = model.selectedType === typeStr && expectedItems.length > 0;
-            const section = {
-                visible,
-                name: Category.typeToString(type, model.locale),
-            };
-            if (visible) {
-                section.items = expectedItems.map((item) => ({
-                    content: CategoryItem.getExpectedState(item, state),
-                }));
-            }
+                const typeStr = Category.getTypeString(type);
+                const visible = model.selectedType === typeStr && expectedItems.length > 0;
 
-            return section;
-        });
+                const section = {
+                    visible,
+                    name: Category.typeToString(type, model.locale),
+                };
+                if (visible) {
+                    section.items = expectedItems.map((item) => ({
+                        content: CategoryItem.getExpectedState(item, state),
+                    }));
+                }
+
+                return section;
+            })
+            : [];
 
         if (model.detailsItem) {
             res.itemInfo = CategoryDetails.getExpectedState(model.detailsItem, state);
@@ -155,7 +158,7 @@ export class CategoryListView extends AppView {
         };
 
         const type = model.items.reduce((selectedType, item) => {
-            if (selectedType === null) {
+            if (selectedType === null || selectedType === ANY_TYPE) {
                 return item.type;
             }
 
@@ -163,7 +166,8 @@ export class CategoryListView extends AppView {
                 ? selectedType
                 : Math.min(selectedType, item.type);
         }, null);
-        model.selectedType = Category.getTypeString(type);
+
+        model.selectedType = (type !== null) ? Category.getTypeString(type) : null;
 
         return this.getExpectedState(model, state);
     }
@@ -210,6 +214,11 @@ export class CategoryListView extends AppView {
         // Categories list
         res.tabs = await TabList.create(this, await query('#contentContainer .tab-list'));
         const sectionElems = await queryAll('#contentContainer .tab-list__content-item');
+        [
+            res.renderTime,
+        ] = await evaluate((el) => ([
+            el?.dataset?.time,
+        ]), res.tabs?.elem);
 
         res.sections = await asyncMap(sectionElems, async (elem) => {
             const listContainer = await query(elem, '.categories-list');
@@ -251,8 +260,6 @@ export class CategoryListView extends AppView {
         });
 
         const [firstSection] = res.sections;
-
-        res.renderTime = firstSection?.renderTime;
         res.listMode = firstSection?.listMode;
 
         res.itemInfo = await CategoryDetails.create(this, await query('#itemInfo .list-item-details'));
@@ -278,7 +285,7 @@ export class CategoryListView extends AppView {
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible,
             items: [],
-            selectedType: cont.tabs?.selectedId ?? null,
+            selectedType: cont.tabs?.tabs?.value ?? null,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
 

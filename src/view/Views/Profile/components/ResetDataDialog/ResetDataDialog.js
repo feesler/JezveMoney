@@ -1,4 +1,4 @@
-import { ge } from 'jezvejs';
+import { createElement, ge } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
@@ -6,6 +6,43 @@ import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
 const DIALOG_CLASS = 'reset-dialog';
+const COLUMN_CONTAINER_CLASS = 'column-container';
+
+const resetOptions = {
+    accountsCheck: {
+        name: 'accounts',
+        titleToken: 'profile.reset.accounts',
+    },
+    personsCheck: {
+        name: 'persons',
+        titleToken: 'profile.reset.persons',
+    },
+    categoriesCheck: {
+        name: 'categories',
+        titleToken: 'profile.reset.categories',
+    },
+    transactionsCheck: {
+        name: 'transactions',
+        titleToken: 'profile.reset.transactions',
+    },
+    keepBalanceCheck: {
+        name: 'keepbalance',
+        titleToken: 'profile.reset.keepBalance',
+        isSuboption: true,
+    },
+    scheduleCheck: {
+        name: 'schedule',
+        titleToken: 'profile.reset.schedule',
+    },
+    importTplCheck: {
+        name: 'importtpl',
+        titleToken: 'profile.reset.importTemplates',
+    },
+    importRulesCheck: {
+        name: 'importrules',
+        titleToken: 'profile.reset.importRules',
+    },
+};
 
 export class ResetDataDialog extends ProfileDialog {
     constructor(...args) {
@@ -20,25 +57,35 @@ export class ResetDataDialog extends ProfileDialog {
             throw new Error('Failed to initialize Reset data form');
         }
 
-        this.resetAllCheck = Checkbox.fromElement(ge('resetAllCheck'), {
+        this.resetAllCheck = Checkbox.create({
+            id: 'resetAllCheck',
+            label: __('profile.reset.all'),
             onChange: () => this.onToggleAll(),
         });
+        const children = [this.resetAllCheck.elem];
 
-        const checkboxProps = { onChange: () => this.onChange() };
-        this.accountsCheck = Checkbox.fromElement(ge('accountsCheck'), checkboxProps);
-        this.personsCheck = Checkbox.fromElement(ge('personsCheck'), checkboxProps);
-        this.categoriesCheck = Checkbox.fromElement(ge('categoriesCheck'), checkboxProps);
-        this.transactionsCheck = Checkbox.fromElement(ge('transactionsCheck'), checkboxProps);
-        this.keepBalanceCheck = Checkbox.fromElement(ge('keepBalanceCheck'), checkboxProps);
-        this.scheduleCheck = Checkbox.fromElement(ge('scheduleCheck'), checkboxProps);
-        this.importTplCheck = Checkbox.fromElement(ge('importTplCheck'), checkboxProps);
-        this.importRulesCheck = Checkbox.fromElement(ge('importRulesCheck'), checkboxProps);
+        Object.entries(resetOptions).forEach(([id, props]) => {
+            this[id] = Checkbox.create({
+                id,
+                className: (props.isSuboption) ? 'suboption' : null,
+                name: props.name,
+                label: __(props.titleToken),
+                onChange: () => this.onChange(),
+            });
+            children.push(this[id].elem);
+        });
 
         this.initDialog({
             id: 'reset_popup',
             title: __('profile.resetData'),
             className: DIALOG_CLASS,
         });
+
+        const columnContainer = createElement('div', {
+            props: { className: COLUMN_CONTAINER_CLASS },
+            children,
+        });
+        this.form.prepend(columnContainer);
 
         this.reset();
     }

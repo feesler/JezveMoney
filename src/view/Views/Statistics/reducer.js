@@ -2,7 +2,7 @@ import { asArray } from 'jezvejs';
 import { createSlice } from 'jezvejs/Store';
 
 import { normalize } from '../../utils/decimal.js';
-import { formatDateRange } from '../../utils/utils.js';
+import { COLORS_COUNT, formatDateRange } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 
 const SECTOR_OFFSET = 10;
@@ -18,11 +18,20 @@ const pieChartInfoFromSector = (sector) => ({
     value: sector.value,
 });
 
-const pieChartInfoFromChartItem = (item) => ({
-    value: item.value,
-    category: item.categoryIndex + 1,
-    categoryId: item.category,
-});
+const pieChartInfoFromChartItem = (item, state) => {
+    let { category } = item;
+    if (state.filter.report !== 'category') {
+        category = (item.categoryIndex + 1 > COLORS_COUNT)
+            ? (item.columnIndex + 1)
+            : (item.categoryIndex + 1);
+    }
+
+    return {
+        value: item.value,
+        category,
+        categoryId: item.category,
+    };
+};
 
 // Reducers
 const slice = createSlice({
@@ -123,7 +132,7 @@ const slice = createSlice({
             total: 0,
         };
 
-        const pieChartInfo = pieChartInfoFromChartItem(target.item);
+        const pieChartInfo = pieChartInfoFromChartItem(target.item, state);
 
         target.group.forEach((item) => {
             if (
@@ -133,7 +142,7 @@ const slice = createSlice({
                 return;
             }
 
-            const pieItem = pieChartInfoFromChartItem(item);
+            const pieItem = pieChartInfoFromChartItem(item, state);
             pieItem.offset = (item.category === pieChartInfo.categoryId) ? SECTOR_OFFSET : 0;
 
             selectedColumn.items.push(pieItem);

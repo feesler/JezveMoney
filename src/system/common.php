@@ -190,6 +190,30 @@ function normalize(mixed $value, int $precision = 2)
 }
 
 /**
+ * Returns hexadecimal color string for specified integer value
+ *
+ * @param int $value
+ *
+ * @return string
+ */
+function intToColor(int $value)
+{
+    return "#" . str_pad(dechex($value), 6, "0", STR_PAD_LEFT);
+}
+
+/**
+ * Converts hexadecimal color string to integer and returns result
+ *
+ * @param string $value
+ *
+ * @return int
+ */
+function colorToInt(string $value)
+{
+    return hexdec(substr($value, 1));
+}
+
+/**
  * Checks session and start if it is not started yet
  */
 function sessionStart()

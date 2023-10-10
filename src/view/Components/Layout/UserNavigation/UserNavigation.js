@@ -10,6 +10,7 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
 import { App } from '../../../Application/App.js';
+import { __ } from '../../../utils/utils.js';
 
 import { LocaleSelectField } from '../../Form/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
@@ -67,19 +68,23 @@ export class UserNavigation extends Component {
 
         if (loggedIn) {
             const menuItems = [
-                { url: 'profile/', titleToken: 'profile.title' },
-                { url: 'settings/', titleToken: 'settings.title' },
-                { url: 'logout/', titleToken: 'actions.logout' },
+                { id: 'profile', titleToken: 'profile.title' },
+                { id: 'settings', titleToken: 'settings.title' },
+                { id: 'logout', titleToken: 'actions.logout' },
             ];
             if (App.isAdminUser()) {
                 menuItems.push(
-                    { type: 'separator' },
-                    { url: 'admin/', titleToken: 'adminPanel' },
+                    { id: 'userNavSeparator', type: 'separator' },
+                    { id: 'admin', titleToken: 'adminPanel' },
                 );
             }
 
             this.menu = NavigationMenu.create({
-                items: menuItems,
+                items: menuItems.map((item) => ({
+                    ...item,
+                    title: (item.type !== 'separator') ? __(item.titleToken) : undefined,
+                    url: (item.type !== 'separator') ? `${item.id}/` : undefined,
+                })),
             });
 
             children.push(this.menu.elem);

@@ -2,6 +2,9 @@ import { Component, createElement } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
+import { App } from '../../../Application/App.js';
+import { __ } from '../../../utils/utils.js';
+
 import { Logo } from '../../Common/Logo/Logo.js';
 import { NavigationMenu } from '../NavigationMenu/NavigationMenu.js';
 
@@ -16,16 +19,16 @@ const LOGO_CLASS = 'header-logo';
 const BACK_BTN_CLASS = 'close-btn circle-btn';
 
 const menuItems = [
-    { url: 'accounts/', titleToken: 'accounts.listTitle', createButton: 'accounts/create/' },
-    { url: 'persons/', titleToken: 'persons.listTitle', createButton: 'persons/create/' },
-    { url: 'categories/', titleToken: 'categories.listTitle', createButton: 'categories/create/' },
-    { url: 'transactions/', titleToken: 'transactions.listTitle', createButton: 'transactions/create/' },
-    { url: 'schedule/', titleToken: 'schedule.listTitle', createButton: 'schedule/create/' },
-    { url: 'reminders/', titleToken: 'reminders.listTitle' },
-    { url: 'statistics/', titleToken: 'statistics.title' },
-    { url: 'import/', titleToken: 'import.listTitle' },
-    { type: 'separator' },
-    { url: 'about/', titleToken: 'about.title', loggedOut: true },
+    { id: 'accounts', titleToken: 'accounts.listTitle', createButton: 'accounts/create/' },
+    { id: 'persons', titleToken: 'persons.listTitle', createButton: 'persons/create/' },
+    { id: 'categories', titleToken: 'categories.listTitle', createButton: 'categories/create/' },
+    { id: 'transactions', titleToken: 'transactions.listTitle', createButton: 'transactions/create/' },
+    { id: 'schedule', titleToken: 'schedule.listTitle', createButton: 'schedule/create/' },
+    { id: 'reminders', titleToken: 'reminders.listTitle' },
+    { id: 'statistics', titleToken: 'statistics.title' },
+    { id: 'import', titleToken: 'import.listTitle' },
+    { id: 'navSeparator1', type: 'separator' },
+    { id: 'about', titleToken: 'about.title', loggedOut: true },
 ];
 
 /**
@@ -60,7 +63,14 @@ export class AppNavigation extends Component {
         });
 
         this.menu = NavigationMenu.create({
-            items: menuItems,
+            items: menuItems
+                .filter((item) => (item.loggedOut || App.isUserLoggedIn()))
+                .map((item) => ({
+                    ...item,
+                    selectable: false,
+                    title: (item.type !== 'separator') ? __(item.titleToken) : undefined,
+                    url: (item.type !== 'separator') ? `${item.id}/` : undefined,
+                })),
         });
 
         this.elem = createElement('nav', {

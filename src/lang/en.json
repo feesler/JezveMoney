@@ -163,6 +163,14 @@
             "delete": "Fail to delete account"
         }
     },
+    "colors": {
+        "deleteMessage": "Are you sure want to delete selected color?",
+        "errors": {
+            "create": "Fail to create new color",
+            "update": "Fail to update color",
+            "delete": "Fail to delete color"
+        }
+    },
     "icons": {
         "byName": {
             "noIcon": "No icon",
@@ -283,9 +291,11 @@
         "name": "Name",
         "invalidName": "Input name",
         "existingName": "Category with this name already exist",
+        "existingColor": "This color is already used by another category",
         "parent": "Parent category",
         "noParent": "No parent",
         "transactionType": "Transaction type",
+        "color": "Color",
         "childCount": "Subcategories:",
         "showChildren": "Show",
         "hideChildren": "Hide",

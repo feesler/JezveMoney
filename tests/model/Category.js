@@ -7,6 +7,7 @@ import { App } from '../Application.js';
 export class Category {
     static availProps = [
         'name',
+        'color',
         'parent_id',
         'type',
     ];
@@ -29,6 +30,7 @@ export class Category {
 
         this.id = data.id;
         this.name = data.name;
+        this.color = data.color;
         this.type = data.type;
         this.parent_id = data.parent_id;
         this.pos = data.pos;

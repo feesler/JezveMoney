@@ -31,6 +31,7 @@ export const create = async () => {
         const expected = CategoryView.getExpectedState({
             locale: App.view.locale,
             name: '',
+            color: App.state.getNextCategoryColor(),
             parent_id: 0,
             type: 0,
             isUpdate: false,
@@ -87,6 +88,7 @@ export const addSubcategory = async (id) => {
         const expected = CategoryView.getExpectedState({
             locale: App.view.locale,
             name: '',
+            color: category.color,
             parent_id: category.id,
             type: category.type,
             isUpdate: false,
@@ -121,6 +123,14 @@ export const inputName = async (name) => {
     await test(`Input name '${name}'`, async () => {
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
         return App.view.inputName(name);
+    });
+};
+
+/** Input category color */
+export const inputColor = async (color) => {
+    await test(`Input color ${color}`, async () => {
+        assert.instanceOf(App.view, CategoryView, 'Invalid view');
+        return App.view.inputColor(color);
     });
 };
 

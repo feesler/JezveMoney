@@ -1,3 +1,5 @@
+@use "../../../Application/colors";
+
 /* Bar chart information popup */
 .chart__popup {
   position: absolute;
@@ -39,8 +41,12 @@
   color: var(--main-text-color);
 }
 
-@for $i from 1 through 13 {
+.chart-popup-list__item {
+  color: var(--category-color);
+}
+
+@for $i from 1 through length(colors.$colors) {
   .chart-popup-list__item-cat-#{$i} {
-    color: var(--charts-color-#{$i});
+    --category-color: var(--charts-color-#{$i});
   }
 }

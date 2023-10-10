@@ -16,6 +16,19 @@ const slice = createSlice({
         },
     }),
 
+    changeColor: (state, color) => ({
+        ...state,
+        data: {
+            ...state.data,
+            color,
+        },
+        validation: {
+            ...state.validation,
+            color: true,
+            valid: true,
+        },
+    }),
+
     changeParent: (state, value) => {
         if (state.data.parent_id === value) {
             return state;
@@ -34,6 +47,12 @@ const slice = createSlice({
                 ...state.data,
                 parent_id: value,
                 type: (parentId === 0) ? state.data.type : parent.type,
+                color: (parentId === 0) ? state.data.color : parent.color,
+            },
+            validation: {
+                ...state.validation,
+                color: true,
+                valid: true,
             },
         };
     },
@@ -55,6 +74,15 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             name: message,
+            valid: false,
+        },
+    }),
+
+    invalidateColorField: (state, message = false) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            color: message,
             valid: false,
         },
     }),

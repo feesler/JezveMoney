@@ -10,12 +10,14 @@ import { Spinner } from 'jezvejs/Spinner';
 
 import { __, getSelectedItems, listData } from '../../../utils/utils.js';
 
-import { REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
+import { REMINDER_SCHEDULED, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 import { LoadingIndicator } from '../../Common/LoadingIndicator/LoadingIndicator.js';
 import { NoDataMessage } from '../../Common/NoDataMessage/NoDataMessage.js';
 import { ListCounter } from '../../List/ListCounter/ListCounter.js';
 import { ToggleDetailsButton } from '../../List/ToggleDetailsButton/ToggleDetailsButton.js';
+import { FiltersContainer } from '../../List/FiltersContainer/FiltersContainer.js';
+import { ReminderFilters } from '../ReminderFilters/ReminderFilters.js';
 import { ReminderListItem } from '../ReminderListItem/ReminderListItem.js';
 
 import './ReminderListGroup.scss';
@@ -29,6 +31,14 @@ const SELECTED_COUNTER_CLASS = 'selected-counter';
 
 const defaultProps = {
     items: [],
+    filter: {
+        reminderState: REMINDER_SCHEDULED,
+        startDate: null,
+        endDate: null,
+    },
+    filtersId: undefined,
+    stateFilterId: undefined,
+    dateRangeFilterId: undefined,
     mode: 'classic', // 'classic' or 'details'
     listMode: 'list',
     showControls: true,
@@ -37,6 +47,9 @@ const defaultProps = {
     onShowMore: null,
     onChangePage: null,
     onChangeMode: null,
+    onChangeDateRange: null,
+    onChangeReminderState: null,
+    onClearAllFilters: null,
 };
 
 /**
@@ -61,6 +74,21 @@ export class ReminderListGroup extends Component {
     }
 
     init() {
+        this.filters = ReminderFilters.create({
+            id: this.state.filtersId,
+            stateFilterId: this.state.stateFilterId,
+            dateRangeFilterId: this.state.dateRangeFilterId,
+            getURL: (state, keepPage) => this.getURL(state, keepPage),
+            onChangeReminderState: (range) => this.onChangeReminderState(range),
+            onChangeDateRange: (range) => this.onChangeDateRange(range),
+            onApplyFilters: (e) => this.onApplyFilters(e),
+            onClearAllFilters: (e) => this.onClearAllFilters(e),
+        });
+
+        this.filtersContainer = FiltersContainer.create({
+            content: this.filters.elem,
+        });
+
         this.reminderList = ListContainer.create({
             ItemComponent: ReminderListItem,
             getItemProps: (item, state) => ({
@@ -91,10 +119,7 @@ export class ReminderListGroup extends Component {
         });
 
         this.container = createElement('div', {
-            props: {
-                id: 'contentContainer',
-                className: 'list-container',
-            },
+            props: { className: 'list-container' },
             children: [
                 this.reminderList.elem,
                 this.loadingIndicator.elem,
@@ -125,9 +150,14 @@ export class ReminderListGroup extends Component {
             onChange: (value) => this.onChangeMode(value),
         });
 
-        this.header = createElement('header', {
+        const listHeader = createElement('header', {
             props: { className: 'list-header' },
             children: [this.counters, this.modeSelector.elem],
+        });
+
+        const contentHeader = createElement('header', {
+            props: { className: 'content-header' },
+            children: [this.filtersContainer.elem, listHeader],
         });
 
         // List footer
@@ -156,9 +186,10 @@ export class ReminderListGroup extends Component {
             ],
         });
 
-        this.elem = createElement('div', {
+        this.elem = createElement('section', {
+            props: { className: 'list-container' },
             children: [
-                this.header,
+                contentHeader,
                 this.container,
                 this.footer,
             ],
@@ -192,6 +223,36 @@ export class ReminderListGroup extends Component {
     /** Returns URL for specified state */
     getURL(state, keepPage = true) {
         return (this.useURL) ? this.props.getURL(state, keepPage) : '';
+    }
+
+    toggleFilters() {
+        this.filtersContainer.toggle();
+    }
+
+    onChangeReminderState(reminderState) {
+        if (isFunction(this.props.onChangeReminderState)) {
+            this.props.onChangeReminderState(reminderState);
+        }
+    }
+
+    onChangeDateRange(range) {
+        if (isFunction(this.props.onChangeDateRange)) {
+            this.props.onChangeDateRange(range);
+        }
+    }
+
+    onApplyFilters(e) {
+        this.filtersContainer.close();
+
+        if (isFunction(this.props.onApplyFilters)) {
+            this.props.onApplyFilters(e);
+        }
+    }
+
+    onClearAllFilters(e) {
+        if (isFunction(this.props.onClearAllFilters)) {
+            this.props.onClearAllFilters(e);
+        }
     }
 
     onItemClick(id, e) {
@@ -297,6 +358,13 @@ export class ReminderListGroup extends Component {
         this.spinner.show(loadingMore);
     }
 
+    renderFilters(state) {
+        this.filters.setState((filtersState) => ({
+            ...filtersState,
+            ...state,
+        }));
+    }
+
     renderList(state, prevState) {
         if (
             state.items === prevState?.items
@@ -340,6 +408,7 @@ export class ReminderListGroup extends Component {
         this.renderPaginator(state, prevState);
         this.renderShowMoreButton(state, prevState);
         this.renderList(state, prevState);
+        this.renderFilters(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

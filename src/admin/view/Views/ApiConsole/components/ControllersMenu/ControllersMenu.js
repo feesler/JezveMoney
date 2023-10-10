@@ -173,6 +173,17 @@ const controllers = [
         ],
     },
     {
+        name: 'color',
+        title: 'Color',
+        methods: [
+            { title: 'List', formId: 'listColorForm' },
+            { title: 'Read', formId: 'readColorForm' },
+            { title: 'Create', formId: 'createColorForm' },
+            { title: 'Update', formId: 'updateColorForm' },
+            { title: 'Delete', formId: 'delColorForm' },
+        ],
+    },
+    {
         name: 'icon',
         title: 'Icon',
         methods: [

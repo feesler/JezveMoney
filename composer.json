@@ -1,7 +1,7 @@
 {
     "name": "henryfeesler/jezvemoney",
     "type": "project",
-    "version": "1.77.0",
+    "version": "1.78.0",
     "description": "",
     "config": {
         "vendor-dir": "vendor",

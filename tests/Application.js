@@ -10,6 +10,7 @@ import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/AppState.js';
 import { Scenario } from './scenario/index.js';
+import { ColorsList } from './model/ColorsList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconsList } from './model/IconsList.js';
 import {
@@ -178,6 +179,7 @@ class Application extends TestApplication {
 
         this.currency = await CurrencyList.create();
         this.icons = await IconsList.create();
+        this.colors = await ColorsList.create();
     }
 
     async updateTimezone() {

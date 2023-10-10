@@ -9,14 +9,6 @@ import {
 } from '../common.js';
 
 export class CategoryList extends SortableList {
-/*
-    setData(data) {
-        super.setData(data);
-
-        this.sortByParent();
-    }
-    */
-
     /**
      * Create list item from specified object
      * @param {Object} obj
@@ -39,27 +31,9 @@ export class CategoryList extends SortableList {
             return false;
         }
 
-        const children = this.findByParent(id);
-
-        if (category.parent_id !== parentId) {
-            if (!this.update({ ...category, parent_id: parentId })) {
-                return false;
-            }
-
-            if (!children.every((item) => this.update({ ...item, parent_id: parentId }))) {
-                return false;
-            }
-        }
-
         if (!this.updatePos(id, pos)) {
             return false;
         }
-
-        if (!children.every((item, index) => this.updatePos(item.id, pos + index + 1))) {
-            return false;
-        }
-
-        this.sortByParent();
 
         return true;
     }
@@ -68,6 +42,12 @@ export class CategoryList extends SortableList {
     findByParent(id = 0) {
         const categoryId = parseInt(id, 10);
         return this.filter((item) => item.parent_id === categoryId);
+    }
+
+    /** Returns array of items with specified color */
+    findByColor(color, parentId = 0) {
+        const categoryId = parseInt(parentId, 10);
+        return this.filter((item) => (item.color === color && item.parent_id === categoryId));
     }
 
     /** Search category with specified name */
@@ -124,5 +104,22 @@ export class CategoryList extends SortableList {
 
     sortByCreateDateDesc() {
         this.data.sort((a, b) => b.id - a.id);
+    }
+
+    getUsedColors() {
+        const res = [];
+        this.forEach((item) => {
+            if (!res.includes(item.color)) {
+                res.push(item.color);
+            }
+        });
+
+        return res;
+    }
+
+    getNextColor(availColors) {
+        const usedColors = this.getUsedColors();
+        const res = availColors.find((color) => !usedColors.includes(color));
+        return res ?? null;
     }
 }

@@ -20,6 +20,7 @@ import { Transaction } from '../../Models/Transaction.js';
 
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Category/CategorySelect/CategorySelect.js';
+import { ColorField } from '../../Components/Form/Fields/ColorField/ColorField.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
 import { DeleteCategoryDialog } from '../../Components/Category/DeleteCategoryDialog/DeleteCategoryDialog.js';
 import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
@@ -37,6 +38,7 @@ class CategoryView extends AppView {
         const initialState = {
             validation: {
                 name: true,
+                color: true,
                 valid: true,
             },
             submitStarted: false,
@@ -87,6 +89,21 @@ class CategoryView extends AppView {
 
         this.createParentCategorySelect();
         this.createTransactionTypeSelect();
+
+        // Color field
+        this.colorField = ColorField.create({
+            id: 'colorField',
+            inputId: 'colorInp',
+            type: 'color',
+            name: 'color',
+            className: 'form-row',
+            title: __('categories.color'),
+            validate: true,
+            feedbackMessage: __('categories.existingColor'),
+            disableAutoProps: false,
+            onInput: (e) => this.onColorInput(e),
+        });
+        this.nameField.elem.after(this.colorField.elem);
 
         // Controls
         this.submitControls = FormControls.create({
@@ -156,6 +173,12 @@ class CategoryView extends AppView {
         this.store.dispatch(actions.changeName(value));
     }
 
+    /** Color input event handler */
+    onColorInput(e) {
+        const { value } = e.target;
+        this.store.dispatch(actions.changeColor(value));
+    }
+
     /** Parent category select event handler */
     onParentSelect(category) {
         if (!category) {
@@ -183,7 +206,8 @@ class CategoryView extends AppView {
             return;
         }
 
-        const { name } = state.data;
+        const { name, color } = state.data;
+
         if (name.length === 0) {
             this.store.dispatch(actions.invalidateNameField(__('categories.invalidName')));
             this.nameField.focus();
@@ -193,6 +217,14 @@ class CategoryView extends AppView {
                 this.store.dispatch(actions.invalidateNameField(__('categories.existingName')));
                 this.nameField.focus();
             }
+        }
+
+        const colorItems = App.model.categories.findByColor(color);
+        if (
+            colorItems?.length > 0
+            && state.original.id !== colorItems[0].id
+        ) {
+            this.store.dispatch(actions.invalidateColorField());
         }
 
         const { validation } = this.store.getState();
@@ -220,6 +252,7 @@ class CategoryView extends AppView {
         const isUpdate = state.original.id;
         const data = {
             name: state.data.name,
+            color: state.data.color,
             parent_id: state.data.parent_id,
             type: state.data.type,
         };
@@ -311,6 +344,8 @@ class CategoryView extends AppView {
             this.deleteBtn.enable(!state.submitStarted);
         }
 
+        const parentId = parseInt(state.data.parent_id, 10);
+
         // Name field
         const isValidName = (state.validation.name === true);
         this.nameField.setState((nameState) => ({
@@ -319,6 +354,14 @@ class CategoryView extends AppView {
             valid: isValidName,
             feedbackMessage: (isValidName) ? '' : state.validation.name,
             disabled: state.submitStarted,
+        }));
+
+        // Color field
+        this.colorField.setState((colorState) => ({
+            ...colorState,
+            value: state.data.color,
+            valid: state.validation.color,
+            disabled: (state.submitStarted || parentId !== 0),
         }));
 
         // Parent category field
@@ -331,8 +374,6 @@ class CategoryView extends AppView {
         this.parentSelect.enable(!state.submitStarted);
 
         // Transaction type field
-        const parentId = parseInt(state.data.parent_id, 10);
-
         this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted && parentId === 0);
 

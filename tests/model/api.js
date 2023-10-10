@@ -112,6 +112,14 @@ export const api = {
         list: apiList,
     }),
 
+    color: apiController('color', {
+        read: apiRead,
+        create: apiCreate,
+        update: apiUpdate,
+        del: apiDelete,
+        list: apiList,
+    }),
+
     icon: apiController('icon', {
         read: apiRead,
         create: apiCreate,

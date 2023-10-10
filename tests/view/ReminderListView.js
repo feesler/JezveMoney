@@ -233,9 +233,8 @@ export class ReminderListView extends AppView {
     async parseContent() {
         const res = {
             filtersBtn: await Button.create(this, await query('#filtersBtn')),
-            filtersContainer: { elem: await query('#filters') },
+            filtersContainer: { elem: await query('.filters-container') },
             clearFiltersBtn: { elem: await query('.filters-controls .clear-all-btn') },
-            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
             menuBtn: { elem: await query('.heading-actions .menu-btn') },
             totalCounter: await Counter.create(this, await query('.items-counter')),
@@ -246,7 +245,11 @@ export class ReminderListView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
-        [res.filtersAnimation] = await evaluate(() => ([
+        res.closeFiltersBtn = { elem: await query('.filters-offcanvas .close-btn') };
+
+        [
+            res.filtersAnimation,
+        ] = await evaluate(() => ([
             document.querySelector('.filters-collapsible')?.classList?.contains('collapsible_animated'),
         ]));
 
@@ -305,7 +308,7 @@ export class ReminderListView extends AppView {
             listMode: (cont.remindersList) ? cont.remindersList.listMode : 'list',
             listMenuVisible: cont.listMenu?.visible,
             contextMenuVisible: cont.contextMenu?.visible,
-            filtersVisible: cont.filtersContainer.visible,
+            filtersVisible: !!cont.filtersContainer.visible,
             filtersAnimation: !!cont.filtersAnimation,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
         };
