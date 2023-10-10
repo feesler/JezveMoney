@@ -30,10 +30,17 @@ if (!isSecure()) {
 require_once(APP_ROOT . "system/Engine/JSON.php");
 require_once(APP_ROOT . "vendor/autoload.php");
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 setupLogs();
 
-$dbConfig = (require_once(APP_ROOT . "system/dbsetup.php"));
-MySqlDB::setup($dbConfig);
+MySqlDB::setup([
+    "name" => $_ENV["DB_NAME"],
+    "user" => $_ENV["DB_USER"],
+    "password" => $_ENV["DB_PASS"],
+    "location" => $_ENV["DB_HOST"],
+]);
 
 date_default_timezone_set("UTC");
 

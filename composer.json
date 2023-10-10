@@ -10,7 +10,8 @@
     "require": {
         "phpoffice/phpspreadsheet": "^1.29",
         "aura/accept": "^4.0",
-        "composer/semver": "^3.4.0"
+        "composer/semver": "^3.4.0",
+        "vlucas/phpdotenv": "^5.5"
     },
     "autoload": {
         "psr-4": {
