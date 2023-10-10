@@ -321,13 +321,20 @@ export class CategoryListView extends AppView {
     }
 
     getExpectedURL(model = this.model) {
-        let res = `${baseUrl()}categories/`;
+        let address = `${baseUrl()}categories/`;
 
         if (model.detailsItem) {
-            res += model.detailsItem.id.toString();
+            address += model.detailsItem.id.toString();
         }
 
-        return res;
+        const url = new URL(address);
+
+        const typeStr = (typeof model.selectedType === 'string')
+            ? model.selectedType
+            : Transaction.getTypeString(model.selectedType);
+        url.searchParams.set('type', typeStr);
+
+        return url.toString();
     }
 
     getExpectedState(model = this.model) {
@@ -386,7 +393,7 @@ export class CategoryListView extends AppView {
     }
 
     /** Opens specified categories tab */
-    async openTabByType(type) {
+    async openTabByType(type, directNavigate = false) {
         assert(this.tabs, 'Tabs not available');
 
         const typeStr = (typeof type === 'string')
@@ -400,9 +407,13 @@ export class CategoryListView extends AppView {
         this.model.selectedType = typeStr;
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.tabs.selectTabById(typeStr));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.performAction(() => this.tabs.selectTabById(typeStr));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
     /** Opens context menu for specified category and clicks by 'Edit' button */

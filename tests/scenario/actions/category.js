@@ -247,6 +247,16 @@ export const delFromUpdate = async (index, removeChildren = true) => {
     });
 };
 
+export const openTabByType = async ({ type, directNavigate = false }) => {
+    const descr = (directNavigate)
+        ? `Open tab by type: '${type}'. Direct navigation`
+        : `Open tab by type: '${type}'. Manual navigation`;
+    await test(descr, async () => {
+        await checkNavigation();
+        return App.view.openTabByType(type, directNavigate);
+    });
+};
+
 export const toggleSelect = async (indexes) => {
     const inds = asArray(indexes);
 

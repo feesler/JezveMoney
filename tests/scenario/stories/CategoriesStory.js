@@ -2,6 +2,7 @@ import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../actions/category.js';
 import { App } from '../../Application.js';
 import { EXPENSE, INCOME } from '../../model/Transaction.js';
+import { ANY_TYPE } from '../../model/AppState.js';
 
 export class CategoriesStory extends TestStory {
     async beforeRun() {
@@ -31,6 +32,7 @@ export class CategoriesStory extends TestStory {
         await Actions.securityTests();
 
         await this.create();
+        await this.openTypeTab();
         await this.select();
         await this.sort();
         await this.details();
@@ -78,6 +80,11 @@ export class CategoriesStory extends TestStory {
         await Actions.create();
         await Actions.inputName('Shop');
         await Actions.selectType(EXPENSE);
+        await Actions.submit();
+
+        await Actions.create();
+        await Actions.inputName('Anything');
+        await Actions.selectType(ANY_TYPE);
         await Actions.submit();
 
         setBlock('Create category with existing name', 2);
@@ -198,6 +205,18 @@ export class CategoriesStory extends TestStory {
         ];
 
         await App.scenario.runner.runGroup(Actions.delFromUpdate, data);
+    }
+
+    async openTypeTab() {
+        setBlock('Open tabs by type', 1);
+
+        await Actions.openTabByType({ type: 'income' });
+        await Actions.openTabByType({ type: 'expense' });
+        await Actions.openTabByType({ type: 'any' });
+
+        await Actions.openTabByType({ type: 'income', directNavigate: true });
+        await Actions.openTabByType({ type: 'any', directNavigate: true });
+        await Actions.openTabByType({ type: 'expense', directNavigate: true });
     }
 
     async select() {
