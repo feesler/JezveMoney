@@ -1,15 +1,22 @@
 /* Pie chart */
+:root {
+  --piechart-min-width: 250px;
+  --piechart-max-width: 400px;
+}
+
+.piechart-group {
+  display: flex;
+  flex-flow: column nowrap;
+  min-width: var(--piechart-min-width);
+  max-width: var(--piechart-max-width);
+}
+
 .piechart-header,
 .piechart-total {
   display: flex;
   flex-flow: row wrap;
   align-items: baseline;
-  max-width: var(--piechart-width);
   justify-content: space-between;
-}
-
-.piechart-header {
-  margin-top: 2rem;
 }
 
 .piechart-header__type {
@@ -34,7 +41,6 @@
 
 .piechart-container {
   position: relative;
-  max-width: var(--piechart-width);
   margin-top: 1rem;
 
   .pie-chart {
