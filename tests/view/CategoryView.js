@@ -1,7 +1,6 @@
 import {
     assert,
     query,
-    prop,
     navigation,
     click,
     evaluate,
@@ -61,22 +60,26 @@ export class CategoryView extends AppView {
     }
 
     async parseContent() {
-        const res = {};
+        const res = await evaluate(() => {
+            const headingEl = document.querySelector('.heading > h1');
+            const idInp = document.getElementById('categoryId');
 
-        res.headingElem = await query('.heading > h1');
-        assert(res.headingElem, 'Heading element not found');
-        res.heading = await prop(res.headingElem, 'textContent');
+            return {
+                heading: {
+                    visible: !!headingEl && !headingEl.hidden,
+                    text: headingEl?.textContent,
+                },
+                isUpdate: !!idInp,
+                id: (idInp) ? parseInt(idInp.value, 10) : undefined,
+            };
+        });
+
+        if (res.isUpdate) {
+            assert(res.id, 'Invalid category id');
+        }
 
         res.formElem = await query('form');
         assert(res.formElem, 'Form element not found');
-
-        const categoryIdInp = await query('#categoryId');
-        res.isUpdate = !!categoryIdInp;
-        if (res.isUpdate) {
-            const value = await prop(categoryIdInp, 'value');
-            res.id = parseInt(value, 10);
-            assert(res.id, 'Wrong category id');
-        }
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
@@ -86,8 +89,10 @@ export class CategoryView extends AppView {
         res.colorInput = await InputField.create(this, await query('#colorField'));
         assert(res.colorInput, 'Category color input not found');
 
-        res.parentSelect = await DropDown.createFromChild(this, await query('#parent'));
-        res.typeSelect = await DropDown.createFromChild(this, await query('#type'));
+        const parentSelectEl = await query('#parentCategoryField .dd__container');
+        res.parentSelect = await DropDown.create(this, parentSelectEl);
+
+        res.typeSelect = await DropDown.create(this, await query('#typeField .dd__container'));
 
         res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');

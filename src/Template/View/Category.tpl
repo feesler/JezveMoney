@@ -10,24 +10,7 @@
                         <div class="heading-actions"></div>
                     </header>
 
-                    <main>
-                        <form id="categoryForm" method="post" action="<?= e(BASEURL . "categories/" . $this->action) ?>/">
-                            <?php if ($this->action == "update") {        ?>
-                                <input id="categoryId" name="id" type="hidden" value="<?= e($category->id) ?>">
-                            <?php    }    ?>
-                            <div id="parentCategoryField" class="field form-row">
-                                <label for="parent" class="field__title"><?= __("categories.parent") ?></label>
-                                <select id="parent" name="parent_id"></select>
-                            </div>
-
-                            <hr class="form-separator">
-
-                            <div id="typeField" class="field form-row">
-                                <label for="type" class="field__title"><?= __("categories.transactionType") ?></label>
-                                <select id="type" name="type"></select>
-                            </div>
-                        </form>
-                    </main>
+                    <main id="formContainer"></main>
                 </div>
             </div>
         </div>
