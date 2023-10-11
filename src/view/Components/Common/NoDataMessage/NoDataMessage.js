@@ -11,6 +11,10 @@ const defaultProps = {
  * No data message component for lists & etc.
  */
 export class NoDataMessage extends Component {
+    static userProps = {
+        elem: ['id'],
+    };
+
     constructor(props = {}) {
         super({
             ...defaultProps,
@@ -20,6 +24,7 @@ export class NoDataMessage extends Component {
         this.state = { ...this.props };
 
         this.init();
+        this.postInit();
         this.render(this.state);
     }
 
@@ -27,6 +32,11 @@ export class NoDataMessage extends Component {
         this.elem = createElement('div', {
             props: { className: MESSAGE_CLASS },
         });
+    }
+
+    postInit() {
+        this.setClassNames();
+        this.setUserProps();
     }
 
     render(state) {
