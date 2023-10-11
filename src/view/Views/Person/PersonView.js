@@ -1,18 +1,19 @@
 import 'jezvejs/style';
-import {
-    setEvents,
-} from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
+// Application
 import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { PersonList } from '../../Models/PersonList.js';
 
+// Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
@@ -54,7 +55,7 @@ class PersonView extends AppView {
 
         this.loadElementsByIds([
             'heading',
-            'personForm',
+            'formContainer',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -62,8 +63,7 @@ class PersonView extends AppView {
             showInHeaderOnScroll: false,
         });
 
-        setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
-
+        // Name field
         this.nameField = InputField.create({
             id: 'nameField',
             inputId: 'nameInp',
@@ -73,7 +73,6 @@ class PersonView extends AppView {
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
-        this.personForm.prepend(this.nameField.elem);
 
         // Controls
         this.submitControls = FormControls.create({
@@ -82,7 +81,29 @@ class PersonView extends AppView {
             cancelTitle: __('actions.cancel'),
             cancelURL: App.props.nextAddress,
         });
-        this.personForm.append(this.submitControls.elem);
+
+        // Hidden inputs
+        const hiddenInputIds = ['flags'];
+        if (isUpdate) {
+            hiddenInputIds.push('pid');
+        }
+        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+
+        this.personForm = createElement('form', {
+            props: {
+                id: 'personForm',
+                method: 'post',
+            },
+            events: {
+                submit: (e) => this.onSubmit(e),
+            },
+            children: [
+                this.nameField.elem,
+                this.submitControls.elem,
+                ...hiddenInputs,
+            ],
+        });
+        this.formContainer.append(this.personForm);
 
         // Update mode
         if (isUpdate) {
@@ -97,6 +118,16 @@ class PersonView extends AppView {
         }
 
         this.subscribeToStore(this.store);
+    }
+
+    /** Returns hidden input element */
+    createHiddenInput(id) {
+        const input = createElement('input', {
+            props: { id, type: 'hidden' },
+        });
+
+        this[id] = input;
+        return input;
     }
 
     /** Name input event handler */
@@ -227,6 +258,12 @@ class PersonView extends AppView {
         // Controls
         if (state.submitStarted !== prevState?.submitStarted) {
             this.submitControls.setLoading(state.submitStarted);
+        }
+
+        // Hidden fields
+        this.flags.value = state.original.flags;
+        if (state.original.id) {
+            this.pid.value = state.original.id;
         }
     }
 }
