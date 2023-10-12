@@ -1,7 +1,9 @@
-import { createElement, ge } from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
+
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
+
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
@@ -45,17 +47,14 @@ const resetOptions = {
 };
 
 export class ResetDataDialog extends ProfileDialog {
-    constructor(...args) {
-        super(...args);
-
-        this.init();
-    }
-
     init() {
-        this.elem = ge('reset');
-        if (!this.elem) {
-            throw new Error('Failed to initialize Reset data form');
-        }
+        this.initDialog({
+            id: 'reset_popup',
+            containerId: 'reset',
+            action: 'profile/reset/',
+            title: __('profile.resetData'),
+            className: DIALOG_CLASS,
+        });
 
         this.resetAllCheck = Checkbox.create({
             id: 'resetAllCheck',
@@ -73,12 +72,6 @@ export class ResetDataDialog extends ProfileDialog {
                 onChange: () => this.onChange(),
             });
             children.push(this[id].elem);
-        });
-
-        this.initDialog({
-            id: 'reset_popup',
-            title: __('profile.resetData'),
-            className: DIALOG_CLASS,
         });
 
         const columnContainer = createElement('div', {

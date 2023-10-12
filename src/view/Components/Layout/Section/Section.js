@@ -4,9 +4,10 @@ import {
     removeChilds,
     Component,
 } from 'jezvejs';
-import { Heading } from '../../../../Components/Layout/Heading/Heading.js';
 
-import './SettingsSection.scss';
+import { Heading } from '../Heading/Heading.js';
+
+import './Section.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'settings-block';
@@ -20,9 +21,9 @@ const defaultProps = {
 };
 
 /**
- * Settings section component
+ * Section component
  */
-export class SettingsSection extends Component {
+export class Section extends Component {
     static userProps = {
         elem: ['id'],
     };

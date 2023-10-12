@@ -1,26 +1,58 @@
 import {
     show,
-    setEvents,
     isFunction,
     Component,
+    createElement,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+
 import { App } from '../../../../Application/App.js';
+import { __, getApplicationURL } from '../../../../utils/utils.js';
+
 import { LoadingIndicator } from '../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
-import './ProfileDialog.scss';
 import { FormControls } from '../../../../Components/Form/FormControls/FormControls.js';
-import { __ } from '../../../../utils/utils.js';
+
+import './ProfileDialog.scss';
 
 /* CSS classes */
 const DIALOG_CLASS = 'profile-dialog';
 
+/**
+ * Base Profile dialog component
+ */
 export class ProfileDialog extends Component {
-    initDialog({ id, title, className }) {
-        this.form = this.elem?.querySelector('form');
-        if (!this.elem || !this.form) {
-            throw new Error('Failed to initialize dialog');
-        }
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+    constructor(props = {}) {
+        super(props);
+
+        this.init();
+    }
+
+    initDialog(options = {}) {
+        const {
+            id,
+            title,
+            className,
+            containerId,
+            action,
+        } = options;
+
+        this.form = createElement('form', {
+            props: {
+                method: 'post',
+                action: getApplicationURL(action),
+            },
+            events: { submit: (e) => this.onSubmit(e) },
+        });
+
+        this.elem = createElement('div', {
+            props: {
+                id: containerId,
+                className: 'profile-form-container',
+            },
+            children: [
+                this.form,
+            ],
+        });
 
         // Submit controls
         this.formControls = FormControls.create({

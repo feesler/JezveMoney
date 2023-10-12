@@ -1,20 +1,23 @@
 import 'jezvejs/style';
-import { setEvents } from 'jezvejs';
+import { createElement } from 'jezvejs';
+import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
-import { __ } from '../../utils/utils.js';
+// Application
+import { __, getApplicationURL } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Common components
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import { ChangeNameDialog } from './components/ChangeNameDialog/ChangeNameDialog.js';
 import { ChangePasswordDialog } from './components/ChangePasswordDialog/ChangePasswordDialog.js';
 import { ResetDataDialog } from './components/ResetDataDialog/ResetDataDialog.js';
+import { Section } from '../../Components/Layout/Section/Section.js';
 
 import { actions, reducer } from './reducer.js';
-import '../../Components/Layout/Heading/Heading.scss';
 import '../../Components/Common/Field/Field.scss';
 import '../../Application/Application.scss';
 import './ProfileView.scss';
@@ -44,23 +47,154 @@ class ProfileView extends AppView {
     /** View initialization */
     onStart() {
         this.loadElementsByIds([
-            'userNameTitle',
-            'changeNameBtn',
-            'changePassBtn',
-            'resetBtn',
-            'delProfileBtn',
+            'mainContent',
         ]);
 
-        setEvents(this.changeNameBtn, { click: (e) => this.onActionClick(e) });
-        setEvents(this.changePassBtn, { click: (e) => this.onActionClick(e) });
-        setEvents(this.resetBtn, { click: (e) => this.onActionClick(e) });
-        setEvents(this.delProfileBtn, { click: () => this.confirmDelete() });
+        this.createLoginSection();
+        this.createNameSection();
+        this.createSecuritySection();
+        this.createUserDataSection();
+
+        this.mainContent.append(
+            this.loginSection.elem,
+            this.nameSection.elem,
+            this.securitySection.elem,
+            this.securitySection.elem,
+            this.userDataSection.elem,
+        );
 
         this.changeNamePopup = null;
         this.changePassPopup = null;
         this.resetPopup = null;
 
         this.subscribeToStore(this.store);
+    }
+
+    createLoginSection() {
+        const loginElem = createElement('span', {
+            props: {
+                textContent: App.userLogin,
+            },
+        });
+
+        this.loginSection = Section.create({
+            id: 'loginSection',
+            title: __('profile.login'),
+            content: [
+                loginElem,
+            ],
+        });
+    }
+
+    createNameSection() {
+        this.userNameTitle = createElement('span', {
+            props: {
+                id: 'userNameTitle',
+                textContent: App.userName,
+            },
+        });
+
+        this.changeNameBtn = this.createActionButton({
+            id: 'changeNameBtn',
+            className: 'change-name-link',
+            action: 'name',
+            title: __('actions.update'),
+        });
+
+        this.nameSection = Section.create({
+            id: 'loginSection',
+            title: __('profile.name'),
+            content: createElement('div', {
+                props: { className: 'name-container' },
+                children: [
+                    this.userNameTitle,
+                    this.changeNameBtn,
+                ],
+            }),
+        });
+    }
+
+    createActionButton(options) {
+        const {
+            action,
+            title,
+            ...rest
+        } = options;
+
+        return createElement('a', {
+            props: {
+                href: getApplicationURL(`profile/${action}/`),
+                textContent: title,
+                dataset: { action },
+                ...rest,
+            },
+            events: { click: (e) => this.onActionClick(e) },
+        });
+    }
+
+    createSecuritySection() {
+        this.changePassBtn = this.createActionButton({
+            id: 'changePassBtn',
+            action: 'password',
+            title: __('profile.changePassword'),
+        });
+
+        this.securitySection = Section.create({
+            id: 'securitySection',
+            title: __('profile.security'),
+            content: this.changePassBtn,
+        });
+    }
+
+    createUserDataSection() {
+        // Reset data
+        this.resetDataDescr = createElement('span', {
+            props: { textContent: __('profile.userDataDescription') },
+        });
+
+        this.resetBtn = this.createActionButton({
+            id: 'resetBtn',
+            action: 'reset',
+            title: __('profile.resetData'),
+        });
+
+        this.resetBtn = createElement('a', {
+            props: {
+                id: 'resetBtn',
+                className: 'change-name-link',
+                href: getApplicationURL('profile/reset/'),
+                textContent: __('profile.resetData'),
+                dataset: { action: 'reset' },
+            },
+            events: { click: (e) => this.onActionClick(e) },
+        });
+
+        // Delete profile
+        this.deleteProfileDescr = createElement('span', {
+            props: { textContent: __('profile.deleteDescription') },
+        });
+
+        this.delProfileBtn = Button.create({
+            id: 'delProfileBtn',
+            className: 'warning-btn',
+            title: __('profile.delete'),
+            onClick: () => this.confirmDelete(),
+        });
+
+        this.userDataSection = Section.create({
+            id: 'userDataSection',
+            title: __('profile.userData'),
+            content: [
+                App.createContainer('profile-block__section', [
+                    this.resetDataDescr,
+                    this.resetBtn,
+                ]),
+                App.createContainer('profile-block__section', [
+                    this.deleteProfileDescr,
+                    this.delProfileBtn.elem,
+                ]),
+            ],
+        });
     }
 
     onActionClick(e) {

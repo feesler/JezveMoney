@@ -327,6 +327,20 @@ class UserModel extends CachedTable
     }
 
     /**
+     * Returns login of currently logged in user or null if no user logged in
+     *
+     * @return string|null
+     */
+    public function getLogin()
+    {
+        if (!$this->currentUser) {
+            return null;
+        }
+
+        return $this->currentUser->login;
+    }
+
+    /**
      * Returns id of owner person of currently logged in user or 0 if no user logged in
      *
      * @return int

@@ -131,6 +131,14 @@ export class Application {
         return this.config.decimalFormatOptions;
     }
 
+    get userLogin() {
+        return this.model.profile?.login;
+    }
+
+    get userName() {
+        return this.model.profile?.name;
+    }
+
     isUserLoggedIn() {
         return !!this.model.profile?.user_id;
     }

@@ -24,12 +24,12 @@ import { DateFormatSelect } from '../../Components/Form/Inputs/Date/DateFormatSe
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { NumberFormatSelect } from '../../Components/Form/Inputs/NumberFormatSelect/NumberFormatSelect.js';
+import { Section } from '../../Components/Layout/Section/Section.js';
 
 // Local components
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
-import { SettingsSection } from './components/Section/SettingsSection.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import '../../Application/Application.scss';
@@ -134,7 +134,7 @@ class SettingsView extends AppView {
             className: 'form-row',
         });
 
-        this.mainSection = SettingsSection.create({
+        this.mainSection = Section.create({
             id: 'mainSection',
             title: __('settings.main'),
             content: [
@@ -192,7 +192,7 @@ class SettingsView extends AppView {
         // Loading indicator
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
 
-        this.userCurrenciesSection = SettingsSection.create({
+        this.userCurrenciesSection = Section.create({
             id: 'userCurrencies',
             title: __('settings.currencies.title'),
             actions: [
@@ -223,7 +223,7 @@ class SettingsView extends AppView {
             onItemSelect: (sel) => this.onDateFormatSelect(sel),
         });
 
-        this.dateFormatSection = SettingsSection.create({
+        this.dateFormatSection = Section.create({
             id: 'dateFormat',
             title: __('settings.dateFormat'),
             content: this.dateFormatSelect.elem,
@@ -234,7 +234,7 @@ class SettingsView extends AppView {
             onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
         });
 
-        this.numberFormatSection = SettingsSection.create({
+        this.numberFormatSection = Section.create({
             id: 'numberFormat',
             title: __('settings.numberFormat'),
             content: this.decimalFormatSelect.elem,
