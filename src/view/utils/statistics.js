@@ -1,8 +1,10 @@
 import { asArray } from 'jezvejs';
-import { App } from '../../Application/App.js';
-import { normalize } from '../../utils/decimal.js';
-import { __ } from '../../utils/utils.js';
-import { Transaction } from '../../Models/Transaction.js';
+
+import { App } from '../Application/App.js';
+import { normalize } from './decimal.js';
+import { __ } from './utils.js';
+
+import { Transaction } from '../Models/Transaction.js';
 
 /**
  * Returns formatted currency value
@@ -36,7 +38,7 @@ export const formatPercent = (value) => (
  * @returns {string}
  */
 export const formatDateLabel = (value, state) => {
-    const { group } = state.form;
+    const { group } = (state.form ?? state.filter);
 
     if (group === 'day' || group === 'week') {
         return App.formatDate(value);

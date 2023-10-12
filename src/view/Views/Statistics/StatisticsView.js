@@ -21,6 +21,12 @@ import {
     formatNumberShort,
     getApplicationURL,
 } from '../../utils/utils.js';
+import {
+    formatDateLabel,
+    formatValue,
+    getDataCategoryName,
+    isStackedData,
+} from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -42,12 +48,6 @@ import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/Loadi
 import { PieChartGroup } from './components/PieChartGroup/PieChartGroup.js';
 import { StatisticsFilters } from './components/Filters/StatisticsFilters.js';
 
-import {
-    formatDateLabel,
-    formatValue,
-    getDataCategoryName,
-    isStackedData,
-} from './helpers.js';
 import { isSameSelection, actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './StatisticsView.scss';

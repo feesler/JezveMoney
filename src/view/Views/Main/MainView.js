@@ -23,6 +23,11 @@ import {
     __,
     getApplicationURL,
 } from '../../utils/utils.js';
+import {
+    formatDateLabel,
+    formatValue,
+    isStackedData,
+} from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -91,9 +96,7 @@ class MainView extends AppView {
                 type: 0,
             },
             statistics: {
-                chartData: this.props.chartData,
-                chartCurrency: this.props.chartCurrency,
-                request: { ...this.props.chartRequest },
+                ...this.props.statistics,
             },
             loading: true,
             showContextMenu: false,
@@ -287,8 +290,9 @@ class MainView extends AppView {
         }
 
         this.histogram = Histogram.create({
-            data: this.props.chartData,
+            data: this.props.statistics.chartData,
             height: 200,
+            fitToWidth: true,
             showPopupOnHover: true,
             showPopupOnClick: true,
             animatePopup: true,
@@ -657,50 +661,18 @@ class MainView extends AppView {
         }));
     }
 
-    renderDateLabel(value) {
-        const state = this.store.getState();
-        const { group } = state.statistics?.request;
-
-        if (group === 'day' || group === 'week') {
-            return App.formatDate(value);
-        }
-
-        if (group === 'month') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric', month: '2-digit' },
-            });
-        }
-
-        if (group === 'year') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric' },
-            });
-        }
-
-        return null;
-    }
-
-    formatValue(value) {
-        const state = this.store.getState();
-        return App.model.currency.formatCurrency(
-            value,
-            state.statistics.chartCurrency,
-        );
-    }
-
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
+        const { statistics } = this.store.getState();
         return ChartPopup.fromTarget(target, {
-            formatValue: (value) => this.formatValue(value),
-            renderDateLabel: (value) => this.renderDateLabel(value),
+            formatValue: (value) => formatValue(value, statistics),
+            renderDateLabel: (value) => formatDateLabel(value, statistics),
         });
     }
 
     /** Renders statistics widget */
     renderStatisticsWidget(state, prevState) {
-        const { chartData } = state.statistics;
+        const { chartData, filter } = state.statistics;
         if (
             !this.isTransactionsAvailable
             || chartData === prevState?.statistics?.chartData
@@ -718,6 +690,7 @@ class MainView extends AppView {
         const data = (noData)
             ? { values: [], series: [] }
             : chartData;
+        data.stacked = isStackedData(filter);
 
         this.histogram?.setData(data);
     }

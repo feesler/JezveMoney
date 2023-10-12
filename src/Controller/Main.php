@@ -11,6 +11,8 @@ use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\Core\Application;
 
+const DEFAULT_CHART_LIMIT = 5;
+
 /**
  * Main controller
  */
@@ -31,68 +33,54 @@ class Main extends TemplateController
         $transMod = TransactionModel::getInstance();
         $currMod = CurrencyModel::getInstance();
         $catModel = CategoryModel::getInstance();
-
-        // Prepare data of transaction list items
-        $transactions = $transMod->getData(["desc" => true, "onPage" => 5]);
-        $data["transactionsCount"] = count($transactions);
-
-        // Find most frequent currency of latest transactions
-        $currencies = [];
-        foreach ($transactions as $item) {
-            if (!isset($currencies[$item->src_curr])) {
-                $currencies[$item->src_curr] = 0;
-            }
-            $currencies[$item->src_curr]++;
-
-            if (!isset($currencies[$item->dest_curr])) {
-                $currencies[$item->dest_curr] = 0;
-            }
-            $currencies[$item->dest_curr]++;
-        }
-        $currencyId = 0;
-        foreach ($currencies as $curr_id => $value) {
-            if (!$currencyId || $value > $currencies[$currencyId]) {
-                $currencyId = $curr_id;
-            }
-        }
-
-        if (!$currencyId) {
-            $currencyId = $currMod->getIdByPos(0);
-        }
-        if (!$currencyId) {
-            throw new \Error("No currencies found");
-        }
-
-        $chartRequest = [
-            "report" => "currency",
-            "curr_id" => $currencyId,
-            "type" => EXPENSE,
-            "group" => GROUP_BY_WEEK,
-            "limit" => 5,
-        ];
-        $chartFilter = (object)$chartRequest;
-        $chartFilter->group = TransactionModel::getHistogramGroupName($chartFilter->group);
-
         $iconModel = IconModel::getInstance();
 
-        $accounts = $accMod->getData(["visibility" => "all", "owner" => "all"]);
-        $persons = $this->personMod->getData(["visibility" => "all"]);
-        $data["accountsCount"] = count($accounts);
-        $data["personsCount"] = count($persons);
+        // Statistics widget
+        $chartFilter = $transMod->getHistogramFilters([]);
+        wlog("chartFilter: ", $chartFilter);
+
+        $chartParams = (array)$chartFilter;
+        $chartParams["limit"] = DEFAULT_CHART_LIMIT;
+
+        if (isset($chartFilter->group)) {
+            $groupType = TransactionModel::getHistogramGroupTypeByName($chartFilter->group);
+            wlog("  groupType: ", $groupType);
+            if ($groupType !== false) {
+                $chartParams["group"] = $groupType;
+            }
+        }
+
+        if ($chartFilter->report === "currency") {
+            $accCurr = $chartFilter->curr_id;
+        } else {
+            $accounts = $chartFilter->accounts ?? null;
+            $account = (is_array($accounts) && count($accounts) > 0)
+                ? $accMod->getItem($accounts[0])
+                : null;
+
+            $accCurr = ($account) ? $account->curr_id : $currMod->getIdByPos(0);
+            if (!$accCurr) {
+                throw new \Error(__("currencies.errors.noCurrencies"));
+            }
+        }
+
+        wlog("chartParams: ", $chartParams);
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $accounts,
-            "persons" => $persons,
+            "accounts" => $accMod->getData(["visibility" => "all", "owner" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $catModel->getData(),
             "currency" => $currMod->getData(),
             "icons" => $iconModel->getData(),
             "view" => [
-                "transactions" => $transactions,
-                "chartData" => $transMod->getHistogramSeries($chartRequest),
-                "chartCurrency" => $currencyId,
-                "chartRequest" => $chartFilter,
-            ]
+                "transactions" => $transMod->getData(["desc" => true, "onPage" => 5]),
+                "statistics" => [
+                    "chartData" => $transMod->getHistogramSeries($chartParams),
+                    "chartCurrency" => $accCurr,
+                    "filter" => $chartFilter,
+                ],
+            ],
         ];
 
         $this->initResources("MainView");

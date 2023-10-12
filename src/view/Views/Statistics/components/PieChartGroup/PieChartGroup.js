@@ -7,13 +7,14 @@ import {
 import { PieChart } from 'jezvejs/PieChart';
 
 import { __ } from '../../../../utils/utils.js';
-import { Transaction } from '../../../../Models/Transaction.js';
 import {
     formatDateLabel,
     formatPercent,
     formatValue,
     getDataCategoryName,
-} from '../../helpers.js';
+} from '../../../../utils/statistics.js';
+
+import { Transaction } from '../../../../Models/Transaction.js';
 
 import './PieChartGroup.scss';
 
