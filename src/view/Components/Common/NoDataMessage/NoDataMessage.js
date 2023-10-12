@@ -39,6 +39,14 @@ export class NoDataMessage extends Component {
         this.setUserProps();
     }
 
+    setTitle(title) {
+        if (this.state.title === title) {
+            return;
+        }
+
+        this.setState({ ...this.state, title });
+    }
+
     render(state) {
         if (!state) {
             throw new Error('Invalid state');

@@ -42,6 +42,7 @@ import {
 
 import { AccountTile } from '../../Common/AccountTile/AccountTile.js';
 import { Field } from '../../Common/Field/Field.js';
+import { NoDataMessage } from '../../Common/NoDataMessage/NoDataMessage.js';
 import { Tile } from '../../Common/Tile/Tile.js';
 
 import { CategorySelect } from '../../Category/CategorySelect/CategorySelect.js';
@@ -255,11 +256,9 @@ export class TransactionForm extends Component {
         const isTransaction = this.props.type === 'transaction';
 
         // Not available message
-        this.notAvailMsg = createElement('span', {
-            props: {
-                id: 'notAvailMsg',
-                className: 'nodata-message',
-            },
+        this.notAvailMsg = NoDataMessage.create({
+            id: 'notAvailMsg',
+            className: 'form-row',
         });
 
         // Transaction type menu
@@ -490,7 +489,11 @@ export class TransactionForm extends Component {
         children.push(this.categoryField.elem, this.commentField.elem);
 
         // Schedule fields
-        if (isTransaction && App.model.schedule?.length > 0) {
+        if (
+            isTransaction
+            && this.props.isAvailable
+            && App.model.schedule?.length > 0
+        ) {
             this.createReminderField();
             children.push(this.reminderField.elem);
         }
@@ -516,7 +519,7 @@ export class TransactionForm extends Component {
 
         children.push(
             this.submitControls.elem,
-            this.notAvailMsg,
+            this.notAvailMsg.elem,
             ...Object.values(hiddenInputs),
         );
 
@@ -1835,6 +1838,7 @@ export class TransactionForm extends Component {
     renderReminder(state, prevState) {
         if (
             this.props.type !== 'transaction'
+            || !state.isAvailable
             || !(App.model.schedule?.length > 0)
         ) {
             this.reminderField?.elem?.remove();
@@ -1888,9 +1892,9 @@ export class TransactionForm extends Component {
                 message = __('transactions.debtNoPersons');
             }
 
-            this.notAvailMsg.textContent = message;
+            this.notAvailMsg.setTitle(message);
         }
-        show(this.notAvailMsg, !state.isAvailable);
+        this.notAvailMsg.show(!state.isAvailable);
 
         if (state.isUpdate) {
             this.idInp.value = transaction.id;
