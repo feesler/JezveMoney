@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\App\Model\CategoryModel;
+use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
@@ -30,16 +31,47 @@ class Categories extends ListViewController
         $data = [
             "titleString" => __("appName") . " | " . __("categories.listTitle"),
         ];
+
+        $trType = $this->getRequestedType($_GET, EXPENSE);
+
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "categories" => $this->model->getData(),
             "view" => [
                 "detailsId" => $this->getRequestedItem(),
+                "selectedType" => $trType,
             ],
         ];
 
         $this->initResources("CategoryListView");
         $this->render($data);
+    }
+
+    /**
+     * Returns transaction type from request
+     *
+     * @param array $request request data
+     * @param int $default default transaction type
+     *
+     * @return int
+     */
+    protected function getRequestedType(array $request, int $default)
+    {
+        if (!is_array($request) || !isset($request["type"])) {
+            return $default;
+        }
+        $res = intval($request["type"]);
+        if (!$res) {
+            if (strtolower($request["type"]) === "any") {
+                return 0;
+            }
+            $res = TransactionModel::stringToType($request["type"]);
+        }
+        if (!$res) {
+            $this->fail(__("transactions.errors.invalidType"));
+        }
+
+        return $res;
     }
 
     /**

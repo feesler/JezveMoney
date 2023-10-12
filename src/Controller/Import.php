@@ -8,7 +8,6 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
-use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\App\Model\ScheduledTransactionModel;
@@ -19,28 +18,15 @@ use JezveMoney\App\Model\UserCurrencyModel;
  */
 class Import extends TemplateController
 {
-    protected $templateModel = null;
-    protected $ruleModel = null;
-    protected $actionModel = null;
-    protected $catModel = null;
-
-    /**
-     * Controller initialization
-     */
-    protected function onStart()
-    {
-        $this->templateModel = ImportTemplateModel::getInstance();
-        $this->ruleModel = ImportRuleModel::getInstance();
-        $this->actionModel = ImportActionModel::getInstance();
-        $this->catModel = CategoryModel::getInstance();
-    }
-
     /**
      * /import/ route handler
      * Renders import view
      */
     public function index()
     {
+        $templateModel = ImportTemplateModel::getInstance();
+        $ruleModel = ImportRuleModel::getInstance();
+        $catModel = CategoryModel::getInstance();
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
         $userCurrModel = UserCurrencyModel::getInstance();
@@ -49,18 +35,9 @@ class Import extends TemplateController
 
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
 
-        $userAccounts = $accMod->getUserAccounts();
-        $importAvailable = count($userAccounts) > 0;
-
         $data = [
             "titleString" => __("appName") . " | " . __("import.listTitle"),
-            "importAvailable" => $importAvailable,
-            "importNotAvailableMessage" => __("import.noAccountsMessage"),
         ];
-
-        if (!$importAvailable) {
-            $data["uploadBtn"]["attributes"] = ["disabled" => ""];
-        }
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -68,12 +45,12 @@ class Import extends TemplateController
             "currency" => $currMod->getData(),
             "userCurrencies" => $userCurrModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
-            "categories" => $this->catModel->getData(),
+            "categories" => $catModel->getData(),
             "schedule" => $scheduleModel->getData(),
             "reminders" => $reminderModel->getData(),
-            "rules" => $this->ruleModel->getData(["extended" => true]),
-            "templates" => $this->templateModel->getData(),
-            "tplColumnTypes" => $this->templateModel->getColumnTypes(),
+            "rules" => $ruleModel->getData(["extended" => true]),
+            "templates" => $templateModel->getData(),
+            "tplColumnTypes" => $templateModel->getColumnTypes(),
         ];
 
         $this->initResources("ImportView");

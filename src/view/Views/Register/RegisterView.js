@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { createElement } from 'jezvejs';
 import { createStore } from 'jezvejs/Store';
 
-import { __ } from '../../utils/utils.js';
+import { __, getApplicationURL } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
@@ -86,10 +86,14 @@ class RegisterView extends AppView {
 
         // Form controls
         this.controls = FormControls.create({
-            submitTitle: __('actions.submit'),
-            cancelTitle: __('actions.cancel'),
-            cancelBtnClass: 'alter-link',
-            cancelURL: `${App.baseURL}login/`,
+            submitBtn: {
+                title: __('actions.submit'),
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                url: getApplicationURL('login/'),
+                className: 'alter-link',
+            },
         });
 
         // Registration form

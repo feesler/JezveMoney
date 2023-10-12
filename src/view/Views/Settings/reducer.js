@@ -17,7 +17,7 @@ const reduceDeselectAll = (state) => ({
 
 const slice = createSlice({
     changeTab: (state, action) => (
-        (state.action === action) ? state : { ...state, action }
+        (state.action === action) ? state : { ...state, action, showMenu: false }
     ),
 
     showMenu: (state) => (

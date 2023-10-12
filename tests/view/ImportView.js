@@ -58,38 +58,37 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            submitBtn: { elem: await query('#submitBtn') },
+            notAvailMsg: { elem: await query('#notAvailMsg') },
         };
 
-        Object.keys(res).forEach((child) => (
-            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
-        ));
-
-        res.notAvailMsg = { elem: await query('#notAvailMsg') };
         const importEnabled = !res.notAvailMsg.elem;
-
-        // Heading
-        [
-            res.submitBtn.disabled,
-        ] = await evaluate((submitBtn) => ([
-            submitBtn.disabled,
-        ]), res.submitBtn.elem);
-
-        res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
-
-        // List menu
-        res.menuBtn = { elem: await query('.heading-actions .menu-btn') };
-
-        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
-
         if (!importEnabled) {
             return res;
         }
 
+        // Heading
+        res.submitBtn = { elem: await query('#submitBtn') };
+        [
+            res.submitBtn.disabled,
+        ] = await evaluate((submitBtn) => ([
+            submitBtn?.disabled,
+        ]), res.submitBtn.elem);
+
+        // 'Done' button
+        res.listModeBtn = await Button.create(this, await query('#listModeBtn'));
+
+        // Main menu button
+        res.menuBtn = { elem: await query('.heading-actions .menu-btn') };
+
+        // Main menu
+        res.listMenu = await PopupMenu.create(this, await query(listMenuSelector));
+
+        // Upload button
         res.uploadBtn = await Button.create(this, await query('#uploadBtn'));
 
         // Main account select
-        res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
+        const mainAccountSelectEl = await query('#mainAccountField .dd__container');
+        res.mainAccountSelect = await DropDown.create(this, mainAccountSelectEl);
         assert(res.mainAccountSelect, 'Invalid structure of import view');
         const mainAccountId = res.mainAccountSelect.value;
 
@@ -211,24 +210,21 @@ export class ImportView extends AppView {
     }
 
     getExpectedState(model = this.model, state = App.state) {
-        const listMode = model.listMode === 'list';
-        const selectMode = model.listMode === 'select';
-        const showMenuItems = model.enabled && model.listMenuVisible;
-        const showListItems = showMenuItems && listMode;
-        const showSelectItems = showMenuItems && selectMode;
-        const hasItems = this.items.length > 0;
-
         const res = {
             header: this.getHeaderExpectedState(state),
             notAvailMsg: { visible: !model.enabled },
-            menuBtn: { visible: model.enabled },
-            submitBtn: { visible: model.enabled },
         };
 
         if (!model.enabled) {
             return res;
         }
 
+        const listMode = model.listMode === 'list';
+        const selectMode = model.listMode === 'select';
+        const showMenuItems = model.enabled && model.listMenuVisible;
+        const showListItems = showMenuItems && listMode;
+        const showSelectItems = showMenuItems && selectMode;
+        const hasItems = this.items.length > 0;
         const enabledItems = this.getEnabledItems();
         const selectedItems = (selectMode) ? this.getSelectedItems() : [];
         const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
@@ -236,8 +232,13 @@ export class ImportView extends AppView {
 
         const pageNum = this.currentPage(model);
 
+        res.submitBtn = {
+            visible: true,
+            disabled: !(listMode && hasItems && enabledItems.length > 0),
+        };
         res.uploadBtn = { visible: listMode };
         res.listModeBtn = { visible: !listMode };
+        res.menuBtn = { visible: true };
 
         // Counters
         res.totalCounter = {
@@ -271,8 +272,6 @@ export class ImportView extends AppView {
             res.itemsList.paginator.pages = model.pagination.pages;
             res.itemsList.paginator.active = pageNum;
         }
-
-        res.submitBtn.disabled = !(listMode && hasItems && enabledItems.length > 0);
 
         // Main menu
         if (model.listMenuVisible) {

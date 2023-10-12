@@ -16,8 +16,6 @@
 }
 
 .logo.login-logo {
-  --btn-content-padding: 0 0 0 12px;
-
   cursor: auto;
 }
 
@@ -63,7 +61,9 @@
   }
 
   .login-logo {
-    padding: 24px 48px;
+    --btn-padding: 0 48px;
+
+    margin-bottom: 5rem;
   }
 
   .form-container {

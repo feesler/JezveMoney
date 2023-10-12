@@ -19,7 +19,7 @@ export class ProfileView extends AppView {
     async parseContent() {
         const res = {};
 
-        const blocks = await queryAll('main .profile-block');
+        const blocks = await queryAll('main .settings-block');
         assert(blocks.length === 4, 'Invalid profile view structure');
 
         res.loginElem = await query(blocks[0], 'span');

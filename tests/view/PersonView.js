@@ -1,9 +1,9 @@
 import {
     assert,
     query,
-    prop,
     navigation,
     click,
+    evaluate,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -14,29 +14,33 @@ import { App } from '../Application.js';
 /** Create or update person test view */
 export class PersonView extends AppView {
     async parseContent() {
-        const res = {};
+        const res = await evaluate(() => {
+            const headingEl = document.querySelector('.heading > h1');
+            const idInp = document.getElementById('pid');
+            const flagsInp = document.getElementById('flags');
 
-        res.headingElem = await query('.heading > h1');
-        assert(res.headingElem, 'Heading element not found');
-        res.heading = await prop(res.headingElem, 'textContent');
+            return {
+                heading: {
+                    visible: !!headingEl && !headingEl.hidden,
+                    text: headingEl?.textContent,
+                },
+                isUpdate: !!idInp,
+                id: (idInp) ? parseInt(idInp.value, 10) : undefined,
+                flags: parseInt(flagsInp.value, 10),
+            };
+        });
+
+        if (res.isUpdate) {
+            assert(res.id, 'Invalid person id');
+        }
 
         res.formElem = await query('form');
         assert(res.formElem, 'Form element not found');
-
-        const personIdInp = await query('#pid');
-        res.isUpdate = !!personIdInp;
-        if (res.isUpdate) {
-            res.id = parseInt(await prop(personIdInp, 'value'), 10);
-            assert(res.id, 'Wrong account id');
-        }
 
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
 
         res.name = await InputField.create(this, await query('#nameField'));
         assert(res.name, 'Person name input not found');
-
-        res.flagsInp = await query('#flags');
-        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
         res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');

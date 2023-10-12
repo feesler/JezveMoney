@@ -1,18 +1,18 @@
 import 'jezvejs/style';
 import {
-    ge,
     show,
     asArray,
     createElement,
     removeChilds,
     isFunction,
 } from 'jezvejs';
-import 'jezvejs/style/Button';
+import { Button } from 'jezvejs/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
+// Application
 import { API } from '../../API/index.js';
 import { normalize } from '../../utils/decimal.js';
 import {
@@ -21,26 +21,38 @@ import {
     getCurrencyPrecision,
     listData,
     __,
+    getApplicationURL,
 } from '../../utils/utils.js';
-import { SetCategoryDialog } from '../../Components/Category/SetCategoryDialog/SetCategoryDialog.js';
+import {
+    formatDateLabel,
+    formatValue,
+    isStackedData,
+} from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
+// Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { IconList } from '../../Models/IconList.js';
 
+// Common components
+import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
 import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import { Tile } from '../../Components/Common/Tile/Tile.js';
-import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
-import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
+import { SetCategoryDialog } from '../../Components/Category/SetCategoryDialog/SetCategoryDialog.js';
 import { TransactionList } from '../../Components/Transaction/TransactionList/TransactionList.js';
 import { TransactionListContextMenu } from '../../Components/Transaction/TransactionListContextMenu/TransactionListContextMenu.js';
+
+// Local components
+import { Widget } from './components/Widget/Widget.js';
+import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
 
 import { reducer, actions } from './reducer.js';
 import './MainView.scss';
@@ -84,9 +96,7 @@ class MainView extends AppView {
                 type: 0,
             },
             statistics: {
-                chartData: this.props.chartData,
-                chartCurrency: this.props.chartCurrency,
-                request: { ...this.props.chartRequest },
+                ...this.props.statistics,
             },
             loading: true,
             showContextMenu: false,
@@ -101,12 +111,10 @@ class MainView extends AppView {
      * View initialization
      */
     onStart() {
-        const { baseURL } = App;
         const state = this.store.getState();
 
         this.loadElementsByIds([
             'contentContainer',
-            'summaryWidget',
         ]);
 
         // Loading indicator
@@ -114,14 +122,31 @@ class MainView extends AppView {
         this.contentContainer.append(this.loadingIndicator.elem);
         this.loadingIndicator.show(state.loading);
 
-        // Summary widget
+        this.createSummaryWidget();
+        this.createTotalsWidget();
+        this.createTransactionsWidget();
+        this.createStatisticsWidget();
+
+        this.subscribeToStore(this.store);
+        this.stopLoading();
+    }
+
+    get isTransactionsAvailable() {
+        return (
+            App.model.userAccounts.length > 0
+            || App.model.persons.length > 0
+        );
+    }
+
+    createSummaryWidget() {
+        const state = this.store.getState();
 
         // Accounts tab
         const accountsProps = {
             ItemComponent: AccountTile,
             getItemProps: (account, { listMode }) => ({
                 type: 'link',
-                link: `${baseURL}transactions/create/?acc_id=${account.id}`,
+                link: getApplicationURL(`transactions/create/?acc_id=${account.id}`),
                 account,
                 selected: account.selected ?? false,
                 selectMode: listMode === 'select',
@@ -132,7 +157,7 @@ class MainView extends AppView {
             PlaceholderComponent: NoDataGroup,
             getPlaceholderProps: () => ({
                 title: __('main.noAccounts'),
-                url: `${App.baseURL}accounts/create/`,
+                url: getApplicationURL('accounts/create/'),
             }),
         };
 
@@ -156,7 +181,7 @@ class MainView extends AppView {
             getItemProps: (person, { listMode }) => ({
                 id: person.id,
                 type: 'link',
-                link: `${baseURL}transactions/create/?type=debt&person_id=${person.id}`,
+                link: getApplicationURL(`transactions/create/?type=debt&person_id=${person.id}`),
                 title: person.name,
                 subtitle: formatPersonDebts(person),
                 selected: person.selected,
@@ -168,7 +193,7 @@ class MainView extends AppView {
             PlaceholderComponent: NoDataGroup,
             getPlaceholderProps: () => ({
                 title: __('persons.noData'),
-                url: `${App.baseURL}persons/create/`,
+                url: getApplicationURL('persons/create/'),
             }),
         };
 
@@ -194,7 +219,7 @@ class MainView extends AppView {
                 content: [
                     this.visibleAccounts.elem,
                     this.hiddenAccounts.elem,
-                    this.toggleAccountsBtn,
+                    this.toggleAccountsBtn.elem,
                 ],
             }, {
                 id: 'persons',
@@ -203,78 +228,113 @@ class MainView extends AppView {
                 content: [
                     this.visiblePersons.elem,
                     this.hiddenPersons.elem,
-                    this.togglePersonsBtn,
+                    this.togglePersonsBtn.elem,
                 ],
             }],
         });
 
-        this.summaryWidget.append(this.summaryTabs.elem);
+        this.summaryWidget = Widget.create({
+            id: 'summaryWidget',
+            className: 'summary-widget',
+            content: this.summaryTabs.elem,
+        });
 
-        // Totals widget
-        this.totalWidget = ge('totalWidget');
-        if (this.totalWidget) {
-            this.totalList = createElement('ul', {
-                props: { className: 'total-list' },
-            });
-            this.totalWidget.append(this.totalList);
+        this.contentContainer.append(this.summaryWidget.elem);
+    }
+
+    createTotalsWidget() {
+        if (App.model.userAccounts.length === 0) {
+            return;
         }
 
-        // Latest transactions widget
-        this.transactionsWidget = ge('transactionsWidget');
-        if (this.transactionsWidget) {
-            this.latestList = TransactionList.create({
-                items: this.props.transactions,
-                listMode: 'list',
-                showControls: true,
-                getPlaceholderProps: () => ({ title: __('main.noTransactions') }),
-                onItemClick: (id, e) => this.onTransactionClick(id, e),
-            });
-            this.transactionsWidget.append(this.latestList.elem);
+        this.totalList = createElement('ul', {
+            props: { className: 'total-list' },
+        });
+
+        this.totalWidget = Widget.create({
+            id: 'totalWidget',
+            className: 'total-widget',
+            header: __('main.total'),
+            content: this.totalList,
+        });
+        this.contentContainer.append(this.totalWidget.elem);
+    }
+
+    createTransactionsWidget() {
+        if (!this.isTransactionsAvailable) {
+            return;
         }
 
-        // Statistics widget
-        const chart = ge('chart');
-        if (chart) {
-            this.histogram = Histogram.create({
-                data: this.props.chartData,
-                height: 200,
-                showPopupOnHover: true,
-                showPopupOnClick: true,
-                animatePopup: true,
-                activateOnClick: true,
-                activateOnHover: true,
-                renderPopup: (target) => this.renderPopupContent(target),
-                renderXAxisLabel: (value) => App.formatDate(value),
-                renderYAxisLabel: (value) => formatNumberShort(value),
-            });
+        this.latestList = TransactionList.create({
+            items: this.props.transactions,
+            listMode: 'list',
+            showControls: true,
+            getPlaceholderProps: () => ({ title: __('main.noTransactions') }),
+            onItemClick: (id, e) => this.onTransactionClick(id, e),
+        });
 
-            this.statNoDataMessage = createElement('span', {
-                props: {
-                    className: 'nodata-message',
-                    textContent: __('statistics.noData'),
-                },
-            });
+        this.transactionsWidget = Widget.create({
+            id: 'transactionsWidget',
+            className: 'transactions-widget',
+            header: __('transactions.listTitle'),
+            headerLink: 'transactions/',
+            content: this.latestList.elem,
+        });
 
-            chart.append(this.statNoDataMessage, this.histogram.elem);
+        this.contentContainer.append(this.transactionsWidget.elem);
+    }
+
+    createStatisticsWidget() {
+        if (!this.isTransactionsAvailable) {
+            return;
         }
 
-        this.subscribeToStore(this.store);
-        this.stopLoading();
+        this.histogram = Histogram.create({
+            data: this.props.statistics.chartData,
+            height: 200,
+            fitToWidth: true,
+            showPopupOnHover: true,
+            showPopupOnClick: true,
+            animatePopup: true,
+            activateOnClick: true,
+            activateOnHover: true,
+            renderPopup: (target) => this.renderPopupContent(target),
+            renderXAxisLabel: (value) => App.formatDate(value),
+            renderYAxisLabel: (value) => formatNumberShort(value),
+        });
+
+        this.statNoDataMessage = NoDataMessage.create({
+            title: __('statistics.noData'),
+        });
+
+        const chart = createElement('div', {
+            props: {
+                id: 'chart',
+                className: 'widget_charts',
+            },
+            children: [
+                this.statNoDataMessage.elem,
+                this.histogram.elem,
+            ],
+        });
+
+        this.statisticsWidget = Widget.create({
+            id: 'statisticsWidget',
+            className: 'statistics-widget',
+            header: __('statistics.title'),
+            headerLink: 'statistics/',
+            content: chart,
+        });
+
+        this.contentContainer.append(this.statisticsWidget.elem);
     }
 
     createToggleShowAllButton(props = {}) {
-        const events = {};
-        if (isFunction(props?.onClick)) {
-            events.click = props.onClick;
-        }
-
-        return createElement('button', {
-            props: {
-                className: 'btn link-btn',
-                type: 'button',
-                textContent: __('actions.showAll'),
-            },
-            events,
+        return Button.create({
+            className: 'link-btn',
+            type: 'button',
+            title: __('actions.showAll'),
+            ...props,
         });
     }
 
@@ -441,8 +501,14 @@ class MainView extends AppView {
         });
     }
 
-    /** Renders accounts widget */
-    renderAccountsWidget(state, prevState) {
+    /** Renders summary widget */
+    renderSummaryWidget(state, prevState) {
+        this.renderAccountsTab(state, prevState);
+        this.renderPersonsTab(state, prevState);
+    }
+
+    /** Renders accounts tab at summary widget */
+    renderAccountsTab(state, prevState) {
         if (
             state.accounts.visible === prevState?.accounts?.visible
             && state.accounts.hidden === prevState?.accounts?.hidden
@@ -460,10 +526,12 @@ class MainView extends AppView {
 
         const hiddenAvailable = state.accounts.hidden.length > 0;
 
-        show(this.toggleAccountsBtn, hiddenAvailable);
-        this.toggleAccountsBtn.textContent = (state.accounts.showHidden)
-            ? __('actions.showVisible')
-            : __('actions.showAll');
+        this.toggleAccountsBtn.show(hiddenAvailable);
+        this.toggleAccountsBtn.setTitle(
+            (state.accounts.showHidden)
+                ? __('actions.showVisible')
+                : __('actions.showAll'),
+        );
 
         this.hiddenAccounts.setState((listState) => ({
             ...listState,
@@ -471,6 +539,40 @@ class MainView extends AppView {
             renderTime: state.renderTime,
         }));
         this.hiddenAccounts.show(hiddenAvailable && state.accounts.showHidden);
+    }
+
+    /** Renders persons widget */
+    renderPersonsTab(state, prevState) {
+        if (
+            state.persons.visible === prevState?.persons?.visible
+            && state.persons.hidden === prevState?.persons?.hidden
+            && state.persons.showHidden === prevState?.persons?.showHidden
+            && state.renderTime === prevState?.renderTime
+        ) {
+            return;
+        }
+
+        this.visiblePersons.setState((listState) => ({
+            ...listState,
+            items: listData(state.persons.visible),
+            renderTime: state.renderTime,
+        }));
+
+        const hiddenAvailable = state.persons.hidden.length > 0;
+
+        this.togglePersonsBtn.show(hiddenAvailable);
+        this.togglePersonsBtn.setTitle(
+            (state.persons.showHidden)
+                ? __('actions.showVisible')
+                : __('actions.showAll'),
+        );
+
+        this.hiddenPersons.setState((listState) => ({
+            ...listState,
+            items: listData(state.persons.hidden),
+            renderTime: state.renderTime,
+        }));
+        this.hiddenPersons.show(hiddenAvailable && state.persons.showHidden);
     }
 
     /** Renders list item of totals widget */
@@ -489,7 +591,7 @@ class MainView extends AppView {
         const { userAccounts } = App.model;
         const noAccounts = userAccounts.length === 0;
 
-        show(this.totalWidget, !noAccounts);
+        this.totalWidget?.show(!noAccounts);
         if (noAccounts) {
             return;
         }
@@ -511,38 +613,6 @@ class MainView extends AppView {
         const elems = Object.values(totals).map((item) => this.renderTotalsListItem(item));
         removeChilds(this.totalList);
         this.totalList.append(...elems);
-    }
-
-    /** Renders persons widget */
-    renderPersonsWidget(state, prevState) {
-        if (
-            state.persons.visible === prevState?.persons?.visible
-            && state.persons.hidden === prevState?.persons?.hidden
-            && state.persons.showHidden === prevState?.persons?.showHidden
-            && state.renderTime === prevState?.renderTime
-        ) {
-            return;
-        }
-
-        this.visiblePersons.setState((listState) => ({
-            ...listState,
-            items: listData(state.persons.visible),
-            renderTime: state.renderTime,
-        }));
-
-        const hiddenAvailable = state.persons.hidden.length > 0;
-
-        show(this.togglePersonsBtn, hiddenAvailable);
-        this.togglePersonsBtn.textContent = (state.persons.showHidden)
-            ? __('actions.showVisible')
-            : __('actions.showAll');
-
-        this.hiddenPersons.setState((listState) => ({
-            ...listState,
-            items: listData(state.persons.hidden),
-            renderTime: state.renderTime,
-        }));
-        this.hiddenPersons.show(hiddenAvailable && state.persons.showHidden);
     }
 
     /** Renders transaction context menu */
@@ -575,7 +645,10 @@ class MainView extends AppView {
 
     /** Renders transactions widget */
     renderTransactionsWidget(state, prevState) {
-        if (state.transactions.length === 0) {
+        if (
+            !this.isTransactionsAvailable
+            || state.transactions.length === 0
+        ) {
             return;
         }
 
@@ -588,51 +661,22 @@ class MainView extends AppView {
         }));
     }
 
-    renderDateLabel(value) {
-        const state = this.store.getState();
-        const { group } = state.statistics?.request;
-
-        if (group === 'day' || group === 'week') {
-            return App.formatDate(value);
-        }
-
-        if (group === 'month') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric', month: '2-digit' },
-            });
-        }
-
-        if (group === 'year') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric' },
-            });
-        }
-
-        return null;
-    }
-
-    formatValue(value) {
-        const state = this.store.getState();
-        return App.model.currency.formatCurrency(
-            value,
-            state.statistics.chartCurrency,
-        );
-    }
-
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
+        const { statistics } = this.store.getState();
         return ChartPopup.fromTarget(target, {
-            formatValue: (value) => this.formatValue(value),
-            renderDateLabel: (value) => this.renderDateLabel(value),
+            formatValue: (value) => formatValue(value, statistics),
+            renderDateLabel: (value) => formatDateLabel(value, statistics),
         });
     }
 
     /** Renders statistics widget */
     renderStatisticsWidget(state, prevState) {
-        const { chartData } = state.statistics;
-        if (chartData === prevState?.statistics?.chartData) {
+        const { chartData, filter } = state.statistics;
+        if (
+            !this.isTransactionsAvailable
+            || chartData === prevState?.statistics?.chartData
+        ) {
             return;
         }
 
@@ -640,12 +684,13 @@ class MainView extends AppView {
         const dataSet = value?.data ?? [];
         const noData = !dataSet.length && !chartData?.series?.length;
 
-        show(this.statNoDataMessage, chartData && noData);
+        this.statNoDataMessage?.show(chartData && noData);
         show(this.histogram?.chartContainer, !noData);
 
         const data = (noData)
             ? { values: [], series: [] }
             : chartData;
+        data.stacked = isStackedData(filter);
 
         this.histogram?.setData(data);
     }
@@ -681,9 +726,8 @@ class MainView extends AppView {
             this.loadingIndicator.show();
         }
 
-        this.renderAccountsWidget(state, prevState);
+        this.renderSummaryWidget(state, prevState);
         this.renderTotalsWidget(state, prevState);
-        this.renderPersonsWidget(state, prevState);
         this.renderTransactionsWidget(state, prevState);
         this.renderStatisticsWidget(state, prevState);
 

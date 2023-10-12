@@ -9,36 +9,7 @@
                         <h1><?= __("settings.title") ?></h1>
                     </header>
 
-                    <main id="tabsContainer">
-                        <section id="mainTab" class="settings-block">
-                            <header id="mainHeading" class="heading">
-                                <h2><?= __("settings.main") ?></h2>
-                            </header>
-                            <div id="mainContainer"></div>
-                        </section>
-
-                        <section id="userCurrenciesTab" class="settings-block">
-                            <header id="userCurrenciesHeading" class="heading">
-                                <h2><?= __("settings.currencies.title") ?></h2>
-                                <div class="heading-actions"></div>
-                            </header>
-                            <div id="userCurrenciesContainer">
-                            </div>
-                        </section>
-
-                        <section id="regionalTab" class="settings-block">
-                            <header id="dateFormatHeading" class="heading">
-                                <h2><?= __("settings.dateFormat") ?></h2>
-                                <div class="heading-actions"></div>
-                            </header>
-                            <div id="dateFormatContainer"></div>
-                            <header id="decimalFormatHeading" class="heading">
-                                <h2><?= __("settings.numberFormat") ?></h2>
-                                <div class="heading-actions"></div>
-                            </header>
-                            <div id="decimalFormatContainer"></div>
-                        </section>
-                    </main>
+                    <main id="tabsContainer"></main>
                 </div>
             </div>
         </div>

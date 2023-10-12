@@ -1,9 +1,9 @@
 import {
     assert,
     query,
-    prop,
     navigation,
     click,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -25,41 +25,46 @@ export class AccountView extends AppView {
     }
 
     async parseContent() {
-        const res = {};
+        const res = await evaluate(() => {
+            const headingEl = document.querySelector('.heading > h1');
+            const idInp = document.getElementById('accid');
+            const flagsInp = document.getElementById('flags');
 
-        res.heading = { elem: await query('.heading > h1') };
-        assert(res.heading.elem, 'Heading element not found');
-        res.heading.text = await prop(res.heading.elem, 'textContent');
+            return {
+                heading: {
+                    visible: !!headingEl && !headingEl.hidden,
+                    text: headingEl?.textContent,
+                },
+                isUpdate: !!idInp,
+                id: (idInp) ? parseInt(idInp.value, 10) : undefined,
+                flags: parseInt(flagsInp.value, 10),
+            };
+        });
+
+        if (res.isUpdate) {
+            assert(res.id, 'Invalid account id');
+        }
+
         res.deleteBtn = await Button.create(this, await query('#deleteBtn'));
         res.tile = await Tile.create(this, await query('#accountTile'));
 
         res.formElem = await query('form');
         assert(res.formElem, 'Form element not found');
 
-        const hiddenEl = await query('#accid');
-        res.isUpdate = (!!hiddenEl);
-        if (res.isUpdate) {
-            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
-            assert(res.id, 'Wrong account id');
-        }
-
-        res.typeDropDown = await DropDown.createFromChild(this, await query('#type'));
+        res.typeDropDown = await DropDown.create(this, await query('#typeField .dd__container'));
 
         res.iconDropDown = await DropDown.create(this, await query('#iconField .icon-select'));
 
         res.name = await InputField.create(this, await query('#nameField'));
         assert(res.name, 'Account name input not found');
 
-        res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
+        res.currDropDown = await DropDown.create(this, await query('#currencyField .dd__container'));
 
         res.balance = await InputField.create(this, await query('#initBalanceField'));
-        assert(res.name, 'Account balance input not found');
+        assert(res.balance, 'Account balance input not found');
 
         res.limit = await InputField.create(this, await query('#initLimitField'));
         assert(res.limit, 'Credit limit field not found');
-
-        res.flagsInp = await query('#flags');
-        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
         res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');

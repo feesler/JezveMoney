@@ -162,9 +162,11 @@ export class ImportTemplateManager extends Component {
         // Controls
         this.controls = FormControls.create({
             id: 'uploadControls',
-            submitId: 'submitUploadedBtn',
-            submitTitle: __('import.convertDone'),
-            onSubmitClick: (e) => this.onSubmit(e),
+            submitBtn: {
+                id: 'submitUploadedBtn',
+                title: __('import.convertDone'),
+                onClick: (e) => this.onSubmit(e),
+            },
             cancelBtn: false,
         });
         this.controls.hide();

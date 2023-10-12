@@ -2,8 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     show,
-    setEvents,
-    enable,
     insertAfter,
     isFunction,
 } from 'jezvejs';
@@ -31,6 +29,8 @@ import { Schedule } from '../../Models/Schedule.js';
 import { ReminderList } from '../../Models/ReminderList.js';
 
 // Common components
+import { Field } from '../../Components/Common/Field/Field.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { ListCounter } from '../../Components/List/ListCounter/ListCounter.js';
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
@@ -128,21 +128,29 @@ class ImportView extends AppView {
      * View initialization
      */
     onStart() {
-        if (App.model.userAccounts.length === 0) {
-            return;
-        }
-
         this.loadElementsByIds([
             'heading',
             'contentHeader',
-            'dataHeaderControls',
-            'submitBtn',
+            'formContainer',
         ]);
+
+        if (App.model.userAccounts.length === 0) {
+            const noDataMsg = NoDataMessage.create({
+                id: 'notAvailMsg',
+                title: __('import.noAccountsMessage'),
+            });
+            this.heading.after(noDataMsg.elem);
+
+            show(this.contentHeader, false);
+            show(this.formContainer, false);
+            return;
+        }
 
         this.heading = Heading.fromElement(this.heading, {
             title: __('import.listTitle'),
         });
 
+        // Upload button
         this.uploadBtn = Button.create({
             id: 'uploadBtn',
             className: 'circle-btn',
@@ -151,10 +159,9 @@ class ImportView extends AppView {
         });
         this.heading.actionsContainer.append(this.uploadBtn.elem);
 
-        setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
-
+        // Main account field
         this.accountDropDown = DropDown.create({
-            elem: 'acc_id',
+            id: 'acc_id',
             enableFilter: true,
             static: true,
             noResultsMessage: __('notFound'),
@@ -162,6 +169,36 @@ class ImportView extends AppView {
             className: 'dd_ellipsis',
         });
         App.initAccountsList(this.accountDropDown);
+
+        this.accountField = Field.create({
+            id: 'mainAccountField',
+            htmlFor: 'acc_id',
+            title: __('import.mainAccount'),
+            className: 'account-field',
+            content: this.accountDropDown.elem,
+        });
+
+        // Submit button
+        this.submitBtn = Button.create({
+            id: 'submitBtn',
+            className: 'submit-btn',
+            title: __('actions.submit'),
+            disabled: true,
+            onClick: () => this.onSubmitClick(),
+        });
+
+        // List header controls
+        const dataHeaderControls = createElement('div', {
+            props: {
+                id: 'dataHeaderControls',
+                className: 'data-header',
+            },
+            children: [
+                this.accountField.elem,
+                this.submitBtn.elem,
+            ],
+        });
+        this.contentHeader.append(dataHeaderControls);
 
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
@@ -208,10 +245,7 @@ class ImportView extends AppView {
             onItemClick: (...args) => this.onItemClick(...args),
             onSort: (...args) => this.onTransPosChanged(...args),
         });
-        const listContainer = document.querySelector('.data-form');
-        listContainer.prepend(this.list.elem);
 
-        const listFooter = document.querySelector('.list-footer');
         // 'Show more' button
         this.showMoreBtn = createElement('button', {
             props: {
@@ -221,27 +255,36 @@ class ImportView extends AppView {
             },
             events: { click: (e) => this.showMore(e) },
         });
-        listFooter.append(this.showMoreBtn);
+
+        // Paginator
+        this.paginator = Paginator.create({
+            arrows: true,
+            onChange: (page) => this.setPage(page),
+        });
+
+        // List footer
+        const listFooter = createElement('button', {
+            props: { className: 'list-footer' },
+            children: [
+                this.showMoreBtn,
+                this.paginator.elem,
+            ],
+        });
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: __('import.submitInProgress') });
         this.submitProgressIndicator = createElement('div');
         this.submitProgress.elem.append(this.submitProgressIndicator);
-        const contentWrapper = document.querySelector('.content_wrap');
-        if (!contentWrapper) {
-            throw new Error('Failed to initialize Import view');
-        }
-        contentWrapper.append(this.submitProgress.elem);
-
-        this.paginator = Paginator.create({
-            arrows: true,
-            onChange: (page) => this.setPage(page),
-        });
-        listFooter.append(this.paginator.elem);
+        this.formContainer.after(this.submitProgress.elem);
 
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
-        listContainer.append(this.loadingInd.elem);
+
+        this.formContainer.append(
+            this.list.elem,
+            listFooter,
+            this.loadingInd.elem,
+        );
 
         this.subscribeToStore(this.store);
         this.setRenderTime();
@@ -901,7 +944,7 @@ class ImportView extends AppView {
         this.accountDropDown.enable(isListMode);
 
         // Submit button
-        enable(this.submitBtn, (enabledList.length > 0 && isListMode));
+        this.submitBtn.enable(enabledList.length > 0 && isListMode);
     }
 
     renderList(state, prevState) {

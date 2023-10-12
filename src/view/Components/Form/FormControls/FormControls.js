@@ -2,6 +2,7 @@ import {
     Component,
     addChilds,
     createElement,
+    isObject,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
@@ -14,18 +15,18 @@ const CANCEL_BTN_CLASS = 'cancel-btn';
 const SPINNER_CLASS = 'request-spinner';
 
 const defaultProps = {
-    id: undefined,
-    submitId: undefined,
-    submitTitle: 'Submit',
-    submitBtnClass: SUBMIT_BTN_CLASS,
-    submitBtnType: 'submit',
-    onSubmitClick: null,
-    cancelBtn: true,
-    cancelTitle: 'Cancel',
-    cancelURL: undefined,
-    cancelBtnClass: CANCEL_BTN_CLASS,
-    cancelBtnType: 'link',
-    onCancelClick: null,
+    submitBtn: {
+        title: 'Submit',
+        type: 'submit',
+        className: SUBMIT_BTN_CLASS,
+        onClick: null,
+    },
+    cancelBtn: {
+        title: 'Cancel',
+        type: 'link',
+        className: CANCEL_BTN_CLASS,
+        onClick: null,
+    },
     disabled: false,
     showSpinner: true,
     controls: null,
@@ -41,10 +42,26 @@ export class FormControls extends Component {
     };
 
     constructor(props = {}) {
-        super({
+        const controlsProps = {
             ...defaultProps,
             ...props,
-        });
+        };
+
+        if (isObject(props.submitBtn)) {
+            controlsProps.submitBtn = {
+                ...defaultProps.submitBtn,
+                ...props.submitBtn,
+            };
+        }
+
+        if (isObject(props.cancelBtn)) {
+            controlsProps.cancelBtn = {
+                ...defaultProps.cancelBtn,
+                ...props.cancelBtn,
+            };
+        }
+
+        super(controlsProps);
 
         this.state = {
             ...this.props,
@@ -55,20 +72,15 @@ export class FormControls extends Component {
     }
 
     init() {
-        this.submitBtn = Button.create({
-            id: this.props.submitId,
-            type: this.props.submitBtnType,
-            className: this.props.submitBtnClass,
-            onClick: (e) => this.props?.onSubmitClick?.(e),
-        });
-        const children = [this.submitBtn.elem];
+        const children = [];
+
+        if (this.props.submitBtn) {
+            this.submitBtn = Button.create({ ...this.props.submitBtn });
+            children.push(this.submitBtn.elem);
+        }
 
         if (this.props.cancelBtn) {
-            this.cancelBtn = Button.create({
-                type: this.props.cancelBtnType,
-                className: this.props.cancelBtnClass,
-                onClick: (e) => this.props?.onCancelClick?.(e),
-            });
+            this.cancelBtn = Button.create({ ...this.props.cancelBtn });
             children.push(this.cancelBtn.elem);
         }
 
@@ -112,22 +124,23 @@ export class FormControls extends Component {
             throw new Error('Invalid state');
         }
 
-        this.submitBtn.setState((btnState) => ({
-            ...btnState,
-            title: state.submitTitle,
-            disabled: state.disabled,
-        }));
-        this.submitBtn.enable(!state.loading);
+        if (this.submitBtn && state.submitBtn) {
+            this.submitBtn.setState((btnState) => ({
+                ...btnState,
+                ...state.submitBtn,
+                disabled: state.submitBtn.disabled || state.disabled,
+            }));
+            this.submitBtn.enable(!state.loading);
+        }
 
         if (this.cancelBtn && state.cancelBtn) {
             this.cancelBtn.setState((btnState) => ({
                 ...btnState,
-                title: state.cancelTitle,
-                url: state.cancelURL,
-                disabled: state.disabled,
+                ...state.cancelBtn,
+                disabled: state.cancelBtn.disabled || state.disabled,
             }));
-            this.cancelBtn.show(state.cancelTitle && !state.loading);
         }
+        this.cancelBtn?.show(state.cancelBtn && !state.loading);
 
         if (this.spinner && state.showSpinner) {
             this.spinner.show(state.loading);

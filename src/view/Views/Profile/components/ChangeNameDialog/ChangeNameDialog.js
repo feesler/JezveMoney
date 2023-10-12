@@ -1,10 +1,9 @@
-import {
-    ge,
-    isFunction,
-} from 'jezvejs';
+import { isFunction } from 'jezvejs';
+
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import { API } from '../../../../API/index.js';
+
 import { InputField } from '../../../../Components/Form/Fields/InputField/InputField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
@@ -16,25 +15,18 @@ const defaultProps = {
 };
 
 export class ChangeNameDialog extends ProfileDialog {
-    constructor(...args) {
-        super(...args);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
-
-        this.init();
+            ...props,
+        });
     }
 
     init() {
-        this.elem = ge('changename');
-        if (!this.elem) {
-            throw new Error('Failed to initialize Change name dialog');
-        }
-
         this.initDialog({
             id: 'chname_popup',
+            containerId: 'changename',
+            action: 'profile/changename/',
             title: __('profile.changeName'),
             className: DIALOG_CLASS,
         });

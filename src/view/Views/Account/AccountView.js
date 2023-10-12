@@ -1,37 +1,36 @@
 import 'jezvejs/style';
-import 'jezvejs/style/Input';
-import 'jezvejs/style/InputGroup';
-import {
-    setEvents,
-    insertAfter,
-} from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
-import { getCurrencyPrecision, __ } from '../../utils/utils.js';
+// Application
+import { getCurrencyPrecision, __, createHiddenInputs } from '../../utils/utils.js';
 import { normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
+// Models
 import { IconList } from '../../Models/IconList.js';
 import { accountTypes, Account } from '../../Models/Account.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { CurrencyList } from '../../Models/CurrencyList.js';
 
+// Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
+import { Field } from '../../Components/Common/Field/Field.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
 import { AmountInputField } from '../../Components/Form/Fields/AmountInputField/AmountInputField.js';
+import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 import { IconSelect } from '../../Components/Form/Inputs/IconSelect/IconSelect.js';
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './AccountView.scss';
-import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 /**
  * Create/update account view
@@ -79,10 +78,7 @@ class AccountView extends AppView {
 
         this.loadElementsByIds([
             'heading',
-            'accountForm',
-            'tileField',
-            'iconField',
-            'currencyField',
+            'formContainer',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -90,14 +86,21 @@ class AccountView extends AppView {
             showInHeaderOnScroll: false,
         });
 
+        // Account tile field
         this.tile = AccountTile.create({
             id: 'accountTile',
             account: this.props.account,
         });
-        this.tileField.append(this.tile.elem);
 
+        this.tileField = Field.create({
+            id: 'tileField',
+            className: 'form-row',
+            content: this.tile.elem,
+        });
+
+        // Account type field
         this.typeSelect = DropDown.create({
-            elem: 'type',
+            id: 'type',
             onItemSelect: (o) => this.onTypeSelect(o),
             className: 'dd_fullwidth',
             data: Object.keys(accountTypes).map((type) => ({
@@ -106,11 +109,13 @@ class AccountView extends AppView {
             })),
         });
 
-        this.iconSelect = IconSelect.create({
-            className: 'dd_fullwidth',
-            onItemSelect: (o) => this.onIconSelect(o),
+        this.typeField = Field.create({
+            id: 'typeField',
+            htmlFor: 'type',
+            title: __('accounts.type'),
+            className: 'form-row',
+            content: this.typeSelect.elem,
         });
-        this.iconField.append(this.iconSelect.elem);
 
         // Name field
         this.nameField = InputField.create({
@@ -122,16 +127,38 @@ class AccountView extends AppView {
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
-        insertAfter(this.nameField.elem, this.iconField);
+
+        // Icon field
+        this.iconSelect = IconSelect.create({
+            id: 'icon',
+            className: 'dd_fullwidth',
+            onItemSelect: (o) => this.onIconSelect(o),
+        });
+
+        this.iconField = Field.create({
+            id: 'iconField',
+            htmlFor: 'icon',
+            title: __('accounts.icon'),
+            className: 'form-row',
+            content: this.iconSelect.elem,
+        });
 
         // Currency field
         this.currencySelect = DropDown.create({
-            elem: 'currency',
+            id: 'currency',
             enableFilter: true,
             onItemSelect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
         App.initUserCurrencyList(this.currencySelect);
+
+        this.currencyField = Field.create({
+            id: 'currencyField',
+            htmlFor: 'currency',
+            title: __('accounts.currency'),
+            className: 'form-row',
+            content: this.currencySelect.elem,
+        });
 
         // Initial balance field
         this.initBalanceField = AmountInputField.create({
@@ -142,7 +169,6 @@ class AccountView extends AppView {
             className: 'form-row',
             onInput: (e) => this.onInitBalanceInput(e),
         });
-        insertAfter(this.initBalanceField.elem, this.currencyField);
 
         // Initial credit limit field
         this.initLimitField = AmountInputField.create({
@@ -153,18 +179,48 @@ class AccountView extends AppView {
             className: 'form-row',
             onInput: (e) => this.onLimitInput(e),
         });
-        insertAfter(this.initLimitField.elem, this.initBalanceField.elem);
-
-        setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
 
         // Controls
         this.submitControls = FormControls.create({
             id: 'submitControls',
-            submitTitle: __('actions.submit'),
-            cancelTitle: __('actions.cancel'),
-            cancelURL: App.props.nextAddress,
+            submitBtn: {
+                title: __('actions.submit'),
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                url: App.props.nextAddress,
+            },
         });
-        this.accountForm.append(this.submitControls.elem);
+
+        // Hidden inputs
+        const hiddenInputIds = ['flags'];
+        if (isUpdate) {
+            hiddenInputIds.push('accid');
+        }
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
+
+        this.accountForm = createElement('form', {
+            props: {
+                id: 'accountForm',
+                method: 'post',
+            },
+            events: {
+                submit: (e) => this.onSubmit(e),
+            },
+            children: [
+                this.tileField.elem,
+                this.typeField.elem,
+                this.iconField.elem,
+                this.nameField.elem,
+                this.currencyField.elem,
+                this.initBalanceField.elem,
+                this.initLimitField.elem,
+                this.submitControls.elem,
+                ...Object.values(hiddenInputs),
+            ],
+        });
+        this.formContainer.append(this.accountForm);
 
         // Update mode
         if (isUpdate) {
@@ -415,6 +471,12 @@ class AccountView extends AppView {
         // Controls
         if (state.submitStarted !== prevState?.submitStarted) {
             this.submitControls.setLoading(state.submitStarted);
+        }
+
+        // Hidden fields
+        this.flags.value = state.original.flags;
+        if (state.original.id) {
+            this.accid.value = state.original.id;
         }
 
         if (this.deleteBtn) {

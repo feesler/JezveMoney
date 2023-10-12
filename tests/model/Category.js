@@ -12,6 +12,8 @@ export class Category {
         'type',
     ];
 
+    static availTypes = [...Transaction.availTypes, 0];
+
     static getTypeString(type) {
         return (type !== 0)
             ? Transaction.getTypeName(type)

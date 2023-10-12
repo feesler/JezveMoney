@@ -6,7 +6,12 @@ import { createStore } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
-import { __, parseCookies, setCookie } from '../../utils/utils.js';
+import {
+    __,
+    getApplicationURL,
+    parseCookies,
+    setCookie,
+} from '../../utils/utils.js';
 
 import { Field } from '../../Components/Common/Field/Field.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
@@ -97,10 +102,14 @@ class LoginView extends AppView {
 
         // Form controls
         this.controls = FormControls.create({
-            submitTitle: __('login.submitButton'),
-            cancelTitle: __('registration.title'),
-            cancelBtnClass: 'alter-link',
-            cancelURL: `${App.baseURL}register/`,
+            submitBtn: {
+                title: __('login.submitButton'),
+            },
+            cancelBtn: {
+                title: __('registration.title'),
+                url: getApplicationURL('register/'),
+                className: 'alter-link',
+            },
         });
 
         // Log in form

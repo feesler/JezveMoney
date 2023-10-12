@@ -1,6 +1,7 @@
 import {
     DAYS_IN_WEEK,
     asArray,
+    createElement,
     isDate,
     isObject,
     parseDateString,
@@ -375,3 +376,13 @@ export const getHideableContextIds = (state, listName = 'items') => {
         ? asArray(state.contextItem)
         : getHideableSelectedIds(state, listName);
 };
+
+/** Returns object with mapped hidden input elements */
+export const createHiddenInputs = (ids) => (
+    Object.fromEntries(
+        asArray(ids).map((id) => ([
+            id,
+            createElement('input', { props: { id, type: 'hidden' } }),
+        ])),
+    )
+);

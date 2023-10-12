@@ -32,7 +32,7 @@ import { API } from '../../API/index.js';
 // Models
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
-import { availTransTypes } from '../../Models/Transaction.js';
+import { Transaction, availTransTypes } from '../../Models/Transaction.js';
 
 // Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -92,7 +92,7 @@ class CategoryListView extends AppView {
             ...this.props,
             detailsItem: null,
             items: createItemsFromModel(),
-            selectedType: null,
+            selectedType: this.props.selectedType ?? null,
             loading: false,
             listMode: 'list',
             showMenu: false,
@@ -186,6 +186,7 @@ class CategoryListView extends AppView {
         // Tabs
         this.sections = {};
         this.tabs = TabList.create({
+            itemParam: 'type',
             onChange: (item) => this.onChangeType(item),
             items: this.transTypes.map((type) => {
                 const key = Category.getTypeString(type);
@@ -653,11 +654,21 @@ class CategoryListView extends AppView {
     /** Returns URL for specified state */
     getURL(state) {
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return getApplicationURL(`categories/${itemPart}`);
+        const url = getApplicationURL(`categories/${itemPart}`);
+
+        const typeStr = (state.selectedType === 0)
+            ? 'any'
+            : Transaction.getTypeString(state.selectedType);
+        url.searchParams.set('type', typeStr);
+
+        return url;
     }
 
     renderHistory(state, prevState) {
-        if (state.detailsId === prevState?.detailsId) {
+        if (
+            state.detailsId === prevState?.detailsId
+            && state.selectedType === prevState?.selectedType
+        ) {
             return;
         }
 

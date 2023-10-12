@@ -107,10 +107,14 @@ export class ImportTransactionForm extends Component {
 
         // Submit controls
         this.formControls = FormControls.create({
-            submitTitle: __('actions.save'),
-            cancelBtnType: 'button',
-            cancelTitle: __('actions.cancel'),
-            onCancelClick: () => this.cancel(),
+            submitBtn: {
+                title: __('actions.save'),
+            },
+            cancelBtn: {
+                type: 'button',
+                title: __('actions.cancel'),
+                onClick: () => this.cancel(),
+            },
             controls: [
                 this.toggleExtBtn.elem,
             ],

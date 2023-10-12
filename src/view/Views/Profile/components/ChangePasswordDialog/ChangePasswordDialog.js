@@ -1,6 +1,6 @@
-import { ge } from 'jezvejs';
 import { __ } from '../../../../utils/utils.js';
 import { API } from '../../../../API/index.js';
+
 import { PasswordField } from '../../../../Components/Form/Fields/PasswordField/PasswordField.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
@@ -8,20 +8,11 @@ import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 const DIALOG_CLASS = 'password-dialog';
 
 export class ChangePasswordDialog extends ProfileDialog {
-    constructor(...args) {
-        super(...args);
-
-        this.init();
-    }
-
     init() {
-        this.elem = ge('changepass');
-        if (!this.elem) {
-            throw new Error('Failed to initialize Change password form');
-        }
-
         this.initDialog({
             id: 'chpass_popup',
+            containerId: 'changepass',
+            action: 'profile/changepass/',
             title: __('profile.changePassword'),
             className: DIALOG_CLASS,
         });

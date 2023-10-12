@@ -13,7 +13,6 @@ $router->setRoutes([
     "currency" => "Currency",
     "color" => "Color",
     "icon" => "Icon",
-    "query" => "Query",
     "log" => "Logs",
     "tests" => "Tests",
     "apiconsole" => "ApiConsole",

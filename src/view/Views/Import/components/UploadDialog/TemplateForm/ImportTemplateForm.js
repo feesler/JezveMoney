@@ -77,6 +77,12 @@ export class ImportTemplateForm extends Component {
             },
         };
 
+        this.cancelBtnProps = {
+            type: 'button',
+            title: __('actions.cancel'),
+            onClick: () => this.onCancel(),
+        };
+
         this.columnFeedback = {
             accountAmount: __('import.templates.accountAmountMessage'),
             accountCurrency: __('import.templates.accountCurrencyMessage'),
@@ -209,12 +215,12 @@ export class ImportTemplateForm extends Component {
 
         // Submit controls
         this.controls = FormControls.create({
-            submitBtnType: 'button',
-            submitTitle: __('actions.save'),
-            cancelBtnType: 'button',
-            cancelTitle: __('actions.cancel'),
-            onSubmitClick: () => this.onSubmit(),
-            onCancelClick: () => this.onCancel(),
+            submitBtn: {
+                type: 'button',
+                title: __('actions.save'),
+                onClick: () => this.onSubmit(),
+            },
+            cancelBtn: { ...this.cancelBtnProps },
         });
 
         this.elem = createElement('section', {
@@ -653,9 +659,9 @@ export class ImportTemplateForm extends Component {
         // Submit controls
         this.controls.setState((controlsState) => ({
             ...controlsState,
-            cancelTitle: (
+            cancelBtn: (
                 (templateAvail && !state.listLoading)
-                    ? __('actions.cancel')
+                    ? { ...this.cancelBtnProps }
                     : null
             ),
             loading: state.listLoading,

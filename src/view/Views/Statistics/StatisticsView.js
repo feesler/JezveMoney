@@ -11,11 +11,9 @@ import {
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { Button } from 'jezvejs/Button';
-import { PieChart } from 'jezvejs/PieChart';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { normalize } from '../../utils/decimal.js';
 import {
     __,
     dateStringToTime,
@@ -23,6 +21,12 @@ import {
     formatNumberShort,
     getApplicationURL,
 } from '../../utils/utils.js';
+import {
+    formatDateLabel,
+    formatValue,
+    getDataCategoryName,
+    isStackedData,
+} from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -32,15 +36,16 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
-import { Transaction } from '../../Models/Transaction.js';
 
 // Common components
 import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 
 // Local components
+import { PieChartGroup } from './components/PieChartGroup/PieChartGroup.js';
 import { StatisticsFilters } from './components/Filters/StatisticsFilters.js';
 
 import { isSameSelection, actions, reducer } from './reducer.js';
@@ -108,18 +113,7 @@ class StatisticsView extends AppView {
         this.loadElementsByIds([
             'heading',
             'contentHeader',
-            // Histogram
-            'chart',
-            // Pie chart
-            'pieChartHeaderType',
-            'pieChartHeaderDate',
-            'pieChartTotal',
-            'pieChartTotalValue',
-            'pieChartContainer',
-            'pieChartInfo',
-            'pieChartInfoTitle',
-            'pieChartInfoPercent',
-            'pieChartInfoValue',
+            'mainContent',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -153,8 +147,12 @@ class StatisticsView extends AppView {
         });
         this.contentHeader.prepend(this.filtersContainer.elem);
 
+        // No data message
+        this.noDataMessage = NoDataMessage.create({
+            title: __('statistics.noData'),
+        });
+
         // Chart
-        this.noDataMessage = this.chart.querySelector('.nodata-message');
         this.histogram = Histogram.create({
             height: 320,
             marginTop: 35,
@@ -172,13 +170,27 @@ class StatisticsView extends AppView {
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatNumberShort(value),
-            renderXAxisLabel: (value) => this.renderDateLabel(value),
+            renderXAxisLabel: (value) => formatDateLabel(value, this.store.getState()),
             onItemClick: (target) => this.onSelectDataColumn(target),
         });
-        this.chart.append(this.histogram.elem);
+
+        // Loading indicator
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
+
+        // Histogram chart container
+        this.chart = createElement('div', {
+            props: { className: 'stat-histogram' },
+            children: [
+                this.histogram.elem,
+                this.noDataMessage.elem,
+                this.loadingIndicator.elem,
+            ],
+        });
 
         // Pie chart
-        this.pieChart = PieChart.create({
+        this.pieChart = PieChartGroup.create({
             data: null,
             radius: 150,
             innerRadius: 120,
@@ -187,13 +199,8 @@ class StatisticsView extends AppView {
             onItemOut: (item) => this.onPieChartItemOut(item),
             onItemClick: (item) => this.onPieChartItemClick(item),
         });
-        this.pieChartContainer.append(this.pieChart.elem);
 
-        // Loading indicator
-        this.loadingIndicator = LoadingIndicator.create({
-            fixed: false,
-        });
-        this.chart.append(this.loadingIndicator.elem);
+        this.mainContent.append(this.chart, this.pieChart.elem);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
@@ -414,60 +421,14 @@ class StatisticsView extends AppView {
         }
     }
 
-    formatValue(value) {
-        const state = this.store.getState();
-        return App.model.currency.formatCurrency(
-            value,
-            state.chartCurrency,
-        );
-    }
-
-    formatPercent(value) {
-        return `${normalize(value, 2)} %`;
-    }
-
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
         const state = this.store.getState();
         return ChartPopup.fromTarget(target, {
             reportType: state.filter?.report,
-            formatValue: (value) => this.formatValue(value),
-            renderDateLabel: (value) => this.renderDateLabel(value),
+            formatValue: (value) => formatValue(value, state),
+            renderDateLabel: (value) => formatDateLabel(value, state),
         });
-    }
-
-    isStackedData(filter) {
-        const { report } = filter;
-        return (
-            report === 'category'
-            || (report === 'account' && filter.accounts?.length > 1)
-        );
-    }
-
-    getDataCategoryName(value) {
-        const categoryId = parseInt(value, 10);
-        const state = this.store.getState();
-        const isStacked = this.isStackedData(state.filter);
-        if (!isStacked) {
-            const selectedTypes = asArray(state.form.type);
-            return Transaction.getTypeTitle(selectedTypes[categoryId]);
-        }
-
-        if (state.filter.report === 'account') {
-            const account = App.model.userAccounts.getItem(categoryId);
-            return account.name;
-        }
-
-        if (state.filter.report === 'category') {
-            if (categoryId === 0) {
-                return __('categories.noCategory');
-            }
-
-            const category = App.model.categories.getItem(categoryId);
-            return category.name;
-        }
-
-        throw new Error('Invalid state');
     }
 
     renderLegendContent(categories) {
@@ -492,7 +453,7 @@ class StatisticsView extends AppView {
                     children: createElement('span', {
                         props: {
                             className: LEGEND_ITEM_TITLE_CLASS,
-                            textContent: this.getDataCategoryName(category),
+                            textContent: getDataCategoryName(category, state),
                         },
                     }),
                 });
@@ -500,31 +461,6 @@ class StatisticsView extends AppView {
                 return item;
             }),
         });
-    }
-
-    renderDateLabel(value) {
-        const state = this.store.getState();
-        const { group } = state.form;
-
-        if (group === 'day' || group === 'week') {
-            return App.formatDate(value);
-        }
-
-        if (group === 'month') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric', month: '2-digit' },
-            });
-        }
-
-        if (group === 'year') {
-            return App.formatDate(value, {
-                locales: App.dateFormatLocale,
-                options: { year: 'numeric' },
-            });
-        }
-
-        return null;
     }
 
     renderFilters(state, prevState = {}) {
@@ -549,71 +485,39 @@ class StatisticsView extends AppView {
         const [value] = state.chartData?.values ?? [];
         const dataSet = value?.data ?? [];
         const noData = !dataSet.length && !state.chartData?.series?.length;
-        show(this.noDataMessage, state.chartData && noData);
+        this.noDataMessage.show(state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
 
         const data = (noData)
             ? { values: [], series: [] }
             : state.chartData;
-        data.stacked = this.isStackedData(state.filter);
+        data.stacked = isStackedData(state.filter);
 
         this.histogram.setData(data);
 
         this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }
 
-    renderPieChart(state) {
+    renderPieChart(state, prevState) {
+        if (
+            state.form === prevState?.form
+            && state.filter === prevState?.filter
+            && state.selectedColumn === prevState?.selectedColumn
+            && state.pieChartInfo === prevState?.pieChartInfo
+        ) {
+            return;
+        }
+
         if (!state.selectedColumn) {
             this.pieChart.hide();
             return;
         }
 
-        this.pieChart.setData(state.selectedColumn.items);
+        this.pieChart.setState((chartState) => ({
+            ...chartState,
+            ...state,
+        }));
         this.pieChart.show();
-        this.pieChart.elem.classList.toggle('categories-report', state.filter.report === 'category');
-    }
-
-    renderPieChartHeader(state, prevState = {}) {
-        if (state.selectedColumn === prevState?.selectedColumn) {
-            return;
-        }
-
-        if (!state.selectedColumn) {
-            this.pieChartHeaderType.textContent = null;
-            this.pieChartHeaderDate.textContent = null;
-            show(this.pieChartTotal, false);
-            return;
-        }
-
-        const { groupName, series, total } = state.selectedColumn;
-        this.pieChartHeaderType.textContent = Transaction.getTypeTitle(groupName);
-        this.pieChartHeaderDate.textContent = this.renderDateLabel(series);
-
-        this.pieChartTotalValue.textContent = this.formatValue(total);
-        show(this.pieChartTotal, true);
-    }
-
-    renderPieChartInfo(state, prevState = {}) {
-        if (state.pieChartInfo === prevState?.pieChartInfo) {
-            return;
-        }
-
-        if (!state.pieChartInfo) {
-            this.pieChartInfoTitle.textContent = null;
-            this.pieChartInfoPercent.textContent = null;
-            this.pieChartInfoValue.textContent = null;
-            show(this.pieChartInfo, false);
-            return;
-        }
-
-        const { categoryId, value } = state.pieChartInfo;
-        const { total } = state.selectedColumn;
-
-        this.pieChartInfoTitle.textContent = this.getDataCategoryName(categoryId);
-        this.pieChartInfoPercent.textContent = this.formatPercent((value / total) * 100);
-        this.pieChartInfoValue.textContent = this.formatValue(value);
-
-        show(this.pieChartInfo, true);
     }
 
     render(state, prevState = {}) {
@@ -628,8 +532,6 @@ class StatisticsView extends AppView {
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
         this.renderPieChart(state, prevState);
-        this.renderPieChartHeader(state, prevState);
-        this.renderPieChartInfo(state, prevState);
 
         this.histogram.elem.dataset.time = state.renderTime;
 

@@ -65,7 +65,7 @@ const availSettings = [
 ];
 
 /** Categories */
-const ANY_TYPE = 0;
+export const ANY_TYPE = 0;
 const transTypes = [...Transaction.availTypes, ANY_TYPE];
 
 /**

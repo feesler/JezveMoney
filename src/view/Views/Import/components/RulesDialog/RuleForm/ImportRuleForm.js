@@ -163,12 +163,16 @@ export class ImportRuleForm extends Component {
 
         // Submit controls
         this.controls = FormControls.create({
-            submitBtnType: 'button',
-            submitTitle: __('actions.submit'),
-            cancelBtnType: 'button',
-            cancelTitle: __('actions.cancel'),
-            onSubmitClick: () => this.onSubmit(),
-            onCancelClick: () => this.onCancel(),
+            submitBtn: {
+                type: 'button',
+                title: __('actions.submit'),
+                onClick: () => this.onSubmit(),
+            },
+            cancelBtn: {
+                type: 'button',
+                title: __('actions.cancel'),
+                onClick: () => this.onCancel(),
+            },
         });
 
         this.elem = App.createContainer(FORM_CLASS, [

@@ -1,0 +1,58 @@
+/* Main page widget */
+.widget {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  min-width: 200px;
+  margin: 0 20px 20px 0;
+}
+
+@media screen and (max-width: 500px) {
+  .widget {
+    margin: 0;
+    padding: 0 0 20px 0;
+  }
+}
+
+/* title of main page widget */
+.widget_title {
+  display: block;
+  height: 32px;
+  margin: 10px 0;
+  color: var(--main-text-color);
+
+  .widget_title-link,
+  .widget_title-link:visited {
+    height: 32px;
+    text-decoration: none;
+    color: var(--main-text-color);
+  }
+
+  span {
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 32px;
+    display: inline-block;
+  }
+
+  .glyph {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin: 0 0 0 4px;
+    vertical-align: text-bottom;
+  }
+
+  .glyph-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--main-text-color);
+  }
+}
+
+@media (hover: hover) {
+  .widget_title-link:hover {
+    color: var(--main-text-color);
+    text-decoration: none;
+  }
+}

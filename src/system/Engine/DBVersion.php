@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 33);
+define("DB_VERSION", 34);
 
 /**
  * Database version manager class
@@ -21,7 +21,6 @@ class DBVersion
     protected $dbClient = null;
     protected $tables = [
         "accounts",
-        "admin_query",
         "currency",
         "dbver",
         "colors",
@@ -76,7 +75,6 @@ class DBVersion
             $this->createImportRuleTable();
             $this->createImportConditionTable();
             $this->createImportActionTable();
-            $this->createAdminQueryTable();
 
             $this->createDBVersionTable();
             $this->setVersion(DB_VERSION);
@@ -1155,6 +1153,26 @@ class DBVersion
     }
 
     /**
+     * Creates database version 34
+     *
+     * @return int
+     */
+    private function version34()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "admin_query";
+        $res = $this->dbClient->dropTableQ($tableName);
+        if (!$res) {
+            throw new \Error("Failed to drop table '$tableName'");
+        }
+
+        return 34;
+    }
+
+    /**
      * Creates currency table
      */
     private function createCurrencyTable()
@@ -1758,36 +1776,6 @@ class DBVersion
                 "value" => "VARCHAR(255) NOT NULL",
                 "createdate" => "DATETIME NOT NULL",
                 "updatedate" => "DATETIME NOT NULL",
-                "PRIMARY KEY (`id`)",
-            ],
-            TABLE_OPTIONS,
-        );
-        if (!$res) {
-            throw new \Error("Failed to create table '$tableName'");
-        }
-    }
-
-    /**
-     * Creates admin queries table
-     */
-    private function createAdminQueryTable()
-    {
-        if (!$this->dbClient) {
-            throw new \Error("Invalid DB client");
-        }
-
-        $tableName = "admin_query";
-        if ($this->dbClient->isTableExist($tableName)) {
-            return;
-        }
-
-        $res = $this->dbClient->createTableQ(
-            $tableName,
-            [
-                "id" => "INT(11) NOT NULL AUTO_INCREMENT",
-                "title" => "VARCHAR(255) NOT NULL",
-                "query" => "TEXT NOT NULL",
-                "flags" => "INT(11) NOT NULL DEFAULT '0'",
                 "PRIMARY KEY (`id`)",
             ],
             TABLE_OPTIONS,

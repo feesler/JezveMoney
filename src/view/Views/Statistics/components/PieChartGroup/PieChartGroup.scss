@@ -1,0 +1,78 @@
+/* Pie chart */
+:root {
+  --piechart-min-width: 250px;
+  --piechart-max-width: 400px;
+}
+
+.piechart-group {
+  display: flex;
+  flex-flow: column nowrap;
+  min-width: var(--piechart-min-width);
+  max-width: var(--piechart-max-width);
+}
+
+.piechart-header,
+.piechart-total {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.piechart-header__type {
+  font-weight: 500;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+}
+
+.piechart-header__date {
+  font-size: 1rem;
+  color: var(--dimmed-text-color);
+}
+
+.piechart-total__title {
+  font-size: 0.9rem;
+  color: var(--dimmed-text-color);
+}
+
+.piechart-total__value {
+  font-size: 1.1rem;
+}
+
+.piechart-container {
+  position: relative;
+  margin-top: 1rem;
+
+  .pie-chart {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.piechart-info {
+  --piechart-info-margin: 45px;
+
+  position: absolute;
+  left: var(--piechart-info-margin);
+  right: var(--piechart-info-margin);
+  top: var(--piechart-info-margin);
+  bottom: var(--piechart-info-margin);
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+
+  .piechart-info__title {
+    font-size: 0.9rem;
+    color: var(--dimmed-text-color);
+  }
+
+  .piechart-info__percent {
+    font-size: 1.2rem;
+  }
+
+  .piechart-info__value {
+    font-size: 1rem;
+    color: var(--dimmed-text-color);
+  }
+}

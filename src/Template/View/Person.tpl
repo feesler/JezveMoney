@@ -10,14 +10,7 @@
                         <div class="heading-actions"></div>
                     </header>
 
-                    <main>
-                        <form id="personForm" method="post" action="<?= e(BASEURL . "persons/" . $this->action) ?>/">
-                            <?php if ($this->action == "update") {        ?>
-                                <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
-                            <?php    }    ?>
-                            <input id="flags" name="flags" type="hidden" value="<?= e($pInfo->flags) ?>">
-                        </form>
-                    </main>
+                    <main id="formContainer"></main>
                 </div>
             </div>
         </div>

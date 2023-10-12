@@ -1,23 +1,23 @@
 import 'jezvejs/style';
-import {
-    show,
-    setEvents,
-    insertBefore,
-} from 'jezvejs';
+import { createElement } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
-import { __ } from '../../utils/utils.js';
+// Application
+import { __, createHiddenInputs } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
+// Models
 import { Category } from '../../Models/Category.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Transaction } from '../../Models/Transaction.js';
 
+// Common components
+import { Field } from '../../Components/Common/Field/Field.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { CategorySelect } from '../../Components/Category/CategorySelect/CategorySelect.js';
 import { ColorField } from '../../Components/Form/Fields/ColorField/ColorField.js';
@@ -63,9 +63,7 @@ class CategoryView extends AppView {
 
         this.loadElementsByIds([
             'heading',
-            'categoryForm',
-            'parentCategoryField',
-            'typeField',
+            'formContainer',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -73,7 +71,15 @@ class CategoryView extends AppView {
             showInHeaderOnScroll: false,
         });
 
-        setEvents(this.categoryForm, { submit: (e) => this.onSubmit(e) });
+        // Parent category field
+        this.createParentCategorySelect();
+        this.parentCategoryField = Field.create({
+            id: 'parentCategoryField',
+            htmlFor: 'parent',
+            title: __('categories.parent'),
+            className: 'form-row',
+            content: this.parentSelect.elem,
+        });
 
         // Name field
         this.nameField = InputField.create({
@@ -85,10 +91,6 @@ class CategoryView extends AppView {
             validate: true,
             onInput: (e) => this.onNameInput(e),
         });
-        insertBefore(this.nameField.elem, this.typeField);
-
-        this.createParentCategorySelect();
-        this.createTransactionTypeSelect();
 
         // Color field
         this.colorField = ColorField.create({
@@ -103,16 +105,56 @@ class CategoryView extends AppView {
             disableAutoProps: false,
             onInput: (e) => this.onColorInput(e),
         });
-        this.nameField.elem.after(this.colorField.elem);
+
+        // Transaction type field
+        this.createTransactionTypeSelect();
+        this.typeField = Field.create({
+            id: 'typeField',
+            htmlFor: 'type',
+            title: __('categories.transactionType'),
+            className: 'form-row',
+            content: this.typeSelect.elem,
+        });
 
         // Controls
         this.submitControls = FormControls.create({
             id: 'submitControls',
-            submitTitle: __('actions.submit'),
-            cancelTitle: __('actions.cancel'),
-            cancelURL: App.props.nextAddress,
+            submitBtn: {
+                title: __('actions.submit'),
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                url: App.props.nextAddress,
+            },
         });
-        this.categoryForm.append(this.submitControls.elem);
+
+        // Hidden inputs
+        const hiddenInputIds = [];
+        if (isUpdate) {
+            hiddenInputIds.push('categoryId');
+        }
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
+
+        this.categoryForm = createElement('form', {
+            props: {
+                id: 'categoryForm',
+                method: 'post',
+            },
+            events: {
+                submit: (e) => this.onSubmit(e),
+            },
+            children: [
+                this.parentCategoryField.elem,
+                createElement('hr', { props: { className: 'form-separator' } }),
+                this.nameField.elem,
+                this.colorField.elem,
+                this.typeField.elem,
+                this.submitControls.elem,
+                ...Object.values(hiddenInputs),
+            ],
+        });
+        this.formContainer.append(this.categoryForm);
 
         // Update mode
         if (isUpdate) {
@@ -138,7 +180,7 @@ class CategoryView extends AppView {
         const { original } = this.store.getState();
 
         this.parentSelect = CategorySelect.create({
-            elem: 'parent',
+            id: 'parent',
             className: 'dd_fullwidth',
             parentCategorySelect: true,
             exclude: original.id,
@@ -160,7 +202,7 @@ class CategoryView extends AppView {
         }));
 
         this.typeSelect = DropDown.create({
-            elem: 'type',
+            id: 'type',
             onItemSelect: (type) => this.onTypeSelect(type),
             className: 'dd_fullwidth',
             data,
@@ -369,13 +411,18 @@ class CategoryView extends AppView {
         const isUpdate = state.original.id;
         const minItems = (isUpdate) ? 1 : 0;
 
-        show(this.parentCategoryField, categories.length > minItems);
+        this.parentCategoryField.show(categories.length > minItems);
         this.parentSelect.setSelection(state.data.parent_id);
         this.parentSelect.enable(!state.submitStarted);
 
         // Transaction type field
         this.typeSelect.setSelection(state.data.type);
         this.typeSelect.enable(!state.submitStarted && parentId === 0);
+
+        // Hidden inputs
+        if (isUpdate) {
+            this.categoryId.value = state.original.id;
+        }
 
         // Controls
         if (state.submitStarted !== prevState?.submitStarted) {
