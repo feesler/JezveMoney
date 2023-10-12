@@ -47,11 +47,11 @@ export class SettingsView extends AppView {
     async parseContent() {
         const res = {
             tabs: await TabList.create(this, await query('.tab-list')),
-            localeSelect: await DropDown.createFromChild(this, await query('#mainContainer .dd__container')),
+            localeSelect: await DropDown.create(this, await query('#localeField .dd__container')),
             createBtn: { elem: await query('#createBtn') },
             listModeBtn: await Button.create(this, await query('#listModeBtn')),
-            menuBtn: { elem: await query('.heading-actions .menu-btn') },
-            currenciesList: await CurrenciesList.create(this, await query('.currencies-list')),
+            menuBtn: { elem: await query('#userCurrencies .heading-actions .menu-btn') },
+            currenciesList: await CurrenciesList.create(this, await query('#userCurrencies .currencies-list')),
         };
 
         Object.keys(res).forEach((child) => (
@@ -79,21 +79,21 @@ export class SettingsView extends AppView {
             res.dateRenderTime,
             res.decimalRenderTime,
         ] = await evaluate(() => {
-            const dateEl = document.getElementById('dateFormatContainer');
-            const decimalEl = document.getElementById('decimalFormatContainer');
+            const dateEl = document.querySelector('#dateFormat .settings-block__content');
+            const decimalEl = document.querySelector('#numberFormat .settings-block__content');
             return [
                 dateEl?.dataset?.time,
                 decimalEl?.dataset?.time,
             ];
         });
 
-        const dateLocaleDropDownEl = await query('#dateFormatContainer .dd__container');
+        const dateLocaleDropDownEl = await query('#dateFormat .dd__container');
         res.dateLocaleDropDown = await DropDown.create(this, dateLocaleDropDownEl);
 
-        const decimalLocaleDropDownEl = await query('#decimalFormatContainer .dd__container');
+        const decimalLocaleDropDownEl = await query('#numberFormat .dd__container');
         res.decimalLocaleDropDown = await DropDown.create(this, decimalLocaleDropDownEl);
 
-        res.loadingIndicator = { elem: await query('#userCurrenciesContainer .loading-indicator') };
+        res.loadingIndicator = { elem: await query('#userCurrencies .loading-indicator') };
 
         return res;
     }

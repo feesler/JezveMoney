@@ -18,7 +18,6 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
 
 // Common components
-import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { LocaleSelectField } from '../../Components/Form/Fields/LocaleSelectField/LocaleSelectField.js';
 import { ThemeSwitchField } from '../../Components/Form/Fields/ThemeSwitchField/ThemeSwitchField.js';
 import { DateFormatSelect } from '../../Components/Form/Inputs/Date/DateFormatSelect/DateFormatSelect.js';
@@ -30,6 +29,7 @@ import { NumberFormatSelect } from '../../Components/Form/Inputs/NumberFormatSel
 import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
+import { SettingsSection } from './components/Section/SettingsSection.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import '../../Application/Application.scss';
@@ -82,39 +82,77 @@ class SettingsView extends AppView {
     /** View initialization */
     onStart() {
         this.loadElementsByIds([
-            'mainContainer',
-            'userCurrenciesHeading',
-            'userCurrenciesContainer',
-            'dateFormatContainer',
-            'decimalFormatContainer',
             'tabsContainer',
-            'mainTab',
-            'userCurrenciesTab',
-            'regionalTab',
         ]);
 
+        this.createMainTab();
+        this.createUserCurrrenciesTab();
+        this.createRegionalTab();
+
+        // Tabs
+        this.tabs = TabList.create({
+            useURLParam: false,
+            onChange: (item) => this.onChangeTab(item),
+            items: [{
+                id: 'index',
+                value: 'index',
+                title: __('settings.main'),
+                content: this.mainSection.elem,
+                url: getApplicationURL('settings/'),
+            }, {
+                id: 'currencies',
+                value: 'currencies',
+                title: __('settings.currencies.title'),
+                content: this.userCurrenciesSection.elem,
+                url: getApplicationURL('settings/currencies/'),
+            }, {
+                id: 'regional',
+                value: 'regional',
+                title: __('settings.regional'),
+                content: [
+                    this.dateFormatSection.elem,
+                    this.numberFormatSection.elem,
+                ],
+                url: getApplicationURL('settings/regional/'),
+            }],
+        });
+        this.tabsContainer.append(this.tabs.elem);
+
+        this.subscribeToStore(this.store);
+    }
+
+    createMainTab() {
         // Locale select field
         this.localeField = LocaleSelectField.create({
+            id: 'localeField',
             className: 'form-row',
         });
+
         // Theme switch field
         this.themeField = ThemeSwitchField.create({
+            id: 'themeField',
             className: 'form-row',
         });
 
-        this.mainContainer.append(this.localeField.elem, this.themeField.elem);
-
-        // User currencies
-        this.userCurrenciesHeading = Heading.fromElement(this.userCurrenciesHeading, {
-            title: __('settings.currencies.title'),
+        this.mainSection = SettingsSection.create({
+            id: 'mainSection',
+            title: __('settings.main'),
+            content: [
+                this.localeField.elem,
+                this.themeField.elem,
+            ],
         });
+    }
 
+    createUserCurrrenciesTab() {
+        // 'Create' button
         this.createBtn = Button.create({
             id: 'createBtn',
             className: 'circle-btn',
             icon: 'plus',
         });
 
+        // 'Done' button
         this.listModeBtn = Button.create({
             id: 'listModeBtn',
             className: 'action-button',
@@ -122,26 +160,13 @@ class SettingsView extends AppView {
             onClick: () => this.setListMode('list'),
         });
 
+        // Main menu toggle button
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
             onClick: (e) => this.showMenu(e),
         });
 
-        this.userCurrenciesHeading.actionsContainer.append(
-            this.createBtn.elem,
-            this.listModeBtn.elem,
-            this.menuButton.elem,
-        );
-
-        this.currencySelect = DropDown.create({
-            elem: this.createBtn.elem,
-            listAttach: true,
-            enableFilter: true,
-            onItemSelect: (sel) => this.onCurrencySelect(sel),
-        });
-
-        App.initCurrencyList(this.currencySelect);
-
+        // User currencies list
         this.list = SortableListContainer.create({
             ItemComponent: CurrencyItem,
             getItemProps: (item, { listMode }) => ({
@@ -163,51 +188,57 @@ class SettingsView extends AppView {
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (info) => this.onSort(info),
         });
-        this.userCurrenciesContainer.append(this.list.elem);
 
-        this.loadingIndicator = LoadingIndicator.create({
-            fixed: false,
+        // Loading indicator
+        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
+
+        this.userCurrenciesSection = SettingsSection.create({
+            id: 'userCurrencies',
+            title: __('settings.currencies.title'),
+            actions: [
+                this.createBtn.elem,
+                this.listModeBtn.elem,
+                this.menuButton.elem,
+            ],
+            content: [
+                this.list.elem,
+                this.loadingIndicator.elem,
+            ],
         });
 
+        // Currency select
+        this.currencySelect = DropDown.create({
+            elem: this.createBtn.elem,
+            listAttach: true,
+            enableFilter: true,
+            onItemSelect: (sel) => this.onCurrencySelect(sel),
+        });
+
+        App.initCurrencyList(this.currencySelect);
+    }
+
+    createRegionalTab() {
         // Date format
         this.dateFormatSelect = DateFormatSelect.create({
             onItemSelect: (sel) => this.onDateFormatSelect(sel),
         });
-        this.dateFormatContainer.append(this.dateFormatSelect.elem);
+
+        this.dateFormatSection = SettingsSection.create({
+            id: 'dateFormat',
+            title: __('settings.dateFormat'),
+            content: this.dateFormatSelect.elem,
+        });
 
         // Numbers format
         this.decimalFormatSelect = NumberFormatSelect.create({
             onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
         });
-        this.decimalFormatContainer.append(this.decimalFormatSelect.elem);
 
-        // Tabs
-        this.tabs = TabList.create({
-            useURLParam: false,
-            onChange: (item) => this.onChangeTab(item),
-            items: [{
-                id: 'index',
-                value: 'index',
-                title: __('settings.main'),
-                content: this.mainTab,
-                url: getApplicationURL('settings/'),
-            }, {
-                id: 'currencies',
-                value: 'currencies',
-                title: __('settings.currencies.title'),
-                content: this.userCurrenciesTab,
-                url: getApplicationURL('settings/currencies/'),
-            }, {
-                id: 'regional',
-                value: 'regional',
-                title: __('settings.regional'),
-                content: this.regionalTab,
-                url: getApplicationURL('settings/regional/'),
-            }],
+        this.numberFormatSection = SettingsSection.create({
+            id: 'numberFormat',
+            title: __('settings.numberFormat'),
+            content: this.decimalFormatSelect.elem,
         });
-        this.tabsContainer.append(this.tabs.elem);
-
-        this.subscribeToStore(this.store);
     }
 
     onChangeTab(item) {
@@ -567,12 +598,12 @@ class SettingsView extends AppView {
 
     renderDateFormat(state) {
         this.dateFormatSelect.selectItem(state.dateLocale);
-        this.dateFormatContainer.dataset.time = state.dateRenderTime;
+        this.dateFormatSection.contentContainer.dataset.time = state.dateRenderTime;
     }
 
     renderDecimalFormat(state) {
         this.decimalFormatSelect.selectItem(state.decimalLocale);
-        this.decimalFormatContainer.dataset.time = state.dateRenderTime;
+        this.numberFormatSection.contentContainer.dataset.time = state.dateRenderTime;
     }
 
     renderTabList(state, prevState) {

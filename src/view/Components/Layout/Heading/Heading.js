@@ -46,10 +46,6 @@ export class Heading extends Component {
             props: { className: ACTIONS_CLASS },
         });
 
-        if (this.props.actions) {
-            this.actionsContainer.append(...asArray(this.props.actions));
-        }
-
         this.elem = createElement('header', {
             props: { className: CONTAINER_CLASS },
             children: [
@@ -82,6 +78,10 @@ export class Heading extends Component {
 
     setTitle(title) {
         this.setState({ ...this.state, title });
+    }
+
+    setActions(actions) {
+        this.setState({ ...this.state, actions });
     }
 
     showInHeader(inHeader) {
@@ -131,7 +131,17 @@ export class Heading extends Component {
         observer.observe(this.elem);
     }
 
-    renderHeaderTitle(state) {
+    renderHeaderTitle(state, prevState) {
+        if (
+            state.title === prevState?.title
+            && state.inHeader === prevState?.inHeader
+            && state.showInHeaderOnScroll === prevState?.showInHeaderOnScroll
+        ) {
+            return;
+        }
+
+        this.titleElem.textContent = (state.inHeader) ? null : state.title;
+
         if (!state.showInHeaderOnScroll) {
             return;
         }
@@ -140,10 +150,16 @@ export class Heading extends Component {
         App.view.header.setTitle(headerTitle);
     }
 
-    render(state, prevState = {}) {
-        this.titleElem.textContent = (state.inHeader) ? null : state.title;
-        this.renderHeaderTitle(state);
+    renderActions(state, prevState) {
+        if (state.actions === prevState?.actions) {
+            return;
+        }
 
+        this.actionsContainer.textContent = '';
+        this.actionsContainer.append(...asArray(state.actions));
+    }
+
+    renderContainer(state, prevState) {
         if (state.inHeader === prevState?.inHeader) {
             return;
         }
@@ -156,5 +172,15 @@ export class Heading extends Component {
             }
             this.elem.style.height = '';
         }
+    }
+
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.renderHeaderTitle(state, prevState);
+        this.renderActions(state, prevState);
+        this.renderContainer(state, prevState);
     }
 }
