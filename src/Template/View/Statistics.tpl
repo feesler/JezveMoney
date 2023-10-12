@@ -12,11 +12,7 @@
 
                     <header id="contentHeader" class="content-header"></header>
 
-                    <main id="mainContent">
-                        <div id="chart" class="stat-histogram">
-                            <span class="nodata-message" hidden><?= __("statistics.noData") ?></span>
-                        </div>
-                    </main>
+                    <main id="mainContent"></main>
                 </div>
             </div>
         </div>

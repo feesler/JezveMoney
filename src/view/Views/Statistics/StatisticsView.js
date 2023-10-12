@@ -33,6 +33,7 @@ import { CategoryList } from '../../Models/CategoryList.js';
 
 // Common components
 import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
+import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { FiltersContainer } from '../../Components/List/FiltersContainer/FiltersContainer.js';
 import { LoadingIndicator } from '../../Components/Common/LoadingIndicator/LoadingIndicator.js';
@@ -113,8 +114,6 @@ class StatisticsView extends AppView {
             'heading',
             'contentHeader',
             'mainContent',
-            // Histogram
-            'chart',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -148,8 +147,12 @@ class StatisticsView extends AppView {
         });
         this.contentHeader.prepend(this.filtersContainer.elem);
 
+        // No data message
+        this.noDataMessage = NoDataMessage.create({
+            title: __('statistics.noData'),
+        });
+
         // Chart
-        this.noDataMessage = this.chart.querySelector('.nodata-message');
         this.histogram = Histogram.create({
             height: 320,
             marginTop: 35,
@@ -170,7 +173,21 @@ class StatisticsView extends AppView {
             renderXAxisLabel: (value) => formatDateLabel(value, this.store.getState()),
             onItemClick: (target) => this.onSelectDataColumn(target),
         });
-        this.chart.append(this.histogram.elem);
+
+        // Loading indicator
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
+
+        // Histogram chart container
+        this.chart = createElement('div', {
+            props: { className: 'stat-histogram' },
+            children: [
+                this.histogram.elem,
+                this.noDataMessage.elem,
+                this.loadingIndicator.elem,
+            ],
+        });
 
         // Pie chart
         this.pieChart = PieChartGroup.create({
@@ -182,13 +199,8 @@ class StatisticsView extends AppView {
             onItemOut: (item) => this.onPieChartItemOut(item),
             onItemClick: (item) => this.onPieChartItemClick(item),
         });
-        this.mainContent.append(this.pieChart.elem);
 
-        // Loading indicator
-        this.loadingIndicator = LoadingIndicator.create({
-            fixed: false,
-        });
-        this.chart.append(this.loadingIndicator.elem);
+        this.mainContent.append(this.chart, this.pieChart.elem);
 
         this.subscribeToStore(this.store);
         this.onPostInit();
@@ -473,7 +485,7 @@ class StatisticsView extends AppView {
         const [value] = state.chartData?.values ?? [];
         const dataSet = value?.data ?? [];
         const noData = !dataSet.length && !state.chartData?.series?.length;
-        show(this.noDataMessage, state.chartData && noData);
+        this.noDataMessage.show(state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
 
         const data = (noData)
