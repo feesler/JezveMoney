@@ -5,7 +5,7 @@ import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { __ } from '../../utils/utils.js';
+import { __, createHiddenInputs } from '../../utils/utils.js';
 import { API } from '../../API/index.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
@@ -129,7 +129,8 @@ class CategoryView extends AppView {
         if (isUpdate) {
             hiddenInputIds.push('categoryId');
         }
-        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
 
         this.categoryForm = createElement('form', {
             props: {
@@ -146,7 +147,7 @@ class CategoryView extends AppView {
                 this.colorField.elem,
                 this.typeField.elem,
                 this.submitControls.elem,
-                ...hiddenInputs,
+                ...Object.values(hiddenInputs),
             ],
         });
         this.formContainer.append(this.categoryForm);
@@ -164,16 +165,6 @@ class CategoryView extends AppView {
         }
 
         this.subscribeToStore(this.store);
-    }
-
-    /** Returns hidden input element */
-    createHiddenInput(id) {
-        const input = createElement('input', {
-            props: { id, type: 'hidden' },
-        });
-
-        this[id] = input;
-        return input;
     }
 
     getHeaderTitle(isUpdate) {

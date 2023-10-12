@@ -4,7 +4,7 @@ import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { __ } from '../../utils/utils.js';
+import { __, createHiddenInputs } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -87,7 +87,8 @@ class PersonView extends AppView {
         if (isUpdate) {
             hiddenInputIds.push('pid');
         }
-        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
 
         this.personForm = createElement('form', {
             props: {
@@ -100,7 +101,7 @@ class PersonView extends AppView {
             children: [
                 this.nameField.elem,
                 this.submitControls.elem,
-                ...hiddenInputs,
+                ...Object.values(hiddenInputs),
             ],
         });
         this.formContainer.append(this.personForm);
@@ -118,16 +119,6 @@ class PersonView extends AppView {
         }
 
         this.subscribeToStore(this.store);
-    }
-
-    /** Returns hidden input element */
-    createHiddenInput(id) {
-        const input = createElement('input', {
-            props: { id, type: 'hidden' },
-        });
-
-        this[id] = input;
-        return input;
     }
 
     /** Name input event handler */

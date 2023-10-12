@@ -5,7 +5,7 @@ import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { getCurrencyPrecision, __ } from '../../utils/utils.js';
+import { getCurrencyPrecision, __, createHiddenInputs } from '../../utils/utils.js';
 import { normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -31,10 +31,6 @@ import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDial
 import { actions, reducer } from './reducer.js';
 import '../../Application/Application.scss';
 import './AccountView.scss';
-
-const hiddenInputIds = [
-    'flags',
-];
 
 /**
  * Create/update account view
@@ -193,10 +189,12 @@ class AccountView extends AppView {
         });
 
         // Hidden inputs
+        const hiddenInputIds = ['flags'];
         if (isUpdate) {
             hiddenInputIds.push('accid');
         }
-        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
 
         this.accountForm = createElement('form', {
             props: {
@@ -215,7 +213,7 @@ class AccountView extends AppView {
                 this.initBalanceField.elem,
                 this.initLimitField.elem,
                 this.submitControls.elem,
-                ...hiddenInputs,
+                ...Object.values(hiddenInputs),
             ],
         });
         this.formContainer.append(this.accountForm);
@@ -233,16 +231,6 @@ class AccountView extends AppView {
         }
 
         this.subscribeToStore(this.store);
-    }
-
-    /** Returns hidden input element */
-    createHiddenInput(id) {
-        const input = createElement('input', {
-            props: { id, type: 'hidden' },
-        });
-
-        this[id] = input;
-        return input;
     }
 
     /** Type select event handler */

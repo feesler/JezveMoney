@@ -19,6 +19,7 @@ import {
     cutTime,
     __,
     MAX_DAYS_IN_MONTH,
+    createHiddenInputs,
 } from '../../../utils/utils.js';
 import { EXCHANGE_PRECISION, normalizeExch } from '../../../utils/decimal.js';
 import { App } from '../../../Application/App.js';
@@ -510,12 +511,13 @@ export class TransactionForm extends Component {
         if (isUpdate) {
             hiddenInputIds.push('idInp');
         }
-        const hiddenInputs = hiddenInputIds.map((id) => this.createHiddenInput(id));
+        const hiddenInputs = createHiddenInputs(hiddenInputIds);
+        Object.assign(this, hiddenInputs);
 
         children.push(
             this.submitControls.elem,
             this.notAvailMsg,
-            ...hiddenInputs,
+            ...Object.values(hiddenInputs),
         );
 
         this.elem = createElement('form', {
@@ -704,16 +706,6 @@ export class TransactionForm extends Component {
             this.daySelectField.elem,
             this.dateRangeField.elem,
         ];
-    }
-
-    /** Returns hidden input element */
-    createHiddenInput(id) {
-        const input = createElement('input', {
-            props: { id, type: 'hidden' },
-        });
-
-        this[id] = input;
-        return input;
     }
 
     /** Initialize DropDown for source account tile */
