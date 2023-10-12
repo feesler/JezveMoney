@@ -41,8 +41,7 @@ export class ApiRequestForm extends Component {
 
     createFormControls() {
         return FormControls.create({
-            submitTitle: 'Submit',
-            cancelTitle: null,
+            cancelBtn: null,
         }).elem;
     }
 

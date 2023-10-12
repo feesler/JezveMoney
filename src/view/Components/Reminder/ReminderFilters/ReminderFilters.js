@@ -165,11 +165,16 @@ export class ReminderFilters extends Component {
         // Controls
         this.controls = FormControls.create({
             className: CONTROLS_CLASS,
-            submitTitle: __('actions.apply'),
-            onSubmitClick: (e) => this.onApplyFilters(e),
-            cancelTitle: __('actions.clearAll'),
-            cancelBtnClass: CLEAR_ALL_BUTTON_CLASS,
-            onCancelClick: (e) => this.onClearAllFilters(e),
+            submitBtn: {
+                type: 'button',
+                title: __('actions.apply'),
+                onClick: (e) => this.onApplyFilters(e),
+            },
+            cancelBtn: {
+                title: __('actions.clearAll'),
+                className: CLEAR_ALL_BUTTON_CLASS,
+                onClick: (e) => this.onClearAllFilters(e),
+            },
         });
 
         // Container
@@ -267,7 +272,10 @@ export class ReminderFilters extends Component {
         const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
         this.controls.setState((controlsState) => ({
             ...controlsState,
-            cancelURL: clearAllURL.toString(),
+            cancelBtn: {
+                ...controlsState.cancelBtn,
+                url: clearAllURL.toString(),
+            },
         }));
     }
 }

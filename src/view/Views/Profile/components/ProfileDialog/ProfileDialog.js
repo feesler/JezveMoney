@@ -56,8 +56,10 @@ export class ProfileDialog extends Component {
 
         // Submit controls
         this.formControls = FormControls.create({
-            submitTitle: __('actions.submit'),
-            cancelTitle: null,
+            submitBtn: {
+                title: __('actions.submit'),
+            },
+            cancelBtn: null,
         });
         this.form.append(this.formControls.elem);
 

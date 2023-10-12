@@ -284,12 +284,16 @@ export class TransactionFilters extends Component {
         const clearAllURL = getApplicationURL('transactions/');
         this.controls = FormControls.create({
             className: CONTROLS_CLASS,
-            submitTitle: __('actions.apply'),
-            onSubmitClick: (e) => this.onApplyFilters(e),
-            cancelTitle: __('actions.clearAll'),
-            cancelURL: clearAllURL.toString(),
-            cancelBtnClass: CLEAR_ALL_BUTTON_CLASS,
-            onCancelClick: (e) => this.onClearAllFilters(e),
+            submitBtn: {
+                title: __('actions.apply'),
+                onClick: (e) => this.onApplyFilters(e),
+            },
+            cancelBtn: {
+                title: __('actions.clearAll'),
+                className: CLEAR_ALL_BUTTON_CLASS,
+                url: clearAllURL.toString(),
+                onClick: (e) => this.onClearAllFilters(e),
+            },
         });
 
         // Container

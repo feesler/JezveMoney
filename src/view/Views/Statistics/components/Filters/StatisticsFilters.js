@@ -338,8 +338,10 @@ export class StatisticsFilters extends Component {
         // Controls
         this.controls = FormControls.create({
             className: CONTROLS_CLASS,
-            submitTitle: __('actions.apply'),
-            onSubmitClick: (e) => this.onApplyFilters(e),
+            submitBtn: {
+                title: __('actions.apply'),
+                onClick: (e) => this.onApplyFilters(e),
+            },
             cancelBtn: false,
         });
 

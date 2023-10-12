@@ -504,9 +504,13 @@ export class TransactionForm extends Component {
         // Controls
         this.submitControls = FormControls.create({
             id: 'submitControls',
-            submitTitle: __('actions.submit'),
-            cancelTitle: __('actions.cancel'),
-            cancelURL: App.props.nextAddress,
+            submitBtn: {
+                title: __('actions.submit'),
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                url: App.props.nextAddress,
+            },
         });
 
         // Hidden inputs
