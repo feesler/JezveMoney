@@ -161,7 +161,6 @@ class ProfileView extends AppView {
         this.resetBtn = createElement('a', {
             props: {
                 id: 'resetBtn',
-                className: 'change-name-link',
                 href: getApplicationURL('profile/reset/'),
                 textContent: __('profile.resetData'),
                 dataset: { action: 'reset' },
