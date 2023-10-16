@@ -41,6 +41,7 @@ const defaultProps = {
     dateRangeFilterId: undefined,
     mode: 'classic', // 'classic' or 'details'
     listMode: 'list',
+    modeSelectorType: 'link',
     showControls: true,
     onItemClick: null,
     getURL: null,
@@ -147,6 +148,7 @@ export class ReminderListGroup extends Component {
 
         // List mode selected
         this.modeSelector = ToggleDetailsButton.create({
+            defaultItemType: this.props.modeSelectorType,
             onChange: (value) => this.onChangeMode(value),
         });
 

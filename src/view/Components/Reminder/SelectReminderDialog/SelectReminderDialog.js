@@ -100,6 +100,7 @@ export class SelectReminderDialog extends Component {
             filtersId: 'filters',
             stateFilterId: 'stateFilter',
             dateRangeFilterId: 'dateFilter',
+            modeSelectorType: 'button',
             showControls: false,
             onChangeReminderState: (range) => this.onChangeReminderState(range),
             onChangeDateRange: (range) => this.onChangeDateRange(range),
@@ -107,7 +108,7 @@ export class SelectReminderDialog extends Component {
             onItemClick: (id, e) => this.onItemClick(id, e),
             onShowMore: (e) => this.showMore(e),
             onChangePage: (page) => this.onChangePage(page),
-            onToggleMode: (e) => this.onToggleMode(e),
+            onChangeMode: (mode) => this.onChangeMode(mode),
         });
 
         this.dialog = Popup.create({
@@ -195,6 +196,39 @@ export class SelectReminderDialog extends Component {
         this.setRenderTime();
     }
 
+    async showMore() {
+        const state = this.store.getState();
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
+
+        if (!isUpcoming) {
+            this.store.dispatch(actions.showMore());
+            this.setRenderTime();
+            return;
+        }
+
+        const { page } = state.pagination;
+        let { range } = state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        await this.requestUpcoming({
+            ...this.getUpcomingRequestData(),
+            range,
+            page,
+            keepState: true,
+            isLoadingMore: true,
+        });
+
+        this.setRenderTime();
+    }
+
+    onChangePage(page) {
+        this.store.dispatch(actions.changePage(page));
+        this.setRenderTime();
+    }
+
     /** Date range filter change handler */
     async onChangeDateRange(range) {
         const { filter } = this.store.getState();
@@ -242,6 +276,16 @@ export class SelectReminderDialog extends Component {
         this.setRenderTime();
     }
 
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
+        }
+
+        this.store.dispatch(actions.toggleMode());
+        this.setRenderTime();
+    }
+
     onCancel() {
         if (isFunction(this.props.onCancel)) {
             this.props.onCancel();
@@ -272,34 +316,6 @@ export class SelectReminderDialog extends Component {
         };
 
         this.props.onChange(selected);
-    }
-
-    async showMore() {
-        const state = this.store.getState();
-        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
-
-        if (!isUpcoming) {
-            this.store.dispatch(actions.showMore());
-            this.setRenderTime();
-            return;
-        }
-
-        const { page } = state.pagination;
-        let { range } = state.pagination;
-        if (!range) {
-            range = 1;
-        }
-        range += 1;
-
-        await this.requestUpcoming({
-            ...this.getUpcomingRequestData(),
-            range,
-            page,
-            keepState: true,
-            isLoadingMore: true,
-        });
-
-        this.setRenderTime();
     }
 
     getUpcomingRequestData() {
@@ -342,18 +358,6 @@ export class SelectReminderDialog extends Component {
         }
 
         this.stopLoading();
-    }
-
-    onChangePage(page) {
-        this.store.dispatch(actions.changePage(page));
-        this.setRenderTime();
-    }
-
-    onToggleMode(e) {
-        e.preventDefault();
-
-        this.store.dispatch(actions.toggleMode());
-        this.setRenderTime();
     }
 
     renderList(state) {
