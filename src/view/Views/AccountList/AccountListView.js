@@ -15,7 +15,6 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
-    listData,
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
@@ -679,7 +678,7 @@ class AccountListView extends AppView {
         // Visible accounts
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: listData(state.items.visible),
+            items: state.items.visible,
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
@@ -687,7 +686,7 @@ class AccountListView extends AppView {
         // Hidden accounts
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: listData(state.items.hidden),
+            items: state.items.hidden,
             listMode: state.listMode,
         }));
 

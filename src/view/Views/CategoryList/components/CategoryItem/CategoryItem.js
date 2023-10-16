@@ -1,8 +1,6 @@
 import { createElement, getClassName } from 'jezvejs';
 import { ListContainer } from 'jezvejs/ListContainer';
 
-import { listData } from '../../../../utils/utils.js';
-
 import { CollapsibleListItem } from '../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';
 
 import './CategoryItem.scss';
@@ -91,7 +89,7 @@ export class CategoryItem extends CollapsibleListItem {
 
         this.childContainer.setState((listState) => ({
             ...listState,
-            items: listData(item.children),
+            items: item.children,
             listMode,
             renderTime: Date.now(),
         }));

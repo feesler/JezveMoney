@@ -13,7 +13,7 @@ export class UserCurrencyList extends List {
     setData(data) {
         super.setData(data);
 
-        this.data.sort((a, b) => a.pos - b.pos);
+        this.sort((a, b) => a.pos - b.pos);
     }
 
     /**

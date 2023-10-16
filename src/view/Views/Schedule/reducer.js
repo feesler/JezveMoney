@@ -16,11 +16,10 @@ const reduceDeselectAll = (state) => ({
 });
 
 export const updateList = (state) => {
-    const { schedule } = App.model;
+    const items = App.model.schedule;
     const result = state;
     const { pagination } = result;
 
-    const items = schedule.data;
     result.items = items;
 
     pagination.pagesCount = Math.ceil(items.length / pagination.onPage);

@@ -32,7 +32,7 @@ export const getStateFilter = (state) => (
 export const getItemsSource = (state) => (
     (getStateFilter(state) === REMINDER_UPCOMING)
         ? (state.upcomingItems ?? [])
-        : App.model.reminders.data
+        : App.model.reminders
 );
 
 export const createList = (items, state) => {

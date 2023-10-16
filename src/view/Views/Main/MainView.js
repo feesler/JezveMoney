@@ -19,7 +19,6 @@ import {
     formatNumberShort,
     formatPersonDebts,
     getCurrencyPrecision,
-    listData,
     __,
     getApplicationURL,
 } from '../../utils/utils.js';
@@ -163,12 +162,12 @@ class MainView extends AppView {
 
         this.visibleAccounts = ListContainer.create({
             ...accountsProps,
-            items: listData(state.accounts.visible),
+            items: state.accounts.visible,
         });
 
         this.hiddenAccounts = ListContainer.create({
             ...accountsProps,
-            items: listData(state.accounts.hidden),
+            items: state.accounts.hidden,
         });
 
         this.toggleAccountsBtn = this.createToggleShowAllButton({
@@ -199,12 +198,12 @@ class MainView extends AppView {
 
         this.visiblePersons = ListContainer.create({
             ...personProps,
-            items: listData(state.persons.visible),
+            items: state.persons.visible,
         });
 
         this.hiddenPersons = ListContainer.create({
             ...personProps,
-            items: listData(state.persons.hidden),
+            items: state.persons.hidden,
         });
 
         this.togglePersonsBtn = this.createToggleShowAllButton({
@@ -520,7 +519,7 @@ class MainView extends AppView {
 
         this.visibleAccounts.setState((listState) => ({
             ...listState,
-            items: listData(state.accounts.visible),
+            items: state.accounts.visible,
             renderTime: state.renderTime,
         }));
 
@@ -535,7 +534,7 @@ class MainView extends AppView {
 
         this.hiddenAccounts.setState((listState) => ({
             ...listState,
-            items: listData(state.accounts.hidden),
+            items: state.accounts.hidden,
             renderTime: state.renderTime,
         }));
         this.hiddenAccounts.show(hiddenAvailable && state.accounts.showHidden);
@@ -554,7 +553,7 @@ class MainView extends AppView {
 
         this.visiblePersons.setState((listState) => ({
             ...listState,
-            items: listData(state.persons.visible),
+            items: state.persons.visible,
             renderTime: state.renderTime,
         }));
 
@@ -569,7 +568,7 @@ class MainView extends AppView {
 
         this.hiddenPersons.setState((listState) => ({
             ...listState,
-            items: listData(state.persons.hidden),
+            items: state.persons.hidden,
             renderTime: state.renderTime,
         }));
         this.hiddenPersons.show(hiddenAvailable && state.persons.showHidden);

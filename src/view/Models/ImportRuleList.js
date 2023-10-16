@@ -15,7 +15,7 @@ export class ImportRuleList extends List {
             throw new Error('Invalid list props');
         }
 
-        this.data = data.map((item) => this.createItem(item));
+        this.splice(0, this.length, ...data.map((item) => this.createItem(item)));
     }
 
     /**

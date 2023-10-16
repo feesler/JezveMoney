@@ -16,7 +16,6 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
-    listData,
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
@@ -721,7 +720,7 @@ class CategoryListView extends AppView {
 
             section.list.setState((listState) => ({
                 ...listState,
-                items: listData(typeCategories),
+                items: typeCategories,
                 listMode: state.listMode,
                 renderTime: Date.now(),
             }));

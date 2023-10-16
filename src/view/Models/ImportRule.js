@@ -20,8 +20,8 @@ export class ImportRule extends ListItem {
     constructor(props) {
         super(props);
 
-        this.conditions = new ImportConditionList(props?.conditions);
-        this.actions = new ImportActionList(props?.actions);
+        this.conditions = ImportConditionList.create(props?.conditions);
+        this.actions = ImportActionList.create(props?.actions);
     }
 
     /**
@@ -47,7 +47,7 @@ export class ImportRule extends ListItem {
 
     /** Run actions assigned to rule */
     runActions(context) {
-        const sortedActions = this.actions.sort();
+        const sortedActions = this.actions.defaultSort();
 
         return sortedActions.reduce((ctx, action) => action.execute(ctx), context);
     }
@@ -73,9 +73,9 @@ export class ImportRule extends ListItem {
             return result;
         }
 
-        const notEqConds = new ImportConditionList();
-        const lessConds = new ImportConditionList();
-        const greaterConds = new ImportConditionList();
+        const notEqConds = ImportConditionList.create();
+        const lessConds = ImportConditionList.create();
+        const greaterConds = ImportConditionList.create();
 
         try {
             this.conditions.forEach((condition, ind) => {

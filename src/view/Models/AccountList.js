@@ -47,7 +47,7 @@ export class AccountList extends List {
      * @param {number} accountId - identifier of account to start looking from
      */
     getNextAccount(accountId = 0) {
-        if (!Array.isArray(this.data) || this.length === 0) {
+        if (this.length === 0) {
             return null;
         }
 

@@ -17,7 +17,6 @@ import {
     dateStringToTime,
     getContextIds,
     getSelectedItems,
-    listData,
 } from '../../../utils/utils.js';
 
 // Models
@@ -789,7 +788,7 @@ export class ReminderListGroup extends Component {
 
         const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
-        const items = listData(state.items).slice(firstItem, lastItem);
+        const items = state.items.slice(firstItem, lastItem);
 
         this.reminderList.setState((listState) => ({
             ...listState,

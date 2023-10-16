@@ -430,8 +430,8 @@ export class Application {
         hiddenUserAccounts.sortBy(settings.sort_accounts);
 
         userAccounts.setData([
-            ...visibleUserAccounts.data,
-            ...hiddenUserAccounts.data,
+            ...visibleUserAccounts,
+            ...hiddenUserAccounts,
         ]);
 
         this.model.userAccounts = userAccounts;
@@ -462,8 +462,8 @@ export class Application {
         hiddenPersons.sortBy(settings.sort_persons);
 
         persons.setData([
-            ...visiblePersons.data,
-            ...hiddenPersons.data,
+            ...visiblePersons,
+            ...hiddenPersons,
         ]);
 
         this.model.visiblePersons = visiblePersons;

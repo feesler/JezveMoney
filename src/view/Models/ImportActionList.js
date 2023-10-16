@@ -99,8 +99,8 @@ export class ImportActionList extends List {
         return ImportActionList.hasSetDebt(this);
     }
 
-    sort() {
-        const sorted = ImportActionList.sort(this.data);
+    defaultSort() {
+        const sorted = ImportActionList.sort(this);
         return ImportActionList.create(sorted);
     }
 }
