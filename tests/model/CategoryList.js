@@ -66,10 +66,11 @@ export class CategoryList extends SortableList {
     /** Sort categories by parent */
     sortByParent() {
         const mainCategories = this.findByParent(0).sort((a, b) => a.id - b.id);
-        this.data = mainCategories.flatMap((item) => {
+        const data = mainCategories.flatMap((item) => {
             const children = this.findByParent(item.id).sort((a, b) => a.id - b.id);
             return [item, ...children];
         });
+        this.setData(data);
     }
 
     sortBy(sortMode) {
@@ -87,23 +88,23 @@ export class CategoryList extends SortableList {
     }
 
     sortByPos() {
-        this.data.sort((a, b) => a.pos - b.pos);
+        this.sort((a, b) => a.pos - b.pos);
     }
 
     sortByNameAsc() {
-        this.data.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name > b.name) ? 1 : -1));
     }
 
     sortByNameDesc() {
-        this.data.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name < b.name) ? 1 : -1));
     }
 
     sortByCreateDateAsc() {
-        this.data.sort((a, b) => a.id - b.id);
+        this.sort((a, b) => a.id - b.id);
     }
 
     sortByCreateDateDesc() {
-        this.data.sort((a, b) => b.id - a.id);
+        this.sort((a, b) => b.id - a.id);
     }
 
     getUsedColors() {

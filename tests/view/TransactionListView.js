@@ -38,6 +38,7 @@ import {
     trimToDigitsLimit,
 } from '../common.js';
 import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
+import { TransactionsList } from '../model/TransactionsList.js';
 
 const listMenuSelector = '#listMenu';
 const categoryDialogSelector = '#selectCategoryDialog';
@@ -216,6 +217,7 @@ export class TransactionListView extends AppView {
         }
 
         res.filtered = res.data.applyFilter(res.filter);
+        res.filtered = TransactionsList.create(res.filtered);
 
         if (cont.paginator && cont.transList) {
             const items = cont.transList.getItems();
@@ -290,10 +292,11 @@ export class TransactionListView extends AppView {
         const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
+        res.filtered = TransactionsList.create(res.filtered);
         if (res.filtered.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = res.filtered.getPage(1, onPage, range, true);
-            const { items } = TransactionList.render(pageItems.data, App.state);
+            const { items } = TransactionList.render(pageItems, App.state);
 
             res.list = {
                 page: 1,
@@ -428,10 +431,11 @@ export class TransactionListView extends AppView {
         const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
+        res.filtered = TransactionsList.create(res.filtered);
         res.list.page = page;
         res.list.range = range;
         const pageItems = res.filtered.getPage(page, onPage, range, true);
-        const { items } = TransactionList.render(pageItems.data, App.state);
+        const { items } = TransactionList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -453,9 +457,10 @@ export class TransactionListView extends AppView {
         const onPage = App.config.transactionsOnPage;
 
         res.filtered = res.data.applyFilter(res.filter);
+        res.filtered = TransactionsList.create(res.filtered);
         res.list.range = range;
         const pageItems = res.filtered.getPage(model.list.page, onPage, range, true);
-        const { items } = TransactionList.render(pageItems.data, App.state);
+        const { items } = TransactionList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -493,7 +498,7 @@ export class TransactionListView extends AppView {
         let items = [];
         if (page !== 0) {
             const pageItems = model.filtered.getPage(page, onPage, range, true);
-            items = pageItems.data;
+            items = pageItems;
         }
 
         const showDate = !App.state.getGroupByDate();

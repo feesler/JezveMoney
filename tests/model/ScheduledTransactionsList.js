@@ -19,21 +19,21 @@ export class ScheduledTransactionsList extends List {
 
     /** Returns expected list of scheduled transactions after update specified account */
     updateAccount(accList, account) {
-        const res = TransactionsList.onUpdateAccount(this.data, accList, account);
+        const res = TransactionsList.onUpdateAccount(this, accList, account);
 
         return ScheduledTransactionsList.create(res);
     }
 
     /** Returns expected list of scheduled transactions after delete specified accounts */
     deleteAccounts(accList, ids) {
-        const res = TransactionsList.onDeleteAccounts(this.data, accList, ids);
+        const res = TransactionsList.onDeleteAccounts(this, accList, ids);
 
         return ScheduledTransactionsList.create(res);
     }
 
     /** Returns expected list of transactions after delete specified categories */
     deleteCategories(ids) {
-        const res = TransactionsList.onDeleteCategories(this.data, ids);
+        const res = TransactionsList.onDeleteCategories(this, ids);
 
         return ScheduledTransactionsList.create(res);
     }
@@ -59,8 +59,8 @@ export class ScheduledTransactionsList extends List {
     }
 
     getPage(num, limit, range, desc = false) {
-        const items = this.getItemsPage(this.data, num, limit, range, desc);
-        if (items === this.data) {
+        const items = this.getItemsPage(this, num, limit, range, desc);
+        if (items === this) {
             return this;
         }
 
@@ -79,16 +79,17 @@ export class ScheduledTransactionsList extends List {
         return res.sort((a, b) => a.pos - b.pos);
     }
 
-    sort() {
-        this.data = this.sortItems(this.data, true);
+    defaultSort() {
+        const data = this.sortItems(this, true);
+        this.setData(data);
     }
 
     sortAsc() {
-        return this.sortItems(this.data);
+        return this.sortItems(this);
     }
 
     sortDesc() {
-        return this.sortItems(this.data, true);
+        return this.sortItems(this, true);
     }
 
     getLongestInterval() {
@@ -133,7 +134,7 @@ export class ScheduledTransactionsList extends List {
         });
 
         const list = RemindersList.create(res);
-        list.sort(false);
+        list.defaultSort(false);
 
         return list;
     }

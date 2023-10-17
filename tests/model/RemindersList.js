@@ -54,7 +54,7 @@ export class RemindersList extends List {
             date: reminder.date,
         };
 
-        const res = RemindersList.filterItems(this.data, options);
+        const res = RemindersList.filterItems(this, options);
         return res.length > 0;
     }
 
@@ -64,7 +64,7 @@ export class RemindersList extends List {
      */
     getReminderByTransaction(transactionId) {
         const id = parseInt(transactionId, 10);
-        return this.data.find((item) => item.transaction_id === id);
+        return this.find((item) => item.transaction_id === id);
     }
 
     /**
@@ -74,7 +74,7 @@ export class RemindersList extends List {
      */
     getRemindersBySchedule(scheduleId, returnIds = false) {
         const id = parseInt(scheduleId, 10);
-        const res = this.data.filter((item) => item.schedule_id === id);
+        const res = this.filter((item) => item.schedule_id === id);
         return (returnIds) ? res.map((item) => item.id) : res;
     }
 
@@ -85,7 +85,7 @@ export class RemindersList extends List {
      */
     getReminderByDate(timestamp, returnIds = false) {
         const date = parseInt(timestamp, 10);
-        const res = this.data.filter((item) => item.date === date);
+        const res = this.filter((item) => item.date === date);
         return (returnIds) ? res.map((item) => item.id) : res;
     }
 
@@ -95,7 +95,8 @@ export class RemindersList extends List {
      */
     deleteRemindersBySchedule(scheduleId) {
         const ids = asArray(scheduleId).map((id) => parseInt(id, 10));
-        this.data = this.data.filter((item) => !ids.includes(item.schedule_id));
+        const data = this.filter((item) => !ids.includes(item.schedule_id));
+        this.setData(data);
     }
 
     /**
@@ -104,8 +105,8 @@ export class RemindersList extends List {
      * @returns RemindersList
      */
     applyFilter(params) {
-        const items = RemindersList.filterItems(this.data, params);
-        if (items === this.data) {
+        const items = RemindersList.filterItems(this, params);
+        if (items === this) {
             return this;
         }
 
@@ -119,7 +120,7 @@ export class RemindersList extends List {
     }
 
     expectedPages(limit) {
-        return this.getExpectedPages(this.data, limit);
+        return this.getExpectedPages(this, limit);
     }
 
     getItemsPage(list, num, limit, range, desc = false) {
@@ -137,8 +138,8 @@ export class RemindersList extends List {
     }
 
     getPage(num, limit, range, desc = false) {
-        const items = this.getItemsPage(this.data, num, limit, range, desc);
-        if (items === this.data) {
+        const items = this.getItemsPage(this, num, limit, range, desc);
+        if (items === this) {
             return this;
         }
 
@@ -148,7 +149,7 @@ export class RemindersList extends List {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = list;
+        const res = structuredClone(list);
 
         if (desc) {
             return res.sort((a, b) => (
@@ -165,22 +166,23 @@ export class RemindersList extends List {
         ));
     }
 
-    sort(desc = true) {
-        this.data = this.sortItems(this.data, desc);
+    defaultSort(desc = true) {
+        const data = this.sortItems(this, desc);
+        this.setData(data);
     }
 
     sortAsc() {
-        return this.sortItems(this.data);
+        return this.sortItems(this);
     }
 
     sortDesc() {
-        return this.sortItems(this.data, true);
+        return this.sortItems(this, true);
     }
 
     deleteTransactions(transactions) {
         const ids = asArray(transactions);
 
-        this.data = this.data.map((item) => (
+        const data = this.map((item) => (
             (ids.includes(item.transaction_id))
                 ? this.createItem({
                     ...item,
@@ -189,5 +191,7 @@ export class RemindersList extends List {
                 })
                 : item
         ));
+
+        this.setData(data);
     }
 }

@@ -52,8 +52,8 @@ export class ImportActionList extends List {
         ));
     }
 
-    sort() {
-        const data = structuredClone(this.data);
+    defaultSort() {
+        const data = structuredClone(this);
         data.sort((a, b) => a.action_id - b.action_id);
         return ImportActionList.create(data);
     }

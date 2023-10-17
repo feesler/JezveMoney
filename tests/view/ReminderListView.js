@@ -187,7 +187,7 @@ export class ReminderListView extends AppView {
         if (page !== 0) {
             const filteredItems = this.getFilteredItems(model);
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            items = pageItems.data;
+            items = pageItems;
         }
 
         return TransactionRemindersList.render(items, state);
@@ -200,7 +200,7 @@ export class ReminderListView extends AppView {
         const sourceItems = App.view.getSourceItems(model);
 
         const list = sourceItems.applyFilter(model.filter);
-        list.sort(!isUpcoming);
+        list.defaultSort(!isUpcoming);
 
         return list;
     }
@@ -399,7 +399,7 @@ export class ReminderListView extends AppView {
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+            const { items } = TransactionRemindersList.render(pageItems, App.state);
 
             res.list = {
                 page: 1,
@@ -432,7 +432,7 @@ export class ReminderListView extends AppView {
     }
 
     getItems() {
-        return this.getSourceItems().data;
+        return this.getSourceItems();
     }
 
     loadReminders(options = {}) {
@@ -454,7 +454,7 @@ export class ReminderListView extends AppView {
                 })),
             );
         }
-        this.items.sort();
+        this.items.defaultSort();
 
         // Upcoming reminders
         const { filter, list } = model;
@@ -478,7 +478,7 @@ export class ReminderListView extends AppView {
             }));
         }
         this.upcomingItems = RemindersList.create(items);
-        this.upcomingItems.sort(false);
+        this.upcomingItems.defaultSort(false);
 
         this.upcomingPagination = upcoming.pagination;
     }
@@ -539,7 +539,7 @@ export class ReminderListView extends AppView {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+        const { items } = TransactionRemindersList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -569,7 +569,7 @@ export class ReminderListView extends AppView {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(res.list.page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+        const { items } = TransactionRemindersList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -592,7 +592,7 @@ export class ReminderListView extends AppView {
             const range = Math.min(model.list.range, pages - page + 1);
 
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+            const { items } = TransactionRemindersList.render(pageItems, App.state);
 
             res.list = {
                 page,

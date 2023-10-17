@@ -146,7 +146,9 @@ export class AppState {
         if (!this.accounts) {
             this.accounts = AccountsList.create();
         }
-        this.accounts.setData(state.accounts.data);
+
+        const accounts = state.accounts?.data ?? state.accounts;
+        this.accounts.setData(accounts);
         this.accounts.autoincrement = state.accounts.autoincrement;
         this.resetUserAccountsCache();
         this.sortAccounts();
@@ -154,7 +156,9 @@ export class AppState {
         if (!this.persons) {
             this.persons = PersonsList.create();
         }
-        this.persons.setData(state.persons.data);
+
+        const persons = state.persons?.data ?? state.persons;
+        this.persons.setData(persons);
         this.persons.autoincrement = state.persons.autoincrement;
         this.resetPersonsCache();
         this.sortPersons();
@@ -162,26 +166,29 @@ export class AppState {
         if (!this.transactions) {
             this.transactions = TransactionsList.create();
         }
-        const transactions = state.transactions?.items ?? state.transactions.data;
+        const transactions = state.transactions?.items ?? state.transactions;
         this.transactions.setData(transactions);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.schedule) {
             this.schedule = ScheduledTransactionsList.create();
         }
-        this.schedule.setData(state.schedule.data);
+        const schedule = state.schedule?.data ?? state.schedule;
+        this.schedule.setData(schedule);
         this.schedule.autoincrement = state.schedule.autoincrement;
 
         if (!this.reminders) {
             this.reminders = RemindersList.create();
         }
-        this.reminders.setData(state.reminders.data);
+        const reminders = state.reminders?.data ?? state.reminders;
+        this.reminders.setData(reminders);
         this.reminders.autoincrement = state.reminders.autoincrement;
 
         if (!this.categories) {
             this.categories = CategoryList.create();
         }
-        this.categories.setData(state.categories.data);
+        const categories = state.categories?.data ?? state.categories;
+        this.categories.setData(categories);
         this.categories.autoincrement = state.categories.autoincrement;
         this.sortCategories();
 
@@ -189,20 +196,21 @@ export class AppState {
             this.templates = ImportTemplateList.create();
         }
         const templates = state.importtemplates ?? state.templates;
-        this.templates.setData(templates.data);
+        this.templates.setData(templates?.data ?? templates);
         this.templates.autoincrement = templates.autoincrement;
 
         if (!this.rules) {
             this.rules = ImportRuleList.create();
         }
         const rules = state.importrules ?? state.rules;
-        this.rules.setData(rules.data);
+        this.rules.setData(rules?.data ?? rules);
         this.rules.autoincrement = rules.autoincrement;
 
         if (!this.userCurrencies) {
             this.userCurrencies = UserCurrencyList.create();
         }
-        this.userCurrencies.setData(state.userCurrencies.data);
+        const userCurrencies = state.userCurrencies?.data ?? state.userCurrencies;
+        this.userCurrencies.setData(userCurrencies);
         this.userCurrencies.autoincrement = state.userCurrencies.autoincrement;
     }
 
@@ -246,14 +254,14 @@ export class AppState {
 
     /* eslint-disable no-console */
     compareLists(local, expected) {
-        const noDatesData = this.getNoDatesList(expected.data);
+        const noDatesData = this.getNoDatesList(expected);
 
         try {
-            assert(local.data.length === expected.data.length);
+            assert(local.length === expected.length);
 
-            assert.deepMeet(local.data, noDatesData);
+            assert.deepMeet(local, noDatesData);
         } catch (e) {
-            console.log('Real data: ', local.data);
+            console.log('Real data: ', local);
             console.log('Expected: ', noDatesData);
 
             throw e;
@@ -273,7 +281,7 @@ export class AppState {
 
         assert(this.rules.length === expected.rules.length);
         this.rules.forEach((rule, index) => {
-            const expectedRule = expected.rules.data[index];
+            const expectedRule = expected.rules[index];
 
             this.compareLists(rule.conditions, expectedRule.conditions);
             this.compareLists(rule.actions, expectedRule.actions);
@@ -298,7 +306,7 @@ export class AppState {
         let res = false;
         try {
             res = action();
-        } catch {
+        } catch (e) {
             res = false;
         }
 
@@ -474,7 +482,7 @@ export class AppState {
 
     getCurrencies() {
         const res = {
-            data: this.getNoDatesList(App.currency.data),
+            data: this.getNoDatesList(App.currency),
         };
 
         return res;
@@ -482,7 +490,7 @@ export class AppState {
 
     getColors() {
         const res = {
-            data: this.getNoDatesList(App.colors.data),
+            data: this.getNoDatesList(App.colors),
         };
 
         return res;
@@ -490,7 +498,7 @@ export class AppState {
 
     getIcons() {
         const res = {
-            data: this.getNoDatesList(App.icons.data),
+            data: this.getNoDatesList(App.icons),
         };
 
         return res;
@@ -534,7 +542,7 @@ export class AppState {
         } else if (visibility === 'hidden') {
             res.data = this.persons.getHidden(true);
         } else if (visibility === 'all') {
-            res.data = this.persons.data;
+            res.data = this.persons;
         } else {
             throw new Error(`Invalid visibility value: ${options.visibility}`);
         }
@@ -550,7 +558,7 @@ export class AppState {
         if ('parent_id' in options) {
             res.data = this.categories.findByParent(options.parent_id);
         } else {
-            res.data = this.categories.data;
+            res.data = this.categories;
         }
 
         res.data = this.getNoDatesList(res.data);
@@ -561,7 +569,7 @@ export class AppState {
 
     getImportTemplates() {
         const res = {
-            data: this.getNoDatesList(this.templates.data),
+            data: this.getNoDatesList(this.templates),
         };
 
         return res;
@@ -582,7 +590,7 @@ export class AppState {
             const item = this.userCurrencies.findByCurrency(options.curr_id);
             res.data = [item];
         } else {
-            res.data = this.userCurrencies.data;
+            res.data = this.userCurrencies;
         }
 
         res.data = this.getNoDatesList(res.data);
@@ -612,7 +620,7 @@ export class AppState {
         };
 
         const filtered = this.transactions.applyFilter(request);
-        let items = filtered.clone();
+        let items = TransactionsList.create(filtered);
         const { onPage } = request;
         const isDesc = request.order?.toLowerCase() === 'desc';
 
@@ -623,11 +631,11 @@ export class AppState {
         }
 
         if (!isDesc) {
-            items.data = items.sortAsc();
+            items = items.sortAsc();
         }
 
         const res = {
-            items: this.getNoDatesList(items.data),
+            items: this.getNoDatesList(items),
             filter: this.transactions.getFilter(request),
             order: request.order ?? 'asc',
             pagination: {
@@ -664,7 +672,7 @@ export class AppState {
 
     getScheduledTransactions() {
         return {
-            data: this.getNoDatesList(this.schedule.data),
+            data: this.getNoDatesList(this.schedule),
         };
     }
 
@@ -829,8 +837,7 @@ export class AppState {
 
         // Check there is no entry for the same currency
         const userCurrency = this.userCurrencies.findByCurrency(currency.id);
-        const isUpdate = !!params.id;
-        if (userCurrency && (!isUpdate || (isUpdate && params.id !== userCurrency.id))) {
+        if (userCurrency && userCurrency.id !== params.id) {
             return false;
         }
 
@@ -1011,11 +1018,11 @@ export class AppState {
         }
 
         // Prepare expected updates of transactions list
-        this.transactions = this.transactions.updateAccount(this.accounts.data, expAccount);
+        this.transactions = this.transactions.updateAccount(this.accounts, expAccount);
 
         // Prepare expected updates of scheduled transactions list
         this.schedule = this.schedule.updateAccount(
-            this.accounts.data,
+            this.accounts,
             expAccount,
         );
 
@@ -1133,8 +1140,8 @@ export class AppState {
             const hidden = userAccounts.getHidden();
             hidden.sortBy(sortMode);
             this.sortedAccountsCache = AccountsList.create([
-                ...visible.data,
-                ...hidden.data,
+                ...visible,
+                ...hidden,
             ]);
         }
 
@@ -1291,10 +1298,10 @@ export class AppState {
     onDeleteAccounts(items) {
         const ids = asArray(items);
 
-        this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
+        this.transactions = this.transactions.deleteAccounts(this.accounts, ids);
 
         const newSchedule = this.schedule.deleteAccounts(
-            this.accounts.data,
+            this.accounts,
             ids,
         );
 
@@ -1435,8 +1442,8 @@ export class AppState {
             const hidden = this.persons.getHidden();
             hidden.sortBy(sortMode);
             this.sortedPersonsCache = PersonsList.create([
-                ...visible.data,
-                ...hidden.data,
+                ...visible,
+                ...hidden,
             ]);
         }
 
@@ -1959,7 +1966,7 @@ export class AppState {
     }
 
     updatePersonAccounts() {
-        for (const person of this.persons.data) {
+        for (const person of this.persons) {
             person.accounts = this.accounts.filter((item) => item.owner_id === person.id)
                 .map((item) => ({ id: item.id, balance: item.balance, curr_id: item.curr_id }));
         }
@@ -1996,11 +2003,11 @@ export class AppState {
 
             // Prepare expected updates of transactions
             const ind = this.transactions.create(expTrans);
+            const item = this.transactions.getItemByIndex(ind);
+
             this.transactions.updateResults(this.accounts);
             this.updatePersonAccounts();
             this.resetPersonsCache();
-
-            const item = this.transactions.getItemByIndex(ind);
 
             const reminderId = (itemData.reminder_id) ? parseInt(itemData.reminder_id, 10) : 0;
             const scheduleId = (itemData.schedule_id) ? parseInt(itemData.schedule_id, 10) : 0;

@@ -19,11 +19,13 @@ export class ImportTemplateList extends List {
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
-        this.data = this.map((item) => (
+        const data = this.map((item) => (
             (itemIds.includes(item.account_id))
                 ? { ...item, account_id: 0 }
                 : item
         ));
+
+        this.setData(data);
     }
 
     /** Searches for import template by name and returns result */

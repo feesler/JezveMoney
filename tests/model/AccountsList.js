@@ -78,7 +78,7 @@ export class AccountsList extends SortableList {
             }
         }
 
-        return res;
+        return AccountsList.create(res);
     }
 
     /** Cancel transaction from accounts */
@@ -112,72 +112,51 @@ export class AccountsList extends SortableList {
             }
         }
 
-        return res;
+        return AccountsList.create(res);
     }
 
     async fetch() {
         return api.account.list({ owner: 'all' });
     }
 
-    createTransaction(transaction, returnRaw = false) {
-        const res = AccountsList.applyTransaction(this.data, transaction);
-
-        if (returnRaw) {
-            return res;
-        }
-
+    createTransaction(transaction) {
+        const res = AccountsList.applyTransaction(this, transaction);
         return AccountsList.create(res);
     }
 
-    updateTransaction(origTransaction, newTransaction, returnRaw = false) {
-        const afterCancel = AccountsList.cancelTransaction(this.data, origTransaction);
+    updateTransaction(origTransaction, newTransaction) {
+        const afterCancel = AccountsList.cancelTransaction(this, origTransaction);
         const res = AccountsList.applyTransaction(afterCancel, newTransaction);
 
-        if (returnRaw) {
-            return res;
-        }
-
         return AccountsList.create(res);
     }
 
-    deleteTransactions(transactions, returnRaw = false) {
+    deleteTransactions(transactions) {
         const transList = asArray(transactions);
 
         const res = transList.reduce((data, transaction) => (
             AccountsList.cancelTransaction(data, transaction)
-        ), structuredClone(this.data));
-
-        if (returnRaw) {
-            return res;
-        }
+        ), structuredClone(this));
 
         return AccountsList.create(res);
     }
 
     /** Reset initial balances of all accounts to current values */
-    toCurrent(returnRaw = false) {
-        const res = this.data.map((account) => ({
+    toCurrent() {
+        const res = this.map((account) => ({
             ...account,
             initbalance: account.balance,
         }));
-
-        if (returnRaw) {
-            return res;
-        }
 
         return AccountsList.create(res);
     }
 
     /** Reset balance of all accounts to initial values */
-    toInitial(returnRaw = false) {
-        const res = this.data.map((account) => ({
+    toInitial() {
+        const res = this.map((account) => ({
             ...account,
             balance: account.initbalance,
         }));
-
-        if (returnRaw) {
-            return res;
-        }
 
         return AccountsList.create(res);
     }
@@ -195,25 +174,17 @@ export class AccountsList extends SortableList {
     }
 
     sortByVisibility() {
-        this.data.sort((a, b) => a.flags - b.flags);
+        this.sort((a, b) => a.flags - b.flags);
     }
 
-    getUserAccounts(returnRaw = false) {
+    getUserAccounts() {
         const res = this.filter((item) => item.owner_id === App.owner_id);
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return AccountsList.create(res);
     }
 
-    getPersonsAccounts(returnRaw = false) {
+    getPersonsAccounts() {
         const res = this.filter((item) => item.owner_id !== App.owner_id);
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return AccountsList.create(res);
     }
@@ -224,34 +195,26 @@ export class AccountsList extends SortableList {
         return hasFlag(account.flags, ACCOUNT_HIDDEN);
     }
 
-    getVisible(returnRaw = false) {
+    getVisible() {
         const res = this.filter((item) => !this.isHidden(item));
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return AccountsList.create(res);
     }
 
-    getHidden(returnRaw = false) {
+    getHidden() {
         const res = this.filter((item) => this.isHidden(item));
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return AccountsList.create(res);
     }
 
     /** Return visible user accounts */
-    getUserVisible(returnRaw = false) {
-        return this.getUserAccounts().getVisible(returnRaw);
+    getUserVisible() {
+        return this.getUserAccounts().getVisible();
     }
 
     /** Return hidden user accounts */
-    getUserHidden(returnRaw = false) {
-        return this.getUserAccounts().getHidden(returnRaw);
+    getUserHidden() {
+        return this.getUserAccounts().getHidden();
     }
 
     sortBy(sortMode) {
@@ -269,22 +232,22 @@ export class AccountsList extends SortableList {
     }
 
     sortByPos() {
-        this.data.sort((a, b) => a.pos - b.pos);
+        this.sort((a, b) => a.pos - b.pos);
     }
 
     sortByNameAsc() {
-        this.data.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name > b.name) ? 1 : -1));
     }
 
     sortByNameDesc() {
-        this.data.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name < b.name) ? 1 : -1));
     }
 
     sortByCreateDateAsc() {
-        this.data.sort((a, b) => a.id - b.id);
+        this.sort((a, b) => a.id - b.id);
     }
 
     sortByCreateDateDesc() {
-        this.data.sort((a, b) => b.id - a.id);
+        this.sort((a, b) => b.id - a.id);
     }
 }

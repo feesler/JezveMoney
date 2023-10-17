@@ -7,6 +7,7 @@ import { ApiRequestError } from '../../../error/ApiRequestError.js';
 import { Transaction } from '../../../model/Transaction.js';
 import { formatProps } from '../../../common.js';
 import { App } from '../../../Application.js';
+import { TransactionsList } from '../../../model/TransactionsList.js';
 
 /**
  * Create transaction with specified params and check expected state of app
@@ -196,6 +197,7 @@ export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
+        expTransList = TransactionsList.create(expTransList);
 
         const isDesc = params.order?.toLowerCase() === 'desc';
         const onPage = params?.onPage ?? App.config.transactionsOnPage;
@@ -208,14 +210,14 @@ export const filter = async (params) => {
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at TransactionsList.setData()
         if (!isDesc) {
-            expTransList.data = expTransList.sortAsc();
+            expTransList = expTransList.sortAsc();
         }
 
         // Send API sequest to server
         const trList = await api.transaction.list(params);
         assert(trList, 'Fail to read list of transactions');
 
-        assert.deepMeet(trList.items, expTransList.data);
+        assert.deepMeet(trList.items, expTransList);
 
         return true;
     });

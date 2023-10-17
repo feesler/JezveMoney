@@ -108,7 +108,7 @@ export class SelectReminderDialog extends TestComponent {
         if (page !== 0) {
             const filteredItems = this.getFilteredItems(model, state);
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            items = pageItems.data;
+            items = pageItems;
         }
 
         return TransactionRemindersList.render(items, state);
@@ -134,14 +134,14 @@ export class SelectReminderDialog extends TestComponent {
 
             const upcoming = state.getUpcomingReminders(params);
             sourceItems = RemindersList.create(upcoming.items);
-            sourceItems.sort(false);
+            sourceItems.defaultSort(false);
         } else {
             sourceItems = state.reminders.clone();
-            sourceItems.sort();
+            sourceItems.defaultSort();
         }
 
         const list = sourceItems.applyFilter(model.filter);
-        list.sort(!isUpcoming);
+        list.defaultSort(!isUpcoming);
 
         return list;
     }
@@ -307,7 +307,7 @@ export class SelectReminderDialog extends TestComponent {
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+            const { items } = TransactionRemindersList.render(pageItems, App.state);
 
             res.list = {
                 page: 1,
@@ -342,7 +342,7 @@ export class SelectReminderDialog extends TestComponent {
     }
 
     getItems() {
-        return this.getSourceItems().data;
+        return this.getSourceItems();
     }
 
     loadReminders(options = {}) {
@@ -352,7 +352,7 @@ export class SelectReminderDialog extends TestComponent {
         } = options;
 
         this.items = state.reminders.clone();
-        this.items.sort();
+        this.items.defaultSort();
 
         // Upcoming reminders
         const { filter, list } = model;
@@ -369,7 +369,7 @@ export class SelectReminderDialog extends TestComponent {
 
         const upcoming = state.getUpcomingReminders(params);
         this.upcomingItems = RemindersList.create(upcoming.items);
-        this.upcomingItems.sort(false);
+        this.upcomingItems.defaultSort(false);
 
         this.upcomingPagination = upcoming.pagination;
     }
@@ -430,7 +430,7 @@ export class SelectReminderDialog extends TestComponent {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+        const { items } = TransactionRemindersList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -460,7 +460,7 @@ export class SelectReminderDialog extends TestComponent {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(res.list.page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+        const { items } = TransactionRemindersList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -483,7 +483,7 @@ export class SelectReminderDialog extends TestComponent {
             const range = Math.min(model.list.range, pages - page + 1);
 
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems.data, App.state);
+            const { items } = TransactionRemindersList.render(pageItems, App.state);
 
             res.list = {
                 page,
