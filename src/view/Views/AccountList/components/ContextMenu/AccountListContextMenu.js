@@ -3,6 +3,9 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
+import { actions } from '../../reducer.js';
+import { showDetails, showItems } from '../../actions.js';
+
 /** Accounts list context menu component */
 export class AccountListContextMenu extends PopupMenu {
     constructor(props) {
@@ -41,12 +44,16 @@ export class AccountListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
             url: getApplicationURL(`accounts/${account.id}`),
-            onClick: (_, e) => e?.preventDefault(),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             type: 'separator',
         }, {
@@ -59,20 +66,24 @@ export class AccountListContextMenu extends PopupMenu {
             id: 'ctxExportBtn',
             icon: 'export',
             title: __('export.menuTitle'),
+            onClick: () => dispatch(actions.showExportDialog()),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',
             title: __('actions.show'),
             hidden: account.isVisible(),
+            onClick: () => dispatch(showItems()),
         }, {
             id: 'ctxHideBtn',
             icon: 'hide',
             title: __('actions.hide'),
             hidden: !account.isVisible(),
+            onClick: () => dispatch(showItems(false)),
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(tile);

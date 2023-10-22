@@ -21,3 +21,19 @@ export const getSelectedIds = (state) => {
 export const getAccountsSortMode = () => (
     App.model.profile.settings.sort_accounts
 );
+
+export const getListRequest = () => ({
+    visibility: 'all',
+});
+
+export const prepareRequest = (data) => ({
+    ...data,
+    returnState: {
+        accounts: getListRequest(),
+        profile: {},
+    },
+});
+
+export const getListDataFromResponse = (response) => (
+    response?.data?.state?.accounts?.data
+);
