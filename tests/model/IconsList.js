@@ -5,7 +5,7 @@ import { api } from './api.js';
 export class IconsList extends List {
     static async create() {
         const data = await api.icon.list();
-        return new IconsList(data);
+        return super.create(data);
     }
 
     async fetch() {

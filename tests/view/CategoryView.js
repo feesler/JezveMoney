@@ -4,6 +4,7 @@ import {
     navigation,
     click,
     evaluate,
+    waitForFunction,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -33,7 +34,6 @@ export class CategoryView extends AppView {
             colorInput: {
                 visible: true,
                 disabled: model.parent_id !== 0,
-                value: model.color.toString(),
                 isInvalid: model.colorInvalidated ?? false,
             },
             parentSelect: {
@@ -47,6 +47,10 @@ export class CategoryView extends AppView {
                 value: model.type.toString(),
             },
         };
+
+        if (model.color) {
+            res.colorInput.value = model.color.toString();
+        }
 
         if (model.isUpdate) {
             res.id = model.id;
@@ -165,6 +169,13 @@ export class CategoryView extends AppView {
         }
 
         return true;
+    }
+
+    async waitForLoad() {
+        await waitForFunction(async () => {
+            await this.parse();
+            return (this.model.color ?? null) !== null;
+        });
     }
 
     async clickDeleteButton() {

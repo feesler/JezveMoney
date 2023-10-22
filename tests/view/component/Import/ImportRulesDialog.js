@@ -138,7 +138,7 @@ export class ImportRulesDialog extends TestComponent {
 
             const filteredRules = (model.filter !== '')
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
-                : App.state.rules.data;
+                : App.state.rules;
 
             const pageNum = this.currentPage(model);
 

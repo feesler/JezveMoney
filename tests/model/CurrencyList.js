@@ -6,7 +6,7 @@ import { api } from './api.js';
 export class CurrencyList extends List {
     static async create() {
         const data = await api.currency.list();
-        return new CurrencyList(data);
+        return super.create(data);
     }
 
     async fetch() {

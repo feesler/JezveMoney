@@ -7,7 +7,7 @@ import './ToggleDetailsButton.scss';
 const BUTTON_CLASS = 'mode-selector';
 
 const defaultProps = {
-    type: 'link',
+    defaultItemType: 'link',
     itemParam: 'mode',
 };
 

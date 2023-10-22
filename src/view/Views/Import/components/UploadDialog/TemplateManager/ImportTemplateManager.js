@@ -66,7 +66,7 @@ export class ImportTemplateManager extends Component {
         this.state = {
             visible: false,
             mainAccount: this.props.mainAccount,
-            templates: App.model.templates.data,
+            templates: App.model.templates,
             listLoading: false,
             formRequest: null,
             template: null,
@@ -458,7 +458,7 @@ export class ImportTemplateManager extends Component {
         templates.setData(templatesData);
         this.setState({
             ...this.state,
-            templates: templates.data,
+            templates,
         });
 
         if (App.model.templates.length > 0) {

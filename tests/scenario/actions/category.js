@@ -39,6 +39,7 @@ export const create = async () => {
 
         await App.view.goToCreateCategory();
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
+        await App.view.waitForLoad();
 
         return App.view.checkState(expected);
     });
@@ -62,6 +63,7 @@ export const update = async (index) => {
 
         await App.view.goToUpdateCategory(index);
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
+        await App.view.waitForLoad();
 
         return App.view.checkState(expected);
     });
@@ -80,7 +82,7 @@ export const addSubcategory = async (id) => {
     assert(category && category.parent_id === 0, 'Invalid category');
 
     const index = sortedCategories.getIndexById(id);
-    assert.arrayIndex(sortedCategories.data, index, 'Invalid category');
+    assert.arrayIndex(sortedCategories, index, 'Invalid category');
 
     await test(`Add subcategory for '${category.name}'`, async () => {
         await checkNavigation();
@@ -96,6 +98,7 @@ export const addSubcategory = async (id) => {
 
         await App.view.goToAddSubcategory(index);
         assert.instanceOf(App.view, CategoryView, 'Invalid view');
+        await App.view.waitForLoad();
 
         return App.view.checkState(expected);
     });

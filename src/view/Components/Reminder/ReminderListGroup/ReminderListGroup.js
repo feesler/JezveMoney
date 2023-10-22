@@ -7,11 +7,22 @@ import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
 import { Spinner } from 'jezvejs/Spinner';
+import { createStore } from 'jezvejs/Store';
 
-import { __, getSelectedItems, listData } from '../../../utils/utils.js';
+// Application
+import { App } from '../../../Application/App.js';
+import { API } from '../../../API/index.js';
+import {
+    __,
+    dateStringToTime,
+    getContextIds,
+    getSelectedItems,
+} from '../../../utils/utils.js';
 
+// Models
 import { REMINDER_SCHEDULED, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
+// Common components
 import { LoadingIndicator } from '../../Common/LoadingIndicator/LoadingIndicator.js';
 import { NoDataMessage } from '../../Common/NoDataMessage/NoDataMessage.js';
 import { ListCounter } from '../../List/ListCounter/ListCounter.js';
@@ -20,6 +31,13 @@ import { FiltersContainer } from '../../List/FiltersContainer/FiltersContainer.j
 import { ReminderFilters } from '../ReminderFilters/ReminderFilters.js';
 import { ReminderListItem } from '../ReminderListItem/ReminderListItem.js';
 
+import {
+    reducer,
+    actions,
+    getStateFilter,
+    getInitialState,
+    updateList,
+} from './reducer.js';
 import './ReminderListGroup.scss';
 
 /* CSS classes */
@@ -40,11 +58,15 @@ const defaultProps = {
     stateFilterId: undefined,
     dateRangeFilterId: undefined,
     mode: 'classic', // 'classic' or 'details'
-    listMode: 'list',
+    listMode: 'list', // 'list', 'select' or 'singleSelect'
+    modeSelectorType: 'link',
     showControls: true,
     onItemClick: null,
     getURL: null,
     onShowMore: null,
+    onChange: null,
+    onUpdate: null,
+    showContextMenu: null,
     onChangePage: null,
     onChangeMode: null,
     onChangeDateRange: null,
@@ -62,15 +84,19 @@ export class ReminderListGroup extends Component {
             ...props,
         });
 
-        this.state = {
-            ...this.props,
-        };
+        const initialState = updateList(getInitialState(this.props));
+        this.store = createStore(reducer, { initialState });
 
         this.init();
+        this.onPostInit();
     }
 
     get useURL() {
         return isFunction(this.props.getURL);
+    }
+
+    get state() {
+        return this.store.getState();
     }
 
     init() {
@@ -147,6 +173,7 @@ export class ReminderListGroup extends Component {
 
         // List mode selected
         this.modeSelector = ToggleDetailsButton.create({
+            defaultItemType: this.props.modeSelectorType,
             onChange: (value) => this.onChangeMode(value),
         });
 
@@ -194,9 +221,157 @@ export class ReminderListGroup extends Component {
                 this.footer,
             ],
         });
+    }
+
+    async onPostInit() {
+        this.subscribeToStore(this.store);
 
         this.setClassNames();
         this.setUserProps();
+
+        const state = this.store.getState();
+        const stateFilter = getStateFilter(state);
+
+        if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                keepState: true,
+            });
+        }
+        this.setRenderTime();
+        this.notifyUpdate();
+    }
+
+    notifyUpdate() {
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.state);
+        }
+    }
+
+    /** Updates dialog state */
+    update() {
+        this.store.dispatch(actions.update());
+    }
+
+    /** Reset dialog state */
+    reset() {
+        this.store.dispatch(actions.reset(this.props));
+    }
+
+    startLoading(isLoadingMore = false) {
+        this.store.dispatch(actions.startLoading(isLoadingMore));
+    }
+
+    stopLoading() {
+        this.store.dispatch(actions.stopLoading());
+    }
+
+    /** Updates render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
+    }
+
+    showContextMenu(itemId) {
+        if (isFunction(this.props.showContextMenu)) {
+            this.props.showContextMenu(itemId);
+        }
+    }
+
+    toggleSelectItem(itemId) {
+        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.notifyUpdate();
+    }
+
+    selectAll() {
+        this.store.dispatch(actions.selectAllItems());
+        this.notifyUpdate();
+    }
+
+    deselectAll() {
+        this.store.dispatch(actions.deselectAllItems());
+        this.notifyUpdate();
+    }
+
+    setListMode(listMode) {
+        this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
+        this.notifyUpdate();
+    }
+
+    getListRequest() {
+        const state = this.store.getState();
+        if (getStateFilter(state) === REMINDER_UPCOMING) {
+            return {};
+        }
+
+        return {
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
+    }
+
+    getUpcomingListRequest() {
+        const state = this.store.getState();
+        if (getStateFilter(state) !== REMINDER_UPCOMING) {
+            return {};
+        }
+
+        return {
+            page: state.pagination.page,
+            range: state.pagination.range,
+        };
+    }
+
+    prepareRequest(data) {
+        return {
+            ...data,
+            returnState: {
+                reminders: this.getListRequest(),
+                upcoming: this.getUpcomingListRequest(),
+                profile: {},
+            },
+        };
+    }
+
+    getRequestData(state) {
+        const ids = getContextIds(state);
+        if (getStateFilter(state) !== REMINDER_UPCOMING) {
+            return { id: ids };
+        }
+
+        return {
+            upcoming: ids.map((id) => {
+                const strId = id?.toString();
+                const reminder = state.items.find((item) => item?.id?.toString() === strId);
+                return {
+                    schedule_id: reminder.schedule_id,
+                    date: reminder.date,
+                };
+            }),
+        };
+    }
+
+    getListDataFromResponse(response) {
+        return response?.data?.state?.reminders?.data;
+    }
+
+    getUpcomingDataFromResponse(response) {
+        return response?.data?.state?.upcoming?.data;
+    }
+
+    setListData(data, keepState = false) {
+        App.model.reminders.setData(data);
+        this.store.dispatch(actions.listRequestLoaded({ keepState }));
+        this.notifyUpdate();
+    }
+
+    setListDataFromResponse(response, keepState = false) {
+        const reminders = this.getListDataFromResponse(response);
+        const upcoming = this.getUpcomingDataFromResponse(response);
+
+        App.model.reminders.setData(reminders);
+
+        this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
     }
 
     /** Returns absolute index for relative index on current page */
@@ -229,16 +404,57 @@ export class ReminderListGroup extends Component {
         this.filtersContainer.toggle();
     }
 
-    onChangeReminderState(reminderState) {
-        if (isFunction(this.props.onChangeReminderState)) {
-            this.props.onChangeReminderState(reminderState);
+    /**
+     * Reminder state filter change callback
+     * @param {string} value - selected state types
+     */
+    async onChangeReminderState(value) {
+        const stateFilter = parseInt(value, 10);
+        const state = this.store.getState();
+        const currentStateFilter = getStateFilter(state);
+        if (currentStateFilter === stateFilter) {
+            return;
         }
+
+        this.store.dispatch(actions.changeStateFilter(stateFilter));
+
+        if (stateFilter === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                keepState: true,
+            });
+        }
+
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
-    onChangeDateRange(range) {
-        if (isFunction(this.props.onChangeDateRange)) {
-            this.props.onChangeDateRange(range);
+    /** Date range filter change handler */
+    async onChangeDateRange(range) {
+        const { filter } = this.store.getState();
+        const startDate = filter.startDate ?? null;
+        const endDate = filter.endDate ?? null;
+        const timeData = {
+            startDate: dateStringToTime(range.startDate, { fixShortYear: false }),
+            endDate: dateStringToTime(range.endDate, { fixShortYear: false }),
+        };
+
+        if (startDate === timeData.startDate && endDate === timeData.endDate) {
+            return;
         }
+
+        this.store.dispatch(actions.changeDateFilter(range));
+        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                range: 1,
+                page: 1,
+                keepState: true,
+            });
+        }
+
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
     onApplyFilters(e) {
@@ -249,37 +465,228 @@ export class ReminderListGroup extends Component {
         }
     }
 
-    onClearAllFilters(e) {
-        if (isFunction(this.props.onClearAllFilters)) {
-            this.props.onClearAllFilters(e);
+    /**
+     * Clear all filters
+     * @param {Event} e - click event object
+     */
+    async onClearAllFilters(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.clearAllFilters());
+        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
+            await this.requestUpcoming({
+                ...this.getUpcomingRequestData(),
+                range: 1,
+                page: 1,
+                keepState: true,
+            });
         }
+
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
     onItemClick(id, e) {
-        if (isFunction(this.props.onItemClick)) {
-            this.props.onItemClick(id, e);
+        const { listMode } = this.store.getState();
+        if (listMode === 'list') {
+            this.onListItemClick(id, e);
+        } else if (listMode === 'select') {
+            this.onSelectItemClick(id, e);
+        } else if (listMode === 'singleSelect') {
+            this.onSingleSelectItemClick(id, e);
         }
     }
 
-    /** 'Show more' button 'click' event handler */
-    onShowMore(e) {
-        if (isFunction(this.props.onShowMore)) {
-            this.props.onShowMore(e);
+    onListItemClick(id, e) {
+        const menuBtn = e?.target?.closest('.menu-btn');
+        if (menuBtn) {
+            this.showContextMenu(id);
         }
+    }
+
+    onSelectItemClick(id, e) {
+        if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
+            e.preventDefault();
+        }
+
+        this.toggleSelectItem(id);
+    }
+
+    onSingleSelectItemClick(id) {
+        if (!isFunction(this.props.onChange)) {
+            return;
+        }
+
+        const strId = id?.toString() ?? null;
+        if (strId === null) {
+            return;
+        }
+
+        const { items } = this.store.getState();
+        const reminder = items.find((item) => item.id?.toString() === strId);
+        if (!reminder) {
+            return;
+        }
+
+        const isUpcoming = (reminder.state === REMINDER_UPCOMING);
+        const selected = {
+            schedule_id: reminder.schedule_id,
+            reminder_date: reminder.date,
+            reminder_id: (isUpcoming) ? null : reminder.id,
+        };
+
+        this.props.onChange(selected);
+    }
+
+    /** 'Show more' button 'click' event handler */
+    async onShowMore() {
+        const state = this.store.getState();
+        const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
+
+        if (!isUpcoming) {
+            this.store.dispatch(actions.showMore());
+            this.setRenderTime();
+            this.notifyUpdate();
+            return;
+        }
+
+        const { page } = state.pagination;
+        let { range } = state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        await this.requestUpcoming({
+            ...this.getUpcomingRequestData(),
+            range,
+            page,
+            keepState: true,
+            isLoadingMore: true,
+        });
+
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
     /** Paginator 'change' event handler */
     onChangePage(page) {
-        if (isFunction(this.props.onChangePage)) {
-            this.props.onChangePage(page);
-        }
+        this.store.dispatch(actions.changePage(page));
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
     /** Toggle mode button 'click' event handler */
-    onChangeMode(value) {
-        if (isFunction(this.props.onChangeMode)) {
-            this.props.onChangeMode(value);
+    onChangeMode(mode) {
+        const state = this.store.getState();
+        if (state.mode === mode) {
+            return;
         }
+
+        this.store.dispatch(actions.toggleMode());
+        this.setRenderTime();
+        this.notifyUpdate();
+    }
+
+    getUpcomingRequestData() {
+        const { pagination, form } = this.store.getState();
+
+        const res = {
+            page: pagination.page,
+            range: pagination.range,
+        };
+
+        if (form.startDate) {
+            res.startDate = dateStringToTime(form.startDate, { fixShortYear: false });
+        }
+        if (form.endDate) {
+            res.endDate = dateStringToTime(form.endDate, { fixShortYear: false });
+        }
+
+        return res;
+    }
+
+    async requestUpcoming(options = {}) {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const {
+            keepState = false,
+            isLoadingMore = false,
+            ...request
+        } = options;
+
+        this.startLoading(isLoadingMore);
+
+        try {
+            const { data: upcoming } = await API.reminder.upcoming(request);
+            this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
+        } catch (e) {
+            App.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.notifyUpdate();
+    }
+
+    /** Creates transactions for selected reminders */
+    async confirmReminder() {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const ids = getContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            const request = this.prepareRequest(this.getRequestData(state));
+            const response = await API.reminder.confirm(request);
+
+            this.setListDataFromResponse(response);
+            App.updateProfileFromResponse(response);
+        } catch (e) {
+            App.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setRenderTime();
+        this.notifyUpdate();
+    }
+
+    /** Cancels selected reminders */
+    async cancelReminder() {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const ids = getContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            const request = this.prepareRequest(this.getRequestData(state));
+            const response = await API.reminder.cancel(request);
+
+            this.setListDataFromResponse(response);
+            App.updateProfileFromResponse(response);
+        } catch (e) {
+            App.createErrorNotification(e.message);
+        }
+
+        this.stopLoading();
+        this.setRenderTime();
+        this.notifyUpdate();
     }
 
     renderCounters(state, prevState) {
@@ -381,7 +788,7 @@ export class ReminderListGroup extends Component {
 
         const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
-        const items = listData(state.items).slice(firstItem, lastItem);
+        const items = state.items.slice(firstItem, lastItem);
 
         this.reminderList.setState((listState) => ({
             ...listState,
@@ -392,6 +799,10 @@ export class ReminderListGroup extends Component {
             showControls: state.showControls,
         }));
         this.reminderList.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
+    }
+
+    setState(state) {
+        this.store.setState(state);
     }
 
     render(state, prevState = {}) {

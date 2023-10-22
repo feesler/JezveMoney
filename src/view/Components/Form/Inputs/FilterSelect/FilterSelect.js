@@ -1,9 +1,14 @@
+import { getClassName } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
+
 import { App } from '../../../../Application/App.js';
 import { __ } from '../../../../utils/utils.js';
 
-const defaultProps = {
-};
+import './FilterSelect.scss';
+
+/* CSS classes */
+const SELECT_CLASS = 'filter-select';
+const CATEGORY_GROUP_CLASS = 'category-group';
 
 /**
  * Combined accounts, persons and categories DropDown component
@@ -11,8 +16,8 @@ const defaultProps = {
 export class FilterSelect extends DropDown {
     constructor(props = {}) {
         super({
-            ...defaultProps,
             ...props,
+            className: getClassName(SELECT_CLASS, props.className),
         });
 
         this.initAccounts();
@@ -77,6 +82,8 @@ export class FilterSelect extends DropDown {
             items.push({
                 id: group,
                 type: 'group',
+                title: category.name,
+                className: CATEGORY_GROUP_CLASS,
                 items: children.map((item) => (
                     { id: `${idPrefix}${item.id}`, title: item.name, group }
                 )),

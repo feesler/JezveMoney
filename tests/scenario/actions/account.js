@@ -13,6 +13,7 @@ import { App } from '../../Application.js';
 import { AccountView } from '../../view/AccountView.js';
 import { __ } from '../../model/locale.js';
 import { getAccountTypeName } from '../../model/AccountsList.js';
+import { TransactionsList } from '../../model/TransactionsList.js';
 
 /** Navigate to accounts list page */
 const checkNavigation = async () => {
@@ -219,7 +220,8 @@ export const exportTest = async (accounts) => {
         await checkNavigation();
 
         const ids = App.state.getSortedAccountsByIndexes(itemIds, true);
-        const transactions = App.state.transactions.applyFilter({ accounts: ids });
+        let transactions = App.state.transactions.applyFilter({ accounts: ids });
+        transactions = TransactionsList.create(transactions);
         const expectedContent = transactions.exportToCSV();
 
         const content = await App.view.exportAccounts(itemIds);

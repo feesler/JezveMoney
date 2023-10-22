@@ -67,7 +67,7 @@ export const updateList = (state) => {
     const { rules } = App.model;
     const { onPage, page } = state.pagination;
 
-    const items = createList(rules.data, state);
+    const items = createList(rules, state);
 
     const pagesCount = Math.ceil(items.length / onPage);
     const pagination = {

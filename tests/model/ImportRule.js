@@ -49,7 +49,7 @@ export class ImportRule {
 
     /** Run actions assigned to rule */
     runActions(context) {
-        const sortedActions = this.actions.sort();
+        const sortedActions = this.actions.defaultSort();
 
         sortedActions.forEach((item) => item.execute(context));
     }

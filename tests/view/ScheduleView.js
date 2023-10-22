@@ -113,7 +113,7 @@ export class ScheduleView extends AppView {
         let items = [];
         if (page !== 0) {
             const pageItems = App.view.items.getPage(page, onPage, range, true);
-            items = pageItems.data;
+            items = pageItems;
         }
 
         const listModel = {
@@ -259,7 +259,7 @@ export class ScheduleView extends AppView {
     }
 
     getItems() {
-        return this.items.data;
+        return this.items;
     }
 
     loadScheduleItems(state = App.state) {
@@ -296,7 +296,7 @@ export class ScheduleView extends AppView {
         res.list.page = page;
         res.list.range = range;
         const pageItems = this.items.getPage(page, onPage, range, true);
-        const { items } = ScheduleList.getExpectedState({ items: pageItems.data });
+        const { items } = ScheduleList.getExpectedState({ items: pageItems });
         res.list.items = items;
 
         return res;
@@ -319,7 +319,7 @@ export class ScheduleView extends AppView {
 
         res.list.range = range;
         const pageItems = this.items.getPage(model.list.page, onPage, range, true);
-        const { items } = ScheduleList.getExpectedState({ items: pageItems.data });
+        const { items } = ScheduleList.getExpectedState({ items: pageItems });
         res.list.items = items;
 
         return res;

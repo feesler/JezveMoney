@@ -9,11 +9,11 @@ export class UserCurrencyList extends SortableList {
     setData(data) {
         super.setData(data);
 
-        this.sort();
+        this.defaultSort();
     }
 
-    sort() {
-        this.data.sort((a, b) => a.pos - b.pos);
+    defaultSort() {
+        this.sort((a, b) => a.pos - b.pos);
     }
 
     /**

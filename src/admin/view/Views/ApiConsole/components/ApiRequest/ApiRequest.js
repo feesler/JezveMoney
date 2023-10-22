@@ -18,6 +18,8 @@ const RESPONSE_OK_CLASS = 'ok-result';
 const RESPONSE_FAIL_CLASS = 'fail-result';
 const RESPONSE_DATA_CLASS = 'response-details';
 
+const JSON_SPACES = 4;
+
 const defaultProps = {
     response: null,
 };
@@ -26,17 +28,12 @@ const defaultProps = {
  * API request component
  */
 export class ApiRequest extends Component {
-    static create(props) {
-        return new ApiRequest(props);
-    }
-
-    constructor(props) {
-        super(props);
-
-        this.props = {
+    constructor(props = {}) {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
+            ...props,
+        });
+
         this.state = {
             ...this.props,
         };
@@ -112,6 +109,15 @@ export class ApiRequest extends Component {
         this.elem.append(this.resultContainer);
     }
 
+    formatResponse(value) {
+        try {
+            const parsed = JSON.parse(value);
+            return JSON.stringify(parsed, null, JSON_SPACES);
+        } catch (error) {
+            return value;
+        }
+    }
+
     renderResponse(state, prevState) {
         const { response } = state;
         if (response === prevState.response) {
@@ -137,7 +143,10 @@ export class ApiRequest extends Component {
         });
         if (response.rawResult) {
             const responseElem = createElement('div', {
-                props: { className: RESPONSE_DATA_CLASS, textContent: response.rawResult },
+                props: {
+                    className: RESPONSE_DATA_CLASS,
+                    textContent: this.formatResponse(response.rawResult),
+                },
             });
             this.resultContainer.setContent(responseElem);
         }

@@ -2,87 +2,23 @@
  * Base List class
  * @param {object[]} props - array of list items
  */
-export class List {
-    static create(props) {
-        return new this(props);
-    }
-
-    constructor(props) {
-        let data;
-        if (props instanceof List) {
-            data = props.data;
-        } else {
-            data = Array.isArray(props) ? props : [];
-        }
-
-        this.setData(data);
-    }
-
-    get length() {
-        return this.data.length;
-    }
-
-    /** Wrap method for array forEach method */
-    forEach(...args) {
-        this.data.forEach(...args);
-    }
-
-    /** Wrap method for array map() method */
-    map(...args) {
-        return this.data.map(...args);
-    }
-
-    /** Wrap method for array reduce() method */
-    reduce(...args) {
-        return this.data.reduce(...args);
-    }
-
-    /** Wrap method for array find() method */
-    find(...args) {
-        return this.data.find(...args);
-    }
-
-    /** Wrap method for array findIndex() method */
-    findIndex(...args) {
-        return this.data.findIndex(...args);
-    }
-
-    /** Wrap method for array filter() method */
-    filter(...args) {
-        return this.data.filter(...args);
-    }
-
-    /** Wrap method for array every() method */
-    every(...args) {
-        return this.data.every(...args);
-    }
-
-    /** Wrap method for array some() method */
-    some(...args) {
-        return this.data.some(...args);
-    }
-
-    /** Wrap method for array sort() method */
-    sort(...args) {
-        return this.data.sort(...args);
-    }
-
-    /** Wrap method for array indexOf() method */
-    indexOf(...args) {
-        return this.data.indexOf(...args);
+export class List extends Array {
+    static create(props = []) {
+        const instance = new this(props);
+        instance.setData(props);
+        return instance;
     }
 
     /**
      * Assign new data to the list
      * @param {Array} data - array of list items
      */
-    setData(data) {
+    setData(data = []) {
         if (!Array.isArray(data)) {
             throw new Error('Invalid list props');
         }
 
-        const newData = structuredClone(data);
-        this.data = newData.map(this.createItem.bind(this));
+        this.splice(0, this.length, ...data.map(this.createItem.bind(this)));
     }
 
     /**
@@ -98,7 +34,7 @@ export class List {
      * @param {Object} obj - object to create new item from
      */
     addItem(obj) {
-        this.data.push(this.createItem(obj));
+        this.push(this.createItem(obj));
     }
 
     /**
@@ -111,7 +47,7 @@ export class List {
             return null;
         }
 
-        return this.data.find((item) => item && item.id.toString() === strId);
+        return this.find((item) => item && item.id.toString() === strId);
     }
 
     /**
@@ -125,7 +61,7 @@ export class List {
             return -1;
         }
 
-        return this.data.findIndex((item) => item && item.id.toString() === strId);
+        return this.findIndex((item) => item && item.id.toString() === strId);
     }
 
     /**
@@ -135,11 +71,11 @@ export class List {
      */
     getItemByIndex(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.data.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.length) {
             return null;
         }
 
-        return this.data[ind];
+        return this[ind];
     }
 
     /**
@@ -156,7 +92,7 @@ export class List {
             throw new Error('Item not found');
         }
 
-        this.data[ind] = this.createItem(obj);
+        this[ind] = this.createItem(obj);
     }
 
     /**
@@ -166,14 +102,14 @@ export class List {
      */
     updateItemByIndex(index, obj) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.data.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.length) {
             throw new Error('Invalid item index');
         }
         if (!obj) {
             throw new Error('Invalid item object');
         }
 
-        this.data[ind] = this.createItem(obj);
+        this[ind] = this.createItem(obj);
     }
 
     /**
@@ -181,12 +117,10 @@ export class List {
      * @param {Number} itemId - id item to remove
      */
     deleteItem(itemId) {
-        const strId = itemId?.toString() ?? null;
-        if (strId === null) {
-            return;
+        const index = this.getItemIndex(itemId);
+        if (index !== -1) {
+            this.deleteItemByIndex(index);
         }
-
-        this.data = this.data.filter((item) => item.id.toString() !== strId);
     }
 
     /**
@@ -195,10 +129,10 @@ export class List {
      */
     deleteItemByIndex(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.data.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.length) {
             throw new Error('Invalid item index');
         }
 
-        this.data.splice(ind, 1);
+        this.splice(ind, 1);
     }
 }

@@ -11,7 +11,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
 import { createStore } from 'jezvejs/Store';
 
-import { __, listData } from '../../../../../utils/utils.js';
+import { __ } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 
 import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
@@ -392,7 +392,7 @@ export class ImportRulesDialog extends Component {
     renderList(state) {
         const firstItem = getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
-        const items = listData(state.items).slice(firstItem, lastItem);
+        const items = state.items.slice(firstItem, lastItem);
 
         this.rulesList.setState((listState) => ({
             ...listState,

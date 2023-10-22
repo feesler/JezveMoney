@@ -12,7 +12,6 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 
 // Application
 import {
-    listData,
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
@@ -677,7 +676,7 @@ class PersonListView extends AppView {
         // Visible persons
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
-            items: listData(state.items.visible),
+            items: state.items.visible,
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
@@ -685,7 +684,7 @@ class PersonListView extends AppView {
         // Hidden persons
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
-            items: listData(state.items.hidden),
+            items: state.items.hidden,
             listMode: state.listMode,
         }));
 

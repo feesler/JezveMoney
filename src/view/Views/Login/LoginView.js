@@ -14,13 +14,13 @@ import {
 } from '../../utils/utils.js';
 
 import { Field } from '../../Components/Common/Field/Field.js';
+import { Logo } from '../../Components/Common/Logo/Logo.js';
 import { InputField } from '../../Components/Form/Fields/InputField/InputField.js';
 import { PasswordField } from '../../Components/Form/Fields/PasswordField/PasswordField.js';
 import { FormControls } from '../../Components/Form/FormControls/FormControls.js';
 
 import { actions, reducer } from './reducer.js';
 import './LoginView.scss';
-import { Logo } from '../../Components/Common/Logo/Logo.js';
 
 /**
  * User log in view

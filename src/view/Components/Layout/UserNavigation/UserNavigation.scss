@@ -2,8 +2,7 @@
 .user-navigation {
   --offcanvas-bg: var(--alt-bg-color);
 
-  max-width: 100%;
-  min-width: 250px;
+  width: 250px;
   z-index: 2110;
 }
 
@@ -25,8 +24,14 @@
   .btn.user-btn {
     --btn-padding: 0 0.75rem;
 
+    .btn__icon {
+      flex: 0 0 auto;
+    }
+
     .btn__content {
-      display: inline-flex;
+      display: inline-block;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 

@@ -58,9 +58,11 @@ try {
         return (prev + (pass ? 1 : 0));
     }, 1);
 
-    progress = new ProgressBar('[:bar] :percent :file', {
+    progress = new ProgressBar(':bar :percent :file', {
         total,
         width: 20,
+        complete: '█',
+        incomplete: ' ',
     });
 
     await client.connect(config);

@@ -17,7 +17,6 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
-    listData,
     __,
     getSelectedItems,
     getApplicationURL,
@@ -697,7 +696,7 @@ class ScheduleView extends AppView {
 
         const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
-        const items = listData(state.items).slice(firstItem, lastItem);
+        const items = state.items.slice(firstItem, lastItem);
 
         // List of scheduled transactions
         this.scheduleList.setState((listState) => ({

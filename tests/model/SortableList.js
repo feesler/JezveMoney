@@ -6,13 +6,13 @@ export class SortableList extends List {
         item.pos = 0;
 
         const ind = super.create(item);
-        const newItem = this.data[ind];
+        const newItem = this[ind];
         const expPos = this.getExpectedPos(newItem);
         if (!this.updatePos(newItem.id, expPos)) {
             return -1;
         }
 
-        this.sort();
+        this.defaultSort();
 
         return this.getIndexById(newItem.id);
     }
@@ -22,12 +22,12 @@ export class SortableList extends List {
             return false;
         }
 
-        this.sort();
+        this.defaultSort();
 
         return true;
     }
 
-    sort() {
+    defaultSort() {
     }
 
     getExpectedPos() {
@@ -36,7 +36,7 @@ export class SortableList extends List {
     }
 
     getLastestPos() {
-        return this.data.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
+        return this.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
     }
 
     isMoveUpAllowed() {
@@ -52,7 +52,7 @@ export class SortableList extends List {
         if (index === -1) {
             return false;
         }
-        const movingItem = this.data[index];
+        const movingItem = this[index];
         if (!movingItem || !pos) {
             return false;
         }
@@ -63,7 +63,7 @@ export class SortableList extends List {
         }
 
         if (this.find((item) => item.pos === pos)) {
-            for (const item of this.data) {
+            for (const item of this) {
                 if (oldPos === 0) { // insert with specified position
                     if (item.pos >= pos) {
                         if (!this.isMoveUpAllowed(movingItem, item)) {

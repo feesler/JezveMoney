@@ -46,6 +46,7 @@
   .request-container .request-details,
   .response-container .response-details {
     word-break: break-all;
+    white-space: pre-wrap;
     font-size: 14px;
     padding: 0 5px;
   }
@@ -64,6 +65,11 @@
 
   .response-container.fail-result .title {
     background-color: #ff6666;
+  }
+
+  .response-container .collapsible-content {
+    max-height: 60vh;
+    overflow: auto;
   }
 }
 

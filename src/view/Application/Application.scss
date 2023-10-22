@@ -74,6 +74,7 @@ b {
 h1 {
   font-weight: 200;
   font-size: 32px;
+  padding-bottom: 1rem;
 }
 
 h2 {
@@ -661,13 +662,6 @@ svg * {
 .dd__list-group {
   .dd__list-group__label {
     padding: 0 10px;
-  }
-}
-
-/* Offset group items */
-.dd_offset-group {
-  .dd__list-group .dd__list-item {
-    margin-left: 1.25rem;
   }
 }
 

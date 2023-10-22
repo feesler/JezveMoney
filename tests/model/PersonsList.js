@@ -35,28 +35,20 @@ export class PersonsList extends SortableList {
         return hasFlag(item.flags, PERSON_HIDDEN);
     }
 
-    getVisible(returnRaw = false) {
+    getVisible() {
         const res = this.filter((item) => !this.isHidden(item));
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return PersonsList.create(res);
     }
 
-    getHidden(returnRaw = false) {
+    getHidden() {
         const res = this.filter((item) => this.isHidden(item));
-
-        if (returnRaw) {
-            return structuredClone(res);
-        }
 
         return PersonsList.create(res);
     }
 
     sortByVisibility() {
-        this.data.sort((a, b) => a.flags - b.flags);
+        this.sort((a, b) => a.flags - b.flags);
     }
 
     sortBy(sortMode) {
@@ -74,22 +66,22 @@ export class PersonsList extends SortableList {
     }
 
     sortByPos() {
-        this.data.sort((a, b) => a.pos - b.pos);
+        this.sort((a, b) => a.pos - b.pos);
     }
 
     sortByNameAsc() {
-        this.data.sort((a, b) => ((a.name > b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name > b.name) ? 1 : -1));
     }
 
     sortByNameDesc() {
-        this.data.sort((a, b) => ((a.name < b.name) ? 1 : -1));
+        this.sort((a, b) => ((a.name < b.name) ? 1 : -1));
     }
 
     sortByCreateDateAsc() {
-        this.data.sort((a, b) => a.id - b.id);
+        this.sort((a, b) => a.id - b.id);
     }
 
     sortByCreateDateDesc() {
-        this.data.sort((a, b) => b.id - a.id);
+        this.sort((a, b) => b.id - a.id);
     }
 }

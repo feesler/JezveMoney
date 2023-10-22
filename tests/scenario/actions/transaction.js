@@ -256,7 +256,7 @@ export const deleteFromContextMenu = async (index) => {
         const expectedItems = App.view.model.data.getPage(1, onPage, 1, true);
         const showDate = !App.state.getGroupByDate();
         const expected = {
-            transList: TransactionList.render(expectedItems.data, App.state, showDate),
+            transList: TransactionList.render(expectedItems, App.state, showDate),
         };
         App.view.checkState(expected);
 

@@ -328,11 +328,9 @@ export const getSelectedItems = (list) => (
     list.filter((item) => item?.selected)
 );
 
-export const listData = (list) => (Array.isArray(list) ? list : list?.data);
-
 /** Returns array of ids of selected items */
 export const getSelectedIds = (state, listName = 'items') => (
-    getSelectedItems(listData(state[listName])).map((item) => item.id)
+    getSelectedItems(state[listName]).map((item) => item.id)
 );
 
 /** Returns array of ids of selected items */

@@ -37,6 +37,10 @@ export class AppView extends TestView {
         this.content.notification = (msgElem) ? await Notification.create(this, msgElem) : null;
     }
 
+    cloneModel(model = this.model) {
+        return structuredClone(model);
+    }
+
     getHeaderExpectedState(state = App.state) {
         return AppView.getHeaderExpectedState(state);
     }

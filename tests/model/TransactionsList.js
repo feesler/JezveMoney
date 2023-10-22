@@ -166,9 +166,7 @@ export class TransactionsList extends SortableList {
     }
 
     setData(data) {
-        super.setData(data);
-
-        this.sort();
+        super.setData(this.sortItems(data, true));
     }
 
     getExpectedPos(params) {
@@ -182,7 +180,7 @@ export class TransactionsList extends SortableList {
             assert.isInteger(date, `Invalid date timestamp: ${date}`);
         }
 
-        const checkList = (date) ? this.filter((item) => item.date <= date) : this.data;
+        const checkList = (date) ? this.filter((item) => item.date <= date) : this;
         const res = checkList.reduce((r, item) => Math.max(r, (item.pos) ? item.pos : 0), 0);
 
         return res;
@@ -222,8 +220,6 @@ export class TransactionsList extends SortableList {
             transObj.pos = 0;
             const newPos = this.getExpectedPos(transObj);
             this.updatePos(transObj.id, newPos);
-
-            this.sort();
         }
 
         return true;
@@ -248,11 +244,11 @@ export class TransactionsList extends SortableList {
     updateResults(accountsList) {
         assert.instanceOf(accountsList, AccountsList, 'Invalid accounts list specified');
 
-        const accounts = accountsList.toInitial();
+        let accounts = accountsList.toInitial();
         const list = this.sortAsc();
 
         for (const trans of list) {
-            accounts.data = AccountsList.applyTransaction(accounts.data, trans);
+            accounts = AccountsList.applyTransaction(accounts, trans);
 
             trans.src_result = 0;
             if (trans.src_id) {
@@ -287,8 +283,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByType(type) {
-        const items = this.getItemsByType(this.data, type);
-        if (items === this.data) {
+        const items = this.getItemsByType(this, type);
+        if (items === this) {
             return this;
         }
 
@@ -309,8 +305,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByAccounts(ids) {
-        const items = this.getItemsByAccounts(this.data, ids);
-        if (items === this.data) {
+        const items = this.getItemsByAccounts(this, ids);
+        if (items === this) {
             return this;
         }
 
@@ -329,8 +325,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByCategories(ids) {
-        const items = this.getItemsByCategories(this.data, ids);
-        if (items === this.data) {
+        const items = this.getItemsByCategories(this, ids);
+        if (items === this) {
             return this;
         }
 
@@ -358,8 +354,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByDate(start, end) {
-        const items = this.getItemsByDate(this.data, start, end);
-        if (items === this.data) {
+        const items = this.getItemsByDate(this, start, end);
+        if (items === this) {
             return this;
         }
 
@@ -381,8 +377,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByAmount(min, max) {
-        const items = this.getItemsByAmount(this.data, min, max);
-        if (items === this.data) {
+        const items = this.getItemsByAmount(this, min, max);
+        if (items === this) {
             return this;
         }
 
@@ -400,8 +396,8 @@ export class TransactionsList extends SortableList {
     }
 
     filterByQuery(query) {
-        const items = this.getItemsByQuery(this.data, query);
-        if (items === this.data) {
+        const items = this.getItemsByQuery(this, query);
+        if (items === this) {
             return this;
         }
 
@@ -423,8 +419,8 @@ export class TransactionsList extends SortableList {
     }
 
     getPage(num, limit, range, desc = false) {
-        const items = this.getItemsPage(this.data, num, limit, range, desc);
-        if (items === this.data) {
+        const items = this.getItemsPage(this, num, limit, range, desc);
+        if (items === this) {
             return this;
         }
 
@@ -479,19 +475,19 @@ export class TransactionsList extends SortableList {
     }
 
     applyFilter(params) {
-        const items = this.filterItems(this.data, params);
-        if (items === this.data) {
+        const items = this.filterItems(this, params);
+        if (items === this) {
             return this;
         }
 
-        const res = TransactionsList.create(items);
+        let res = TransactionsList.create(items);
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at setData()
         const isDesc = params.order?.toLowerCase() === 'desc';
         if (params.orderByDate) {
-            res.data = this.sortItemsByDate(res.data, isDesc);
+            res = this.sortItemsByDate(res, isDesc);
         } else if (!isDesc) {
-            res.data = res.sortAsc();
+            res = res.sortAsc();
         }
 
         return res;
@@ -528,7 +524,7 @@ export class TransactionsList extends SortableList {
     sortItemsByDate(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = structuredClone(list);
+        const res = TransactionsList.create(list);
 
         if (desc) {
             return res.sort((a, b) => {
@@ -543,16 +539,12 @@ export class TransactionsList extends SortableList {
         });
     }
 
-    sort() {
-        this.data = this.sortItems(this.data, true);
-    }
-
     sortAsc() {
-        return this.sortItems(this.data);
+        return this.sortItems(this);
     }
 
     sortDesc() {
-        return this.sortItems(this.data, true);
+        return this.sortItems(this, true);
     }
 
     getExpectedPages(list, limit) {
@@ -562,26 +554,26 @@ export class TransactionsList extends SortableList {
     }
 
     expectedPages(limit) {
-        return this.getExpectedPages(this.data, limit);
+        return this.getExpectedPages(this, limit);
     }
 
     /** Returns expected list of transactions after update specified account */
     updateAccount(accList, account) {
-        const res = TransactionsList.onUpdateAccount(this.data, accList, account);
+        const res = TransactionsList.onUpdateAccount(this, accList, account);
 
         return TransactionsList.create(res);
     }
 
     /** Returns expected list of transactions after delete specified accounts */
     deleteAccounts(accList, ids) {
-        const res = TransactionsList.onDeleteAccounts(this.data, accList, ids);
+        const res = TransactionsList.onDeleteAccounts(this, accList, ids);
 
         return TransactionsList.create(res);
     }
 
     /** Returns expected list of transactions after delete specified categories */
     deleteCategories(ids) {
-        const res = TransactionsList.onDeleteCategories(this.data, ids);
+        const res = TransactionsList.onDeleteCategories(this, ids);
 
         return TransactionsList.create(res);
     }
@@ -623,7 +615,7 @@ export class TransactionsList extends SortableList {
             __('transactions.comment'),
         ];
 
-        const data = this.map((transaction) => [
+        const data = this.sortAsc().map((transaction) => [
             transaction.id,
             Transaction.typeToString(transaction.type),
             App.currency.format(transaction.src_curr, transaction.src_amount),

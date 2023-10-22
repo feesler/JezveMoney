@@ -1,8 +1,10 @@
 import { assert, asArray } from 'jezve-test';
 
-export class List {
-    static create(props) {
-        return new this(props);
+export class List extends Array {
+    static create(props = []) {
+        const instance = new this();
+        instance.setData(props);
+        return instance;
     }
 
     static deleteByIds(list, ids) {
@@ -18,33 +20,27 @@ export class List {
         return res;
     }
 
-    constructor(data = []) {
-        if (data instanceof List) {
-            this.setData(data.data);
-        } else if (Array.isArray(data)) {
-            this.setData(data);
-        } else {
-            throw new Error('Invalid data specified');
-        }
-    }
-
-    get length() {
-        return this.data.length;
-    }
-
     clone() {
-        const res = new this.constructor(this.data);
+        const res = this.constructor.create(this);
         res.autoincrement = this.autoincrement;
 
         return res;
     }
 
-    setData(data) {
-        this.data = data.map((item) => this.createItem(item));
+    /**
+     * Assign new data to the list
+     * @param {Array} data - array of list items
+     */
+    setData(data = []) {
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid list props');
+        }
+
+        this.splice(0, this.length, ...data.map(this.createItem.bind(this)));
     }
 
     reset() {
-        this.data = [];
+        this.setData([]);
     }
 
     async fetch() {
@@ -57,7 +53,7 @@ export class List {
     }
 
     getIds() {
-        return this.data.map((item) => item.id);
+        return this.map((item) => item.id);
     }
 
     getItem(id) {
@@ -66,7 +62,7 @@ export class List {
             return null;
         }
 
-        const res = this.data.find((item) => item?.id?.toString() === itemId);
+        const res = this.find((item) => item?.id?.toString() === itemId);
         return (res) ? this.createItem(res) : null;
     }
 
@@ -78,9 +74,9 @@ export class List {
 
     getItemByIndex(ind) {
         const pos = parseInt(ind, 10);
-        assert.arrayIndex(this.data, pos, `Invalid item index: ${ind}`);
+        assert.arrayIndex(this, pos, `Invalid item index: ${ind}`);
 
-        return this.createItem(this.data[pos]);
+        return this.createItem(this[pos]);
     }
 
     getItemsByIndexes(index) {
@@ -94,11 +90,11 @@ export class List {
             return null;
         }
 
-        return this.data.findIndex((item) => item.id.toString() === itemId);
+        return this.findIndex((item) => item.id.toString() === itemId);
     }
 
     getLatestId() {
-        return this.data.reduce((res, item) => Math.max(parseInt(item.id, 10), res), 0);
+        return this.reduce((res, item) => Math.max(parseInt(item.id, 10), res), 0);
     }
 
     /** Return id of item with specified index(absolute position) in list */
@@ -109,7 +105,7 @@ export class List {
             `Invalid position ${pos} specified`,
         );
 
-        const item = this.data[ind];
+        const item = this[ind];
         return item.id;
     }
 
@@ -145,7 +141,7 @@ export class List {
         assert(item, 'Invalid item');
 
         const res = this.length;
-        this.data.push(item);
+        this.push(item);
 
         return res;
     }
@@ -187,58 +183,18 @@ export class List {
 
     updateByIndex(item, index) {
         const ind = parseInt(index, 10);
-        assert.arrayIndex(this.data, ind);
+        assert.arrayIndex(this, ind);
 
         const itemObj = this.createItem(item);
-        this.data.splice(ind, 1, itemObj);
+        this.splice(ind, 1, itemObj);
 
         return true;
     }
 
     deleteItems(ids) {
-        const res = List.deleteByIds(this.data, ids);
-        this.data = res;
+        const res = List.deleteByIds(this, ids);
+        this.setData(res);
 
         return true;
-    }
-
-    indexOf(...args) {
-        return this.data.indexOf(...args);
-    }
-
-    forEach(...args) {
-        this.data.forEach(...args);
-    }
-
-    every(...args) {
-        return this.data.every(...args);
-    }
-
-    some(...args) {
-        return this.data.some(...args);
-    }
-
-    find(...args) {
-        return this.data.find(...args);
-    }
-
-    findIndex(...args) {
-        return this.data.findIndex(...args);
-    }
-
-    filter(...args) {
-        return this.data.filter(...args);
-    }
-
-    map(...args) {
-        return this.data.map(...args);
-    }
-
-    reduce(...args) {
-        return this.data.reduce(...args);
-    }
-
-    slice(...args) {
-        return this.data.slice(...args);
     }
 }

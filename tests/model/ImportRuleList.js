@@ -8,9 +8,10 @@ export class ImportRuleList extends List {
     }
 
     deleteEmptyRules() {
-        this.data = this.filter(
+        const data = this.filter(
             (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
         );
+        this.setData(data);
 
         return true;
     }
@@ -22,10 +23,10 @@ export class ImportRuleList extends List {
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
-        this.data = this.map((rule) => {
+        const data = this.map((rule) => {
             const res = rule;
 
-            res.conditions.data = res.conditions.filter(
+            res.conditions = res.conditions.filter(
                 (condition) => {
                     if (!condition.isAccountField()
                         || condition.isPropertyValue()) {
@@ -37,7 +38,7 @@ export class ImportRuleList extends List {
                 },
             );
 
-            res.actions.data = res.actions.filter(
+            res.actions = res.actions.filter(
                 (action) => {
                     if (!action.isAccountValue()) {
                         return true;
@@ -51,6 +52,8 @@ export class ImportRuleList extends List {
             return res;
         });
 
+        this.setData(data);
+
         return this.deleteEmptyRules();
     }
 
@@ -60,10 +63,10 @@ export class ImportRuleList extends List {
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
-        this.data = this.map((rule) => {
+        const data = this.map((rule) => {
             const res = rule;
 
-            res.actions.data = res.actions.filter(
+            res.actions = res.actions.filter(
                 (action) => {
                     if (!action.isPersonValue()) {
                         return true;
@@ -77,6 +80,8 @@ export class ImportRuleList extends List {
             return res;
         });
 
+        this.setData(data);
+
         return this.deleteEmptyRules();
     }
 
@@ -86,10 +91,10 @@ export class ImportRuleList extends List {
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
-        this.data = this.map((rule) => {
+        const data = this.map((rule) => {
             const res = rule;
 
-            res.actions.data = res.actions.filter(
+            res.actions = res.actions.filter(
                 (action) => {
                     if (!action.isCategoryValue()) {
                         return true;
@@ -102,6 +107,7 @@ export class ImportRuleList extends List {
 
             return res;
         });
+        this.setData(data);
 
         return this.deleteEmptyRules();
     }
@@ -112,10 +118,10 @@ export class ImportRuleList extends List {
         }
 
         const itemIds = ids.map((id) => parseInt(id, 10));
-        this.data = this.map((rule) => {
+        const data = this.map((rule) => {
             const res = rule;
 
-            res.conditions.data = res.conditions.filter(
+            res.conditions = res.conditions.filter(
                 (condition) => {
                     if (!condition.isTemplateField()
                         || condition.isPropertyValue()) {
@@ -129,6 +135,8 @@ export class ImportRuleList extends List {
 
             return res;
         });
+
+        this.setData(data);
 
         return this.deleteEmptyRules();
     }
