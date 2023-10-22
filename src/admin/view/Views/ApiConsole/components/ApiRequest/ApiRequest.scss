@@ -46,6 +46,7 @@
   .request-container .request-details,
   .response-container .response-details {
     word-break: break-all;
+    white-space: pre-wrap;
     font-size: 14px;
     padding: 0 5px;
   }
