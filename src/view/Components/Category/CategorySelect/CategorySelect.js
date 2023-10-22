@@ -1,8 +1,13 @@
-import { asArray } from 'jezvejs';
+import { asArray, getClassName } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
+
 import { __ } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
+
 import { actions, reducer } from './reducer.js';
+import './CategorySelect.scss';
+
+const CATEGORY_SELECT_CLASS = 'category-select';
 
 const defaultProps = {
     transactionType: null, // filter categories by type, null - show all
@@ -23,9 +28,8 @@ export class CategorySelect extends DropDown {
             ...defaultProps,
             ...props,
             reducers: reducer,
+            className: getClassName(CATEGORY_SELECT_CLASS, props.className),
         });
-
-        this.elem.classList.add('dd_offset-group');
 
         this.initCategories();
     }
@@ -80,6 +84,7 @@ export class CategorySelect extends DropDown {
             items.push({
                 id: group,
                 type: 'group',
+                title: category.name,
                 items: children.map((item) => (
                     { id: item.id, title: item.name, group }
                 )),
