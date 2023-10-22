@@ -359,19 +359,9 @@ export function createCSV({
     return `${res}${newLine}`;
 }
 
-export const formatProps = (params) => {
-    if (typeof params === 'undefined') {
-        return 'undefined';
-    }
-
-    if (!isObject(params)) {
-        return `${params}`;
-    }
-
-    const res = Object.keys(params).map((key) => `${key}: ${params[key]}`);
-
-    return res.join(', ');
-};
+export const formatProps = (params) => (
+    JSON.stringify(params) ?? 'undefined'
+);
 
 export const checkPHPerrors = (content) => {
     const errSignatures = [
@@ -416,3 +406,33 @@ export function getExpectedValues(control, expected) {
 
     return res;
 }
+
+/**
+ * Check all specified properties are presents in an object
+ * @param {Object} obj - object to check
+ * @param {Array} propNames - array of props to check
+ */
+export const checkFields = (obj, propNames) => (
+    obj
+    && propNames
+    && propNames.every((f) => (f in obj))
+);
+
+/**
+ * Returns new object with specified properties from source object
+ *
+ * @param {Object} source - source object
+ * @param {Array} propNames - array of props to copy
+ */
+export const copyFields = (source, propNames) => {
+    assert(source && propNames, 'Invalid parameters');
+
+    const res = {};
+    propNames.forEach((f) => {
+        if (f in source) {
+            res[f] = structuredClone(source[f]);
+        }
+    });
+
+    return res;
+};

@@ -14,17 +14,54 @@ import { Transaction } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
 import { App } from '../Application.js';
-import { dateToSeconds, shiftMonth } from '../common.js';
+import { copyFields, dateToSeconds, shiftMonth } from '../common.js';
+import {
+    getColumnsInGroupCount,
+    getDataSets,
+    getLongestDataSet,
+    getValidValuesCount,
+    padArray,
+} from '../model/histogram.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
 const GROUP_BY_MONTH = 3;
 const GROUP_BY_YEAR = 4;
 
+const columnWidth = 38;
+const columnGap = 10;
+const groupsGap = 10;
+const columnOuterWidth = columnWidth + columnGap;
+const visibilityOffset = 1;
+
 const availGroupTypes = [GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
 
 /** Statistics view class */
 export class StatisticsView extends AppView {
+    get filtersBtn() {
+        return this.content.filtersBtn;
+    }
+
+    get typeMenu() {
+        return this.content.typeMenu;
+    }
+
+    get groupTypeMenu() {
+        return this.content.groupTypeMenu;
+    }
+
+    get reportMenu() {
+        return this.content.reportMenu;
+    }
+
+    get currencyDropDown() {
+        return this.content.currencyDropDown;
+    }
+
+    get dateFilter() {
+        return this.content.dateFilter;
+    }
+
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
@@ -54,12 +91,18 @@ export class StatisticsView extends AppView {
             res.categoriesFilterVisible,
             res.currencyFilterVisible,
             res.chart.renderTime,
+            res.chart.width,
+            res.chart.scrollerWidth,
+            res.chart.scrollLeft,
+            res.chart.animation,
             res.chart.heights,
         ] = await evaluate((titleEl, chartEl, ...barElems) => {
             const filtersEl = document.querySelector('.filters-collapsible');
             const accountsFilter = document.querySelector('#accountsFilter');
             const categoriesFilter = document.querySelector('#categoriesFilter');
             const currencyFilter = document.querySelector('#currencyFilter');
+            const chartHorEl = chartEl.querySelector('.chart__horizontal');
+            const chartScrollerEl = chartEl.querySelector('.chart__scroller');
 
             return [
                 titleEl?.textContent ?? null,
@@ -68,6 +111,10 @@ export class StatisticsView extends AppView {
                 categoriesFilter && !categoriesFilter.hidden,
                 currencyFilter && !currencyFilter.hidden,
                 chartEl.dataset.time,
+                chartEl.offsetWidth ?? 0,
+                chartScrollerEl?.offsetWidth ?? 0,
+                chartScrollerEl?.scrollLeft ?? 0,
+                chartHorEl?.classList?.contains('chart_animated'),
                 barElems.map((el) => el?.attributes?.height?.nodeValue),
             ];
         }, res.titleEl, res.chart.elem, ...bars);
@@ -157,6 +204,10 @@ export class StatisticsView extends AppView {
         res.filter.group = groupType;
 
         res.chart = {
+            width: cont.chart.width,
+            scrollerWidth: cont.chart.scrollerWidth,
+            scrollLeft: cont.chart.scrollLeft,
+            animation: cont.chart.animation,
             bars: cont.chart.bars.map(({ height }) => ({ height })),
         };
 
@@ -190,6 +241,19 @@ export class StatisticsView extends AppView {
         assert(groupName in groupTypesMap, 'Invalid group type');
 
         return groupTypesMap[groupName];
+    }
+
+    assignChartDimensions(expected, model = this.model) {
+        const propsToCopy = ['width', 'scrollerWidth', 'scrollLeft'];
+        const res = expected;
+
+        if (!res.chart) {
+            res.chart = {};
+        }
+
+        Object.assign(res.chart, copyFields(model.chart, propsToCopy));
+
+        return res;
     }
 
     getExpectedState(model = this.model, state = App.state) {
@@ -287,21 +351,36 @@ export class StatisticsView extends AppView {
         const [firstValue] = histogram.values ?? [];
         const dataSet = firstValue?.data ?? [];
         const noData = !dataSet.length && !histogram.series?.length;
+        const isStacked = (
+            report === 'category'
+            || (report === 'account' && model.filter.accounts?.length > 1)
+        );
 
+        const dataSets = getDataSets(histogram);
+        const columnsInGroup = (isStacked) ? getColumnsInGroupCount(dataSets) : dataSets.length;
+        const groupWidth = columnOuterWidth * columnsInGroup - columnGap;
+        const groupOuterWidth = groupWidth + groupsGap;
+        const longestSet = getLongestDataSet(dataSets);
+        const expectedYAxisLabels = (longestSet.length > 0) ? 100 : 0;
+        const availableWidth = (model.chart.scrollerWidth === 0)
+            ? (model.chart.width - expectedYAxisLabels)
+            : model.chart.scrollerWidth;
+
+        const groupsVisible = Math.round(availableWidth / groupOuterWidth) + visibilityOffset;
+        const groupsCount = Math.max(0, Math.min(longestSet.length, groupsVisible));
         let barsCount = 0;
-        const getValidValuesCount = (values) => values.reduce((count, value) => (
-            (value === 0) ? count : (count + 1)
-        ), 0);
 
         if (!noData) {
             if (isObject(firstValue)) {
                 histogram.values.forEach((value) => {
                     if (value?.data?.length) {
-                        barsCount += getValidValuesCount(value.data);
+                        const padded = padArray(value.data, longestSet.length);
+                        const visibleItems = padded.slice(longestSet.length - groupsCount);
+                        barsCount += getValidValuesCount(visibleItems);
                     }
                 });
             } else {
-                barsCount = getValidValuesCount(histogram.values);
+                barsCount = getValidValuesCount(histogram.values.slice(-groupsCount));
             }
         }
 
@@ -314,10 +393,26 @@ export class StatisticsView extends AppView {
         return res;
     }
 
+    async runFiltersAction(action) {
+        await this.parse();
+        await this.openFilters();
+        await this.waitForData(action);
+        await this.closeFilters();
+    }
+
+    checkFixedState(model) {
+        App.view.assignChartDimensions(model);
+        const expected = App.view.getExpectedState(model);
+        return App.view.checkState(expected);
+    }
+
     async waitForLoad() {
         await waitForFunction(async () => {
             await this.parse();
-            return !this.model.loading;
+            return (
+                !this.model.chart.animation
+                && !this.model.loading
+            );
         });
 
         await this.parse();
@@ -334,6 +429,7 @@ export class StatisticsView extends AppView {
             await this.parse();
             return (
                 !this.model.loading
+                && !this.model.chart.animation
                 && prevTime !== this.model.renderTime
             );
         });
@@ -341,8 +437,8 @@ export class StatisticsView extends AppView {
         await this.parse();
     }
 
-    async waitForAnimation(action) {
-        const expectedVisibility = this.model.filtersVisible;
+    async waitForAnimation(action, model) {
+        const expectedVisibility = model.filtersVisible;
 
         await this.parse();
 
@@ -364,10 +460,11 @@ export class StatisticsView extends AppView {
             return true;
         }
 
-        this.model.filtersVisible = true;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filtersVisible = true;
+        const expected = this.getExpectedState(model);
 
-        await this.waitForAnimation(() => this.content.filtersBtn.click());
+        await this.waitForAnimation(() => this.filtersBtn.click(), model);
 
         return this.checkState(expected);
     }
@@ -377,97 +474,85 @@ export class StatisticsView extends AppView {
             return true;
         }
 
-        this.model.filtersVisible = false;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filtersVisible = false;
+        const expected = this.getExpectedState(model);
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
+            await this.waitForAnimation(() => click(closeFiltersBtn.elem), model);
         } else {
-            await this.waitForAnimation(() => this.content.filtersBtn.click());
+            await this.waitForAnimation(() => this.filtersBtn.click(), model);
         }
 
         return this.checkState(expected);
     }
 
     async filterByType(value) {
-        const types = asArray(value);
-        types.sort();
+        const types = asArray(value).sort();
 
-        if (this.content.typeMenu.isSameSelected(types)) {
+        if (this.typeMenu.isSameSelected(types)) {
             return true;
         }
 
-        await this.openFilters();
+        const model = this.cloneModel();
+        const typesBefore = model.filter.type;
+        model.filter.type = types;
 
-        const typesBefore = this.model.filter.type;
-        this.model.filter.type = types;
-        const expected = this.getExpectedState();
-
-        // Select new types
-        for (const type of Transaction.availTypes) {
-            if (!typesBefore.includes(type) && types.includes(type)) {
-                await this.waitForData(() => App.view.content.typeMenu.toggle(type));
+        await this.runFiltersAction(async () => {
+            // Select new types
+            for (const type of Transaction.availTypes) {
+                if (!typesBefore.includes(type) && types.includes(type)) {
+                    await this.performAction(() => App.view.typeMenu.toggle(type));
+                }
             }
-        }
-        // Deselect previous types
-        for (const type of Transaction.availTypes) {
-            if (typesBefore.includes(type) && !types.includes(type)) {
-                await this.waitForData(() => App.view.content.typeMenu.toggle(type));
+            // Deselect previous types
+            for (const type of Transaction.availTypes) {
+                if (typesBefore.includes(type) && !types.includes(type)) {
+                    await this.performAction(() => App.view.typeMenu.toggle(type));
+                }
             }
-        }
+        });
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async byCategories() {
-        await this.parse();
+        const model = this.cloneModel();
+        model.filter.report = 'category';
+        delete model.filter.curr_id;
+        delete model.filter.accounts;
+        model.filter.categories = [];
 
-        await this.openFilters();
+        await this.runFiltersAction(() => this.reportMenu.selectItemByValue('category'));
 
-        this.model.filter.report = 'category';
-        delete this.model.filter.curr_id;
-        delete this.model.filter.accounts;
-        this.model.filter.categories = [];
-        const expected = this.getExpectedState();
-
-        await this.waitForData(() => this.content.reportMenu.selectItemByValue('category'));
-
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async byAccounts() {
-        await this.parse();
+        const model = this.cloneModel();
+        model.filter.report = 'account';
+        model.filter.accounts = [];
+        delete model.filter.curr_id;
+        delete model.filter.categories;
 
-        await this.openFilters();
+        await this.runFiltersAction(() => this.reportMenu.selectItemByValue('account'));
 
-        this.model.filter.report = 'account';
-        this.model.filter.accounts = [];
-        delete this.model.filter.curr_id;
-        delete this.model.filter.categories;
-        const expected = this.getExpectedState();
-
-        await this.waitForData(() => this.content.reportMenu.selectItemByValue('account'));
-
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async byCurrencies() {
-        await this.parse();
-
-        await this.openFilters();
-
-        this.model.filter.report = 'currency';
-        delete this.model.filter.accounts;
-        delete this.model.filter.categories;
+        const model = this.cloneModel();
+        model.filter.report = 'currency';
+        delete model.filter.accounts;
+        delete model.filter.categories;
 
         const currency = App.currency.getItemByIndex(0);
-        this.model.filter.curr_id = currency.id;
-        const expected = this.getExpectedState();
+        model.filter.curr_id = currency.id;
 
-        await this.waitForData(() => this.content.reportMenu.selectItemByValue('currency'));
+        await this.runFiltersAction(() => this.reportMenu.selectItemByValue('currency'));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async setFilterSelection(dropDown, itemIds) {
@@ -488,61 +573,51 @@ export class StatisticsView extends AppView {
     }
 
     async filterByCategories(ids) {
-        await this.openFilters();
-
+        const model = this.cloneModel();
         const categories = asArray(ids);
-        this.model.filter.categories = categories;
-        const expected = this.getExpectedState();
+        model.filter.categories = categories;
 
-        await this.setFilterSelection('categoryDropDown', categories);
+        await this.runFiltersAction(() => (
+            this.setFilterSelection('categoryDropDown', categories)
+        ));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async filterByAccounts(ids) {
         assert(App.state.accounts.length > 0, 'No accounts available');
 
-        await this.openFilters();
-
+        const model = this.cloneModel();
         const accounts = asArray(ids);
-        this.model.filter.accounts = accounts;
-        const expected = this.getExpectedState();
+        model.filter.accounts = accounts;
 
-        await this.setFilterSelection('accountsDropDown', accounts);
+        await this.runFiltersAction(() => (
+            this.setFilterSelection('accountsDropDown', accounts)
+        ));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async selectCurrency(currencyId) {
-        assert(this.content.currencyDropDown, 'Currency drop down control not found');
+        assert(this.currencyDropDown, 'Currency drop down control not found');
 
-        await this.openFilters();
+        const model = this.cloneModel();
+        model.filter.curr_id = parseInt(currencyId, 10);
 
-        this.model.filter.curr_id = parseInt(currencyId, 10);
-        const expected = this.getExpectedState();
+        await this.runFiltersAction(() => this.currencyDropDown.setSelection(currencyId));
 
-        await this.waitForData(() => this.content.currencyDropDown.setSelection(currencyId));
-
-        return App.view.checkState(expected);
-    }
-
-    selectCurrencyByPos(pos) {
-        assert(this.content.currencyDropDown, 'Currency drop down control not found');
-
-        return this.selectCurrency(this.content.currencyDropDown.content.items[pos].id);
+        return App.view.checkFixedState(model);
     }
 
     async groupBy(group) {
-        await this.openFilters();
-
         const groupName = this.getGroupTypeName(group);
 
-        this.model.filter.group = group;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.group = group;
 
-        await this.waitForData(() => this.content.groupTypeMenu.selectItemByValue(groupName));
+        await this.runFiltersAction(() => this.groupTypeMenu.selectItemByValue(groupName));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     groupByDay() {
@@ -569,8 +644,6 @@ export class StatisticsView extends AppView {
     async selectWeekRangeFilter() {
         this.checkRangeSelectorsAvailable();
 
-        await this.openFilters();
-
         const { filter } = this.model;
         const startDate = dateToSeconds(App.dates.weekAgo);
         const endDate = dateToSeconds(App.dates.now);
@@ -578,20 +651,20 @@ export class StatisticsView extends AppView {
             return true;
         }
 
-        filter.startDate = startDate;
-        filter.endDate = endDate;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.startDate = startDate;
+        model.filter.endDate = endDate;
 
-        assert(this.content.weekRangeBtn.visible, 'Week range button not visible');
-        await this.waitForData(() => click(this.content.weekRangeBtn.elem));
+        await this.runFiltersAction(() => {
+            assert(this.content.weekRangeBtn.visible, 'Week range button not visible');
+            return click(this.content.weekRangeBtn.elem);
+        });
 
-        return this.checkState(expected);
+        return this.checkFixedState(model);
     }
 
     async selectMonthRangeFilter() {
         this.checkRangeSelectorsAvailable();
-
-        await this.openFilters();
 
         const { filter } = this.model;
         const startDate = dateToSeconds(App.dates.monthAgo);
@@ -600,20 +673,20 @@ export class StatisticsView extends AppView {
             return true;
         }
 
-        filter.startDate = startDate;
-        filter.endDate = endDate;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.startDate = startDate;
+        model.filter.endDate = endDate;
 
-        assert(this.content.monthRangeBtn.visible, 'Month range button not visible');
-        await this.waitForData(() => click(this.content.monthRangeBtn.elem));
+        await this.runFiltersAction(() => {
+            assert(this.content.monthRangeBtn.visible, 'Month range button not visible');
+            return click(this.content.monthRangeBtn.elem);
+        });
 
-        return this.checkState(expected);
+        return this.checkFixedState(model);
     }
 
     async selectHalfYearRangeFilter() {
         this.checkRangeSelectorsAvailable();
-
-        await this.openFilters();
 
         const { filter } = this.model;
         const startDate = dateToSeconds(shiftMonth(App.dates.now, -6));
@@ -622,69 +695,63 @@ export class StatisticsView extends AppView {
             return true;
         }
 
-        filter.startDate = startDate;
-        filter.endDate = endDate;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.startDate = startDate;
+        model.filter.endDate = endDate;
 
-        assert(this.content.halfYearRangeBtn.visible, 'Half a year range button not visible');
-        await this.waitForData(() => click(this.content.halfYearRangeBtn.elem));
+        await this.runFiltersAction(() => {
+            assert(this.content.halfYearRangeBtn.visible, 'Half a year range button not visible');
+            return click(this.content.halfYearRangeBtn.elem);
+        });
 
-        return this.checkState(expected);
+        return this.checkFixedState(model);
     }
 
     async selectStartDateFilter(value) {
-        await this.openFilters();
-
         const date = new Date(App.parseDate(value));
         const startDate = dateToSeconds(date);
         if (this.model.filter.startDate === startDate) {
             return true;
         }
 
-        this.model.filter.startDate = startDate;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.startDate = startDate;
 
-        await this.waitForData(() => this.content.dateFilter.selectStart(date));
+        await this.runFiltersAction(() => this.dateFilter.selectStart(date));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async selectEndDateFilter(value) {
-        await this.openFilters();
-
         const date = new Date(App.parseDate(value));
         const endDate = dateToSeconds(date);
         if (this.model.filter.endDate === endDate) {
             return true;
         }
 
-        this.model.filter.endDate = endDate;
-        const expected = this.getExpectedState();
+        const model = this.cloneModel();
+        model.filter.endDate = endDate;
 
-        await this.waitForData(() => this.content.dateFilter.selectEnd(date));
+        await this.runFiltersAction(() => this.dateFilter.selectEnd(date));
 
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async clearStartDateFilter() {
-        await this.openFilters();
+        const model = this.cloneModel();
+        model.filter.startDate = null;
 
-        this.model.filter.startDate = null;
-        const expected = this.getExpectedState();
+        await this.runFiltersAction(() => this.dateFilter.clearStart());
 
-        await this.waitForData(() => this.content.dateFilter.clearStart());
-
-        return App.view.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async clearEndDateFilter() {
-        await this.openFilters();
+        const model = this.cloneModel();
+        model.filter.endDate = null;
 
-        this.model.filter.endDate = null;
-        const expected = this.getExpectedState();
+        await this.runFiltersAction(() => this.dateFilter.clearEnd());
 
-        await this.waitForData(() => this.content.dateFilter.clearEnd());
-
-        return App.view.checkState(expected);
+        return this.checkFixedState(model);
     }
 }

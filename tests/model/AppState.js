@@ -15,6 +15,8 @@ import {
     secondsToDate,
     stepInterval,
     INTERVAL_NONE,
+    checkFields,
+    copyFields,
 } from '../common.js';
 import {
     EXPENSE,
@@ -67,37 +69,6 @@ const availSettings = [
 /** Categories */
 export const ANY_TYPE = 0;
 const transTypes = [...Transaction.availTypes, ANY_TYPE];
-
-/**
- * Check all properties of expected object are presents in specified object
- * @param {Object} fields - object to check
- * @param {Object} expFields - expected object
- */
-function checkFields(fields, expFields) {
-    if (!fields || !expFields) {
-        return false;
-    }
-
-    return expFields.every((f) => (f in fields));
-}
-
-/**
- * Return new object with properties of specified object which are presents in expected object
- * @param {Object} fields - object to check
- * @param {Object} expFields - expected object
- */
-function copyFields(fields, expFields) {
-    assert(fields && expFields, 'Invalid parameters');
-
-    const res = {};
-    expFields.forEach((f) => {
-        if (f in fields) {
-            res[f] = structuredClone(fields[f]);
-        }
-    });
-
-    return res;
-}
 
 export class AppState {
     static dataRequestMap = {
