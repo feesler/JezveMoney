@@ -1,0 +1,9 @@
+.field.optional-field {
+  --field-title-margin: 0;
+
+  padding-top: 0.7rem;
+}
+
+.optional-field + .optional-field {
+  border-top: 1px solid var(--list-separator-color);
+}

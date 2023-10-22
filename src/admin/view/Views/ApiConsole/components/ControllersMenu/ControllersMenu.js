@@ -8,7 +8,7 @@ import {
 import './ControllersMenu.scss';
 
 /* CSS classes */
-const MENU_CLASS = 'menu-list';
+const MENU_CLASS = 'api-menu';
 const MENU_ITEM_CLASS = 'menu-item';
 const SUB_MENU_CLASS = 'sub-menu-list';
 const SUB_MENU_ITEM_CLASS = 'sub-menu-item';

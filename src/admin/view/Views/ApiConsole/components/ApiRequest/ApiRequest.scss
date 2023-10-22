@@ -66,6 +66,11 @@
   .response-container.fail-result .title {
     background-color: #ff6666;
   }
+
+  .response-container .collapsible-content {
+    max-height: 60vh;
+    overflow: auto;
+  }
 }
 
 @media (hover: hover) {
