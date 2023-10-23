@@ -91,6 +91,8 @@ const slice = createSlice({
         dateRenderTime: Date.now(),
     }),
 
+    cancelPosChange: (state) => ({ ...state }),
+
     listRequestLoaded: (state, keepState) => ({
         ...state,
         userCurrencies: createItemsFromModel(),
