@@ -10,12 +10,9 @@ import { Spinner } from 'jezvejs/Spinner';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { App } from '../../../Application/App.js';
-import { API } from '../../../API/index.js';
 import {
     __,
     dateStringToTime,
-    getContextIds,
     getSelectedItems,
 } from '../../../utils/utils.js';
 
@@ -38,6 +35,8 @@ import {
     getInitialState,
     updateList,
 } from './reducer.js';
+import { requestUpcoming } from './actions.js';
+import { getUpcomingRequestData } from './helpers.js';
 import './ReminderListGroup.scss';
 
 /* CSS classes */
@@ -233,10 +232,10 @@ export class ReminderListGroup extends Component {
         const stateFilter = getStateFilter(state);
 
         if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            await this.requestUpcoming({
-                ...this.getUpcomingRequestData(),
+            this.store.dispatch(requestUpcoming({
+                ...getUpcomingRequestData(state),
                 keepState: true,
-            });
+            }));
         }
         this.setRenderTime();
         this.notifyUpdate();
@@ -280,98 +279,6 @@ export class ReminderListGroup extends Component {
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
         this.notifyUpdate();
-    }
-
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-        this.notifyUpdate();
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
-        this.notifyUpdate();
-    }
-
-    setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
-        this.setRenderTime();
-        this.notifyUpdate();
-    }
-
-    getListRequest() {
-        const state = this.store.getState();
-        if (getStateFilter(state) === REMINDER_UPCOMING) {
-            return {};
-        }
-
-        return {
-            page: state.pagination.page,
-            range: state.pagination.range,
-        };
-    }
-
-    getUpcomingListRequest() {
-        const state = this.store.getState();
-        if (getStateFilter(state) !== REMINDER_UPCOMING) {
-            return {};
-        }
-
-        return {
-            page: state.pagination.page,
-            range: state.pagination.range,
-        };
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                reminders: this.getListRequest(),
-                upcoming: this.getUpcomingListRequest(),
-                profile: {},
-            },
-        };
-    }
-
-    getRequestData(state) {
-        const ids = getContextIds(state);
-        if (getStateFilter(state) !== REMINDER_UPCOMING) {
-            return { id: ids };
-        }
-
-        return {
-            upcoming: ids.map((id) => {
-                const strId = id?.toString();
-                const reminder = state.items.find((item) => item?.id?.toString() === strId);
-                return {
-                    schedule_id: reminder.schedule_id,
-                    date: reminder.date,
-                };
-            }),
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.reminders?.data;
-    }
-
-    getUpcomingDataFromResponse(response) {
-        return response?.data?.state?.upcoming?.data;
-    }
-
-    setListData(data, keepState = false) {
-        App.model.reminders.setData(data);
-        this.store.dispatch(actions.listRequestLoaded({ keepState }));
-        this.notifyUpdate();
-    }
-
-    setListDataFromResponse(response, keepState = false) {
-        const reminders = this.getListDataFromResponse(response);
-        const upcoming = this.getUpcomingDataFromResponse(response);
-
-        App.model.reminders.setData(reminders);
-
-        this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
     }
 
     /** Returns absolute index for relative index on current page */
@@ -419,10 +326,10 @@ export class ReminderListGroup extends Component {
         this.store.dispatch(actions.changeStateFilter(stateFilter));
 
         if (stateFilter === REMINDER_UPCOMING) {
-            await this.requestUpcoming({
-                ...this.getUpcomingRequestData(),
+            this.store.dispatch(requestUpcoming({
+                ...getUpcomingRequestData(state),
                 keepState: true,
-            });
+            }));
         }
 
         this.setRenderTime();
@@ -444,13 +351,15 @@ export class ReminderListGroup extends Component {
         }
 
         this.store.dispatch(actions.changeDateFilter(range));
-        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
-            await this.requestUpcoming({
-                ...this.getUpcomingRequestData(),
+
+        const state = this.store.getState();
+        if (getStateFilter(state) === REMINDER_UPCOMING) {
+            this.store.dispatch(requestUpcoming({
+                ...getUpcomingRequestData(state),
                 range: 1,
                 page: 1,
                 keepState: true,
-            });
+            }));
         }
 
         this.setRenderTime();
@@ -473,13 +382,15 @@ export class ReminderListGroup extends Component {
         e.preventDefault();
 
         this.store.dispatch(actions.clearAllFilters());
-        if (getStateFilter(this.store.getState()) === REMINDER_UPCOMING) {
-            await this.requestUpcoming({
-                ...this.getUpcomingRequestData(),
+
+        const state = this.store.getState();
+        if (getStateFilter(state) === REMINDER_UPCOMING) {
+            this.store.dispatch(requestUpcoming({
+                ...getUpcomingRequestData(state),
                 range: 1,
                 page: 1,
                 keepState: true,
-            });
+            }));
         }
 
         this.setRenderTime();
@@ -557,16 +468,13 @@ export class ReminderListGroup extends Component {
         }
         range += 1;
 
-        await this.requestUpcoming({
-            ...this.getUpcomingRequestData(),
+        this.store.dispatch(requestUpcoming({
+            ...getUpcomingRequestData(state),
             range,
             page,
             keepState: true,
             isLoadingMore: true,
-        });
-
-        this.setRenderTime();
-        this.notifyUpdate();
+        }));
     }
 
     /** Paginator 'change' event handler */
@@ -584,107 +492,6 @@ export class ReminderListGroup extends Component {
         }
 
         this.store.dispatch(actions.toggleMode());
-        this.setRenderTime();
-        this.notifyUpdate();
-    }
-
-    getUpcomingRequestData() {
-        const { pagination, form } = this.store.getState();
-
-        const res = {
-            page: pagination.page,
-            range: pagination.range,
-        };
-
-        if (form.startDate) {
-            res.startDate = dateStringToTime(form.startDate, { fixShortYear: false });
-        }
-        if (form.endDate) {
-            res.endDate = dateStringToTime(form.endDate, { fixShortYear: false });
-        }
-
-        return res;
-    }
-
-    async requestUpcoming(options = {}) {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const {
-            keepState = false,
-            isLoadingMore = false,
-            ...request
-        } = options;
-
-        this.startLoading(isLoadingMore);
-
-        try {
-            const { data: upcoming } = await API.reminder.upcoming(request);
-            this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.notifyUpdate();
-    }
-
-    /** Creates transactions for selected reminders */
-    async confirmReminder() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest(this.getRequestData(state));
-            const response = await API.reminder.confirm(request);
-
-            this.setListDataFromResponse(response);
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-        this.notifyUpdate();
-    }
-
-    /** Cancels selected reminders */
-    async cancelReminder() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest(this.getRequestData(state));
-            const response = await API.reminder.cancel(request);
-
-            this.setListDataFromResponse(response);
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
         this.setRenderTime();
         this.notifyUpdate();
     }

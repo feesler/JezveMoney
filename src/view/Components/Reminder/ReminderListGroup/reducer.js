@@ -7,9 +7,8 @@ import {
     formatDateRange,
 } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
-import { ScheduledTransaction } from '../../../Models/ScheduledTransaction.js';
 import { ReminderList } from '../../../Models/ReminderList.js';
-import { REMINDER_SCHEDULED, REMINDER_UPCOMING } from '../../../Models/Reminder.js';
+import { REMINDER_SCHEDULED, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 /** Returns initial state object */
 export const getInitialState = (props = {}) => ({
@@ -119,7 +118,7 @@ const slice = createSlice({
             ? state
             : {
                 ...state,
-                detailsItem: new ScheduledTransaction(item),
+                detailsItem: Reminder.createExtended(item),
             }
     ),
 

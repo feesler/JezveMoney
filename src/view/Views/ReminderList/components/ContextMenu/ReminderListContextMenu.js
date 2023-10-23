@@ -1,8 +1,8 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getApplicationURL } from '../../../../utils/utils.js';
-import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../../../tests/model/Reminder.js';
-import { REMINDER_UPCOMING } from '../../../../Models/Reminder.js';
+import { REMINDER_UPCOMING, REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../Models/Reminder.js';
+import { cancelReminder, confirmReminder, showDetails } from '../../../../Components/Reminder/ReminderListGroup/actions.js';
 
 /** Reminders list context menu component */
 export class ReminderListContextMenu extends PopupMenu {
@@ -57,13 +57,17 @@ export class ReminderListContextMenu extends PopupMenu {
 
         const updateURL = getApplicationURL('transactions/create/', updateParams);
 
+        const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
             url: getApplicationURL(`reminders/${reminder.id}`),
             hidden: (reminder.state === REMINDER_UPCOMING),
-            onClick: (_, e) => e?.preventDefault(),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             type: 'separator',
         }, {
@@ -71,6 +75,7 @@ export class ReminderListContextMenu extends PopupMenu {
             icon: 'check',
             title: __('reminders.confirm'),
             hidden: (reminder.state === REMINDER_CONFIRMED),
+            onClick: () => dispatch(confirmReminder()),
         }, {
             id: 'ctxUpdateBtn',
             type: 'link',
@@ -83,6 +88,7 @@ export class ReminderListContextMenu extends PopupMenu {
             icon: 'del',
             title: __('reminders.cancel'),
             hidden: (reminder.state === REMINDER_CANCELLED),
+            onClick: () => dispatch(cancelReminder()),
         }]);
 
         this.attachAndShow(menuButton);

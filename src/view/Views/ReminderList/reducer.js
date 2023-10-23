@@ -1,5 +1,5 @@
 import { createSlice } from 'jezvejs/Store';
-import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
+import { Reminder } from '../../Models/Reminder.js';
 
 const slice = createSlice({
     updateRemindersList: (state, data) => ({
@@ -25,7 +25,7 @@ const slice = createSlice({
             ? state
             : {
                 ...state,
-                detailsItem: new ScheduledTransaction(item),
+                detailsItem: Reminder.createExtended(item),
             }
     ),
 
