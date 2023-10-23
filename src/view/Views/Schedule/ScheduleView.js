@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     insertAfter,
-    isFunction,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -22,7 +21,6 @@ import {
     getApplicationURL,
     getContextIds,
 } from '../../utils/utils.js';
-import { API } from '../../API/index.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -52,6 +50,7 @@ import {
     createList,
     updateList,
 } from './reducer.js';
+import { deleteItems, setListMode } from './actions.js';
 import './ScheduleView.scss';
 
 /* CSS classes */
@@ -67,20 +66,6 @@ const SHOW_ON_PAGE = 10;
 class ScheduleView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            finishBtn: () => this.finishSelected(),
-            deleteBtn: () => this.confirmDelete(),
-        };
-
-        this.contextMenuActions = {
-            ctxDetailsBtn: () => this.showDetails(),
-            ctxFinishBtn: () => this.finishSelected(),
-            ctxDeleteBtn: () => this.confirmDelete(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(AccountList, 'accounts', App.props.accounts);
@@ -101,6 +86,7 @@ class ScheduleView extends AppView {
             loading: false,
             isLoadingMore: false,
             listMode: 'list',
+            showDeleteConfirmDialog: false,
             showMenu: false,
             showContextMenu: false,
             contextItem: null,
@@ -204,7 +190,7 @@ class ScheduleView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.setListMode('list'),
+            onClick: () => this.store.dispatch(setListMode('list')),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
@@ -251,24 +237,6 @@ class ScheduleView extends AppView {
 
     hideMenu() {
         this.store.dispatch(actions.hideMenu());
-    }
-
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
     }
 
     showMore() {
@@ -344,160 +312,32 @@ class ScheduleView extends AppView {
         this.store.dispatch(actions.deselectAllItems());
     }
 
-    setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
-        this.setRenderTime();
-    }
-
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
-    }
-
-    stopLoading() {
-        this.store.dispatch(actions.stopLoading());
-    }
-
     /** Updates render time */
     setRenderTime() {
         this.store.dispatch(actions.setRenderTime());
     }
 
-    async deleteItems() {
-        const state = this.store.getState();
-        if (state.loading) {
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
             return;
         }
 
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
+        if (!state.showDeleteConfirmDialog) {
             return;
         }
 
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids });
-            const response = await API.schedule.del(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        this.startLoading();
-
-        try {
-            const request = this.getListRequest();
-            const { data } = await API.schedule.list(request);
-            this.setListData(data, keepState);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    getListRequest() {
-        return {};
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                schedule: this.getListRequest(),
-                profile: {},
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.schedule?.data;
-    }
-
-    setListData(data, keepState = false) {
-        App.model.schedule.setData(data);
-        this.store.dispatch(actions.listRequestLoaded(keepState));
-    }
-
-    async requestItem() {
-        const state = this.store.getState();
-        if (!state.detailsId) {
-            return;
-        }
-
-        try {
-            const { data } = await API.schedule.read(state.detailsId);
-            const [item] = data;
-
-            this.store.dispatch(actions.itemDetailsLoaded(item));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-    }
-
-    /** Sends finish API request for selected items */
-    async finishSelected() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids });
-            const response = await API.schedule.finish(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /** Show person(s) delete confirmation popup */
-    confirmDelete() {
-        const state = this.store.getState();
         const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
         }
 
         const multiple = (ids.length > 1);
-        const title = (multiple)
-            ? __('schedule.deleteMultiple')
-            : __('schedule.delete');
-        const content = (multiple)
-            ? __('schedule.deleteMultipleMessage')
-            : __('schedule.deleteMessage');
-
         ConfirmDialog.create({
             id: 'delete_warning',
-            title,
-            content,
-            onConfirm: () => this.deleteItems(),
+            title: (multiple) ? __('schedule.deleteMultiple') : __('schedule.delete'),
+            content: (multiple) ? __('schedule.deleteMultipleMessage') : __('schedule.deleteMessage'),
+            onConfirm: () => this.store.dispatch(deleteItems()),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -509,7 +349,7 @@ class ScheduleView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = ScheduleItemContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -537,7 +377,7 @@ class ScheduleView extends AppView {
             this.menu = ScheduleMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }
@@ -726,6 +566,7 @@ class ScheduleView extends AppView {
         this.renderContextMenu(state, prevState);
         this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

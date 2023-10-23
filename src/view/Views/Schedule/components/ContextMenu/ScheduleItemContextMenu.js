@@ -1,6 +1,10 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
+
 import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
+import { finishSelected, showDetails } from '../../actions.js';
+import { actions } from '../../reducer.js';
 
 /** Scheduled transactions list context menu component */
 export class ScheduleItemContextMenu extends PopupMenu {
@@ -40,12 +44,16 @@ export class ScheduleItemContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
             url: getApplicationURL(`schedule/${scheduleItem.id}`),
-            onClick: (_, e) => e?.preventDefault(),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             type: 'separator',
         }, {
@@ -63,12 +71,14 @@ export class ScheduleItemContextMenu extends PopupMenu {
         }, {
             id: 'ctxFinishBtn',
             title: __('schedule.finish'),
+            onClick: () => dispatch(finishSelected()),
         }, {
             type: 'separator',
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(menuButton);
