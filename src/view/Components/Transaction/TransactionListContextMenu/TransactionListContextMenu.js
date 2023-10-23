@@ -1,6 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getApplicationURL } from '../../../utils/utils.js';
+import { showDetails } from '../../../Views/TransactionList/actions.js';
 
 /** Transactions list context menu component */
 export class TransactionListContextMenu extends PopupMenu {
@@ -32,13 +33,17 @@ export class TransactionListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch, actions } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
             url: getApplicationURL(`transactions/${itemId}`),
             hidden: !context.showDetailsItem,
-            onClick: (_, e) => e?.preventDefault(),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             id: 'separator1',
             type: 'separator',
@@ -58,12 +63,14 @@ export class TransactionListContextMenu extends PopupMenu {
         }, {
             id: 'ctxSetCategoryBtn',
             title: __('transactions.setCategoryMenu'),
+            onClick: () => dispatch(actions.showCategoryDialog()),
         }, {
             type: 'separator',
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(menuButton);

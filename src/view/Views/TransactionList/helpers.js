@@ -9,3 +9,22 @@ export const isSameSelection = (a, b) => (
 export const getTransactionsGroupByDate = () => (
     App.model.profile.settings.tr_group_by_date
 );
+
+export const getListRequest = (state) => ({
+    ...state.form,
+    order: 'desc',
+    page: state.pagination.page,
+    range: state.pagination.range,
+});
+
+export const prepareRequest = (data, state) => ({
+    ...data,
+    returnState: {
+        transactions: getListRequest(state),
+        profile: {},
+    },
+});
+
+export const getListDataFromResponse = (response) => (
+    response?.data?.state?.transactions
+);

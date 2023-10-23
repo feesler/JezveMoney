@@ -1,6 +1,7 @@
 import { createSlice } from 'jezvejs/Store';
 import {
     formatDateRange,
+    getContextIds,
     reduceDeselectItem,
     reduceSelectItem,
     reduceToggleItem,
@@ -197,7 +198,8 @@ const slice = createSlice({
         contextItem: null,
     }),
 
-    showCategoryDialog: (state, ids) => {
+    showCategoryDialog: (state) => {
+        const ids = getContextIds(state);
         if (ids.length === 0) {
             return state;
         }
@@ -252,6 +254,30 @@ const slice = createSlice({
             categoryId,
         },
     }),
+
+    cancelPosChange: (state) => ({ ...state }),
+
+    showDeleteConfirmDialog: (state) => {
+        if (state.showDeleteConfirmDialog) {
+            return state;
+        }
+
+        const ids = getContextIds(state);
+        if (ids.length === 0) {
+            return state;
+        }
+
+        return {
+            ...state,
+            showDeleteConfirmDialog: true,
+        };
+    },
+
+    hideDeleteConfirmDialog: (state) => (
+        (state.showDeleteConfirmDialog)
+            ? { ...state, showDeleteConfirmDialog: false }
+            : state
+    ),
 
     listRequestLoaded: (state, data) => {
         const selectedBefore = (data.keepState && state.listMode === 'select')

@@ -1,10 +1,8 @@
 import 'jezvejs/style';
 import {
     show,
-    asArray,
     createElement,
     removeChilds,
-    isFunction,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Histogram } from 'jezvejs/Histogram';
@@ -13,7 +11,6 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 // Application
-import { API } from '../../API/index.js';
 import { normalize } from '../../utils/decimal.js';
 import {
     formatNumberShort,
@@ -54,6 +51,8 @@ import { Widget } from './components/Widget/Widget.js';
 import { NoDataGroup } from './components/NoDataGroup/NoDataGroup.js';
 
 import { reducer, actions } from './reducer.js';
+import { setItemsCategory, deleteItems } from './actions.js';
+import { getTransactionListContextIds } from './helpers.js';
 import './MainView.scss';
 
 /**
@@ -62,11 +61,6 @@ import './MainView.scss';
 class MainView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.trContextMenuActions = {
-            ctxSetCategoryBtn: () => this.showCategoryDialog(),
-            ctxDeleteBtn: () => this.confirmDelete(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(AccountList, 'accounts', App.props.accounts);
@@ -99,6 +93,7 @@ class MainView extends AppView {
             },
             loading: true,
             showContextMenu: false,
+            showDeleteConfirmDialog: false,
             transactionContextItem: null,
             renderTime: Date.now(),
         };
@@ -337,15 +332,6 @@ class MainView extends AppView {
         });
     }
 
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.trContextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     /** Toggle shows/hides hidden accounts */
     toggleHiddenAccounts() {
         this.store.dispatch(actions.toggleHiddenAccounts());
@@ -364,11 +350,6 @@ class MainView extends AppView {
     /** Hides context menu */
     hideContextMenu() {
         this.store.dispatch(actions.hideTransactionContextMenu());
-    }
-
-    showCategoryDialog() {
-        const ids = this.getContextIds();
-        this.store.dispatch(actions.showCategoryDialog(ids));
     }
 
     closeCategoryDialog() {
@@ -402,101 +383,27 @@ class MainView extends AppView {
         this.store.dispatch(actions.changeCategorySelect(category.id));
     }
 
-    /** Returns currently slelected transactions */
-    getContextIds() {
-        const state = this.store.getState();
-        return asArray(state.transactionContextItem);
-    }
-
-    /** Sends API request to change category of selected transactions */
-    async setItemsCategory() {
-        const state = this.store.getState();
-        if (state.loading) {
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
             return;
         }
 
-        const { ids, categoryId } = state.categoryDialog;
+        if (!state.showDeleteConfirmDialog) {
+            return;
+        }
+
+        const ids = getTransactionListContextIds(state);
         if (ids.length === 0) {
             return;
         }
 
-        this.closeCategoryDialog();
-        this.startLoading();
-
-        try {
-            await API.transaction.setCategory({ id: ids, category_id: categoryId });
-            this.requestState();
-        } catch (e) {
-            App.createErrorNotification(e.message);
-            this.stopLoading();
-            this.setRenderTime();
-        }
-    }
-
-    /** Sends delete transaction API request */
-    async deleteItems() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = this.getContextIds();
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            await API.transaction.del({ id: ids });
-            this.requestState();
-        } catch (e) {
-            App.createErrorNotification(e.message);
-            this.stopLoading();
-            this.setRenderTime();
-        }
-    }
-
-    /** Sends /state/main API request */
-    async requestState() {
-        this.startLoading();
-
-        try {
-            const result = await API.state.main();
-            const { accounts, persons, profile } = result.data;
-
-            App.updateProfile(profile);
-
-            App.model.accounts.setData(accounts.data);
-            App.model.userAccounts = null;
-            App.checkUserAccountModels();
-
-            App.model.persons.setData(persons.data);
-            App.model.visiblePersons = null;
-            App.checkPersonModels();
-
-            this.store.dispatch(actions.listRequestLoaded(result.data));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /** Creates and show transaction delete warning popup */
-    confirmDelete() {
-        const ids = this.getContextIds();
-        if (ids.length === 0) {
-            return;
-        }
-
-        const multi = (ids.length > 1);
+        const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
-            content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
-            onConfirm: () => this.deleteItems(),
+            title: (multiple) ? __('transactions.deleteMultiple') : __('transactions.delete'),
+            content: (multiple) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
+            onConfirm: () => this.store.dispatch(deleteItems()),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -630,7 +537,8 @@ class MainView extends AppView {
         if (!this.transactionContextMenu) {
             this.transactionContextMenu = TransactionListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                actions,
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -703,7 +611,7 @@ class MainView extends AppView {
         if (state.categoryDialog.show && !this.setCategoryDialog) {
             this.setCategoryDialog = SetCategoryDialog.create({
                 onChange: (category) => this.onChangeCategorySelect(category),
-                onSubmit: () => this.setItemsCategory(),
+                onSubmit: () => this.store.dispatch(setItemsCategory()),
                 onCancel: () => this.closeCategoryDialog(),
             });
         }
@@ -731,6 +639,7 @@ class MainView extends AppView {
         this.renderStatisticsWidget(state, prevState);
 
         this.renderCategoryDialog(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

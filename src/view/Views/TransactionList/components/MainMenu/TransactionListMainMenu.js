@@ -1,7 +1,10 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getSelectedItems } from '../../../../utils/utils.js';
+
 import { getTransactionsGroupByDate } from '../../helpers.js';
+import { setListMode, toggleGroupByDate } from '../../actions.js';
+import { actions } from '../../reducer.js';
 
 /** Transactions list main menu component */
 export class TransactionListMainMenu extends PopupMenu {
@@ -15,6 +18,7 @@ export class TransactionListMainMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         const itemsCount = context.items.length;
         const isListMode = context.listMode === 'list';
         const isSelectMode = context.listMode === 'select';
@@ -27,11 +31,13 @@ export class TransactionListMainMenu extends PopupMenu {
             icon: 'select',
             title: __('actions.select'),
             hidden: !(isListMode && itemsCount > 0),
+            onClick: () => dispatch(setListMode('select')),
         }, {
             id: 'sortModeBtn',
             icon: 'sort',
             title: __('actions.sort'),
             hidden: !(isListMode && itemsCount > 1),
+            onClick: () => dispatch(setListMode('sort')),
         }, {
             id: 'separator1',
             type: 'separator',
@@ -40,10 +46,12 @@ export class TransactionListMainMenu extends PopupMenu {
             id: 'selectAllBtn',
             title: __('actions.selectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && selCount < itemsCount),
+            onClick: () => dispatch(actions.selectAllItems()),
         }, {
             id: 'deselectAllBtn',
             title: __('actions.deselectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && selCount > 0),
+            onClick: () => dispatch(actions.deselectAllItems()),
         }, {
             id: 'separator2',
             type: 'separator',
@@ -53,15 +61,18 @@ export class TransactionListMainMenu extends PopupMenu {
             icon: 'export',
             title: __('export.menuTitle'),
             hidden: !(itemsCount > 0),
+            onClick: () => dispatch(actions.showExportDialog()),
         }, {
             id: 'setCategoryBtn',
             title: __('transactions.setCategoryMenu'),
             hidden: !(isSelectMode && selCount > 0),
+            onClick: () => dispatch(actions.showCategoryDialog()),
         }, {
             id: 'deleteBtn',
             icon: 'del',
             title: __('actions.delete'),
             hidden: !(isSelectMode && selCount > 0),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }, {
             id: 'separator3',
             type: 'separator',
@@ -71,6 +82,7 @@ export class TransactionListMainMenu extends PopupMenu {
             title: __('transactions.groupByDate'),
             icon: (groupByDate) ? 'check' : null,
             hidden: !(isListMode),
+            onClick: () => dispatch(toggleGroupByDate()),
         }]);
     }
 }
