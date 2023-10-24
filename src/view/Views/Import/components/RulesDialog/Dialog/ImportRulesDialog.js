@@ -43,12 +43,19 @@ const DIALOG_CONTENT_CLASS = 'rules-content';
 const LIST_CONTAINER_CLASS = 'rules-list-container';
 const LIST_CLASS = 'rules-list';
 
+const defaultProps = {
+    onClose: null,
+};
+
 /**
  * ImportRulesDialog component
  */
 export class ImportRulesDialog extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         this.contextMenuActions = {
             ctxUpdateRuleBtn: () => this.onUpdateItem(),
@@ -204,6 +211,10 @@ export class ImportRulesDialog extends Component {
     /** Hide dialog */
     onClose() {
         this.reset();
+
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** Search input */
