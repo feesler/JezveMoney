@@ -90,6 +90,7 @@ class ImportView extends AppView {
             activeItemIndex: -1,
             mainAccount,
             rulesEnabled: true,
+            showUploadDialog: false,
             showRulesDialog: false,
             checkSimilarEnabled: true,
             checkRemindersEnabled: true,
@@ -135,7 +136,7 @@ class ImportView extends AppView {
             id: 'uploadBtn',
             className: 'circle-btn',
             icon: 'import',
-            onClick: () => this.showUploadDialog(),
+            onClick: () => this.store.dispatch(actions.openUploadDialog()),
         });
         this.heading.actionsContainer.append(this.uploadBtn.elem);
 
@@ -274,28 +275,11 @@ class ImportView extends AppView {
         this.store.dispatch(actions.applyRules());
     }
 
-    /** Show upload file dialog popup */
-    showUploadDialog() {
-        if (!this.uploadDialog) {
-            const state = this.store.getState();
-            this.uploadDialog = ImportUploadDialog.create({
-                mainAccount: state.mainAccount,
-                elem: 'uploadDialog',
-                onAccountChange: (accountId) => this.onUploadAccChange(accountId),
-                onUploadDone: (items) => this.onImportDone(items),
-                onTemplateUpdate: () => this.onUpdateRules(),
-            });
-        }
-
-        this.uploadDialog.show();
-    }
-
     /** File upload done handler */
     onImportDone(items) {
-        this.uploadDialog.hide();
-
         this.store.dispatch(actions.uploadFileDone(items));
         this.store.dispatch(actions.applyRules());
+        this.store.dispatch(actions.closeUploadDialog());
 
         const state = this.store.getState();
         if (state.checkSimilarEnabled) {
@@ -303,11 +287,6 @@ class ImportView extends AppView {
         } else {
             this.store.dispatch(actions.setRenderTime());
         }
-    }
-
-    /** Initial account of upload change callback */
-    onUploadAccChange(accountId) {
-        this.setMainAccount(accountId);
     }
 
     toggleSelectItem(index) {
@@ -365,24 +344,15 @@ class ImportView extends AppView {
             throw new Error('Invalid account');
         }
 
-        this.setMainAccount(account.id);
+        this.store.dispatch(actions.changeMainAccount(account.id));
         this.store.dispatch(actions.applyRules());
 
         const state = this.store.getState();
-        if (this.uploadDialog) {
-            this.uploadDialog.setMainAccount(state.mainAccount);
-        }
-
-        if (state.checkSimilarEnabled && !this.uploadDialog?.isVisible()) {
+        if (state.checkSimilarEnabled && !state.showUploadDialog) {
             this.store.dispatch(requestSimilar());
         } else {
             this.store.dispatch(actions.setRenderTime());
         }
-    }
-
-    /** Set main account */
-    setMainAccount(accountId) {
-        this.store.dispatch(actions.changeMainAccount(accountId));
     }
 
     /** Filter enabled transaction items */
@@ -513,7 +483,35 @@ class ImportView extends AppView {
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
     }
 
-    /** Show transaction form dialog */
+    renderUploadDialog(state, prevState) {
+        if (
+            state.showUploadDialog === prevState.showUploadDialog
+            && state.mainAccount?.id === prevState.mainAccount?.id
+        ) {
+            return;
+        }
+
+        if (!state.showUploadDialog) {
+            this.uploadDialog?.hide();
+            return;
+        }
+
+        if (this.uploadDialog) {
+            this.uploadDialog.setMainAccount(state.mainAccount);
+        } else {
+            this.uploadDialog = ImportUploadDialog.create({
+                mainAccount: state.mainAccount,
+                elem: 'uploadDialog',
+                onAccountChange: (id) => this.store.dispatch(actions.changeMainAccount(id)),
+                onUploadDone: (items) => this.onImportDone(items),
+                onTemplateUpdate: () => this.onUpdateRules(),
+                onClose: () => this.store.dispatch(actions.closeUploadDialog()),
+            });
+        }
+
+        this.uploadDialog.show();
+    }
+
     renderTransactionFormDialog(state) {
         if (state.activeItemIndex === -1) {
             this.transactionDialog?.hide();
@@ -713,6 +711,7 @@ class ImportView extends AppView {
 
         this.renderListHeader(state, prevState);
         this.renderList(state, prevState);
+        this.renderUploadDialog(state, prevState);
         this.renderTransactionFormDialog(state, prevState);
         this.renderRulesDialog(state, prevState);
         this.renderContextMenu(state, prevState);

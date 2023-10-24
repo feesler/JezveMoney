@@ -50,6 +50,18 @@ const slice = createSlice({
             }
     ),
 
+    openUploadDialog: (state) => (
+        (state.showUploadDialog)
+            ? state
+            : { ...state, showUploadDialog: true }
+    ),
+
+    closeUploadDialog: (state) => (
+        (!state.showUploadDialog)
+            ? state
+            : { ...state, showUploadDialog: false }
+    ),
+
     uploadFileDone: (state, data) => {
         if (!Array.isArray(data)) {
             throw new Error('Invalid data');

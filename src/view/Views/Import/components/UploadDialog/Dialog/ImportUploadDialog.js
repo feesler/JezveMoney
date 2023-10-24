@@ -38,12 +38,21 @@ const TPL_FORM_TITLE_CLASS = 'template-form-title';
 const UPLOAD_STATE = 1;
 const CONVERT_STATE = 2;
 
+const defaultProps = {
+    mainAccount: null,
+    onClose: null,
+    onUploadDone: null,
+};
+
 /**
  * ImportUploadDialog component
  */
 export class ImportUploadDialog extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         if (!this.props?.mainAccount) {
             throw new Error('Invalid props');
@@ -157,6 +166,9 @@ export class ImportUploadDialog extends Component {
     /** Hide dialog */
     onClose() {
         this.reset();
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** File 'dragenter' event handler */
