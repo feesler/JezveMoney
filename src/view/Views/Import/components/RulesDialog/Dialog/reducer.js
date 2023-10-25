@@ -1,9 +1,11 @@
 import { createSlice } from 'jezvejs/Store';
 
 import { App } from '../../../../../Application/App.js';
-import { ImportRuleList } from '../../../../../Models/ImportRuleList.js';
+
 import { ImportRule } from '../../../../../Models/ImportRule.js';
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
+
+import { updateList } from './helpers.js';
 
 /* Dialogs states */
 export const LIST_STATE = 1;
@@ -26,64 +28,12 @@ export const getInitialState = () => ({
         total: 0,
     },
     showContextMenu: false,
+    showDeleteConfirmDialog: false,
     contextItem: null,
     renderTime: Date.now(),
 });
 
-/** Returns absolute index for relative index on current page */
-export const getAbsoluteIndex = (index, state) => {
-    if (index === -1) {
-        return index;
-    }
-
-    const { pagination } = state;
-    if (!pagination) {
-        return index;
-    }
-
-    const firstItemIndex = (pagination.page - 1) * pagination.onPage;
-    return firstItemIndex + index;
-};
-
-/** Returns rules list according to current filters */
-export const createList = (items, state) => {
-    const filter = state?.filter ?? '';
-
-    let res = (filter !== '')
-        ? items.filter((rule) => rule.isMatchFilter(filter))
-        : items;
-
-    res = res.map((item) => (
-        ('collapsed' in item) ? item : { ...item, collapsed: true }
-    ));
-
-    return ImportRuleList.create(res);
-};
-
 // Reducers
-
-/** Updates rules list state */
-export const updateList = (state) => {
-    const { rules } = App.model;
-    const { onPage, page } = state.pagination;
-
-    const items = createList(rules, state);
-
-    const pagesCount = Math.ceil(items.length / onPage);
-    const pagination = {
-        ...state.pagination,
-        pagesCount,
-        page: (pagesCount > 0) ? Math.min(pagesCount, page) : 1,
-        total: items.length,
-    };
-
-    return {
-        ...state,
-        items,
-        pagination,
-    };
-};
-
 const slice = createSlice({
     reset: () => updateList(getInitialState()),
 
@@ -217,6 +167,28 @@ const slice = createSlice({
             rule: new ImportRule(rule),
         };
     },
+
+    showDeleteConfirmDialog: (state) => {
+        if (state.showDeleteConfirmDialog) {
+            return state;
+        }
+
+        const item = App.model.rules.getItem(state.contextItem);
+        if (!item) {
+            return state;
+        }
+
+        return {
+            ...state,
+            showDeleteConfirmDialog: true,
+        };
+    },
+
+    hideDeleteConfirmDialog: (state) => (
+        (state.showDeleteConfirmDialog)
+            ? { ...state, showDeleteConfirmDialog: false }
+            : state
+    ),
 });
 
 export const { actions, reducer } = slice;
