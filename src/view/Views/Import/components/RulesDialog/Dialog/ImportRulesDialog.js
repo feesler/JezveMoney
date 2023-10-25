@@ -11,7 +11,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
 import { createStore } from 'jezvejs/Store';
 
-import { __ } from '../../../../../utils/utils.js';
+import { __, getAbsoluteIndex } from '../../../../../utils/utils.js';
 
 import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
@@ -30,7 +30,6 @@ import {
     UPDATE_STATE,
 } from './reducer.js';
 import { deleteRule, submitRule } from './actions.js';
-import { getAbsoluteIndex } from './helpers.js';
 import './ImportRulesDialog.scss';
 
 /** CSS classes */

@@ -11,7 +11,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { __, getSelectedItems } from '../../utils/utils.js';
+import { __, getAbsoluteIndex, getSelectedItems } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -43,7 +43,7 @@ import { ImportListMainMenu } from './components/MainMenu/ImportListMainMenu.js'
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 
 import { actions, reducer } from './reducer.js';
-import { getAbsoluteIndex, getPageIndex } from './helpers.js';
+import { getPageIndex } from './helpers.js';
 import { deleteAll, requestSimilar } from './actions.js';
 import '../../Application/Application.scss';
 import './ImportView.scss';

@@ -13,6 +13,7 @@ import { createStore } from 'jezvejs/Store';
 import {
     __,
     dateStringToTime,
+    getAbsoluteIndex,
     getSelectedItems,
 } from '../../../utils/utils.js';
 
@@ -279,21 +280,6 @@ export class ReminderListGroup extends Component {
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
         this.notifyUpdate();
-    }
-
-    /** Returns absolute index for relative index on current page */
-    getAbsoluteIndex(index, state) {
-        if (index === -1) {
-            return index;
-        }
-
-        const { pagination } = state;
-        if (!pagination) {
-            return index;
-        }
-
-        const firstItemIndex = (pagination.page - 1) * pagination.onPage;
-        return firstItemIndex + index;
     }
 
     /** Returns page number of paginator */
@@ -593,7 +579,7 @@ export class ReminderListGroup extends Component {
             return;
         }
 
-        const firstItem = this.getAbsoluteIndex(0, state);
+        const firstItem = getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = state.items.slice(firstItem, lastItem);
 

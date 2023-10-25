@@ -14,21 +14,6 @@ export const getPageIndex = (index, state) => {
     };
 };
 
-/** Returns absolute index for relative index on current page */
-export const getAbsoluteIndex = (index, state) => {
-    if (index === -1) {
-        return index;
-    }
-
-    const { pagination } = state;
-    if (!pagination) {
-        return index;
-    }
-
-    const firstItemIndex = (pagination.page - 1) * pagination.onPage;
-    return firstItemIndex + index;
-};
-
 /**
  * Compare transaction item with reference object
  * @param {TransactionItem} item - transaction item object
