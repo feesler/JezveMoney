@@ -1,6 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../../../utils/utils.js';
+import { actions } from '../../reducer.js';
 
 /** Import transactions list context menu component */
 export class ImportListContextMenu extends PopupMenu {
@@ -41,6 +42,7 @@ export class ImportListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         const itemRestoreAvail = (
             !!item.originalData && (item.rulesApplied || item.modifiedByUser)
         );
@@ -50,6 +52,7 @@ export class ImportListContextMenu extends PopupMenu {
             title: __('import.itemRestore'),
             className: 'warning-item',
             hidden: !itemRestoreAvail,
+            onClick: () => dispatch(actions.restoreItem()),
         }, {
             id: 'separator1',
             type: 'separator',
@@ -57,18 +60,22 @@ export class ImportListContextMenu extends PopupMenu {
         }, {
             id: 'ctxEnableBtn',
             title: (item.enabled) ? __('actions.disable') : __('actions.enable'),
+            onClick: () => dispatch(actions.toggleEnableItem()),
         }, {
             id: 'ctxUpdateBtn',
             icon: 'update',
             title: __('actions.update'),
+            onClick: () => dispatch(actions.editItem()),
         }, {
             id: 'ctxDuplicateBtn',
             icon: 'duplicate',
             title: __('actions.duplicate'),
+            onClick: () => dispatch(actions.duplicateItem()),
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.deleteItem()),
         }]);
 
         this.attachAndShow(menuButton);

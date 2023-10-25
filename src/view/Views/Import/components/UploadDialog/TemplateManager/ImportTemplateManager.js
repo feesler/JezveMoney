@@ -7,15 +7,14 @@ import {
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
+import { createStore } from 'jezvejs/Store';
 
 // Application
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
-import { API } from '../../../../../API/index.js';
 
 // Models
 import { ImportTemplateError } from '../../../../../Models/Error/ImportTemplateError.js';
-import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../../../Models/ImportTemplate.js';
 
 // Common components
 import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
@@ -27,6 +26,24 @@ import { FormControls } from '../../../../../Components/Form/FormControls/FormCo
 import { ImportTemplateForm } from '../TemplateForm/ImportTemplateForm.js';
 import { TemplateSelect } from '../TemplateSelect/TemplateSelect.js';
 
+import {
+    reducer,
+    actions,
+    defaultValidation,
+    LOADING_STATE,
+    TPL_SELECT_STATE,
+    TPL_CREATE_STATE,
+    TPL_UPDATE_STATE,
+} from './reducer.js';
+import {
+    cancelTemplate,
+    changeMainAccount,
+    createTemplate,
+    requestDeleteTemplate,
+    requestSubmitTemplate,
+    setRawData,
+    setTemplate,
+} from './actions.js';
 import './ImportTemplateManager.scss';
 
 /** CSS classes */
@@ -39,44 +56,41 @@ const FEEDBACK_CLASS = 'feedback';
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
 const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
 
-/** States */
-export const LOADING_STATE = 1;
-export const TPL_SELECT_STATE = 2;
-export const TPL_CREATE_STATE = 3;
-export const TPL_UPDATE_STATE = 4;
-
-const defaultValidation = {
-    name: true,
-    firstRow: true,
-    valid: true,
-    columns: true,
-};
-
 /**
  * ImportTemplateManager component
  */
 export class ImportTemplateManager extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super(props);
 
         if (!this.props?.mainAccount) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
-        this.state = {
+        const initialState = {
+            ...this.props,
             visible: false,
             mainAccount: this.props.mainAccount,
             templates: App.model.templates,
             listLoading: false,
             formRequest: null,
             template: null,
+            id: LOADING_STATE,
+            rawData: null,
+            filename: null,
+            rowsToShow: 3,
             selectedTemplateId: 0,
+            showDeleteConfirmDialog: false,
             validation: {
                 ...defaultValidation,
             },
         };
 
+        this.store = createStore(reducer, { initialState });
+
         this.init();
+
+        this.subscribeToStore(this.store);
     }
 
     init() {
@@ -90,14 +104,13 @@ export class ImportTemplateManager extends Component {
             id: 'createTplBtn',
             className: CREATE_BTN_CLASS,
             icon: 'plus',
-            onClick: () => this.onCreateTemplateClick(),
+            onClick: () => this.store.dispatch(createTemplate()),
         });
 
         // Template select
         this.templateSelect = TemplateSelect.create({
             onChange: (tpl) => this.onTemplateChange(tpl),
-            onUpdate: () => this.onUpdateTemplate(),
-            onDelete: () => this.onDeleteTemplate(),
+            dispatch: (action) => this.store.dispatch(action),
         });
 
         // Feedback element
@@ -127,12 +140,12 @@ export class ImportTemplateManager extends Component {
 
         // Template form
         this.templateForm = ImportTemplateForm.create({
-            mainAccount: this.state.mainAccount,
-            rawData: this.state.rawData,
-            template: this.state.template,
-            listLoading: this.state.listLoading,
-            onSubmit: (request) => this.onSubmitTemplate(request),
-            onCancel: () => this.onCancelTemplate(),
+            mainAccount: this.props.mainAccount,
+            rawData: this.props.rawData,
+            template: this.props.template,
+            listLoading: this.props.listLoading,
+            onSubmit: (request) => this.store.dispatch(requestSubmitTemplate(request)),
+            onCancel: () => this.store.dispatch(cancelTemplate()),
         });
 
         // Main account select
@@ -140,10 +153,10 @@ export class ImportTemplateManager extends Component {
             id: 'initialAccount',
             enableFilter: true,
             noResultsMessage: __('notFound'),
-            onChange: (account) => this.onAccountChange(account),
+            onChange: (account) => this.store.dispatch(changeMainAccount(account.id)),
         });
         App.initAccountsList(this.accountDropDown);
-        this.accountDropDown.setSelection(this.state.mainAccount.id);
+        this.accountDropDown.setSelection(this.props.mainAccount.id);
 
         // Main account field
         this.initialAccField = Field.create({
@@ -186,16 +199,14 @@ export class ImportTemplateManager extends Component {
             ],
         });
         show(this.elem, false);
-
-        this.reset();
     }
 
-    show(visible = true) {
-        this.setState({ ...this.state, visible });
+    show() {
+        this.store.dispatch(actions.show());
     }
 
     hide() {
-        this.show(false);
+        this.store.dispatch(actions.hide());
     }
 
     onSubmit() {
@@ -206,16 +217,13 @@ export class ImportTemplateManager extends Component {
 
     /** Apply currently selected template to raw data and return array of import data items */
     applyTemplate() {
-        if (
-            !this.state
-            || !Array.isArray(this.state.rawData)
-            || !this.state.template
-        ) {
+        const state = this.store.getState();
+        if (!Array.isArray(state?.rawData) || !state?.template) {
             throw new Error('Invalid state');
         }
 
         try {
-            const res = this.state.template.applyTo(this.state.rawData, this.state.mainAccount);
+            const res = state.template.applyTo(state.rawData, state.mainAccount);
             return res;
         } catch (e) {
             if (!(e instanceof ImportTemplateError)) {
@@ -230,52 +238,17 @@ export class ImportTemplateManager extends Component {
 
     /** Reset component state */
     reset() {
-        this.setState({
-            ...this.state,
-            id: LOADING_STATE,
-            visible: false,
-            rawData: null,
-            filename: null,
-            rowsToShow: 3,
-            listLoading: false,
-            formRequest: null,
-            template: null,
-            selectedTemplateId: 0,
-        });
+        this.store.dispatch(actions.reset());
     }
 
     /** Show/hide loading indication */
     setLoading() {
-        this.setState({ ...this.state, id: LOADING_STATE });
+        this.store.dispatch(actions.setLoading());
     }
 
     /** Copy specified data to component */
-    setRawData(data, filename) {
-        this.setState({
-            ...this.state,
-            rawData: structuredClone(data),
-            filename,
-        });
-
-        if (App.model.templates.length === 0) {
-            this.setCreateTemplateState();
-            return;
-        }
-
-        let template = this.findValidTemplate(this.state.rawData);
-        if (!template) {
-            [template] = this.state.templates;
-            if (!template) {
-                throw new Error('Invalid selection');
-            }
-        }
-
-        this.setTemplate(template.id);
-        this.setState({
-            ...this.state,
-            selectedTemplateId: template.id,
-        });
-        this.setSelectTemplateState();
+    setRawData(data) {
+        this.store.dispatch(setRawData(data));
     }
 
     /** Main account update handler */
@@ -284,273 +257,26 @@ export class ImportTemplateManager extends Component {
             throw new Error('Invalid account');
         }
 
-        this.setState({
-            ...this.state,
-            mainAccount,
-        });
-    }
-
-    /** Initial account select 'change' event handler */
-    onAccountChange(selectedAccount) {
-        return this.changeMainAccount(selectedAccount?.id);
-    }
-
-    changeMainAccount(id) {
-        if (this.state.mainAccount.id === id) {
-            return;
-        }
-        const mainAccount = App.model.accounts.getItem(id);
-        if (!mainAccount) {
-            throw new Error('Account not found');
-        }
-
-        this.setState({
-            ...this.state,
-            mainAccount,
-        });
-
-        if (isFunction(this.props.onAccountChange)) {
-            this.props.onAccountChange(mainAccount.id);
-        }
+        this.store.dispatch(actions.setMainAccount(mainAccount));
     }
 
     /** Import template select 'change' event handler */
     onTemplateChange(selectedTemplate) {
-        if (this.state.id !== TPL_SELECT_STATE) {
-            return;
-        }
-
         if (!selectedTemplate) {
             throw new Error('Invalid selection');
         }
 
-        this.setTemplate(selectedTemplate.id);
-
-        this.setState({
-            ...this.state,
-            selectedTemplateId: selectedTemplate.id,
-        });
-    }
-
-    /**
-     * Set specified template
-     * @param {number} value - import template id
-     */
-    setTemplate(value) {
-        const template = App.model.templates.getItem(value) ?? null;
-
-        if (template?.account_id) {
-            this.changeMainAccount(template.account_id);
-        }
-
-        this.validateTemplateAndSetState({
-            ...this.state,
-            template,
-        });
-    }
-
-    /** Create template button 'click' event handler */
-    onCreateTemplateClick() {
-        this.setCreateTemplateState();
-    }
-
-    /** Set select template state */
-    setSelectTemplateState() {
-        this.setState({
-            ...this.state,
-            id: TPL_SELECT_STATE,
-        });
-        this.notifyStateChanged();
-    }
-
-    /** Set create template state */
-    setCreateTemplateState() {
-        this.setState({
-            ...this.state,
-            id: TPL_CREATE_STATE,
-            template: new ImportTemplate({
-                name: '',
-                type_id: 0,
-                account_id: 0,
-                first_row: 2,
-                date_locale: IMPORT_DATE_LOCALE,
-                columns: {},
-            }),
-            validation: {
-                ...defaultValidation,
-            },
-        });
-
-        this.templateForm.validateTemplateAndSetState();
-        this.notifyStateChanged();
-    }
-
-    /** Update template button 'click' event handler */
-    onUpdateTemplate() {
-        this.setState({
-            ...this.state,
-            id: TPL_UPDATE_STATE,
-        });
-        this.templateForm.validateTemplateAndSetState();
-        this.notifyStateChanged();
-    }
-
-    /** Notifyes template form state changed */
-    notifyStateChanged() {
-        if (!isFunction(this.props.onChangeState)) {
+        const state = this.store.getState();
+        if (state.id !== TPL_SELECT_STATE) {
             return;
         }
 
-        this.props.onChangeState(this.state.id);
-    }
-
-    /** Delete template button 'click' event handler */
-    onDeleteTemplate() {
-        ConfirmDialog.create({
-            id: 'tpl_delete_warning',
-            title: __('import.templates.delete'),
-            content: __('import.templates.deleteMessage'),
-            onConfirm: () => this.requestDeleteTemplate(this.state.template.id),
-        });
-    }
-
-    /** Save template button 'click' event handler */
-    onSubmitTemplate(request) {
-        this.requestSubmitTemplate(request);
+        this.store.dispatch(setTemplate(selectedTemplate.id));
+        this.store.dispatch(actions.selectTemplate(selectedTemplate.id));
     }
 
     startListLoading(formRequest = null) {
-        this.setState({
-            ...this.state,
-            listLoading: true,
-            formRequest,
-        });
-    }
-
-    stopListLoading() {
-        this.setState({
-            ...this.state,
-            listLoading: false,
-            formRequest: null,
-        });
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                importtemplates: {},
-                importrules: {},
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        const state = response?.data?.state;
-        return {
-            templates: state?.importtemplates?.data,
-            rules: state?.importrules?.data,
-        };
-    }
-
-    setListData(templatesData, rulesData) {
-        const { templates } = App.model;
-        templates.setData(templatesData);
-        this.setState({
-            ...this.state,
-            templates,
-        });
-
-        if (App.model.templates.length > 0) {
-            // Find template with same name as currently selected
-            let template = null;
-            if (this.state.formRequest) {
-                template = templates.find((item) => item.name === this.state.formRequest.name);
-            } else if (this.state.selectedTemplateId) {
-                template = templates.getItem(this.state.selectedTemplateId);
-            }
-            if (!template) {
-                template = templates.getItemByIndex(0);
-            }
-            this.setTemplate(template.id);
-            this.setState({
-                ...this.state,
-                selectedTemplateId: template.id,
-            });
-            this.setSelectTemplateState();
-        } else {
-            this.setCreateTemplateState();
-        }
-
-        if (rulesData) {
-            App.model.rules.setData(rulesData);
-        }
-
-        this.stopListLoading();
-
-        if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate();
-        }
-    }
-
-    /** Send API request to create/update template */
-    async requestSubmitTemplate(data) {
-        this.startListLoading(data);
-
-        try {
-            const request = this.prepareRequest(data);
-            const response = (data.id)
-                ? await API.importTemplate.update(request)
-                : await API.importTemplate.create(request);
-
-            const { templates, rules } = this.getListDataFromResponse(response);
-            this.setListData(templates, rules);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-    }
-
-    /** Send API request to delete template */
-    async requestDeleteTemplate(id) {
-        this.startListLoading();
-
-        try {
-            const request = this.prepareRequest({ id });
-            const response = await API.importTemplate.del(request);
-            const { templates, rules } = this.getListDataFromResponse(response);
-            this.setListData(templates, rules);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-            this.stopListLoading();
-        }
-    }
-
-    /** Cancel template button 'click' event handler */
-    onCancelTemplate() {
-        if (this.state.id !== TPL_CREATE_STATE && this.state.id !== TPL_UPDATE_STATE) {
-            return;
-        }
-
-        this.setSelectTemplateState();
-        // Restore previously selected template
-        this.setTemplate(this.state.selectedTemplateId);
-    }
-
-    validateTemplateAndSetState(state) {
-        const validation = this.validateTemplate(state.template, state.rawData);
-        const newState = {
-            ...state,
-            validation: {
-                ...state.validation,
-                ...validation,
-            },
-        };
-
-        if (!validation.valid && typeof validation.column === 'string') {
-            newState.selectedColumn = validation.column;
-        }
-
-        this.setState(newState);
+        this.store.dispatch(actions.startListLoading(formRequest));
     }
 
     /** Set feedback for specified element */
@@ -586,60 +312,6 @@ export class ImportTemplateManager extends Component {
         this.setFeedback(this.convertFeedback, message, isValid);
     }
 
-    /** Validate current template on raw data */
-    validateTemplate(template, rawData) {
-        if (!template) {
-            throw new Error('Invalid template');
-        }
-        if (!Array.isArray(rawData)) {
-            throw new Error('Invalid data');
-        }
-
-        const [data] = rawData.slice(1, 2);
-        // Account amount
-        let value = template.getProperty('accountAmount', data, true);
-        if (!value) {
-            return { valid: false, column: 'accountAmount' };
-        }
-        // Transaction amount
-        value = template.getProperty('transactionAmount', data, true);
-        if (!value) {
-            return { valid: false, column: 'transactionAmount' };
-        }
-        // Account currency
-        value = template.getProperty('accountCurrency', data, true);
-        let currency = App.model.currency.findByCode(value);
-        if (!currency) {
-            return { valid: false, column: 'accountCurrency' };
-        }
-        // Transaction currency
-        value = template.getProperty('transactionCurrency', data, true);
-        currency = App.model.currency.findByCode(value);
-        if (!currency) {
-            return { valid: false, column: 'transactionCurrency' };
-        }
-        // Date
-        value = template.getProperty('date', data, true);
-        if (!value) {
-            return { valid: false, column: 'date' };
-        }
-        // Comment
-        value = template.getProperty('comment', data, true);
-        if (!value) {
-            return { valid: false, column: 'comment' };
-        }
-
-        return { valid: true, column: true };
-    }
-
-    /** Find valid template for data */
-    findValidTemplate(rawData) {
-        return App.model.templates.find((template) => {
-            const { valid } = this.validateTemplate(template, rawData);
-            return valid;
-        });
-    }
-
     /** Render import template select element according to the data in model */
     renderTemplateSelect(state, prevState) {
         if (
@@ -657,6 +329,24 @@ export class ImportTemplateManager extends Component {
         }));
     }
 
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
+            return;
+        }
+
+        if (!state.showDeleteConfirmDialog) {
+            return;
+        }
+
+        ConfirmDialog.create({
+            id: 'tpl_delete_warning',
+            title: __('import.templates.delete'),
+            content: __('import.templates.deleteMessage'),
+            onConfirm: () => this.store.dispatch(requestDeleteTemplate()),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+        });
+    }
+
     /** Render component */
     render(state, prevState = {}) {
         const templateAvail = (App.model.templates.length > 0);
@@ -667,6 +357,7 @@ export class ImportTemplateManager extends Component {
         show(this.elem, state.visible);
 
         this.renderTemplateSelect(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
 
         if (isLoadingState || isFormState) {
             show(this.convertFeedback, false);
@@ -694,6 +385,10 @@ export class ImportTemplateManager extends Component {
                 mainAccount: state.mainAccount,
                 listLoading: state.listLoading,
             }));
+
+            if (state.id !== prevState.id) {
+                this.templateForm.validateTemplateAndSetState();
+            }
         }
 
         if (!Array.isArray(state.rawData) || !state.rawData.length) {

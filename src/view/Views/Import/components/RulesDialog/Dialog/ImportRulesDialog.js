@@ -11,8 +11,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Popup } from 'jezvejs/Popup';
 import { createStore } from 'jezvejs/Store';
 
-import { __ } from '../../../../../utils/utils.js';
-import { API } from '../../../../../API/index.js';
+import { __, getAbsoluteIndex } from '../../../../../utils/utils.js';
 
 import { ConfirmDialog } from '../../../../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
@@ -29,10 +28,9 @@ import {
     LIST_STATE,
     CREATE_STATE,
     UPDATE_STATE,
-    getAbsoluteIndex,
 } from './reducer.js';
+import { deleteRule, submitRule } from './actions.js';
 import './ImportRulesDialog.scss';
-import { App } from '../../../../../Application/App.js';
 
 /** CSS classes */
 const DIALOG_CLASS = 'rules-dialog';
@@ -43,28 +41,25 @@ const DIALOG_CONTENT_CLASS = 'rules-content';
 const LIST_CONTAINER_CLASS = 'rules-list-container';
 const LIST_CLASS = 'rules-list';
 
+const defaultProps = {
+    onClose: null,
+};
+
 /**
  * ImportRulesDialog component
  */
 export class ImportRulesDialog extends Component {
-    constructor(...args) {
-        super(...args);
-
-        this.contextMenuActions = {
-            ctxUpdateRuleBtn: () => this.onUpdateItem(),
-            ctxDuplicateRuleBtn: () => this.onDuplicateItem(),
-            ctxDeleteRuleBtn: () => this.onDeleteItem(),
-        };
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         this.store = createStore(reducer, { initialState: getInitialState() });
 
         this.init();
 
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.subscribeToStore(this.store);
     }
 
     init() {
@@ -76,7 +71,7 @@ export class ImportRulesDialog extends Component {
             id: 'createRuleBtn',
             className: CREATE_BTN_CLASS,
             icon: 'plus',
-            onClick: () => this.onCreateRuleClick(),
+            onClick: () => this.store.dispatch(actions.createRule()),
         });
 
         // Header
@@ -166,15 +161,6 @@ export class ImportRulesDialog extends Component {
         show(this.elem, true);
     }
 
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     /** Show/hide dialog */
     show(val) {
         this.reset();
@@ -191,19 +177,13 @@ export class ImportRulesDialog extends Component {
         this.store.dispatch(actions.reset());
     }
 
-    /** Set loading state and render component */
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
-    }
-
-    /** Remove loading state and render component */
-    stopLoading() {
-        this.store.dispatch(actions.stopLoading());
-    }
-
     /** Hide dialog */
     onClose() {
         this.reset();
+
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** Search input */
@@ -230,7 +210,7 @@ export class ImportRulesDialog extends Component {
         const state = this.store.getState();
 
         if (e.target.closest('.toggle-btn')) {
-            this.toggleCollapseItem(itemId);
+            this.store.dispatch(actions.toggleCollapseItem(itemId));
             return;
         }
 
@@ -238,136 +218,28 @@ export class ImportRulesDialog extends Component {
             state.id === LIST_STATE
             && e.target.closest('.menu-btn')
         ) {
-            this.showContextMenu(itemId);
+            this.store.dispatch(actions.showContextMenu(itemId));
         }
     }
 
-    showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
-    }
-
-    hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
-    }
-
-    toggleCollapseItem(itemId) {
-        this.store.dispatch(actions.toggleCollapseItem(itemId));
-    }
-
-    /** Rule 'submit' event handler */
-    onSubmitItem(data) {
-        if (!data) {
-            throw new Error('Invalid data');
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
+            return;
         }
 
-        this.submitRule(data);
-    }
+        if (!state.showDeleteConfirmDialog) {
+            return;
+        }
 
-    /** Rule create/update 'cancel' event handler */
-    onCancelItem() {
-        this.reset();
-    }
-
-    /** Rule 'update' event handler */
-    onUpdateItem() {
-        this.store.dispatch(actions.updateRule());
-    }
-
-    /** Rule 'duplicate' event handler */
-    onDuplicateItem() {
-        this.store.dispatch(actions.duplicateRule());
-    }
-
-    /** Rule 'delete' event handler */
-    onDeleteItem() {
         const { contextItem } = this.store.getState();
 
         ConfirmDialog.create({
             id: 'rule_delete_warning',
             title: __('import.rules.delete'),
             content: __('import.rules.deleteMessage'),
-            onConfirm: () => this.deleteRule(contextItem),
+            onConfirm: () => this.store.dispatch(deleteRule(contextItem)),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
         });
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                importrules: {},
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.importrules?.data;
-    }
-
-    setListData(data) {
-        App.model.rules.setData(data);
-        this.store.dispatch(actions.listRequestLoaded());
-
-        if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate();
-        }
-    }
-
-    /** Send create/update import rule request to API */
-    async submitRule(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest(data);
-            const response = (data.id)
-                ? await API.importRule.update(request)
-                : await API.importRule.create(request);
-
-            const rules = this.getListDataFromResponse(response);
-            this.setListData(rules);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    /** Send delete import rule request to API */
-    async deleteRule(ruleId) {
-        const id = parseInt(ruleId, 10);
-        if (!id) {
-            throw new Error('Invalid rule id');
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id });
-            const response = await API.importRule.del(request);
-            const rules = this.getListDataFromResponse(response);
-            this.setListData(rules);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    /** Send API request to obain list of import rules */
-    async requestRulesList() {
-        this.startLoading();
-
-        try {
-            const result = await API.importRule.list({ extended: true });
-            this.setListData(result.data);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
     }
 
     renderContextMenu(state) {
@@ -377,8 +249,8 @@ export class ImportRulesDialog extends Component {
 
         if (!this.contextMenu) {
             this.contextMenu = RuleListContextMenu.create({
-                onItemClick: (item) => this.onContextMenuClick(item),
-                onClose: () => this.hideContextMenu(),
+                dispatch: (action) => this.store.dispatch(action),
+                onClose: () => this.store.dispatch(actions.hideContextMenu()),
             });
         }
 
@@ -440,8 +312,8 @@ export class ImportRulesDialog extends Component {
 
         this.formContainer = ImportRuleForm.create({
             data: state.rule,
-            onSubmit: (data) => this.onSubmitItem(data),
-            onCancel: () => this.onCancelItem(),
+            onSubmit: (data) => this.store.dispatch(submitRule(data)),
+            onCancel: () => this.reset(),
         });
         this.rulesContent.append(this.formContainer.elem);
 
@@ -452,7 +324,7 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Render component state */
-    render(state) {
+    render(state, prevState = {}) {
         if (state.listLoading) {
             this.loadingIndicator.show();
         }
@@ -469,7 +341,8 @@ export class ImportRulesDialog extends Component {
             this.renderForm(state);
         }
 
-        this.renderContextMenu(state);
+        this.renderContextMenu(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
 
         if (!state.listLoading) {
             this.loadingIndicator.hide();

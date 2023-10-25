@@ -1,5 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import {
+    getHideableContextIds,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { Person } from '../../Models/Person.js';
 import { PersonList } from '../../Models/PersonList.js';
@@ -33,14 +38,19 @@ const slice = createSlice({
             : state
     ),
 
-    showExportDialog: (state, persons) => ({
-        ...state,
-        showExportDialog: true,
-        exportFilter: { persons },
-        showMenu: false,
-        showContextMenu: false,
-        contextItem: null,
-    }),
+    showExportDialog: (state) => {
+        const persons = getHideableContextIds(state);
+        return (persons.length === 0)
+            ? state
+            : {
+                ...state,
+                showExportDialog: true,
+                exportFilter: { persons },
+                showMenu: false,
+                showContextMenu: false,
+                contextItem: null,
+            };
+    },
 
     hideExportDialog: (state) => ({
         ...state,
@@ -145,6 +155,30 @@ const slice = createSlice({
                 },
                 sortMode,
             }
+    ),
+
+    cancelPosChange: (state) => ({ ...state }),
+
+    showDeleteConfirmDialog: (state) => {
+        if (state.showDeleteConfirmDialog) {
+            return state;
+        }
+
+        const ids = getHideableContextIds(state);
+        if (ids.length === 0) {
+            return state;
+        }
+
+        return {
+            ...state,
+            showDeleteConfirmDialog: true,
+        };
+    },
+
+    hideDeleteConfirmDialog: (state) => (
+        (state.showDeleteConfirmDialog)
+            ? { ...state, showDeleteConfirmDialog: false }
+            : state
     ),
 
     listRequestLoaded: (state, keepState) => ({

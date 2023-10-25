@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     insertAfter,
-    isFunction,
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -16,17 +15,11 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
-    SORT_BY_CREATEDATE_ASC,
-    SORT_BY_CREATEDATE_DESC,
-    SORT_BY_NAME_ASC,
-    SORT_BY_NAME_DESC,
-    SORT_MANUALLY,
     __,
     getSelectedIds,
     getApplicationURL,
     getContextIds,
 } from '../../utils/utils.js';
-import { API } from '../../API/index.js';
 
 // Models
 import { Category } from '../../Models/Category.js';
@@ -52,7 +45,13 @@ import {
     reducer,
     selectAvailableType,
 } from './reducer.js';
-import { ANY_TYPE, getCategoriesSortMode } from './helpers.js';
+import { ANY_TYPE } from './helpers.js';
+import {
+    deleteItems,
+    requestItem,
+    sendChangePosRequest,
+    setListMode,
+} from './actions.js';
 import './CategoryListView.scss';
 
 /* CSS classes */
@@ -65,21 +64,6 @@ const SORT_MODE_CLASS = 'list_sort';
 class CategoryListView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            sortByNameBtn: () => this.toggleSortByName(),
-            sortByDateBtn: () => this.toggleSortByDate(),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            deleteBtn: () => this.confirmDelete(),
-        };
-
-        this.contextMenuActions = {
-            ctxDetailsBtn: () => this.showDetails(),
-            ctxDeleteBtn: () => this.confirmDelete(),
-        };
 
         App.loadModel(CategoryList, 'categories', App.props.categories);
         App.initCategoriesModel();
@@ -96,6 +80,7 @@ class CategoryListView extends AppView {
             listMode: 'list',
             showMenu: false,
             sortMode,
+            showDeleteConfirmDialog: false,
             showContextMenu: false,
             contextItem: null,
             renderTime: Date.now(),
@@ -213,7 +198,7 @@ class CategoryListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.setListMode('list'),
+            onClick: () => this.store.dispatch(setListMode('list')),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
@@ -231,7 +216,7 @@ class CategoryListView extends AppView {
         this.subscribeToStore(this.store);
 
         if (this.props.detailsId) {
-            this.requestItem();
+            this.store.dispatch(requestItem());
         }
     }
 
@@ -246,26 +231,6 @@ class CategoryListView extends AppView {
     onChangeType(selected) {
         const type = Category.getTypeByString(selected?.id);
         this.store.dispatch(actions.selectType(type));
-    }
-
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (!isFunction(menuAction)) {
-            return;
-        }
-
-        menuAction();
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
     }
 
     getItemById(itemId) {
@@ -293,13 +258,6 @@ class CategoryListView extends AppView {
         }
     }
 
-    showDetails(e) {
-        e?.preventDefault();
-        this.store.dispatch(actions.showDetails());
-
-        this.requestItem();
-    }
-
     closeDetails() {
         this.store.dispatch(actions.closeDetails());
     }
@@ -314,121 +272,7 @@ class CategoryListView extends AppView {
 
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
-        this.setRenderTime();
-    }
-
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-        this.setRenderTime();
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
-        this.setRenderTime();
-    }
-
-    async setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
-
-        const state = this.store.getState();
-        if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
-            await this.requestSortMode(SORT_MANUALLY);
-        } else {
-            this.setRenderTime();
-        }
-    }
-
-    setRenderTime() {
         this.store.dispatch(actions.setRenderTime());
-    }
-
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
-    }
-
-    stopLoading() {
-        this.store.dispatch(actions.stopLoading());
-    }
-
-    async deleteItems(removeChild = true) {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids, removeChild });
-            const response = await API.category.del(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        this.startLoading();
-
-        try {
-            const request = this.getListRequest();
-            const { data } = await API.category.list(request);
-            this.setListData(data, keepState);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    getListRequest() {
-        return {};
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                categories: this.getListRequest(),
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.categories?.data;
-    }
-
-    setListData(data, keepState = false) {
-        App.model.categories.setData(data);
-        this.store.dispatch(actions.listRequestLoaded(keepState));
-    }
-
-    async requestItem() {
-        const state = this.store.getState();
-        if (!state.detailsId) {
-            return;
-        }
-
-        try {
-            const { data } = await API.category.read(state.detailsId);
-            const [item] = data;
-
-            this.store.dispatch(actions.itemDetailsLoaded(item));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
     }
 
     /**
@@ -471,79 +315,24 @@ class CategoryListView extends AppView {
                 : (parent?.pos ?? 0) + 1;
         }
 
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({
+        this.store.dispatch(
+            sendChangePosRequest({
                 id: itemId,
                 pos: newPos,
                 parent_id: parentId,
-            });
-
-            const response = await API.category.setPos(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data, true);
-        } catch (e) {
-            this.cancelPosChange();
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
+            }),
+        );
     }
 
-    /**
-     * Cancel local changes on position update fail
-     */
-    cancelPosChange() {
-        this.render(this.store.getState());
-
-        App.createErrorNotification(__('categories.errors.changePos'));
-    }
-
-    toggleSortByName() {
-        const current = getCategoriesSortMode();
-        const sortMode = (current === SORT_BY_NAME_ASC)
-            ? SORT_BY_NAME_DESC
-            : SORT_BY_NAME_ASC;
-
-        this.requestSortMode(sortMode);
-    }
-
-    toggleSortByDate() {
-        const current = getCategoriesSortMode();
-        const sortMode = (current === SORT_BY_CREATEDATE_ASC)
-            ? SORT_BY_CREATEDATE_DESC
-            : SORT_BY_CREATEDATE_ASC;
-
-        this.requestSortMode(sortMode);
-    }
-
-    async requestSortMode(sortMode) {
-        const { settings } = App.model.profile;
-        if (settings.sort_categories === sortMode) {
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
             return;
         }
 
-        this.startLoading();
-
-        try {
-            await API.profile.updateSettings({
-                sort_categories: sortMode,
-            });
-            settings.sort_categories = sortMode;
-
-            this.store.dispatch(actions.changeSortMode(sortMode));
-        } catch (e) {
-            App.createErrorNotification(e.message);
+        if (!state.showDeleteConfirmDialog) {
+            return;
         }
 
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /** Show person(s) delete confirmation popup */
-    confirmDelete() {
-        const state = this.store.getState();
         const ids = getContextIds(state);
         if (ids.length === 0) {
             return;
@@ -561,7 +350,8 @@ class CategoryListView extends AppView {
             title: (multiple) ? __('categories.deleteMultiple') : __('categories.delete'),
             content: (multiple) ? __('categories.deleteMultipleMessage') : __('categories.deleteMessage'),
             showChildrenCheckbox,
-            onConfirm: (opt) => this.deleteItems(opt),
+            onConfirm: (opt) => this.store.dispatch(deleteItems(opt)),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -573,7 +363,7 @@ class CategoryListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = CategoryListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -602,7 +392,7 @@ class CategoryListView extends AppView {
             this.menu = CategoryListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }
@@ -750,6 +540,7 @@ class CategoryListView extends AppView {
         this.renderList(state, prevState);
         this.renderContextMenu(state);
         this.renderMenu(state);
+        this.renderDeleteConfirmDialog(state, prevState);
         this.renderDetails(state, prevState);
 
         if (!state.loading) {

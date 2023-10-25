@@ -1,5 +1,10 @@
 import { createSlice } from 'jezvejs/Store';
-import { reduceDeselectItem, reduceSelectItem, reduceToggleItem } from '../../utils/utils.js';
+import {
+    getContextIds,
+    reduceDeselectItem,
+    reduceSelectItem,
+    reduceToggleItem,
+} from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
 import { Schedule } from '../../Models/Schedule.js';
@@ -151,6 +156,28 @@ const slice = createSlice({
         ...state,
         renderTime: Date.now(),
     }),
+
+    showDeleteConfirmDialog: (state) => {
+        if (state.showDeleteConfirmDialog) {
+            return state;
+        }
+
+        const ids = getContextIds(state);
+        if (ids.length === 0) {
+            return state;
+        }
+
+        return {
+            ...state,
+            showDeleteConfirmDialog: true,
+        };
+    },
+
+    hideDeleteConfirmDialog: (state) => (
+        (state.showDeleteConfirmDialog)
+            ? { ...state, showDeleteConfirmDialog: false }
+            : state
+    ),
 
     listRequestLoaded: (state, keepState) => ({
         ...state,

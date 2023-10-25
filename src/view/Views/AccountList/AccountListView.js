@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     insertAfter,
-    isFunction,
     show,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -15,16 +14,10 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
-    SORT_BY_CREATEDATE_ASC,
-    SORT_BY_CREATEDATE_DESC,
-    SORT_BY_NAME_ASC,
-    SORT_BY_NAME_DESC,
-    SORT_MANUALLY,
     __,
     getApplicationURL,
     getHideableContextIds,
 } from '../../utils/utils.js';
-import { API } from '../../API/index.js';
 
 // Models
 import { AccountList } from '../../Models/AccountList.js';
@@ -46,7 +39,13 @@ import { AccountListContextMenu } from './components/ContextMenu/AccountListCont
 import { AccountListMainMenu } from './components/MainMenu/AccountListMainMenu.js';
 
 import { actions, createList, reducer } from './reducer.js';
-import { getAccountsSortMode, getSelectedIds } from './helpers.js';
+import {
+    deleteItems,
+    requestItem,
+    sendChangePosRequest,
+    setListMode,
+} from './actions.js';
+import { getSelectedIds } from './helpers.js';
 import './AccountListView.scss';
 
 /**
@@ -55,27 +54,6 @@ import './AccountListView.scss';
 class AccountListView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            sortByNameBtn: () => this.toggleSortByName(),
-            sortByDateBtn: () => this.toggleSortByDate(),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            exportBtn: () => this.showExportDialog(),
-            showBtn: () => this.showItems(true),
-            hideBtn: () => this.showItems(false),
-            deleteBtn: () => this.confirmDelete(),
-        };
-
-        this.contextMenuActions = {
-            ctxDetailsBtn: () => this.showDetails(),
-            ctxExportBtn: () => this.showExportDialog(),
-            ctxShowBtn: () => this.showItems(),
-            ctxHideBtn: () => this.showItems(false),
-            ctxDeleteBtn: () => this.confirmDelete(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(AccountList, 'accounts', App.props.accounts);
@@ -99,6 +77,7 @@ class AccountListView extends AppView {
             sortMode,
             showContextMenu: false,
             contextItem: null,
+            showDeleteConfirmDialog: false,
             showExportDialog: false,
             exportFilter: null,
             renderTime: Date.now(),
@@ -202,7 +181,7 @@ class AccountListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.setListMode('list'),
+            onClick: () => this.store.dispatch(setListMode('list')),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
@@ -220,7 +199,7 @@ class AccountListView extends AppView {
         this.subscribeToStore(this.store);
 
         if (this.props.detailsId) {
-            this.requestItem();
+            this.store.dispatch(requestItem());
         }
     }
 
@@ -230,24 +209,6 @@ class AccountListView extends AppView {
 
     hideMenu() {
         this.store.dispatch(actions.hideMenu());
-    }
-
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
     }
 
     onItemClick(itemId, e) {
@@ -268,23 +229,8 @@ class AccountListView extends AppView {
         }
     }
 
-    showDetails() {
-        this.store.dispatch(actions.showDetails());
-        this.requestItem();
-    }
-
     closeDetails() {
         this.store.dispatch(actions.closeDetails());
-    }
-
-    showExportDialog() {
-        const state = this.store.getState();
-        const ids = getHideableContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.store.dispatch(actions.showExportDialog(ids));
     }
 
     hideExportDialog() {
@@ -303,147 +249,6 @@ class AccountListView extends AppView {
         this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
-    }
-
-    async setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
-
-        const state = this.store.getState();
-        if (listMode === 'sort' && state.sortMode !== SORT_MANUALLY) {
-            await this.requestSortMode(SORT_MANUALLY);
-        }
-    }
-
-    startLoading() {
-        this.store.dispatch(actions.startLoading());
-    }
-
-    stopLoading() {
-        this.store.dispatch(actions.stopLoading());
-    }
-
-    async showItems(value = true) {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getHideableContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids });
-            const response = (value)
-                ? await API.account.show(request)
-                : await API.account.hide(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    async deleteItems() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getHideableContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids });
-            const response = await API.account.del(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        this.startLoading();
-
-        try {
-            const request = this.getListRequest();
-            const { data } = await API.account.list(request);
-            this.setListData(data, keepState);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    getListRequest() {
-        return { visibility: 'all' };
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                accounts: this.getListRequest(),
-                profile: {},
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.accounts?.data;
-    }
-
-    setListData(data, keepState = false) {
-        App.model.accounts.setData(data);
-        App.model.userAccounts = null;
-        App.checkUserAccountModels();
-
-        this.store.dispatch(actions.listRequestLoaded(keepState));
-    }
-
-    async requestItem() {
-        const state = this.store.getState();
-        if (!state.detailsId) {
-            return;
-        }
-
-        try {
-            const { data } = await API.account.read(state.detailsId);
-            const [item] = data;
-
-            this.store.dispatch(actions.itemDetailsLoaded(item));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-    }
-
     onSort(info) {
         const { userAccounts } = App.model;
         const item = userAccounts.getItem(info.itemId);
@@ -460,86 +265,18 @@ class AccountListView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.sendChangePosRequest(item.id, pos);
+        this.store.dispatch(sendChangePosRequest(item.id, pos));
     }
 
-    /**
-     * Sent API request to server to change position of account
-     * @param {number} id - identifier of item to change position
-     * @param {number} pos - new position of item
-     */
-    async sendChangePosRequest(id, pos) {
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id, pos });
-            const response = await API.account.setPos(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data, true);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            this.cancelPosChange();
-        }
-
-        this.stopLoading();
-    }
-
-    /**
-     * Cancel local changes on position update fail
-     */
-    cancelPosChange() {
-        this.render(this.store.getState());
-
-        App.createErrorNotification(__('accounts.errors.changePos'));
-    }
-
-    toggleSortByName() {
-        const current = getAccountsSortMode();
-        const sortMode = (current === SORT_BY_NAME_ASC)
-            ? SORT_BY_NAME_DESC
-            : SORT_BY_NAME_ASC;
-
-        this.requestSortMode(sortMode);
-    }
-
-    toggleSortByDate() {
-        const current = getAccountsSortMode();
-        const sortMode = (current === SORT_BY_CREATEDATE_ASC)
-            ? SORT_BY_CREATEDATE_DESC
-            : SORT_BY_CREATEDATE_ASC;
-
-        this.requestSortMode(sortMode);
-    }
-
-    async requestSortMode(sortMode) {
-        const { settings } = App.model.profile;
-        if (settings.sort_accounts === sortMode) {
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
             return;
         }
 
-        this.startLoading();
-
-        try {
-            await API.profile.updateSettings({
-                sort_accounts: sortMode,
-            });
-            settings.sort_accounts = sortMode;
-
-            this.store.dispatch(actions.changeSortMode(sortMode));
-        } catch (e) {
-            App.createErrorNotification(e.message);
+        if (!state.showDeleteConfirmDialog) {
+            return;
         }
 
-        this.stopLoading();
-    }
-
-    /**
-     * Show account(s) delete confirmation popup
-     */
-    confirmDelete() {
-        const state = this.store.getState();
         const ids = getHideableContextIds(state);
         if (ids.length === 0) {
             return;
@@ -550,7 +287,8 @@ class AccountListView extends AppView {
             id: 'delete_warning',
             title: (multiple) ? __('accounts.deleteMultiple') : __('accounts.delete'),
             content: (multiple) ? __('accounts.deleteMultipleMessage') : __('accounts.deleteMessage'),
-            onConfirm: () => this.deleteItems(),
+            onConfirm: () => this.store.dispatch(deleteItems()),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -562,7 +300,7 @@ class AccountListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = AccountListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -590,8 +328,8 @@ class AccountListView extends AppView {
         if (!this.menu) {
             this.menu = AccountListMainMenu.create({
                 id: 'listMenu',
+                dispatch: (action) => this.store.dispatch(action),
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
                 onClose: () => this.hideMenu(),
             });
         }
@@ -733,6 +471,7 @@ class AccountListView extends AppView {
         this.renderContextMenu(state, prevState);
         this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
         this.renderExportDialog(state, prevState);
 
         if (!state.loading) {

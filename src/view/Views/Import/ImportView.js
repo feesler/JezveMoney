@@ -3,7 +3,6 @@ import {
     createElement,
     show,
     insertAfter,
-    isFunction,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
@@ -12,7 +11,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { __, getSeconds, getSelectedItems } from '../../utils/utils.js';
+import { __, getAbsoluteIndex, getSelectedItems } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
@@ -43,7 +42,9 @@ import { ImportTransactionList } from './components/List/ImportTransactionList.j
 import { ImportListMainMenu } from './components/MainMenu/ImportListMainMenu.js';
 import { ImportTransactionForm } from './components/TransactionForm/ImportTransactionForm.js';
 
-import { actions, reducer, getPageIndex } from './reducer.js';
+import { actions, reducer } from './reducer.js';
+import { getPageIndex } from './helpers.js';
+import { deleteAll, requestSimilar } from './actions.js';
 import '../../Application/Application.scss';
 import './ImportView.scss';
 
@@ -64,30 +65,6 @@ const defaultPagination = {
 class ImportView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            createItemBtn: () => this.createItem(),
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            enableSelectedBtn: () => this.enableSelected(true),
-            disableSelectedBtn: () => this.enableSelected(false),
-            deleteSelectedBtn: () => this.deleteSelected(),
-            deleteAllBtn: () => this.removeAllItems(),
-            rulesCheck: () => this.onToggleEnableRules(),
-            rulesBtn: () => this.onRulesClick(),
-            similarCheck: () => this.onToggleCheckSimilar(),
-            remindersCheck: () => this.onToggleCheckReminders(),
-        };
-
-        this.contextMenuActions = {
-            ctxRestoreBtn: () => this.onRestoreItem(),
-            ctxEnableBtn: () => this.onToggleEnableItem(),
-            ctxUpdateBtn: () => this.onUpdateItem(),
-            ctxDuplicateBtn: () => this.onDuplicateItem(),
-            ctxDeleteBtn: () => this.onRemoveItem(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
@@ -113,12 +90,16 @@ class ImportView extends AppView {
             activeItemIndex: -1,
             mainAccount,
             rulesEnabled: true,
+            showUploadDialog: false,
+            showRulesDialog: false,
             checkSimilarEnabled: true,
             checkRemindersEnabled: true,
             showContextMenu: false,
             contextItemIndex: -1,
             listMode: 'list',
             showMenu: false,
+            loading: false,
+            renderTime: Date.now(),
         };
 
         this.store = createStore(reducer, { initialState });
@@ -155,7 +136,7 @@ class ImportView extends AppView {
             id: 'uploadBtn',
             className: 'circle-btn',
             icon: 'import',
-            onClick: () => this.showUploadDialog(),
+            onClick: () => this.store.dispatch(actions.openUploadDialog()),
         });
         this.heading.actionsContainer.append(this.uploadBtn.elem);
 
@@ -204,13 +185,13 @@ class ImportView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.setListMode('list'),
+            onClick: () => this.store.dispatch(actions.changeListMode('list')),
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
-            onClick: (e) => this.showMenu(e),
+            onClick: () => this.store.dispatch(actions.showMenu()),
         });
         insertAfter(this.menuButton.elem, this.listModeBtn.elem);
 
@@ -253,13 +234,13 @@ class ImportView extends AppView {
                 type: 'button',
                 textContent: __('actions.showMore'),
             },
-            events: { click: (e) => this.showMore(e) },
+            events: { click: () => this.store.dispatch(actions.showMore()) },
         });
 
         // Paginator
         this.paginator = Paginator.create({
             arrows: true,
-            onChange: (page) => this.setPage(page),
+            onChange: (page) => this.store.dispatch(actions.changePage(page)),
         });
 
         // List footer
@@ -287,201 +268,25 @@ class ImportView extends AppView {
         );
 
         this.subscribeToStore(this.store);
-        this.setRenderTime();
-    }
-
-    showMenu() {
-        this.store.dispatch(actions.showMenu());
-    }
-
-    hideMenu() {
-        this.store.dispatch(actions.hideMenu());
-    }
-
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    showContextMenu(itemIndex) {
-        this.store.dispatch(actions.showContextMenu(itemIndex));
-    }
-
-    hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
-    }
-
-    /** Update render time data attribute of list container */
-    setRenderTime() {
-        this.list.setState((listState) => ({
-            ...listState,
-            renderTime: Date.now(),
-        }));
     }
 
     /** Import rules 'update' event handler */
     onUpdateRules() {
-        this.applyRules();
-    }
-
-    /** Show upload file dialog popup */
-    showUploadDialog() {
-        if (!this.uploadDialog) {
-            const state = this.store.getState();
-            this.uploadDialog = ImportUploadDialog.create({
-                mainAccount: state.mainAccount,
-                elem: 'uploadDialog',
-                onAccountChange: (accountId) => this.onUploadAccChange(accountId),
-                onUploadDone: (items) => this.onImportDone(items),
-                onTemplateUpdate: () => this.onUpdateRules(),
-            });
-        }
-
-        this.uploadDialog.show();
+        this.store.dispatch(actions.applyRules());
     }
 
     /** File upload done handler */
     onImportDone(items) {
-        this.uploadDialog.hide();
-
         this.store.dispatch(actions.uploadFileDone(items));
-        this.applyRules();
+        this.store.dispatch(actions.applyRules());
+        this.store.dispatch(actions.closeUploadDialog());
 
         const state = this.store.getState();
         if (state.checkSimilarEnabled) {
-            this.requestSimilar();
+            this.store.dispatch(requestSimilar());
         } else {
-            this.setRenderTime();
+            this.store.dispatch(actions.setRenderTime());
         }
-    }
-
-    /** Returns date range for current imported transactions */
-    getImportedItemsDateRange(state) {
-        const res = { start: 0, end: 0 };
-        state.items.forEach((item) => {
-            if (!item.originalData) {
-                return;
-            }
-
-            const time = item.originalData.date.getTime();
-            if (res.start === 0) {
-                res.start = time;
-                res.end = time;
-            } else {
-                res.start = Math.min(time, res.start);
-                res.end = Math.max(time, res.end);
-            }
-        });
-
-        return res;
-    }
-
-    /** Request API for list of transactions similar to imported */
-    async fetchSimilarTransactions() {
-        try {
-            const state = this.store.getState();
-            const range = this.getImportedItemsDateRange(state);
-            const result = await API.transaction.list({
-                onPage: 0,
-                startDate: getSeconds(range.start),
-                endDate: getSeconds(range.end),
-                accounts: state.mainAccount.id,
-            });
-            return result.data.items;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    /**
-     * Send API request to obtain transactions similar to imported.
-     * Compare list of import items with transactions already in DB
-     *  and disable import item if same(similar) transaction found
-     */
-    async requestSimilar() {
-        const state = this.store.getState();
-        if (
-            !state.checkSimilarEnabled
-            || !state.items.some((item) => item.originalData)
-        ) {
-            this.setRenderTime();
-            return;
-        }
-
-        this.loadingInd.show();
-
-        const transCache = await this.fetchSimilarTransactions();
-        if (!transCache) {
-            this.loadingInd.hide();
-            return;
-        }
-
-        this.store.dispatch(actions.similarTransactionsLoaded(transCache));
-
-        this.loadingInd.hide();
-        this.setRenderTime();
-    }
-
-    disableCheckSimilar() {
-        this.store.dispatch(actions.disableFindSimilar());
-        this.setRenderTime();
-    }
-
-    /** Initial account of upload change callback */
-    onUploadAccChange(accountId) {
-        this.setMainAccount(accountId);
-    }
-
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
-    }
-
-    enableSelected(value) {
-        const state = this.store.getState();
-        if (state.listMode !== 'select') {
-            return;
-        }
-
-        this.store.dispatch(actions.enableSelectedItems(value));
-    }
-
-    deleteSelected() {
-        const state = this.store.getState();
-        if (state.listMode !== 'select') {
-            return;
-        }
-
-        this.store.dispatch(actions.deleteSelectedItems());
-        this.setRenderTime();
-    }
-
-    setListMode(listMode) {
-        const state = this.store.getState();
-        if (
-            state.listMode === listMode
-            || state.activeItemIndex !== -1
-        ) {
-            return;
-        }
-
-        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     toggleSelectItem(index) {
@@ -493,50 +298,16 @@ class ImportView extends AppView {
         this.store.dispatch(actions.toggleSelectItemByIndex(index));
     }
 
-    /** Remove all transaction rows */
-    removeAllItems() {
-        this.store.dispatch(actions.deleteAllItems());
-        this.setRenderTime();
-    }
-
-    toggleCollapseItem(index) {
-        this.store.dispatch(actions.toggleCollapseItem(index));
-    }
-
-    /** Restore original data of transaction item */
-    onRestoreItem() {
-        const state = this.store.getState();
-        const index = state.contextItemIndex;
-        if (index === -1) {
-            this.hideContextMenu();
-            return;
-        }
-
-        this.store.dispatch(actions.restoreItemByIndex(index));
-    }
-
-    /** Transaction item enable/disable event handler */
-    onToggleEnableItem() {
-        const state = this.store.getState();
-        const index = state.contextItemIndex;
-        if (index === -1) {
-            this.hideContextMenu();
-            return;
-        }
-
-        this.store.dispatch(actions.toggleEnableItemByIndex(index));
-    }
-
     onItemClick(id, e) {
         const state = this.store.getState();
         const relIndex = this.list.getItemIndexById(id);
-        const index = this.getAbsoluteIndex(relIndex, state);
+        const index = getAbsoluteIndex(relIndex, state);
         if (index === -1) {
             return;
         }
 
         if (e.target.closest('.toggle-btn')) {
-            this.toggleCollapseItem(index);
+            this.store.dispatch(actions.toggleCollapseItem(index));
             return;
         }
 
@@ -545,7 +316,8 @@ class ImportView extends AppView {
             if (!e.target.closest('.menu-btn')) {
                 return;
             }
-            this.showContextMenu(index);
+
+            this.store.dispatch(actions.showContextMenu(index));
         } else if (listMode === 'select') {
             if (e.target.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
@@ -553,21 +325,6 @@ class ImportView extends AppView {
 
             this.toggleSelectItem(index);
         }
-    }
-
-    /** Transaction item remove event handler */
-    onRemoveItem() {
-        const { contextItemIndex } = this.store.getState();
-        this.store.dispatch(actions.deleteItemByIndex(contextItemIndex));
-    }
-
-    /** Change page of transactions list */
-    setPage(page) {
-        this.store.dispatch(actions.changePage(page));
-    }
-
-    showMore() {
-        this.store.dispatch(actions.showMore());
     }
 
     /** Save form data and replace it by item component */
@@ -579,23 +336,6 @@ class ImportView extends AppView {
         this.store.dispatch(actions.saveItem(data));
     }
 
-    onCancelEditItem() {
-        this.store.dispatch(actions.cancelEditItem());
-    }
-
-    /** Add new transaction row and insert it into list */
-    createItem() {
-        this.store.dispatch(actions.createItem());
-    }
-
-    onUpdateItem() {
-        this.store.dispatch(actions.editItem());
-    }
-
-    onDuplicateItem() {
-        this.store.dispatch(actions.duplicateItem());
-    }
-
     /**
      * Main account select event handler
      */
@@ -604,24 +344,15 @@ class ImportView extends AppView {
             throw new Error('Invalid account');
         }
 
-        this.setMainAccount(account.id);
-        this.applyRules();
+        this.store.dispatch(actions.changeMainAccount(account.id));
+        this.store.dispatch(actions.applyRules());
 
         const state = this.store.getState();
-        if (this.uploadDialog) {
-            this.uploadDialog.setMainAccount(state.mainAccount);
-        }
-
-        if (state.checkSimilarEnabled && !this.uploadDialog?.isVisible()) {
-            this.requestSimilar();
+        if (state.checkSimilarEnabled && !state.showUploadDialog) {
+            this.store.dispatch(requestSimilar());
         } else {
-            this.setRenderTime();
+            this.store.dispatch(actions.setRenderTime());
         }
-    }
-
-    /** Set main account */
-    setMainAccount(accountId) {
-        this.store.dispatch(actions.changeMainAccount(accountId));
     }
 
     /** Filter enabled transaction items */
@@ -720,7 +451,7 @@ class ImportView extends AppView {
 
         this.updateModelsFromResponse(response);
 
-        this.removeAllItems();
+        this.store.dispatch(deleteAll());
         this.submitProgress.hide();
         App.createSuccessNotification(__('import.successMessage'));
     }
@@ -736,71 +467,6 @@ class ImportView extends AppView {
         App.updateProfileFromResponse(response);
     }
 
-    /** Apply rules to imported items */
-    applyRules() {
-        this.store.dispatch(actions.applyRules());
-    }
-
-    /** Rules checkbox 'change' event handler */
-    onToggleEnableRules() {
-        this.store.dispatch(actions.toggleEnableRules());
-        this.setRenderTime();
-    }
-
-    /** Check similar transactions checkbox 'change' event handler */
-    onToggleCheckSimilar() {
-        this.store.dispatch(actions.toggleCheckSimilar());
-
-        const state = this.store.getState();
-        if (state.checkSimilarEnabled) {
-            this.requestSimilar();
-        } else {
-            this.disableCheckSimilar();
-        }
-    }
-
-    /** 'Check suitable reminders' checkbox 'change' event handler */
-    onToggleCheckReminders() {
-        this.store.dispatch(actions.toggleCheckReminders());
-        this.setRenderTime();
-    }
-
-    /** Rules button 'click' event handler */
-    onRulesClick() {
-        const state = this.store.getState();
-        if (!state.rulesEnabled) {
-            return;
-        }
-
-        this.showRulesDialog();
-    }
-
-    /** Show rules dialog popup */
-    showRulesDialog() {
-        if (!this.rulesDialog) {
-            this.rulesDialog = ImportRulesDialog.create({
-                onUpdate: () => this.onUpdateRules(),
-            });
-        }
-
-        this.rulesDialog.show();
-    }
-
-    /** Returns absolute index for relative index on current page */
-    getAbsoluteIndex(index, state) {
-        if (index === -1) {
-            return index;
-        }
-
-        const { pagination } = state;
-        if (!pagination) {
-            return index;
-        }
-
-        const firstItemIndex = (pagination.page - 1) * pagination.onPage;
-        return firstItemIndex + index;
-    }
-
     /**
      * Transaction reorder handler
      * @param {Object} from - original item index
@@ -812,12 +478,40 @@ class ImportView extends AppView {
             return;
         }
 
-        const fromIndex = this.getAbsoluteIndex(from, state);
-        const toIndex = this.getAbsoluteIndex(to, state);
+        const fromIndex = getAbsoluteIndex(from, state);
+        const toIndex = getAbsoluteIndex(to, state);
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
     }
 
-    /** Show transaction form dialog */
+    renderUploadDialog(state, prevState) {
+        if (
+            state.showUploadDialog === prevState.showUploadDialog
+            && state.mainAccount?.id === prevState.mainAccount?.id
+        ) {
+            return;
+        }
+
+        if (!state.showUploadDialog) {
+            this.uploadDialog?.hide();
+            return;
+        }
+
+        if (this.uploadDialog) {
+            this.uploadDialog.setMainAccount(state.mainAccount);
+        } else {
+            this.uploadDialog = ImportUploadDialog.create({
+                mainAccount: state.mainAccount,
+                elem: 'uploadDialog',
+                onAccountChange: (id) => this.store.dispatch(actions.changeMainAccount(id)),
+                onUploadDone: (items) => this.onImportDone(items),
+                onTemplateUpdate: () => this.onUpdateRules(),
+                onClose: () => this.store.dispatch(actions.closeUploadDialog()),
+            });
+        }
+
+        this.uploadDialog.show();
+    }
+
     renderTransactionFormDialog(state) {
         if (state.activeItemIndex === -1) {
             this.transactionDialog?.hide();
@@ -834,7 +528,7 @@ class ImportView extends AppView {
                 transaction: state.form,
                 isUpdate,
                 onSave: (data) => this.onSaveItem(data),
-                onCancel: () => this.onCancelEditItem(),
+                onCancel: () => this.store.dispatch(actions.cancelEditItem()),
             });
         } else {
             this.transactionDialog.setState((formState) => ({
@@ -847,7 +541,32 @@ class ImportView extends AppView {
         this.transactionDialog.show();
     }
 
-    renderContextMenu(state, prevState) {
+    renderRulesDialog(state, prevState) {
+        if (state.showRulesDialog === prevState.showRulesDialog) {
+            return;
+        }
+
+        if (!state.showRulesDialog) {
+            this.rulesDialog?.hide();
+            return;
+        }
+
+        if (!this.rulesDialog) {
+            this.rulesDialog = ImportRulesDialog.create({
+                onUpdate: () => this.onUpdateRules(),
+                onClose: () => this.store.dispatch(actions.closeRulesDialog()),
+            });
+        }
+
+        this.rulesDialog.show();
+    }
+
+    renderContextMenu(state) {
+        if (!state.showContextMenu) {
+            this.contextMenu?.detach();
+            return;
+        }
+
         const index = state.contextItemIndex;
         const pageIndex = getPageIndex(index, state);
         const startPage = state.pagination.page;
@@ -856,24 +575,12 @@ class ImportView extends AppView {
             return;
         }
 
-        if (!state.showContextMenu && !this.contextMenu) {
-            return;
-        }
-
         if (!this.contextMenu) {
             this.contextMenu = ImportListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
-                onClose: () => this.hideContextMenu(),
+                dispatch: (action) => this.store.dispatch(action),
+                onClose: () => this.store.dispatch(actions.hideContextMenu()),
             });
-        }
-
-        if (
-            (state.showContextMenu === prevState?.showContextMenu)
-            && (state.contextItemIndex === prevState?.contextItemIndex)
-            && (state.items === prevState?.items)
-        ) {
-            return;
         }
 
         this.contextMenu.setContext({
@@ -898,8 +605,8 @@ class ImportView extends AppView {
             this.menu = ImportListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
-                onClose: () => this.hideMenu(),
+                dispatch: (action) => this.store.dispatch(action),
+                onClose: () => this.store.dispatch(actions.hideMenu()),
             });
         }
 
@@ -952,11 +659,12 @@ class ImportView extends AppView {
             state.items === prevState.items
             && state.pagination === prevState.pagination
             && state.listMode === prevState.listMode
+            && state.renderTime === prevState.renderTime
         ) {
             return;
         }
 
-        const firstItem = this.getAbsoluteIndex(0, state);
+        const firstItem = getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = state.items.slice(firstItem, lastItem);
 
@@ -964,6 +672,7 @@ class ImportView extends AppView {
         this.list.setState((listState) => ({
             ...listState,
             listMode: state.listMode,
+            renderTime: state.renderTime,
             items,
         }));
 
@@ -996,11 +705,21 @@ class ImportView extends AppView {
             return;
         }
 
+        if (state.loading) {
+            this.loadingInd.show();
+        }
+
         this.renderListHeader(state, prevState);
         this.renderList(state, prevState);
-        this.renderTransactionFormDialog(state);
+        this.renderUploadDialog(state, prevState);
+        this.renderTransactionFormDialog(state, prevState);
+        this.renderRulesDialog(state, prevState);
         this.renderContextMenu(state, prevState);
         this.renderMenu(state);
+
+        if (!state.loading) {
+            this.loadingInd.hide();
+        }
     }
 }
 

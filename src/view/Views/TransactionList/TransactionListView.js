@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     insertAfter,
     asArray,
-    isFunction,
     createElement,
 } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -56,6 +55,13 @@ import { TransactionDetails } from './components/TransactionDetails/TransactionD
 
 import { reducer, actions } from './reducer.js';
 import {
+    deleteItems,
+    sendChangePosRequest,
+    setItemsCategory,
+    setListData,
+    setListMode,
+} from './actions.js';
+import {
     getTransactionsGroupByDate,
     isSameSelection,
 } from './helpers.js';
@@ -67,23 +73,6 @@ import './TransactionListView.scss';
 class TransactionListView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            setCategoryBtn: () => this.showCategoryDialog(),
-            exportBtn: () => this.showExportDialog(),
-            deleteBtn: () => this.confirmDelete(),
-            groupByDateBtn: () => this.toggleGroupByDate(),
-        };
-
-        this.contextMenuActions = {
-            ctxDetailsBtn: () => this.showDetails(),
-            ctxSetCategoryBtn: () => this.showCategoryDialog(),
-            ctxDeleteBtn: () => this.confirmDelete(),
-        };
 
         const { filter } = this.props;
 
@@ -106,6 +95,7 @@ class TransactionListView extends AppView {
                 categoryId: 0,
                 type: 0,
             },
+            showDeleteConfirmDialog: false,
             showExportDialog: false,
             exportFilter: null,
             renderTime: Date.now(),
@@ -244,7 +234,7 @@ class TransactionListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.setListMode('list'),
+            onClick: () => this.store.dispatch(setListMode('list')),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn.elem);
 
@@ -270,24 +260,6 @@ class TransactionListView extends AppView {
         this.store.dispatch(actions.hideMenu());
     }
 
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     /** Returns true if accounts or persons is available */
     isAvailable() {
         const { accounts, persons } = App.model;
@@ -303,14 +275,6 @@ class TransactionListView extends AppView {
         this.store.dispatch(actions.closeDetails());
     }
 
-    showExportDialog() {
-        this.store.dispatch(actions.showExportDialog());
-    }
-
-    hideExportDialog() {
-        this.store.dispatch(actions.hideExportDialog());
-    }
-
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
     }
@@ -319,82 +283,13 @@ class TransactionListView extends AppView {
         this.store.dispatch(actions.hideContextMenu());
     }
 
-    showCategoryDialog() {
-        const state = this.store.getState();
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.store.dispatch(actions.showCategoryDialog(ids));
-    }
-
-    closeCategoryDialog() {
-        this.store.dispatch(actions.closeCategoryDialog());
-    }
-
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
-    }
-
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
-    }
-
-    setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
-        this.setRenderTime();
-    }
-
-    /** Set loading state and render view */
-    startLoading(isLoadingMore = false) {
-        this.store.dispatch(actions.startLoading(isLoadingMore));
-    }
-
-    /** Remove loading state and render view */
-    stopLoading() {
-        this.store.dispatch(actions.stopLoading());
     }
 
     /** Update render time */
     setRenderTime() {
         this.store.dispatch(actions.setRenderTime());
-    }
-
-    getListRequest(state) {
-        return {
-            ...state.form,
-            order: 'desc',
-            page: state.pagination.page,
-            range: state.pagination.range,
-        };
-    }
-
-    prepareRequest(data, state) {
-        return {
-            ...data,
-            returnState: {
-                transactions: this.getListRequest(state),
-                profile: {},
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.transactions;
-    }
-
-    setListData(data, keepState = false) {
-        const payload = {
-            ...data,
-            keepState,
-        };
-
-        this.store.dispatch(actions.listRequestLoaded(payload));
     }
 
     getItem(id) {
@@ -422,42 +317,7 @@ class TransactionListView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.sendChangePosRequest(item.id, pos);
-    }
-
-    /**
-     * Sent AJAX request to server to change position of transaction
-     * @param {number} id - identifier of transaction to change position
-     * @param {number} pos  - new position of transaction
-     */
-    async sendChangePosRequest(id, pos) {
-        const state = this.store.getState();
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id, pos }, state);
-            const response = await API.transaction.setPos(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data, true);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            this.cancelPosChange();
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /**
-     * Cancel local changes on transaction position update fail
-     */
-    cancelPosChange() {
-        this.render(this.store.getState());
-
-        App.createErrorNotification(__('transactions.errors.changePos'));
+        this.store.dispatch(sendChangePosRequest(item.id, pos));
     }
 
     /** Returns URL for filter of specified state */
@@ -553,85 +413,6 @@ class TransactionListView extends AppView {
     onSearchInputChange(value) {
         this.store.dispatch(actions.changeSearchQuery(value));
         this.requestTransactions(this.getRequestData());
-    }
-
-    async deleteItems() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids }, state);
-            const response = await API.transaction.del(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /**
-     * Create and show transaction delete warning popup
-     */
-    confirmDelete() {
-        const state = this.store.getState();
-        const ids = getContextIds(state);
-        if (ids.length === 0) {
-            return;
-        }
-
-        const multi = (ids.length > 1);
-        ConfirmDialog.create({
-            id: 'delete_warning',
-            title: (multi) ? __('transactions.deleteMultiple') : __('transactions.delete'),
-            content: (multi) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
-            onConfirm: () => this.deleteItems(),
-        });
-    }
-
-    /** Send API request to change category of selected transactions */
-    async setItemsCategory() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const { ids, categoryId } = state.categoryDialog;
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.closeCategoryDialog();
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids, category_id: categoryId }, state);
-            const response = await API.transaction.setCategory(request);
-
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-
-            App.updateProfileFromResponse(response);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
     }
 
     onChangeCategorySelect(category) {
@@ -758,11 +539,12 @@ class TransactionListView extends AppView {
             ...request
         } = options;
 
-        this.startLoading(isLoadingMore);
+        this.store.dispatch(actions.startLoading(isLoadingMore));
 
         try {
             const { data } = await API.transaction.list(request, { signal });
-            this.setListData(data, keepState);
+
+            this.store.dispatch(setListData(data, keepState));
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
@@ -772,39 +554,34 @@ class TransactionListView extends AppView {
         }
 
         if (!aborted) {
-            this.stopLoading();
+            this.store.dispatch(actions.stopLoading());
             this.setRenderTime();
             this.abortController = null;
         }
     }
 
-    toggleGroupByDate() {
-        const { settings } = App.model.profile;
-        const groupByDate = (settings.tr_group_by_date === 0) ? 1 : 0;
-        this.requestGroupByDate(groupByDate);
-    }
-
-    async requestGroupByDate(groupByDate) {
-        const { settings } = App.model.profile;
-        if (settings.tr_group_by_date === groupByDate) {
+    renderDeleteConfirmDialog(state, prevState) {
+        if (state.showDeleteConfirmDialog === prevState.showDeleteConfirmDialog) {
             return;
         }
 
-        this.startLoading();
-
-        try {
-            await API.profile.updateSettings({
-                tr_group_by_date: groupByDate,
-            });
-            settings.tr_group_by_date = groupByDate;
-
-            this.store.dispatch(actions.toggleGroupByDate());
-        } catch (e) {
-            App.createErrorNotification(e.message);
+        if (!state.showDeleteConfirmDialog) {
+            return;
         }
 
-        this.stopLoading();
-        this.setRenderTime();
+        const ids = getContextIds(state);
+        if (ids.length === 0) {
+            return;
+        }
+
+        const multiple = (ids.length > 1);
+        ConfirmDialog.create({
+            id: 'delete_warning',
+            title: (multiple) ? __('transactions.deleteMultiple') : __('transactions.delete'),
+            content: (multiple) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
+            onConfirm: () => this.store.dispatch(deleteItems()),
+            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+        });
     }
 
     renderContextMenu(state) {
@@ -815,7 +592,8 @@ class TransactionListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = TransactionListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                actions,
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -845,7 +623,7 @@ class TransactionListView extends AppView {
             this.menu = TransactionListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }
@@ -878,8 +656,8 @@ class TransactionListView extends AppView {
         if (state.categoryDialog.show && !this.setCategoryDialog) {
             this.setCategoryDialog = SetCategoryDialog.create({
                 onChange: (category) => this.onChangeCategorySelect(category),
-                onSubmit: () => this.setItemsCategory(),
-                onCancel: () => this.closeCategoryDialog(),
+                onSubmit: () => this.store.dispatch(setItemsCategory()),
+                onCancel: () => this.store.dispatch(actions.closeCategoryDialog()),
             });
         }
         if (!this.setCategoryDialog) {
@@ -1068,7 +846,7 @@ class TransactionListView extends AppView {
         if (!this.exportDialog) {
             this.exportDialog = ExportDialog.create({
                 filter: state.exportFilter,
-                onCancel: () => this.hideExportDialog(),
+                onCancel: () => this.store.dispatch(actions.hideExportDialog()),
             });
         } else {
             this.exportDialog.setFilter(state.exportFilter);
@@ -1093,6 +871,7 @@ class TransactionListView extends AppView {
         this.renderMenu(state, prevState);
         this.renderDetails(state, prevState);
         this.renderCategoryDialog(state, prevState);
+        this.renderDeleteConfirmDialog(state, prevState);
         this.renderExportDialog(state, prevState);
 
         if (!state.loading) {

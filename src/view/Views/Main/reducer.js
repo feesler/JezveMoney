@@ -1,7 +1,9 @@
 import { createSlice } from 'jezvejs/Store';
+
 import { App } from '../../Application/App.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
+import { getTransactionListContextIds } from './helpers.js';
 
 // Reducers
 const slice = createSlice({
@@ -52,7 +54,8 @@ const slice = createSlice({
         renderTime: Date.now(),
     }),
 
-    showCategoryDialog: (state, ids) => {
+    showCategoryDialog: (state) => {
+        const ids = getTransactionListContextIds(state);
         if (ids.length === 0) {
             return state;
         }
@@ -109,6 +112,28 @@ const slice = createSlice({
             categoryId,
         },
     }),
+
+    showDeleteConfirmDialog: (state) => {
+        if (state.showDeleteConfirmDialog) {
+            return state;
+        }
+
+        const ids = getTransactionListContextIds(state);
+        if (ids.length === 0) {
+            return state;
+        }
+
+        return {
+            ...state,
+            showDeleteConfirmDialog: true,
+        };
+    },
+
+    hideDeleteConfirmDialog: (state) => (
+        (state.showDeleteConfirmDialog)
+            ? { ...state, showDeleteConfirmDialog: false }
+            : state
+    ),
 
     listRequestLoaded: (state, data) => ({
         ...state,

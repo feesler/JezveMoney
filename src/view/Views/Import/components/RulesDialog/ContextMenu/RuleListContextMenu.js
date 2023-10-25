@@ -2,6 +2,7 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
+import { actions } from '../Dialog/reducer.js';
 
 /* CSS classes */
 const UPDATE_BUTTON_CLASS = 'update-btn';
@@ -47,21 +48,25 @@ export class RuleListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxUpdateRuleBtn',
             icon: 'update',
             title: __('actions.update'),
             className: UPDATE_BUTTON_CLASS,
+            onClick: () => dispatch(actions.updateRule()),
         }, {
             id: 'ctxDuplicateRuleBtn',
             icon: 'duplicate',
             title: __('actions.duplicate'),
             className: DUPLICATE_BUTTON_CLASS,
+            onClick: () => dispatch(actions.duplicateRule()),
         }, {
             id: 'ctxDeleteRuleBtn',
             icon: 'del',
             title: __('actions.delete'),
             className: DEL_BUTTON_CLASS,
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(menuButton);

@@ -1,9 +1,8 @@
 import 'jezvejs/style';
-import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';
-import { createStore } from 'jezvejs/Store';
+import { createStore, combineReducers } from 'jezvejs/Store';
 
 // Application
 import { App } from '../../Application/App.js';
@@ -14,7 +13,6 @@ import {
     getApplicationURL,
     formatDateRange,
 } from '../../utils/utils.js';
-import { API } from '../../API/index.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -31,6 +29,8 @@ import { ReminderList } from '../../Models/ReminderList.js';
 // Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
 import { ReminderListGroup } from '../../Components/Reminder/ReminderListGroup/ReminderListGroup.js';
+import { reducer as listGroupReducer } from '../../Components/Reminder/ReminderListGroup/reducer.js';
+import { setListMode } from '../../Components/Reminder/ReminderListGroup/actions.js';
 
 // Local components
 import { ReminderDetails } from './components/ReminderDetails/ReminderDetails.js';
@@ -46,20 +46,6 @@ import './ReminderListView.scss';
 class ReminderListView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.listGroup?.setListMode('select'),
-            selectAllBtn: () => this.listGroup?.selectAll(),
-            deselectAllBtn: () => this.listGroup?.deselectAll(),
-            confirmBtn: () => this.listGroup?.confirmReminder(),
-            cancelBtn: () => this.listGroup?.cancelReminder(),
-        };
-
-        this.contextMenuActions = {
-            ctxDetailsBtn: () => this.showDetails(),
-            ctxConfirmBtn: () => this.listGroup?.confirmReminder(),
-            ctxCancelBtn: () => this.listGroup?.cancelReminder(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(AccountList, 'accounts', App.props.accounts);
@@ -83,7 +69,8 @@ class ReminderListView extends AppView {
             contextItem: null,
         };
 
-        this.store = createStore(reducer, { initialState });
+        const storeReducer = combineReducers(reducer, listGroupReducer);
+        this.store = createStore(storeReducer, { initialState });
     }
 
     /**
@@ -118,7 +105,7 @@ class ReminderListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.listGroup?.setListMode('list'),
+            onClick: () => this.listGroup?.store?.dispatch(setListMode('list')),
         });
 
         this.menuButton = MenuButton.create({
@@ -151,24 +138,6 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.hideMenu());
     }
 
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     updateRemindersList(data) {
         this.store.dispatch(actions.updateRemindersList(data));
     }
@@ -189,47 +158,6 @@ class ReminderListView extends AppView {
         this.store.dispatch(actions.hideContextMenu());
     }
 
-    async requestList(options = {}) {
-        const { keepState = false } = options;
-
-        this.startLoading();
-
-        try {
-            const request = this.getListRequest();
-            const { data } = await API.reminder.list(request);
-            this.setListData(data, keepState);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-    }
-
-    setListDataFromResponse(response, keepState = false) {
-        const reminders = this.getListDataFromResponse(response);
-        const upcoming = this.getUpcomingDataFromResponse(response);
-
-        App.model.reminders.setData(reminders);
-
-        this.store.dispatch(actions.listRequestLoaded({ upcoming, keepState }));
-    }
-
-    async requestItem() {
-        const state = this.store.getState();
-        if (!state.detailsId) {
-            return;
-        }
-
-        try {
-            const { data } = await API.reminder.read(state.detailsId);
-            const [item] = data;
-
-            this.store.dispatch(actions.itemDetailsLoaded(item));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-    }
-
     renderContextMenu(state) {
         if (!state.showContextMenu && !this.contextMenu) {
             return;
@@ -238,7 +166,7 @@ class ReminderListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = ReminderListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -266,7 +194,7 @@ class ReminderListView extends AppView {
             this.menu = ReminderListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

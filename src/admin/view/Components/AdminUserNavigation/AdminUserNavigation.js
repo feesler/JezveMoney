@@ -62,7 +62,6 @@ export class AdminUserNavigation extends UserNavigation {
         this.themeField = ThemeSwitchField.create();
 
         const menuItems = [
-            { id: 'theme', content: this.themeField.elem },
             { id: 'separator1', type: 'separator' },
             { id: 'profile', url: 'profile/', title: __('profile.title') },
             { id: 'settings', url: 'settings/', title: __('settings.title') },
@@ -82,6 +81,7 @@ export class AdminUserNavigation extends UserNavigation {
             props: { className: CONTAINER_CLASS },
             children: [
                 controls,
+                this.themeField.elem,
                 this.menu.elem,
             ],
         });

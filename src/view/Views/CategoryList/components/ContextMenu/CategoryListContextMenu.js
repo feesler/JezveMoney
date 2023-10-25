@@ -2,6 +2,8 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+import { actions } from '../../reducer.js';
+import { showDetails } from '../../actions.js';
 
 /** Categories list context menu component */
 export class CategoryListContextMenu extends PopupMenu {
@@ -42,12 +44,16 @@ export class CategoryListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            onClick: (_, e) => e?.preventDefault(),
             url: getApplicationURL(`categories/${category.id}`),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             type: 'separator',
         }, {
@@ -66,6 +72,7 @@ export class CategoryListContextMenu extends PopupMenu {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(menuButton);

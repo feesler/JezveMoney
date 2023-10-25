@@ -1,144 +1,26 @@
 import { createSlice } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import { ImportTransaction } from '../../Models/ImportTransaction.js';
-import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
-
-/** Returns page number and relative index of specified absolute index */
-export const getPageIndex = (index, state) => {
-    if (index === -1) {
-        return { page: 0, index: -1 };
-    }
-
-    const { onPage } = state.pagination;
-    return {
-        page: Math.floor(index / onPage) + 1,
-        index: index % onPage,
-    };
-};
-
-/**
- * Compare transaction item with reference object
- * @param {TransactionItem} item - transaction item object
- * @param {Object} reference - imported transaction object
- */
-const isSimilarTransaction = (item, reference) => {
-    if (!item || !reference) {
-        throw new Error('Invalid parameters');
-    }
-
-    // Check date, source and destination accounts
-    if (
-        item.src_id !== reference.src_id
-        || item.dest_id !== reference.dest_id
-        || item.date !== reference.date
-    ) {
-        return false;
-    }
-
-    // Check amounts
-    // Source and destination amount can be swapped
-    const refSrcAmount = Math.abs(reference.src_amount);
-    const refDestAmount = Math.abs(reference.dest_amount);
-    if (
-        (item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
-        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)
-    ) {
-        return false;
-    }
-
-    return true;
-};
-
-/** Return first found transaction with same date and amount as reference */
-const findSimilarTransaction = (transactions, reference) => {
-    const res = transactions.find((item) => (
-        item
-        && !item.picked
-        && isSimilarTransaction(item, reference)
-    ));
-    return res ?? null;
-};
-
-/** Returns array of extended reminders */
-const getExtendedReminders = () => (
-    App.model.reminders.map((item) => Reminder.createExtended(item))
-);
-
-/** Returns true if both items has the same reminder selected */
-const isSameRemiderSelected = (a, b) => (
-    (
-        !!a.reminderId
-        && a.reminderId === b.reminderId
-    ) || (
-        !!a.scheduleId
-        && a.scheduleId === b.scheduleId
-        && a.reminderDate === b.reminderDate
-    )
-);
-
-/** Removes reminder from item if the same reminder is selected by reference item */
-const removeSameReminder = (item, ref) => (
-    isSameRemiderSelected(item, ref)
-        ? item.removeReminder()
-        : item
-);
-
-/** Returns true if specified reminder is suitable for transaction */
-const isSuitableReminder = (item, reminder) => {
-    if (!item || reminder?.state !== REMINDER_SCHEDULED) {
-        return false;
-    }
-
-    // Check date, source and destination accounts
-    if (
-        item.type !== reminder.type
-        || item.src_id !== reminder.src_id
-        || item.dest_id !== reminder.dest_id
-        || item.date !== reminder.date
-    ) {
-        return false;
-    }
-
-    // Check amounts
-    // Source and destination amount can be swapped
-    const refSrcAmount = Math.abs(reminder.src_amount);
-    const refDestAmount = Math.abs(reminder.dest_amount);
-    if (
-        (item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
-        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)
-    ) {
-        return false;
-    }
-
-    return true;
-};
-
-/** Returns first suitable reminder for specified transaction */
-const findSuitableReminder = (transaction, reminders) => (
-    reminders.find((item) => (
-        item
-        && !item.picked
-        && isSuitableReminder(transaction, item)
-    )) ?? null
-);
-
-/** Updates list state */
-const getPagination = (state) => {
-    const { items, pagination } = state;
-    const pagesCount = Math.ceil(items.length / pagination.onPage);
-    const res = {
-        ...pagination,
-        total: items.length,
-        pagesCount,
-        range: 1,
-    };
-
-    res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
-
-    return res;
-};
+import {
+    findSimilarTransaction,
+    findSuitableReminder,
+    getExtendedReminders,
+    getPageIndex,
+    getPagination,
+    removeSameReminder,
+} from './helpers.js';
 
 const slice = createSlice({
+    startLoading: (state) => (
+        (state.loading) ? state : { ...state, loading: true }
+    ),
+
+    stopLoading: (state) => (
+        (state.loading) ? { ...state, loading: false } : state
+    ),
+
+    setRenderTime: (state) => ({ ...state, renderTime: Date.now() }),
+
     showMenu: (state) => (
         (state.showMenu) ? state : { ...state, showMenu: true, showContextMenu: false }
     ),
@@ -148,7 +30,7 @@ const slice = createSlice({
     ),
 
     showContextMenu: (state, itemIndex) => (
-        (state.contextItemIndex === itemIndex && state.showContextMenu)
+        (state.showContextMenu)
             ? state
             : {
                 ...state,
@@ -159,7 +41,25 @@ const slice = createSlice({
     ),
 
     hideContextMenu: (state) => (
-        (state.showContextMenu) ? { ...state, showContextMenu: false } : state
+        (!state.showContextMenu)
+            ? state
+            : {
+                ...state,
+                showContextMenu: false,
+                contextItemIndex: -1,
+            }
+    ),
+
+    openUploadDialog: (state) => (
+        (state.showUploadDialog)
+            ? state
+            : { ...state, showUploadDialog: true }
+    ),
+
+    closeUploadDialog: (state) => (
+        (!state.showUploadDialog)
+            ? state
+            : { ...state, showUploadDialog: false }
     ),
 
     uploadFileDone: (state, data) => {
@@ -244,14 +144,22 @@ const slice = createSlice({
         items: state.items.map((item) => item.select(false)),
     }),
 
-    enableSelectedItems: (state, value) => ({
-        ...state,
-        items: state.items.map((item) => (
-            (item.selected) ? item.enable(!!value) : item
-        )),
-    }),
+    enableSelectedItems: (state, value) => (
+        (state.listMode !== 'select')
+            ? state
+            : {
+                ...state,
+                items: state.items.map((item) => (
+                    (item.selected) ? item.enable(!!value) : item
+                )),
+            }
+    ),
 
     deleteSelectedItems: (state) => {
+        if (state.listMode !== 'select') {
+            return state;
+        }
+
         const newState = {
             ...state,
             items: state.items.filter((item) => !item.selected),
@@ -276,27 +184,31 @@ const slice = createSlice({
         return newState;
     },
 
-    deleteItemByIndex: (state, index) => {
-        if (index === -1) {
+    deleteItem: (state) => {
+        if (state.contextItemIndex === -1) {
             return state;
         }
 
         const newState = {
             ...state,
             contextItemIndex: -1,
-            items: state.items.filter((_, ind) => (ind !== index)),
+            items: state.items.filter((_, ind) => (ind !== state.contextItemIndex)),
         };
         newState.pagination = getPagination(newState);
         return newState;
     },
 
-    changeListMode: (state, listMode) => ({
-        ...state,
-        listMode,
-        contextItemIndex: -1,
-        showContextMenu: false,
-        items: state.items.map((item) => item.setListMode(listMode)),
-    }),
+    changeListMode: (state, listMode) => (
+        (state.listMode === listMode || state.activeItemIndex !== -1)
+            ? state
+            : {
+                ...state,
+                listMode,
+                contextItemIndex: -1,
+                showContextMenu: false,
+                items: state.items.map((item) => item.setListMode(listMode)),
+            }
+    ),
 
     toggleSelectItemByIndex: (state, index) => ({
         ...state,
@@ -312,21 +224,33 @@ const slice = createSlice({
         )),
     }),
 
-    restoreItemByIndex: (state, index) => ({
-        ...state,
-        contextItemIndex: -1,
-        items: state.items.map((item, ind) => (
-            (index === ind) ? item.restoreOriginal() : item
-        )),
-    }),
+    restoreItem: (state) => (
+        (state.contextItemIndex === -1)
+            ? state
+            : {
+                ...state,
+                contextItemIndex: -1,
+                items: state.items.map((item, ind) => (
+                    (ind === state.contextItemIndex)
+                        ? item.restoreOriginal()
+                        : item
+                )),
+            }
+    ),
 
-    toggleEnableItemByIndex: (state, index) => ({
-        ...state,
-        contextItemIndex: -1,
-        items: state.items.map((item, ind) => (
-            (ind === index) ? item.enable(!item.enabled) : item
-        )),
-    }),
+    toggleEnableItem: (state) => (
+        (state.contextItemIndex === -1)
+            ? state
+            : {
+                ...state,
+                contextItemIndex: -1,
+                items: state.items.map((item, ind) => (
+                    (ind === state.contextItemIndex)
+                        ? item.enable(!item.enabled)
+                        : item
+                )),
+            }
+    ),
 
     changePage: (state, page) => ({
         ...state,
@@ -504,6 +428,18 @@ const slice = createSlice({
             return (enable) ? rules.applyTo(newItem) : newItem;
         }),
     }),
+
+    openRulesDialog: (state) => (
+        (state.showRulesDialog || !state.rulesEnabled)
+            ? state
+            : { ...state, showRulesDialog: true }
+    ),
+
+    closeRulesDialog: (state) => (
+        (!state.showRulesDialog)
+            ? state
+            : { ...state, showRulesDialog: false }
+    ),
 
     toggleCheckSimilar: (state) => ({
         ...state,

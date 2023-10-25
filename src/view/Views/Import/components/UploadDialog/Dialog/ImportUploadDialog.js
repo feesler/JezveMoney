@@ -17,12 +17,12 @@ import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndica
 
 // Local components
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
+import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import {
-    ImportTemplateManager,
     TPL_SELECT_STATE,
     TPL_CREATE_STATE,
     TPL_UPDATE_STATE,
-} from '../TemplateManager/ImportTemplateManager.js';
+} from '../TemplateManager/reducer.js';
 
 import './ImportUploadDialog.scss';
 
@@ -38,12 +38,21 @@ const TPL_FORM_TITLE_CLASS = 'template-form-title';
 const UPLOAD_STATE = 1;
 const CONVERT_STATE = 2;
 
+const defaultProps = {
+    mainAccount: null,
+    onClose: null,
+    onUploadDone: null,
+};
+
 /**
  * ImportUploadDialog component
  */
 export class ImportUploadDialog extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         if (!this.props?.mainAccount) {
             throw new Error('Invalid props');
@@ -157,6 +166,9 @@ export class ImportUploadDialog extends Component {
     /** Hide dialog */
     onClose() {
         this.reset();
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** File 'dragenter' event handler */
@@ -271,7 +283,7 @@ export class ImportUploadDialog extends Component {
             }
 
             this.setConvertState();
-            this.tplManager.setRawData(data, filename);
+            this.tplManager.setRawData({ data, filename });
             this.setLoading(false);
         } catch (e) {
             this.onUploadError(e.message);

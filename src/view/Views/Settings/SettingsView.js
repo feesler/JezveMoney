@@ -1,5 +1,4 @@
 import 'jezvejs/style';
-import { isFunction } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -8,10 +7,9 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 // Application
-import { __, getApplicationURL, getContextIds } from '../../utils/utils.js';
+import { __, getApplicationURL } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
-import { API } from '../../API/index.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -32,6 +30,12 @@ import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListCo
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
 
 import { actions, createItemsFromModel, reducer } from './reducer.js';
+import {
+    requestDateLocale,
+    requestDecimalLocale,
+    sendChangePosRequest,
+    sendCreateRequest,
+} from './actions.js';
 import '../../Application/Application.scss';
 import './SettingsView.scss';
 
@@ -44,18 +48,6 @@ const SELECT_MODE_CLASS = 'list_select';
 class SettingsView extends AppView {
     constructor(...args) {
         super(...args);
-
-        this.menuActions = {
-            selectModeBtn: () => this.setListMode('select'),
-            sortModeBtn: () => this.setListMode('sort'),
-            selectAllBtn: () => this.selectAll(),
-            deselectAllBtn: () => this.deselectAll(),
-            deleteBtn: () => this.deleteItems(),
-        };
-
-        this.contextMenuActions = {
-            ctxDeleteBtn: () => this.deleteItems(),
-        };
 
         App.loadModel(CurrencyList, 'currency', App.props.currency);
         App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
@@ -253,24 +245,6 @@ class SettingsView extends AppView {
         this.store.dispatch(actions.hideMenu());
     }
 
-    onMenuClick(item) {
-        this.menu.hideMenu();
-
-        const menuAction = this.menuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
-    onContextMenuClick(item) {
-        this.hideContextMenu();
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
     }
@@ -281,14 +255,6 @@ class SettingsView extends AppView {
 
     toggleSelectItem(itemId) {
         this.store.dispatch(actions.toggleSelectItem(itemId));
-    }
-
-    selectAll() {
-        this.store.dispatch(actions.selectAllItems());
-    }
-
-    deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
     }
 
     startLoading() {
@@ -313,7 +279,7 @@ class SettingsView extends AppView {
     }
 
     onCurrencySelect(selection) {
-        this.sendCreateRequest({ curr_id: selection.id, flags: 0 });
+        this.store.dispatch(sendCreateRequest({ curr_id: selection.id, flags: 0 }));
     }
 
     onItemClick(itemId, e) {
@@ -353,159 +319,15 @@ class SettingsView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.sendChangePosRequest(item.id, pos);
-    }
-
-    getListRequest() {
-        return {};
-    }
-
-    prepareRequest(data) {
-        return {
-            ...data,
-            returnState: {
-                userCurrencies: this.getListRequest(),
-            },
-        };
-    }
-
-    getListDataFromResponse(response) {
-        return response?.data?.state?.userCurrencies?.data;
-    }
-
-    setListData(data, keepState = false) {
-        App.model.userCurrencies.setData(data);
-        this.store.dispatch(actions.listRequestLoaded(keepState));
-    }
-
-    /**
-     * Sents API request to server to add currency to the list of user
-     * @param {Object} data - new user currency entry data
-     */
-    async sendCreateRequest(data) {
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest(data);
-            const response = await API.userCurrency.create(request);
-            const listData = this.getListDataFromResponse(response);
-            this.setListData(listData, true);
-        } catch (e) {
-            this.cancelPosChange();
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /**
-     * Sent API request to server to change position of currency
-     * @param {number} id - identifier of item to change position
-     * @param {number} pos - new position of item
-     */
-    async sendChangePosRequest(id, pos) {
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id, pos });
-            const response = await API.userCurrency.setPos(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data, true);
-        } catch (e) {
-            this.cancelPosChange();
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
-    }
-
-    /**
-     * Cancel local changes on position update fail
-     */
-    cancelPosChange() {
-        this.render(this.store.getState());
-
-        App.createErrorNotification(__('userCurrencies.errors.changePos'));
-    }
-
-    async deleteItems() {
-        const state = this.store.getState();
-        if (state.loading) {
-            return;
-        }
-
-        const ids = getContextIds(state, 'userCurrencies');
-        if (ids.length === 0) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            const request = this.prepareRequest({ id: ids });
-            const response = await API.userCurrency.del(request);
-            const data = this.getListDataFromResponse(response);
-            this.setListData(data);
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setRenderTime();
+        this.store.dispatch(sendChangePosRequest(item.id, pos));
     }
 
     onDateFormatSelect(format) {
-        this.requestDateLocale(format.id);
-    }
-
-    async requestDateLocale(locale) {
-        const { settings } = App.model.profile;
-        if (settings.date_locale === locale) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            await API.profile.updateSettings({
-                date_locale: locale,
-            });
-            settings.date_locale = locale;
-
-            this.store.dispatch(actions.changeDateLocale(locale));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setDateRenderTime();
+        this.store.dispatch(requestDateLocale(format.id));
     }
 
     onDecimalFormatSelect(format) {
-        this.requestDecimalLocale(format.id);
-    }
-
-    async requestDecimalLocale(locale) {
-        const { settings } = App.model.profile;
-        if (settings.decimal_locale === locale) {
-            return;
-        }
-
-        this.startLoading();
-
-        try {
-            await API.profile.updateSettings({
-                decimal_locale: locale,
-            });
-            settings.decimal_locale = locale;
-
-            this.store.dispatch(actions.changeDecimalLocale(locale));
-        } catch (e) {
-            App.createErrorNotification(e.message);
-        }
-
-        this.stopLoading();
-        this.setDateRenderTime();
+        this.store.dispatch(requestDecimalLocale(format.id));
     }
 
     renderContextMenu(state) {
@@ -516,7 +338,7 @@ class SettingsView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = CurrencyListContextMenu.create({
                 id: 'contextMenu',
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -545,7 +367,7 @@ class SettingsView extends AppView {
             this.menu = CurrencyListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                onItemClick: (item) => this.onMenuClick(item),
+                dispatch: (action) => this.store.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

@@ -1,6 +1,9 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getSelectedItems } from '../../../../utils/utils.js';
+import { deleteItems } from '../../actions.js';
+import { actions } from '../../reducer.js';
+import { setListMode } from '../../../Schedule/actions.js';
 
 /** User currencies list main menu component */
 export class CurrencyListMainMenu extends PopupMenu {
@@ -14,6 +17,7 @@ export class CurrencyListMainMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         const itemsCount = context.items.length;
         const selArr = getSelectedItems(context.items);
         const selCount = selArr.length;
@@ -25,19 +29,23 @@ export class CurrencyListMainMenu extends PopupMenu {
             icon: 'select',
             title: __('actions.select'),
             hidden: !(isListMode && itemsCount > 0),
+            onClick: () => dispatch(setListMode('select')),
         }, {
             id: 'sortModeBtn',
             icon: 'sort',
             title: __('actions.sort'),
             hidden: !(isListMode && itemsCount > 1),
+            onClick: () => dispatch(setListMode('sort')),
         }, {
             id: 'selectAllBtn',
             title: __('actions.selectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && selCount < itemsCount),
+            onClick: () => dispatch(actions.selectAllItems()),
         }, {
             id: 'deselectAllBtn',
             title: __('actions.deselectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && selCount > 0),
+            onClick: () => dispatch(actions.deselectAllItems()),
         }, {
             id: 'separator2',
             type: 'separator',
@@ -47,6 +55,7 @@ export class CurrencyListMainMenu extends PopupMenu {
             icon: 'del',
             title: __('actions.delete'),
             hidden: !(selCount > 0),
+            onClick: () => dispatch(deleteItems()),
         }]);
     }
 }

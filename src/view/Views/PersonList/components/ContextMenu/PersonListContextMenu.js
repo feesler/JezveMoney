@@ -3,6 +3,9 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __, getApplicationURL } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
+import { actions } from '../../reducer.js';
+import { showDetails, showItems } from '../../actions.js';
+
 /** Persons list context menu component */
 export class PersonListContextMenu extends PopupMenu {
     constructor(props) {
@@ -41,12 +44,17 @@ export class PersonListContextMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
+
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
             url: getApplicationURL(`persons/${person.id}`),
-            onClick: (_, e) => e?.preventDefault(),
+            onClick: (_, e) => {
+                e?.preventDefault();
+                dispatch(showDetails());
+            },
         }, {
             type: 'separator',
         }, {
@@ -59,20 +67,24 @@ export class PersonListContextMenu extends PopupMenu {
             id: 'ctxExportBtn',
             icon: 'export',
             title: __('export.menuTitle'),
+            onClick: () => dispatch(actions.showExportDialog()),
         }, {
             id: 'ctxShowBtn',
             icon: 'show',
             title: __('actions.show'),
             hidden: person.isVisible(),
+            onClick: () => dispatch(showItems()),
         }, {
             id: 'ctxHideBtn',
             icon: 'hide',
             title: __('actions.hide'),
             hidden: !person.isVisible(),
+            onClick: () => dispatch(showItems(false)),
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',
             title: __('actions.delete'),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
 
         this.attachAndShow(tile);

@@ -1,6 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+import { deleteItems } from '../../actions.js';
 
 /** User currencies list context menu component */
 export class CurrencyListContextMenu extends PopupMenu {
@@ -8,11 +9,6 @@ export class CurrencyListContextMenu extends PopupMenu {
         super({
             ...props,
             fixed: false,
-            items: [{
-                id: 'ctxDeleteBtn',
-                icon: 'del',
-                title: __('actions.delete'),
-            }],
         });
     }
 
@@ -45,6 +41,14 @@ export class CurrencyListContextMenu extends PopupMenu {
             this.detach();
             return;
         }
+
+        const { dispatch } = this.state;
+        this.setItems([{
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: __('actions.delete'),
+            onClick: () => dispatch(deleteItems()),
+        }]);
 
         this.attachAndShow(menuButton);
     }

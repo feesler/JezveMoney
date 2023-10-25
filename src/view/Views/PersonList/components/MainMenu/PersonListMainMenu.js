@@ -10,6 +10,13 @@ import {
     getHiddenSelectedItems,
     getVisibleSelectedItems,
 } from '../../helpers.js';
+import { actions } from '../../reducer.js';
+import {
+    setListMode,
+    showItems,
+    toggleSortByDate,
+    toggleSortByName,
+} from '../../actions.js';
 
 /** Persons list main menu component */
 export class PersonListMainMenu extends PopupMenu {
@@ -23,6 +30,7 @@ export class PersonListMainMenu extends PopupMenu {
             return;
         }
 
+        const { dispatch } = this.state;
         const itemsCount = context.items.visible.length + context.items.hidden.length;
         const selArr = getVisibleSelectedItems(context);
         const hiddenSelArr = getHiddenSelectedItems(context);
@@ -39,29 +47,35 @@ export class PersonListMainMenu extends PopupMenu {
             icon: 'select',
             title: __('actions.select'),
             hidden: !(isListMode && itemsCount > 0),
+            onClick: () => dispatch(setListMode('select')),
         }, {
             id: 'sortModeBtn',
             icon: 'sort',
             title: __('actions.sort'),
             hidden: !showSortItems,
+            onClick: () => dispatch(setListMode('sort')),
         }, {
             id: 'sortByNameBtn',
             title: __('actions.sortByName'),
             icon: getSortByNameIcon(sortMode),
             hidden: !showSortItems,
+            onClick: () => dispatch(toggleSortByName()),
         }, {
             id: 'sortByDateBtn',
             title: __('actions.sortByDate'),
             icon: getSortByDateIcon(sortMode),
             hidden: !showSortItems,
+            onClick: () => dispatch(toggleSortByDate()),
         }, {
             id: 'selectAllBtn',
             title: __('actions.selectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount),
+            onClick: () => dispatch(actions.selectAllItems()),
         }, {
             id: 'deselectAllBtn',
             title: __('actions.deselectAll'),
             hidden: !(isSelectMode && itemsCount > 0 && totalSelCount > 0),
+            onClick: () => dispatch(actions.deselectAllItems()),
         }, {
             id: 'separator2',
             type: 'separator',
@@ -71,21 +85,25 @@ export class PersonListMainMenu extends PopupMenu {
             icon: 'export',
             title: __('export.menuTitle'),
             hidden: !(isSelectMode && totalSelCount > 0),
+            onClick: () => dispatch(actions.showExportDialog()),
         }, {
             id: 'showBtn',
             icon: 'show',
             title: __('actions.show'),
             hidden: !(isSelectMode && hiddenSelCount > 0),
+            onClick: () => dispatch(showItems()),
         }, {
             id: 'hideBtn',
             icon: 'hide',
             title: __('actions.hide'),
             hidden: !(isSelectMode && selCount > 0),
+            onClick: () => dispatch(showItems(false)),
         }, {
             id: 'deleteBtn',
             icon: 'del',
             title: __('actions.delete'),
             hidden: !(isSelectMode && totalSelCount > 0),
+            onClick: () => dispatch(actions.showDeleteConfirmDialog()),
         }]);
     }
 }
