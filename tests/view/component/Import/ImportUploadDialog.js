@@ -31,6 +31,8 @@ export const UPDATE_TPL_STATE = 5;
 
 const TPL_FORM_STATES = [CREATE_TPL_STATE, UPDATE_TPL_STATE];
 
+const deleteConfirmSelector = '#tpl_delete_warning';
+
 export class ImportUploadDialog extends TestComponent {
     get tplContextMenu() {
         return this.content.tplContextMenu;
@@ -248,7 +250,12 @@ export class ImportUploadDialog extends TestComponent {
             res.state = BROWSE_FILE_STATE;
         }
 
-        res.delete_warning = await WarningPopup.create(this, await query('#tpl_delete_warning'));
+        const confirmPopupEl = await query(deleteConfirmSelector);
+        if (confirmPopupEl) {
+            res.delete_warning = await WarningPopup.create(this, confirmPopupEl);
+        } else {
+            res.delete_warning = null;
+        }
 
         return res;
     }
@@ -685,7 +692,7 @@ export class ImportUploadDialog extends TestComponent {
 
         await this.openTemplateMenu();
         await this.performAction(() => this.tplContextMenu.select('ctxDeleteTemplateBtn'));
-
+        await wait(deleteConfirmSelector, { visible: true });
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
 
         await click(this.content.delete_warning.content.okBtn);

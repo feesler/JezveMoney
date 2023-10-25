@@ -25,8 +25,7 @@ const defaultProps = {
     template: null,
     templates: null,
     onChange: null,
-    onUpdate: null,
-    onDelete: null,
+    dispatch: null,
 };
 
 /**
@@ -39,11 +38,6 @@ export class TemplateSelect extends Component {
             ...defaultProps,
             ...props,
         });
-
-        this.contextMenuActions = {
-            ctxUpdateTemplateBtn: () => this.onUpdate(),
-            ctxDeleteTemplateBtn: () => this.onDelete(),
-        };
 
         this.state = {
             ...this.props,
@@ -110,15 +104,6 @@ export class TemplateSelect extends Component {
         this.setState({ ...this.state, showMenu: !!value });
     }
 
-    onContextMenuClick(item) {
-        this.showMenu(false);
-
-        const menuAction = this.contextMenuActions[item];
-        if (isFunction(menuAction)) {
-            menuAction();
-        }
-    }
-
     /** Menu button 'click' event handler */
     onToggleMenu(e) {
         e.stopPropagation();
@@ -159,7 +144,7 @@ export class TemplateSelect extends Component {
 
         if (!this.contextMenu) {
             this.contextMenu = TemplateSelectContextMenu.create({
-                onItemClick: (item) => this.onContextMenuClick(item),
+                dispatch: (action) => state.dispatch(action),
                 onClose: () => this.showMenu(false),
             });
         }

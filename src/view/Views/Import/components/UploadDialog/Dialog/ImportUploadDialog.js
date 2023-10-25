@@ -17,12 +17,12 @@ import { LoadingIndicator } from '../../../../../Components/Common/LoadingIndica
 
 // Local components
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
+import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import {
-    ImportTemplateManager,
     TPL_SELECT_STATE,
     TPL_CREATE_STATE,
     TPL_UPDATE_STATE,
-} from '../TemplateManager/ImportTemplateManager.js';
+} from '../TemplateManager/reducer.js';
 
 import './ImportUploadDialog.scss';
 
@@ -283,7 +283,7 @@ export class ImportUploadDialog extends Component {
             }
 
             this.setConvertState();
-            this.tplManager.setRawData(data, filename);
+            this.tplManager.setRawData({ data, filename });
             this.setLoading(false);
         } catch (e) {
             this.onUploadError(e.message);
