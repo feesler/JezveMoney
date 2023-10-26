@@ -547,6 +547,7 @@ export class TransactionListView extends AppView {
 
         const res = {
             header: this.getHeaderExpectedState(state),
+            notification: null,
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,
