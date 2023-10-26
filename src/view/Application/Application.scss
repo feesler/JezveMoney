@@ -842,6 +842,10 @@ svg * {
   --notification-error-close-btn: #ffffff;
   --notification-error-close-btn-hover: #ffffff;
 
+  .close-btn {
+    align-self: auto;
+  }
+
   .close-btn__icon {
     opacity: 0.5;
   }
