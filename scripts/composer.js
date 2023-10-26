@@ -13,10 +13,16 @@ const composerConfig = [
 ];
 
 const option = (process.argv.length > 2) ? process.argv[2] : null;
+const install = option?.toLowerCase() === 'install';
 const update = option?.toLowerCase() === 'update';
 
 const projectDir = resolve(currentDir, '..').replace(/\\/g, '/');
 const destDir = resolve(currentDir, '../dist').replace(/\\/g, '/');
+
+// Create 'dist' directory if not exists
+if (!shell.test('-d', destDir)) {
+    shell.mkdir('-p', destDir);
+}
 
 // Copy config files from sources to destination directory
 composerConfig.forEach((path) => {
@@ -29,7 +35,9 @@ composerConfig.forEach((path) => {
 // Change directory and run composer commands
 shell.pushd('-q', destDir);
 
-if (update) {
+if (install) {
+    shell.exec('composer install --no-dev');
+} else if (update) {
     shell.exec('composer update --no-dev');
     shell.exec('composer bump');
 }

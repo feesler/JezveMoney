@@ -20,6 +20,8 @@
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
         "install-backend": "node ./scripts/install-backend.js",
         "update": "npm update --save",
+        "postinstall": "npm-run-all build install-composer",
+        "install-composer": "node ./scripts/composer.js install",
         "update-composer": "node ./scripts/composer.js update",
         "dump-autoload": "node ./scripts/composer.js",
         "postbuild": "npm-run-all install-backend",
