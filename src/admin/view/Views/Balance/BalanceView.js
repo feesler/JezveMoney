@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { asArray } from 'jezvejs';
+import { asArray } from '@jezvejs/types';
 import { DropDown } from 'jezvejs/DropDown';
 import { App } from '../../../../view/Application/App.js';
 import '../../../../view/Application/Application.scss';

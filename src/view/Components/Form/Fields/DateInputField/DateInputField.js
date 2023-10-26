@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { DatePicker } from 'jezvejs/DatePicker';
 
 import { __, timeToDate } from '../../../../utils/utils.js';

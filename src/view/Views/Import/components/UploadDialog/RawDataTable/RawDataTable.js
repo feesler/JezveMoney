@@ -1,10 +1,10 @@
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
 import {
     createElement,
     getClassName,
-    isFunction,
     removeChilds,
-    Component,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import './RawDataTable.scss';
 
 /** CSS classes */

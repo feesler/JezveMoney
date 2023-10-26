@@ -1,4 +1,5 @@
-import { createElement, Component } from 'jezvejs';
+import { Component } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 import './SimilarTransactionInfo.scss';

@@ -1,9 +1,6 @@
-import {
-    isDate,
-    isFunction,
-    Component,
-    createElement,
-} from 'jezvejs';
+import { isDate, isFunction } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { DatePicker } from 'jezvejs/DatePicker';
 
 import { parseDate, __, timeToDate } from '../../../../../utils/utils.js';

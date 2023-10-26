@@ -1,4 +1,4 @@
-import { isObject } from 'jezvejs';
+import { isObject } from '@jezvejs/types';
 
 /**
  * @constructor ListItem

@@ -1,4 +1,5 @@
-import { assert, asArray } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 
 export class List extends Array {
     static create(props = []) {

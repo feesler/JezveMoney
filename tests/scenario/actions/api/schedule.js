@@ -1,7 +1,5 @@
-import {
-    test,
-    assert,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { test } from 'jezve-test';
 import { api } from '../../../model/api.js';
 import { ApiRequestError } from '../../../error/ApiRequestError.js';
 import { formatProps } from '../../../common.js';

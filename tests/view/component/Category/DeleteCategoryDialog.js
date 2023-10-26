@@ -1,9 +1,9 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     click,
     query,
     evaluate,
-    assert,
 } from 'jezve-test';
 import { Checkbox } from 'jezvejs-test';
 

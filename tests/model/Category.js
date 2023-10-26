@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import { __ } from './locale.js';
 import { Transaction } from './Transaction.js';
 import { App } from '../Application.js';

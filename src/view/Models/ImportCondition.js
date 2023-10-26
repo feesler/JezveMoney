@@ -1,9 +1,6 @@
-import {
-    isObject,
-    hasFlag,
-    fixFloat,
-    isDate,
-} from 'jezvejs';
+import { isDate, isObject } from '@jezvejs/types';
+import { fixFloat } from '@jezvejs/number';
+import { hasFlag } from 'jezvejs';
 import { __, getSeconds } from '../utils/utils.js';
 import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';

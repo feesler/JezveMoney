@@ -1,7 +1,5 @@
-import {
-    isFunction,
-    createElement,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { InputGroup } from 'jezvejs/InputGroup';

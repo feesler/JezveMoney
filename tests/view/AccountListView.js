@@ -1,11 +1,11 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
-    assert,
     query,
     prop,
     navigation,
     waitForFunction,
     click,
-    asArray,
     goTo,
     baseUrl,
     wait,

@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
-    assert,
-    asArray,
     query,
     evaluate,
     navigation,

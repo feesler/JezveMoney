@@ -1,8 +1,6 @@
-import {
-    isFunction,
-    Component,
-    createElement,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { ConfirmDialog } from '../../Common/ConfirmDialog/ConfirmDialog.js';
 import { __ } from '../../../utils/utils.js';

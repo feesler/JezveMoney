@@ -1,4 +1,4 @@
-import { getClassName } from 'jezvejs';
+import { getClassName } from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
 
 import { App } from '../../../../Application/App.js';

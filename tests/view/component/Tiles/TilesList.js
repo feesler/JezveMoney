@@ -1,8 +1,8 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     query,
     queryAll,
-    assert,
     asyncMap,
     prop,
 } from 'jezve-test';

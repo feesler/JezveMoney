@@ -1,9 +1,6 @@
-import {
-    show,
-    isFunction,
-    Component,
-    createElement,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
+import { show, createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Input } from 'jezvejs/Input';

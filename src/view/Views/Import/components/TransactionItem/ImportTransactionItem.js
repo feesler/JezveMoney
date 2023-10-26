@@ -1,4 +1,4 @@
-import { enable, getClassName } from 'jezvejs';
+import { enable, getClassName } from '@jezvejs/dom';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';

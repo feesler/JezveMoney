@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 
 /** Person model */
 export class Person {

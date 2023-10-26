@@ -1,4 +1,5 @@
-import { assert, isDate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { isDate } from '@jezvejs/types';
 import { fixFloat, fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';

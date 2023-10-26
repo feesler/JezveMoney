@@ -1,4 +1,4 @@
-import { getClassName } from 'jezvejs';
+import { getClassName } from '@jezvejs/dom';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { InputField } from '../../../../../../../view/Components/Form/Fields/InputField/InputField.js';
 

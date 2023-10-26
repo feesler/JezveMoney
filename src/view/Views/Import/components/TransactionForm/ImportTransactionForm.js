@@ -1,10 +1,7 @@
-import {
-    createElement,
-    enable,
-    isFunction,
-    Component,
-    fixFloat,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
+import { fixFloat } from '@jezvejs/number';
+import { createElement, enable } from '@jezvejs/dom';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
 import { Popup } from 'jezvejs/Popup';

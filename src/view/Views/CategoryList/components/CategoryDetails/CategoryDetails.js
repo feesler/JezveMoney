@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { Collapsible } from 'jezvejs/Collapsible';
 
 import { __, getApplicationURL } from '../../../../utils/utils.js';

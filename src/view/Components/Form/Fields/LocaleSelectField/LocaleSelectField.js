@@ -1,4 +1,4 @@
-import { getClassNames } from 'jezvejs';
+import { getClassNames } from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
 
 import { __ } from '../../../../utils/utils.js';

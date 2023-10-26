@@ -1,7 +1,7 @@
 import {
     createElement,
     show,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';

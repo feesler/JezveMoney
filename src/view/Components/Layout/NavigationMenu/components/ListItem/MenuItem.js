@@ -1,4 +1,4 @@
-import { createElement, getClassName } from 'jezvejs';
+import { createElement, getClassName } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuItem } from 'jezvejs/Menu';
 

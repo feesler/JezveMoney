@@ -1,11 +1,13 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestApplication,
-    assert,
-    formatDate,
-    isValidDateString,
     goTo,
     baseUrl,
 } from 'jezve-test';
+import {
+    formatDate,
+    isValidDateString,
+} from '@jezvejs/datetime';
 import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/AppState.js';

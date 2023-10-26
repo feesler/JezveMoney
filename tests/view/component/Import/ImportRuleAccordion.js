@@ -1,7 +1,7 @@
+import { assert } from '@jezvejs/assert';
 import {
     query,
     click,
-    assert,
     prop,
 } from 'jezve-test';
 import { Collapsible } from 'jezvejs-test';

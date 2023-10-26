@@ -1,4 +1,5 @@
-import { isFunction, Component } from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Popup } from 'jezvejs/Popup';
 

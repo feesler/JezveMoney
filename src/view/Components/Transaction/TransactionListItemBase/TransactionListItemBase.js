@@ -2,9 +2,9 @@ import {
     createElement,
     removeChilds,
     show,
-    Component,
-    getContrastColor,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { getContrastColor } from '@jezvejs/color';
+import { Component } from 'jezvejs';
 
 import { __ } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';

@@ -1,4 +1,4 @@
-import { fixFloat } from 'jezvejs';
+import { fixFloat } from '@jezvejs/number';
 import { __ } from '../utils/utils.js';
 import { ListItem } from './ListItem.js';
 import {

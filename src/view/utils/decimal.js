@@ -1,4 +1,4 @@
-import { fixFloat } from 'jezvejs';
+import { fixFloat } from '@jezvejs/number';
 
 /* Decimal values precision */
 export const DEFAULT_PRECISION = 2;

@@ -1,4 +1,5 @@
-import { Component, createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 

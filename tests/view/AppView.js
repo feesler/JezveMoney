@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestView,
-    assert,
     url,
     navigation,
     query,

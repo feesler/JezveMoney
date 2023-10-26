@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import {
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_LESS,

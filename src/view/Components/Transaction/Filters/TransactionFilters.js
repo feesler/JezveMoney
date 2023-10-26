@@ -1,11 +1,6 @@
-import {
-    Component,
-    createElement,
-    debounce,
-    show,
-    isFunction,
-    asArray,
-} from 'jezvejs';
+import { isFunction, asArray } from '@jezvejs/types';
+import { createElement, show } from '@jezvejs/dom';
+import { Component, debounce } from 'jezvejs';
 
 // Application
 import {

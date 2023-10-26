@@ -1,9 +1,6 @@
 import 'jezvejs/style';
-import {
-    insertAfter,
-    asArray,
-    createElement,
-} from 'jezvejs';
+import { asArray } from '@jezvejs/types';
+import { insertAfter, createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';

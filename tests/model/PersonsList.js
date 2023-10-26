@@ -1,4 +1,5 @@
-import { hasFlag, assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { hasFlag } from 'jezvejs';
 import { SortableList } from './SortableList.js';
 import {
     SORT_BY_CREATEDATE_ASC,

@@ -1,4 +1,5 @@
-import { query, prop, assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { query, prop } from 'jezve-test';
 import { AppView } from './AppView.js';
 
 /** About view class */

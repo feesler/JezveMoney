@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { Checkbox } from 'jezvejs/Checkbox';
 
 import { __ } from '../../../../utils/utils.js';

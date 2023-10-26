@@ -1,11 +1,11 @@
 import {
     DEFAULT_FIRST_DAY_OF_WEEK,
-    asArray,
-    firstUpperCase,
     getFirstDayOfWeek,
     getWeekdayShort,
     shiftDate,
-} from 'jezvejs';
+} from '@jezvejs/datetime';
+import { asArray } from '@jezvejs/types';
+import { firstUpperCase } from 'jezvejs';
 import { __ } from '../utils/utils.js';
 import { App } from '../Application/App.js';
 import { ListItem } from './ListItem.js';

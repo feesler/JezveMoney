@@ -1,6 +1,6 @@
+import { isObject } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
-    assert,
-    isObject,
     setBlock,
     test,
 } from 'jezve-test';

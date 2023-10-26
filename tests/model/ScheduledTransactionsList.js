@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import { List } from './List.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
 import { TransactionsList } from './TransactionsList.js';

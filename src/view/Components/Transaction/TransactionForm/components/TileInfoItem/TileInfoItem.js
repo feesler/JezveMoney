@@ -1,9 +1,6 @@
-import {
-    isFunction,
-    enable,
-    Component,
-    createElement,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { enable, createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import './TileInfoItem.scss';
 
 const ITEM_CLASS = 'tile-info-item';

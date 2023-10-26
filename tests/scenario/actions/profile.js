@@ -1,4 +1,5 @@
-import { test, assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { test } from 'jezve-test';
 import { LoginView } from '../../view/LoginView.js';
 import { MainView } from '../../view/MainView.js';
 import { App } from '../../Application.js';

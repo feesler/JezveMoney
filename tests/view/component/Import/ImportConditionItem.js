@@ -1,4 +1,5 @@
-import { TestComponent, assert, evaluate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { TestComponent, evaluate } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
 import { dateStringToSeconds } from '../../../common.js';

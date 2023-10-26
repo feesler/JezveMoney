@@ -1,10 +1,6 @@
-import {
-    createElement,
-    show,
-    isFunction,
-    asArray,
-    Component,
-} from 'jezvejs';
+import { isFunction, asArray } from '@jezvejs/types';
+import { createElement, show } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';

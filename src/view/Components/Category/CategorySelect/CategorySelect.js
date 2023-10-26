@@ -1,4 +1,5 @@
-import { asArray, getClassName } from 'jezvejs';
+import { asArray } from '@jezvejs/types';
+import { getClassName } from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
 
 import { __ } from '../../../utils/utils.js';

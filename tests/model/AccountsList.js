@@ -1,8 +1,6 @@
-import {
-    hasFlag,
-    assert,
-    asArray,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
+import { hasFlag } from 'jezvejs';
 import {
     normalize,
     SORT_BY_CREATEDATE_ASC,

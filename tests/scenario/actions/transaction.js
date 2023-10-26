@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     test,
-    assert,
     setBlock,
     baseUrl,
     goTo,

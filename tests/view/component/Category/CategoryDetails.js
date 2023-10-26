@@ -1,3 +1,4 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     query,
@@ -6,7 +7,6 @@ import {
     asyncMap,
     queryAll,
     prop,
-    assert,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { Category } from '../../../model/Category.js';

@@ -1,4 +1,4 @@
-import { asArray } from 'jezvejs';
+import { asArray } from '@jezvejs/types';
 import { createSlice } from 'jezvejs/Store';
 
 import {

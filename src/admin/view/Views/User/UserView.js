@@ -5,7 +5,7 @@ import {
     show,
     enable,
     setEvents,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';

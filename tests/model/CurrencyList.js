@@ -1,4 +1,5 @@
-import { asArray, assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import { Currency } from './Currency.js';
 import { List } from './List.js';
 import { api } from './api.js';

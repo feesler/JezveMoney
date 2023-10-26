@@ -1,4 +1,5 @@
-import { assert, setBlock, TestStory } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { setBlock, TestStory } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,

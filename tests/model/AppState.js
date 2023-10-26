@@ -1,10 +1,10 @@
 import {
-    isObject,
-    isInt,
-    assert,
-    asArray,
+    isInteger,
     isDate,
-} from 'jezve-test';
+    isObject,
+    asArray,
+} from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
     isValidValue,
     availSortTypes,
@@ -1853,7 +1853,7 @@ export class AppState {
             }
         }
 
-        if ('date' in params && !isInt(params.date)) {
+        if ('date' in params && !isInteger(params.date)) {
             return false;
         }
 
@@ -2287,18 +2287,18 @@ export class AppState {
             }
         }
 
-        if ('start_date' in params && !isInt(params.start_date)) {
+        if ('start_date' in params && !isInteger(params.start_date)) {
             return false;
         }
 
-        if ('end_date' in params && !isInt(params.end_date) && params.end_date !== null) {
+        if ('end_date' in params && !isInteger(params.end_date) && params.end_date !== null) {
             return false;
         }
 
         // End date must be greater than start date
         if (
-            isInt(params.start_date)
-            && isInt(params.end_date)
+            isInteger(params.start_date)
+            && isInteger(params.end_date)
             && params.start_date >= params.end_date
         ) {
             return false;
@@ -2585,7 +2585,7 @@ export class AppState {
             return false;
         }
 
-        if ('date' in params && !isInt(params.date)) {
+        if ('date' in params && !isInteger(params.date)) {
             return false;
         }
 
@@ -2843,7 +2843,7 @@ export class AppState {
         // Check every column value is present and have correct value
         return Object.values(ImportTemplate.columnsMap).every((columnName) => (
             (columnName in params.columns)
-            && isInt(params.columns[columnName])
+            && isInteger(params.columns[columnName])
             && params.columns[columnName] > 0
         ));
     }

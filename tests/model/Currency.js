@@ -1,4 +1,5 @@
-import { assert, hasFlag } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { hasFlag } from 'jezvejs';
 import { normalize } from '../common.js';
 import { hasToken, __ } from './locale.js';
 import { App } from '../Application.js';

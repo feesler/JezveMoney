@@ -1,4 +1,4 @@
-import { getClassName } from 'jezvejs';
+import { getClassName } from '@jezvejs/dom';
 
 import { TransactionListItemBase } from '../TransactionListItemBase/TransactionListItemBase.js';
 import { ListItem } from '../../List/ListItem/ListItem.js';

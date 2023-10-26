@@ -1,7 +1,7 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     queryAll,
-    assert,
     asyncMap,
 } from 'jezve-test';
 import { ImportConditionItem } from './ImportConditionItem.js';

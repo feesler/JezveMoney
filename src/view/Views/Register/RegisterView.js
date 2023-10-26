@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { createStore } from 'jezvejs/Store';
 
 import { __, getApplicationURL } from '../../utils/utils.js';

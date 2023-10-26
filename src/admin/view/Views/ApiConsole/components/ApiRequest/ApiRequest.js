@@ -1,9 +1,6 @@
-import {
-    createElement,
-    re,
-    Component,
-} from 'jezvejs';
+import { createElement, re } from '@jezvejs/dom';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { Component } from 'jezvejs';
 import { App } from '../../../../../../view/Application/App.js';
 import './ApiRequest.scss';
 

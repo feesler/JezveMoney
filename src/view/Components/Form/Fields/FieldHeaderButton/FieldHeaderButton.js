@@ -1,4 +1,4 @@
-import { getClassNames } from 'jezvejs';
+import { getClassNames } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import './FieldHeaderButton.scss';
 

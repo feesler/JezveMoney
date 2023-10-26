@@ -1,13 +1,15 @@
+import { isFunction } from '@jezvejs/types';
 import {
-    isFunction,
     insertAfter,
     show,
     addChilds,
     createElement,
-    Component,
+} from '@jezvejs/dom';
+import {
     getLongMonthName,
     MONTHS_COUNT,
-} from 'jezvejs';
+} from '@jezvejs/datetime';
+import { Component } from 'jezvejs';
 
 import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';

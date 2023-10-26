@@ -1,4 +1,4 @@
-import { asArray } from 'jezvejs';
+import { asArray } from '@jezvejs/types';
 import { App } from '../Application/App.js';
 
 /** Strings */

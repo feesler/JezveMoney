@@ -1,9 +1,6 @@
-import {
-    test,
-    setBlock,
-    assert,
-    asArray,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
+import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';

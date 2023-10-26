@@ -1,4 +1,4 @@
-import { fixFloat } from 'jezvejs';
+import { fixFloat } from '@jezvejs/number';
 
 import { timestampFromString, __ } from '../utils/utils.js';
 import { amountFix } from '../utils/decimal.js';

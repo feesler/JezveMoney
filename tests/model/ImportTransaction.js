@@ -1,4 +1,5 @@
-import { assert, isDate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { isDate } from '@jezvejs/types';
 import { App } from '../Application.js';
 import {
     dateToSeconds,

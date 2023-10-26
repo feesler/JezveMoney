@@ -1,12 +1,11 @@
+import { isObject, isFunction } from '@jezvejs/types';
 import 'jezvejs/style';
 import {
     ge,
-    isObject,
-    isFunction,
     removeChilds,
     show,
     getFormData,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Offcanvas } from 'jezvejs/Offcanvas';

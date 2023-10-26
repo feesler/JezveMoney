@@ -1,7 +1,12 @@
-import { Component, createElement, isFunction } from 'jezvejs';
-import { TransactionList } from '../TransactionList/TransactionList.js';
-import './TransactionListGroup.scss';
+import { isFunction } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
+
 import { App } from '../../../Application/App.js';
+
+import { TransactionList } from '../TransactionList/TransactionList.js';
+
+import './TransactionListGroup.scss';
 
 /* CSS classes */
 const GROUP_CLASS = 'trans-group';

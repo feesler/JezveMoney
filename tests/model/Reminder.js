@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 
 export const REMINDER_UPCOMING = 0;
 export const REMINDER_SCHEDULED = 1;

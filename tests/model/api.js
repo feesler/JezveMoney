@@ -1,9 +1,8 @@
+import { isObject, asArray } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
     baseUrl,
     httpReq,
-    assert,
-    asArray,
-    isObject,
 } from 'jezve-test';
 import { ApiRequestError } from '../error/ApiRequestError.js';
 

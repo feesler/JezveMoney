@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
-    assert,
     queryAll,
     asyncMap,
     evaluate,

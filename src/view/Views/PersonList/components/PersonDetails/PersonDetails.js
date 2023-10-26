@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 
 import { __, formatPersonDebts, getApplicationURL } from '../../../../utils/utils.js';
 

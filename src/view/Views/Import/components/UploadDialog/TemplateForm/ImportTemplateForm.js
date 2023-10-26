@@ -1,11 +1,11 @@
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
 import {
-    isFunction,
     show,
     enable,
-    Component,
     re,
     createElement,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
 
 // Application

@@ -1,8 +1,6 @@
-import {
-    createElement,
-    isFunction,
-    Component,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { ListContainer } from 'jezvejs/ListContainer';

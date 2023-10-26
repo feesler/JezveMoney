@@ -1,4 +1,4 @@
-import { getClassNames } from 'jezvejs';
+import { getClassNames } from '@jezvejs/dom';
 import { InputField } from '../InputField/InputField.js';
 import './ColorField.scss';
 

@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import { LinkMenu } from 'jezvejs-test';
 
 export class TransactionTypeMenu extends LinkMenu {

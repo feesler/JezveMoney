@@ -1,4 +1,5 @@
-import { createElement, getClassName, isFunction } from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { createElement, getClassName } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 
