@@ -1,4 +1,5 @@
-import { assert, test } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { test } from 'jezve-test';
 import {
     amountFix,
     correct,

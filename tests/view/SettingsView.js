@@ -1,12 +1,12 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
-    assert,
     query,
     click,
     asyncMap,
     evaluate,
     waitForFunction,
     wait,
-    asArray,
     navigation,
     goTo,
     baseUrl,

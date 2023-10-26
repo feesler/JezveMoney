@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import { List } from './List.js';
 import {
     IMPORT_COND_OP_NOT_EQUAL,

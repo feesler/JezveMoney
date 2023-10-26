@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     setBlock,
-    assert,
     TestStory,
 } from 'jezve-test';
 import {

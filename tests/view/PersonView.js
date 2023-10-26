@@ -1,5 +1,5 @@
+import { assert } from '@jezvejs/assert';
 import {
-    assert,
     query,
     navigation,
     click,

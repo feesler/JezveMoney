@@ -1,4 +1,4 @@
-import { createElement, getClassNames, setProps } from 'jezvejs';
+import { createElement, getClassNames, setProps } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Input } from 'jezvejs/Input';
 import { InputGroup } from 'jezvejs/InputGroup';

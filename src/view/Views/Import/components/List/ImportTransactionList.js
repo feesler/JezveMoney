@@ -1,4 +1,4 @@
-import { isFunction } from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
 import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { __ } from '../../../../utils/utils.js';

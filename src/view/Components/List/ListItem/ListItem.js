@@ -1,9 +1,9 @@
 import {
     createElement,
     show,
-    Component,
     getClassName,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { MenuButton } from 'jezvejs/MenuButton';
 import './ListItem.scss';

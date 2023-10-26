@@ -1,5 +1,5 @@
+import { assert } from '@jezvejs/assert';
 import {
-    assert,
     query,
     queryAll,
     prop,

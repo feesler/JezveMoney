@@ -1,10 +1,6 @@
-import {
-    isFunction,
-    isObject,
-    hasFlag,
-    assert,
-    isDate,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { isFunction, isObject, isDate } from '@jezvejs/types';
+import { hasFlag } from 'jezvejs';
 import { App } from '../Application.js';
 import { dateToSeconds, fixFloat } from '../common.js';
 import { __ } from './locale.js';

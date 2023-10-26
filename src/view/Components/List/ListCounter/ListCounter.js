@@ -1,4 +1,4 @@
-import { getClassName } from 'jezvejs';
+import { getClassName } from '@jezvejs/dom';
 import { Field } from '../../Common/Field/Field.js';
 
 import './ListCounter.scss';

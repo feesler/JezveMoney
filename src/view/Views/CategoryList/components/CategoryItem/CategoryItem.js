@@ -1,4 +1,4 @@
-import { createElement, getClassName } from 'jezvejs';
+import { createElement, getClassName } from '@jezvejs/dom';
 import { ListContainer } from 'jezvejs/ListContainer';
 
 import { CollapsibleListItem } from '../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';

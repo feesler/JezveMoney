@@ -1,8 +1,8 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     click,
     query,
-    assert,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 

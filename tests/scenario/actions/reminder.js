@@ -1,8 +1,6 @@
-import {
-    test,
-    assert,
-    asArray,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
+import { test } from 'jezve-test';
 import { ReminderListView } from '../../view/ReminderListView.js';
 import { App } from '../../Application.js';
 import { TransactionView } from '../../view/TransactionView.js';

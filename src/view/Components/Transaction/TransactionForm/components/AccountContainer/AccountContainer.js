@@ -1,8 +1,6 @@
-import {
-    createElement,
-    Component,
-    isFunction,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { __ } from '../../../../../utils/utils.js';

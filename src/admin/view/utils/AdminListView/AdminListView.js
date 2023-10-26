@@ -1,13 +1,13 @@
+import { isObject } from '@jezvejs/types';
 import {
     ge,
     setProps,
-    isObject,
     addChilds,
     removeChilds,
     show,
     setEvents,
     getFormData,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Popup } from 'jezvejs/Popup';
 
 import { App } from '../../../../view/Application/App.js';

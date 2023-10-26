@@ -2,13 +2,15 @@ import 'jezvejs/style';
 import {
     createElement,
     show,
-    asArray,
+    getClassName,
+} from '@jezvejs/dom';
+import { asArray } from '@jezvejs/types';
+import {
     rgbToHSL,
     hslToRGB,
     rgbToColor,
     MAX_LIGHTNESS,
-    getClassName,
-} from 'jezvejs';
+} from '@jezvejs/color';
 import { Histogram } from 'jezvejs/Histogram';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';

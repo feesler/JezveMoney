@@ -1,4 +1,5 @@
-import { asArray, assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import { List } from './List.js';
 import { REMINDER_SCHEDULED, Reminder } from './Reminder.js';
 import { App } from '../Application.js';

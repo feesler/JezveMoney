@@ -1,12 +1,12 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
-    assert,
     query,
     closest,
     prop,
     click,
     wait,
     waitForFunction,
-    asArray,
     evaluate,
 } from 'jezve-test';
 import {

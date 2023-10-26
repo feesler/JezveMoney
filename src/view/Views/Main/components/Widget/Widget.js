@@ -1,9 +1,6 @@
-import {
-    Component,
-    asArray,
-    createElement,
-    getClassName,
-} from 'jezvejs';
+import { Component } from 'jezvejs';
+import { createElement, getClassName } from '@jezvejs/dom';
+import { asArray } from '@jezvejs/types';
 import { Icon } from 'jezvejs/Icon';
 
 import { getApplicationURL } from '../../../../utils/utils.js';

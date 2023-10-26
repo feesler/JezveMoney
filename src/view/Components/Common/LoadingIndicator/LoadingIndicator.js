@@ -1,8 +1,5 @@
-import {
-    createElement,
-    show,
-    Component,
-} from 'jezvejs';
+import { createElement, show } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Spinner } from 'jezvejs/Spinner';
 import { __ } from '../../../utils/utils.js';
 import './LoadingIndicator.scss';

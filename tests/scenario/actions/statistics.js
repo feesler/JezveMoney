@@ -1,8 +1,6 @@
-import {
-    test,
-    asArray,
-    assert,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
+import { test } from 'jezve-test';
 import { App } from '../../Application.js';
 import { Transaction } from '../../model/Transaction.js';
 import { StatisticsView } from '../../view/StatisticsView.js';

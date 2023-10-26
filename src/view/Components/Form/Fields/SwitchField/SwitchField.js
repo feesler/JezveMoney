@@ -1,4 +1,4 @@
-import { getClassNames } from 'jezvejs';
+import { getClassNames } from '@jezvejs/dom';
 import { Switch } from 'jezvejs/Switch';
 
 import './SwitchField.scss';

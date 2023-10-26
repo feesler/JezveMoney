@@ -1,4 +1,5 @@
-import { createElement, Component } from 'jezvejs';
+import { Component } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,

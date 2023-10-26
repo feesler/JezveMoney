@@ -1,9 +1,5 @@
-import {
-    asArray,
-    isDate,
-    isObject,
-    shiftDate,
-} from 'jezvejs';
+import { asArray, isDate, isObject } from '@jezvejs/types';
+import { shiftDate } from '@jezvejs/datetime';
 import { createSlice } from 'jezvejs/Store';
 
 import { dateStringToTime, getSeconds, parseDate } from '../../../utils/utils.js';

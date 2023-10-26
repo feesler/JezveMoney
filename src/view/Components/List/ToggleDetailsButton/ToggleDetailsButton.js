@@ -1,4 +1,4 @@
-import { getClassNames } from 'jezvejs';
+import { getClassNames } from '@jezvejs/dom';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { __ } from '../../../utils/utils.js';
 import './ToggleDetailsButton.scss';

@@ -1,4 +1,5 @@
-import { Component, createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 
 /* CSS classes */
 const MESSAGE_CLASS = 'nodata-message';

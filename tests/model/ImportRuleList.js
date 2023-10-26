@@ -1,4 +1,4 @@
-import { asArray } from 'jezve-test';
+import { asArray } from '@jezvejs/types';
 import { List } from './List.js';
 import { ImportRule } from './ImportRule.js';
 

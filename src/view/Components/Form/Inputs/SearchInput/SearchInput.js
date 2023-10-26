@@ -1,10 +1,10 @@
+import { isFunction } from '@jezvejs/types';
 import {
     createElement,
     getClassName,
     re,
-    isFunction,
-    Component,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import 'jezvejs/style/Input';
 import { InputGroup } from 'jezvejs/InputGroup';

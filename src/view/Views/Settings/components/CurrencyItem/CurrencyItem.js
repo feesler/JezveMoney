@@ -1,4 +1,4 @@
-import { createElement, getClassName } from 'jezvejs';
+import { createElement, getClassName } from '@jezvejs/dom';
 
 import { App } from '../../../../Application/App.js';
 

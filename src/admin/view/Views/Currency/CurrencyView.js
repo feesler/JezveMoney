@@ -1,5 +1,6 @@
 import 'jezvejs/style';
-import { ge, createElement, hasFlag } from 'jezvejs';
+import { hasFlag } from 'jezvejs';
+import { ge, createElement } from '@jezvejs/dom';
 
 import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';

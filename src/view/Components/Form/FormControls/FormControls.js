@@ -1,9 +1,6 @@
-import {
-    Component,
-    addChilds,
-    createElement,
-    isObject,
-} from 'jezvejs';
+import { isObject } from '@jezvejs/types';
+import { createElement, addChilds } from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { Spinner } from 'jezvejs/Spinner';
 import './FormControls.scss';

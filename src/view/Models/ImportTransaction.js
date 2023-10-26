@@ -1,7 +1,7 @@
 import {
     trimDecimalPlaces,
     fixFloat,
-} from 'jezvejs';
+} from '@jezvejs/number';
 import {
     dateStringToTime,
     getCurrencyPrecision,

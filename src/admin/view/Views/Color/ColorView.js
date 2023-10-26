@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, createElement } from 'jezvejs';
+import { ge, createElement } from '@jezvejs/dom';
 
 import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';

@@ -1,11 +1,10 @@
+import { isObject, asArray } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
-    assert,
-    asArray,
     query,
     queryAll,
     click,
     waitForFunction,
-    isObject,
     evaluate,
 } from 'jezve-test';
 import { DropDown, LinkMenu, Button } from 'jezvejs-test';

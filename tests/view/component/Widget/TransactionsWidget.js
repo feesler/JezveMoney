@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     query,
-    assert,
     evaluate,
     navigation,
     wait,

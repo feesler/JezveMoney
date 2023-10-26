@@ -1,6 +1,6 @@
+import { assert } from '@jezvejs/assert';
 import {
     Runner,
-    assert,
     setBlock,
     getSelectedStory,
 } from 'jezve-test';

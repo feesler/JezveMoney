@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
 

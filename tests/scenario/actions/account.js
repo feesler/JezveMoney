@@ -1,7 +1,7 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
     test,
-    asArray,
-    assert,
     setBlock,
     baseUrl,
     goTo,

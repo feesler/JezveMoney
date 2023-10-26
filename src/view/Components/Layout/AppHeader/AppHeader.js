@@ -1,8 +1,8 @@
+import { isFunction } from '@jezvejs/types';
 import {
     re,
-    isFunction,
     createElement,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Header } from 'jezvejs/Header';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';

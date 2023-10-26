@@ -1,8 +1,8 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     query,
     click,
-    assert,
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';

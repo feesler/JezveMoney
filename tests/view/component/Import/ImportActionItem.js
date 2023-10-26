@@ -1,4 +1,5 @@
-import { TestComponent, assert, evaluate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { TestComponent, evaluate } from 'jezve-test';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';

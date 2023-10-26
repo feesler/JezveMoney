@@ -1,10 +1,10 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
     test,
-    assert,
     setBlock,
     baseUrl,
     goTo,
-    asArray,
 } from 'jezve-test';
 import { ScheduleView } from '../../view/ScheduleView.js';
 import { MainView } from '../../view/MainView.js';

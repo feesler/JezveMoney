@@ -1,10 +1,11 @@
+import { Component } from 'jezvejs';
 import {
-    Component,
     removeChilds,
     createElement,
     addChilds,
     getClassName,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+
 import './ControllersMenu.scss';
 
 /* CSS classes */

@@ -1,9 +1,9 @@
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
     query,
     click,
     input,
-    assert,
     asyncMap,
     evaluate,
     waitForFunction,

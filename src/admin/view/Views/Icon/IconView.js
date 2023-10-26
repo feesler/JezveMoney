@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, createElement, selectByValue } from 'jezvejs';
+import { ge, createElement, selectByValue } from '@jezvejs/dom';
 import { App } from '../../../../view/Application/App.js';
 import { __ } from '../../../../view/utils/utils.js';
 import '../../../../view/Application/Application.scss';

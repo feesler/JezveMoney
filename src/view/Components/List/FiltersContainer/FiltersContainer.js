@@ -1,9 +1,8 @@
 import {
     isVisible,
-    debounce,
-    Component,
     afterTransition,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component, debounce } from 'jezvejs';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { Offcanvas } from 'jezvejs/Offcanvas';

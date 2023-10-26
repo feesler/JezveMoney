@@ -2,7 +2,7 @@ import {
     createElement,
     getClassName,
     removeChilds,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';

@@ -1,13 +1,11 @@
+import { isDate, isObject, asArray } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
 import {
     DAYS_IN_WEEK,
-    asArray,
-    createElement,
-    isDate,
-    isObject,
     parseDateString,
     shiftDate,
     shiftMonth,
-} from 'jezvejs';
+} from '@jezvejs/datetime';
 
 import { correct, formatValue } from './decimal.js';
 import { App } from '../Application/App.js';
@@ -70,20 +68,6 @@ export const setCookie = (name, value) => {
     ];
 
     document.cookie = parts.join('; ');
-};
-
-/* Convert number to string and prepend zero if value is less than 10 */
-export const leadZero = (val) => {
-    const v = parseInt(val, 10);
-    if (Number.isNaN(v)) {
-        throw new Error('Invalid value');
-    }
-
-    if (v < 10) {
-        return `0${v}`;
-    }
-
-    return v.toString();
 };
 
 /** Convert date string to timestamp */

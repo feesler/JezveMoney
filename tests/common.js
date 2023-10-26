@@ -1,11 +1,10 @@
+import { isDate, isObject } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
-    isDate,
-    isObject,
-    assert,
     formatDate,
     parseDateString,
     getLocaleDateFormat,
-} from 'jezve-test';
+} from '@jezvejs/datetime';
 
 export const MS_IN_SECOND = 1000;
 export const DAYS_IN_WEEK = 7;

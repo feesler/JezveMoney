@@ -1,9 +1,6 @@
-import {
-    asArray,
-    Component,
-    createElement,
-    px,
-} from 'jezvejs';
+import { asArray } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
+import { Component, px } from 'jezvejs';
 
 import { App } from '../../../Application/App.js';
 import './Heading.scss';

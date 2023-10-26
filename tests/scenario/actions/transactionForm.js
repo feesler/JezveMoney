@@ -1,8 +1,6 @@
-import {
-    test,
-    assert,
-    formatDate,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { formatDate } from '@jezvejs/datetime';
+import { test } from 'jezve-test';
 import { App } from '../../Application.js';
 import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 import { Transaction } from '../../model/Transaction.js';

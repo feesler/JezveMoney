@@ -1,4 +1,4 @@
-import { isFunction } from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
 
 import { App } from '../../../Application/App.js';
 import { API } from '../../../API/index.js';

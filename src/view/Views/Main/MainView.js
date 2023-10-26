@@ -3,7 +3,7 @@ import {
     show,
     createElement,
     removeChilds,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Histogram } from 'jezvejs/Histogram';
 import { ListContainer } from 'jezvejs/ListContainer';

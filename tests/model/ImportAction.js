@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 import { fixFloat } from '../common.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from './ImportTransaction.js';

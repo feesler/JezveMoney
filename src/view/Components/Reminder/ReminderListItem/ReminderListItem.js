@@ -1,4 +1,4 @@
-import { getClassName } from 'jezvejs';
+import { getClassName } from '@jezvejs/dom';
 
 import { Reminder } from '../../../Models/Reminder.js';
 

@@ -1,4 +1,4 @@
-import { createElement, getClassNames, setProps } from 'jezvejs';
+import { createElement, getClassNames, setProps } from '@jezvejs/dom';
 import { Input } from 'jezvejs/Input';
 
 import { App } from '../../../../Application/App.js';

@@ -1,6 +1,7 @@
+import { isNumber } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
 import {
     TestComponent,
-    assert,
     query,
     queryAll,
     prop,
@@ -8,7 +9,6 @@ import {
     input,
     wait,
     waitForFunction,
-    isNum,
     evaluate,
     asyncMap,
 } from 'jezve-test';
@@ -403,7 +403,7 @@ export class ImportUploadDialog extends TestComponent {
         const cellsData = data.slice(firstRowInd, firstRowInd + rowsToShow);
         res.cells = cellsData.map((row) => {
             const val = row[ind];
-            if (isNum(val)) {
+            if (isNumber(val)) {
                 return parseFloat(val).toString();
             }
 

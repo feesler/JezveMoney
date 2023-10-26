@@ -1,10 +1,10 @@
+import { createElement, show } from '@jezvejs/dom';
 import {
     Component,
-    createElement,
     removeEmptyClick,
     setEmptyClick,
-    show,
 } from 'jezvejs';
+
 import { Button } from 'jezvejs/Button';
 import { CloseButton } from 'jezvejs/CloseButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';

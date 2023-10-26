@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import {
     createElement,
     insertAfter,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Offcanvas } from 'jezvejs/Offcanvas';

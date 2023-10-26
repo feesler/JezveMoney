@@ -1,9 +1,9 @@
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
 import {
     test,
-    assert,
     baseUrl,
     goTo,
-    asArray,
 } from 'jezve-test';
 import { App } from '../../Application.js';
 import { TransactionListView } from '../../view/TransactionListView.js';

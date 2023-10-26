@@ -1,9 +1,9 @@
 import {
     createElement,
     createSVGElement,
-    Component,
     removeChilds,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import './Tile.scss';
 

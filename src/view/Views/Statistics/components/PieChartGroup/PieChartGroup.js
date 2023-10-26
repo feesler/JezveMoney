@@ -1,9 +1,6 @@
-import {
-    Component,
-    createElement,
-    isFunction,
-    show,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
+import { createElement, show } from '@jezvejs/dom';
 import { PieChart } from 'jezvejs/PieChart';
 
 import { __ } from '../../../../utils/utils.js';

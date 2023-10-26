@@ -1,4 +1,5 @@
-import { assert, setBlock } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { ACCOUNT_TYPE_OTHER } from '../../../model/AccountsList.js';
 import {

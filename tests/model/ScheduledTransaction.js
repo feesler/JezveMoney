@@ -1,4 +1,5 @@
-import { asArray, assert, isDate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { isDate, asArray } from '@jezvejs/types';
 import {
     DEBT,
     EXPENSE,

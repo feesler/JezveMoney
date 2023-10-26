@@ -2,8 +2,8 @@ import {
     createElement,
     addChilds,
     removeChilds,
-    Component,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 import './Field.scss';
 
 /** CSS classes */

@@ -1,8 +1,6 @@
-import {
-    assert,
-    formatDate,
-    asArray,
-} from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { asArray } from '@jezvejs/types';
+import { formatDate } from '@jezvejs/datetime';
 import {
     createCSV,
     cutDate,

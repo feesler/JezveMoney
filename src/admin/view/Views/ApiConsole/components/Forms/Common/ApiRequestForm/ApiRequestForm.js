@@ -1,4 +1,6 @@
-import { createElement, Component, asArray } from 'jezvejs';
+import { Component } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
+import { asArray } from '@jezvejs/types';
 
 import { InputField } from '../../../../../../../../view/Components/Form/Fields/InputField/InputField.js';
 import { FormControls } from '../../../../../../../../view/Components/Form/FormControls/FormControls.js';

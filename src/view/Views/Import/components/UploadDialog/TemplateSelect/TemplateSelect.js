@@ -1,9 +1,6 @@
-import {
-    createElement,
-    enable,
-    isFunction,
-    Component,
-} from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
+import { createElement, enable } from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
 

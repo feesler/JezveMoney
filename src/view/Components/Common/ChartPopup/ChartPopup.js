@@ -1,10 +1,10 @@
+import { isFunction } from '@jezvejs/types';
 import {
-    Component,
     createElement,
     getClassName,
-    isFunction,
     removeChilds,
-} from 'jezvejs';
+} from '@jezvejs/dom';
+import { Component } from 'jezvejs';
 
 import { COLORS_COUNT } from '../../../utils/utils.js';
 import { Transaction } from '../../../Models/Transaction.js';

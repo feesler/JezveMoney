@@ -1,4 +1,5 @@
-import { TestComponent, assert, evaluate } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+import { TestComponent, evaluate } from 'jezve-test';
 
 /** Counter component */
 export class Counter extends TestComponent {

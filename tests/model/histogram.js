@@ -1,4 +1,4 @@
-import { isObject } from 'jezve-test';
+import { isObject } from '@jezvejs/types';
 
 /** Returns array of data sets */
 export const getDataSets = (chartData) => {

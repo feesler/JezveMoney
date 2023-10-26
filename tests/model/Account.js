@@ -1,4 +1,4 @@
-import { assert } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
 
 /** Account model */
 export class Account {

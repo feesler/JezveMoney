@@ -1,14 +1,15 @@
+import { isDate, isFunction } from '@jezvejs/types';
 import {
     ge,
     createElement,
     getClassName,
-    isDate,
+} from '@jezvejs/dom';
+import {
     formatDate,
-    isFunction,
     getLocaleDateFormat,
     isValidDateString,
-    hasFlag,
-} from 'jezvejs';
+} from '@jezvejs/datetime';
+import { hasFlag } from 'jezvejs';
 import { Notification } from 'jezvejs/Notification';
 
 import { API } from '../API/index.js';

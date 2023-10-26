@@ -1,4 +1,5 @@
-import { createElement, getClassNames, isFunction } from 'jezvejs';
+import { isFunction } from '@jezvejs/types';
+import { createElement, getClassNames } from '@jezvejs/dom';
 import { WeekDaySelect } from 'jezvejs/WeekDaySelect';
 
 import { __ } from '../../../../utils/utils.js';

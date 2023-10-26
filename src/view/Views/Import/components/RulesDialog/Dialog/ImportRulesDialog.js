@@ -1,10 +1,10 @@
+import { isFunction } from '@jezvejs/types';
+import { Component } from 'jezvejs';
 import {
     re,
     show,
-    isFunction,
-    Component,
     createElement,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';

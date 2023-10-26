@@ -1,4 +1,4 @@
-import { createElement } from 'jezvejs';
+import { createElement } from '@jezvejs/dom';
 import { App } from '../../../../../../../view/Application/App.js';
 import { ApiRequestForm } from '../Common/ApiRequestForm/ApiRequestForm.js';
 

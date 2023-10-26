@@ -1,9 +1,11 @@
-import { getClassName, isFunction, isNum } from 'jezvejs';
+import { isFunction, isNumber } from '@jezvejs/types';
+import { getClassName } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { InputGroup } from 'jezvejs/InputGroup';
-import './NumberInputGroup.scss';
+
 import { getFixedValue } from './helpers.js';
+import './NumberInputGroup.scss';
 
 /* CSS classes */
 const GROUP_CLASS = 'number-input-group';
@@ -174,8 +176,8 @@ export class NumberInputGroup extends InputGroup {
         this.renderInput(state, prevState);
 
         const fixedValue = getFixedValue(state.value);
-        const isMinLimit = isNum(state.minValue);
-        const isMaxLimit = isNum(state.maxValue);
+        const isMinLimit = isNumber(state.minValue);
+        const isMaxLimit = isNumber(state.maxValue);
 
         const enableDecrease = (
             !isMinLimit

@@ -3,7 +3,7 @@ import {
     createElement,
     show,
     insertAfter,
-} from 'jezvejs';
+} from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
