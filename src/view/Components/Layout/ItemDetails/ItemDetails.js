@@ -13,6 +13,7 @@ import './ItemDetails.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'list-item-details';
+const ROW_CLASS = 'list-item-details__row';
 const CREATE_DATE_FIELD_CLASS = 'create-date-field';
 const UPDATE_DATE_FIELD_CLASS = 'update-date-field';
 
@@ -70,13 +71,22 @@ export class ItemDetails extends Component {
             children: [
                 this.heading.elem,
                 ...asArray(content),
-                this.createDateField.elem,
-                this.updateDateField.elem,
+                this.createRow(
+                    this.createDateField.elem,
+                    this.updateDateField.elem,
+                ),
             ],
         });
 
         this.setClassNames();
         this.render(this.state);
+    }
+
+    createRow(...children) {
+        return createElement('div', {
+            props: { className: ROW_CLASS },
+            children,
+        });
     }
 
     onClose() {
