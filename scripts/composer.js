@@ -17,23 +17,24 @@ const install = option?.toLowerCase() === 'install';
 const update = option?.toLowerCase() === 'update';
 
 const projectDir = resolve(currentDir, '..').replace(/\\/g, '/');
-const destDir = resolve(currentDir, '../dist/app').replace(/\\/g, '/');
+const distDir = resolve(currentDir, '../dist/app').replace(/\\/g, '/');
+const composerDir = resolve(currentDir, '../src').replace(/\\/g, '/');
 
 // Create 'dist' directory if not exists
-if (!shell.test('-d', destDir)) {
-    shell.mkdir('-p', destDir);
+if (!shell.test('-d', composerDir)) {
+    shell.mkdir('-p', composerDir);
 }
 
 // Copy config files from sources to destination directory
 composerConfig.forEach((path) => {
     const source = resolve(projectDir, path);
-    const dest = resolve(destDir, path);
+    const dest = resolve(composerDir, path);
 
     shell.cp('-f', source, dest);
 });
 
 // Change directory and run composer commands
-shell.pushd('-q', destDir);
+shell.pushd('-q', composerDir);
 
 if (install) {
     shell.exec('composer install --no-dev');
@@ -48,7 +49,7 @@ shell.popd('-q');
 
 // Move files back to sources or remove it from destination directory
 composerConfig.forEach((path) => {
-    const source = resolve(destDir, path);
+    const source = resolve(composerDir, path);
     const dest = resolve(projectDir, path);
 
     if (update) {
@@ -57,3 +58,8 @@ composerConfig.forEach((path) => {
         shell.rm('-f', source);
     }
 });
+
+// Create symbolic link to vendor/ directory
+const source = resolve(composerDir, 'vendor');
+const target = resolve(distDir, 'vendor');
+shell.ln('-s', source, target);

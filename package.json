@@ -5,8 +5,8 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "lint-php": "npm-run-all lint-php-cs install-backend lint-php-phan",
-        "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php ./src/",
+        "lint-php": "npm-run-all lint-php-cs lint-php-phan",
+        "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php --ignore=*/vendor/* ./src/",
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",

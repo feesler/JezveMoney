@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import Client from 'ssh2-sftp-client';
 import ProgressBar from 'progress';
+import { readlink, stat } from 'fs/promises';
 
 /* eslint-disable no-console */
 
@@ -25,7 +26,8 @@ const APP_BACKUP_DIR = 'backup';
 const HTACCESS_FILE = '.htaccess';
 
 const client = new Client();
-const srcRoot = join(currentDir, '..', 'dist');
+const sources = join(currentDir, '..', 'src');
+const distRoot = join(currentDir, '..', 'dist');
 const src = join(currentDir, '..', 'dist', APP_DIR);
 const dest = process.env.DEPLOY_PATH;
 
@@ -49,8 +51,8 @@ const filterFiles = (source) => {
     return (isFullDeploy || !skipList.includes(firstPart));
 };
 
-const destPath = (filename) => (
-    `${dest}/${filename}`
+const destPath = (...parts) => (
+    `${dest}/${parts.join('/')}`
 );
 
 const removeByType = async (path, type) => {
@@ -70,7 +72,7 @@ const removeIfExists = async (path) => {
     return removeByType(path, type);
 };
 
-let res = 1;
+let processRes = 1;
 let progress = null;
 let backupPath = null;
 const appPath = destPath(APP_DIR);
@@ -88,25 +90,64 @@ const restoreBackup = async () => {
 };
 
 const onError = async (e) => {
+    console.log('Upload error: ', e.message);
     await restoreBackup();
 
     progress?.interrupt(`Upload error: ${e.message}`);
 };
 
+const getDirectoryFiles = async (directoryPath) => {
+    const res = {
+        files: [],
+        links: [],
+        linkTargets: [],
+    };
+    const files = await readdir(directoryPath, { withFileTypes: true, recursive: true });
+
+    files.forEach((file) => {
+        const fullName = join(file.path, file.name);
+        if (!filterFiles(fullName)) {
+            return;
+        }
+
+        if (file.isSymbolicLink()) {
+            res.links.push(file);
+        } else if (file.isFile()) {
+            res.files.push(file);
+        }
+    });
+
+    for (const item of res.links) {
+        const fullName = join(item.path, item.name);
+        const linkValue = await readlink(fullName);
+        const linkTarget = await stat(linkValue);
+
+        const extendedItem = {
+            path: item.path,
+            name: item.name,
+            fullName,
+            linkValue,
+            linkTarget,
+        };
+
+        if (linkTarget.isDirectory()) {
+            extendedItem.child = await getDirectoryFiles(linkValue);
+            res.files.push(...extendedItem.child.files);
+        }
+
+        res.linkTargets.push(extendedItem);
+    }
+
+    return res;
+};
+
 try {
     client.on('error', onError);
 
-    // Obtain total count of files
-    const files = await readdir(src, { withFileTypes: true, recursive: true });
-
-    const total = files.reduce((prev, file) => {
-        const fullName = join(file.path, file.name);
-        const pass = filterFiles(fullName) && file.isFile();
-        return (prev + (pass ? 1 : 0));
-    }, 1);
+    const srcDir = await getDirectoryFiles(src);
 
     progress = new ProgressBar('[:bar] :percent :file', {
-        total,
+        total: srcDir.files.length + 1,
         width: 20,
         complete: '█',
         incomplete: ' ',
@@ -131,6 +172,18 @@ try {
         filter: filterFiles,
     });
 
+    if (isFullDeploy) {
+        for (const item of srcDir.linkTargets) {
+            const srcPath = join(sources, item.name);
+            const childDeployPath = destPath(deployDir, item.name);
+
+            await client.mkdir(childDeployPath, true);
+            await client.chmod(childDeployPath, 0o0755);
+
+            await client.uploadDir(srcPath, childDeployPath);
+        }
+    }
+
     progress.tick({ file: 'Upload done' });
 
     if (isFullDeploy) {
@@ -146,7 +199,7 @@ try {
 
         // Upload root .htaccess file
         await client.put(
-            join(srcRoot, HTACCESS_FILE),
+            join(distRoot, HTACCESS_FILE),
             destPath(HTACCESS_FILE),
         );
 
@@ -181,10 +234,10 @@ try {
         }
     }
 
-    res = 0;
+    processRes = 0;
 } catch (e) {
     onError(e);
 } finally {
     client.end();
-    process.exit(res);
+    process.exit(processRes);
 }
