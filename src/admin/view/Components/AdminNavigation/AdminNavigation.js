@@ -31,12 +31,6 @@ const menuItems = [
  * Application navigation container component
  */
 export class AdminNavigation extends AppNavigation {
-    constructor(props = {}) {
-        super(props);
-
-        this.init();
-    }
-
     init() {
         this.backButton = Button.create({
             className: BACK_BTN_CLASS,
