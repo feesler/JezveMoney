@@ -2216,11 +2216,11 @@ class TransactionModel extends SortableModel
         }
 
         // Date range
-        if (isset($request["startDate"])) {
-            $res->startDate = $request["startDate"];
+        if (isset($request["startDate"]) && !is_null($request["startDate"])) {
+            $res->startDate = intval($request["startDate"]);
         }
-        if (isset($request["endDate"])) {
-            $res->endDate = $request["endDate"];
+        if (isset($request["endDate"]) && !is_null($request["endDate"])) {
+            $res->endDate = intval($request["endDate"]);
         }
 
         return $res;
