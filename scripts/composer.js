@@ -17,7 +17,7 @@ const install = option?.toLowerCase() === 'install';
 const update = option?.toLowerCase() === 'update';
 
 const projectDir = resolve(currentDir, '..').replace(/\\/g, '/');
-const destDir = resolve(currentDir, '../dist').replace(/\\/g, '/');
+const destDir = resolve(currentDir, '../dist/app').replace(/\\/g, '/');
 
 // Create 'dist' directory if not exists
 if (!shell.test('-d', destDir)) {

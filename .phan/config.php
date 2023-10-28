@@ -8,10 +8,10 @@
 return [
     'target_php_version' => '8.0',
     'directory_list' => [
-        'dist',
+        'dist/app',
     ],
     'exclude_file_regex' => '@^vendor/@',
     'exclude_analysis_directory_list' => [
-        'dist/vendor/'
+        'dist/app/vendor/'
     ],
 ];

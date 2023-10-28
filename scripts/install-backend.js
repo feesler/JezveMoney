@@ -4,8 +4,10 @@ import shell from 'shelljs';
 
 /* eslint-disable no-console */
 
-const filename = fileURLToPath(import.meta.url);
-const currentDir = dirname(filename);
+const currentDir = dirname(fileURLToPath(import.meta.url));
+
+const HTACCESS_FILE = '.htaccess';
+const ROOT_HTACCESS_FILE = 'root.htaccess';
 
 const serverFilter = [
     'admin/Controller/',
@@ -29,11 +31,12 @@ const silent = true;
 const createDirs = ['system/logs', 'system/uploads', 'admin/view/tests'];
 
 const srcDir = resolve(currentDir, '../src').replace(/\\/g, '/');
-const destDir = resolve(currentDir, '../dist').replace(/\\/g, '/');
+const destRootDir = resolve(currentDir, '../dist').replace(/\\/g, '/');
+const destAppDir = resolve(currentDir, '../dist/app').replace(/\\/g, '/');
 
 serverFilter.forEach((path) => {
     const source = resolve(srcDir, path);
-    const dest = resolve(destDir, path);
+    const dest = resolve(destAppDir, path);
 
     if (clean) {
         shell.rm('-rf', dest);
@@ -45,8 +48,15 @@ serverFilter.forEach((path) => {
     }
 });
 
+// Copy root .htaccess file
+shell.cp(
+    '-rf',
+    resolve(srcDir, ROOT_HTACCESS_FILE),
+    resolve(destRootDir, HTACCESS_FILE),
+);
+
 createDirs.forEach((path) => {
-    const dir = resolve(destDir, path);
+    const dir = resolve(destAppDir, path);
     shell.mkdir('-p', dir);
     if (!silent) {
         console.log('Created directory: ', path);

@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteBase /
+
+RewriteRule ^((?!app/).*)$ app/$1 [L,NC]
