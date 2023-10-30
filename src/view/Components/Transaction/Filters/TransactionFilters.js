@@ -33,6 +33,7 @@ const SEPARATOR_CLASS = 'filters-separator';
 const FILTERS_CLASS = 'filters-list';
 const FILTERS_ROW_CLASS = 'filters-row';
 const FILTER_HEADER_CLASS = 'filter-item__title';
+const FILTER_HEADER_CONTROLS_CLASS = 'filter-item__controls';
 
 const FILTER_ITEM_CLASS = 'filter-item';
 const TYPE_FILTER_CLASS = 'filter-item trans-type-filter';
@@ -194,13 +195,20 @@ export class TransactionFilters extends Component {
             onClick: (e) => this.showHalfYearRange(e),
         });
 
+        const dateRangeHeaderControls = createElement('div', {
+            props: { className: FILTER_HEADER_CONTROLS_CLASS },
+            children: [
+                this.weekRangeBtn.elem,
+                this.monthRangeBtn.elem,
+                this.halfYearRangeBtn.elem,
+            ],
+        });
+
         this.dateRangeHeader = createElement('header', {
             props: { className: FILTER_HEADER_CLASS },
             children: [
                 this.dateRangeFilterTitle,
-                this.weekRangeBtn.elem,
-                this.monthRangeBtn.elem,
-                this.halfYearRangeBtn.elem,
+                dateRangeHeaderControls,
             ],
         });
 
