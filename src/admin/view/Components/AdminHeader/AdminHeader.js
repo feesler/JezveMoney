@@ -3,7 +3,6 @@ import { Button } from 'jezvejs/Button';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
 
 import { App } from '../../../../view/Application/App.js';
-import { getApplicationURL } from '../../../../view/utils/utils.js';
 
 import { AdminNavigation } from '../AdminNavigation/AdminNavigation.js';
 import { AdminUserNavigation } from '../AdminUserNavigation/AdminUserNavigation.js';
@@ -38,7 +37,7 @@ export class AdminHeader extends AppHeader {
             className: 'header-logo',
             title: 'Admin',
             tabIndex: 1,
-            url: getApplicationURL('admin/'),
+            url: App.getURL('admin/'),
         });
 
         this.menuButton = HeaderMenuButton.create({

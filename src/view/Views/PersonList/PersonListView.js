@@ -12,7 +12,6 @@ import { SortableListContainer } from 'jezvejs/SortableListContainer';
 // Application
 import {
     __,
-    getApplicationURL,
     getHideableContextIds,
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
@@ -387,7 +386,7 @@ class PersonListView extends AppView {
     /** Returns URL for specified state */
     getURL(state) {
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return getApplicationURL(`persons/${itemPart}`);
+        return App.getURL(`persons/${itemPart}`);
     }
 
     renderHistory(state, prevState) {

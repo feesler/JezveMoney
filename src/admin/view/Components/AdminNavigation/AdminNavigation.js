@@ -2,7 +2,7 @@ import { createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 
-import { getApplicationURL } from '../../../../view/utils/utils.js';
+import { App } from '../../../../view/Application/App.js';
 
 import { Logo } from '../../../../view/Components/Common/Logo/Logo.js';
 import { NavigationMenu } from '../../../../view/Components/Layout/NavigationMenu/NavigationMenu.js';
@@ -40,7 +40,7 @@ export class AdminNavigation extends AppNavigation {
 
         this.logo = Logo.create({
             className: LOGO_CLASS,
-            url: getApplicationURL('admin/'),
+            url: App.getURL('admin/'),
             title: 'Admin',
         });
 

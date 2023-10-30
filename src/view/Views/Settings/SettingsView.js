@@ -7,7 +7,7 @@ import { createStore } from 'jezvejs/Store';
 import { TabList } from 'jezvejs/TabList';
 
 // Application
-import { __, getApplicationURL } from '../../utils/utils.js';
+import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
@@ -90,13 +90,13 @@ class SettingsView extends AppView {
                 value: 'index',
                 title: __('settings.main'),
                 content: this.mainSection.elem,
-                url: getApplicationURL('settings/'),
+                url: App.getURL('settings/'),
             }, {
                 id: 'currencies',
                 value: 'currencies',
                 title: __('settings.currencies.title'),
                 content: this.userCurrenciesSection.elem,
-                url: getApplicationURL('settings/currencies/'),
+                url: App.getURL('settings/currencies/'),
             }, {
                 id: 'regional',
                 value: 'regional',
@@ -105,7 +105,7 @@ class SettingsView extends AppView {
                     this.dateFormatSection.elem,
                     this.numberFormatSection.elem,
                 ],
-                url: getApplicationURL('settings/regional/'),
+                url: App.getURL('settings/regional/'),
             }],
         });
         this.tabsContainer.append(this.tabs.elem);

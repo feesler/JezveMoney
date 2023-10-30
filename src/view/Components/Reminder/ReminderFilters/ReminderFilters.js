@@ -3,10 +3,10 @@ import { createElement } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 
+import { App } from '../../../Application/App.js';
 import {
     __,
     formatDateRange,
-    getApplicationURL,
 } from '../../../utils/utils.js';
 
 import {
@@ -263,7 +263,7 @@ export class ReminderFilters extends Component {
             clearAllURLParams.state = Reminder.getStateName(filter.reminderState);
         }
 
-        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
+        const clearAllURL = App.getURL('reminders/', clearAllURLParams);
         this.controls.setState((controlsState) => ({
             ...controlsState,
             cancelBtn: {

@@ -1,6 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { finishSelected, showDetails } from '../../actions.js';
@@ -49,7 +49,7 @@ export class ScheduleItemContextMenu extends PopupMenu {
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            url: getApplicationURL(`schedule/${scheduleItem.id}`),
+            url: App.getURL(`schedule/${scheduleItem.id}`),
             onClick: (_, e) => {
                 e?.preventDefault();
                 dispatch(showDetails());
@@ -61,13 +61,13 @@ export class ScheduleItemContextMenu extends PopupMenu {
             type: 'link',
             icon: 'update',
             title: __('actions.update'),
-            url: getApplicationURL(`schedule/update/${scheduleItem.id}`),
+            url: App.getURL(`schedule/update/${scheduleItem.id}`),
         }, {
             id: 'ctxDuplicateBtn',
             type: 'link',
             icon: 'duplicate',
             title: __('actions.duplicate'),
-            url: getApplicationURL(`schedule/create?from=${scheduleItem.id}`),
+            url: App.getURL(`schedule/create?from=${scheduleItem.id}`),
         }, {
             id: 'ctxFinishBtn',
             title: __('schedule.finish'),

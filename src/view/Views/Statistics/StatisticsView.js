@@ -21,7 +21,6 @@ import {
     dateStringToTime,
     formatDateRange,
     formatNumberShort,
-    getApplicationURL,
 } from '../../utils/utils.js';
 import {
     formatDateLabel,
@@ -258,7 +257,7 @@ class StatisticsView extends AppView {
 
     /** Returns URL for filter of specified state */
     getFilterURL(state) {
-        return getApplicationURL('statistics/', { ...state.filter });
+        return App.getURL('statistics/', { ...state.filter });
     }
 
     onApplyFilters() {

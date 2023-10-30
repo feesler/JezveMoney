@@ -1,7 +1,10 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
+
 import { REMINDER_UPCOMING, REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../Models/Reminder.js';
+
 import { cancelReminder, confirmReminder, showDetails } from '../../../../Components/Reminder/ReminderListGroup/actions.js';
 
 /** Reminders list context menu component */
@@ -55,14 +58,14 @@ export class ReminderListContextMenu extends PopupMenu {
             updateParams.reminder_id = reminder.id;
         }
 
-        const updateURL = getApplicationURL('transactions/create/', updateParams);
+        const updateURL = App.getURL('transactions/create/', updateParams);
 
         const { dispatch } = this.state;
         this.setItems([{
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            url: getApplicationURL(`reminders/${reminder.id}`),
+            url: App.getURL(`reminders/${reminder.id}`),
             hidden: (reminder.state === REMINDER_UPCOMING),
             onClick: (_, e) => {
                 e?.preventDefault();

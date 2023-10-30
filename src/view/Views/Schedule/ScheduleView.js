@@ -18,7 +18,6 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
     getSelectedItems,
-    getApplicationURL,
     getContextIds,
     getAbsoluteIndex,
 } from '../../utils/utils.js';
@@ -435,7 +434,7 @@ class ScheduleView extends AppView {
             params.mode = 'details';
         }
 
-        return getApplicationURL(`schedule/${itemPart}`, params);
+        return App.getURL(`schedule/${itemPart}`, params);
     }
 
     renderHistory(state, prevState) {

@@ -6,7 +6,6 @@ import { Component, debounce } from 'jezvejs';
 import {
     __,
     formatDateRange,
-    getApplicationURL,
     getHalfYearRange,
     getMonthRange,
     getWeekRange,
@@ -236,7 +235,7 @@ export class TransactionFilters extends Component {
         });
 
         // Controls
-        const clearAllURL = getApplicationURL('transactions/');
+        const clearAllURL = App.getURL('transactions/');
         this.controls = FormControls.create({
             className: CONTROLS_CLASS,
             submitBtn: {

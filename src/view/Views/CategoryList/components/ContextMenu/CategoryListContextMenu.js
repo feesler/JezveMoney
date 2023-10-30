@@ -1,7 +1,8 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
+
 import { actions } from '../../reducer.js';
 import { showDetails } from '../../actions.js';
 
@@ -49,7 +50,7 @@ export class CategoryListContextMenu extends PopupMenu {
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            url: getApplicationURL(`categories/${category.id}`),
+            url: App.getURL(`categories/${category.id}`),
             onClick: (_, e) => {
                 e?.preventDefault();
                 dispatch(showDetails());
@@ -61,13 +62,13 @@ export class CategoryListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'update',
             title: __('actions.update'),
-            url: getApplicationURL(`categories/update/${category.id}`),
+            url: App.getURL(`categories/update/${category.id}`),
         }, {
             id: 'ctxAddSubcategoryBtn',
             type: 'link',
             title: __('categories.addSubcategory'),
             hidden: category.parent_id !== 0,
-            url: getApplicationURL(`categories/create/?parent_id=${category.id}`),
+            url: App.getURL(`categories/create/?parent_id=${category.id}`),
         }, {
             id: 'ctxDeleteBtn',
             icon: 'del',

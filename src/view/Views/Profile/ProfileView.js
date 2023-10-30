@@ -4,7 +4,7 @@ import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
 
 // Application
-import { __, getApplicationURL } from '../../utils/utils.js';
+import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
@@ -123,7 +123,7 @@ class ProfileView extends AppView {
 
         return createElement('a', {
             props: {
-                href: getApplicationURL(`profile/${action}/`),
+                href: App.getURL(`profile/${action}/`),
                 textContent: title,
                 dataset: { action },
                 ...rest,
@@ -161,7 +161,7 @@ class ProfileView extends AppView {
         this.resetBtn = createElement('a', {
             props: {
                 id: 'resetBtn',
-                href: getApplicationURL('profile/reset/'),
+                href: App.getURL('profile/reset/'),
                 textContent: __('profile.resetData'),
                 dataset: { action: 'reset' },
             },

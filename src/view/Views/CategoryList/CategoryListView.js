@@ -17,7 +17,6 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
     getSelectedIds,
-    getApplicationURL,
     getContextIds,
 } from '../../utils/utils.js';
 
@@ -443,7 +442,7 @@ class CategoryListView extends AppView {
     /** Returns URL for specified state */
     getURL(state) {
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        const url = getApplicationURL(`categories/${itemPart}`);
+        const url = App.getURL(`categories/${itemPart}`);
 
         const typeStr = (state.selectedType === 0)
             ? 'any'

@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { createElement } from '@jezvejs/dom';
 import { createStore } from 'jezvejs/Store';
 
-import { __, getApplicationURL } from '../../utils/utils.js';
+import { __ } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
@@ -91,7 +91,7 @@ class RegisterView extends AppView {
             },
             cancelBtn: {
                 title: __('actions.cancel'),
-                url: getApplicationURL('login/'),
+                url: App.getURL('login/'),
                 className: 'alter-link',
             },
         });

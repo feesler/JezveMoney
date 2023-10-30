@@ -4,7 +4,7 @@ import { show, createElement } from '@jezvejs/dom';
 import { Popup } from 'jezvejs/Popup';
 
 import { App } from '../../../../Application/App.js';
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 
 import { LoadingIndicator } from '../../../../Components/Common/LoadingIndicator/LoadingIndicator.js';
 import { FormControls } from '../../../../Components/Form/FormControls/FormControls.js';
@@ -36,7 +36,7 @@ export class ProfileDialog extends Component {
         this.form = createElement('form', {
             props: {
                 method: 'post',
-                action: getApplicationURL(action),
+                action: App.getURL(action),
             },
             events: { submit: (e) => this.onSubmit(e) },
         });

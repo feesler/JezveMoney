@@ -15,7 +15,6 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
-    getApplicationURL,
     getHideableContextIds,
 } from '../../utils/utils.js';
 
@@ -380,7 +379,7 @@ class AccountListView extends AppView {
     /** Returns URL for specified state */
     getURL(state) {
         const itemPart = (state.detailsId) ? state.detailsId : '';
-        return getApplicationURL(`accounts/${itemPart}`);
+        return App.getURL(`accounts/${itemPart}`);
     }
 
     renderHistory(state, prevState) {

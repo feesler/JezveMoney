@@ -1,6 +1,6 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { actions } from '../../reducer.js';
@@ -49,7 +49,7 @@ export class AccountListContextMenu extends PopupMenu {
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            url: getApplicationURL(`accounts/${account.id}`),
+            url: App.getURL(`accounts/${account.id}`),
             onClick: (_, e) => {
                 e?.preventDefault();
                 dispatch(showDetails());
@@ -61,7 +61,7 @@ export class AccountListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'update',
             title: __('actions.update'),
-            url: getApplicationURL(`accounts/update/${account.id}`),
+            url: App.getURL(`accounts/update/${account.id}`),
         }, {
             id: 'ctxExportBtn',
             icon: 'export',

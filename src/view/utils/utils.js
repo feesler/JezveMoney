@@ -23,9 +23,9 @@ export const DEFAULT_PAGE_LIMIT = 10;
 
 export const COLORS_COUNT = 23;
 
-/** Returns URL instance for specified path and search params */
-export const getApplicationURL = (path = '', params = {}) => {
-    const res = new URL(`${App.baseURL}${path}`);
+/** Returns URL instance for specified address and search params */
+export const createURL = (address, params = {}) => {
+    const res = new URL(address);
 
     Object.entries(params ?? {}).forEach(([prop, value]) => {
         if (Array.isArray(value)) {
@@ -41,7 +41,7 @@ export const getApplicationURL = (path = '', params = {}) => {
 
 /** Returns export transactions URL */
 export const getExportURL = (options) => (
-    getApplicationURL('transactions/export/', options)
+    App.getURL('transactions/export/', options)
 );
 
 /** Returns array of { name, value } cookie objects */

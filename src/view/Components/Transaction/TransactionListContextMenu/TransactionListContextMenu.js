@@ -1,6 +1,7 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
-import { __, getApplicationURL } from '../../../utils/utils.js';
+import { __ } from '../../../utils/utils.js';
+import { App } from '../../../Application/App.js';
 import { showDetails } from '../../../Views/TransactionList/actions.js';
 
 /** Transactions list context menu component */
@@ -38,7 +39,7 @@ export class TransactionListContextMenu extends PopupMenu {
             id: 'ctxDetailsBtn',
             type: 'link',
             title: __('actions.openItem'),
-            url: getApplicationURL(`transactions/${itemId}`),
+            url: App.getURL(`transactions/${itemId}`),
             hidden: !context.showDetailsItem,
             onClick: (_, e) => {
                 e?.preventDefault();
@@ -53,13 +54,13 @@ export class TransactionListContextMenu extends PopupMenu {
             type: 'link',
             icon: 'update',
             title: __('actions.update'),
-            url: getApplicationURL(`transactions/update/${itemId}`),
+            url: App.getURL(`transactions/update/${itemId}`),
         }, {
             id: 'ctxDuplicateBtn',
             type: 'link',
             icon: 'duplicate',
             title: __('actions.duplicate'),
-            url: getApplicationURL(`transactions/create?from=${itemId}`),
+            url: App.getURL(`transactions/create?from=${itemId}`),
         }, {
             id: 'ctxSetCategoryBtn',
             title: __('transactions.setCategoryMenu'),

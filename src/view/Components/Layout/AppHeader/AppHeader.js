@@ -8,7 +8,6 @@ import { Header } from 'jezvejs/Header';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
 
 import { App } from '../../../Application/App.js';
-import { getApplicationURL } from '../../../utils/utils.js';
 
 import { Badge } from '../../Common/Badge/Badge.js';
 import { Logo } from '../../Common/Logo/Logo.js';
@@ -193,7 +192,7 @@ export class AppHeader extends Header {
             this.remindersBtn = Button.create({
                 id: 'remindersBtn',
                 type: 'link',
-                url: getApplicationURL('reminders'),
+                url: App.getURL('reminders'),
                 icon: 'notification',
                 title: this.remindersBadge.elem,
                 className: 'header-btn',
