@@ -5,7 +5,6 @@ import { LinkMenu } from 'jezvejs/LinkMenu';
 
 import {
     __,
-    dateStringToTime,
     formatDateRange,
     getApplicationURL,
 } from '../../../utils/utils.js';
@@ -18,7 +17,7 @@ import {
     Reminder,
 } from '../../../Models/Reminder.js';
 
-import { DateRangeInput } from '../../Form/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { DateRangeField } from '../../Form/Fields/DateRangeField/DateRangeField.js';
 import { FormControls } from '../../Form/FormControls/FormControls.js';
 
 import './ReminderFilters.scss';
@@ -32,7 +31,7 @@ const FILTERS_CLASS = 'filters-list';
 const FILTERS_ROW_CLASS = 'filters-row';
 const FILTER_TITLE_CLASS = 'filter-item__title';
 const STATE_FILTER_CLASS = 'filter-item trans-type-filter';
-const DATE_FILTER_CLASS = 'filter-item date-range-filter validation-block';
+const DATE_FILTER_CLASS = 'filter-item validation-block';
 const CONTROLS_CLASS = 'filters-controls';
 const CLEAR_ALL_BUTTON_CLASS = 'clear-all-btn';
 
@@ -130,26 +129,15 @@ export class ReminderFilters extends Component {
         });
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.create({
-            id: 'dateFrm',
-            startPlaceholder: __('dateRange.from'),
-            endPlaceholder: __('dateRange.to'),
-            onChange: (range) => this.onChangeDateRange(range),
-        });
-        this.dateFilter = createElement('section', {
-            props: {
-                id: this.props.dateRangeFilterId,
-                className: DATE_FILTER_CLASS,
+        this.dateRangeFilter = DateRangeField.create({
+            id: this.props.dateRangeFilterId,
+            title: __('filters.dateRange'),
+            input: {
+                startPlaceholder: __('dateRange.from'),
+                endPlaceholder: __('dateRange.to'),
             },
-            children: [
-                createElement('header', {
-                    props: {
-                        className: FILTER_TITLE_CLASS,
-                        textContent: __('filters.dateRange'),
-                    },
-                }),
-                this.dateRangeFilter.elem,
-            ],
+            className: DATE_FILTER_CLASS,
+            onChange: (range) => this.onChangeDateRange(range),
         });
 
         this.filtersElem = createElement('div', {
@@ -159,7 +147,7 @@ export class ReminderFilters extends Component {
                 children: [
                     this.stateFilter,
                     filtersSeparator(),
-                    this.dateFilter,
+                    this.dateRangeFilter.elem,
                 ],
             }),
         });
@@ -227,6 +215,64 @@ export class ReminderFilters extends Component {
             : '';
     }
 
+    renderStateFilter(state, prevState) {
+        if (
+            state.filter === prevState?.filter
+            && state.form === prevState?.form
+            && state.form.reminderState === prevState?.form?.reminderState
+        ) {
+            return;
+        }
+
+        const filterUrl = this.getURL(state, false);
+
+        this.stateMenu.setURL(filterUrl);
+        this.stateMenu.setSelection(state.filter.reminderState);
+    }
+
+    renderDateRangeFilter(state, prevState) {
+        if (
+            state.filter === prevState?.filter
+            && state.form === prevState?.form
+            && state.form.startDate === prevState?.form?.startDate
+            && state.form.endDate === prevState?.form?.endDate
+        ) {
+            return;
+        }
+
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            startDate: state.form.startDate,
+            endDate: state.form.endDate,
+        }));
+    }
+
+    renderControls(state, prevState) {
+        if (
+            state.filter === prevState?.filter
+            && state.form === prevState?.form
+            && state.form.reminderState === prevState?.form?.reminderState
+        ) {
+            return;
+        }
+
+        const { filter } = state;
+        const clearAllURLParams = {};
+
+        if (filter.state !== REMINDER_SCHEDULED) {
+            clearAllURLParams.state = Reminder.getStateName(filter.reminderState);
+        }
+
+        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
+        this.controls.setState((controlsState) => ({
+            ...controlsState,
+            cancelBtn: {
+                ...controlsState.cancelBtn,
+                url: clearAllURL.toString(),
+            },
+        }));
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -242,42 +288,8 @@ export class ReminderFilters extends Component {
             return;
         }
 
-        const filterUrl = this.getURL(state, false);
-
-        // Reminder state filter
-        this.stateMenu.setURL(filterUrl);
-        this.stateMenu.setSelection(state.filter.reminderState);
-
-        // Date range filter
-        this.dateRangeFilter.setState((rangeState) => ({
-            ...rangeState,
-            form: {
-                ...rangeState.form,
-                startDate: state.form.startDate,
-                endDate: state.form.endDate,
-            },
-            filter: {
-                ...rangeState.filter,
-                startDate: dateStringToTime(state.form.startDate),
-                endDate: dateStringToTime(state.form.endDate),
-            },
-        }));
-
-        // Controls
-        const { filter } = state;
-        const clearAllURLParams = {};
-
-        if (filter.state !== REMINDER_SCHEDULED) {
-            clearAllURLParams.state = Reminder.getStateName(filter.state);
-        }
-
-        const clearAllURL = getApplicationURL('reminders/', clearAllURLParams);
-        this.controls.setState((controlsState) => ({
-            ...controlsState,
-            cancelBtn: {
-                ...controlsState.cancelBtn,
-                url: clearAllURL.toString(),
-            },
-        }));
+        this.renderStateFilter(state, prevState);
+        this.renderDateRangeFilter(state, prevState);
+        this.renderControls(state, prevState);
     }
 }

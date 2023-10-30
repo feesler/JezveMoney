@@ -55,7 +55,7 @@ import { InputField } from '../../Form/Fields/InputField/InputField.js';
 import { SwitchField } from '../../Form/Fields/SwitchField/SwitchField.js';
 import { TransactionTypeMenu } from '../../Form/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
 import { WeekDaySelectField } from '../../Form/Fields/WeekDaySelectField/WeekDaySelectField.js';
-import { DateRangeInput } from '../../Form/Inputs/Date/DateRangeInput/DateRangeInput.js';
+import { DateRangeField } from '../../Form/Fields/DateRangeField/DateRangeField.js';
 import { NumberInputGroup } from '../../Form/Inputs/NumberInputGroup/NumberInputGroup.js';
 import { FormControls } from '../../Form/FormControls/FormControls.js';
 
@@ -579,20 +579,16 @@ export class TransactionForm extends Component {
     /** Creates schedule fields */
     createScheduleFields() {
         // Date range field
-        this.dateRangeInput = DateRangeInput.create({
-            id: 'dateRangeInput',
-            startPlaceholder: __('dateRange.from'),
-            endPlaceholder: __('dateRange.to'),
-            startClearable: false,
-            onChange: (range) => this.onScheduleRangeChange(range),
-        });
-
-        this.dateRangeField = Field.create({
+        this.dateRangeField = DateRangeField.create({
             id: 'dateRangeField',
-            htmlFor: 'dateRangeInput',
             title: __('filters.dateRange'),
+            input: {
+                startPlaceholder: __('dateRange.from'),
+                endPlaceholder: __('dateRange.to'),
+                startClearable: false,
+            },
             className: 'form-row',
-            content: this.dateRangeInput.elem,
+            onChange: (range) => this.onScheduleRangeChange(range),
         });
 
         // Interval step field
@@ -1754,46 +1750,52 @@ export class TransactionForm extends Component {
         this.destAmountField.enableSelect(false);
     }
 
-    renderScheduleFields(state, prevState) {
+    renderDateRangeFilter(state, prevState) {
+        const { transaction, form, validation } = state;
+
+        if (
+            state.type === prevState?.type
+            && state.filter === prevState?.filter
+            && form === prevState?.form
+            && form.startDate === prevState?.form?.startDate
+            && form.endDate === prevState?.form?.endDate
+            && validation.startDate === prevState?.validation?.startDate
+            && validation.endDate === prevState?.validation?.endDate
+            && transaction.interval_type === prevState?.transaction?.interval_type
+            && state.submitStarted === prevState?.submitStarted
+        ) {
+            return;
+        }
+
         const isScheduleItem = (state.type === 'scheduleItem');
+        const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = trIntervalType !== INTERVAL_NONE;
+
+        this.dateRangeField.setState((rangeState) => ({
+            ...rangeState,
+            startDate: form.startDate,
+            endDate: form.endDate,
+            input: {
+                validation: {
+                    startDate: validation.startDate,
+                    endDate: validation.endDate,
+                    valid: (validation.startDate && validation.endDate),
+                },
+                endVisible: isRepeat,
+            },
+            disabled: state.submitStarted,
+        }));
+
+        this.dateRangeField.show(isScheduleItem || isRepeat);
+    }
+
+    renderScheduleFields(state, prevState) {
         const { transaction, form, validation } = state;
         const { intervalType, intervalOffset } = form;
         const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = trIntervalType !== INTERVAL_NONE;
 
-        // Date range field
-        if (
-            (form.startDate !== prevState?.form?.startDate)
-            || (form.endDate !== prevState?.form?.endDate)
-            || (validation.startDate !== prevState?.validation?.startDate)
-            || (validation.endDate !== prevState?.validation?.endDate)
-            || (transaction.interval_type !== prevState?.transaction?.interval_type)
-            || (state.submitStarted !== prevState?.submitStarted)
-        ) {
-            this.dateRangeInput.setState((rangeState) => ({
-                ...rangeState,
-                form: {
-                    ...rangeState.form,
-                    startDate: form.startDate,
-                    endDate: form.endDate,
-                },
-                filter: {
-                    ...rangeState.filter,
-                    startDate: transaction.start_date,
-                    endDate: transaction.end_date,
-                },
-                validation: {
-                    ...state.validation,
-                    startDate: validation.startDate,
-                    endDate: validation.endDate,
-                    valid: (validation.startDate && validation.endDate),
-                },
-                disabled: state.submitStarted,
-                endVisible: isRepeat,
-            }));
-
-            this.dateRangeField.show(isScheduleItem || isRepeat);
-        }
+        this.renderDateRangeFilter(state, prevState);
 
         // Interval type and step fields group
         show(this.intervalFieldsGroup, isRepeat);

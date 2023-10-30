@@ -40,6 +40,11 @@
   cursor: pointer;
 }
 
+/* Date range field */
+.date-range-field.form-row {
+  max-width: var(--form-field-width);
+}
+
 /* Interval type field */
 .interval-fields {
   .form-fields-row {

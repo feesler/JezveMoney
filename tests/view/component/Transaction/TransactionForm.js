@@ -1339,7 +1339,7 @@ export class TransactionForm extends TestComponent {
             res.datePicker = await DatePickerField.create(this, await query('#dateField'));
         }
 
-        res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
+        res.dateRangeInput = await DatePickerFilter.create(this, await query('.date-range-input'));
 
         const repeatSwitchEl = await query(this.elem, '.repeat-switch-field');
         res.repeatSwitch = await Switch.create(this, repeatSwitchEl);

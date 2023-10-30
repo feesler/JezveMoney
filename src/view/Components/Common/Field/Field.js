@@ -14,6 +14,7 @@ const CONTENT_CLASS = 'field__content';
 const defaultProps = {
     title: null,
     content: null,
+    tagName: 'div',
 };
 
 /**
@@ -41,7 +42,13 @@ export class Field extends Component {
     init() {
         this.titleElem = createElement('label', { props: { className: TITLE_CLASS } });
         this.contentContainer = createElement('div', { props: { className: CONTENT_CLASS } });
-        this.elem = createElement('div', {
+
+        const { tagName } = this.props;
+        if (typeof tagName !== 'string' || tagName.length === 0) {
+            throw new Error('Invalid tagName property');
+        }
+
+        this.elem = createElement(tagName, {
             props: { className: CONTAINER_CLASS },
             children: [this.titleElem, this.contentContainer],
         });
