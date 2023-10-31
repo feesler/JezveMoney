@@ -15,11 +15,17 @@ export class SetCategoryDialog extends TestComponent {
             categorySelect: await DropDown.create(this, await query(this.elem, '.dd__container')),
         };
 
+        res.categorySelectOpen = !!res.categorySelect.listContainer?.visible;
+
         return res;
     }
 
     get categorySelect() {
         return this.content.categorySelect;
+    }
+
+    get categorySelectOpen() {
+        return this.content.categorySelectOpen;
     }
 
     get value() {

@@ -54,25 +54,16 @@ export class ImportTransactionForm extends TestComponent {
         const isTransfer = (model.type === 'transfer_out' || model.type === 'transfer_in');
         const isDebt = (model.type === 'debt_out' || model.type === 'debt_in');
         const isLimit = (model.type === 'limit');
-        const isCreditCard = (model.mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD);
-
-        const visibleTypes = ImportTransaction.availTypes.filter((item) => (
-            item.id !== 'limit' || isCreditCard
-        )).map((item) => ({ id: item.id.toString() }));
 
         const showSrcAmount = (!isExpense && !isLimit) || model.isDifferent;
         const showDestAmount = isExpense || isLimit || model.isDifferent;
-
-        const realType = ImportTransaction.typeFromString(model.type);
-        const visibleCategories = App.state
-            .getCategoriesForType(realType)
-            .map((item) => ({ id: item.id.toString() }));
 
         const res = {
             typeField: {
                 disabled: false,
                 visible: true,
-                dropDown: { items: visibleTypes },
+                dropDown: {},
+                dropDownOpen: model.typeSelectOpen,
             },
             srcAmountField: {
                 disabled: !showSrcAmount,
@@ -112,7 +103,8 @@ export class ImportTransactionForm extends TestComponent {
                 value: model.categoryId.toString(),
                 disabled: false,
                 visible: true,
-                dropDown: { items: visibleCategories },
+                dropDown: {},
+                dropDownOpen: model.categorySelectOpen,
             },
             commentField: {
                 value: model.comment.toString(),
@@ -122,6 +114,24 @@ export class ImportTransactionForm extends TestComponent {
             reminderField: null,
             reminderDialog: {},
         };
+
+        if (model.typeSelectOpen) {
+            const isCreditCard = (model.mainAccount.type === ACCOUNT_TYPE_CREDIT_CARD);
+            const visibleTypes = ImportTransaction.availTypes.filter((item) => (
+                item.id !== 'limit' || isCreditCard
+            )).map((item) => ({ id: item.id.toString() }));
+
+            res.categoryField.dropDown.items = visibleTypes;
+        }
+
+        if (model.categorySelectOpen) {
+            const realType = ImportTransaction.typeFromString(model.type);
+            const visibleCategories = App.state
+                .getCategoriesForType(realType)
+                .map((item) => ({ id: item.id.toString() }));
+
+            res.categoryField.dropDown.items = visibleCategories;
+        }
 
         if (!res.typeField.disabled) {
             res.typeField.value = model.type.toString();
@@ -273,6 +283,8 @@ export class ImportTransactionForm extends TestComponent {
             res.dropDown = await DropDown.create(this, await query(elem, res.dropDownSelector));
             assert(res.dropDown, 'Invalid structure of field');
 
+            res.dropDownOpen = !!res.dropDown.listContainer?.visible;
+
             // If field is select only, then save values from DropDown
             if (!res.inputSelector) {
                 res.disabled = res.dropDown.disabled;
@@ -367,6 +379,8 @@ export class ImportTransactionForm extends TestComponent {
         assert(res.mainAccount, 'Main account not found');
 
         res.type = cont.typeField.value;
+        res.typeSelectOpen = !!cont.typeField.dropDownOpen;
+
         res.srcAmount = cont.srcAmountField.value;
         res.destAmount = cont.destAmountField.value;
 
@@ -413,7 +427,10 @@ export class ImportTransactionForm extends TestComponent {
         res.destCurrency = App.currency.getItem(res.destCurrId);
 
         res.date = cont.dateField.value;
+
         res.categoryId = parseInt(cont.categoryField.value, 10);
+        res.categorySelectOpen = !!cont.categoryField.dropDownOpen;
+
         res.comment = cont.commentField.value;
 
         // Reminder

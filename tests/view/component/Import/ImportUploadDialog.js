@@ -665,7 +665,7 @@ export class ImportUploadDialog extends TestComponent {
     async deleteTemplate() {
         this.checkRawDataState();
 
-        if (this.content.templateDropDown.items.length === 1) {
+        if (App.state.templates.length === 0) {
             this.model.state = CREATE_TPL_STATE;
             this.model.selectedColumn = 'accountAmount';
             this.model.template = new ImportTemplate({
@@ -676,12 +676,7 @@ export class ImportUploadDialog extends TestComponent {
             });
         } else {
             this.model.state = CONVERT_STATE;
-            const currentInd = this.content.templateDropDown.items.findIndex(
-                (item) => item.id === this.content.templateDropDown.value,
-            );
-            const newInd = (currentInd > 0) ? 0 : 1;
-            const newTplId = this.content.templateDropDown.items[newInd].id;
-            const template = App.state.templates.getItem(newTplId);
+            const template = App.state.templates.getItemByIndex(0);
             this.model.template = template;
             if (template?.account_id) {
                 this.model.initialAccount = App.state.accounts.getItem(template.account_id);
