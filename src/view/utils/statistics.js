@@ -84,7 +84,7 @@ export const getDataCategoryName = (value, state) => {
 
     const isStacked = isStackedData(state.filter);
     if (!isStacked) {
-        const selectedTypes = asArray(state.form.type);
+        const selectedTypes = asArray(state.filter.type);
         return Transaction.getTypeTitle(selectedTypes[categoryId]);
     }
 

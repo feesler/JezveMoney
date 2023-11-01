@@ -17,6 +17,7 @@ import {
     formatPersonDebts,
     getCurrencyPrecision,
     __,
+    createColorStyle,
 } from '../../utils/utils.js';
 import {
     formatDateLabel,
@@ -104,6 +105,8 @@ class MainView extends AppView {
      * View initialization
      */
     onStart() {
+        createColorStyle();
+
         const state = this.store.getState();
 
         this.loadElementsByIds([
@@ -571,6 +574,7 @@ class MainView extends AppView {
     renderPopupContent(target) {
         const { statistics } = this.store.getState();
         return ChartPopup.fromTarget(target, {
+            filter: statistics.filter,
             formatValue: (value) => formatValue(value, statistics),
             renderDateLabel: (value) => formatDateLabel(value, statistics),
         });
@@ -599,6 +603,8 @@ class MainView extends AppView {
         data.stacked = isStackedData(filter);
 
         this.histogram?.setData(data);
+
+        this.histogram.elem.classList.toggle('categories-report', filter.report === 'category');
     }
 
     /** Renders 'Set transaction category' dialog */

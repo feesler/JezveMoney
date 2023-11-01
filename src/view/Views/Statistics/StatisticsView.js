@@ -5,12 +5,6 @@ import {
     getClassName,
 } from '@jezvejs/dom';
 import { asArray } from '@jezvejs/types';
-import {
-    rgbToHSL,
-    hslToRGB,
-    rgbToColor,
-    MAX_LIGHTNESS,
-} from '@jezvejs/color';
 import { Histogram } from 'jezvejs/Histogram';
 import { Button } from 'jezvejs/Button';
 import { createStore } from 'jezvejs/Store';
@@ -18,6 +12,7 @@ import { createStore } from 'jezvejs/Store';
 // Application
 import {
     __,
+    createColorStyle,
     dateStringToTime,
     formatDateRange,
     formatNumberShort,
@@ -109,7 +104,7 @@ class StatisticsView extends AppView {
      * View initialization
      */
     onStart() {
-        this.createColorStyle();
+        createColorStyle();
 
         this.loadElementsByIds([
             'heading',
@@ -218,31 +213,6 @@ class StatisticsView extends AppView {
         }
 
         this.requestData(this.getRequestData());
-    }
-
-    createColorStyle() {
-        const ACTIVE_LIGHTNESS_STEP = 15;
-        const activeColors = {};
-
-        const rules = App.model.categories.map((item) => {
-            if (!activeColors[item.color]) {
-                const hsl = rgbToHSL(item.color);
-                const lighten = (hsl.lightness + ACTIVE_LIGHTNESS_STEP <= MAX_LIGHTNESS);
-                hsl.lightness += ((lighten) ? 1 : -1) * ACTIVE_LIGHTNESS_STEP;
-                activeColors[item.color] = rgbToColor(hslToRGB(hsl));
-            }
-
-            return `.categories-report .chart_stacked .histogram_category-${item.id},
-            .categories-report .pie__sector-${item.id},
-            .categories-report .legend-item-${item.id},
-            .categories-report .chart-popup-list__item-cat-${item.id} {
-                --category-color: ${item.color};
-                --category-active-color: ${activeColors[item.color]};
-            }`;
-        });
-
-        const style = createElement('style', { props: { textContent: rules.join('') } });
-        document.body.appendChild(style);
     }
 
     /** Set loading state and render view */
@@ -426,7 +396,7 @@ class StatisticsView extends AppView {
     renderPopupContent(target) {
         const state = this.store.getState();
         return ChartPopup.fromTarget(target, {
-            reportType: state.filter?.report,
+            filter: state.filter,
             formatValue: (value) => formatValue(value, state),
             renderDateLabel: (value) => formatDateLabel(value, state),
         });

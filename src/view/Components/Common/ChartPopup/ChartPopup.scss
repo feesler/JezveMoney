@@ -2,6 +2,8 @@
 
 /* Bar chart information popup */
 .chart__popup {
+  --chart-popup-item-marker-size: 8px;
+
   position: absolute;
   border: 0 none;
   border-radius: var(--default-border-radius);
@@ -31,18 +33,29 @@
 .chart-popup-list {
   display: flex;
   flex-flow: column nowrap;
-  list-style-position: inside;
-  list-style-type: disc;
-}
-
-.chart-popup-list__value {
-  position: relative;
-  left: -5px;
-  color: var(--main-text-color);
 }
 
 .chart-popup-list__item {
-  color: var(--category-color);
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.chart-popup-list__item-marker {
+  display: block;
+  width: var(--chart-popup-item-marker-size);
+  height: var(--chart-popup-item-marker-size);
+  border-radius: 100vh;
+  background-color: var(--category-color);
+}
+
+.chart-popup-list__item-title {
+  color: var(--dimmed-text-color);
+}
+
+.chart-popup-list__item-value {
+  color: var(--main-text-color);
 }
 
 @for $i from 1 through length(colors.$colors) {
