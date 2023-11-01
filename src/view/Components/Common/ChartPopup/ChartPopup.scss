@@ -37,7 +37,7 @@
 
 .chart-popup-list__item {
   display: inline-flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: center;
   column-gap: 0.5rem;
 }
