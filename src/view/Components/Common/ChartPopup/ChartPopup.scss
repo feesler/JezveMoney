@@ -51,10 +51,12 @@
 }
 
 .chart-popup-list__item-title {
+  margin-right: 1rem;
   color: var(--dimmed-text-color);
 }
 
 .chart-popup-list__item-value {
+  margin-left: auto;
   color: var(--main-text-color);
 }
 
