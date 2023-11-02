@@ -164,6 +164,7 @@ class StatisticsView extends AppView {
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
+            onlyVisibleCategoriesLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatNumberShort(value),
             renderXAxisLabel: (value) => formatDateLabel(value, this.store.getState()),
