@@ -109,7 +109,7 @@ export class ChartPopup extends Component {
             const titleEl = createElement('span', {
                 props: {
                     className: ITEM_TITLE_CLASS,
-                    textContent: getDataCategoryName(item.category, state),
+                    textContent: categoryName,
                 },
             });
             children.push(titleEl);
