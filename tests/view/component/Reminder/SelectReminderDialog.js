@@ -198,7 +198,7 @@ export class SelectReminderDialog extends TestComponent {
         assert(res.stateMenu, 'Reminder state filter not found');
 
         // Date range filter
-        const dateRangeEl = await query(this.elem, '.date-range-filter .date-range-input');
+        const dateRangeEl = await query(this.elem, '.date-range-field .date-range-input');
         res.dateFilter = await DatePickerFilter.create(this, dateRangeEl);
         assert(res.dateFilter, 'Date filter not found');
 

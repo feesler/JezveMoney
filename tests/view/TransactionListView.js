@@ -252,6 +252,7 @@ export class TransactionListView extends AppView {
         res.categoryDialog = {
             show: !!(cont.selectCategoryDialog?.visible),
             categoryId: cont.selectCategoryDialog?.value,
+            categorySelectOpen: !!cont.selectCategoryDialog?.categorySelectOpen,
             items: cont.selectCategoryDialog?.items.map((item) => item.id),
         };
 
@@ -547,6 +548,7 @@ export class TransactionListView extends AppView {
 
         const res = {
             header: this.getHeaderExpectedState(state),
+            notification: null,
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,
@@ -667,10 +669,14 @@ export class TransactionListView extends AppView {
                 visible: true,
                 categorySelect: {
                     visible: true,
-                    items: model.categoryDialog.items,
                     value: model.categoryDialog.categoryId.toString(),
                 },
             };
+
+            if (model.categoryDialog.categorySelectOpen) {
+                const { items } = model.categoryDialog;
+                res.selectCategoryDialog.categorySelect.items = structuredClone(items);
+            }
         }
 
         return res;

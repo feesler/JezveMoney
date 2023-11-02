@@ -8,7 +8,6 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import {
     __,
-    getApplicationURL,
     parseCookies,
     setCookie,
 } from '../../utils/utils.js';
@@ -107,7 +106,7 @@ class LoginView extends AppView {
             },
             cancelBtn: {
                 title: __('registration.title'),
-                url: getApplicationURL('register/'),
+                url: App.getURL('register/'),
                 className: 'alter-link',
             },
         });

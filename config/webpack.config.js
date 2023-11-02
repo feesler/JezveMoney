@@ -142,7 +142,7 @@ export default {
         },
     },
     output: {
-        path: resolve(currentDir, '../dist'),
+        path: resolve(currentDir, '../dist/app'),
         clean: {
             keep: 'vendor',
         },
@@ -152,7 +152,7 @@ export default {
     },
     plugins: [
         new WebpackManifestPlugin({
-            fileName: resolve(currentDir, '../dist/view/manifest.json'),
+            fileName: resolve(currentDir, '../dist/app/view/manifest.json'),
             generate: (seed, files) => {
                 const entrypoints = new Set();
                 files.forEach(
@@ -193,7 +193,7 @@ export default {
             patterns: [{
                 context: resolve(currentDir, '../src/view/img').replace(/\\/g, '/'),
                 from: '**/*',
-                to: '../dist/view/img/',
+                to: 'view/img/',
             }],
         }),
     ],

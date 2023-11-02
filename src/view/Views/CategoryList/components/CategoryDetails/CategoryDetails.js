@@ -1,7 +1,7 @@
 import { createElement } from '@jezvejs/dom';
 import { Collapsible } from 'jezvejs/Collapsible';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { Category } from '../../../../Models/Category.js';
@@ -78,7 +78,7 @@ export class CategoryDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by category */
     getTransactionsListURL(item) {
-        return getApplicationURL('transactions/', { categories: [item.id] });
+        return App.getURL('transactions/', { categories: [item.id] });
     }
 
     onToggleSubcategories(expanded) {

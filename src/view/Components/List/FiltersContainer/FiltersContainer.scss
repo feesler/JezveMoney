@@ -120,7 +120,7 @@
 
 @media (min-width: 576px) {
   .filters-row {
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
   }
 
   .filters-separator {
@@ -137,5 +137,11 @@
   .filters-container .filters-controls {
     flex-flow: row nowrap;
     align-items: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .filters-row {
+    flex-flow: row nowrap;
   }
 }

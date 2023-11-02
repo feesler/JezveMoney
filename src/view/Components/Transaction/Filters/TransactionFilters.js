@@ -5,9 +5,7 @@ import { Component, debounce } from 'jezvejs';
 // Application
 import {
     __,
-    dateStringToTime,
     formatDateRange,
-    getApplicationURL,
     getHalfYearRange,
     getMonthRange,
     getWeekRange,
@@ -16,10 +14,9 @@ import { App } from '../../../Application/App.js';
 
 // Common components
 import { AmountRangeField } from '../../Form/Fields/AmountRangeField/AmountRangeField.js';
-import { FieldHeaderButton } from '../../Form/Fields/FieldHeaderButton/FieldHeaderButton.js';
 import { TransactionTypeMenu } from '../../Form/Fields/TransactionTypeMenu/TransactionTypeMenu.js';
+import { DateRangeField } from '../../Form/Fields/DateRangeField/DateRangeField.js';
 import { FormControls } from '../../Form/FormControls/FormControls.js';
-import { DateRangeInput } from '../../Form/Inputs/Date/DateRangeInput/DateRangeInput.js';
 import { FilterSelect } from '../../Form/Inputs/FilterSelect/FilterSelect.js';
 import { SearchInput } from '../../Form/Inputs/SearchInput/SearchInput.js';
 
@@ -36,7 +33,7 @@ const FILTER_HEADER_CLASS = 'filter-item__title';
 
 const FILTER_ITEM_CLASS = 'filter-item';
 const TYPE_FILTER_CLASS = 'filter-item trans-type-filter';
-const DATE_FILTER_CLASS = 'filter-item date-range-filter validation-block';
+const DATE_FILTER_CLASS = 'filter-item validation-block';
 const AMOUNT_FILTER_CLASS = 'filter-item amount-range-filter validation-block';
 const CONTROLS_CLASS = 'filters-controls';
 const CLEAR_ALL_BUTTON_CLASS = 'clear-all-btn';
@@ -172,53 +169,15 @@ export class TransactionFilters extends Component {
         show(this.accountsFilter, this.isAvailable());
 
         // Date range filter
-        this.dateRangeFilterTitle = createElement('span', {
-            props: { textContent: __('filters.dateRange') },
-        });
-
-        this.weekRangeBtn = FieldHeaderButton.create({
-            dataValue: 'week',
-            title: __('dateRange.forWeek'),
-            onClick: (e) => this.showWeekRange(e),
-        });
-
-        this.monthRangeBtn = FieldHeaderButton.create({
-            dataValue: 'month',
-            title: __('dateRange.forMonth'),
-            onClick: (e) => this.showMonthRange(e),
-        });
-
-        this.halfYearRangeBtn = FieldHeaderButton.create({
-            dataValue: 'halfyear',
-            title: __('dateRange.forHalfYear'),
-            onClick: (e) => this.showHalfYearRange(e),
-        });
-
-        this.dateRangeHeader = createElement('header', {
-            props: { className: FILTER_HEADER_CLASS },
-            children: [
-                this.dateRangeFilterTitle,
-                this.weekRangeBtn.elem,
-                this.monthRangeBtn.elem,
-                this.halfYearRangeBtn.elem,
-            ],
-        });
-
-        this.dateRangeFilter = DateRangeInput.create({
-            id: 'dateFrm',
-            startPlaceholder: __('dateRange.from'),
-            endPlaceholder: __('dateRange.to'),
-            onChange: (range) => this.onChangeDateRange(range),
-        });
-        this.dateFilter = createElement('section', {
-            props: {
-                id: this.props.dateRangeFilterId,
-                className: DATE_FILTER_CLASS,
+        this.dateRangeFilter = DateRangeField.create({
+            id: this.props.dateRangeFilterId,
+            title: __('filters.dateRange'),
+            input: {
+                startPlaceholder: __('dateRange.from'),
+                endPlaceholder: __('dateRange.to'),
             },
-            children: [
-                this.dateRangeHeader,
-                this.dateRangeFilter.elem,
-            ],
+            className: DATE_FILTER_CLASS,
+            onChange: (range) => this.onChangeDateRange(range),
         });
 
         // Amount range filter
@@ -265,7 +224,7 @@ export class TransactionFilters extends Component {
                 ]),
                 filtersSeparator(),
                 filtersRow([
-                    this.dateFilter,
+                    this.dateRangeFilter.elem,
                     filtersSeparator(),
                     this.amountFilter,
                     filtersSeparator(),
@@ -276,7 +235,7 @@ export class TransactionFilters extends Component {
         });
 
         // Controls
-        const clearAllURL = getApplicationURL('transactions/');
+        const clearAllURL = App.getURL('transactions/');
         this.controls = FormControls.create({
             className: CONTROLS_CLASS,
             submitBtn: {
@@ -416,33 +375,41 @@ export class TransactionFilters extends Component {
             return;
         }
 
-        this.dateRangeFilter.setState((rangeState) => ({
-            ...rangeState,
-            form: {
-                ...rangeState.form,
-                startDate: state.form.startDate,
-                endDate: state.form.endDate,
-            },
-            filter: {
-                ...rangeState.filter,
-                startDate: dateStringToTime(state.form.startDate),
-                endDate: dateStringToTime(state.form.endDate),
-            },
-        }));
-
         const dateFilterURL = this.getURL(state, false);
         const weekRange = getWeekRange();
         dateFilterURL.searchParams.set('startDate', weekRange.startDate);
         dateFilterURL.searchParams.set('endDate', weekRange.endDate);
-        this.weekRangeBtn.setURL(dateFilterURL.toString());
+        const weekRangeURL = dateFilterURL.toString();
 
         const monthRange = getMonthRange();
         dateFilterURL.searchParams.set('startDate', monthRange.startDate);
-        this.monthRangeBtn.setURL(dateFilterURL.toString());
+        const monthRangeURL = dateFilterURL.toString();
 
         const halfYearRange = getHalfYearRange();
         dateFilterURL.searchParams.set('startDate', halfYearRange.startDate);
-        this.halfYearRangeBtn.setURL(dateFilterURL.toString());
+        const halfYearRangeURL = dateFilterURL.toString();
+
+        this.dateRangeFilter.setState((rangeState) => ({
+            ...rangeState,
+            startDate: state.form.startDate,
+            endDate: state.form.endDate,
+            headerButtons: [{
+                dataValue: 'week',
+                title: __('dateRange.forWeek'),
+                url: weekRangeURL,
+                onClick: (e) => this.showWeekRange(e),
+            }, {
+                dataValue: 'month',
+                title: __('dateRange.forMonth'),
+                url: monthRangeURL,
+                onClick: (e) => this.showMonthRange(e),
+            }, {
+                dataValue: 'halfyear',
+                title: __('dateRange.forHalfYear'),
+                url: halfYearRangeURL,
+                onClick: (e) => this.showHalfYearRange(e),
+            }],
+        }));
     }
 
     /** Renders amount range filter */

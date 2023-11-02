@@ -39,7 +39,6 @@ export class CategoryView extends AppView {
             parentSelect: {
                 visible: showParent,
                 value: model.parent_id.toString(),
-                items: availParentCategories,
             },
             typeSelect: {
                 visible: true,
@@ -47,6 +46,10 @@ export class CategoryView extends AppView {
                 value: model.type.toString(),
             },
         };
+
+        if (model.parentSelectOpen) {
+            res.parentSelect.items = availParentCategories;
+        }
 
         if (model.color) {
             res.colorInput.value = model.color.toString();
@@ -119,6 +122,7 @@ export class CategoryView extends AppView {
             name: cont.nameInput.value,
             color: cont.colorInput.value,
             parent_id: parseInt(cont.parentSelect.value, 10),
+            parentSelectOpen: !!cont.parentSelect.listContainer?.visible,
             type: parseInt(cont.typeSelect.value, 10),
             invalidated: cont.nameInput.isInvalid,
             colorInvalidated: cont.colorInput.isInvalid,

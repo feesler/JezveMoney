@@ -14,7 +14,6 @@ import {
     cutDate,
     dateStringToTime,
     formatDateRange,
-    getApplicationURL,
     getContextIds,
     getSelectedItems,
     timeToDate,
@@ -330,7 +329,7 @@ class TransactionListView extends AppView {
             params.mode = 'details';
         }
 
-        return getApplicationURL('transactions/', params);
+        return App.getURL('transactions/', params);
     }
 
     onApplyFilters() {
@@ -710,7 +709,7 @@ class TransactionListView extends AppView {
         }
 
         const url = (state.detailsId)
-            ? getApplicationURL(`transactions/${state.detailsId}`)
+            ? App.getURL(`transactions/${state.detailsId}`)
             : this.getFilterURL(state);
 
         const pageTitle = `${__('appName')} | ${__('transactions.listTitle')}`;

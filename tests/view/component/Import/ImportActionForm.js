@@ -54,13 +54,16 @@ export class ImportActionForm extends TestComponent {
             actionField: {
                 visible: true,
                 value: model.actionType.toString(),
-                dropDown: {
-                    items: model.actionsAvailable.map((id) => ({ id })),
-                },
+                dropDown: {},
+                dropDownOpen: model.actionSelectOpen,
             },
             feedbackElem: { visible: model.feedbackVisible },
             deleteBtn: { visible: true },
         };
+
+        if (model.actionSelectOpen) {
+            res.actionField.dropDown.items = model.actionsAvailable.map((id) => ({ id }));
+        }
 
         const state = ImportActionForm.getStateName(model);
 
@@ -152,6 +155,8 @@ export class ImportActionForm extends TestComponent {
             res.dropDown = await DropDown.create(this, elem);
             assert(res.dropDown, 'Invalid structure of field element');
 
+            res.dropDownOpen = !!res.dropDown.listContainer?.visible;
+
             res.disabled = res.dropDown.disabled;
             res.value = res.dropDown.value;
         } else {
@@ -166,6 +171,7 @@ export class ImportActionForm extends TestComponent {
     buildModel(cont) {
         const res = {
             actionType: parseInt(cont.actionField.value, 10),
+            actionSelectOpen: !!cont.actionField.dropDownOpen,
             actionsAvailable: cont.actionField.dropDown.items.map(({ id }) => id),
             transType: cont.transTypeField.value,
             account: parseInt(cont.accountField.value, 10),

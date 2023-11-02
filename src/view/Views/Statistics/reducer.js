@@ -124,6 +124,17 @@ const slice = createSlice({
             }
     ),
 
+    setLegendCategories: (state, legendCategories) => ({
+        ...state,
+        legendCategories,
+        expandedLegend: false,
+    }),
+
+    toggleExpandLegend: (state) => ({
+        ...state,
+        expandedLegend: !state.expandedLegend,
+    }),
+
     selectDataColumn: (state, target) => {
         const selectedColumn = {
             groupName: target.item.groupName,

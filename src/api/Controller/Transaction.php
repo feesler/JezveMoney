@@ -204,11 +204,11 @@ class Transaction extends ApiSortableListController
             }
         }
 
-        if (isset($filterObj->startDate)) {
-            $params["startDate"] = $filterObj->startDate;
+        if (isset($filterObj->startDate) && !is_null($filterObj->startDate)) {
+            $params["startDate"] = intval($filterObj->startDate);
         }
-        if (isset($filterObj->endDate)) {
-            $params["endDate"] = $filterObj->endDate;
+        if (isset($filterObj->endDate) && !is_null($filterObj->endDate)) {
+            $params["endDate"] = intval($filterObj->endDate);
         }
 
         $res->histogram = $this->model->getHistogramSeries($params);

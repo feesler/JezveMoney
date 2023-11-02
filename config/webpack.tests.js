@@ -12,7 +12,7 @@ export default {
     entry: './tests/index.js',
     output: {
         filename: 'index.js',
-        path: resolve(currentDir, '../dist/admin/view/js/tests'),
+        path: resolve(currentDir, '../dist/app/admin/view/js/tests'),
         clean: true,
     },
     module: {

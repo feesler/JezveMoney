@@ -2,8 +2,9 @@ import { createElement, getClassName } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuItem } from 'jezvejs/Menu';
 
+import { App } from '../../../../../Application/App.js';
+
 import { Badge } from '../../../../Common/Badge/Badge.js';
-import { getApplicationURL } from '../../../../../utils/utils.js';
 
 /* CSS classes */
 const ITEM_CLASS = 'menu-item nav-item static-menu-item';
@@ -85,7 +86,7 @@ export class NavigationMenuListItem extends MenuItem {
         }
         const createBtn = Button.create({
             type: 'link',
-            url: getApplicationURL(state.createButton),
+            url: App.getURL(state.createButton),
             icon: 'plus-light',
             className: CREATE_BTN_CLASS,
         });
@@ -99,7 +100,7 @@ export class NavigationMenuListItem extends MenuItem {
         const title = state.title ?? '';
         this.titleElem.title = title;
         this.titleElem.textContent = title;
-        const url = getApplicationURL(this.getItemURL(state));
+        const url = App.getURL(this.getItemURL(state));
         this.titleElem.href = url.toString();
     }
 }

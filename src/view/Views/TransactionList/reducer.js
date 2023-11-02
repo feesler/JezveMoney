@@ -45,6 +45,15 @@ const slice = createSlice({
         exportFilter: null,
     }),
 
+    itemDetailsLoaded: (state, item) => (
+        (state.detailsId !== item?.id)
+            ? state
+            : {
+                ...state,
+                detailsItem: structuredClone(item),
+            }
+    ),
+
     showMenu: (state) => (
         (state.showMenu)
             ? state

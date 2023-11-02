@@ -34,7 +34,10 @@ export class AppView extends TestView {
         this.content.nav = await Navigation.create(this, await query('.offcanvas.navigation'));
 
         const msgElem = await query('.popup.notification');
-        this.content.notification = (msgElem) ? await Notification.create(this, msgElem) : null;
+        this.content.notification = null;
+        if (msgElem) {
+            this.content.notification = await Notification.create(this, msgElem);
+        }
     }
 
     cloneModel(model = this.model) {

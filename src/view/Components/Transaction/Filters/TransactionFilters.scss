@@ -3,17 +3,8 @@
   max-width: 500px;
 }
 
-.date-range-filter {
-  max-width: 400px;
-
-  .filter-item__title {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 1.5rem;
-  }
-}
-
 .amount-range-filter {
+  min-width: 250px;
   max-width: 400px;
 }
 

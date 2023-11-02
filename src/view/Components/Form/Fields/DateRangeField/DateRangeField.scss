@@ -1,0 +1,32 @@
+/* Date range field */
+.date-range-field {
+  min-width: 250px;
+  max-width: 400px;
+
+  .field__title {
+    display: flex;
+    flex-flow: row nowrap;
+    column-gap: 1rem;
+    overflow: hidden;
+
+    .field__controls {
+      display: flex;
+      flex-flow: row nowrap;
+      column-gap: 1rem;
+      overflow-x: auto;
+    }
+
+    .field-header-btn {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+@media (min-width: 576px) {
+  .date-range-field {
+    .field__title,
+    .field__controls {
+      column-gap: 1.5rem;
+    }
+  }
+}

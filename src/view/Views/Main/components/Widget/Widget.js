@@ -3,7 +3,7 @@ import { createElement, getClassName } from '@jezvejs/dom';
 import { asArray } from '@jezvejs/types';
 import { Icon } from 'jezvejs/Icon';
 
-import { getApplicationURL } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 import './Widget.scss';
 
@@ -58,7 +58,7 @@ export class Widget extends Component {
                 this.headerContent = createElement('a', {
                     props: {
                         className: HEADER_LINK_CLASS,
-                        href: getApplicationURL(this.props.headerLink),
+                        href: App.getURL(this.props.headerLink),
                     },
                     children: [titleElem, glyphElem],
                 });

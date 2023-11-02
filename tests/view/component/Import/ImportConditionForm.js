@@ -58,9 +58,8 @@ export class ImportConditionForm extends TestComponent {
             fieldTypeField: {
                 value: model.fieldType.toString(),
                 visible: true,
-                dropDown: {
-                    items: model.fieldsAvailable.map((id) => ({ id })),
-                },
+                dropDown: {},
+                dropDownOpen: model.fieldTypeSelectOpen,
             },
             operatorField: { value: model.operator.toString(), visible: true },
             fieldValueCheck: {
@@ -70,6 +69,10 @@ export class ImportConditionForm extends TestComponent {
             feedbackElem: { visible: model.feedbackVisible },
             deleteBtn: { visible: true },
         };
+
+        if (model.fieldTypeSelectOpen) {
+            res.fieldTypeField.dropDown.items = model.fieldsAvailable.map((id) => ({ id }));
+        }
 
         const state = ImportConditionForm.getStateName(model);
 
@@ -191,6 +194,8 @@ export class ImportConditionForm extends TestComponent {
             res.dropDown = await DropDown.create(this, elem);
             assert(res.dropDown, 'Invalid structure of field element');
 
+            res.dropDownOpen = !!res.dropDown.listContainer?.visible;
+
             res.disabled = res.dropDown.disabled;
             res.value = res.dropDown.value;
         } else {
@@ -205,6 +210,7 @@ export class ImportConditionForm extends TestComponent {
     buildModel(cont) {
         const res = {
             fieldType: parseInt(cont.fieldTypeField.value, 10),
+            fieldTypeSelectOpen: !!cont.fieldTypeField.dropDownOpen,
             fieldsAvailable: cont.fieldTypeField.dropDown.items.map(({ id }) => id),
             operator: parseInt(cont.operatorField.value, 10),
             isFieldValue: cont.fieldValueCheck.checked,

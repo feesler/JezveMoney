@@ -1,12 +1,12 @@
 {
     "name": "jezve-money",
-    "version": "1.82.0",
+    "version": "1.83.0",
     "description": "",
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "lint-php": "npm-run-all lint-php-cs install-backend lint-php-phan",
-        "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php ./src/",
+        "lint-php": "npm-run-all lint-php-cs lint-php-phan",
+        "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php --ignore=*/vendor/* ./src/",
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
         "all": "npm-run-all lint build test",
         "test": "node ./tests/index.js",
@@ -20,6 +20,8 @@
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
         "install-backend": "node ./scripts/install-backend.js",
         "update": "npm update --save",
+        "postinstall": "npm-run-all build install-composer",
+        "install-composer": "node ./scripts/composer.js install",
         "update-composer": "node ./scripts/composer.js update",
         "dump-autoload": "node ./scripts/composer.js",
         "postbuild": "npm-run-all install-backend",
@@ -69,7 +71,7 @@
         "imagemin": "^8.0.1",
         "imagemin-svgo": "^10.0.1",
         "jezve-test": "^2.0.0",
-        "jezvejs-test": "^1.13.2",
+        "jezvejs-test": "^1.14.0",
         "mini-css-extract-plugin": "^2.7.6",
         "node-fetch": "^3.3.2",
         "npm-run-all": "^4.1.5",
@@ -97,8 +99,8 @@
         "@jezvejs/dom": "^0.1.0",
         "@jezvejs/number": "^0.1.0",
         "@jezvejs/types": "^0.2.0",
-        "core-js": "^3.33.1",
-        "jezvejs": "^2.0.0",
+        "core-js": "^3.33.2",
+        "jezvejs": "^2.3.2",
         "whatwg-fetch": "^3.6.19"
     }
 }

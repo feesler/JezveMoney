@@ -842,6 +842,10 @@ svg * {
   --notification-error-close-btn: #ffffff;
   --notification-error-close-btn-hover: #ffffff;
 
+  .close-btn {
+    align-self: auto;
+  }
+
   .close-btn__icon {
     opacity: 0.5;
   }
@@ -866,6 +870,7 @@ svg * {
   align-items: center;
   justify-content: flex-start;
   column-gap: 24px;
+  height: 2rem;
 }
 
 .counter {
@@ -1005,6 +1010,8 @@ a.paginator-arrow:focus-visible {
 }
 
 .chart-legend__item {
+  height: 1.5rem;
+  line-height: 1.5rem;
   color: var(--category-color, var(--charts-color-1));
 }
 

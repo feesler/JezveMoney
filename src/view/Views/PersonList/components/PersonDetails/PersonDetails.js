@@ -1,6 +1,7 @@
 import { createElement } from '@jezvejs/dom';
 
-import { __, formatPersonDebts, getApplicationURL } from '../../../../utils/utils.js';
+import { __, formatPersonDebts } from '../../../../utils/utils.js';
+import { App } from '../../../../Application/App.js';
 
 import { Field } from '../../../../Components/Common/Field/Field.js';
 import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
@@ -58,7 +59,7 @@ export class PersonDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by person */
     getTransactionsListURL(item) {
-        return getApplicationURL('transactions/', { persons: [item.id] });
+        return App.getURL('transactions/', { persons: [item.id] });
     }
 
     /**

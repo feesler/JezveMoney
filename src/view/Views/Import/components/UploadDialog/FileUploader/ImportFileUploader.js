@@ -6,7 +6,7 @@ import { Checkbox } from 'jezvejs/Checkbox';
 import { Input } from 'jezvejs/Input';
 import { InputGroup } from 'jezvejs/InputGroup';
 
-import { __, getApplicationURL } from '../../../../../utils/utils.js';
+import { __ } from '../../../../../utils/utils.js';
 import { API } from '../../../../../API/index.js';
 import { App } from '../../../../../Application/App.js';
 
@@ -70,7 +70,7 @@ export class ImportFileUploader extends Component {
                 className: FORM_CLASS,
                 method: 'post',
                 encoding: 'multipart/form-data',
-                action: getApplicationURL('api/import/upload'),
+                action: App.getURL('api/import/upload'),
             },
             children: [
                 this.fileBrowser,

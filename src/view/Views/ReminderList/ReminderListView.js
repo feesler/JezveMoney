@@ -8,11 +8,7 @@ import { createStore, combineReducers } from 'jezvejs/Store';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
-import {
-    __,
-    getApplicationURL,
-    formatDateRange,
-} from '../../utils/utils.js';
+import { __, formatDateRange } from '../../utils/utils.js';
 
 // Models
 import { CurrencyList } from '../../Models/CurrencyList.js';
@@ -268,7 +264,7 @@ class ReminderListView extends AppView {
             params.mode = 'details';
         }
 
-        return getApplicationURL(`reminders/${itemPart}`, params);
+        return App.getURL(`reminders/${itemPart}`, params);
     }
 
     renderHistory(state, prevState) {

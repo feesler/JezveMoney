@@ -17,7 +17,7 @@ import {
     formatPersonDebts,
     getCurrencyPrecision,
     __,
-    getApplicationURL,
+    createColorStyle,
 } from '../../utils/utils.js';
 import {
     formatDateLabel,
@@ -105,6 +105,8 @@ class MainView extends AppView {
      * View initialization
      */
     onStart() {
+        createColorStyle();
+
         const state = this.store.getState();
 
         this.loadElementsByIds([
@@ -140,7 +142,7 @@ class MainView extends AppView {
             ItemComponent: AccountTile,
             getItemProps: (account, { listMode }) => ({
                 type: 'link',
-                link: getApplicationURL(`transactions/create/?acc_id=${account.id}`),
+                link: App.getURL(`transactions/create/?acc_id=${account.id}`),
                 account,
                 selected: account.selected ?? false,
                 selectMode: listMode === 'select',
@@ -151,7 +153,7 @@ class MainView extends AppView {
             PlaceholderComponent: NoDataGroup,
             getPlaceholderProps: () => ({
                 title: __('main.noAccounts'),
-                url: getApplicationURL('accounts/create/'),
+                url: App.getURL('accounts/create/'),
             }),
         };
 
@@ -175,7 +177,7 @@ class MainView extends AppView {
             getItemProps: (person, { listMode }) => ({
                 id: person.id,
                 type: 'link',
-                link: getApplicationURL(`transactions/create/?type=debt&person_id=${person.id}`),
+                link: App.getURL(`transactions/create/?type=debt&person_id=${person.id}`),
                 title: person.name,
                 subtitle: formatPersonDebts(person),
                 selected: person.selected,
@@ -187,7 +189,7 @@ class MainView extends AppView {
             PlaceholderComponent: NoDataGroup,
             getPlaceholderProps: () => ({
                 title: __('persons.noData'),
-                url: getApplicationURL('persons/create/'),
+                url: App.getURL('persons/create/'),
             }),
         };
 
@@ -572,6 +574,7 @@ class MainView extends AppView {
     renderPopupContent(target) {
         const { statistics } = this.store.getState();
         return ChartPopup.fromTarget(target, {
+            filter: statistics.filter,
             formatValue: (value) => formatValue(value, statistics),
             renderDateLabel: (value) => formatDateLabel(value, statistics),
         });
@@ -600,6 +603,8 @@ class MainView extends AppView {
         data.stacked = isStackedData(filter);
 
         this.histogram?.setData(data);
+
+        this.histogram.elem.classList.toggle('categories-report', filter.report === 'category');
     }
 
     /** Renders 'Set transaction category' dialog */

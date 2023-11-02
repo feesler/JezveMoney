@@ -1,6 +1,6 @@
 import { createElement } from '@jezvejs/dom';
 
-import { __, getApplicationURL } from '../../../../utils/utils.js';
+import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD } from '../../../../Models/Account.js';
@@ -80,7 +80,7 @@ export class AccountDetails extends ItemDetails {
 
     /** Returns URL to Transactions list view with filter by account */
     getTransactionsListURL(item) {
-        return getApplicationURL('transactions/', { accounts: [item.id] });
+        return App.getURL('transactions/', { accounts: [item.id] });
     }
 
     /**

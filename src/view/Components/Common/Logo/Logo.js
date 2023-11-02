@@ -1,7 +1,7 @@
 import { createElement, getClassName } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 
-import { getApplicationURL } from '../../../utils/utils.js';
+import { App } from '../../../Application/App.js';
 
 import './Logo.scss';
 
@@ -11,7 +11,7 @@ const LOGO_CLASS = 'logo';
 const defaultProps = {
     icon: 'header-logo',
     type: 'link',
-    url: getApplicationURL(),
+    url: App.getURL(),
 };
 
 /**

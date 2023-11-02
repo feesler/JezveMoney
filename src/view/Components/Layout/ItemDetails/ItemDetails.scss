@@ -1,5 +1,7 @@
 /* List item details base */
 .list-item-details {
+  --details-min-column-width: 140px;
+
   display: flex;
   flex-flow: column nowrap;
 
@@ -40,6 +42,14 @@
     flex-flow: row wrap;
     align-items: baseline;
     column-gap: 2rem;
+  }
+
+  .list-item-details__row {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(var(--details-min-column-width), 1fr)
+    );
   }
 
   .subcategories-field,

@@ -112,15 +112,13 @@ function defineHostConstants()
     define("APP_HOST", $host);
     $domain = domainFromHost($host);
     define("APP_DOMAIN", $domain);
+    define("APP_ROOT", pathJoin($approot, "app"));
+    define("APP_PATH", "/");
 
     if (strcmp(APP_HOST, PROD_HOST) == 0) {
-        define("APP_ROOT", $approot);
-        define("APP_PATH", "/");
         define("PRODUCTION", true);
         define("LOCAL_DEV", false);
     } elseif (strcmp(APP_HOST, LOCAL_DEV_HOST) == 0) {
-        define("APP_ROOT", $approot);
-        define("APP_PATH", "/");
         define("PRODUCTION", false);
         define("LOCAL_DEV", true);
     }

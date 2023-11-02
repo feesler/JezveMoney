@@ -18,6 +18,7 @@ import {
     setCookie,
     __,
     timeToDate,
+    createURL,
 } from '../utils/utils.js';
 
 /** CSS classes */
@@ -150,6 +151,11 @@ export class Application {
 
     isTesterUser() {
         return hasFlag(this.model.profile?.access ?? 0, TESTER_FLAG);
+    }
+
+    /** Returns URL instance for specified path and search params */
+    getURL(path = '', params = {}) {
+        return createURL(`${this.baseURL}${path}`, params);
     }
 
     isValidDateString(value, params = {}) {

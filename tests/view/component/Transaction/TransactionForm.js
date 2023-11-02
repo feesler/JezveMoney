@@ -691,15 +691,19 @@ export class TransactionForm extends TestComponent {
                 }
             }
 
-            const visibleCategories = state
-                .getCategoriesForType(model.type)
-                .map((item) => ({ id: item.id.toString() }));
-
             res.categorySelect = {
                 visible: true,
-                items: visibleCategories,
                 value: model.categoryId.toString(),
             };
+
+            if (model.categorySelectOpen) {
+                const visibleCategories = state
+                    .getCategoriesForType(model.type)
+                    .map((item) => ({ id: item.id.toString() }));
+
+                res.categorySelect.items = visibleCategories;
+            }
+
             res.commentField = {
                 visible: true,
                 value: model.comment,
@@ -1339,7 +1343,7 @@ export class TransactionForm extends TestComponent {
             res.datePicker = await DatePickerField.create(this, await query('#dateField'));
         }
 
-        res.dateRangeInput = await DatePickerFilter.create(this, await query('#dateRangeInput'));
+        res.dateRangeInput = await DatePickerFilter.create(this, await query('.date-range-input'));
 
         const repeatSwitchEl = await query(this.elem, '.repeat-switch-field');
         res.repeatSwitch = await Switch.create(this, repeatSwitchEl);
@@ -1687,6 +1691,8 @@ export class TransactionForm extends TestComponent {
         }
 
         res.categoryId = parseInt(cont.categorySelect.value, 10);
+        res.categorySelectOpen = !!cont.categorySelect.listContainer?.visible;
+
         res.comment = cont.commentField.value;
 
         return res;

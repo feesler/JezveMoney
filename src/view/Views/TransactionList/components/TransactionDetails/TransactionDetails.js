@@ -67,12 +67,18 @@ export class TransactionDetails extends ItemDetails {
         });
 
         return [
-            this.sourceField.elem,
-            this.destinationField.elem,
-            this.srcAmountField.elem,
-            this.destAmountField.elem,
-            this.srcResultField.elem,
-            this.destResultField.elem,
+            this.createRow(
+                this.sourceField.elem,
+                this.destinationField.elem,
+            ),
+            this.createRow(
+                this.srcAmountField.elem,
+                this.destAmountField.elem,
+            ),
+            this.createRow(
+                this.srcResultField.elem,
+                this.destResultField.elem,
+            ),
             this.dateField.elem,
             this.categoryField.elem,
             this.commentField.elem,

@@ -1,2 +1,7 @@
 .env
 /src/system/.env
+/src/vendor
+/node_modules
+/dist
+.cache
+.vscode

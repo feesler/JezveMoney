@@ -6,6 +6,12 @@ import {
     shiftDate,
     shiftMonth,
 } from '@jezvejs/datetime';
+import {
+    rgbToHSL,
+    hslToRGB,
+    rgbToColor,
+    MAX_LIGHTNESS,
+} from '@jezvejs/color';
 
 import { correct, formatValue } from './decimal.js';
 import { App } from '../Application/App.js';
@@ -23,9 +29,9 @@ export const DEFAULT_PAGE_LIMIT = 10;
 
 export const COLORS_COUNT = 23;
 
-/** Returns URL instance for specified path and search params */
-export const getApplicationURL = (path = '', params = {}) => {
-    const res = new URL(`${App.baseURL}${path}`);
+/** Returns URL instance for specified address and search params */
+export const createURL = (address, params = {}) => {
+    const res = new URL(address);
 
     Object.entries(params ?? {}).forEach(([prop, value]) => {
         if (Array.isArray(value)) {
@@ -41,7 +47,7 @@ export const getApplicationURL = (path = '', params = {}) => {
 
 /** Returns export transactions URL */
 export const getExportURL = (options) => (
-    getApplicationURL('transactions/export/', options)
+    App.getURL('transactions/export/', options)
 );
 
 /** Returns array of { name, value } cookie objects */
@@ -383,3 +389,29 @@ export const createHiddenInputs = (ids) => (
         ])),
     )
 );
+
+/** Prepares style element with colors for categories and appends it to body */
+export const createColorStyle = () => {
+    const ACTIVE_LIGHTNESS_STEP = 15;
+    const activeColors = {};
+
+    const rules = App.model.categories.map((item) => {
+        if (!activeColors[item.color]) {
+            const hsl = rgbToHSL(item.color);
+            const lighten = (hsl.lightness + ACTIVE_LIGHTNESS_STEP <= MAX_LIGHTNESS);
+            hsl.lightness += ((lighten) ? 1 : -1) * ACTIVE_LIGHTNESS_STEP;
+            activeColors[item.color] = rgbToColor(hslToRGB(hsl));
+        }
+
+        return `.categories-report .chart_stacked .histogram_category-${item.id},
+            .categories-report .pie__sector-${item.id},
+            .categories-report .legend-item-${item.id},
+            .categories-report .chart-popup-list__item-cat-${item.id} {
+                --category-color: ${item.color};
+                --category-active-color: ${activeColors[item.color]};
+            }`;
+    });
+
+    const style = createElement('style', { props: { textContent: rules.join('') } });
+    document.body.appendChild(style);
+};
