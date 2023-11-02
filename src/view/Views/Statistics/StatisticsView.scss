@@ -18,6 +18,17 @@ main {
   }
 }
 
+.chart__legend-list {
+  --chart-legend-max-collapsed-height: 53px;
+
+  max-height: var(--chart-legend-max-collapsed-height);
+  overflow: hidden;
+}
+
+.chart__legend-list.expanded {
+  max-height: none;
+}
+
 .chart-legend__item-title {
   position: relative;
   left: -5px;

@@ -1010,6 +1010,8 @@ a.paginator-arrow:focus-visible {
 }
 
 .chart-legend__item {
+  height: 1.5rem;
+  line-height: 1.5rem;
   color: var(--category-color, var(--charts-color-1));
 }
 

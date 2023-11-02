@@ -49,9 +49,12 @@ import '../../Application/Application.scss';
 import './StatisticsView.scss';
 
 /* CSS classes */
+const LEGEND_CONTENT_CLASS = 'chart-legend__content';
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CLASS = 'chart-legend__item';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
+
+const LEGEND_MAX_HEIGHT_PROP = '--chart-legend-max-collapsed-height';
 
 const defaultProps = {
     filter: {},
@@ -81,6 +84,8 @@ class StatisticsView extends AppView {
             selectedColumn: null,
             pieChartInfo: null,
             selectedPieChartItem: null,
+            expandedLegend: false,
+            legendCategories: null,
             filter: { ...filter },
             form: {
                 ...filter,
@@ -404,6 +409,10 @@ class StatisticsView extends AppView {
     }
 
     renderLegendContent(categories) {
+        setTimeout(() => {
+            this.store.dispatch(actions.setLegendCategories(categories));
+        });
+
         if (!Array.isArray(categories) || categories.length === 0) {
             return null;
         }
@@ -411,27 +420,56 @@ class StatisticsView extends AppView {
         const state = this.store.getState();
         const categoryReport = (state.filter.report === 'category');
 
-        return createElement('ul', {
-            props: { className: LEGEND_LIST_CLASS },
-            children: categories.map((category, index) => {
-                const id = (categoryReport) ? category : (index + 1);
-                const item = createElement('li', {
-                    props: {
-                        className: getClassName(
-                            LEGEND_ITEM_CLASS,
-                            `legend-item-${id}`,
-                        ),
-                    },
-                    children: createElement('span', {
-                        props: {
-                            className: LEGEND_ITEM_TITLE_CLASS,
-                            textContent: getDataCategoryName(category, state),
-                        },
-                    }),
-                });
+        // Data categories legend list
+        if (!this.legendList) {
+            this.legendList = createElement('ul', { props: { className: LEGEND_LIST_CLASS } });
+        } else {
+            this.legendList.textContent = '';
+        }
 
-                return item;
-            }),
+        const listItems = categories.map((category, index) => {
+            const id = (categoryReport) ? category : (index + 1);
+            const item = createElement('li', {
+                props: {
+                    className: getClassName(
+                        LEGEND_ITEM_CLASS,
+                        `legend-item-${id}`,
+                    ),
+                },
+                children: createElement('span', {
+                    props: {
+                        className: LEGEND_ITEM_TITLE_CLASS,
+                        textContent: getDataCategoryName(category, state),
+                    },
+                }),
+            });
+
+            return item;
+        });
+        this.legendList.append(...listItems);
+
+        // Toggle collapse/expand button
+        if (!this.toggleLegendButton) {
+            this.toggleLegendButton = this.createToggleShowAllButton({
+                onClick: () => this.store.dispatch(actions.toggleExpandLegend()),
+            });
+        }
+
+        return createElement('div', {
+            props: { className: LEGEND_CONTENT_CLASS },
+            children: [
+                this.legendList,
+                this.toggleLegendButton.elem,
+            ],
+        });
+    }
+
+    createToggleShowAllButton(props = {}) {
+        return Button.create({
+            className: 'link-btn',
+            type: 'button',
+            title: __('actions.showAll'),
+            ...props,
         });
     }
 
@@ -470,6 +508,32 @@ class StatisticsView extends AppView {
         this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }
 
+    renderToggleLegendButton(state, prevState) {
+        if (
+            state.chartData === prevState.chartData
+            && state.legendCategories === prevState.legendCategories
+            && state.expandedLegend === prevState.expandedLegend
+        ) {
+            return;
+        }
+
+        if (!this.toggleLegendButton || !this.legendList) {
+            return;
+        }
+
+        const maxHeight = this.legendList.style.getPropertyValue(LEGEND_MAX_HEIGHT_PROP);
+        const showToggleButton = this.legendList.scrollHeight > maxHeight;
+
+        this.toggleLegendButton.show(showToggleButton);
+        this.toggleLegendButton.setTitle(
+            (state.expandedLegend)
+                ? __('actions.showVisible')
+                : __('actions.showAll'),
+        );
+
+        this.legendList.classList.toggle('expanded', state.expandedLegend);
+    }
+
     renderPieChart(state, prevState) {
         if (
             state.form === prevState?.form
@@ -503,6 +567,7 @@ class StatisticsView extends AppView {
 
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
+        this.renderToggleLegendButton(state, prevState);
         this.renderPieChart(state, prevState);
 
         this.histogram.elem.dataset.time = state.renderTime;
