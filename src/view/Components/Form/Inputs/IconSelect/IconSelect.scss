@@ -21,13 +21,16 @@
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
-    width: var(--dd-icon-item-size);
+    width: 100%;
+    min-width: var(--dd-icon-item-size);
+    max-width: 33.3%;
     height: var(--dd-icon-item-size);
   }
 
   /* Icon item */
   .menu-item__content {
     display: none;
+    white-space: normal;
   }
 
   .menu-item__icon {
