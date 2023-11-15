@@ -3,6 +3,7 @@ import {
     createElement,
     show,
     getClassName,
+    computedStyle,
 } from '@jezvejs/dom';
 import { asArray } from '@jezvejs/types';
 import { Histogram } from 'jezvejs/Histogram';
@@ -508,6 +509,15 @@ class StatisticsView extends AppView {
         this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }
 
+    getMaxLegendHeight() {
+        if (!this.legendList) {
+            return 0;
+        }
+
+        const value = computedStyle(this.legendList).getPropertyValue(LEGEND_MAX_HEIGHT_PROP);
+        return parseInt(value, 10);
+    }
+
     renderToggleLegendButton(state, prevState) {
         if (
             state.chartData === prevState.chartData
@@ -521,8 +531,8 @@ class StatisticsView extends AppView {
             return;
         }
 
-        const maxHeight = this.legendList.style.getPropertyValue(LEGEND_MAX_HEIGHT_PROP);
-        const showToggleButton = this.legendList.scrollHeight > maxHeight;
+        const maxHeight = this.getMaxLegendHeight();
+        const showToggleButton = maxHeight && this.legendList.scrollHeight > maxHeight;
 
         this.toggleLegendButton.show(showToggleButton);
         this.toggleLegendButton.setTitle(

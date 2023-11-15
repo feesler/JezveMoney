@@ -244,7 +244,7 @@ class ImportView extends AppView {
         });
 
         // List footer
-        const listFooter = createElement('button', {
+        const listFooter = createElement('div', {
             props: { className: 'list-footer' },
             children: [
                 this.showMoreBtn,

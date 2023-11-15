@@ -337,11 +337,7 @@ export class DateRangeInput extends Component {
             validation: { ...defaultValidation },
         });
 
-        if (this.datePicker) {
-            this.datePicker.hide();
-        } else {
-            this.notifyChanged();
-        }
+        this.hideDatePicketAndNotify();
     }
 
     /**
@@ -361,7 +357,11 @@ export class DateRangeInput extends Component {
             validation: { ...defaultValidation },
         });
 
-        if (this.datePicker) {
+        this.hideDatePicketAndNotify();
+    }
+
+    hideDatePicketAndNotify() {
+        if (this.datePicker?.visible()) {
             this.datePicker.hide();
         } else {
             this.notifyChanged();
