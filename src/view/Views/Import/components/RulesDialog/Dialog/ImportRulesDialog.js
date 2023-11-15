@@ -55,7 +55,9 @@ export class ImportRulesDialog extends Component {
             ...props,
         });
 
-        this.store = createStore(reducer, { initialState: getInitialState() });
+        this.store = createStore(reducer, {
+            initialState: getInitialState(this.props),
+        });
 
         this.init();
 
@@ -174,7 +176,7 @@ export class ImportRulesDialog extends Component {
 
     /** Reset dialog state */
     reset() {
-        this.store.dispatch(actions.reset());
+        this.store.dispatch(actions.reset(this.props));
     }
 
     /** Hide dialog */

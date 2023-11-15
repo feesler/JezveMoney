@@ -10,6 +10,8 @@ import {
     REMINDER_SCHEDULED,
     REMINDER_UPCOMING,
 } from '../../../model/Reminder.js';
+import { IMPORT_COND_FIELD_COMMENT, IMPORT_COND_OP_STRING_INCLUDES } from '../../../model/ImportCondition.js';
+import { IMPORT_ACTION_SET_COMMENT } from '../../../model/ImportAction.js';
 
 export class ImportListStory extends TestStory {
     async beforeRun() {
@@ -53,7 +55,10 @@ export class ImportListStory extends TestStory {
         await this.duplicate();
         await this.checkSimilar();
         await this.reminders();
+
+        await this.updateRules();
         await this.enableDisableRules();
+
         await this.del();
         await this.submit();
         await this.formOrigDataCollapsible();
@@ -236,6 +241,71 @@ export class ImportListStory extends TestStory {
         });
         await Actions.enableCheckSimilar(true);
         await Actions.deleteAllItems();
+    }
+
+    async updateRules() {
+        setBlock('Update rules list', 1);
+
+        const { cardFile, ACC_RUB } = App.scenario;
+
+        await Actions.uploadFile(cardFile);
+        await Actions.submitUploaded({
+            ...cardFile,
+            account: ACC_RUB,
+        });
+
+        await this.createRule();
+        await this.updateRule();
+        await this.deleteRule();
+
+        await Actions.deleteAllItems();
+    }
+
+    async createRule() {
+        setBlock('Create import rule', 2);
+
+        await Actions.openRulesDialog();
+
+        await Actions.createRule();
+        await Actions.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'DOSTAVKA' },
+        ]);
+        await Actions.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+            { action: 'inputValue', data: 'Delivery' },
+        ]);
+        await Actions.submitRule();
+
+        await Actions.closeRulesDialog();
+    }
+
+    async updateRule() {
+        setBlock('Update import rule', 2);
+
+        await Actions.openRulesDialog();
+
+        const ruleIndex = App.state.rules.length - 1;
+        await Actions.updateRule(ruleIndex);
+        await Actions.updateRuleAction({
+            pos: 0,
+            action: { action: 'inputValue', data: 'Food' },
+        });
+        await Actions.submitRule();
+
+        await Actions.closeRulesDialog();
+    }
+
+    async deleteRule() {
+        setBlock('Delete import rule', 2);
+
+        await Actions.openRulesDialog();
+
+        const ruleIndex = App.state.rules.length - 1;
+        await Actions.deleteRule(ruleIndex);
+
+        await Actions.closeRulesDialog();
     }
 
     async enableDisableRules() {
