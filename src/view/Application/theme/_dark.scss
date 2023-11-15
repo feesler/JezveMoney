@@ -1,4 +1,3 @@
-
 .dark-theme {
   /* Text colors */
   --main-text-color: #dddddd;
@@ -68,4 +67,10 @@
   --popup-menu-border: #444444;
   --popup-menu-bg: #202020f8;
   --popup-menu-box-shadow: 0 0 10px 0 #000000bb;
+
+  /* Switch */
+  .switch {
+    --switch-disabled-bg: #2e2e2e;
+    --switch-disabled-slider-color: #464646;
+  }
 }
