@@ -51,44 +51,39 @@ export const closeRulesDialog = async () => {
 };
 
 /** Navigates to the first page */
-export const goToFirstRulesPage = async () => {
-    await test('Navigate to first page', async () => {
-        await checkRulesDialog();
-        return App.view.goToFirstRulesPage();
-    });
-};
+export const goToFirstRulesPage = () => (
+    test('Navigate to first page', () => (
+        App.view.goToFirstRulesPage()
+    ))
+);
 
 /** Navigates to the last page */
-export const goToLastRulesPage = async () => {
-    await test('Navigate to last page', async () => {
-        await checkRulesDialog();
-        return App.view.goToLastRulesPage();
-    });
-};
+export const goToLastRulesPage = () => (
+    test('Navigate to last page', () => (
+        App.view.goToLastRulesPage()
+    ))
+);
 
 /** Navigates to previous page */
-export const goToPrevRulesPage = async () => {
-    await test('Navigate to previous page', async () => {
-        await checkRulesDialog();
-        return App.view.goToPrevRulesPage();
-    });
-};
+export const goToPrevRulesPage = () => (
+    test('Navigate to previous page', () => (
+        App.view.goToPrevRulesPage()
+    ))
+);
 
 /** Navigates to next page */
-export const goToNextRulesPage = async () => {
-    await test('Navigate to next page', async () => {
-        await checkRulesDialog();
-        return App.view.goToNextRulesPage();
-    });
-};
+export const goToNextRulesPage = () => (
+    test('Navigate to next page', () => (
+        App.view.goToNextRulesPage()
+    ))
+);
 
 /** Clicks by 'Show more' button */
-export const showMoreRules = async () => {
-    await test('Show more items', async () => {
-        await checkRulesDialog();
-        return App.view.showMoreRules();
-    });
-};
+export const showMoreRules = () => (
+    test('Show more items', () => (
+        App.view.showMoreRules()
+    ))
+);
 
 /** Click by create import rule button */
 export const iterateRulesList = async () => {
@@ -100,47 +95,42 @@ export const iterateRulesList = async () => {
 };
 
 /** Click by 'toggle' button of specified import rule */
-export const toggleExpandRule = async (index) => {
-    await test(`Toggle expand rule [${index}]`, async () => {
-        await checkRulesDialog();
-        return App.view.toggleExpandRule(index);
-    });
-};
+export const toggleExpandRule = (index) => (
+    test(`Toggle expand rule [${index}]`, () => (
+        App.view.toggleExpandRule(index)
+    ))
+);
 
 /** Click by create import rule button */
-export const createRule = async () => {
-    await test('Create rule', async () => {
-        await checkRulesDialog();
-        return App.view.createRule();
-    });
-};
+export const createRule = () => (
+    test('Create rule', () => (
+        App.view.createRule()
+    ))
+);
 
 /** Click by update import rule button */
 export const updateRule = async (index) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Invalid rule index');
 
-    await test(`Update rule [${ind}]`, async () => {
-        await checkRulesDialog();
-        return App.view.updateRule(ind);
-    });
+    await test(`Update rule [${ind}]`, () => (
+        App.view.updateRule(ind)
+    ));
 };
 
 /** Click by 'Duplicate' import rule button */
-export const duplicateRule = async (index) => {
-    await test(`Update rule [${index}]`, async () => {
-        await checkRulesDialog();
-        return App.view.duplicateRule(index);
-    });
-};
+export const duplicateRule = (index) => (
+    test(`Update rule [${index}]`, () => (
+        App.view.duplicateRule(index)
+    ))
+);
 
 /** Click by delete import rule button */
-export const deleteRule = async (index) => {
-    await test(`Delete rule [${index}]`, async () => {
-        await checkRulesDialog();
-        return App.view.deleteRule(index);
-    });
-};
+export const deleteRule = (index) => (
+    test(`Delete rule [${index}]`, () => (
+        App.view.deleteRule(index)
+    ))
+);
 
 /** Run set of actions on specified rule condition item */
 const runOnRuleCondition = async (params) => {
@@ -205,9 +195,9 @@ const runOnRuleCondition = async (params) => {
 };
 
 /** Click by create import condition button */
-export const addRuleCondition = async () => {
-    await test('Add rule condition', () => App.view.addRuleCondition());
-};
+export const addRuleCondition = () => (
+    test('Add rule condition', () => App.view.addRuleCondition())
+);
 
 /** Create new import rule condition */
 export const createRuleCondition = async (params) => {
@@ -308,9 +298,9 @@ const runOnRuleAction = async (params) => {
 };
 
 /** Click by create import action button */
-export const addRuleAction = async () => {
-    await test('Add rule action', () => App.view.addRuleAction());
-};
+export const addRuleAction = () => (
+    test('Add rule action', () => App.view.addRuleAction())
+);
 
 /** Create new import rule action */
 export const createRuleAction = async (params) => {
@@ -347,9 +337,9 @@ export const deleteRuleAction = async (index) => {
 };
 
 /** Submit import rule */
-export const submitRule = async () => {
-    await test('Submit import rule', () => App.view.submitRule());
-};
+export const submitRule = () => (
+    test('Submit import rule', () => App.view.submitRule())
+);
 
 /** Cancel import rule form */
 export const cancelRule = async () => {
@@ -360,11 +350,11 @@ export const cancelRule = async () => {
 };
 
 /** Input import rule search filter */
-export const inputRulesSearch = async (value) => {
-    await test('Search rules', () => App.view.inputRulesSearch(value));
-};
+export const inputRulesSearch = (value) => (
+    test('Search rules', () => App.view.inputRulesSearch(value))
+);
 
 /** Clear import rules search filter */
-export const clearRulesSearch = async () => {
-    await test('Clear rules filter', () => App.view.clearRulesSearch());
-};
+export const clearRulesSearch = () => (
+    test('Clear rules filter', () => App.view.clearRulesSearch())
+);

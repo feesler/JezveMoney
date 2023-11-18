@@ -76,13 +76,13 @@ export const closeDetails = async (directNavigate = false) => {
     });
 };
 
-export const inputName = async (value) => {
-    await test(`Input name '${value}'`, () => App.view.inputName(value));
-};
+export const inputName = (value) => (
+    test(`Input name '${value}'`, () => App.view.inputName(value))
+);
 
-export const inputBalance = async (value) => {
-    await test(`Input initial balance '${value}'`, () => App.view.inputBalance(value));
-};
+export const inputBalance = (value) => (
+    test(`Input initial balance '${value}'`, () => App.view.inputBalance(value))
+);
 
 export const changeType = async (value) => {
     const typeName = getAccountTypeName(value);

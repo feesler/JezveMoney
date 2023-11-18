@@ -51,6 +51,8 @@ export class ScheduleStory extends TestStory {
     }
 
     async list() {
+        await App.view.navigateToSchedule();
+
         await this.detailsMode();
         await this.select();
         await this.details();

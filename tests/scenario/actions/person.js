@@ -58,18 +58,16 @@ export const showDetails = async ({ index, directNavigate = false }) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of person not specified');
 
-    await test(`Show details of person [${index}]`, async () => {
-        await checkNavigation();
-        return App.view.showDetails(index, directNavigate);
-    });
+    await test(`Show details of person [${index}]`, () => (
+        App.view.showDetails(index, directNavigate)
+    ));
 };
 
-export const closeDetails = async (directNavigate = false) => {
-    await test('Close person details', async () => {
-        await checkNavigation();
-        return App.view.closeDetails(directNavigate);
-    });
-};
+export const closeDetails = (directNavigate = false) => (
+    test('Close person details', () => (
+        App.view.closeDetails(directNavigate)
+    ))
+);
 
 export const inputName = async (value) => {
     await test(`Input name '${value}'`, () => App.view.inputName(value));
@@ -238,33 +236,29 @@ export const toggleSelect = async (persons) => {
     });
 };
 
-export const selectAll = async () => {
-    await test('Select all persons', async () => {
-        await checkNavigation();
-        return App.view.selectAll();
-    });
-};
+export const selectAll = () => (
+    test('Select all persons', () => (
+        App.view.selectAll()
+    ))
+);
 
-export const deselectAll = async () => {
-    await test('Deselect all persons', async () => {
-        await checkNavigation();
-        return App.view.deselectAll();
-    });
-};
+export const deselectAll = () => (
+    test('Deselect all persons', () => (
+        App.view.deselectAll()
+    ))
+);
 
-export const toggleSortByName = async () => {
-    await test('Toggle sort by name', async () => {
-        await checkNavigation();
-        return App.view.toggleSortByName();
-    });
-};
+export const toggleSortByName = () => (
+    test('Toggle sort by name', () => (
+        App.view.toggleSortByName()
+    ))
+);
 
-export const toggleSortByDate = async () => {
-    await test('Toggle sort by date', async () => {
-        await checkNavigation();
-        return App.view.toggleSortByDate();
-    });
-};
+export const toggleSortByDate = () => (
+    test('Toggle sort by date', () => (
+        App.view.toggleSortByDate()
+    ))
+);
 
 export const sortManually = async () => {
     await test('Sort manually', async () => {

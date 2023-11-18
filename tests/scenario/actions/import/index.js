@@ -64,20 +64,18 @@ const parseCSV = (data) => {
 };
 
 /** Open import upload dialog */
-export const openUploadDialog = async () => {
-    await test('Open upload dialog', async () => {
-        await checkNavigation();
-        return App.view.launchUploadDialog();
-    });
-};
+export const openUploadDialog = () => (
+    test('Open upload dialog', () => (
+        App.view.launchUploadDialog()
+    ))
+);
 
 /** Close import upload dialog */
-export const closeUploadDialog = async () => {
-    await test('Close upload dialog', async () => {
-        await checkNavigation();
-        return App.view.closeUploadDialog();
-    });
-};
+export const closeUploadDialog = () => (
+    test('Close upload dialog', () => (
+        App.view.closeUploadDialog()
+    ))
+);
 
 /* eslint-disable no-console */
 /** Admin access required */
@@ -201,10 +199,9 @@ export const selectUploadAccount = async (accountId) => {
     const account = userAccounts.getItem(accountId);
     assert(account, `Invalid account id ${accountId}`);
 
-    await test(`Change main account at upload dialog to '${account.name}'`, async () => {
-        await checkNavigation();
-        return App.view.selectUploadAccount(accountId);
-    });
+    await test(`Change main account at upload dialog to '${account.name}'`, () => (
+        App.view.selectUploadAccount(accountId)
+    ));
 };
 
 /** Change main account */
@@ -213,20 +210,18 @@ export const changeMainAccount = async (accountId) => {
     const account = userAccounts.getItem(accountId);
     assert(account, `Invalid account id ${accountId}`);
 
-    await test(`Change main account to '${account.name}'`, async () => {
-        await checkNavigation();
-        return App.view.selectMainAccount(accountId);
-    });
+    await test(`Change main account to '${account.name}'`, () => (
+        App.view.selectMainAccount(accountId)
+    ));
 };
 
 export const enableRules = async (value = true) => {
     const enable = !!value;
     const descr = enable ? 'Enable rules' : 'Disable rules';
 
-    await test(descr, async () => {
-        await checkNavigation();
-        return App.view.enableRules(enable);
-    });
+    await test(descr, () => (
+        App.view.enableRules(enable)
+    ));
 };
 
 /** Enable/disable 'Check similar transactions' option */
@@ -234,10 +229,9 @@ export const enableCheckSimilar = async (value = true) => {
     const enable = !!value;
     const act = enable ? 'Enable' : 'Disable';
 
-    await test(`${act} check similar transactions`, async () => {
-        await checkNavigation();
-        return App.view.enableCheckSimilar(enable);
-    });
+    await test(`${act} check similar transactions`, () => (
+        App.view.enableCheckSimilar(enable)
+    ));
 };
 
 /** Enable/disable 'Check suitable reminders' option */
@@ -245,10 +239,9 @@ export const enableCheckReminders = async (value = true) => {
     const enable = !!value;
     const act = enable ? 'Enable' : 'Disable';
 
-    await test(`${act} check suitable reminders`, async () => {
-        await checkNavigation();
-        return App.view.enableCheckReminders(enable);
-    });
+    await test(`${act} check suitable reminders`, () => (
+        App.view.enableCheckReminders(enable)
+    ));
 };
 
 /** Enable/disable items */
@@ -256,94 +249,83 @@ export const enableItems = async ({ index, value = true }) => {
     const enable = !!value;
     const descr = enable ? 'Enable items' : 'Disable items';
 
-    await test(`${descr} [${index}]`, async () => {
-        await checkNavigation();
-        return App.view.enableItems(index, enable);
-    });
+    await test(`${descr} [${index}]`, () => (
+        App.view.enableItems(index, enable)
+    ));
 };
 
 /** Set list mode */
-export const setListMode = async () => {
-    await test('Set list mode', async () => {
-        await checkNavigation();
-        return App.view.setListMode();
-    });
-};
+export const setListMode = () => (
+    test('Set list mode', () => (
+        App.view.setListMode()
+    ))
+);
 
 /** Set select mode */
-export const setSelectMode = async () => {
-    await test('Set select mode', async () => {
-        await checkNavigation();
-        return App.view.setSelectMode();
-    });
-};
+export const setSelectMode = () => (
+    test('Set select mode', () => (
+        App.view.setSelectMode()
+    ))
+);
 
 /** Set sort mode */
-export const setSortMode = async () => {
-    await test('Set sort mode', async () => {
-        await checkNavigation();
-        return App.view.setSortMode();
-    });
-};
+export const setSortMode = () => (
+    test('Set sort mode', () => (
+        App.view.setSortMode()
+    ))
+);
 
 /** Toggle select items */
-export const toggleSelectItems = async (index) => {
-    await test(`Toggle select items [${index}]`, async () => {
-        await checkNavigation();
-        return App.view.toggleSelectItems(index);
-    });
-};
+export const toggleSelectItems = (index) => (
+    test(`Toggle select items [${index}]`, () => (
+        App.view.toggleSelectItems(index)
+    ))
+);
 
 /** Select all items */
-export const selectAllItems = async () => {
-    await test('Select all items', async () => {
-        await checkNavigation();
-        return App.view.selectAllItems();
-    });
-};
+export const selectAllItems = () => (
+    test('Select all items', () => (
+        App.view.selectAllItems()
+    ))
+);
 
 /** Deselect all items */
-export const deselectAllItems = async () => {
-    await test('Deselect all items', async () => {
-        await checkNavigation();
-        return App.view.deselectAllItems();
-    });
-};
+export const deselectAllItems = () => (
+    test('Deselect all items', () => (
+        App.view.deselectAllItems()
+    ))
+);
 
 /** Select enabled items */
-export const selectEnabledItems = async () => {
-    await test('Select enabled items', async () => {
-        await checkNavigation();
-        return App.view.selectEnabledItems();
-    });
-};
+export const selectEnabledItems = () => (
+    test('Select enabled items', () => (
+        App.view.selectEnabledItems()
+    ))
+);
 
 /** Select disabled items */
-export const selectDisabledItems = async () => {
-    await test('Select disabled items', async () => {
-        await checkNavigation();
-        return App.view.selectDisabledItems();
-    });
-};
+export const selectDisabledItems = () => (
+    test('Select disabled items', () => (
+        App.view.selectDisabledItems()
+    ))
+);
 
 /** Enable/disable selected items */
 export const enableSelectedItems = async (value) => {
     const enable = !!value;
     const descr = enable ? 'Enable selected items' : 'Disable selected items';
 
-    await test(descr, async () => {
-        await checkNavigation();
-        return App.view.enableSelectedItems(value);
-    });
+    await test(descr, () => (
+        App.view.enableSelectedItems(value)
+    ));
 };
 
 /** Enable/disable selected items */
-export const deleteSelectedItems = async () => {
-    await test('Delete selected items', async () => {
-        await checkNavigation();
-        return App.view.deleteSelectedItems();
-    });
-};
+export const deleteSelectedItems = () => (
+    test('Delete selected items', () => (
+        App.view.deleteSelectedItems()
+    ))
+);
 
 export const runFormAction = async (action) => {
     const actDescr = {
@@ -427,10 +409,9 @@ export const runFormActions = async (actions) => {
 
 /** Test manual add new import item */
 export const addItem = async (actions) => {
-    await test('Add import item', async () => {
-        await checkNavigation();
-        return App.view.addItem();
-    });
+    await test('Add import item', () => (
+        App.view.addItem()
+    ));
 
     await runFormActions(actions);
 };
@@ -452,29 +433,26 @@ export const updateItem = async (params) => {
 export const duplicateItem = async (params) => {
     assert(params && ('pos' in params), 'Invalid parameters');
 
-    await test(`Duplicate item [${params.pos}]`, async () => {
-        await checkNavigation();
-        return App.view.duplicateItemByPos(params.pos);
-    });
+    await test(`Duplicate item [${params.pos}]`, () => (
+        App.view.duplicateItemByPos(params.pos)
+    ));
 
     await runFormActions(params.action);
 };
 
 /** Save current import transaction form */
-export const saveItem = async () => {
-    await test('Save import form', async () => {
-        await checkNavigation();
-        return App.view.saveItem();
-    });
-};
+export const saveItem = () => (
+    test('Save import form', () => (
+        App.view.saveItem()
+    ))
+);
 
 /** Cancel edit current import transaction form */
-export const cancelItem = async () => {
-    await test('Cancel import form', async () => {
-        await checkNavigation();
-        return App.view.cancelItem();
-    });
-};
+export const cancelItem = () => (
+    test('Cancel import form', () => (
+        App.view.cancelItem()
+    ))
+);
 
 /** Create item and save */
 export const createItemAndSave = async (action) => {
@@ -498,10 +476,9 @@ export const duplicateItemAndSave = async (params) => {
 export const restoreItems = async (indexes) => {
     const itemInds = asArray(indexes);
 
-    await test(`Cancel changes of item(s) [${itemInds.join()}]`, async () => {
-        await checkNavigation();
-        return App.view.restoreItems(itemInds);
-    });
+    await test(`Cancel changes of item(s) [${itemInds.join()}]`, () => (
+        App.view.restoreItems(itemInds)
+    ));
 };
 
 /**
@@ -511,58 +488,51 @@ export const restoreItems = async (indexes) => {
 export const deleteItems = async (indexes) => {
     const itemInds = asArray(indexes);
 
-    await test(`Delete import item(s) [${itemInds.join()}]`, async () => {
-        await checkNavigation();
-        return App.view.deleteItem(itemInds);
-    });
+    await test(`Delete import item(s) [${itemInds.join()}]`, () => (
+        App.view.deleteItem(itemInds)
+    ));
 };
 
 /**
  * Click by delete all items button test
  */
-export const deleteAllItems = async () => {
-    await test('Delete all import items', async () => {
-        await checkNavigation();
-        return App.view.deleteAllItems();
-    });
-};
+export const deleteAllItems = () => (
+    test('Delete all import items', () => (
+        App.view.deleteAllItems()
+    ))
+);
 
 /** Submit */
-export const submit = async () => {
-    await test('Submit items', async () => {
-        await checkNavigation();
-        return App.view.submit();
-    });
-};
+export const submit = () => (
+    test('Submit items', () => (
+        App.view.submit()
+    ))
+);
 
 /** Navigate to first page */
-export const goToFirstPage = async () => {
-    await test('Navigate to first page', async () => {
-        await checkNavigation();
-        return App.view.goToFirstPage();
-    });
-};
+export const goToFirstPage = () => (
+    test('Navigate to first page', () => (
+        App.view.goToFirstPage()
+    ))
+);
 
 /** Navigate to next page */
-export const goToNextPage = async () => {
-    await test('Navigate to next page', async () => {
-        await checkNavigation();
-        return App.view.goToNextPage();
-    });
-};
+export const goToNextPage = () => (
+    test('Navigate to next page', () => (
+        App.view.goToNextPage()
+    ))
+);
 
 /** Navigate to previous page */
-export const goToPrevPage = async () => {
-    await test('Navigate to previous page', async () => {
-        await checkNavigation();
-        return App.view.goToPrevPage();
-    });
-};
+export const goToPrevPage = () => (
+    test('Navigate to previous page', () => (
+        App.view.goToPrevPage()
+    ))
+);
 
 /** Show more items */
-export const showMore = async () => {
-    await test('Show more items', async () => {
-        await checkNavigation();
-        return App.view.showMore();
-    });
-};
+export const showMore = () => (
+    test('Show more items', () => (
+        App.view.showMore()
+    ))
+);

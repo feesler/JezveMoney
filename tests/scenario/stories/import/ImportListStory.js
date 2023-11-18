@@ -846,6 +846,7 @@ export class ImportListStory extends TestStory {
         const { cardFile, ACC_RUB } = App.scenario;
 
         setBlock('Create transaction', 2);
+        await App.view.navigateToImport();
         await Actions.createItemAndSave([
             { action: 'inputDestAmount', data: '100' },
             { action: 'inputDate', data: App.formatInputDate(App.dates.weekAgo) },

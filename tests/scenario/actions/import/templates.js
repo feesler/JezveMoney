@@ -5,81 +5,81 @@ import { ImportTemplate } from '../../../model/ImportTemplate.js';
 import { CREATE_TPL_STATE } from '../../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
-export const selectTemplateById = async (value) => {
-    await test(`Select upload template [${value}]`, () => (
+export const selectTemplateById = (value) => (
+    test(`Select upload template [${value}]`, () => (
         App.view.selectUploadTemplateById(value)
-    ));
-};
+    ))
+);
 
 /** Test selection of import template by index */
-export const selectTemplateByIndex = async (value) => {
-    await test(`Select upload template by index [${value}]`, () => (
+export const selectTemplateByIndex = (value) => (
+    test(`Select upload template by index [${value}]`, () => (
         App.view.selectUploadTemplateByIndex(value)
-    ));
-};
+    ))
+);
 
 /** Test input import template name on create/update state */
-export const inputTemplateName = async (value) => {
-    await test(`Input template name (${value})`, () => (
+export const inputTemplateName = (value) => (
+    test(`Input template name (${value})`, () => (
         App.view.inputTemplateName(value)
-    ));
-};
+    ))
+);
 
 /** Select column of import template */
-export const selectTemplateColumn = async ({ column, index }) => {
-    await test(`Select template column [${column} => ${index}]`, () => (
+export const selectTemplateColumn = ({ column, index }) => (
+    test(`Select template column [${column} => ${index}]`, () => (
         App.view.selectTemplateColumn(column, index)
-    ));
-};
+    ))
+);
 
 /** Select date format of import template */
-export const selectTemplateDateFormat = async (locale) => {
-    await test(`Select template date format '${locale}'`, () => (
+export const selectTemplateDateFormat = (locale) => (
+    test(`Select template date format '${locale}'`, () => (
         App.view.selectTemplateDateFormat(locale)
-    ));
-};
+    ))
+);
 
 /** Input import template first row */
-export const inputTemplateFirstRow = async (value) => {
-    await test(`Input template first row (${value})`, () => (
+export const inputTemplateFirstRow = (value) => (
+    test(`Input template first row (${value})`, () => (
         App.view.inputTemplateFirstRow(value)
-    ));
-};
+    ))
+);
 
 /** Click by decrease template first row button */
-export const decreaseTemplateFirstRow = async () => {
-    await test('Decrease template first row', () => (
+export const decreaseTemplateFirstRow = () => (
+    test('Decrease template first row', () => (
         App.view.decreaseTemplateFirstRow()
-    ));
-};
+    ))
+);
 
 /** Click by increase template first row button */
-export const increaseTemplateFirstRow = async (value) => {
-    await test('Increase template first row', () => (
+export const increaseTemplateFirstRow = (value) => (
+    test('Increase template first row', () => (
         App.view.increaseTemplateFirstRow(value)
-    ));
-};
+    ))
+);
 
 /** Click by template account checkbox */
-export const toggleTemplateAccount = async () => {
-    await test('Toggle enable template account', () => (
+export const toggleTemplateAccount = () => (
+    test('Toggle enable template account', () => (
         App.view.toggleTemplateAccount()
-    ));
-};
+    ))
+);
 
 /** Select template account */
-export const selectTemplateAccountById = async (value) => {
-    await test(`Select template account by id (${value})`, () => (
+export const selectTemplateAccountById = (value) => (
+    test(`Select template account by id (${value})`, () => (
         App.view.selectTemplateAccountById(value)
-    ));
-};
+    ))
+);
 
 /** Select template account */
-export const selectTemplateAccountByIndex = async (index) => {
-    await test(`Select template account by index [${index}]`, () => (
+export const selectTemplateAccountByIndex = (index) => (
+    test(`Select template account by index [${index}]`, () => (
         App.view.selectTemplateAccountByIndex(index)
-    ));
-};
+    ))
+);
 
 /** Go to create import template state */
 export const createTemplate = async () => {
@@ -134,11 +134,11 @@ export const cancelTemplate = async () => {
 };
 
 /** Clicks on 'Back' button at upload dialog to return to select file stage */
-export const backToSelectFile = async () => {
-    await test('Cancel template', () => (
+export const backToSelectFile = () => (
+    test('Cancel template', () => (
         App.view.backToSelectFile()
-    ));
-};
+    ))
+);
 
 /** Creates template from specified props and submit */
 export const addTemplate = async (props) => {
