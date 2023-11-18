@@ -1710,6 +1710,16 @@ export class ImportView extends AppView {
 
         let removed = 0;
         for (const ind of items) {
+            const origItems = this.items;
+            const expectedItems = this.items.map((item) => new ImportTransaction(item));
+            expectedItems.splice(ind - removed, 1);
+
+            this.items = expectedItems;
+            const expected = this.getExpectedState();
+            const expectedList = this.getExpectedList();
+            expected.itemsList.items = expectedList.items;
+            this.items = origItems;
+
             await this.openContextMenu(ind - removed);
             await this.performAction(async () => {
                 await this.contextMenu.select('ctxDeleteBtn');
@@ -1717,16 +1727,13 @@ export class ImportView extends AppView {
                 await this.parse();
             });
 
-            this.items.splice(ind - removed, 1);
+            this.checkState(expected);
+            this.items = expectedItems;
 
             removed += 1;
         }
 
-        this.expectedState = this.getExpectedState();
-        const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
-
-        return this.checkState();
+        return true;
     }
 
     async deleteSelectedItems() {

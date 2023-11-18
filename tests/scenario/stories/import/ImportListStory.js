@@ -170,6 +170,12 @@ export class ImportListStory extends TestStory {
         await Actions.goToPrevPage(); // page 1
         await Actions.toggleSelectItems([11, 12]);
         await Actions.deleteSelectedItems();
+        await Actions.setListMode();
+
+        setBlock('Delete items while showing pages 2-3', 2);
+        await Actions.goToNextPage(); // page 2
+        await Actions.showMore(); // pages 2-3
+        await Actions.deleteItems(21);
 
         await Actions.deleteAllItems();
     }
