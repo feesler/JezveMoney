@@ -96,7 +96,10 @@ export class ReminderListView extends AppView {
             clearFiltersBtn: {
                 visible: filtersVisible,
             },
-            totalCounter: { visible: true, value: filteredItems.length },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(filteredItems.length),
+            },
             selectedCounter: { visible: selectMode },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: showMoreBtnVisible },
@@ -110,7 +113,7 @@ export class ReminderListView extends AppView {
         };
 
         if (selectMode) {
-            res.selectedCounter.value = selected.length;
+            res.selectedCounter.value = App.formatNumber(selected.length);
         }
 
         if (model.detailsItem) {

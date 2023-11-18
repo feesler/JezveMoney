@@ -55,8 +55,14 @@ export class CategoryListView extends AppView {
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
-            totalCounter: { visible: true, value: itemsCount },
-            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(itemsCount),
+            },
+            selectedCounter: {
+                visible: model.mode === 'select',
+                value: App.formatNumber(totalSelected),
+            },
             menuBtn: { visible: itemsCount > 0 && !isSortMode },
         };
 

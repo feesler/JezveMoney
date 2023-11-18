@@ -55,9 +55,18 @@ export class AccountListView extends AppView {
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
-            totalCounter: { visible: true, value: itemsCount },
-            hiddenCounter: { visible: true, value: hiddenTiles.items.length },
-            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(itemsCount),
+            },
+            hiddenCounter: {
+                visible: true,
+                value: App.formatNumber(hiddenTiles.items.length),
+            },
+            selectedCounter: {
+                visible: model.mode === 'select',
+                value: App.formatNumber(totalSelected),
+            },
             menuBtn: { visible: itemsCount > 0 && !isSortMode },
             tiles,
             hiddenTiles,

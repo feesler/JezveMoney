@@ -729,9 +729,9 @@ class TransactionListView extends AppView {
         const isSelectMode = (state.listMode === 'select');
         const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
 
-        this.itemsCounter.setContent(itemsCount.toString());
+        this.itemsCounter.setContent(App.formatNumber(itemsCount));
         this.selectedCounter.show(isSelectMode);
-        this.selectedCounter.setContent(selected.length.toString());
+        this.selectedCounter.setContent(App.formatNumber(selected.length));
     }
 
     renderModeSelector(state, prevState) {

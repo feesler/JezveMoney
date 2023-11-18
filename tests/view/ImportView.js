@@ -243,15 +243,15 @@ export class ImportView extends AppView {
         // Counters
         res.totalCounter = {
             visible: true,
-            value: this.items.length,
+            value: App.formatNumber(this.items.length),
         };
         res.enabledCounter = {
             visible: true,
-            value: enabledItems.length,
+            value: App.formatNumber(enabledItems.length),
         };
         res.selectedCounter = {
             visible: selectMode,
-            value: selectedItems.length,
+            value: App.formatNumber(selectedItems.length),
         };
 
         res.mainAccountSelect = {
