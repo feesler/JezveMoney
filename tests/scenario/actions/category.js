@@ -108,61 +108,53 @@ export const showDetails = async ({ index, directNavigate = false }) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of category not specified');
 
-    await test(`Show details of category [${index}]`, async () => {
-        await checkNavigation();
-        return App.view.showDetails(index, directNavigate);
-    });
+    await test(`Show details of category [${index}]`, () => (
+        App.view.showDetails(index, directNavigate)
+    ));
 };
 
-export const closeDetails = async (directNavigate = false) => {
-    await test('Close category details', async () => {
-        await checkNavigation();
-        return App.view.closeDetails(directNavigate);
-    });
-};
+export const closeDetails = (directNavigate = false) => (
+    test('Close category details', () => (
+        App.view.closeDetails(directNavigate)
+    ))
+);
 
 /** Input category name */
-export const inputName = async (name) => {
-    await test(`Input name '${name}'`, async () => {
-        assert.instanceOf(App.view, CategoryView, 'Invalid view');
-        return App.view.inputName(name);
-    });
-};
+export const inputName = (name) => (
+    test(`Input name '${name}'`, () => (
+        App.view.inputName(name)
+    ))
+);
 
 /** Input category color */
-export const inputColor = async (color) => {
-    await test(`Input color ${color}`, async () => {
-        assert.instanceOf(App.view, CategoryView, 'Invalid view');
-        return App.view.inputColor(color);
-    });
-};
+export const inputColor = (color) => (
+    test(`Input color ${color}`, () => (
+        App.view.inputColor(color)
+    ))
+);
 
 /** Select parent category */
 export const selectParentCategory = async (id) => {
     const category = App.state.categories.getItem(id);
     assert(category, 'Invalid category id');
 
-    await test(`Change parent category to '${category.name}'`, async () => {
-        assert.instanceOf(App.view, CategoryView, 'Invalid view');
-        return App.view.selectParentCategory(id);
-    });
+    await test(`Change parent category to '${category.name}'`, () => (
+        App.view.selectParentCategory(id)
+    ));
 };
 
 /** Select transaction type */
 export const selectType = async (type) => {
     const typeName = Category.typeToString(type);
 
-    await test(`Change transaction type to '${typeName}'`, async () => {
-        assert.instanceOf(App.view, CategoryView, 'Invalid view');
-        return App.view.selectType(type);
-    });
+    await test(`Change transaction type to '${typeName}'`, () => (
+        App.view.selectType(type)
+    ));
 };
 
 /** Submit category form */
 export const submit = async () => {
     await test('Submit category', async () => {
-        assert.instanceOf(App.view, CategoryView, 'Invalid view');
-
         const validInput = App.view.isValid();
         const { isUpdate } = App.view;
         const expectedCategory = App.view.getExpectedCategory();

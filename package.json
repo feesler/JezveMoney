@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.83.1",
+    "version": "1.84.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -13,7 +13,7 @@
         "lint": "npm-run-all --parallel lint-src lint-style lint-php lint-tests",
         "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
-        "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
+        "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location ./node_modules/.cache/stylelint/ --rd",
         "deploy": "node ./scripts/deploy.js",
         "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
@@ -99,7 +99,7 @@
         "@jezvejs/number": "^0.1.0",
         "@jezvejs/types": "^0.2.0",
         "core-js": "^3.33.2",
-        "jezvejs": "^2.8.0",
+        "jezvejs": "^2.9.0",
         "whatwg-fetch": "^3.6.19"
     }
 }

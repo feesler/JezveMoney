@@ -46,8 +46,14 @@ export class ScheduleView extends AppView {
 
         const res = {
             header: this.getHeaderExpectedState(state),
-            totalCounter: { visible: true, value: itemsCount },
-            selectedCounter: { visible: selectMode, value: selected.length },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(itemsCount),
+            },
+            selectedCounter: {
+                visible: selectMode,
+                value: App.formatNumber(selected.length),
+            },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: {
                 visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,

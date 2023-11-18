@@ -411,56 +411,49 @@ export const showDetails = async ({ index, directNavigate = false }) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Position of transaction not specified');
 
-    await test(`Show details of transaction [${index}]`, async () => {
-        await checkNavigation();
-        return App.view.showDetails(index, directNavigate);
-    });
+    await test(`Show details of transaction [${index}]`, () => (
+        App.view.showDetails(index, directNavigate)
+    ));
 };
 
-export const closeDetails = async ({ directNavigate = false } = {}) => {
-    await test('Close transaction details', async () => {
-        await checkNavigation();
-        return App.view.closeDetails(directNavigate);
-    });
-};
+export const closeDetails = ({ directNavigate = false } = {}) => (
+    test('Close transaction details', () => (
+        App.view.closeDetails(directNavigate)
+    ))
+);
 
 /** Clicks by mode selector button */
-export const toggleMode = async () => {
-    await test('Toggle details/classic mode', async () => {
-        await checkNavigation();
-        return App.view.toggleMode();
-    });
-};
+export const toggleMode = () => (
+    test('Toggle details/classic mode', () => (
+        App.view.toggleMode()
+    ))
+);
 
 /** Set list mode */
-export const setListMode = async () => {
-    await test('Set list mode', async () => {
-        await checkNavigation();
-        return App.view.setListMode();
-    });
-};
+export const setListMode = () => (
+    test('Set list mode', () => (
+        App.view.setListMode()
+    ))
+);
 
 /** Set select mode */
-export const setSelectMode = async () => {
-    await test('Set select mode', async () => {
-        await checkNavigation();
-        return App.view.setSelectMode();
-    });
-};
+export const setSelectMode = () => (
+    test('Set select mode', () => (
+        App.view.setSelectMode()
+    ))
+);
 
-export const selectAll = async () => {
-    await test('Select all transactions', async () => {
-        await checkNavigation();
-        return App.view.selectAll();
-    });
-};
+export const selectAll = () => (
+    test('Select all transactions', () => (
+        App.view.selectAll()
+    ))
+);
 
-export const deselectAll = async () => {
-    await test('Deselect all transactions', async () => {
-        await checkNavigation();
-        return App.view.deselectAll();
-    });
-};
+export const deselectAll = () => (
+    test('Deselect all transactions', () => (
+        App.view.deselectAll()
+    ))
+);
 
 export const goToFirstPage = async ({ directNavigate = false } = {}) => {
     if (!directNavigate) {

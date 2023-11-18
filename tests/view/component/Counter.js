@@ -15,7 +15,7 @@ export class Counter extends TestComponent {
 
             return {
                 title: titleEl?.textContent,
-                value: parseInt(valueEl?.textContent, 10),
+                value: valueEl?.textContent,
             };
         }, this.elem);
 

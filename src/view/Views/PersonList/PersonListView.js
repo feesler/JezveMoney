@@ -412,10 +412,10 @@ class PersonListView extends AppView {
         const isSelectMode = (state.listMode === 'select');
         const selected = (isSelectMode) ? getSelectedIds(state) : [];
 
-        this.itemsCounter.setContent(itemsCount.toString());
-        this.hiddenCounter.setContent(hiddenCount.toString());
+        this.itemsCounter.setContent(App.formatNumber(itemsCount));
+        this.hiddenCounter.setContent(App.formatNumber(hiddenCount));
         this.selectedCounter.show(isSelectMode);
-        this.selectedCounter.setContent(selected.length.toString());
+        this.selectedCounter.setContent(App.formatNumber(selected.length));
     }
 
     renderList(state) {

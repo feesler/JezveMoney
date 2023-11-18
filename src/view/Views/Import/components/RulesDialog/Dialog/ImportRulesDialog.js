@@ -38,6 +38,7 @@ const POPUP_CLASS = 'rules-popup';
 const HEADER_CLASS = 'rules-header';
 const CREATE_BTN_CLASS = 'create-btn circle-btn';
 const DIALOG_CONTENT_CLASS = 'rules-content';
+const LOADING_CLASS = 'rules-content_loading';
 const LIST_CONTAINER_CLASS = 'rules-list-container';
 const LIST_CLASS = 'rules-list';
 
@@ -55,7 +56,9 @@ export class ImportRulesDialog extends Component {
             ...props,
         });
 
-        this.store = createStore(reducer, { initialState: getInitialState() });
+        this.store = createStore(reducer, {
+            initialState: getInitialState(this.props),
+        });
 
         this.init();
 
@@ -131,14 +134,20 @@ export class ImportRulesDialog extends Component {
             ],
         });
 
+        // Loading indicator
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+            visible: true,
+        });
+
         // Dialog content
         this.rulesContent = createElement('div', {
             props: { className: DIALOG_CONTENT_CLASS },
-            children: this.listContainer,
+            children: [
+                this.loadingIndicator.elem,
+                this.listContainer,
+            ],
         });
-
-        // Loading indicator
-        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
 
         this.elem = createElement('div', {
             props: { className: DIALOG_CLASS },
@@ -146,7 +155,6 @@ export class ImportRulesDialog extends Component {
                 this.headerElem,
                 this.searchInput.elem,
                 this.rulesContent,
-                this.loadingIndicator.elem,
             ],
         });
 
@@ -174,7 +182,7 @@ export class ImportRulesDialog extends Component {
 
     /** Reset dialog state */
     reset() {
-        this.store.dispatch(actions.reset());
+        this.store.dispatch(actions.reset(this.props));
     }
 
     /** Hide dialog */
@@ -326,7 +334,7 @@ export class ImportRulesDialog extends Component {
     /** Render component state */
     render(state, prevState = {}) {
         if (state.listLoading) {
-            this.loadingIndicator.show();
+            this.rulesContent.classList.add(LOADING_CLASS);
         }
 
         if (state.id === LIST_STATE) {
@@ -345,7 +353,7 @@ export class ImportRulesDialog extends Component {
         this.renderDeleteConfirmDialog(state, prevState);
 
         if (!state.listLoading) {
-            this.loadingIndicator.hide();
+            this.rulesContent.classList.remove(LOADING_CLASS);
         }
     }
 }

@@ -243,15 +243,15 @@ export class ImportView extends AppView {
         // Counters
         res.totalCounter = {
             visible: true,
-            value: this.items.length,
+            value: App.formatNumber(this.items.length),
         };
         res.enabledCounter = {
             visible: true,
-            value: enabledItems.length,
+            value: App.formatNumber(enabledItems.length),
         };
         res.selectedCounter = {
             visible: selectMode,
-            value: selectedItems.length,
+            value: App.formatNumber(selectedItems.length),
         };
 
         res.mainAccountSelect = {
@@ -1563,6 +1563,48 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    async selectEnabledItems() {
+        assert(this.itemsList, 'No items available');
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.items.forEach((_, ind) => {
+            const item = this.items[ind];
+            item.selected = item.enabled;
+        });
+
+        this.model.listMenuVisible = false;
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.listMenu.select('selectEnabledBtn'));
+
+        return this.checkState();
+    }
+
+    async selectDisabledItems() {
+        assert(this.itemsList, 'No items available');
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.items.forEach((_, ind) => {
+            const item = this.items[ind];
+            item.selected = !item.enabled;
+        });
+
+        this.model.listMenuVisible = false;
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.listMenu.select('selectDisabledBtn'));
+
+        return this.checkState();
+    }
+
     async enableSelectedItems(value) {
         assert(this.itemsList, 'No items available');
         this.checkSelectMode();
@@ -1668,6 +1710,16 @@ export class ImportView extends AppView {
 
         let removed = 0;
         for (const ind of items) {
+            const origItems = this.items;
+            const expectedItems = this.items.map((item) => new ImportTransaction(item));
+            expectedItems.splice(ind - removed, 1);
+
+            this.items = expectedItems;
+            const expected = this.getExpectedState();
+            const expectedList = this.getExpectedList();
+            expected.itemsList.items = expectedList.items;
+            this.items = origItems;
+
             await this.openContextMenu(ind - removed);
             await this.performAction(async () => {
                 await this.contextMenu.select('ctxDeleteBtn');
@@ -1675,16 +1727,13 @@ export class ImportView extends AppView {
                 await this.parse();
             });
 
-            this.items.splice(ind - removed, 1);
+            this.checkState(expected);
+            this.items = expectedItems;
 
             removed += 1;
         }
 
-        this.expectedState = this.getExpectedState();
-        const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
-
-        return this.checkState();
+        return true;
     }
 
     async deleteSelectedItems() {

@@ -72,7 +72,10 @@ export class SelectReminderDialog extends TestComponent {
             clearFiltersBtn: {
                 visible: filtersVisible,
             },
-            totalCounter: { visible: true, value: filteredItems.length },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(filteredItems.length),
+            },
             selectedCounter: { visible: false },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: showMoreBtnVisible },

@@ -6,71 +6,71 @@ import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 import { Transaction } from '../../model/Transaction.js';
 import { Reminder } from '../../model/Reminder.js';
 
-export const inputStartDate = async (value) => {
-    await test(`Input schedule start date '${value}'`, () => (
+export const inputStartDate = (value) => (
+    test(`Input schedule start date '${value}'`, () => (
         App.view.inputStartDate(value)
-    ));
-};
+    ))
+);
 
-export const selectStartDate = async (date) => {
-    await test(`Select schedule start date '${formatDate(date, { locales: App.view.locale })}'`, () => (
+export const selectStartDate = (date) => (
+    test(`Select schedule start date '${formatDate(date, { locales: App.view.locale })}'`, () => (
         App.view.selectStartDate(date)
-    ));
-};
+    ))
+);
 
-export const inputEndDate = async (value) => {
-    await test(`Input schedule end date '${value}'`, () => (
+export const inputEndDate = (value) => (
+    test(`Input schedule end date '${value}'`, () => (
         App.view.inputEndDate(value)
-    ));
-};
+    ))
+);
 
-export const selectEndDate = async (date) => {
-    await test(`Select schedule end date '${formatDate(date, { locales: App.view.locale })}'`, () => (
+export const selectEndDate = (date) => (
+    test(`Select schedule end date '${formatDate(date, { locales: App.view.locale })}'`, () => (
         App.view.selectEndDate(date)
-    ));
-};
+    ))
+);
 
-export const clearEndDate = async () => {
-    await test('Clear schedule end date', () => (
+export const clearEndDate = () => (
+    test('Clear schedule end date', () => (
         App.view.clearEndDate()
-    ));
-};
+    ))
+);
 
-export const inputIntervalStep = async (data) => {
-    await test(`Input schedule interval step '${data}'`, () => (
+export const inputIntervalStep = (data) => (
+    test(`Input schedule interval step '${data}'`, () => (
         App.view.inputIntervalStep(data)
-    ));
-};
+    ))
+);
 
-export const selectWeekDayOffset = async (data) => {
-    await test(`Select schedule interval week day offset '${data}'`, () => (
+export const selectWeekDayOffset = (data) => (
+    test(`Select schedule interval week day offset '${data}'`, () => (
         App.view.selectWeekDayOffset(data)
-    ));
-};
+    ))
+);
 
-export const selectWeekdaysOffset = async () => {
-    await test('Select weekdays as schedule interval offset', () => (
+export const selectWeekdaysOffset = () => (
+    test('Select weekdays as schedule interval offset', () => (
         App.view.selectWeekdaysOffset()
-    ));
-};
+    ))
+);
 
-export const selectWeekendOffset = async () => {
-    await test('Select weekend as schedule interval offset', () => (
+export const selectWeekendOffset = () => (
+    test('Select weekend as schedule interval offset', () => (
         App.view.selectWeekendOffset()
-    ));
-};
+    ))
+);
 
-export const selectMonthDayOffset = async (data) => {
-    await test(`Select schedule interval month day offset '${data}'`, () => (
+export const selectMonthDayOffset = (data) => (
+    test(`Select schedule interval month day offset '${data}'`, () => (
         App.view.selectMonthDayOffset(data)
-    ));
-};
+    ))
+);
 
-export const selectMonthOffset = async (data) => {
-    await test(`Select schedule interval month offset '${data}'`, () => (
+export const selectMonthOffset = (data) => (
+    test(`Select schedule interval month offset '${data}'`, () => (
         App.view.selectMonthOffset(data)
-    ));
-};
+    ))
+);
 
 export const toggleEnableRepeat = async () => {
     const descr = (App.view.formModel.repeatEnabled)
@@ -132,17 +132,17 @@ export const changeAccount = async (value) => {
     });
 };
 
-export const toggleAccount = async () => {
-    await test(App.view.formModel.noAccount ? 'Enable account' : 'Disable account', () => (
+export const toggleAccount = () => (
+    test(App.view.formModel.noAccount ? 'Enable account' : 'Disable account', () => (
         App.view.toggleAccount()
-    ));
-};
+    ))
+);
 
-export const swapSourceAndDest = async () => {
-    await test('Swap source and destination', () => (
+export const swapSourceAndDest = () => (
+    test('Swap source and destination', () => (
         App.view.swapSourceAndDest()
-    ));
-};
+    ))
+);
 
 export const changeSourceCurrency = async (data) => {
     const curr = App.currency.getItem(data);
@@ -171,125 +171,125 @@ export const changeCategory = async (data) => {
     ));
 };
 
-export const inputSrcAmount = async (value) => {
-    await test(`Input source amount '${value}'`, () => (
+export const inputSrcAmount = (value) => (
+    test(`Input source amount '${value}'`, () => (
         App.view.inputSrcAmount(value)
-    ));
-};
+    ))
+);
 
-export const inputDestAmount = async (value) => {
-    await test(`Input destination amount '${value}'`, () => (
+export const inputDestAmount = (value) => (
+    test(`Input destination amount '${value}'`, () => (
         App.view.inputDestAmount(value)
-    ));
-};
+    ))
+);
 
-export const inputResBalance = async (value) => {
-    await test(`Input source result balance '${value}'`, () => (
+export const inputResBalance = (value) => (
+    test(`Input source result balance '${value}'`, () => (
         App.view.inputResBalance(value)
-    ));
-};
+    ))
+);
 
-export const inputDestResBalance = async (value) => {
-    await test(`Input destination result balance '${value}'`, () => (
+export const inputDestResBalance = (value) => (
+    test(`Input destination result balance '${value}'`, () => (
         App.view.inputDestResBalance(value)
-    ));
-};
+    ))
+);
 
-export const inputExchRate = async (value) => {
-    await test(`Input exchange rate '${value}'`, () => (
+export const inputExchRate = (value) => (
+    test(`Input exchange rate '${value}'`, () => (
         App.view.inputExchRate(value)
-    ));
-};
+    ))
+);
 
-export const toggleExchange = async () => {
-    await test('Toggle exchange rate direction', () => (
+export const toggleExchange = () => (
+    test('Toggle exchange rate direction', () => (
         App.view.toggleExchange()
-    ));
-};
+    ))
+);
 
-export const clickSrcAmount = async () => {
-    await test('Click on source amount', () => (
+export const clickSrcAmount = () => (
+    test('Click on source amount', () => (
         App.view.clickSrcAmount()
-    ));
-};
+    ))
+);
 
-export const clickDestAmount = async () => {
-    await test('Click on destination amount', () => (
+export const clickDestAmount = () => (
+    test('Click on destination amount', () => (
         App.view.clickDestAmount()
-    ));
-};
+    ))
+);
 
-export const clickSrcResultBalance = async () => {
-    await test('Click on source result balance', () => (
+export const clickSrcResultBalance = () => (
+    test('Click on source result balance', () => (
         App.view.clickSrcResultBalance()
-    ));
-};
+    ))
+);
 
-export const clickDestResultBalance = async () => {
-    await test('Click on destination result balance', () => (
+export const clickDestResultBalance = () => (
+    test('Click on destination result balance', () => (
         App.view.clickDestResultBalance()
-    ));
-};
+    ))
+);
 
-export const clickExchRate = async () => {
-    await test('Click on exchange rate', () => (
+export const clickExchRate = () => (
+    test('Click on exchange rate', () => (
         App.view.clickExchRate()
-    ));
-};
+    ))
+);
 
-export const inputDate = async (value) => {
-    await test(`Input date '${value}'`, () => (
+export const inputDate = (value) => (
+    test(`Input date '${value}'`, () => (
         App.view.inputDate(value)
-    ));
-};
+    ))
+);
 
-export const selectDate = async (date) => {
-    await test(`Select date '${formatDate(date, { locales: App.view.locale })}'`, () => (
+export const selectDate = (date) => (
+    test(`Select date '${formatDate(date, { locales: App.view.locale })}'`, () => (
         App.view.selectDate(date)
-    ));
-};
+    ))
+);
 
-export const inputComment = async (value) => {
-    await test(`Input comment '${value}'`, () => (
+export const inputComment = (value) => (
+    test(`Input comment '${value}'`, () => (
         App.view.inputComment(value)
-    ));
-};
+    ))
+);
 
-export const changeTransactionType = async (type) => {
-    await test(`Change type to ${Transaction.typeToString(type, App.config.logsLocale)}`, () => (
+export const changeTransactionType = (type) => (
+    test(`Change type to ${Transaction.typeToString(type, App.config.logsLocale)}`, () => (
         App.view.changeTransactionType(type)
-    ));
-};
+    ))
+);
 
-export const openReminderDialog = async () => {
-    await test('Open \'Select reminder\' dialog', () => (
+export const openReminderDialog = () => (
+    test('Open \'Select reminder\' dialog', () => (
         App.view.openReminderDialog()
-    ));
-};
+    ))
+);
 
-export const closeReminderDialog = async () => {
-    await test('Close \'Select reminder\' dialog', () => (
+export const closeReminderDialog = () => (
+    test('Close \'Select reminder\' dialog', () => (
         App.view.closeReminderDialog()
-    ));
-};
+    ))
+);
 
-export const selectReminderByIndex = async (index) => {
-    await test(`Select reminder by index [${index}]`, () => (
+export const selectReminderByIndex = (index) => (
+    test(`Select reminder by index [${index}]`, () => (
         App.view.selectReminderByIndex(index)
-    ));
-};
+    ))
+);
 
-export const removeReminder = async () => {
-    await test('Remove reminder', () => (
+export const removeReminder = () => (
+    test('Remove reminder', () => (
         App.view.removeReminder()
-    ));
-};
+    ))
+);
 
-export const clearAllRemindersFilters = async () => {
-    await test('Clear all filters', () => (
+export const clearAllRemindersFilters = () => (
+    test('Clear all filters', () => (
         App.view.clearAllRemindersFilters()
-    ));
-};
+    ))
+);
 
 export const filterRemindersByState = async (state) => {
     const stateType = parseInt(state, 10);
@@ -317,56 +317,56 @@ export const selectRemindersEndDateFilter = async (date) => {
     ));
 };
 
-export const clearRemindersStartDateFilter = async () => {
-    await test('Clear reminders start date filter', () => (
+export const clearRemindersStartDateFilter = () => (
+    test('Clear reminders start date filter', () => (
         App.view.clearRemindersStartDateFilter()
-    ));
-};
+    ))
+);
 
-export const clearRemindersEndDateFilter = async () => {
-    await test('Clear reminders end date filter', () => (
+export const clearRemindersEndDateFilter = () => (
+    test('Clear reminders end date filter', () => (
         App.view.clearRemindersEndDateFilter()
-    ));
-};
+    ))
+);
 
-export const goToRemindersFirstPage = async () => {
-    await test('Navigate to reminders first page', () => (
+export const goToRemindersFirstPage = () => (
+    test('Navigate to reminders first page', () => (
         App.view.goToRemindersFirstPage()
-    ));
-};
+    ))
+);
 
-export const goToRemindersLastPage = async () => {
-    await test('Navigate to reminders last page', () => (
+export const goToRemindersLastPage = () => (
+    test('Navigate to reminders last page', () => (
         App.view.goToRemindersLastPage()
-    ));
-};
+    ))
+);
 
-export const goToRemindersPrevPage = async () => {
-    await test('Navigate to reminders previous page', () => (
+export const goToRemindersPrevPage = () => (
+    test('Navigate to reminders previous page', () => (
         App.view.goToRemindersPrevPage()
-    ));
-};
+    ))
+);
 
-export const goToRemindersNextPage = async () => {
-    await test('Navigate to reminders next page', () => (
+export const goToRemindersNextPage = () => (
+    test('Navigate to reminders next page', () => (
         App.view.goToRemindersNextPage()
-    ));
-};
+    ))
+);
 
-export const showMoreReminders = async () => {
-    await test('Show more reminders', () => (
+export const showMoreReminders = () => (
+    test('Show more reminders', () => (
         App.view.showMoreReminders()
-    ));
-};
+    ))
+);
 
-export const setRemindersClassicMode = async () => {
-    await test('Set reminders list classic mode', () => (
+export const setRemindersClassicMode = () => (
+    test('Set reminders list classic mode', () => (
         App.view.setRemindersClassicMode()
-    ));
-};
+    ))
+);
 
-export const setRemindersDetailsMode = async () => {
-    await test('Set reminders list details mode', () => (
+export const setRemindersDetailsMode = () => (
+    test('Set reminders list details mode', () => (
         App.view.setRemindersDetailsMode()
-    ));
-};
+    ))
+);

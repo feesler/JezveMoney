@@ -641,10 +641,10 @@ class ImportView extends AppView {
         const selected = (isSelectMode) ? getSelectedItems(state.items) : [];
 
         // Counters
-        this.itemsCounter.setContent(itemsCount.toString());
-        this.enabledCounter.setContent(enabledCount.toString());
+        this.itemsCounter.setContent(App.formatNumber(itemsCount));
+        this.enabledCounter.setContent(App.formatNumber(enabledCount));
         this.selectedCounter.show(isSelectMode);
-        this.selectedCounter.setContent(selected.length.toString());
+        this.selectedCounter.setContent(App.formatNumber(selected.length));
 
         // Main account select
         this.accountDropDown.setSelection(state.mainAccount.id);

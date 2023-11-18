@@ -67,4 +67,10 @@
   --popup-menu-border: #b0b0b0;
   --popup-menu-bg: #ffffffeb;
   --popup-menu-box-shadow: 0 0 10px 0 #00000080;
+
+  /* Switch */
+  .switch {
+    --switch-disabled-bg: #dddddd;
+    --switch-disabled-slider-color: #f0f0f0;
+  }
 }

@@ -128,10 +128,10 @@ export const getPagination = (state) => {
         ...pagination,
         total: items.length,
         pagesCount,
-        range: 1,
     };
 
     res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
+    res.range = (pagesCount > 0) ? Math.min(pagesCount - res.page + 1, pagination.range) : 1;
 
     return res;
 };

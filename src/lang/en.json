@@ -33,6 +33,8 @@
         "select": "Select",
         "selectAll": "Select all",
         "deselectAll": "Clear selection",
+        "selectEnabled": "Select enabled",
+        "selectDisabled": "Select disabled",
         "sort": "Sort",
         "sortByName": "Sort by name",
         "sortByDate": "Sort by create date",

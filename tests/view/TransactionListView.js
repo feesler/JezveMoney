@@ -577,8 +577,14 @@ export class TransactionListView extends AppView {
                 value: model.filter.search,
                 visible: filtersVisible,
             },
-            totalCounter: { visible: true, value: model.filtered.length },
-            selectedCounter: { visible: selectMode, value: selected.length },
+            totalCounter: {
+                visible: true,
+                value: App.formatNumber(model.filtered.length),
+            },
+            selectedCounter: {
+                visible: selectMode,
+                value: App.formatNumber(selected.length),
+            },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: {
                 visible: isItemsAvailable && pageNum < model.list.pages && !model.isLoadingMore,

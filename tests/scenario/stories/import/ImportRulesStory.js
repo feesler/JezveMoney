@@ -614,6 +614,7 @@ export class ImportRulesStory extends TestStory {
             : App.datesFmt.now;
 
         setBlock('Update conditions and actions', 2);
+        await Actions.openRulesDialog();
         await Actions.updateRule(3);
         await Actions.updateRuleCondition({
             pos: 0,

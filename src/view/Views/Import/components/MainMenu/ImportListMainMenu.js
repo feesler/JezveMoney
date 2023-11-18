@@ -34,9 +34,15 @@ export class ImportListMainMenu extends PopupMenu {
         const isListMode = context.listMode === 'list';
         const isSelectMode = context.listMode === 'select';
         const hasItems = context.items.length > 0;
+        const hasNotSelectedEnabled = context.items.some((item) => (
+            item.enabled && !item.selected
+        ));
+        const hasNotSelectedDisabled = context.items.some((item) => (
+            !item.enabled && !item.selected
+        ));
         const selectedItems = getSelectedItems(context.items);
-        const hasEnabled = selectedItems.some((item) => item.enabled);
-        const hasDisabled = selectedItems.some((item) => !item.enabled);
+        const hasSelectedEnabled = selectedItems.some((item) => item.enabled);
+        const hasSelectedDisabled = selectedItems.some((item) => !item.enabled);
 
         this.setItems([{
             id: 'createItemBtn',
@@ -45,7 +51,6 @@ export class ImportListMainMenu extends PopupMenu {
             hidden: !isListMode,
             onClick: () => dispatch(actions.createItem()),
         }, {
-            id: 'separator1',
             type: 'separator',
             hidden: !isListMode,
         }, {
@@ -61,7 +66,6 @@ export class ImportListMainMenu extends PopupMenu {
             hidden: !(isListMode && context.items.length > 1),
             onClick: () => dispatch(actions.changeListMode('sort')),
         }, {
-            id: 'separator2',
             type: 'separator',
             hidden: !(isListMode && hasItems),
         }, {
@@ -75,14 +79,27 @@ export class ImportListMainMenu extends PopupMenu {
             hidden: !(isSelectMode && selectedItems.length > 0),
             onClick: () => dispatch(actions.deselectAllItems()),
         }, {
+            id: 'selectEnabledBtn',
+            title: __('actions.selectEnabled'),
+            hidden: !(isSelectMode && hasNotSelectedEnabled),
+            onClick: () => dispatch(actions.selectEnabledItems()),
+        }, {
+            id: 'selectDisabledBtn',
+            title: __('actions.selectDisabled'),
+            hidden: !(isSelectMode && hasNotSelectedDisabled),
+            onClick: () => dispatch(actions.selectDisabledItems()),
+        }, {
+            type: 'separator',
+            hidden: !isSelectMode,
+        }, {
             id: 'enableSelectedBtn',
             title: __('actions.enableSelected'),
-            hidden: !(isSelectMode && hasDisabled),
+            hidden: !(isSelectMode && hasSelectedDisabled),
             onClick: () => dispatch(actions.enableSelectedItems(true)),
         }, {
             id: 'disableSelectedBtn',
             title: __('actions.disableSelected'),
-            hidden: !(isSelectMode && hasEnabled),
+            hidden: !(isSelectMode && hasSelectedEnabled),
             onClick: () => dispatch(actions.enableSelectedItems(false)),
         }, {
             id: 'deleteSelectedBtn',
@@ -97,7 +114,6 @@ export class ImportListMainMenu extends PopupMenu {
             disabled: !(context.items.length > 0),
             onClick: () => dispatch(deleteAll()),
         }, {
-            id: 'separator3',
             type: 'separator',
             hidden: !isListMode,
         }, {
@@ -114,7 +130,6 @@ export class ImportListMainMenu extends PopupMenu {
             disabled: !context.rulesEnabled,
             onClick: () => dispatch(actions.openRulesDialog()),
         }, {
-            id: 'separator4',
             type: 'separator',
             hidden: !isListMode,
         }, {

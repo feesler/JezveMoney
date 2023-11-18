@@ -15,7 +15,8 @@ export const UPDATE_STATE = 3;
 const SHOW_ON_PAGE = 20;
 
 /** Returns initial state object */
-export const getInitialState = () => ({
+export const getInitialState = (props) => ({
+    ...props,
     id: LIST_STATE,
     listLoading: false,
     filter: '',
@@ -35,7 +36,7 @@ export const getInitialState = () => ({
 
 // Reducers
 const slice = createSlice({
-    reset: () => updateList(getInitialState()),
+    reset: (_, props) => updateList(getInitialState(props)),
 
     showContextMenu: (state, contextItem) => (
         (state.contextItem === contextItem && state.showContextMenu)
