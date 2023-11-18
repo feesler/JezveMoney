@@ -188,10 +188,17 @@ export class ImportListStory extends TestStory {
         setBlock('List items select', 2);
         await Actions.toggleSelectItems([0, 1]);
         await Actions.toggleSelectItems([0, 1]);
+
         await Actions.selectAllItems();
         await Actions.deselectAllItems();
+
         await Actions.toggleSelectItems([0, 1, 2]);
         await Actions.enableSelectedItems(false);
+        await Actions.deselectAllItems();
+
+        await Actions.selectEnabledItems();
+        await Actions.selectDisabledItems();
+
         await Actions.enableSelectedItems(true);
         await Actions.deleteSelectedItems();
         await Actions.setListMode();

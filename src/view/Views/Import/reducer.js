@@ -144,6 +144,28 @@ const slice = createSlice({
         items: state.items.map((item) => item.select(false)),
     }),
 
+    selectEnabledItems: (state) => (
+        (state.listMode !== 'select')
+            ? state
+            : {
+                ...state,
+                items: state.items.map((item) => (
+                    item.select(item.enabled)
+                )),
+            }
+    ),
+
+    selectDisabledItems: (state) => (
+        (state.listMode !== 'select')
+            ? state
+            : {
+                ...state,
+                items: state.items.map((item) => (
+                    item.select(!item.enabled)
+                )),
+            }
+    ),
+
     enableSelectedItems: (state, value) => (
         (state.listMode !== 'select')
             ? state

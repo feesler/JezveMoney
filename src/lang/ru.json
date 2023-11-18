@@ -33,6 +33,8 @@
         "select": "Выбрать",
         "selectAll": "Выбрать все",
         "deselectAll": "Снять выделение",
+        "selectEnabled": "Выбрать включенные",
+        "selectDisabled": "Выбрать отключенные",
         "sort": "Сортировать",
         "sortByName": "По названию",
         "sortByDate": "По дате создания",

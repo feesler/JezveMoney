@@ -1563,6 +1563,48 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
+    async selectEnabledItems() {
+        assert(this.itemsList, 'No items available');
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.items.forEach((_, ind) => {
+            const item = this.items[ind];
+            item.selected = item.enabled;
+        });
+
+        this.model.listMenuVisible = false;
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.listMenu.select('selectEnabledBtn'));
+
+        return this.checkState();
+    }
+
+    async selectDisabledItems() {
+        assert(this.itemsList, 'No items available');
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.items.forEach((_, ind) => {
+            const item = this.items[ind];
+            item.selected = !item.enabled;
+        });
+
+        this.model.listMenuVisible = false;
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.listMenu.select('selectDisabledBtn'));
+
+        return this.checkState();
+    }
+
     async enableSelectedItems(value) {
         assert(this.itemsList, 'No items available');
         this.checkSelectMode();

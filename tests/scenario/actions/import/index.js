@@ -310,6 +310,22 @@ export const deselectAllItems = async () => {
     });
 };
 
+/** Select enabled items */
+export const selectEnabledItems = async () => {
+    await test('Select enabled items', async () => {
+        await checkNavigation();
+        return App.view.selectEnabledItems();
+    });
+};
+
+/** Select disabled items */
+export const selectDisabledItems = async () => {
+    await test('Select disabled items', async () => {
+        await checkNavigation();
+        return App.view.selectDisabledItems();
+    });
+};
+
 /** Enable/disable selected items */
 export const enableSelectedItems = async (value) => {
     const enable = !!value;
