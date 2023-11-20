@@ -11,6 +11,7 @@ const TRANS_ITEM_CLASS = 'trans-item';
 const defaultProps = {
     mode: 'classic', // 'classic' or 'details'
     showDate: true,
+    showResults: true,
 };
 
 /**
@@ -30,6 +31,7 @@ export class TransactionListItem extends ListItem {
             state.item === prevState?.item
             && state.mode === prevState?.mode
             && state.showDate === prevState?.showDate
+            && state.showResults === prevState?.showResults
         ) {
             return;
         }
@@ -38,6 +40,7 @@ export class TransactionListItem extends ListItem {
             item: state.item,
             mode: state.mode,
             showDate: state.showDate,
+            showResults: state.showResults,
         };
 
         if (this.transactionBase) {

@@ -798,6 +798,7 @@ class TransactionListView extends AppView {
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
             showDate: !state.groupByDate,
+            showResults: (state.mode === 'details'),
             items: listItems,
             renderTime: state.renderTime,
         }));

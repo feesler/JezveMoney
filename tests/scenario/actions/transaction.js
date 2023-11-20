@@ -246,6 +246,8 @@ export const deleteFromContextMenu = async (index) => {
     await test(`Delete transaction from context menu [${index}]`, async () => {
         await App.view.navigateToTransactions();
 
+        const options = TransactionList.getRenderOptions(App.view.model, App.state);
+
         await App.view.deleteFromContextMenu(index);
 
         const id = App.state.transactions.indexesToIds(index);
@@ -254,9 +256,8 @@ export const deleteFromContextMenu = async (index) => {
         App.view.model.data = App.state.transactions.clone();
 
         const expectedItems = App.view.model.data.getPage(1, onPage, 1, true);
-        const showDate = !App.state.getGroupByDate();
         const expected = {
-            transList: TransactionList.render(expectedItems, App.state, showDate),
+            transList: TransactionList.render(expectedItems, App.state, options),
         };
         App.view.checkState(expected);
 

@@ -297,7 +297,8 @@ export class TransactionListView extends AppView {
         if (res.filtered.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = res.filtered.getPage(1, onPage, range, true);
-            const { items } = TransactionList.render(pageItems, App.state);
+            const options = TransactionList.getRenderOptions(model);
+            const { items } = TransactionList.render(pageItems, App.state, options);
 
             res.list = {
                 page: 1,
@@ -436,7 +437,9 @@ export class TransactionListView extends AppView {
         res.list.page = page;
         res.list.range = range;
         const pageItems = res.filtered.getPage(page, onPage, range, true);
-        const { items } = TransactionList.render(pageItems, App.state);
+
+        const options = TransactionList.getRenderOptions(model);
+        const { items } = TransactionList.render(pageItems, App.state, options);
         res.list.items = items;
 
         return res;
@@ -461,7 +464,9 @@ export class TransactionListView extends AppView {
         res.filtered = TransactionsList.create(res.filtered);
         res.list.range = range;
         const pageItems = res.filtered.getPage(model.list.page, onPage, range, true);
-        const { items } = TransactionList.render(pageItems, App.state);
+
+        const options = TransactionList.getRenderOptions(model);
+        const { items } = TransactionList.render(pageItems, App.state, options);
         res.list.items = items;
 
         return res;
@@ -502,8 +507,8 @@ export class TransactionListView extends AppView {
             items = pageItems;
         }
 
-        const showDate = !App.state.getGroupByDate();
-        return TransactionList.render(items, App.state, showDate);
+        const options = TransactionList.getRenderOptions(model);
+        return TransactionList.render(items, App.state, options);
     }
 
     getExpectedState(model = this.model, state = App.state) {

@@ -24,6 +24,7 @@ const defaultProps = {
     mode: 'classic', // 'classic' or 'details'
     showControls: true,
     showDate: true,
+    showResults: true,
     ascending: false,
     onSort: null,
     onItemClick: null,
@@ -176,6 +177,7 @@ export class TransactionList extends SortableListContainer {
             listMode: state.listMode,
             showControls: state.showControls,
             showDate: state.showDate,
+            showResults: state.showResults,
             renderTime: state.renderTime,
             onItemClick: state.onItemClick,
             onSort: state.onSort,
@@ -190,6 +192,7 @@ export class TransactionList extends SortableListContainer {
             || state.listMode !== prevState.listMode
             || state.showControls !== prevState.showControls
             || state.showDate !== prevState.showDate
+            || state.showResults !== prevState.showResults
         );
     }
 

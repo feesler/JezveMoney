@@ -81,6 +81,7 @@ export class TransactionListGroup extends Component {
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
             showDate: false,
+            showResults: state.showResults,
             items: state.item.items,
             renderTime: state.renderTime,
         }));
