@@ -1,8 +1,18 @@
 /* Color input field */
-.color-field {
+.field.color-field {
   --cf-disabled-opacity: 0.3;
   --cf-disabled-text-color: var(--neutral-color);
   --cf-box-shadow-color: #000000;
+
+  display: grid;
+
+  .field__title {
+    grid-column: 1 / 1;
+  }
+
+  .field__content {
+    grid-column: 2 / 2;
+  }
 
   .input-field__input-container {
     width: var(--input-height);
@@ -12,7 +22,7 @@
     border-radius: 100vh;
   }
 
-  .input {
+  .input-field__input {
     position: absolute;
     left: 0;
     right: 0;
@@ -35,12 +45,22 @@
   }
 }
 
-/* Disabled state */
-.color-field[disabled] {
-  --field-title-color: var(--switch-disabled-text-color);
+/* Invalidated state */
+.color-field.validation-block.invalid-block {
+  .input-field__input-container {
+    outline-color: var(--invalid-feedback-color);
+    outline-offset: 2px;
+    outline-style: solid;
+    outline-width: 2px;
+  }
 }
 
-[disabled] .input-field__input-color,
-[disabled] + .input-field__input-color {
+/* Disabled state */
+.field.color-field[disabled] {
+  --field-title-color: var(--cf-disabled-text-color);
+}
+
+.field.color-field[disabled] .input-field__input-color,
+.field.color-field .input-field__input[disabled] + .input-field__input-color {
   opacity: var(--cf-disabled-opacity);
 }
