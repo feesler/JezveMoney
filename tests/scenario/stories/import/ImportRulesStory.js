@@ -13,6 +13,7 @@ import {
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_STRING_INCLUDES,
+    IMPORT_COND_OP_STRING_NOT_INCLUDES,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
 } from '../../../model/ImportCondition.js';
@@ -320,7 +321,12 @@ export class ImportRulesStory extends TestStory {
     async create() {
         setBlock('Create import rules', 1);
 
-        const { CREDIT_CARD, MARIA, TRANSPORT_CATEGORY } = App.scenario;
+        const {
+            CREDIT_CARD,
+            MARIA,
+            TRANSPORT_CATEGORY,
+            INVEST_CATEGORY,
+        } = App.scenario;
 
         setBlock('Create import rule #1', 2);
         await Actions.createRule();
@@ -432,6 +438,24 @@ export class ImportRulesStory extends TestStory {
         await Actions.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Bar date' },
+        ]);
+        await Actions.submitRule();
+
+        setBlock('Create import rule #6', 2);
+        await Actions.createRule();
+        await Actions.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+            { action: 'inputValue', data: 'R-BANK' },
+        ]);
+        await Actions.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_STRING_NOT_INCLUDES },
+            { action: 'inputValue', data: 'C2C' },
+        ]);
+        await Actions.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_CATEGORY },
+            { action: 'changeCategory', data: INVEST_CATEGORY },
         ]);
         await Actions.submitRule();
     }

@@ -474,6 +474,13 @@ export class ImportTransaction {
         }
     }
 
+    setCategory(value) {
+        const category = App.state.categories.getItem(value);
+        assert(category, `Category not found: ${value}`);
+
+        this.category_id = category.id;
+    }
+
     setComment(value) {
         this.comment = value;
     }

@@ -29,13 +29,6 @@ const create = async () => {
             actions.setComment('Bank'),
         ],
     }, {
-        conditions: [
-            conditions.comment.includes.value('ANOTHER BANK'),
-        ],
-        actions: [
-            actions.setCategory(App.scenario.INVEST_CATEGORY),
-        ],
-    }, {
         conditions: [taxiCondition],
         actions: [taxiAction],
     }, {
@@ -45,6 +38,14 @@ const create = async () => {
         ],
         actions: [
             actions.setTransactionType('limit'),
+        ],
+    }, {
+        conditions: [
+            conditions.comment.includes.value('R-BANK'),
+            conditions.comment.notIncludes.value('C2C'),
+        ],
+        actions: [
+            actions.setCategory(App.scenario.INVEST_CATEGORY),
         ],
     }, {
         // Invalid rules

@@ -413,6 +413,7 @@
             "emptyValue": "Введите значение",
             "comparePropertyUnavailable": "Сравнение с другим полем недоступно",
             "compareSameError": "Невозможно сравнивать поле с самим собой",
+            "notIncludesConditionConflict": "Условие 'Не содержит' конфликтует с другим условием для того же поля",
             "equalConditionError": "Условие 'Равно' не может быть комбинировано с другими условиями для того же поля",
             "duplicateLessConditionError": "Повторяющееся условие 'меньше'",
             "conditionRangesError": "Диапазоны условий не пересекаются",
@@ -444,6 +445,7 @@
             "compareWithProperty": "Сравнить с другим полем",
             "operators": {
                 "includes": "Содержит",
+                "notIncludes": "Не содержит",
                 "equal": "Равно",
                 "notEqual": "Не равно",
                 "less": "Меньше",
@@ -451,6 +453,7 @@
             },
             "opInline": {
                 "includes": "содержит",
+                "notIncludes": "не содержит",
                 "equal": "равно",
                 "notEqual": "не равно",
                 "less": "меньше чем",

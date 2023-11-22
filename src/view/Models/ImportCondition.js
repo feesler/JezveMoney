@@ -20,6 +20,7 @@ export const IMPORT_COND_OP_EQUAL = 2;
 export const IMPORT_COND_OP_NOT_EQUAL = 3;
 export const IMPORT_COND_OP_LESS = 4;
 export const IMPORT_COND_OP_GREATER = 5;
+export const IMPORT_COND_OP_STRING_NOT_INCLUDES = 6;
 /** Condition flags */
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 
@@ -65,6 +66,7 @@ export class ImportCondition extends ListItem {
     /** String operators */
     static stringOperators = [
         IMPORT_COND_OP_STRING_INCLUDES,
+        IMPORT_COND_OP_STRING_NOT_INCLUDES,
         IMPORT_COND_OP_EQUAL,
         IMPORT_COND_OP_NOT_EQUAL,
         IMPORT_COND_OP_LESS,
@@ -118,6 +120,7 @@ export class ImportCondition extends ListItem {
     /** List of available condition operator types */
     static operatorTypes = [
         { id: IMPORT_COND_OP_STRING_INCLUDES, title: __('import.conditions.opInline.includes') },
+        { id: IMPORT_COND_OP_STRING_NOT_INCLUDES, title: __('import.conditions.opInline.notIncludes') },
         { id: IMPORT_COND_OP_EQUAL, title: __('import.conditions.opInline.equal') },
         { id: IMPORT_COND_OP_NOT_EQUAL, title: __('import.conditions.opInline.notEqual') },
         { id: IMPORT_COND_OP_LESS, title: __('import.conditions.opInline.less') },
@@ -139,6 +142,7 @@ export class ImportCondition extends ListItem {
     /** Operator functions map */
     static operatorsMap = {
         [IMPORT_COND_OP_STRING_INCLUDES]: (left, right) => left.includes(right),
+        [IMPORT_COND_OP_STRING_NOT_INCLUDES]: (left, right) => !left.includes(right),
         [IMPORT_COND_OP_EQUAL]: (left, right) => left === right,
         [IMPORT_COND_OP_NOT_EQUAL]: (left, right) => left !== right,
         [IMPORT_COND_OP_LESS]: (left, right) => left < right,

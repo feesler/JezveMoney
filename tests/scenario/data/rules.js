@@ -77,6 +77,14 @@ export const createImportRules = async () => {
         actions: [
             actions.setComment('Bar date'),
         ],
+    }, {
+        conditions: [
+            conditions.comment.includes.value('R-BANK'),
+            conditions.comment.notIncludes.value('C2C'),
+        ],
+        actions: [
+            actions.setCategory(App.scenario.INVEST_CATEGORY),
+        ],
     }];
 
     await App.scenario.runner.runGroup(api.importrule.create, rulesList);

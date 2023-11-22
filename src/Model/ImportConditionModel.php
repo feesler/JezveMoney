@@ -22,6 +22,7 @@ define("IMPORT_COND_OP_EQUAL", 2);
 define("IMPORT_COND_OP_NOT_EQUAL", 3);
 define("IMPORT_COND_OP_LESS", 4);
 define("IMPORT_COND_OP_GREATER", 5);
+define("IMPORT_COND_OP_STRING_NOT_INCLUDES", 6);
 // Rule flags
 define("IMPORT_COND_OP_FIELD_FLAG", 0x01);
 
@@ -47,6 +48,7 @@ class ImportConditionModel extends CachedTable
 
     protected static $availCondOperators = [
         IMPORT_COND_OP_STRING_INCLUDES,
+        IMPORT_COND_OP_STRING_NOT_INCLUDES,
         IMPORT_COND_OP_EQUAL,
         IMPORT_COND_OP_NOT_EQUAL,
         IMPORT_COND_OP_LESS,
@@ -491,6 +493,7 @@ class ImportConditionModel extends CachedTable
     {
         return [
             IMPORT_COND_OP_STRING_INCLUDES => __("import.conditions.operators.includes"),
+            IMPORT_COND_OP_STRING_NOT_INCLUDES => __("import.conditions.operators.notIncludes"),
             IMPORT_COND_OP_EQUAL => __("import.conditions.operators.equal"),
             IMPORT_COND_OP_NOT_EQUAL => __("import.conditions.operators.notEqual"),
             IMPORT_COND_OP_LESS => __("import.conditions.operators.less"),

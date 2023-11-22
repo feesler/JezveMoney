@@ -3,6 +3,8 @@ import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_EQUAL,
     ImportCondition,
+    IMPORT_COND_OP_STRING_NOT_INCLUDES,
+    IMPORT_COND_OP_STRING_INCLUDES,
 } from './ImportCondition.js';
 
 /**
@@ -194,6 +196,31 @@ export class ImportConditionList extends List {
                     && parseInt(condition.value, 10) !== accountId
                 )
             )
+        ));
+    }
+
+    /**
+     * Returns true if list of conditions has condition conflicting with
+     *  specified condition with 'not includes' operator:
+     *  conditions with 'includes' or 'equal' operators and crossinig value
+     * @param {ImportCondition} condition
+     * @returns {boolean}
+     */
+    hasConflictForNotIncludes(condition) {
+        if (!(condition instanceof ImportCondition)) {
+            throw new Error('Invalid import condition');
+        }
+
+        if (condition.operator !== IMPORT_COND_OP_STRING_NOT_INCLUDES) {
+            return false;
+        }
+
+        const conflictingOperators = [IMPORT_COND_OP_EQUAL, IMPORT_COND_OP_STRING_INCLUDES];
+        return this.find((item) => (
+            item.field_id === condition.field_id
+            && !item.isPropertyValue()
+            && conflictingOperators.includes(item.operator)
+            && item.value.includes(condition.value)
         ));
     }
 }
