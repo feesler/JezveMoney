@@ -413,6 +413,7 @@
             "emptyValue": "Input value",
             "comparePropertyUnavailable": "Compare with another property not available",
             "compareSameError": "Can not compare property with itself",
+            "notIncludesConditionConflict": "'Not includes' condition is in conflict with another one for same property",
             "equalConditionError": "'Equal' condition can not be combined with other conditions for same property",
             "duplicateLessConditionError": "Duplicate 'less' condition",
             "conditionRangesError": "Condition ranges do not overlap",
@@ -444,6 +445,7 @@
             "compareWithProperty": "Compare with another property",
             "operators": {
                 "includes": "Includes",
+                "notIncludes": "Not Includes",
                 "equal": "Equal",
                 "notEqual": "Not equal",
                 "less": "Less",
@@ -451,6 +453,7 @@
             },
             "opInline": {
                 "includes": "contains",
+                "notIncludes": "not contains",
                 "equal": "is",
                 "notEqual": "is not",
                 "less": "less than",

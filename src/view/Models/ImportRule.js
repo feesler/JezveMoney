@@ -6,6 +6,7 @@ import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
+    IMPORT_COND_OP_STRING_NOT_INCLUDES,
 } from './ImportCondition.js';
 import { ImportConditionList } from './ImportConditionList.js';
 import { ImportActionList } from './ImportActionList.js';
@@ -99,6 +100,13 @@ export class ImportRule extends ListItem {
                 // Check full duplicates of condition
                 if (this.conditions.hasSameCondition(condition)) {
                     throw new ImportConditionValidationError(__('import.rules.duplicateCondition'), ind);
+                }
+
+                // Check conflicts for 'not includes' string operator
+                if (condition.operator === IMPORT_COND_OP_STRING_NOT_INCLUDES) {
+                    if (this.conditions.hasConflictForNotIncludes(condition)) {
+                        throw new ImportConditionValidationError(__('import.rules.notIncludesConditionConflict'), ind);
+                    }
                 }
 
                 // Check 'equal' conditions for each field type present only once

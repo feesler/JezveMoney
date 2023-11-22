@@ -53,6 +53,8 @@ export class ImportTransaction {
         const res = new ImportTransaction({
             enabled: true,
             similarTransaction: null,
+            selectMode: false,
+            selected: false,
             rulesApplied: false,
             modifiedByUser: false,
             mainAccount,
@@ -110,6 +112,10 @@ export class ImportTransaction {
 
     constructor(props) {
         Object.assign(this, props);
+    }
+
+    get restoreAvailable() {
+        return !!this.original && (this.rulesApplied || this.modifiedByUser);
     }
 
     isDiff() {
@@ -466,6 +472,13 @@ export class ImportTransaction {
         if (!this.isDiff()) {
             this.src_amount = this.dest_amount;
         }
+    }
+
+    setCategory(value) {
+        const category = App.state.categories.getItem(value);
+        assert(category, `Category not found: ${value}`);
+
+        this.category_id = category.id;
     }
 
     setComment(value) {

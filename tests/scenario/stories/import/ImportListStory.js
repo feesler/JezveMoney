@@ -122,11 +122,14 @@ export class ImportListStory extends TestStory {
         });
 
         setBlock('Cancel changes', 2);
+        await Actions.restoreItems([3, 6]);
+
+        setBlock('Cancel changes from context menu', 2);
         await Actions.updateItemAndSave({
             pos: 8,
             action: { action: 'inputDestAmount', data: '100' },
         });
-        await Actions.restoreItems(8);
+        await Actions.restoreItemsFromContextMenu(8);
 
         await Actions.deleteAllItems();
     }

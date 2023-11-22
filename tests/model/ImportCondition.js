@@ -20,6 +20,7 @@ export const IMPORT_COND_OP_EQUAL = 2;
 export const IMPORT_COND_OP_NOT_EQUAL = 3;
 export const IMPORT_COND_OP_LESS = 4;
 export const IMPORT_COND_OP_GREATER = 5;
+export const IMPORT_COND_OP_STRING_NOT_INCLUDES = 6;
 /** Condition flags */
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 
@@ -36,6 +37,7 @@ export const ConditionFields = {
 
 export const ConditionOperators = {
     includes: IMPORT_COND_OP_STRING_INCLUDES,
+    notIncludes: IMPORT_COND_OP_STRING_NOT_INCLUDES,
     is: IMPORT_COND_OP_EQUAL,
     isNot: IMPORT_COND_OP_NOT_EQUAL,
     less: IMPORT_COND_OP_LESS,
@@ -84,6 +86,7 @@ const numOperators = [
 /** String operators */
 const stringOperators = [
     ConditionOperators.includes,
+    ConditionOperators.notIncludes,
     ConditionOperators.is,
     ConditionOperators.isNot,
     ConditionOperators.less,
@@ -123,6 +126,7 @@ const fieldsMap = {
 /** Operator functions map */
 const operatorsMap = {
     [ConditionOperators.includes]: (left, right) => left.includes(right),
+    [ConditionOperators.notIncludes]: (left, right) => !left.includes(right),
     [ConditionOperators.is]: (left, right) => left === right,
     [ConditionOperators.isNot]: (left, right) => left !== right,
     [ConditionOperators.less]: (left, right) => left < right,
@@ -132,6 +136,7 @@ const operatorsMap = {
 /** Operator type to name map */
 const operatorNames = {
     [ConditionOperators.includes]: 'includes',
+    [ConditionOperators.notIncludes]: 'notIncludes',
     [ConditionOperators.is]: 'is',
     [ConditionOperators.isNot]: 'isNot',
     [ConditionOperators.less]: 'less',
@@ -141,6 +146,7 @@ const operatorNames = {
 /** List of available condition operator types */
 const operatorTypes = [
     { id: ConditionOperators.includes, titleToken: 'import.conditions.opInline.includes' },
+    { id: ConditionOperators.notIncludes, titleToken: 'import.conditions.opInline.notIncludes' },
     { id: ConditionOperators.is, titleToken: 'import.conditions.opInline.equal' },
     { id: ConditionOperators.isNot, titleToken: 'import.conditions.opInline.notEqual' },
     { id: ConditionOperators.less, titleToken: 'import.conditions.opInline.less' },

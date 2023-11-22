@@ -227,8 +227,11 @@ export class ImportView extends AppView {
         const hasItems = this.items.length > 0;
         const enabledItems = this.getEnabledItems();
         const selectedItems = (selectMode) ? this.getSelectedItems() : [];
-        const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
-        const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
+        const restoreAvailable = selectMode && selectedItems.some((item) => (
+            item.restoreAvailable
+        ));
+        const hasEnabled = selectMode && selectedItems.some((item) => item.enabled);
+        const hasDisabled = selectMode && selectedItems.some((item) => !item.enabled);
 
         const pageNum = this.currentPage(model);
 
@@ -284,6 +287,7 @@ export class ImportView extends AppView {
                     visible: showSelectItems && selectedItems.length < this.items.length,
                 },
                 deselectAllBtn: { visible: showSelectItems && selectedItems.length > 0 },
+                restoreSelectedBtn: { visible: showSelectItems && restoreAvailable },
                 enableSelectedBtn: { visible: showMenuItems && hasDisabled },
                 disableSelectedBtn: { visible: showMenuItems && hasEnabled },
                 deleteSelectedBtn: { visible: showMenuItems && selectedItems.length > 0 },
@@ -1286,6 +1290,8 @@ export class ImportView extends AppView {
         const form = new ImportTransaction({
             enabled: true,
             mainAccount,
+            selectMode: false,
+            selected: false,
             rulesApplied: false,
             modifiedByUser: false,
             type: 'expense',
@@ -1631,6 +1637,44 @@ export class ImportView extends AppView {
     }
 
     async restoreItems(index) {
+        this.checkMainState();
+        this.checkListMode();
+
+        const indexes = asArray(index);
+        assert(indexes.length > 0, 'No items specified');
+        assert(this.itemsList, 'No items available');
+
+        const expectedItems = this.items.map((item) => {
+            const res = new ImportTransaction(item);
+            res.selectMode = true;
+            res.selected = false;
+            return res;
+        });
+
+        indexes.forEach((ind) => {
+            assert.arrayIndex(expectedItems, ind);
+            const item = expectedItems[ind];
+            assert(item.original, 'Item not imported');
+            assert(item.rulesApplied || item.modifiedByUser, 'Item not modified');
+
+            item.restoreOriginal();
+        });
+
+        await this.toggleSelectItems(indexes);
+        await this.openListMenu();
+
+        this.items = expectedItems;
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.listMenu.select('restoreSelectedBtn'));
+
+        return this.checkState(expected);
+    }
+
+    async restoreItemsFromContextMenu(index) {
         this.checkMainState();
         this.checkListMode();
 
