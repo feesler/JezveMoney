@@ -70,8 +70,6 @@ export class ColorField extends Field {
                     className: 'feedback invalid-feedback',
                 },
             });
-
-            this.state.content.push(this.feedbackElem);
         }
 
         this.titleElem = createElement('label', { props: { className: TITLE_CLASS } });
@@ -84,7 +82,11 @@ export class ColorField extends Field {
 
         this.elem = createElement(tagName, {
             props: { className: FIELD_CLASS },
-            children: [this.titleElem, this.contentContainer],
+            children: [
+                this.titleElem,
+                this.contentContainer,
+                this.feedbackElem,
+            ],
         });
     }
 

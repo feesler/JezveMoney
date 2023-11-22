@@ -1,10 +1,6 @@
 import { isFunction } from '@jezvejs/types';
 import { Component } from 'jezvejs';
-import {
-    re,
-    show,
-    createElement,
-} from '@jezvejs/dom';
+import { show, createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
 import { Paginator } from 'jezvejs/Paginator';
@@ -307,7 +303,7 @@ export class ImportRulesDialog extends Component {
         show(this.listContainer, true);
         this.createRuleBtn.show(true);
         if (this.formContainer) {
-            re(this.formContainer.elem);
+            this.formContainer.elem.remove();
             this.formContainer = null;
         }
     }
@@ -315,7 +311,7 @@ export class ImportRulesDialog extends Component {
     /** Render form state of component */
     renderForm(state) {
         if (this.formContainer) {
-            re(this.formContainer.elem);
+            this.formContainer.elem.remove();
         }
 
         this.formContainer = ImportRuleForm.create({

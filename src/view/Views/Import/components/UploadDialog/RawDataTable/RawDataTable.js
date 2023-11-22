@@ -3,7 +3,6 @@ import { Component } from 'jezvejs';
 import {
     createElement,
     getClassName,
-    removeChilds,
 } from '@jezvejs/dom';
 import './RawDataTable.scss';
 
@@ -166,8 +165,7 @@ export class RawDataTable extends Component {
             children: colElems,
         });
 
-        removeChilds(this.elem);
-        this.elem.append(rowNumbersColumn, this.columnContainer);
+        this.elem.replaceChildren(rowNumbersColumn, this.columnContainer);
 
         if (propertiesPerColumn > 1) {
             this.elem.classList.add(`${TABLE_TPL_CLASS}${propertiesPerColumn}`);

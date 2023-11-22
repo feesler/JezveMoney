@@ -2,7 +2,6 @@ import { isFunction } from '@jezvejs/types';
 import {
     createElement,
     getClassName,
-    removeChilds,
 } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 
@@ -137,8 +136,7 @@ export class ChartPopup extends Component {
         }
 
         const listItems = state.items.map((item) => this.renderPopupListItem(item, state));
-        removeChilds(this.list);
-        this.list.append(...listItems);
+        this.list.replaceChildren(...listItems);
 
         this.header.textContent = Transaction.getTypeTitle(state.item.groupName);
 

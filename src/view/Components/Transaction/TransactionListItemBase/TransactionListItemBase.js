@@ -1,6 +1,5 @@
 import {
     createElement,
-    removeChilds,
     show,
 } from '@jezvejs/dom';
 import { getContrastColor } from '@jezvejs/color';
@@ -206,7 +205,7 @@ export class TransactionListItemBase extends Component {
     }
 
     resetContent() {
-        removeChilds(this.elem);
+        this.elem.replaceChildren();
         // Classic mode elements
         this.titleElem = null;
         this.amountElem = null;

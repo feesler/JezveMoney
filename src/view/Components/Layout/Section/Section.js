@@ -1,8 +1,5 @@
-import {
-    createElement,
-    addChilds,
-    removeChilds,
-} from '@jezvejs/dom';
+import { asArray } from '@jezvejs/types';
+import { createElement } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 
 import { Heading } from '../Heading/Heading.js';
@@ -102,18 +99,7 @@ export class Section extends Component {
             return;
         }
 
-        removeChilds(this.contentContainer);
-
-        const content = state.content ?? null;
-        if (content === null) {
-            return;
-        }
-
-        if (typeof content === 'string') {
-            this.contentContainer.textContent = content;
-        } else {
-            addChilds(this.contentContainer, content);
-        }
+        this.contentContainer.replaceChildren(...asArray(state.content));
     }
 
     render(state, prevState = {}) {

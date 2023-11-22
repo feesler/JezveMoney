@@ -3,7 +3,6 @@ import { Component } from 'jezvejs';
 import {
     show,
     enable,
-    re,
     createElement,
 } from '@jezvejs/dom';
 import { DropDown } from 'jezvejs/DropDown';
@@ -608,7 +607,7 @@ export class ImportTemplateForm extends Component {
 
         // Raw data table
         if (!Array.isArray(state.rawData) || !state.rawData.length) {
-            re(this.dataTable?.elem);
+            this.dataTable?.elem?.remove();
             return;
         }
 
@@ -625,7 +624,7 @@ export class ImportTemplateForm extends Component {
         this.rawDataTable.setContent(dataTable.elem);
         dataTable.scrollLeft = scrollLeft;
 
-        re(this.dataTable?.elem);
+        this.dataTable?.elem.remove();
         this.dataTable = dataTable;
 
         this.firstRowGroup.setState((fieldState) => ({

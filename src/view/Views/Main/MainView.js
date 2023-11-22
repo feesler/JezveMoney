@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     show,
     createElement,
-    removeChilds,
 } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Histogram } from 'jezvejs/Histogram';
@@ -519,8 +518,7 @@ class MainView extends AppView {
         });
 
         const elems = Object.values(totals).map((item) => this.renderTotalsListItem(item));
-        removeChilds(this.totalList);
-        this.totalList.append(...elems);
+        this.totalList.replaceChildren(...elems);
     }
 
     /** Renders transaction context menu */

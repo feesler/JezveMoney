@@ -6,11 +6,22 @@ import {
     evaluate,
     asyncMap,
 } from 'jezve-test';
+import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { TransactionListItem } from './TransactionListItem.js';
 import { TransactionListGroup } from './TransactionListGroup.js';
 
 export class TransactionList extends TestComponent {
+    static getRenderOptions(model, state = App.state) {
+        assert(model, 'Invalid model');
+        assert(state, 'Invalid state');
+
+        return {
+            showDate: !state.getGroupByDate(),
+            showResults: model.detailsMode,
+        };
+    }
+
     async parseContent() {
         const res = {
             items: [],
@@ -96,11 +107,11 @@ export class TransactionList extends TestComponent {
             .map((item) => this.content.items.indexOf(item));
     }
 
-    static render(transactions, state, showDate = true) {
+    static render(transactions, state, options = {}) {
         assert.isArray(transactions);
 
         return {
-            items: transactions.map((item) => TransactionListItem.render(item, state, showDate)),
+            items: transactions.map((item) => TransactionListItem.render(item, state, options)),
             noDataMessage: { visible: transactions.length === 0 },
         };
     }
@@ -108,9 +119,14 @@ export class TransactionList extends TestComponent {
     static renderWidget(transactions, state) {
         assert.isArray(transactions, 'Invalid data');
 
+        const options = {
+            showDate: true,
+            showResults: false,
+        };
+
         const res = {
             title: __('transactions.listTitle'),
-            transList: this.render(transactions, state, true),
+            transList: this.render(transactions, state, options),
         };
 
         return res;

@@ -2,8 +2,6 @@ import { isObject } from '@jezvejs/types';
 import {
     ge,
     setProps,
-    addChilds,
-    removeChilds,
     show,
     setEvents,
     getFormData,
@@ -280,14 +278,13 @@ export class AdminListView extends AdminView {
 
     setListData(data) {
         this.setData(data);
-        removeChilds(this.itemsListElem);
         const rows = data.map((item) => {
             const row = this.renderItem(item);
             row.dataset.id = item.id;
             return row;
         });
 
-        addChilds(this.itemsListElem, rows);
+        this.itemsListElem.replaceChildren(...rows);
         this.selectItem(null);
         show(this.itemsListElem, true);
     }

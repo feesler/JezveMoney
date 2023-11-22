@@ -2,7 +2,6 @@ import { isFunction } from '@jezvejs/types';
 import {
     createElement,
     getClassName,
-    re,
 } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -121,7 +120,7 @@ export class SearchInput extends Component {
         if (value.length > 0) {
             this.elem.append(this.clearBtn.elem);
         } else {
-            re(this.clearBtn.elem);
+            this.clearBtn?.elem?.remove();
         }
     }
 }

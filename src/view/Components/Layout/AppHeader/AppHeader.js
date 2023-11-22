@@ -1,8 +1,5 @@
 import { isFunction } from '@jezvejs/types';
-import {
-    re,
-    createElement,
-} from '@jezvejs/dom';
+import { createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { Header } from 'jezvejs/Header';
 import { HeaderMenuButton } from 'jezvejs/HeaderMenuButton';
@@ -105,7 +102,7 @@ export class AppHeader extends Header {
             return;
         }
 
-        re(this.actionsContainer);
+        this.actionsContainer?.remove();
         this.actionsContainer = null;
 
         if (isFunction(this.onActionsShown)) {
