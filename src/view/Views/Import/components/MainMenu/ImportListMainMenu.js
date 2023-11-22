@@ -34,15 +34,19 @@ export class ImportListMainMenu extends PopupMenu {
         const isListMode = context.listMode === 'list';
         const isSelectMode = context.listMode === 'select';
         const hasItems = context.items.length > 0;
-        const hasNotSelectedEnabled = context.items.some((item) => (
+        const hasNotSelectedEnabled = isSelectMode && context.items.some((item) => (
             item.enabled && !item.selected
         ));
-        const hasNotSelectedDisabled = context.items.some((item) => (
+        const hasNotSelectedDisabled = isSelectMode && context.items.some((item) => (
             !item.enabled && !item.selected
         ));
-        const selectedItems = getSelectedItems(context.items);
-        const hasSelectedEnabled = selectedItems.some((item) => item.enabled);
-        const hasSelectedDisabled = selectedItems.some((item) => !item.enabled);
+
+        const selectedItems = (isSelectMode) ? getSelectedItems(context.items) : [];
+        const restoreAvailable = isSelectMode && selectedItems.some((item) => (
+            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
+        ));
+        const hasSelectedEnabled = isSelectMode && selectedItems.some((item) => item.enabled);
+        const hasSelectedDisabled = isSelectMode && selectedItems.some((item) => !item.enabled);
 
         this.setItems([{
             id: 'createItemBtn',
@@ -91,6 +95,15 @@ export class ImportListMainMenu extends PopupMenu {
         }, {
             type: 'separator',
             hidden: !isSelectMode,
+        }, {
+            id: 'restoreSelectedBtn',
+            title: __('import.itemRestore'),
+            className: 'warning-item',
+            hidden: !(isSelectMode && restoreAvailable),
+            onClick: () => dispatch(actions.restoreSelectedItems()),
+        }, {
+            type: 'separator',
+            hidden: !isSelectMode && restoreAvailable,
         }, {
             id: 'enableSelectedBtn',
             title: __('actions.enableSelected'),

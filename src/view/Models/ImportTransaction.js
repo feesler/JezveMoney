@@ -339,6 +339,10 @@ export class ImportTransaction {
 
     /** Restore original data */
     restoreOriginal() {
+        if (!this.originalData) {
+            return this;
+        }
+
         const res = ImportTransaction.fromImportData({
             ...this.originalData,
             mainAccount: this.originalData.origAccount,

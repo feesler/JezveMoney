@@ -473,13 +473,18 @@ export const duplicateItemAndSave = async (params) => {
 };
 
 /** Restore original data of imported transaction */
-export const restoreItems = async (indexes) => {
-    const itemInds = asArray(indexes);
+export const restoreItems = (indexes) => (
+    test(`Cancel changes of selected item(s) [${asArray(indexes).join()}]`, () => (
+        App.view.restoreItems(indexes)
+    ))
+);
 
-    await test(`Cancel changes of item(s) [${itemInds.join()}]`, () => (
-        App.view.restoreItems(itemInds)
-    ));
-};
+/** Restore original data of imported transaction(s) using context menu */
+export const restoreItemsFromContextMenu = (indexes) => (
+    test(`Cancel changes of item(s) from context menu [${asArray(indexes).join()}]`, () => (
+        App.view.restoreItemsFromContextMenu(indexes)
+    ))
+);
 
 /**
  * Click by delete button of items specified by indexes

@@ -260,6 +260,15 @@ const slice = createSlice({
             }
     ),
 
+    restoreSelectedItems: (state) => ({
+        ...state,
+        items: state.items.map((item) => (
+            (item.originalData && item.selected)
+                ? item.restoreOriginal()
+                : item
+        )),
+    }),
+
     toggleEnableItem: (state) => (
         (state.contextItemIndex === -1)
             ? state
