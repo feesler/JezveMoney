@@ -2,7 +2,6 @@ import { isObject, isFunction } from '@jezvejs/types';
 import 'jezvejs/style';
 import {
     ge,
-    removeChilds,
     show,
     getFormData,
 } from '@jezvejs/dom';
@@ -1103,7 +1102,7 @@ class AdminApiConsoleView extends AdminView {
      * Clear all items from request log container
      */
     clearResults() {
-        removeChilds(this.resultsContainer);
+        this.resultsContainer.replaceChildren();
         this.clearResultsBtn.enable(false);
     }
 

@@ -1,6 +1,6 @@
 import 'jezvejs/style';
 import { asArray } from '@jezvejs/types';
-import { insertAfter, createElement } from '@jezvejs/dom';
+import { createElement } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { Paginator } from 'jezvejs/Paginator';
@@ -232,13 +232,13 @@ class TransactionListView extends AppView {
             title: __('actions.done'),
             onClick: () => this.store.dispatch(setListMode('list')),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
+        this.createBtn.elem.after(this.listModeBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
             onClick: (e) => this.showMenu(e),
         });
-        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
+        this.listModeBtn.elem.after(this.menuButton.elem);
 
         this.subscribeToStore(this.store);
     }

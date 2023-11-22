@@ -1,9 +1,5 @@
 import 'jezvejs/style';
-import {
-    createElement,
-    insertAfter,
-    show,
-} from '@jezvejs/dom';
+import { createElement, show } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { MenuButton } from 'jezvejs/MenuButton';
 import { createStore } from 'jezvejs/Store';
@@ -181,13 +177,13 @@ class PersonListView extends AppView {
             title: __('actions.done'),
             onClick: () => this.store.dispatch(setListMode('list')),
         });
-        insertAfter(this.listModeBtn.elem, this.createBtn.elem);
+        this.createBtn.elem.after(this.listModeBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
             onClick: (e) => this.showMenu(e),
         });
-        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
+        this.listModeBtn.elem.after(this.menuButton.elem);
 
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,

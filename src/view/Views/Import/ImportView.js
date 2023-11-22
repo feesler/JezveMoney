@@ -1,9 +1,5 @@
 import 'jezvejs/style';
-import {
-    createElement,
-    show,
-    insertAfter,
-} from '@jezvejs/dom';
+import { createElement, show } from '@jezvejs/dom';
 import { Button } from 'jezvejs/Button';
 import { DropDown } from 'jezvejs/DropDown';
 import { MenuButton } from 'jezvejs/MenuButton';
@@ -187,13 +183,13 @@ class ImportView extends AppView {
             title: __('actions.done'),
             onClick: () => this.store.dispatch(actions.changeListMode('list')),
         });
-        insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
+        this.uploadBtn.elem.after(this.listModeBtn.elem);
 
         this.menuButton = MenuButton.create({
             className: 'circle-btn',
             onClick: () => this.store.dispatch(actions.showMenu()),
         });
-        insertAfter(this.menuButton.elem, this.listModeBtn.elem);
+        this.listModeBtn.elem.after(this.menuButton.elem);
 
         // List header
         // Counters

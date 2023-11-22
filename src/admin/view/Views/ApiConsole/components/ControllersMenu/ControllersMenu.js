@@ -1,10 +1,5 @@
 import { Component } from 'jezvejs';
-import {
-    removeChilds,
-    createElement,
-    addChilds,
-    getClassName,
-} from '@jezvejs/dom';
+import { createElement, getClassName } from '@jezvejs/dom';
 
 import './ControllersMenu.scss';
 
@@ -352,7 +347,6 @@ export class ControllersMenu extends Component {
         }
 
         const elems = state.items.map((item) => this.renderControllerItem(item, state));
-        removeChilds(this.elem);
-        addChilds(this.elem, elems);
+        this.elem.replaceChildren(...elems);
     }
 }

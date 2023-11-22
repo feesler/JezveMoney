@@ -1,7 +1,6 @@
 import {
     createElement,
     getClassName,
-    removeChilds,
 } from '@jezvejs/dom';
 
 import { __ } from '../../../../utils/utils.js';
@@ -116,7 +115,7 @@ export class ScheduleListItem extends ListItem {
     }
 
     resetContent() {
-        removeChilds(this.scheduleGroup);
+        this.scheduleGroup.replaceChildren();
 
         // Details mode elements
         this.startDateField = null;

@@ -1,6 +1,5 @@
 import { isFunction } from '@jezvejs/types';
 import {
-    insertAfter,
     show,
     addChilds,
     createElement,
@@ -1486,7 +1485,7 @@ export class TransactionForm extends Component {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
-        insertAfter(this.swapBtn.elem, this.sourceContainer.elem);
+        this.sourceContainer.elem.after(this.swapBtn.elem);
 
         addChilds(this.sourceContainer.infoBlock, [
             this.srcAmountInfo.elem,
@@ -1643,11 +1642,11 @@ export class TransactionForm extends Component {
 
         this.debtOperationInp.value = (debtType) ? 1 : 2;
         if (debtType) {
-            insertAfter(this.swapBtn.elem, this.personContainer.elem);
-            insertAfter(this.debtAccountContainer.elem, this.swapBtn.elem);
+            this.personContainer.elem.after(this.swapBtn.elem);
+            this.swapBtn.elem.after(this.debtAccountContainer.elem);
         } else {
-            insertAfter(this.swapBtn.elem, this.debtAccountContainer.elem);
-            insertAfter(this.personContainer.elem, this.swapBtn.elem);
+            this.debtAccountContainer.elem.after(this.swapBtn.elem);
+            this.swapBtn.elem.after(this.personContainer.elem);
         }
 
         addChilds(this.personContainer.infoBlock, [

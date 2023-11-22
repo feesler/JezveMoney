@@ -1,8 +1,6 @@
 import {
     createElement,
     show,
-    addChilds,
-    removeChilds,
     getClassName,
 } from '@jezvejs/dom';
 
@@ -106,11 +104,11 @@ export class ImportRuleItem extends CollapsibleListItem {
             throw new Error('Invalid list container');
         }
 
-        removeChilds(container);
         const isValid = (Array.isArray(data) && data.length > 0);
-        if (isValid) {
-            addChilds(container, data.map((item) => item.elem));
-        }
+        const content = (isValid)
+            ? data.map((item) => item.elem)
+            : [];
+        container.replaceChildren(...content);
 
         show(container, isValid);
     }

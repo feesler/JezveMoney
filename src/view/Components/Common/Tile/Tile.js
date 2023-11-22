@@ -1,11 +1,11 @@
 import {
     createElement,
     createSVGElement,
-    removeChilds,
 } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import './Tile.scss';
+import { asArray } from '@jezvejs/types';
 
 /** CSS classes */
 const TILE_CLASS = 'tile';
@@ -117,17 +117,13 @@ export class Tile extends Component {
             this.elem.append(this.subTitleElem);
         }
 
-        const subtitle = state.subtitle ?? '';
-        removeChilds(this.subTitleElem);
-        if (Array.isArray(subtitle)) {
-            const subTitleElems = subtitle.map((textContent) => (
+        const subtitle = Array.isArray(state.subtitle)
+            ? state.subtitle.map((textContent) => (
                 createElement('span', { props: { textContent } })
-            ));
+            ))
+            : asArray(state.subtitle);
 
-            this.subTitleElem.append(...subTitleElems);
-        } else {
-            this.subTitleElem.textContent = subtitle;
-        }
+        this.subTitleElem.replaceChildren(...subtitle);
 
         this.elem.classList.toggle(WIDE_CLASS, (subtitle.length > SUBTITLE_LIMIT));
     }
