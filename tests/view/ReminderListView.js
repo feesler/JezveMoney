@@ -742,6 +742,11 @@ export class ReminderListView extends AppView {
         return App.view.waitForLoad();
     }
 
+    async reloadView() {
+        await goTo(this.location);
+        return App.view.waitForLoad();
+    }
+
     async goToDetailsURL() {
         await goTo(this.getDetailsURL());
         return App.view.waitForLoad();
@@ -763,6 +768,16 @@ export class ReminderListView extends AppView {
         });
 
         await this.parse();
+    }
+
+    async reload() {
+        this.model.filtersVisible = false;
+        this.model.filtersAnimation = false;
+        const expected = this.getExpectedState();
+
+        await this.reloadView();
+
+        return App.view.checkState(expected);
     }
 
     async openFilters() {

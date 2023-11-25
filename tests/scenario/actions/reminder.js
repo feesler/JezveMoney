@@ -15,6 +15,13 @@ const checkNavigation = async () => {
     await App.view.navigateToReminders();
 };
 
+export const reload = async () => {
+    await test('Reload reminders list view', async () => {
+        await checkNavigation();
+        return App.view.reload();
+    });
+};
+
 export const confirmFromContextMenu = async (index) => {
     await test(`Confirm reminder from context menu [${index}]`, async () => {
         await checkNavigation();

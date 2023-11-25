@@ -284,10 +284,13 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_CONFIRMED });
         await Actions.filterByState({ state: REMINDER_CANCELLED });
         await Actions.filterByState({ state: REMINDER_CANCELLED, directNavigate: true });
+        await Actions.reload();
         await Actions.filterByState({ state: REMINDER_CONFIRMED, directNavigate: true });
+        await Actions.reload();
         await Actions.filterByState({ state: REMINDER_SCHEDULED });
         await Actions.filterByState({ state: REMINDER_UPCOMING });
         await Actions.filterByState({ state: REMINDER_UPCOMING, directNavigate: true });
+        await Actions.reload();
 
         await Actions.selectEndDateFilter({ date: App.dates.monthAfter });
         await Actions.selectStartDateFilter({ date: App.dates.weekAfter });
