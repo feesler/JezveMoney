@@ -1,6 +1,7 @@
 import { setBlock, TestStory } from 'jezve-test';
 import * as Actions from '../actions/reminder.js';
 import * as trActions from '../actions/transaction.js';
+import * as trFormActions from '../actions/transactionForm.js';
 import { App } from '../../Application.js';
 import * as ApiActions from '../actions/api/schedule.js';
 import {
@@ -9,7 +10,7 @@ import {
     REMINDER_SCHEDULED,
     REMINDER_UPCOMING,
 } from '../../model/Reminder.js';
-import { EXPENSE } from '../../model/Transaction.js';
+import { EXPENSE, TRANSFER } from '../../model/Transaction.js';
 import { INTERVAL_NONE } from '../../common.js';
 
 export class RemindersStory extends TestStory {
@@ -39,6 +40,8 @@ export class RemindersStory extends TestStory {
         await this.updateAndConfirm();
         await this.selectReminderDialog();
         await this.selectReminder();
+        await this.selectReminderOnCreate();
+        await this.selectReminderOnUpdate();
         await this.removeReminder();
         await this.dialogPagination();
         await this.dialogFilters();
@@ -154,6 +157,26 @@ export class RemindersStory extends TestStory {
         await Actions.updateFromContextMenu(0);
         await trActions.openReminderDialog();
         await trActions.selectReminderByIndex(1);
+        await trActions.submit();
+    }
+
+    async selectReminderOnCreate() {
+        setBlock('Select reminder on create transaction', 1);
+
+        await trActions.createFromAccount(0);
+        await trFormActions.inputDestAmount('1');
+        await trActions.openReminderDialog();
+        await trActions.selectReminderByIndex(0);
+        await trActions.submit();
+    }
+
+    async selectReminderOnUpdate() {
+        setBlock('Select reminder on update transaction', 1);
+
+        await trActions.update(TRANSFER, 1);
+        await trActions.openReminderDialog();
+        await trActions.filterRemindersByState(REMINDER_UPCOMING);
+        await trActions.selectReminderByIndex(0);
         await trActions.submit();
     }
 

@@ -587,24 +587,24 @@ class TransactionModel extends SortableModel
                 return false;
             }
 
-            $reminderId = 0;
-            $scheduleId = 0;
-            if (is_array($this->confirmReminders) && count($this->confirmReminders) > 0) {
-                $reminder = array_shift($this->confirmReminders);
-                $reminderId = intval($reminder["reminder_id"]);
-                $scheduleId = intval($reminder["schedule_id"]);
-                if ($reminderId !== 0) {
-                    $reminderModel->confirm($reminderId, [
-                        "transaction_id" => $item_id,
-                    ]);
-                } elseif ($scheduleId !== 0) {
-                    $reminderId = $reminderModel->create([
-                        "schedule_id" => $scheduleId,
-                        "transaction_id" => $item_id,
-                        "date" => $reminder["reminder_date"],
-                        "state" => REMINDER_CONFIRMED,
-                    ]);
-                }
+            $reminder = (is_array($this->confirmReminders) && count($this->confirmReminders) > 0)
+                ? array_shift($this->confirmReminders)
+                : null;
+            $reminderId = intval($reminder["reminder_id"] ?? 0);
+            $scheduleId = intval($reminder["schedule_id"] ?? 0);
+            $reminderDate = intval($reminder["reminder_date"] ?? 0);
+
+            if ($reminderId !== 0) {
+                $reminderModel->confirm($reminderId, [
+                    "transaction_id" => $item_id,
+                ]);
+            } elseif ($scheduleId !== 0 && $reminderDate !== 0) {
+                $reminderId = $reminderModel->create([
+                    "schedule_id" => $scheduleId,
+                    "transaction_id" => $item_id,
+                    "date" => $reminderDate,
+                    "state" => REMINDER_CONFIRMED,
+                ]);
             }
 
             if (is_array($this->requestedItems) && count($this->requestedItems) > 0) {
@@ -866,6 +866,8 @@ class TransactionModel extends SortableModel
         $canceled = $this->cancelTransaction($item);
         $this->balanceChanges = $this->applyTransaction($res, $canceled);
 
+        $this->saveConfirmReminder($params);
+
         // check date is changed
         $orig_date = getdate($item->date);
         $target_date = getdate($res["date"]);
@@ -929,6 +931,39 @@ class TransactionModel extends SortableModel
             $this->updateResults([$this->originalTrans->src_id, $this->originalTrans->dest_id], $trObj->pos);
         }
         $this->originalTrans = null;
+
+        // Update reminders
+        $reminderModel = ReminderModel::getInstance();
+
+        $reminder = (is_array($this->confirmReminders) && count($this->confirmReminders) > 0)
+            ? array_shift($this->confirmReminders)
+            : null;
+        $reminderId = intval($reminder["reminder_id"] ?? 0);
+        $scheduleId = intval($reminder["schedule_id"] ?? 0);
+        $reminderDate = intval($reminder["reminder_date"] ?? 0);
+
+        $reminders = $reminderModel->getData([
+            "transaction_id" => $item_id,
+            "returnIds" => true,
+        ]);
+
+        $remindersToCancel = ($reminderId !== 0)
+            ? array_diff($reminders, [$reminderId])
+            : $reminders;
+        $reminderModel->cancelConfirmation($remindersToCancel);
+
+        if ($reminderId !== 0 && !in_array($reminderId, $reminders)) {
+            $reminderModel->confirm($reminderId, [
+                "transaction_id" => $item_id,
+            ]);
+        } elseif ($scheduleId !== 0 && $reminderDate !== 0) {
+            $reminderId = $reminderModel->create([
+                "schedule_id" => $scheduleId,
+                "transaction_id" => $item_id,
+                "date" => $reminderDate,
+                "state" => REMINDER_CONFIRMED,
+            ]);
+        }
 
         $this->commitAffected();
 

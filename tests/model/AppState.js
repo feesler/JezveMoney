@@ -2054,6 +2054,37 @@ export class AppState {
             this.updatePersonAccounts();
             this.resetPersonsCache();
 
+            // Update reminder
+            const reminderId = (params.reminder_id) ? parseInt(params.reminder_id, 10) : 0;
+            const scheduleId = (params.schedule_id) ? parseInt(params.schedule_id, 10) : 0;
+            const remiderDate = (params.reminder_date) ? parseInt(params.reminder_date, 10) : 0;
+
+            const reminders = this.reminders
+                .applyFilter({ transaction_id: expTrans.id })
+                .map((item) => parseInt(item.id, 10));
+
+            const remindersToCancel = reminders.filter((id) => (id !== reminderId));
+            this.cancelRemidersConfirmation({ id: remindersToCancel });
+
+            if (reminderId !== 0 && !reminders.includes(reminderId)) {
+                const reminderResult = this.confirmReminder({
+                    id: reminderId,
+                    transaction_id: expTrans.id,
+                });
+                if (!reminderResult) {
+                    return false;
+                }
+            } else if (scheduleId !== 0 && remiderDate !== 0) {
+                const reminderResult = this.confirmUpcomingReminder({
+                    schedule_id: scheduleId,
+                    date: remiderDate,
+                    transaction_id: expTrans.id,
+                });
+                if (!reminderResult) {
+                    return false;
+                }
+            }
+
             return true;
         });
 
@@ -2799,6 +2830,31 @@ export class AppState {
         ));
 
         return (actionResult) ? this.returnState(params.returnState) : false;
+    }
+
+    cancelRemidersConfirmation(params) {
+        const ids = asArray(params?.id);
+        if (ids.length === 0) {
+            return true;
+        }
+
+        const now = dateToSeconds(App.dates.now);
+        const res = ids.every((id) => {
+            const reminder = this.reminders.getItem(id);
+            if (!reminder) {
+                return false;
+            }
+
+            return (reminder.date > now)
+                ? this.deleteReminder(id)
+                : this.updateReminder({
+                    id: reminder.id,
+                    state: REMINDER_SCHEDULED,
+                    transaction_id: 0,
+                });
+        });
+
+        return res;
     }
 
     /**

@@ -614,8 +614,8 @@ const createMultipleInvalid = async () => {
     await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
 };
 
-const confirmReminders = async () => {
-    setBlock('Create transaction confirming reminder', 2);
+const createWithReminder = async () => {
+    setBlock('Create transaction with reminder confirmation', 2);
 
     const {
         ACC_RUB,
@@ -633,6 +633,32 @@ const confirmReminders = async () => {
     };
 
     await App.scenario.createOneByOne(Actions.extractAndCreate, data);
+};
+
+const updateWithReminder = async () => {
+    setBlock('Update transaction with reminder confirmation', 2);
+
+    const {
+        TR_EXPENSE_REMINDER_1,
+        TR_EXPENSE_CHAINED_2,
+        REMINDER_EXPENSE_1_2,
+    } = App.scenario;
+
+    const { items: reminders } = App.state.getUpcomingReminders();
+
+    const data = [{
+        id: TR_EXPENSE_REMINDER_1,
+        reminder_id: REMINDER_EXPENSE_1_2,
+    }, {
+        id: TR_EXPENSE_CHAINED_2,
+        reminder_id: REMINDER_EXPENSE_1_2,
+    }, {
+        id: TR_EXPENSE_CHAINED_2,
+        schedule_id: reminders[0].schedule_id,
+        date: reminders[0].date,
+    }];
+
+    await App.scenario.runner.runGroup(Actions.update, data);
 };
 
 const update = async () => {
@@ -1131,7 +1157,8 @@ export const apiTransactionsTests = {
     },
 
     async confirmRemindersTests() {
-        await confirmReminders();
+        await createWithReminder();
+        await updateWithReminder();
     },
 
     async updateTests() {
