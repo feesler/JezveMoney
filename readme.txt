@@ -62,6 +62,34 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 	Get-ExecutionPolicy -List
 
 
+- Debug server side PHP code in VSCode:
+
+1. Install xDebug extension for PHP
+2. Update PHP.ini:
+2.1 Enable xDebug extension
+    zend_extension = xdebug
+3. Update settings
+    ;xdebug.mode = off
+    xdebug.mode = debug,trace
+    xdebug.start_with_request = yes
+4. Install "PHP Debug" extension for VSCode
+5. Go to "Run and Debug" tab of Activity bar
+6. Go to settings (open launch.json file)
+7. From drop down menu near to "Start Debugging" button select "Add Configuration..."
+8. Select "PHP: Listen for XDebug" configuration item at opened menu
+9. New configuration object will be added to launch.json file:
+    {
+        "name": "Listen for Xdebug",
+        "type": "php",
+        "request": "launch",
+        "port": 9003
+    },
+10. Check "port" property is the same as "xdebug.client_port" at PHP.ini
+    xdebug.client_port = 9003
+11. Restart server
+12. Launch "Listen for XDebug" from "Run and Debug" tab
+
+
 - WebGrind profiler:
 
 1. In PHP.ini set

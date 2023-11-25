@@ -178,7 +178,7 @@ export class ImportConditionList extends List {
     /**
      * Check list of conditions has guard condition for Main account:
      * Main account not equal accountId or Main account equal not accountId
-     * @param {ImportCondition} condition
+     * @param {number} accountId
      */
     hasAccountGuardCondition(accountId) {
         if (!accountId) {

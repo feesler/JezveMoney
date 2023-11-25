@@ -65,6 +65,39 @@ function getDateFormatPattern(string $locale)
 }
 
 /**
+ * Parses date string and returns timestamp or false if parse failed
+ * @param string $value
+ * @param string $locale
+ *
+ * @return int|false
+ */
+function parseDateString(string $value, string $locale)
+{
+    $dateFormatter = new IntlDateFormatter(
+        $locale,
+        IntlDateFormatter::SHORT,
+        IntlDateFormatter::NONE,
+        new DateTimeZone('UTC'),
+        null,
+        getDateFormatPattern($locale),
+    );
+
+    return $dateFormatter->parse($value);
+}
+
+/**
+ * Returns true if value is valid date string for specified locale
+ * @param string $value
+ * @param string $locale
+ *
+ * @return bool
+ */
+function isValidDateString(string $value, string $locale)
+{
+    return parseDateString($value, $locale) !== false;
+}
+
+/**
  * Returns timestamp for the start of day
  *
  * @param int|DateTime|null $value timestamp or DateTime object to process
