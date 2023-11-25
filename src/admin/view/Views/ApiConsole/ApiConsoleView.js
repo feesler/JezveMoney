@@ -623,14 +623,14 @@ class AdminApiConsoleView extends AdminView {
         this.creators.createRuleForm = () => ImportRuleForm.create({
             id: 'createRuleForm',
             title: 'Create import rule',
-            onSubmit: this.getVerifyHandler(apiTypes.isCreateResult),
+            onSubmit: (e) => this.onRuleFormSubmit(e, apiTypes.isCreateResult),
         });
 
         this.creators.updateRuleForm = () => ImportRuleForm.create({
             id: 'updateRuleForm',
             title: 'Update import rule',
             isUpdate: true,
-            onSubmit: this.defaultSubmitHandler,
+            onSubmit: (e) => this.onRuleFormSubmit(e),
         });
 
         this.creators.delRuleForm = () => ItemIdsForm.create({

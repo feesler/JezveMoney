@@ -1,3 +1,4 @@
+import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
 import {
     ConditionFields,
@@ -7,6 +8,7 @@ import {
 import { actions, ImportActionTypes } from '../../../model/ImportAction.js';
 import { App } from '../../../Application.js';
 import * as Actions from '../../actions/api/importrule.js';
+import { formatProps } from '../../../common.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);
@@ -47,21 +49,40 @@ const create = async () => {
         actions: [
             actions.setCategory(App.scenario.INVEST_CATEGORY),
         ],
-    }, {
-        // Invalid rules
-    }, {
+    }];
+
+    [
+        App.scenario.RULE_1,
+        App.scenario.RULE_2,
+        App.scenario.RULE_3,
+    ] = await App.scenario.runner.runGroup(Actions.create, data);
+};
+
+const createInvalid = async () => {
+    setBlock('Create import rule with invalid data', 2);
+
+    const { PERSON_Y, CASH_RUB } = App.scenario;
+
+    const taxiCondition = conditions.comment.includes.value('BANK MESSAGE');
+    const taxiAction = actions.setComment('Rule');
+
+    const data = [{ // empty object
+    }, { // Invalid conditions property
         conditions: null,
-    }, {
+    }, { // Invalid actions property
         actions: null,
     }, {
-        conditions: [],
-        actions: [],
-    }, {
         conditions: [taxiCondition],
+        actions: null,
+    }, { // Empty conditions list
+        conditions: [],
         actions: [],
     }, {
         conditions: [],
         actions: [taxiAction],
+    }, { // Empty actions list
+        conditions: [taxiCondition],
+        actions: [],
     }, {
         conditions: [null],
         actions: [null],
@@ -111,6 +132,75 @@ const create = async () => {
             value: 'TEST',
         }],
         actions: [null],
+    }, { // `Comment includes` condition with empty value
+        conditions: [
+            conditions.comment.includes.value(''),
+        ],
+        actions: [taxiAction],
+    }, { // Date condition with empty value
+        conditions: [
+            conditions.date.greater.value(''),
+        ],
+        actions: [taxiAction],
+    }, { // Date condition with invalid value
+        conditions: [
+            conditions.date.greater.value('01xx'),
+        ],
+        actions: [taxiAction],
+    }, { // Rule without guard condition for `Set account` action
+        conditions: [taxiCondition],
+        actions: [
+            actions.setTransactionType('transfer_out'),
+            actions.setAccount(CASH_RUB),
+        ],
+    }, { // Condition with empty amount
+        conditions: [
+            conditions.accountAmount.greater.value(''),
+        ],
+        actions: [taxiAction],
+    }, { // Duplicate conditions
+        conditions: [
+            conditions.accountAmount.greater.value('100.01'),
+            conditions.accountAmount.greater.value('99.99'),
+        ],
+        actions: [taxiAction],
+    }, { // Conditions with non-intersecting value regions
+        conditions: [
+            conditions.accountAmount.greater.value('100.01'),
+            conditions.accountAmount.less.value('99.99'),
+        ],
+        actions: [taxiAction],
+    }, { // Conditions action 'Set person' for transfer transaction
+        conditions: [taxiCondition],
+        actions: [
+            actions.setTransactionType('transfer_out'),
+            actions.setPerson(PERSON_Y),
+        ],
+    }, { // Conditions action 'Set person' for transfer transaction
+        conditions: [taxiCondition],
+        actions: [
+            actions.setTransactionType('transfer_in'),
+            actions.setPerson(PERSON_Y),
+        ],
+    }, { // Conditions action 'Set account' for debt transaction
+        conditions: [taxiCondition],
+        actions: [
+            actions.setTransactionType('debt_out'),
+            actions.setAccount(CASH_RUB),
+        ],
+    }, { // Conditions action 'Set account' for debt transaction
+        conditions: [taxiCondition],
+        actions: [
+            actions.setTransactionType('debt_in'),
+            actions.setAccount(CASH_RUB),
+        ],
+    }, { // Conditions with non-intersecting value regions
+        conditions: [
+            conditions.accountAmount.greater.value('100.01'),
+            conditions.accountAmount.less.value('999.99'),
+            conditions.accountAmount.isNot.value('5'),
+        ],
+        actions: [taxiAction],
     }, {
         conditions: [
             conditions.comment.includes.value('TEST'),
@@ -144,13 +234,46 @@ const create = async () => {
             // Action with invalid value
             actions.setTransactionType(100),
         ],
+    }, { // Empty amount action
+        conditions: [taxiCondition],
+        actions: [
+            actions.setSourceAmount(''),
+        ],
+    }, { // Zero amount action
+        conditions: [taxiCondition],
+        actions: [
+            actions.setSourceAmount('0.'),
+        ],
+    }, { // Negative amount action
+        conditions: [taxiCondition],
+        actions: [
+            actions.setSourceAmount('-10.'),
+        ],
+    }, {
+        // Conflicting conditions for comment field
+        conditions: [
+            conditions.comment.includes.value('C2C R-BANK'),
+            conditions.comment.notIncludes.value('C2C'),
+        ],
+        actions: [
+            actions.setCategory(App.scenario.INVEST_CATEGORY),
+        ],
+    }, {
+        // Conflicting conditions for comment field
+        conditions: [
+            conditions.comment.is.value('C2C R-BANK'),
+            conditions.comment.notIncludes.value('C2C'),
+        ],
+        actions: [
+            actions.setCategory(App.scenario.INVEST_CATEGORY),
+        ],
     }];
 
-    [
-        App.scenario.RULE_1,
-        App.scenario.RULE_2,
-        App.scenario.RULE_3,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    const res = await App.scenario.runner.runGroup(Actions.create, data);
+    // Double check all rules was not created
+    res.forEach((item, index) => {
+        assert(!item, `Created import rule with invalid data: { ${formatProps(data[index])} }`);
+    });
 };
 
 const createWithChainedRequest = async () => {
@@ -273,6 +396,7 @@ export const apiImportRulesTests = {
         setBlock('Import rule', 1);
 
         await create();
+        await createInvalid();
         await createWithChainedRequest();
         await update();
         await updateWithChainedRequest();

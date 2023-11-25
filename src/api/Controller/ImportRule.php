@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\API\Controller;
 
+use JezveMoney\App\Item\ImportRuleItem;
 use JezveMoney\Core\ApiListController;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportConditionModel;
@@ -80,31 +81,8 @@ class ImportRule extends ApiListController
      */
     protected function verifyRequest(array $request)
     {
-        if (
-            !is_array($request)
-            || !isset($request["conditions"])
-            || !is_array($request["conditions"])
-            || !count($request["conditions"])
-            || !isset($request["actions"])
-            || !is_array($request["actions"])
-            || !count($request["actions"])
-        ) {
-            return false;
-        }
-
-        foreach ($request["conditions"] as $condition) {
-            if (!is_array($condition)) {
-                return false;
-            }
-        }
-
-        foreach ($request["actions"] as $action) {
-            if (!is_array($action)) {
-                return false;
-            }
-        }
-
-        return true;
+        $rule = ImportRuleItem::fromRequest($request);
+        return !is_null($rule) && $rule->validate();
     }
 
     /**
