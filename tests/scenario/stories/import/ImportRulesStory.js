@@ -1,4 +1,5 @@
 import { assert } from '@jezvejs/assert';
+import { getLocaleDateFormat } from '@jezvejs/datetime';
 import {
     setBlock,
     TestStory,
@@ -281,16 +282,23 @@ export class ImportRulesStory extends TestStory {
         await Actions.submitRule();
 
         setBlock('Submit Date condition with invalid value', 2);
+
+        const { separator } = getLocaleDateFormat({
+            locales: App.state.getDateFormatLocale(),
+            options: App.dateFormatOptions,
+        });
+        const dateString = `01${separator}${separator}`;
+
         await Actions.updateRuleCondition({
             pos: 0,
-            action: { action: 'inputValue', data: '01xx' },
+            action: { action: 'inputDate', data: dateString },
         });
         await Actions.submitRule();
 
         setBlock('Submit rule without guard condition for `Set account` action', 2);
         await Actions.updateRuleCondition({
             pos: 0,
-            action: { action: 'inputValue', data: App.datesFmt.now },
+            action: { action: 'inputDate', data: App.formatInputDate(App.dates.now) },
         });
         await Actions.deleteRuleAction(0);
         await Actions.createRuleAction([
@@ -428,7 +436,7 @@ export class ImportRulesStory extends TestStory {
         await Actions.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_DATE },
             { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-            { action: 'inputValue', data: App.datesFmt.now },
+            { action: 'changeDate', data: App.dates.now },
         ]);
         await Actions.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -634,15 +642,15 @@ export class ImportRulesStory extends TestStory {
 
     async checkLocale() {
         const date = (App.view.locale === 'en')
-            ? App.datesFmt.weekAgo
-            : App.datesFmt.now;
+            ? App.dates.weekAgo
+            : App.dates.now;
 
         setBlock('Update conditions and actions', 2);
         await Actions.openRulesDialog();
         await Actions.updateRule(3);
         await Actions.updateRuleCondition({
             pos: 0,
-            action: { action: 'inputValue', data: date },
+            action: { action: 'inputDate', data: App.formatInputDate(date) },
         });
         await Actions.submitRule();
     }

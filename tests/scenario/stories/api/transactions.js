@@ -75,7 +75,7 @@ const create = async () => {
         TR_INCOME_1: {
             type: INCOME,
             dest_id: ACC_RUB,
-            dest_amount: 1000.50,
+            dest_amount: 1000.5054,
             comment: 'lalala',
         },
         TR_INCOME_2: {
@@ -97,8 +97,8 @@ const create = async () => {
             type: TRANSFER,
             src_id: ACC_RUB,
             dest_id: ACC_USD,
-            src_amount: 6500,
-            dest_amount: 100,
+            src_amount: 6500.2574,
+            dest_amount: 100.0015,
         },
         TR_DEBT_1: {
             type: DEBT,
@@ -704,7 +704,7 @@ const update = async () => {
         id: App.scenario.TR_TRANSFER_2,
         dest_id: CASH_RUB,
         dest_curr: RUB,
-        dest_amount: 6500,
+        dest_amount: 6500.26,
         date: App.datesSec.yesterday,
     }, {
         id: App.scenario.TR_DEBT_1,

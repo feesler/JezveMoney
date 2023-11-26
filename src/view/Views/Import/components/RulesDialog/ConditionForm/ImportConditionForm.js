@@ -6,13 +6,20 @@ import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 
-import { __ } from '../../../../../utils/utils.js';
-import { MAX_PRECISION } from '../../../../../utils/decimal.js';
+// Application
 import { App } from '../../../../../Application/App.js';
+import { __, dateStringToTime } from '../../../../../utils/utils.js';
+import { MAX_PRECISION } from '../../../../../utils/decimal.js';
+
+// Models
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../../Models/ImportCondition.js';
+
+// Common components
+import { DateInputField } from '../../../../../Components/Form/Fields/DateInputField/DateInputField.js';
+
 import './ImportConditionForm.scss';
 
 /** CSS classes */
@@ -25,6 +32,7 @@ const AMOUNT_FIELD_CLASS = 'input stretch-input amount-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
 const TEMPLATE_FIELD_CLASS = 'tpl-field';
 const CURRENCY_FIELD_CLASS = 'currency-field';
+const DATE_FIELD_CLASS = 'date-field';
 const VALUE_PROP_FIELD_CLASS = 'value-prop-field';
 const COND_FIELDS_CLASS = 'cond-form__fields';
 const CONTROLS_CLASS = 'cond-form__controls';
@@ -97,6 +105,7 @@ export class ImportConditionForm extends Component {
         this.createAccountField();
         this.createTemplateField();
         this.createCurrencyField();
+        this.createDateField();
         this.createValuePropField();
 
         // Create amount input element
@@ -126,6 +135,7 @@ export class ImportConditionForm extends Component {
             this.accountDropDown.elem,
             this.templateDropDown.elem,
             this.currencyDropDown.elem,
+            this.dateField.elem,
             this.amountInput,
             this.valueInput,
             this.valuePropDropDown.elem,
@@ -237,6 +247,18 @@ export class ImportConditionForm extends Component {
         App.initUserCurrencyList(this.currencyDropDown);
     }
 
+    /** Create date field */
+    createDateField() {
+        this.dateField = DateInputField.create({
+            id: 'dateField',
+            className: DATE_FIELD_CLASS,
+            locales: App.dateFormatLocale,
+            validate: true,
+            onInput: (e) => this.onDateInput(e),
+            onDateSelect: (e) => this.onDateSelect(e),
+        });
+    }
+
     /** Create value property field */
     createValuePropField() {
         this.valuePropDropDown = DropDown.create({
@@ -344,6 +366,9 @@ export class ImportConditionForm extends Component {
         if (ImportCondition.isAmountField(state.fieldType)) {
             return this.decAmountInput.value;
         }
+        if (ImportCondition.isDateField(state.fieldType)) {
+            return this.dateField.value;
+        }
 
         return this.valueInput.value;
     }
@@ -369,14 +394,18 @@ export class ImportConditionForm extends Component {
             this.currencyDropDown.setSelection(value);
         } else if (ImportCondition.isAmountField(state.fieldType)) {
             this.decAmountInput.value = state.value;
+        } else if (ImportCondition.isDateField(state.fieldType)) {
+            this.dateField.setState((dateFieldState) => ({
+                ...dateFieldState,
+                value: state.value,
+                date: dateStringToTime(state.value),
+            }));
         } else {
             this.valueInput.value = state.value;
         }
     }
 
-    /** Value property select 'change' event handler */
-    onValueChange() {
-        const value = this.getConditionValue(this.state);
+    setValue(value) {
         if (this.state.value === value) {
             return;
         }
@@ -387,6 +416,26 @@ export class ImportConditionForm extends Component {
             isValid: true,
         });
         this.sendUpdate();
+    }
+
+    /** Value property select 'change' event handler */
+    onValueChange() {
+        const value = this.getConditionValue(this.state);
+        this.setValue(value);
+    }
+
+    onDateInput(e) {
+        const { value } = e.target;
+        this.setValue(value);
+    }
+
+    /**
+     * Date select callback
+     * @param {Date} date - selected date object
+     */
+    onDateSelect(date) {
+        const value = App.formatInputDate(date);
+        this.setValue(value);
     }
 
     /** Field value checkbox 'change' event handler */
@@ -531,12 +580,10 @@ export class ImportConditionForm extends Component {
         const isCurrencyValue = (!state.isFieldValue && isCurrencyField);
         const isAmountField = ImportCondition.isAmountField(state.fieldType);
         const isAmountValue = (!state.isFieldValue && isAmountField);
+        const isDateValue = (!state.isFieldValue && ImportCondition.isDateField(state.fieldType));
         const isTextValue = (
             !state.isFieldValue
-            && (
-                ImportCondition.isDateField(state.fieldType)
-                || ImportCondition.isStringField(state.fieldType)
-            )
+            && ImportCondition.isStringField(state.fieldType)
         );
 
         this.accountDropDown.show(isAccountValue);
@@ -547,6 +594,7 @@ export class ImportConditionForm extends Component {
             this.renderValueProperty(state);
         }
         this.valuePropDropDown.show(state.isFieldValue);
+        this.dateField.show(isDateValue);
         show(this.valueInput, isTextValue);
 
         this.setConditionValue(state);

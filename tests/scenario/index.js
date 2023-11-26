@@ -1,11 +1,13 @@
 import { assert } from '@jezvejs/assert';
+import { formatTime } from '@jezvejs/datetime';
 import {
     Runner,
     setBlock,
     getSelectedStory,
 } from 'jezve-test';
-import { api } from '../model/api.js';
+
 import { App } from '../Application.js';
+import { api } from '../model/api.js';
 
 import { createUserCurrencies } from './data/userCurrencies.js';
 import { createAccounts } from './data/accounts.js';
@@ -95,6 +97,8 @@ export class Scenario {
     }
 
     async run() {
+        this.storiesResults = {};
+
         const story = getSelectedStory();
         if (story) {
             if (!this.checkSelectedStory(story)) {
@@ -138,9 +142,30 @@ export class Scenario {
         return Object.keys(storiesMap);
     }
 
+    beforeStory(name) {
+        this.storiesResults[name] = {
+            startTime: Date.now(),
+            startTests: App.environment.results.total,
+        };
+    }
+
+    afterStory(name) {
+        const res = this.storiesResults[name];
+
+        res.endTime = Date.now();
+        res.duration = res.endTime - res.startTime;
+
+        res.endTests = App.environment.results.total;
+        res.testsCount = res.endTests - res.startTests;
+    }
+
     async runStory(name) {
+        this.beforeStory(name);
+
         const story = this.getStory(name);
         await story.run();
+
+        this.afterStory(name);
     }
 
     async runFullScenario() {
@@ -331,5 +356,10 @@ export class Scenario {
     async finishTests() {
         await ApiTests.loginTest(App.config.testAdminUser);
         await App.setupUser();
+
+        Object.entries(this.storiesResults).forEach(([name, { testsCount, duration }]) => {
+            /* eslint-disable-next-line no-console */
+            console.log(` ${name}: `, formatTime(duration), ' ', testsCount, ' tests');
+        });
     }
 }

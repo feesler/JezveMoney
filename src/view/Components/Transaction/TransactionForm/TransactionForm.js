@@ -22,7 +22,7 @@ import {
     MAX_DAYS_IN_MONTH,
     createHiddenInputs,
 } from '../../../utils/utils.js';
-import { EXCHANGE_PRECISION, normalizeExch } from '../../../utils/decimal.js';
+import { EXCHANGE_PRECISION, normalize, normalizeExch } from '../../../utils/decimal.js';
 import { App } from '../../../Application/App.js';
 
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../Models/Account.js';
@@ -241,8 +241,12 @@ export class TransactionForm extends Component {
             }
         }
 
-        initialState.form.sourceAmount = (transaction.src_amount) ? transaction.src_amount : '';
-        initialState.form.destAmount = (transaction.dest_amount) ? transaction.dest_amount : '';
+        initialState.form.sourceAmount = (transaction.src_amount)
+            ? normalize(transaction.src_amount, initialState.srcCurrency.precision)
+            : '';
+        initialState.form.destAmount = (transaction.dest_amount)
+            ? normalize(transaction.dest_amount, initialState.destCurrency.precision)
+            : '';
 
         calculateSourceResult(initialState);
         calculateDestResult(initialState);

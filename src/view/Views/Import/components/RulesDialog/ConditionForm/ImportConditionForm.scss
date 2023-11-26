@@ -57,8 +57,16 @@
 .tpl-field,
 .currency-field,
 .amount-field,
-.text-field {
-  flex: 1 1 30px;
+.text-field,
+.date-field {
+  flex: 1 1 0;
+  min-width: 200px;
+}
+
+.date-field {
+  --field-title-margin: 0;
+
+  max-width: 200px;
 }
 
 /* Controls container */
