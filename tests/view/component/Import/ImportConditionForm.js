@@ -19,6 +19,7 @@ import {
     IMPORT_COND_FIELD_COMMENT,
     ImportCondition,
 } from '../../../model/ImportCondition.js';
+import { DatePickerField } from '../Fields/DatePickerField.js';
 
 const fieldValueTypes = [
     'property',
@@ -26,6 +27,7 @@ const fieldValueTypes = [
     'template',
     'amount',
     'currency',
+    'date',
     'text',
 ];
 
@@ -37,7 +39,7 @@ const fieldValueMap = {
     [IMPORT_COND_FIELD_TR_CURRENCY]: 'currency',
     [IMPORT_COND_FIELD_ACC_CURRENCY]: 'currency',
     [IMPORT_COND_FIELD_COMMENT]: 'text',
-    [IMPORT_COND_FIELD_DATE]: 'text',
+    [IMPORT_COND_FIELD_DATE]: 'date',
 };
 
 const fieldSelectors = [
@@ -51,7 +53,9 @@ const fieldSelectors = [
     '.text-field',
 ];
 
-/** Import condition form */
+/**
+ * Import condition form test component
+ */
 export class ImportConditionForm extends TestComponent {
     static getExpectedState(model) {
         const res = {
@@ -134,18 +138,16 @@ export class ImportConditionForm extends TestComponent {
     async parseContent() {
         const res = {
             fieldValueCheck: await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox')),
-            feedbackElem: { elem: await query(this.elem, '.invalid-feedback') },
+            feedbackElem: { elem: await query(this.elem, '.cond-form__container > .invalid-feedback') },
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
-        [
-            res.fieldValueCheck.content.visible,
-            res.deleteBtn.visible,
-        ] = await evaluate(
-            (...elems) => elems.map((el) => (el && !el.hidden)),
-            res.fieldValueCheck.elem,
-            res.deleteBtn.elem,
-        );
+        Object.keys(res).forEach((child) => (
+            assert(
+                res[child]?.elem,
+                `Invalid structure of import condition form: ${child} component not found`,
+            )
+        ));
 
         [
             res.fieldTypeField,
@@ -156,24 +158,24 @@ export class ImportConditionForm extends TestComponent {
             res.currencyField,
             res.propertyField,
             res.textField,
-        ] = await asyncMap(
-            fieldSelectors,
-            (selector) => this.parseField(query(this.elem, selector)),
-        );
+        ] = await asyncMap(fieldSelectors, async (selector) => {
+            const field = this.parseField(query(this.elem, selector));
+            assert(field, 'Invalid structure of import condition form');
+            return field;
+        });
 
-        assert(
-            res.fieldTypeField
-            && res.operatorField
-            && res.amountField
-            && res.accountField
-            && res.templateField
-            && res.currencyField
-            && res.propertyField
-            && res.textField
-            && res.fieldValueCheck.elem
-            && res.feedbackElem.elem
-            && res.deleteBtn.elem,
-            'Invalid structure of import condition form',
+        res.dateField = await DatePickerField.create(this, await query(this.elem, '.date-field'));
+        assert(res.dateField, 'Invalid structure of import condition form: date field not found');
+
+        [
+            res.fieldValueCheck.content.visible,
+            res.deleteBtn.visible,
+            res.dateField.content.visible,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => (!!el && !el.hidden)),
+            res.fieldValueCheck.elem,
+            res.deleteBtn.elem,
+            res.dateField.elem,
         );
 
         return res;
@@ -185,7 +187,7 @@ export class ImportConditionForm extends TestComponent {
 
         const res = await evaluate((el) => ({
             dropDown: el?.classList?.contains('dd__container'),
-            visible: el && !el.hidden,
+            visible: !!el && !el.hidden,
             disabled: el.disabled,
             value: el.value,
         }), elem);
@@ -219,6 +221,7 @@ export class ImportConditionForm extends TestComponent {
             template: cont.templateField.value,
             amount: cont.amountField.value,
             currency: cont.currencyField.value,
+            date: cont.dateField.value,
             text: cont.textField.value,
             feedbackVisible: cont.feedbackElem.visible,
         };
@@ -272,6 +275,14 @@ export class ImportConditionForm extends TestComponent {
 
     async inputAmount(value) {
         return this.changeValue('amount', value);
+    }
+
+    async inputDate(value) {
+        return this.content.dateField.input(value);
+    }
+
+    async changeDate(value) {
+        return this.content.dateField.selectDate(value);
     }
 
     async inputValue(value) {

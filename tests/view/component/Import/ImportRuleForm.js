@@ -8,6 +8,11 @@ import {
     asyncMap,
     waitForFunction,
 } from 'jezve-test';
+
+import { App } from '../../../Application.js';
+import { MAX_PRECISION, secondsToDate, trimToDigitsLimit } from '../../../common.js';
+
+import { __ } from '../../../model/locale.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
 import {
@@ -21,13 +26,14 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../../model/ImportAction.js';
+
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
-import { MAX_PRECISION, trimToDigitsLimit } from '../../../common.js';
-import { App } from '../../../Application.js';
-import { __ } from '../../../model/locale.js';
 
+/**
+ * Import rule form test component
+ */
 export class ImportRuleForm extends TestComponent {
     static getExpectedCondition(model) {
         const res = {
@@ -104,7 +110,8 @@ export class ImportRuleForm extends TestComponent {
             };
 
             if (ImportCondition.isDateField(item.field_id)) {
-                condition.value = App.secondsToDateString(parseInt(condition.value, 10));
+                const seconds = parseInt(item.value, 10);
+                condition.value = App.formatInputDate(secondsToDate(seconds));
             }
 
             return condition;
@@ -221,10 +228,8 @@ export class ImportRuleForm extends TestComponent {
         res.feedbackElem = { elem: await query(this.elem, '.rule-form__feedback .invalid-feedback') };
         assert(
             res.idInput.elem
-            && res.conditionsList
-            && res.conditionsList.elem
-            && res.actionsList
-            && res.actionsList.elem
+            && res.conditionsList?.elem
+            && res.actionsList?.elem
             && res.submitBtn.elem
             && res.cancelBtn.elem
             && res.feedbackElem.elem,
@@ -495,6 +500,12 @@ export class ImportRuleForm extends TestComponent {
         if (action === 'inputAmount') {
             return this.inputConditionAmount(index, data);
         }
+        if (action === 'inputDate') {
+            return this.inputConditionDate(index, data);
+        }
+        if (action === 'changeDate') {
+            return this.changeConditionDate(index, data);
+        }
         if (action === 'inputValue') {
             return this.inputConditionValue(index, data);
         }
@@ -552,7 +563,11 @@ export class ImportRuleForm extends TestComponent {
         await this.openConditions();
 
         const item = this.content.conditionsList.items[ind];
-        await this.performAction(() => item.changeValue(name, value));
+        if (name === 'date') {
+            await this.performAction(() => item.inputDate(value));
+        } else {
+            await this.performAction(() => item.changeValue(name, value));
+        }
 
         return this.checkState();
     }
@@ -593,6 +608,30 @@ export class ImportRuleForm extends TestComponent {
 
     async inputConditionAmount(index, value) {
         return this.changeConditionValue(index, 'amount', value);
+    }
+
+    async inputConditionDate(index, value) {
+        return this.changeConditionValue(index, 'date', value);
+    }
+
+    async changeConditionDate(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        assert(conditionModel.state === 'date', `Invalid state ${conditionModel.state} expected 'date'`);
+
+        conditionModel.date = App.formatInputDate(value);
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.resetValidation();
+        const expected = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.items[ind];
+        await this.performAction(() => item.changeDate(value));
+
+        return this.checkState(expected);
     }
 
     async inputConditionValue(index, value) {

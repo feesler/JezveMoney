@@ -120,9 +120,12 @@ export const formatInputDate = (date, params = {}) => {
         locales: params?.locales ?? [],
         options: inputFormatOptions,
     });
+    res = res.trim();
 
-    if (res.endsWith(format.separator)) {
-        const length = res.lastIndexOf(format.separator);
+    // Remove trailing separator
+    const separator = format.separator.trim();
+    if (res.endsWith(separator)) {
+        const length = res.lastIndexOf(separator);
         res = res.substring(0, length);
     }
 

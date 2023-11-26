@@ -1,11 +1,15 @@
-import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
+import { assert } from '@jezvejs/assert';
+import { formatDate } from '@jezvejs/datetime';
 import { test, setBlock } from 'jezve-test';
+
 import { App } from '../../../Application.js';
+
 import { __ } from '../../../model/locale.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { ImportAction } from '../../../model/ImportAction.js';
+
 import { ImportView } from '../../../view/ImportView.js';
 
 /** Navigate to import page */
@@ -148,6 +152,8 @@ const runOnRuleCondition = async (params) => {
         changeCurrency: 'Change currency',
         togglePropValue: 'Toggle enable property value',
         inputAmount: 'Input amount value',
+        inputDate: 'Input date value',
+        changeDate: 'Select date',
         inputValue: 'Input value',
     };
 
@@ -184,6 +190,10 @@ const runOnRuleCondition = async (params) => {
             assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.code}'`;
+        } else if (action.action === 'changeDate') {
+            const dateFmt = formatDate(action.data, { locales: App.view.locale });
+
+            descr = `${actDescr[action.action]} to '${dateFmt}'`;
         } else if (action.action === 'togglePropValue') {
             descr = `${actDescr[action.action]}`;
         } else {

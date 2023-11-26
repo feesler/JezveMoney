@@ -47,7 +47,9 @@ const fieldSelectors = [
     '.action-value-field',
 ];
 
-/** Import action form */
+/**
+ * Import action form test component
+ */
 export class ImportActionForm extends TestComponent {
     static getExpectedState(model) {
         const res = {
@@ -100,7 +102,7 @@ export class ImportActionForm extends TestComponent {
         assert(this.elem, 'Invalid import action form');
 
         const res = {
-            feedbackElem: { elem: await query(this.elem, '.invalid-feedback') },
+            feedbackElem: { elem: await query(this.elem, '.action-form__container > .invalid-feedback') },
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 

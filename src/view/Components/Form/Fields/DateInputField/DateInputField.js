@@ -17,6 +17,9 @@ const defaultProps = {
     feedbackMessage: null,
     valid: true,
     clearButton: false,
+    datePicker: {
+        hideOnSelect: true,
+    },
     onInput: null,
     onClear: null,
     onDateSelect: null,
@@ -36,6 +39,10 @@ export class DateInputField extends Field {
             ...defaultProps,
             ...props,
         });
+    }
+
+    get value() {
+        return this.state.value;
     }
 
     init() {
@@ -78,6 +85,7 @@ export class DateInputField extends Field {
         }
 
         this.datePicker = DatePicker.create({
+            ...this.props.datePicker,
             relparent: this.container,
             locales: App.getCurrrentLocale(),
             onDateSelect: this.props.onDateSelect,
