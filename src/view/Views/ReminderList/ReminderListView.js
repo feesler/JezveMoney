@@ -246,7 +246,7 @@ class ReminderListView extends AppView {
         const params = {};
 
         if (filter.reminderState !== REMINDER_SCHEDULED) {
-            params.reminderState = Reminder.getStateName(filter.reminderState);
+            params.state = Reminder.getStateName(filter.reminderState);
         }
 
         if (filter.startDate) {

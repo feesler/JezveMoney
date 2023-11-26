@@ -265,6 +265,60 @@ class ReminderModel extends CachedTable
     }
 
     /**
+     * Cancels confirmation of specified reminders:
+     *  changes state to REMINDER_SCHEDULED if reminder date is in past
+     *  removes reminder if date is in future
+     *
+     * @param mixed $items item id or array of item ids
+     *
+     * @return bool
+     */
+    public function cancelConfirmation(mixed $items)
+    {
+        if (!self::$user_id) {
+            return false;
+        }
+
+        $ids = asArray($items);
+        if (count($ids) === 0) {
+            return true;
+        }
+
+        $clientTime = cutDate(UserSettingsModel::clientTime());
+        $itemsToRemove = [];
+
+        foreach ($ids as $item_id) {
+            $item = $this->getItem($item_id);
+            if (!$item) {
+                return false;
+            }
+
+            if ($item->date > $clientTime) {
+                $itemsToRemove[] = $item_id;
+            } else {
+                $updRes = $this->update($item_id, [
+                    "transaction_id" => 0,
+                    "state" => REMINDER_SCHEDULED,
+                ]);
+                if (!$updRes) {
+                    return false;
+                }
+            }
+        }
+
+        if (count($itemsToRemove) > 0) {
+            if (!$this->del($itemsToRemove)) {
+                return false;
+            }
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+
+    /**
      * Removes all reminders
      *
      * @return bool
@@ -515,10 +569,7 @@ class ReminderModel extends CachedTable
         foreach ($ids as $item_id) {
             $item = $this->getItem($item_id);
             if (!$item) {
-                throw new \Error("Invalid reminder");
-            }
-            if ($item->state === REMINDER_CONFIRMED) {
-                throw new \Error("Reminder already confirmed");
+                throw new \Error("Reminder '$item_id' not found");
             }
 
             if (isset($request["transaction_id"])) {

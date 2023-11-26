@@ -398,6 +398,14 @@ class Transactions extends ListViewController
             throw new \Error(__("transactions.errors.update"));
         }
 
+        $reminders = $reminderModel->getData([
+            "transaction_id" => $trans_id,
+            "returnIds" => true,
+        ]);
+        if (count($reminders) === 1) {
+            $tr["reminder_id"] = $reminders[0];
+        }
+
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
 
