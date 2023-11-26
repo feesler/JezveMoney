@@ -122,11 +122,17 @@ export class NumberInputGroup extends InputGroup {
     }
 
     onInput(e) {
-        const numberValue = parseFloat(e.target.value);
-        this.setState({
-            ...this.state,
-            value: numberValue,
-        });
+        let value = parseFloat(e.target.value);
+
+        const { minValue, maxValue } = this.state;
+        if (
+            (isNumber(minValue) && value < minValue)
+            || (isNumber(maxValue) && value > maxValue)
+        ) {
+            value = this.state.value;
+        }
+
+        this.setState({ ...this.state, value });
 
         if (isFunction(this.props.onInput)) {
             this.props.onInput(e);
@@ -160,7 +166,7 @@ export class NumberInputGroup extends InputGroup {
 
     renderInput(state, prevState) {
         if (state.value !== this.input.value) {
-            this.input.value = state.value;
+            this.input.value = state.value.toString();
         }
         if (state.disabled !== prevState?.disabled) {
             this.input.enable(!state.disabled);
