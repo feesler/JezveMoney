@@ -1911,6 +1911,12 @@ export class AppState {
             res.id = itemData.id;
         }
 
+        const srcCurrency = App.currency.getItem(res.src_curr);
+        const destCurrency = App.currency.getItem(res.dest_curr);
+
+        res.src_amount = normalize(res.src_amount, srcCurrency.precision);
+        res.dest_amount = normalize(res.dest_amount, destCurrency.precision);
+
         if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
             return res;
         }
@@ -2373,6 +2379,12 @@ export class AppState {
 
         const res = copyFields(itemData, fields);
         res.interval_offset = asArray(res.interval_offset);
+
+        const srcCurrency = App.currency.getItem(res.src_curr);
+        const destCurrency = App.currency.getItem(res.dest_curr);
+
+        res.src_amount = normalize(res.src_amount, srcCurrency.precision);
+        res.dest_amount = normalize(res.dest_amount, destCurrency.precision);
 
         if (res.type !== DEBT || (res.type === DEBT && !isPersonRequest)) {
             return res;

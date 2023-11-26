@@ -173,7 +173,7 @@ export class RemindersStory extends TestStory {
     async selectReminderOnUpdate() {
         setBlock('Select reminder on update transaction', 1);
 
-        await trActions.update(TRANSFER, 1);
+        await trActions.update(TRANSFER, 0);
         await trActions.openReminderDialog();
         await trActions.filterRemindersByState(REMINDER_UPCOMING);
         await trActions.selectReminderByIndex(0);

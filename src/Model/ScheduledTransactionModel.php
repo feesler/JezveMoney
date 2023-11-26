@@ -179,27 +179,13 @@ class ScheduledTransactionModel extends CachedTable
             throw new \Error("Source and destination are the same.");
         }
 
-        if (isset($params["src_amount"])) {
-            $res["src_amount"] = floatval($params["src_amount"]);
-            if ($res["src_amount"] <= 0.0) {
-                throw new \Error("Invalid src_amount specified");
-            }
-        }
-        $srcAmount = (isset($res["src_amount"])) ? $res["src_amount"] : $item->src_amount;
-
-        if (isset($params["dest_amount"])) {
-            $res["dest_amount"] = floatval($params["dest_amount"]);
-            if ($res["dest_amount"] <= 0.0) {
-                throw new \Error("Invalid dest_amount specified");
-            }
-        }
-        $destAmount = (isset($res["dest_amount"])) ? $res["dest_amount"] : $item->dest_amount;
-
+        // Category
         $res["category_id"] = (isset($params["category_id"])) ? intval($params["category_id"]) : 0;
         if ($res["category_id"] !== 0 && !$this->catModel->isExist($res["category_id"])) {
             throw new \Error("Invalid category_id specified");
         }
 
+        // Source currency
         if (isset($params["src_curr"])) {
             $res["src_curr"] = intval($params["src_curr"]);
             if (
@@ -210,6 +196,8 @@ class ScheduledTransactionModel extends CachedTable
             }
         }
         $srcCurrId = (isset($res["src_curr"])) ? $res["src_curr"] : $item->src_curr;
+        $sourceCurrency = $this->currMod->getItem($srcCurrId);
+
         // Check source currency is the same as currency of source account
         if ($srcAcc && $srcAcc->curr_id !== $srcCurrId) {
             throw new \Error("src_curr is not the same as currency of source account");
@@ -225,10 +213,30 @@ class ScheduledTransactionModel extends CachedTable
             }
         }
         $destCurrId = (isset($res["dest_curr"])) ? $res["dest_curr"] : $item->dest_curr;
+        $destCurrency = $this->currMod->getItem($destCurrId);
+
         // Check destination currency is the same as currency of destination account
         if ($destAcc && $destAcc->curr_id !== $destCurrId) {
             throw new \Error("dest_curr is not the same as currency of destination account");
         }
+
+        // Source amount
+        if (isset($params["src_amount"])) {
+            $res["src_amount"] = normalize($params["src_amount"], $sourceCurrency->precision);
+            if ($res["src_amount"] <= 0.0) {
+                throw new \Error("Invalid src_amount specified");
+            }
+        }
+        $srcAmount = (isset($res["src_amount"])) ? $res["src_amount"] : $item->src_amount;
+
+        // Destination amount
+        if (isset($params["dest_amount"])) {
+            $res["dest_amount"] = normalize($params["dest_amount"], $destCurrency->precision);
+            if ($res["dest_amount"] <= 0.0) {
+                throw new \Error("Invalid dest_amount specified");
+            }
+        }
+        $destAmount = (isset($res["dest_amount"])) ? $res["dest_amount"] : $item->dest_amount;
 
         if ($srcCurrId === $destCurrId && $srcAmount != $destAmount) {
             throw new \Error("src_amount and dest_amount must be equal when src_curr and dest_curr are same");
