@@ -5,10 +5,9 @@
     "$phpPath\pear"
     "$phpPath\pear\bin"
     "$phpPath"
-    "$osPanelPath\modules\wget\bin"
-    "$osPanelPath\modules\database\MariaDB-10.4\bin"
-    "$osPanelPath\modules\http\Apache_2.4-PHP_7.2-7.4\bin"
-    "$osPanelPath\modules\http\Apache_2.4-PHP_7.2-7.4"
+    "$osPanelPath\modules\MariaDB-10.6\bin"
+    "$osPanelPath\modules\PHP-8.2\Apache\bin"
+    "$osPanelPath\modules\PHP-8.2\Apache"
 2. Add environment variables:
     PHP_BIN = "$phpPath\php.exe"
     PHP_BINARY = "$phpPath\php.exe"
@@ -26,11 +25,29 @@
     PHPDIR = "$phpPath\"
     PHPRC = "$phpPath"
 
-Ex.: $osPanelPath = "c:\ospanel"
-$phpPath = "$osPanelPath\modules\php\PHP_7.4"
+Ex.: $osPanelPath = "C:\OSPanel"
+$phpPath = "$osPanelPath\modules\PHP-8.2\PHP"
 
 
-- HTTPS setup with OpenServer
+- Install and setup phpMyAdmin with MariaDB on OSPanel 6
+
+1. Download phpMyAdmin release from official site: https://www.phpmyadmin.net/downloads/
+2. Add domain configuration for phpmyadmin
+3. Extract downloaded archive to domain directory. Ex.: C:\OSPanel\home\phpmyadmin\www
+4. Go to phpmyadmin domain directory
+5. Copy config.sample.inc.php to config.inc.php
+6. Check MariaDB server settings at C:\OSPanel\config\MariaDB-10.6\default\settings.ini
+   To use 'localhost' server set following
+   [main]
+   ip = 127.0.0.1
+
+6. Set following values at config.inc.php:
+    $cfg['Servers'][$i]['host'] = 'localhost';
+    $cfg['Servers'][$i]['user'] = 'root';
+    $cfg['Servers'][$i]['AllowNoPassword'] = true;
+
+
+- HTTPS setup with OpenServer 5
 
 1. Download mkcert https://github.com/FiloSottile/mkcert/releases
 2. mkcert -install
