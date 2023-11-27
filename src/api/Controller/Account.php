@@ -60,12 +60,12 @@ class Account extends ApiSortableListController
             return $item;
         }
 
-        $res = $item;
-        $res->transactionsCount = $this->transModel->getTransCount([
+        $res = (array)$item;
+        $res["transactionsCount"] = $this->transModel->getTransCount([
             "accounts" => $item->id,
         ]);
 
-        return $res;
+        return (object)$res;
     }
 
     /**

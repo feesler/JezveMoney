@@ -7,7 +7,24 @@ namespace JezveMoney\Core;
  */
 class Template
 {
-    protected $filename;
+    protected $filename = null;
+
+    public $action = null;
+    public $actionParam = null;
+    public $cssArr = [];
+    public $jsArr = [];
+    public $cssAdmin = [];
+    public $jsAdmin = [];
+
+    public $user_id = 0;
+    public $user_name = null;
+    public $adminUser = false;
+    public $locale = [];
+
+    public $userTheme = null;
+    public $themes = [];
+    public $themeColor = null;
+    public $themeClass = null;
 
     /**
      * @param string $filename template file name
