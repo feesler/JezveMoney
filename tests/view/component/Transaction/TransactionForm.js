@@ -482,7 +482,6 @@ export class TransactionForm extends TestComponent {
         const isDebt = model.type === DEBT;
         const isLimitChange = model.type === LIMIT_CHANGE;
         const { isAvailable, isDiffCurr } = model;
-        const { locale } = App.view;
 
         const allowCreditLimit = (
             model.srcAccount?.type === ACCOUNT_TYPE_CREDIT_CARD
@@ -495,32 +494,32 @@ export class TransactionForm extends TestComponent {
                 items: [
                     {
                         id: 'all',
-                        title: __('actions.showAll', locale),
+                        title: __('actions.showAll'),
                         hidden: true,
                     },
                     {
                         id: EXPENSE.toString(),
-                        title: __('transactions.types.expense', locale),
+                        title: __('transactions.types.expense'),
                         hidden: false,
                     },
                     {
                         id: INCOME.toString(),
-                        title: __('transactions.types.income', locale),
+                        title: __('transactions.types.income'),
                         hidden: false,
                     },
                     {
                         id: TRANSFER.toString(),
-                        title: __('transactions.types.transfer', locale),
+                        title: __('transactions.types.transfer'),
                         hidden: false,
                     },
                     {
                         id: DEBT.toString(),
-                        title: __('transactions.types.debt', locale),
+                        title: __('transactions.types.debt'),
                         hidden: false,
                     },
                     {
                         id: LIMIT_CHANGE.toString(),
-                        title: __('transactions.types.creditLimit', locale),
+                        title: __('transactions.types.creditLimit'),
                         hidden: !allowCreditLimit,
                     },
                 ],
@@ -765,14 +764,14 @@ export class TransactionForm extends TestComponent {
         if (isAvailable) {
             if (model.type === LIMIT_CHANGE) {
                 res.srcAmountField.label = '';
-                res.destAmountField.label = __('transactions.limitDelta', locale);
+                res.destAmountField.label = __('transactions.limitDelta');
             } else {
-                res.srcAmountField.label = (isDiffCurr) ? __('transactions.sourceAmount', locale) : __('transactions.amount', locale);
-                res.destAmountField.label = (isDiffCurr) ? __('transactions.destAmount', locale) : __('transactions.amount', locale);
+                res.srcAmountField.label = (isDiffCurr) ? __('transactions.sourceAmount') : __('transactions.amount');
+                res.destAmountField.label = (isDiffCurr) ? __('transactions.destAmount') : __('transactions.amount');
             }
         }
 
-        const resultBalanceTok = __('transactions.result', locale);
+        const resultBalanceTok = __('transactions.result');
 
         if (isExpense) {
             assert(stateId >= -1 && stateId <= 4, 'Invalid state specified');
@@ -881,8 +880,8 @@ export class TransactionForm extends TestComponent {
             assert(stateId >= -1 && stateId <= 8, 'Invalid state specified');
 
             if (isAvailable && isTransactionForm) {
-                res.srcResultField.label = `${resultBalanceTok} (${__('transactions.source', locale)})`;
-                res.destResultField.label = `${resultBalanceTok} (${__('transactions.destination', locale)})`;
+                res.srcResultField.label = `${resultBalanceTok} (${__('transactions.source')})`;
+                res.destResultField.label = `${resultBalanceTok} (${__('transactions.destination')})`;
             }
 
             if (isScheduleItemForm) {
@@ -971,13 +970,13 @@ export class TransactionForm extends TestComponent {
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
             if (isAvailable && isTransactionForm) {
-                res.srcResultField.label = `${__('transactions.sourceResult', locale)}`;
-                res.destResultField.label = `${__('transactions.destResult', locale)}`;
+                res.srcResultField.label = `${__('transactions.sourceResult')}`;
+                res.destResultField.label = `${__('transactions.destResult')}`;
             }
 
             if (debtType) {
                 if (isAvailable) {
-                    res.personContainer.label = __('transactions.sourcePerson', locale);
+                    res.personContainer.label = __('transactions.sourcePerson');
                     res.personContainer.tile.title = (model.person) ? model.person.name : '';
                     res.personContainer.tile.subtitle = (model.srcAccount)
                         ? model.srcCurr.format(model.srcAccount.balance)
@@ -994,7 +993,7 @@ export class TransactionForm extends TestComponent {
                 }
             } else {
                 if (isAvailable) {
-                    res.personContainer.label = __('transactions.destPerson', locale);
+                    res.personContainer.label = __('transactions.destPerson');
                     res.personContainer.tile.title = (model.person) ? model.person.name : '';
                     res.personContainer.tile.subtitle = (model.destAccount)
                         ? model.destCurr.format(model.destAccount.balance)

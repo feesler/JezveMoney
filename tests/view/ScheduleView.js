@@ -138,9 +138,7 @@ export class ScheduleView extends AppView {
         return model.list.page + model.list.range - 1;
     }
 
-    constructor(...args) {
-        super(...args);
-
+    init() {
         this.items = null;
     }
 

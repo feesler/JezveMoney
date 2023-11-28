@@ -18,9 +18,7 @@ import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../m
 
 /** Account view class */
 export class AccountView extends AppView {
-    constructor(...args) {
-        super(...args);
-
+    init() {
         this.nameTyped = false;
     }
 

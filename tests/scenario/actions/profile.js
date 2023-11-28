@@ -100,22 +100,25 @@ export const register = async ({ login, name, password }) => {
 };
 
 export const resetData = async (options = {}) => {
-    App.state.resetData(options);
+    await test('Reset data', async () => {
+        App.state.resetData(options);
 
-    await App.view.goToProfile();
-    await App.view.resetData(options);
+        await App.view.goToProfile();
+        await App.view.resetData(options);
 
-    App.view.expectedState = {
-        notification: { success: true, message: __('profile.resetMessage') },
-    };
-    await test('Reset data', () => App.view.checkState());
+        const expected = {
+            notification: { success: true, message: __('profile.resetMessage') },
+        };
 
-    await App.view.closeNotification();
-    await App.goToMainView();
-    await App.view.waitForLoad();
+        await App.view.checkState(expected);
 
-    const expected = MainView.getInitialState();
-    await test('Main view update', () => App.view.checkState(expected));
+        await App.view.closeNotification();
+        await App.goToMainView();
+        await App.view.waitForLoad();
+
+        const mainViewExpected = MainView.getInitialState();
+        return App.view.checkState(mainViewExpected);
+    });
 };
 
 export const changeName = async (newName) => {

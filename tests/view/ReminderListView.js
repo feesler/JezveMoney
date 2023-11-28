@@ -217,9 +217,7 @@ export class ReminderListView extends AppView {
         return model.list.page + model.list.range - 1;
     }
 
-    constructor(...args) {
-        super(...args);
-
+    init() {
         this.items = null;
         this.upcomingItems = null;
         this.upcomingPagination = null;
