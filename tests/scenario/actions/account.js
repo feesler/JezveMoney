@@ -6,7 +6,6 @@ import {
     baseUrl,
     goTo,
 } from 'jezve-test';
-import { MainView } from '../../view/MainView.js';
 import { AccountListView } from '../../view/AccountListView.js';
 import { generateId } from '../../common.js';
 import { App } from '../../Application.js';
@@ -183,10 +182,6 @@ export const delFromUpdate = async (pos) => {
 
         const expected = AccountListView.getInitialState();
         App.view.checkState(expected);
-
-        await App.goToMainView();
-        const mainViewExpected = MainView.getInitialState();
-        App.view.checkState(mainViewExpected);
 
         return App.state.fetchAndTest();
     });

@@ -1037,7 +1037,6 @@ class ScheduledTransactionModel extends CachedTable
                 $queryItem = clone $trans;
                 $queryItem->type = INCOME;
                 $queryItem->src_id = 0;
-                $queryItem->src_result = 0;
             }
 
             // set incoming debt(person give) as expense from source account
@@ -1045,7 +1044,6 @@ class ScheduledTransactionModel extends CachedTable
                 $queryItem = clone $trans;
                 $queryItem->type = EXPENSE;
                 $queryItem->dest_id = 0;
-                $queryItem->dest_result = 0;
             }
 
             // check account of user
@@ -1054,14 +1052,12 @@ class ScheduledTransactionModel extends CachedTable
             if ($trans->type == DEBT && in_array($trans->src_id, $userAccounts)) {
                 $queryItem = clone $trans;
                 $queryItem->src_id = 0;
-                $queryItem->src_result = 0;
             }
 
             // set incoming debt(person give) as debt without acc
             if ($trans->type == DEBT && in_array($trans->dest_id, $userAccounts)) {
                 $queryItem = clone $trans;
                 $queryItem->dest_id = 0;
-                $queryItem->dest_result = 0;
             }
 
             // set transfer from account as income to destination account
@@ -1069,7 +1065,6 @@ class ScheduledTransactionModel extends CachedTable
                 $queryItem = clone $trans;
                 $queryItem->type = INCOME;
                 $queryItem->src_id = 0;
-                $queryItem->src_result = 0;
             }
 
             // set transfer to account as expense from source account
@@ -1077,7 +1072,6 @@ class ScheduledTransactionModel extends CachedTable
                 $queryItem = clone $trans;
                 $queryItem->type = EXPENSE;
                 $queryItem->dest_id = 0;
-                $queryItem->dest_result = 0;
             }
 
             if (!is_null($queryItem)) {

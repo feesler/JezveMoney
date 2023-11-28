@@ -33,17 +33,13 @@ const defaultPagination = {
 };
 
 const listMenuSelector = '#listMenu';
-
 const transactionPopupId = '#transactionFormPopup';
+const uploadPopupId = '#fileupload_popup';
+const rulesPopupId = '#rules_popup';
 
 /** Import view class */
 export class ImportView extends AppView {
-    constructor(...args) {
-        super(...args);
-
-        this.transactionPopupId = '#transactionFormPopup';
-        this.uploadPopupId = '#fileupload_popup';
-        this.rulesPopupId = '#rules_popup';
+    init() {
         this.items = [];
         this.formIndex = -1;
     }
@@ -117,8 +113,8 @@ export class ImportView extends AppView {
         }
 
         const transactionFormDialog = await query(transactionPopupId);
-        const uploadDialogPopup = await query(this.uploadPopupId);
-        const rulesDialogPopup = await query(this.rulesPopupId);
+        const uploadDialogPopup = await query(uploadPopupId);
+        const rulesDialogPopup = await query(rulesPopupId);
 
         const [
             transactionFormVisible,
@@ -606,7 +602,7 @@ export class ImportView extends AppView {
         this.expectedState.uploadDialog = { visible: true };
 
         await this.performAction(() => this.content.uploadBtn.click());
-        await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
+        await this.performAction(() => wait(uploadPopupId, { visible: true }));
         await waitForFunction(async () => {
             await this.parse();
             return !!this.uploadDialog?.isBrowseFileState();
@@ -622,7 +618,7 @@ export class ImportView extends AppView {
         this.expectedState.uploadDialog = { visible: false };
 
         await this.performAction(() => this.uploadDialog.close());
-        await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
+        await this.performAction(() => wait(uploadPopupId, { hidden: true }));
 
         return this.checkState();
     }
@@ -918,7 +914,7 @@ export class ImportView extends AppView {
         if (isValid) {
             await this.waitForList(async () => {
                 await this.uploadDialog.submit();
-                await wait(this.uploadPopupId, { hidden: true });
+                await wait(uploadPopupId, { hidden: true });
             });
         } else {
             await this.performAction(() => this.uploadDialog.submit());
@@ -1000,7 +996,7 @@ export class ImportView extends AppView {
         await this.openListMenu();
 
         await this.performAction(() => this.listMenu.select('rulesBtn'));
-        await this.performAction(() => wait(this.rulesPopupId, { visible: true }));
+        await this.performAction(() => wait(rulesPopupId, { visible: true }));
 
         this.checkRulesListState();
 
@@ -1011,7 +1007,7 @@ export class ImportView extends AppView {
         this.checkRulesState();
 
         await this.performAction(() => this.rulesDialog.close());
-        await this.performAction(() => wait(this.rulesPopupId, { hidden: true }));
+        await this.performAction(() => wait(rulesPopupId, { hidden: true }));
 
         this.checkMainState();
 

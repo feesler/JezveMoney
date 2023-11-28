@@ -92,10 +92,8 @@ export const submit = async () => {
             await App.view.cancel();
         }
 
-        await App.goToMainView();
-        const mainExpected = MainView.getInitialState();
-        App.view.checkState(mainExpected);
-        return App.state.fetchAndTest();
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 
@@ -261,68 +259,65 @@ export const deleteFromContextMenu = async (index) => {
         };
         App.view.checkState(expected);
 
-        await App.view.iteratePages();
-
-        return App.state.fetchAndTest();
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 
 export const del = async (type, transactions) => {
-    setBlock(`Delete transactions [${transactions.join()}]`, 3);
-
-    await App.goToMainView();
-
-    const expectedState = App.state.clone();
-    const id = expectedState.transactions.filterByType(type).indexesToIds(transactions);
-    expectedState.deleteTransactions({ id });
-
-    // Navigate to transactions view and filter by specified type of transaction
-    await App.view.navigateToTransactions();
-    await App.view.filterByType(type);
-
-    let tr = structuredClone(transactions);
-    const onPage = App.config.transactionsOnPage;
-
-    while (true) {
-        const pageNum = App.view.currentPage();
-
-        const absTrOnCurrentPage = tr.filter(
-            (ind) => (ind >= onPage * (pageNum - 1) && ind < onPage * pageNum),
-        );
-
-        if (absTrOnCurrentPage.length) {
-            const trOnCurrentPage = absTrOnCurrentPage.map((ind) => (ind - (pageNum - 1) * onPage));
-
-            // Request view to select and delete transactions
-            await App.view.deleteTransactions(trOnCurrentPage);
-
-            // Refresh state and rebuild model
-            await App.state.fetch();
-            await App.view.updateModel();
-
-            // Exclude previously removed transactions
-            tr = tr.filter((ind) => !absTrOnCurrentPage.includes(ind));
-            if (!tr.length) {
-                break;
-            }
-
-            // Shift positions
-            const shiftSize = trOnCurrentPage.length;
-            tr = tr.map((ind) => ind - shiftSize);
-        } else if (App.view.isLastPage()) {
-            assert(tr.length === 0, `Transaction(s) ${tr.join()} can not be removed`);
-            break;
-        } else {
-            await App.view.goToNextPage();
-        }
-    }
-
-    await test('Submit result', async () => {
+    await test(`Delete transactions [${transactions.join()}]`, async () => {
         await App.goToMainView();
+
+        const expectedState = App.state.clone();
+        const id = expectedState.transactions.filterByType(type).indexesToIds(transactions);
+        expectedState.deleteTransactions({ id });
+
+        // Navigate to transactions view and filter by specified type of transaction
+        await App.view.navigateToTransactions();
+        await App.view.filterByType(type);
+
+        let tr = structuredClone(transactions);
+        const onPage = App.config.transactionsOnPage;
+
+        while (true) {
+            const pageNum = App.view.currentPage();
+
+            const indexesOnPage = tr.filter((ind) => (
+                ind >= onPage * (pageNum - 1) && ind < onPage * pageNum
+            ));
+
+            if (indexesOnPage.length) {
+                const relativeIndexes = indexesOnPage.map((ind) => (
+                    ind - (pageNum - 1) * onPage
+                ));
+
+                // Request view to select and delete transactions
+                await App.view.deleteTransactions(relativeIndexes);
+
+                // Refresh state and rebuild model
+                await App.state.fetch();
+                await App.view.updateModel();
+
+                // Exclude previously removed transactions
+                tr = tr.filter((ind) => !indexesOnPage.includes(ind));
+                if (!tr.length) {
+                    break;
+                }
+
+                // Shift positions
+                const shiftSize = relativeIndexes.length;
+                tr = tr.map((ind) => ind - shiftSize);
+            } else if (App.view.isLastPage()) {
+                assert(tr.length === 0, `Transaction(s) ${tr.join()} can not be removed`);
+                break;
+            } else {
+                await App.view.goToNextPage();
+            }
+        }
+
         App.state.setState(expectedState);
-        const mainExpected = MainView.getInitialState();
-        App.view.checkState(mainExpected);
-        return App.state.fetchAndTest();
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 
@@ -331,26 +326,22 @@ export const delFromUpdate = async (type, pos) => {
     assert(!Number.isNaN(ind) && ind >= 0, 'Position of transaction not specified');
     const typeStr = Transaction.typeToString(type, App.config.logsLocale);
 
-    setBlock(`Delete ${typeStr} from update view [${ind}]`, 2);
+    await test(`Delete ${typeStr} from update view [${ind}]`, async () => {
+        const expectedState = App.state.clone();
+        const id = expectedState.transactions.filterByType(type).indexesToIds(ind);
+        expectedState.deleteTransactions({ id });
 
-    const expectedState = App.state.clone();
-    const id = expectedState.transactions.filterByType(type).indexesToIds(ind);
-    expectedState.deleteTransactions({ id });
+        if (!(App.view instanceof TransactionListView)) {
+            await App.view.navigateToTransactions();
+        }
 
-    if (!(App.view instanceof TransactionListView)) {
-        await App.view.navigateToTransactions();
-    }
+        await App.view.filterByType(type);
+        await App.view.goToUpdateTransaction(ind);
+        await App.view.deleteSelfItem();
 
-    await App.view.filterByType(type);
-    await App.view.goToUpdateTransaction(ind);
-    await App.view.deleteSelfItem();
-
-    await test('Submit result', async () => {
-        await App.goToMainView();
         App.state.setState(expectedState);
-        const mainExpected = MainView.getInitialState();
-        App.view.checkState(mainExpected);
-        return App.state.fetchAndTest();
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 
@@ -371,7 +362,8 @@ export const setTransactionCategory = async ({ index, category }) => {
         const mainExpected = MainView.getInitialState();
         App.view.checkState(mainExpected);
 
-        return App.state.fetchAndTest();
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 
@@ -390,7 +382,9 @@ export const deleteFromMainView = async (pos) => {
         App.state.setState(expectedState);
         const mainExpected = MainView.getInitialState();
         App.view.checkState(mainExpected);
-        return App.state.fetchAndTest();
+
+        await App.state.fetchAndTest();
+        return App.view.reinit();
     });
 };
 

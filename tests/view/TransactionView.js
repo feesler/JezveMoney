@@ -32,9 +32,7 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    constructor(...args) {
-        super(...args);
-
+    init() {
         this.loaded = false;
     }
 

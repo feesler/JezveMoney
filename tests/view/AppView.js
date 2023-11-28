@@ -16,6 +16,22 @@ export class AppView extends TestView {
         return Header.getExpectedState(state);
     }
 
+    constructor(...args) {
+        super(...args);
+
+        this.init();
+    }
+
+    init() {
+    }
+
+    async reinit() {
+        this.init();
+        await this.parse();
+
+        return true;
+    }
+
     isUserLoggedIn() {
         return this.content.header?.userBtn?.title?.length > 0;
     }

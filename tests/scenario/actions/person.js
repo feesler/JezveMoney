@@ -9,7 +9,6 @@ import {
 import { generateId } from '../../common.js';
 import { PersonListView } from '../../view/PersonListView.js';
 import { PersonView } from '../../view/PersonView.js';
-import { MainView } from '../../view/MainView.js';
 import { App } from '../../Application.js';
 import { __ } from '../../model/locale.js';
 import { TransactionsList } from '../../model/TransactionsList.js';
@@ -150,10 +149,6 @@ export const delFromUpdate = async (pos) => {
 
         const expected = PersonListView.getInitialState();
         App.view.checkState(expected);
-
-        await App.goToMainView();
-        const mainViewExpected = MainView.getInitialState();
-        App.view.checkState(mainViewExpected);
 
         return App.state.fetchAndTest();
     });

@@ -46,12 +46,12 @@ class Person extends ApiSortableListController
             return $item;
         }
 
-        $res = $item;
-        $res->transactionsCount = $this->transModel->getTransCount([
+        $res = (array)$item;
+        $res["transactionsCount"] = $this->transModel->getTransCount([
             "persons" => $item->id,
         ]);
 
-        return $res;
+        return (object)$res;
     }
 
     /**

@@ -49,12 +49,15 @@ export class TransactionListStory extends TestStory {
         }
 
         await App.scenario.runner.runGroup(
-            Actions.filterByType,
+            async (data) => {
+                await Actions.filterByType(data);
+                await Actions.iteratePages();
+            },
             Transaction.availTypes.map((type) => ({ type, directNavigate })),
         );
 
         // Show all types
-        await Actions.filterByType({ type: 0, iteratePages: false });
+        await Actions.filterByType({ type: 0 });
 
         await Actions.filterByAccounts({ accounts: App.scenario.ACC_3 });
         await Actions.filterByAccounts({
@@ -68,12 +71,10 @@ export class TransactionListStory extends TestStory {
             await Actions.exportTest();
         }
 
-        await Actions.filterByType({ type: 0, directNavigate, iteratePages: false });
-        await Actions.filterByType({ type: EXPENSE, directNavigate, iteratePages: false });
-        await Actions.filterByType({ type: [INCOME, DEBT], directNavigate, iteratePages: false });
-        await Actions.filterByCategories(
-            { categories: FOOD_CATEGORY, directNavigate, iteratePages: false },
-        );
+        await Actions.filterByType({ type: 0, directNavigate });
+        await Actions.filterByType({ type: EXPENSE, directNavigate });
+        await Actions.filterByType({ type: [INCOME, DEBT], directNavigate });
+        await Actions.filterByCategories({ categories: FOOD_CATEGORY, directNavigate });
         await Actions.filterByCategories({
             categories: [FOOD_CATEGORY, TRANSPORT_CATEGORY],
             directNavigate,
@@ -83,39 +84,35 @@ export class TransactionListStory extends TestStory {
         await Actions.selectStartDateFilter({ date: App.dates.weekAgo, directNavigate });
         await Actions.clearEndDateFilter();
         await Actions.clearStartDateFilter();
-        await Actions.selectStartDateFilter(
-            { date: App.dates.yearAgo, directNavigate, iteratePages: false },
-        );
-        await Actions.selectEndDateFilter(
-            { date: App.dates.monthAgo, directNavigate, iteratePages: false },
-        );
+        await Actions.selectStartDateFilter({ date: App.dates.yearAgo, directNavigate });
+        await Actions.selectEndDateFilter({ date: App.dates.monthAgo, directNavigate });
 
-        await Actions.selectWeekRangeFilter({ directNavigate, iteratePages: false });
-        await Actions.selectMonthRangeFilter({ directNavigate, iteratePages: false });
-        await Actions.selectHalfYearRangeFilter({ directNavigate, iteratePages: false });
+        await Actions.selectWeekRangeFilter({ directNavigate });
+        await Actions.selectMonthRangeFilter({ directNavigate });
+        await Actions.selectHalfYearRangeFilter({ directNavigate });
 
-        await Actions.inputMinAmountFilter({ value: '100', directNavigate, iteratePages: false });
-        await Actions.inputMaxAmountFilter({ value: '1000', directNavigate, iteratePages: false });
-        await Actions.clearMinAmountFilter({ directNavigate, iteratePages: false });
-        await Actions.clearMaxAmountFilter({ directNavigate, iteratePages: false });
-        await Actions.inputMinAmountFilter({ value: '1000', directNavigate, iteratePages: false });
-        await Actions.inputMaxAmountFilter({ value: '100', directNavigate, iteratePages: false });
-        await Actions.clearMinAmountFilter({ directNavigate, iteratePages: false });
-        await Actions.clearMaxAmountFilter({ directNavigate, iteratePages: false });
+        await Actions.inputMinAmountFilter({ value: '100', directNavigate });
+        await Actions.inputMaxAmountFilter({ value: '1000', directNavigate });
+        await Actions.clearMinAmountFilter({ directNavigate });
+        await Actions.clearMaxAmountFilter({ directNavigate });
+        await Actions.inputMinAmountFilter({ value: '1000', directNavigate });
+        await Actions.inputMaxAmountFilter({ value: '100', directNavigate });
+        await Actions.clearMinAmountFilter({ directNavigate });
+        await Actions.clearMaxAmountFilter({ directNavigate });
 
         await Actions.search({ text: '1', directNavigate });
         await Actions.search({ text: 'la', directNavigate });
         await Actions.search({ text: 'кк', directNavigate });
-        await Actions.clearSearchForm({ directNavigate, iteratePages: false });
-        await Actions.clearStartDateFilter({ directNavigate, iteratePages: false });
-        await Actions.clearEndDateFilter({ directNavigate, iteratePages: false });
-        await Actions.search({ text: '1', directNavigate, iteratePages: false });
+        await Actions.clearSearchForm({ directNavigate });
+        await Actions.clearStartDateFilter({ directNavigate });
+        await Actions.clearEndDateFilter({ directNavigate });
+        await Actions.search({ text: '1', directNavigate });
 
         await Actions.selectStartDateFilter(
-            { date: App.dates.yearAgo, directNavigate, iteratePages: false },
+            { date: App.dates.yearAgo, directNavigate },
         );
         await Actions.selectEndDateFilter(
-            { date: App.dates.monthAgo, directNavigate, iteratePages: false },
+            { date: App.dates.monthAgo, directNavigate },
         );
 
         await Actions.clearAllFilters({ directNavigate });
@@ -166,7 +163,7 @@ export class TransactionListStory extends TestStory {
             category: TAXES_CATEGORY,
         });
 
-        await Actions.filterByType({ type: EXPENSE, iteratePages: false });
+        await Actions.filterByType({ type: EXPENSE });
         await Actions.setTransactionCategory({
             index: 1,
             category: FOOD_CATEGORY,
@@ -180,7 +177,7 @@ export class TransactionListStory extends TestStory {
             category: 0,
         });
         // Show all types
-        await Actions.filterByType({ type: 0, iteratePages: false });
+        await Actions.filterByType({ type: 0 });
     }
 
     async locales() {
@@ -194,7 +191,7 @@ export class TransactionListStory extends TestStory {
     }
 
     async checkLocale() {
-        await Actions.selectStartDateFilter({ date: App.dates.weekAgo, iteratePages: false });
-        await Actions.clearStartDateFilter({ iteratePages: false });
+        await Actions.selectStartDateFilter({ date: App.dates.weekAgo });
+        await Actions.clearStartDateFilter();
     }
 }
