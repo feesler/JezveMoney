@@ -130,7 +130,7 @@ const slice = createSlice({
                 (ImportCondition.isDateField(condition.field_id))
                     ? {
                         ...condition,
-                        value: App.formatDate(condition.value),
+                        value: App.formatInputDate(condition.value),
                     }
                     : condition
             )),
@@ -155,7 +155,7 @@ const slice = createSlice({
                 (ImportCondition.isDateField(condition.field_id))
                     ? {
                         ...condition,
-                        value: App.formatDate(condition.value),
+                        value: App.formatInputDate(condition.value),
                     }
                     : condition
             )),
