@@ -46,12 +46,12 @@
     "license": "ISC",
     "devDependencies": {
         "@babel/cli": "^7.23.4",
-        "@babel/core": "^7.23.3",
+        "@babel/core": "^7.23.5",
         "@babel/eslint-parser": "^7.23.3",
         "@babel/plugin-syntax-import-assertions": "^7.23.3",
         "@babel/plugin-transform-regenerator": "^7.23.3",
         "@babel/plugin-transform-runtime": "^7.23.4",
-        "@babel/preset-env": "^7.23.3",
+        "@babel/preset-env": "^7.23.5",
         "@jezvejs/assert": "^1.0.1",
         "astroturf": "^1.2.0",
         "autoprefixer": "^10.4.16",
@@ -85,21 +85,21 @@
         "stylelint": "^15.11.0",
         "stylelint-config-prettier-scss": "^1.0.0",
         "stylelint-config-standard-scss": "^11.1.0",
-        "svgo": "^3.0.4",
+        "svgo": "^3.0.5",
         "webpack": "^5.89.0",
         "webpack-cli": "^4.10.0",
         "webpack-manifest-plugin": "^5.0.0",
         "webpack-merge": "^5.10.0"
     },
     "dependencies": {
-        "@babel/runtime": "^7.23.4",
+        "@babel/runtime": "^7.23.5",
         "@jezvejs/color": "^1.0.1",
         "@jezvejs/datetime": "^1.0.2",
         "@jezvejs/dom": "^1.0.1",
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.33.3",
-        "jezvejs": "^2.12.2",
+        "jezvejs": "^2.14.0",
         "whatwg-fetch": "^3.6.19"
     }
 }
