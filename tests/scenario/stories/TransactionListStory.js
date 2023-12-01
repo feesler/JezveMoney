@@ -158,6 +158,7 @@ export class TransactionListStory extends TestStory {
         await Actions.showDetails({ index: 1, directNavigate: true });
         await Actions.closeDetails();
 
+        await Actions.selectHalfYearRangeFilter();
         await Actions.setCategory({
             items: [0, 1],
             category: TAXES_CATEGORY,
