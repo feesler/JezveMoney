@@ -11,7 +11,7 @@ export const getTransactionsGroupByDate = () => (
 );
 
 export const getListRequest = (state) => ({
-    ...state.form,
+    ...state.filter,
     order: 'desc',
     page: state.pagination.page,
     range: state.pagination.range,
