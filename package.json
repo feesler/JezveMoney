@@ -18,6 +18,7 @@
         "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
+        "start": "npx webpack --watch --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
         "install-backend": "node ./scripts/install-backend.js",
         "update": "npm update --save",
         "postinstall": "npm-run-all build install-composer",

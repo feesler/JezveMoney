@@ -8,6 +8,17 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 const filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(filename);
 
+const keepOnClean = [
+    'admin',
+    'api',
+    'Controller',
+    'lang',
+    'Model',
+    'system',
+    'Template',
+    'vendor',
+];
+
 export default {
     target: 'browserslist',
     context: resolve(currentDir, '..'),
@@ -144,7 +155,7 @@ export default {
     output: {
         path: resolve(currentDir, '../dist/app'),
         clean: {
-            keep: 'vendor',
+            keep: (asset) => keepOnClean.some((item) => asset.includes(item)),
         },
         filename: (pathData) => (
             `view/js/chunk.${pathData.chunk.renderedHash}.js`
