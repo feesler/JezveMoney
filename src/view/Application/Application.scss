@@ -813,8 +813,8 @@ svg * {
   column-gap: 18px;
 
   .close-btn {
-    align-self: flex-end;
     flex: 0 0 auto;
+    margin: 8px 0 0 8px;
   }
 }
 
