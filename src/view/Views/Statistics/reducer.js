@@ -130,6 +130,12 @@ const slice = createSlice({
         expandedLegend: false,
     }),
 
+    toggleActivateChartCategory: (state, category) => (
+        (state.activeCategory === category)
+            ? { ...state, activeCategory: null }
+            : { ...state, activeCategory: category }
+    ),
+
     toggleExpandLegend: (state) => ({
         ...state,
         expandedLegend: !state.expandedLegend,

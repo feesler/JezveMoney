@@ -53,6 +53,7 @@ import './StatisticsView.scss';
 const LEGEND_CONTENT_CLASS = 'chart-legend__content';
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CLASS = 'chart-legend__item';
+const LEGEND_ITEM_ACTIVE_CLASS = 'chart-legend__item_active';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
 
 const LEGEND_MAX_HEIGHT_PROP = '--chart-legend-max-collapsed-height';
@@ -87,6 +88,7 @@ class StatisticsView extends AppView {
             selectedPieChartItem: null,
             expandedLegend: false,
             legendCategories: null,
+            activeCategory: null,
             filter: { ...filter },
             form: {
                 ...filter,
@@ -430,12 +432,17 @@ class StatisticsView extends AppView {
 
         const listItems = categories.map((category, index) => {
             const id = (categoryReport) ? category : (index + 1);
+            const strCategory = category?.toString();
+
             const item = createElement('li', {
                 props: {
                     className: getClassName(
                         LEGEND_ITEM_CLASS,
                         `legend-item-${id}`,
                     ),
+                    dataset: {
+                        category,
+                    },
                 },
                 children: createElement('span', {
                     props: {
@@ -443,7 +450,20 @@ class StatisticsView extends AppView {
                         textContent: getDataCategoryName(category, state),
                     },
                 }),
+                events: {
+                    click: (e) => {
+                        const listItem = e.target.closest(`.${LEGEND_ITEM_CLASS}`);
+                        if (!listItem) {
+                            return;
+                        }
+
+                        const selectedCategory = listItem.dataset.category;
+                        this.store.dispatch(actions.toggleActivateChartCategory(selectedCategory));
+                    },
+                },
             });
+
+            item.classList.toggle(LEGEND_ITEM_ACTIVE_CLASS, state.activeCategory === strCategory);
 
             return item;
         });
@@ -489,6 +509,7 @@ class StatisticsView extends AppView {
         if (
             state.chartData === prevState.chartData
             && state.filter?.report === prevState.filter?.report
+            && state.activeCategory === prevState.activeCategory
         ) {
             return;
         }
@@ -505,6 +526,9 @@ class StatisticsView extends AppView {
         data.stacked = isStackedData(state.filter);
 
         this.histogram.setData(data);
+        if (state.activeCategory !== prevState.activeCategory) {
+            this.histogram.setActiveCategory(state.activeCategory);
+        }
 
         this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
     }

@@ -36,7 +36,14 @@ main {
 .chart-legend__item-title {
   position: relative;
   left: -5px;
-  color: var(--main-text-color);
+  color: var(--dimmed-text-color);
+}
+
+/* Active legend item */
+.chart-legend__item.chart-legend__item_active {
+  .chart-legend__item-title {
+    color: var(--main-text-color);
+  }
 }
 
 .piechart-group {
