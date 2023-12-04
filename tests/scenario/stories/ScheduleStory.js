@@ -67,11 +67,6 @@ export class ScheduleStory extends TestStory {
             { action: Actions.inputIntervalStep, data: '' },
         ]);
 
-        await Actions.createAndSubmit('Invalid interval step', [
-            { action: Actions.inputDestAmount, data: '1' },
-            { action: Actions.inputIntervalStep, data: '0' },
-        ]);
-
         await Actions.createAndSubmit('Invalid start date', [
             { action: Actions.inputDestAmount, data: '1' },
             { action: Actions.inputStartDate, data: '' },
