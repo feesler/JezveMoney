@@ -5,6 +5,8 @@ import {
     click,
     evaluate,
 } from 'jezve-test';
+import { fixFloat } from '@jezvejs/number';
+
 import {
     EXPENSE,
     INCOME,
@@ -14,7 +16,6 @@ import {
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import {
     normalize,
-    fixFloat,
     dateStringToSeconds,
 } from '../../../common.js';
 import { App } from '../../../Application.js';

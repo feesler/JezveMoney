@@ -7,14 +7,13 @@ import {
 import {
     formatDate,
     isValidDateString,
+    shiftDate,
+    shiftMonth,
+    shiftYear,
 } from '@jezvejs/datetime';
-import { api } from './model/api.js';
+
 import { config } from './config.js';
-import { AppState } from './model/AppState.js';
-import { Scenario } from './scenario/index.js';
-import { ColorsList } from './model/ColorsList.js';
-import { CurrencyList } from './model/CurrencyList.js';
-import { IconsList } from './model/IconsList.js';
+
 import {
     cutDate,
     dateStringToSeconds,
@@ -23,10 +22,15 @@ import {
     formatInputDate,
     reformatDate,
     secondsToDateString,
-    shiftDate,
-    shiftMonth,
-    shiftYear,
 } from './common.js';
+
+import { api } from './model/api.js';
+import { AppState } from './model/AppState.js';
+import { ColorsList } from './model/ColorsList.js';
+import { CurrencyList } from './model/CurrencyList.js';
+import { IconsList } from './model/IconsList.js';
+
+import { Scenario } from './scenario/index.js';
 
 class Application extends TestApplication {
     dates = {

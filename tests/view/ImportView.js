@@ -1,5 +1,6 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
+import { fixFloat } from '@jezvejs/number';
 import {
     query,
     closest,
@@ -14,6 +15,7 @@ import {
     DropDown,
     PopupMenu,
 } from 'jezvejs-test';
+
 import { AppView } from './AppView.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
@@ -23,7 +25,6 @@ import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { Counter } from './component/Counter.js';
-import { fixFloat } from '../common.js';
 import { __ } from '../model/locale.js';
 import { Reminder } from '../model/Reminder.js';
 

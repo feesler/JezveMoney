@@ -1,4 +1,6 @@
 import { assert } from '@jezvejs/assert';
+import { fixFloat } from '@jezvejs/number';
+
 import {
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_LESS,
@@ -11,7 +13,6 @@ import { ImportActionList } from './ImportActionList.js';
 import { ImportConditionValidationError } from '../error/ImportConditionValidationError.js';
 import { ImportActionValidationError } from '../error/ImportActionValidationError.js';
 import { __ } from './locale.js';
-import { fixFloat } from '../common.js';
 
 /** Import rule model */
 export class ImportRule {

@@ -1,5 +1,6 @@
 import { assert } from '@jezvejs/assert';
-import { fixFloat } from '../common.js';
+import { fixFloat } from '@jezvejs/number';
+
 import { App } from '../Application.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { __ } from './locale.js';
