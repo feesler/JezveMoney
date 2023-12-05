@@ -357,9 +357,42 @@ export class Scenario {
         await ApiTests.loginTest(App.config.testAdminUser);
         await App.setupUser();
 
-        Object.entries(this.storiesResults).forEach(([name, { testsCount, duration }]) => {
+        this.printResults();
+    }
+
+    printResults() {
+        const column = {
+            storyName: 0,
+            duration: 0,
+            testsCount: 0,
+        };
+        const results = [];
+
+        Object.entries(this.storiesResults).forEach(([storyName, { testsCount, duration }]) => {
+            const resultItem = {
+                storyName,
+                duration: formatTime(duration),
+                testsCount,
+            };
+
+            column.storyName = Math.max(column.storyName, storyName.length);
+            column.duration = Math.max(column.duration, duration.length);
+            column.testsCount = Math.max(
+                column.testsCount,
+                testsCount.toString().length,
+            );
+
+            results.push(resultItem);
+        });
+
+        results.forEach((item) => {
             /* eslint-disable-next-line no-console */
-            console.log(` ${name}: `, formatTime(duration), ' ', testsCount, ' tests');
+            console.log(
+                item.storyName.padEnd(column.storyName + 2, ' '),
+                item.duration.padStart(column.duration + 2, ' '),
+                ''.padEnd(column.testsCount - item.testsCount.toString().length, ' '),
+                item.testsCount,
+            );
         });
     }
 }
