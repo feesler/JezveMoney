@@ -99,8 +99,8 @@
         "@jezvejs/dom": "^1.0.1",
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
-        "core-js": "^3.33.3",
-        "jezvejs": "^2.15.2",
+        "core-js": "^3.34.0",
+        "jezvejs": "^2.16.0",
         "whatwg-fetch": "^3.6.19"
     }
 }
