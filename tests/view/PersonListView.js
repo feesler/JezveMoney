@@ -299,7 +299,10 @@ export class PersonListView extends AppView {
 
         await waitForFunction(async () => {
             await this.parse();
-            return (!this.content.itemInfo.loading);
+            return (
+                !!this.content.itemInfo?.content?.visible
+                && !this.content.itemInfo.loading
+            );
         });
 
         return App.view.checkState(expected);
