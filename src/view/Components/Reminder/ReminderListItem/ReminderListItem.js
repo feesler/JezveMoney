@@ -1,4 +1,4 @@
-import { getClassName } from '@jezvejs/dom';
+import { enable, getClassName } from '@jezvejs/dom';
 
 import { Reminder } from '../../../Models/Reminder.js';
 
@@ -12,6 +12,7 @@ const ITEM_CLASS = 'reminder-item';
 
 const defaultProps = {
     mode: 'classic', // 'classic' or 'details'
+    disabled: false,
 };
 
 /**
@@ -66,5 +67,7 @@ export class ReminderListItem extends ListItem {
         this.elem.setAttribute('data-schedule-id', item.schedule_id);
         this.elem.setAttribute('data-date', item.date);
         this.elem.setAttribute('data-type', item.type);
+
+        enable(this.elem, !state.disabled);
     }
 }

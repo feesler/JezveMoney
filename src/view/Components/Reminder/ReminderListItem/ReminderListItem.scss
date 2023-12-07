@@ -1,4 +1,5 @@
 .reminder-item {
+  --reminder-item-disabled-opacity: 0.5;
   --trans-item-column-gap: 16px;
   --trans-item-row-gap: 2px;
   --trans-item-details-row-gap: 8px;
@@ -38,4 +39,10 @@
   border-left-width: 2px;
   border-left-style: solid;
   border-left-color: var(--transaction-color);
+}
+
+/* Disabled state */
+.reminder-item[disabled] {
+  pointer-events: none;
+  opacity: var(--reminder-item-disabled-opacity);
 }

@@ -114,6 +114,7 @@ export class ReminderField extends Field {
             state.title === prevState?.title
             && state.reminder_id === prevState?.reminder_id
             && state.schedule_id === prevState?.schedule_id
+            && state.disabled === prevState?.disabled
         ) {
             return;
         }
@@ -121,7 +122,8 @@ export class ReminderField extends Field {
         const reminderSelected = state.reminder_id || state.schedule_id;
 
         this.titleTextElem.textContent = state.title ?? '';
-        this.closeButton.show(reminderSelected);
+        this.closeButton.show(!!reminderSelected);
+        this.closeButton.enable(!state.disabled);
     }
 
     renderContent(state, prevState) {
@@ -129,6 +131,7 @@ export class ReminderField extends Field {
             state.reminder_id === prevState?.reminder_id
             && state.schedule_id === prevState?.schedule_id
             && state.reminder_date === prevState?.reminder_date
+            && state.disabled === prevState?.disabled
         ) {
             return;
         }
@@ -148,16 +151,20 @@ export class ReminderField extends Field {
 
         if (!this.reminderItem) {
             this.reminderItem = ReminderListItem.create({
+                disabled: state.disabled,
                 item,
             });
             this.contentContainer.prepend(this.reminderItem.elem);
         } else {
             this.reminderItem.setState((fieldState) => ({
                 ...fieldState,
+                disabled: state.disabled,
                 item: Reminder.createExtended(item),
             }));
         }
 
         this.reminderItem.show();
+
+        this.selectButton.enable(!state.disabled);
     }
 }
