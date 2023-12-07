@@ -5,6 +5,8 @@
   --tile-bg-color: var(--accent-color-alt);
   --tile-hover-bg-color: var(--accent-hover-color);
   --tile-active-bg-color: var(--accent-active-color);
+  --tile-disabled-bg-color: var(--accent-disabled-color);
+  --tile-disabled-opacity: 0.5;
 
   width: var(--tile-size);
   height: var(--tile-size);
@@ -106,6 +108,13 @@
 /* Sort mode */
 .tile_sort {
   cursor: move;
+}
+
+/* Disabled state */
+.tile[disabled] {
+  pointer-events: none;
+  background-color: var(--tile-disabled-bg-color);
+  opacity: var(--tile-disabled-opacity);
 }
 
 @media (hover: hover) {

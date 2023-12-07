@@ -1703,6 +1703,7 @@ export class TransactionForm extends Component {
         this.personTile.setState({
             title: state.person.name,
             subtitle: personBalance,
+            disabled: !!state.submitStarted,
         });
 
         this.debtAccountInp.value = (noAccount) ? 0 : state.account.id;
@@ -1715,7 +1716,10 @@ export class TransactionForm extends Component {
         }
 
         if (!noAccount) {
-            this.debtAccountTile.setState({ account: state.account });
+            this.debtAccountTile.setState({
+                account: state.account,
+                disabled: !!state.submitStarted,
+            });
             if (!this.accDDList) {
                 this.initAccList(state);
             }
@@ -1863,6 +1867,7 @@ export class TransactionForm extends Component {
             transaction.reminder_id === prevTransaction?.reminder_id
             && transaction.schedule_id === prevTransaction?.schedule_id
             && transaction.reminder_date === prevTransaction?.reminder_date
+            && state.submitStarted === prevState?.submitStarted
         ) {
             return;
         }
@@ -1874,6 +1879,7 @@ export class TransactionForm extends Component {
 
         this.reminderField.setState((fieldState) => ({
             ...fieldState,
+            disabled: !!state.submitStarted,
             reminder_id: transaction.reminder_id,
             schedule_id: transaction.schedule_id,
             reminder_date: transaction.reminder_date,
@@ -2035,7 +2041,10 @@ export class TransactionForm extends Component {
         this.srcIdInp.value = transaction.src_id;
         if (scrTypes.includes(transaction.type)) {
             if (this.sourceTile && state.srcAccount) {
-                this.sourceTile.setState({ account: state.srcAccount });
+                this.sourceTile.setState({
+                    account: state.srcAccount,
+                    disabled: !!state.submitStarted,
+                });
             }
 
             this.initSrcAccList(state);
@@ -2046,7 +2055,10 @@ export class TransactionForm extends Component {
         this.destIdInp.value = transaction.dest_id;
         if (destTypes.includes(transaction.type)) {
             if (this.destTile && state.destAccount) {
-                this.destTile.setState({ account: state.destAccount });
+                this.destTile.setState({
+                    account: state.destAccount,
+                    disabled: !!state.submitStarted,
+                });
             }
 
             this.initDestAccList(state, prevState);
