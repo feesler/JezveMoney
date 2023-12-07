@@ -17,6 +17,10 @@ const keepOnClean = [
     'system',
     'Template',
     'vendor',
+    '.htaccess',
+    'favicon.ico',
+    'index.php',
+    'manifest.webmanifest',
 ];
 
 export default {
