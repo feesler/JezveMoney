@@ -4,7 +4,10 @@ import {
     formatDate,
     parseDateString,
     getLocaleDateFormat,
+    shiftDate,
+    shiftYear,
 } from '@jezvejs/datetime';
+import { fixFloat } from '@jezvejs/number';
 
 export const MS_IN_SECOND = 1000;
 export const DAYS_IN_WEEK = 7;
@@ -35,15 +38,6 @@ export const INTERVAL_YEAR = 4;
 export const DEFAULT_PRECISION = 2;
 export const EXCHANGE_PRECISION = 4;
 export const MAX_PRECISION = 8;
-
-/** Check object is empty */
-export const isEmpty = (obj) => {
-    if (typeof obj === 'object') {
-        return Object.keys(obj).length === 0;
-    }
-
-    return true;
-};
 
 /** Return timestamp for the start of the day */
 export const cutDate = (value) => {
@@ -156,33 +150,6 @@ export const getWeek = (timestamp) => {
     return 1 + Math.round((diff / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
 };
 
-/** Returns a new date shifted by the specified number of years */
-export const shiftYear = (date, shift) => (
-    new Date(Date.UTC(
-        date.getFullYear() + shift,
-        date.getMonth(),
-        date.getDate(),
-    ))
-);
-
-/** Returns a new date shifted by the specified number of months */
-export const shiftMonth = (date, shift) => (
-    new Date(Date.UTC(
-        date.getFullYear(),
-        date.getMonth() + shift,
-        date.getDate(),
-    ))
-);
-
-/** Returns a new date shifted by the specified number of days */
-export const shiftDate = (date, shift) => (
-    new Date(Date.UTC(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate() + shift,
-    ))
-);
-
 /** Returns last date of month */
 export const getLastDayOfMonth = (date) => (
     new Date(Date.UTC(
@@ -235,48 +202,12 @@ export const stepInterval = (timestamp, intervalType, step = 1) => {
     throw new Error('Invalid type of interval');
 };
 
-function firstUpperCase(str, locales = []) {
-    const first = str.substring(0, 1);
-    const rest = str.substring(1);
-
-    return first.toLocaleUpperCase(locales)
-        .concat(rest.toLocaleLowerCase(locales));
-}
-
-export const getWeekdayShort = (date, locales = []) => {
-    const weekdayName = formatDate(date, { locales, options: { weekday: 'short' } });
-    return firstUpperCase(weekdayName.substr(0, 3), locales);
-};
-
 /** Format specified value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 
 /*
 * Normalized decimal calculations
 */
-
-/** Fix string to correct float number format */
-export const fixFloat = (str) => {
-    if (typeof str === 'number' && !Number.isNaN(str) && Number.isFinite(str)) {
-        return str.toString();
-    }
-    if (typeof str !== 'string') {
-        return null;
-    }
-
-    let res = str.replace(/,/g, '.');
-    if (res.indexOf('-') === 0
-        && (
-            res.length === 1
-            || res.indexOf('.') === 1
-        )) {
-        res = `-0${res.substring(1)}`;
-    }
-    if (res.indexOf('.') === 0 || !res.length) {
-        res = `0${res}`;
-    }
-    return res;
-};
 
 /** Correct calculated value */
 export const correct = (val, prec = DEFAULT_PRECISION) => parseFloat(parseFloat(val).toFixed(prec));

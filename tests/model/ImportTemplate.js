@@ -1,6 +1,8 @@
 import { assert } from '@jezvejs/assert';
 import { isDate } from '@jezvejs/types';
-import { fixFloat, fixDate } from '../common.js';
+import { fixFloat } from '@jezvejs/number';
+
+import { fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';

@@ -1,10 +1,14 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
-import { test } from 'jezve-test';
-import { ReminderListView } from '../../view/ReminderListView.js';
+import { baseUrl, goTo, test } from 'jezve-test';
+
 import { App } from '../../Application.js';
-import { TransactionView } from '../../view/TransactionView.js';
+
 import { Reminder } from '../../model/Reminder.js';
+import { Transaction } from '../../model/Transaction.js';
+
+import { ReminderListView } from '../../view/ReminderListView.js';
+import { TransactionView } from '../../view/TransactionView.js';
 
 /** Navigate to reminders page */
 const checkNavigation = async () => {
@@ -238,4 +242,26 @@ export const showMore = async () => {
     await checkNavigation();
 
     await test('Show more items', () => App.view.showMore());
+};
+
+export const requestTypeWithReminderURL = async (params) => {
+    const typeStr = Transaction.getTypeName(params.type);
+
+    await test(`Create transaction from reminder with ${typeStr} type request`, async () => {
+        const reminder = App.state.reminders.getItem(params.reminder_id);
+        assert(reminder, 'Reminder not found');
+
+        const scheduleItem = App.state.schedule.getItem(reminder.schedule_id);
+        assert(scheduleItem, 'Schedule item not found');
+
+        const requestURL = `${baseUrl()}transactions/create/?type=${typeStr}&reminder_id=${reminder.id}`;
+        await goTo(requestURL);
+
+        const expected = TransactionView.getInitialState({
+            type: params.type,
+            fromReminder: reminder.id,
+        });
+
+        return App.view.checkState(expected);
+    });
 };

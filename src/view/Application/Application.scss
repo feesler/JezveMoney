@@ -1026,6 +1026,11 @@ a.paginator-arrow:focus-visible {
   height: 1.5rem;
   line-height: 1.5rem;
   color: var(--category-color, var(--charts-color-1));
+  cursor: pointer;
+}
+
+.chart-legend__item.chart-legend__item_active {
+  color: var(--category-active-color, var(--charts-active-color-1));
 }
 
 .pie__sector {

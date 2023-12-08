@@ -62,6 +62,8 @@ export class NumberInputGroup extends InputGroup {
             className: INPUT_CLASS,
             locales: this.props.locales,
             digits: this.props.digits,
+            min: this.props.minValue,
+            max: this.props.maxValue,
             allowNegative: this.props.allowNegative,
             placeholder: this.props.placeholder,
             onInput: (e) => this.onInput(e),
@@ -82,15 +84,30 @@ export class NumberInputGroup extends InputGroup {
         super.init();
     }
 
+    isValidValue(value) {
+        if (value === '') {
+            return true;
+        }
+
+        const fixedValue = getFixedValue(value);
+        const { minValue, maxValue, allowNegative } = this.state;
+        if (
+            (!allowNegative && fixedValue < 0)
+            || (isNumber(minValue) && fixedValue < minValue)
+            || (isNumber(maxValue) && fixedValue > maxValue)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
     onDecrease(e) {
         const fixedValue = getFixedValue(this.state.value);
         const step = parseFloat(this.state.step);
         const value = fixedValue - step;
 
-        if (
-            (!this.state.allowNegative && value < 0)
-            || (value < this.state.minValue)
-        ) {
+        if (!this.isValidValue(value)) {
             return;
         }
 
@@ -108,7 +125,7 @@ export class NumberInputGroup extends InputGroup {
         const step = parseFloat(this.state.step);
         const value = fixedValue + step;
 
-        if (value > this.state.maxValue) {
+        if (!this.isValidValue(value)) {
             return;
         }
 
@@ -122,14 +139,9 @@ export class NumberInputGroup extends InputGroup {
     }
 
     onInput(e) {
-        let value = parseFloat(e.target.value);
-
-        const { minValue, maxValue } = this.state;
-        if (
-            (isNumber(minValue) && value < minValue)
-            || (isNumber(maxValue) && value > maxValue)
-        ) {
-            value = this.state.value;
+        const { value } = e.target;
+        if (!this.isValidValue(value)) {
+            return;
         }
 
         this.setState({ ...this.state, value });
@@ -158,6 +170,14 @@ export class NumberInputGroup extends InputGroup {
 
     setValue(value) {
         if (this.state.value === value) {
+            return;
+        }
+
+        const { minValue, maxValue } = this.state;
+        if (
+            (isNumber(minValue) && value < minValue)
+            || (isNumber(maxValue) && value > maxValue)
+        ) {
             return;
         }
 

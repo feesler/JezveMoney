@@ -1,6 +1,7 @@
 import {
     createElement,
     createSVGElement,
+    enable,
 } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
@@ -27,6 +28,7 @@ const defaultProps = {
     subtitle: null,
     icon: null,
     selected: false,
+    disabled: false,
     listMode: 'list',
 };
 
@@ -190,5 +192,7 @@ export class Tile extends Component {
         this.renderSelectControls(state, prevState);
 
         this.elem.classList.toggle(SORT_CLASS, state.listMode === 'sort');
+
+        enable(this.elem, !state.disabled);
     }
 }

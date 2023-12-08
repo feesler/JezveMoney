@@ -1660,6 +1660,8 @@ const slice = createSlice({
                 transaction.noAccount = false;
             }
 
+            transaction.acc_id = newState.account?.id ?? 0;
+
             newState.srcCurrency = currencyModel.getItem(transaction.src_curr);
             newState.destCurrency = currencyModel.getItem(transaction.dest_curr);
 

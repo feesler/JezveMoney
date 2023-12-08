@@ -4,6 +4,11 @@ import { App } from '../../../Application/App.js';
 
 import { Tile } from '../Tile/Tile.js';
 
+const defaultProps = {
+    account: null,
+    disabled: false,
+};
+
 /**
  * Account Tile component
  * @param {object} props
@@ -17,8 +22,11 @@ export class AccountTile extends Component {
         return Tile.sortSelector;
     }
 
-    constructor(props) {
-        super(props);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         this.state = {
             ...this.props,

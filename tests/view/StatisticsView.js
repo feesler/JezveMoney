@@ -1,5 +1,6 @@
 import { isObject, asArray } from '@jezvejs/types';
 import { assert } from '@jezvejs/assert';
+import { shiftMonth } from '@jezvejs/datetime';
 import {
     query,
     queryAll,
@@ -8,12 +9,12 @@ import {
     evaluate,
 } from 'jezve-test';
 import { DropDown, LinkMenu, Button } from 'jezvejs-test';
-import { AppView } from './AppView.js';
-import { Transaction } from '../model/Transaction.js';
-import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
+
 import { App } from '../Application.js';
-import { copyFields, dateToSeconds, shiftMonth } from '../common.js';
+import { AppView } from './AppView.js';
+import { copyFields, dateToSeconds } from '../common.js';
+
+import { Transaction } from '../model/Transaction.js';
 import {
     getColumnsInGroupCount,
     getDataSets,
@@ -21,6 +22,9 @@ import {
     getValidValuesCount,
     padArray,
 } from '../model/histogram.js';
+
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
+import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
 
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;

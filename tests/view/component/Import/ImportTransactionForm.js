@@ -1,4 +1,5 @@
 import { assert } from '@jezvejs/assert';
+import { fixFloat } from '@jezvejs/number';
 import {
     TestComponent,
     query,
@@ -9,6 +10,7 @@ import {
     waitForFunction,
 } from 'jezve-test';
 import { Collapsible, DropDown } from 'jezvejs-test';
+
 import {
     EXPENSE,
     INCOME,
@@ -19,7 +21,6 @@ import {
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import {
     normalize,
-    fixFloat,
     dateStringToSeconds,
     trimToDigitsLimit,
 } from '../../../common.js';

@@ -599,11 +599,6 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importrule/list/'),
             additionalFields: [
                 Checkbox.create({
-                    label: 'List for all users',
-                    name: 'full',
-                    className: 'checkbox-field form-row',
-                }).elem,
-                Checkbox.create({
                     label: 'Return extended objects',
                     name: 'extended',
                     className: 'checkbox-field form-row',
@@ -652,13 +647,6 @@ class AdminApiConsoleView extends AdminView {
             optionalFields: [
                 { title: 'Import rule id', name: 'rule' },
             ],
-            additionalFields: [
-                Checkbox.create({
-                    label: 'List for all users',
-                    name: 'full',
-                    className: 'checkbox-field form-row',
-                }).elem,
-            ],
             onSubmit: this.getVerifyHandler(apiTypes.isConditionsArray),
         });
 
@@ -701,13 +689,6 @@ class AdminApiConsoleView extends AdminView {
             action: this.getRequestURL('importaction/list/'),
             optionalFields: [
                 { title: 'Import rule id', name: 'rule' },
-            ],
-            additionalFields: [
-                Checkbox.create({
-                    label: 'List for all users',
-                    name: 'full',
-                    className: 'checkbox-field form-row',
-                }).elem,
             ],
             onSubmit: this.getVerifyHandler(apiTypes.isActionsArray),
         });

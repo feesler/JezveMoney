@@ -1,5 +1,6 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
+import { shiftMonth } from '@jezvejs/datetime';
 import {
     query,
     evaluate,
@@ -18,27 +19,29 @@ import {
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
+
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { WarningPopup } from './component/WarningPopup.js';
-import { AmountRangeFilter } from './component/Fields/AmountRangeFilter.js';
-import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
-import { SearchInput } from './component/Fields/SearchInput.js';
-import { TransactionList } from './component/TransactionList/TransactionList.js';
-import { Counter } from './component/Counter.js';
-import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
-import { ExportDialog } from './component/ExportDialog.js';
 import {
     MAX_PRECISION,
     dateToSeconds,
     isValidValue,
     secondsToDate,
-    shiftMonth,
     trimToDigitsLimit,
 } from '../common.js';
-import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
+
 import { TransactionsList } from '../model/TransactionsList.js';
+
+import { AmountRangeFilter } from './component/Fields/AmountRangeFilter.js';
+import { Counter } from './component/Counter.js';
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
+import { ExportDialog } from './component/ExportDialog.js';
+import { SearchInput } from './component/Fields/SearchInput.js';
+import { SetCategoryDialog } from './component/TransactionList/SetCategoryDialog.js';
+import { TransactionDetails } from './component/Transaction/TransactionDetails.js';
+import { TransactionList } from './component/TransactionList/TransactionList.js';
+import { TransactionTypeMenu } from './component/Fields/TransactionTypeMenu.js';
+import { WarningPopup } from './component/WarningPopup.js';
 
 const listMenuSelector = '#listMenu';
 const categoryDialogSelector = '#selectCategoryDialog';

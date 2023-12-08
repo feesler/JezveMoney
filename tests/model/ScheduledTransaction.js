@@ -1,5 +1,10 @@
 import { assert } from '@jezvejs/assert';
 import { isDate, asArray } from '@jezvejs/types';
+import { getWeekdayShort, shiftDate } from '@jezvejs/datetime';
+import { firstUpperCase } from 'jezvejs';
+
+import { App } from '../Application.js';
+
 import {
     DEBT,
     EXPENSE,
@@ -17,13 +22,10 @@ import {
     INTERVAL_YEAR,
     MONTHS_IN_YEAR,
     cutDate,
-    getWeekdayShort,
     secondsToTime,
-    shiftDate,
     stepInterval,
 } from '../common.js';
 import { __ } from './locale.js';
-import { App } from '../Application.js';
 
 const MAX_DAYS_IN_MONTH = 31;
 
@@ -319,9 +321,11 @@ export class ScheduledTransaction {
         const firstDay = shiftDate(date, -date.getDay());
 
         const weekdaysFmt = intervalOffsets.map((item) => (
-            getWeekdayShort(
-                shiftDate(firstDay, item),
-                App.view.locale,
+            firstUpperCase(
+                getWeekdayShort(
+                    shiftDate(firstDay, item),
+                    App.view.locale,
+                ),
             )
         ));
 

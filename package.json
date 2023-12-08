@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.85.1",
+    "version": "1.85.2",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -57,7 +57,7 @@
         "astroturf": "^1.2.0",
         "autoprefixer": "^10.4.16",
         "babel-loader": "^8.3.0",
-        "browserslist": "^4.22.1",
+        "browserslist": "^4.22.2",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^5.2.7",
         "css-minimizer-webpack-plugin": "^3.4.1",
@@ -99,8 +99,8 @@
         "@jezvejs/dom": "^1.0.1",
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
-        "core-js": "^3.33.3",
-        "jezvejs": "^2.14.0",
+        "core-js": "^3.34.0",
+        "jezvejs": "^2.16.2",
         "whatwg-fetch": "^3.6.19"
     }
 }

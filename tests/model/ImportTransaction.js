@@ -1,9 +1,10 @@
 import { assert } from '@jezvejs/assert';
 import { isDate } from '@jezvejs/types';
+import { fixFloat } from '@jezvejs/number';
+
 import { App } from '../Application.js';
 import {
     dateToSeconds,
-    fixFloat,
     normalize,
 } from '../common.js';
 import { getCurrencyPrecision } from './import.js';
