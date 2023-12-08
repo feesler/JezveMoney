@@ -10,7 +10,7 @@ import {
     REMINDER_SCHEDULED,
     REMINDER_UPCOMING,
 } from '../../model/Reminder.js';
-import { EXPENSE, TRANSFER } from '../../model/Transaction.js';
+import { EXPENSE, Transaction, TRANSFER } from '../../model/Transaction.js';
 import { INTERVAL_NONE } from '../../common.js';
 
 export class RemindersStory extends TestStory {
@@ -49,6 +49,7 @@ export class RemindersStory extends TestStory {
         await this.upcoming();
         await this.confirmCancelled();
         await this.cancelConfirmed();
+        await this.reminderURL();
         await this.noLongestInterval();
     }
 
@@ -321,6 +322,21 @@ export class RemindersStory extends TestStory {
         await Actions.filterByState({ state: REMINDER_CANCELLED });
         await Actions.clearEndDateFilter();
         await Actions.clearAllFilters();
+    }
+
+    async reminderURL() {
+        setBlock('Create transaction for reminder with type change request in URL', 1);
+
+        const reminder = App.state.reminders.find((item) => (
+            item?.state === REMINDER_SCHEDULED
+        ));
+
+        const data = Transaction.basicTypes.map((type) => ({
+            type,
+            reminder_id: reminder.id,
+        }));
+
+        await App.scenario.runner.runGroup(Actions.requestTypeWithReminderURL, data);
     }
 
     async noLongestInterval() {

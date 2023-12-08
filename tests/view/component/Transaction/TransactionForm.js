@@ -123,7 +123,14 @@ export class TransactionForm extends TestComponent {
         };
 
         const userAccounts = state.getUserAccounts();
+        const transactionOptions = {
+            formType,
+            transaction: null,
+            isDuplicate: false,
+            isReminder: false,
+        };
         let reminder = null;
+        let transaction = null;
 
         if (isCreate && from) {
             const item = (formType === SCHEDULE_ITEM_FORM)
@@ -131,17 +138,14 @@ export class TransactionForm extends TestComponent {
                 : state.transactions.getItem(from);
             assert(item, 'Transaction not found');
 
-            const transaction = structuredClone(item);
+            transaction = structuredClone(item);
             delete transaction.id;
 
             model.isAvailable = true;
             model.isReminder = false;
 
-            const transactionOptions = {
-                transaction,
-                formType,
-                isDuplicate: true,
-            };
+            transactionOptions.transaction = transaction;
+            transactionOptions.isDuplicate = true;
 
             Object.assign(model, this.transactionToModel(transactionOptions, state));
         } else if (isCreate && !from) {
@@ -217,7 +221,7 @@ export class TransactionForm extends TestComponent {
                 model.dest_curr_id = model.personAccount.curr_id;
             } else if (fromReminder) {
                 const isUpcoming = isObject(fromReminder);
-                const transaction = (
+                transaction = (
                     (isUpcoming)
                         ? state.getDefaultReminderTransactionBySchedule(
                             fromReminder.schedule_id,
@@ -227,14 +231,78 @@ export class TransactionForm extends TestComponent {
                 );
                 assert(transaction, 'Invalid reminder');
 
-                Object.assign(
-                    model,
-                    this.transactionToModel({ transaction, formType, isReminder: true }, state),
-                );
+                transactionOptions.transaction = transaction;
+                transactionOptions.isReminder = true;
 
                 reminder = (isUpcoming)
                     ? fromReminder
                     : state.reminders.getItem(fromReminder);
+            }
+
+            if (transaction !== null) {
+                const typeChanged = options.type && options.type !== transaction.type;
+
+                if (typeChanged) {
+                    const mainAccount = (transaction.src_id !== 0)
+                        ? transaction.src_id
+                        : transaction.dest_id;
+
+                    if (options.type === EXPENSE) {
+                        transaction.src_id = mainAccount;
+                        transaction.dest_id = 0;
+                    } else if (options.type === INCOME) {
+                        transaction.src_id = 0;
+                        transaction.dest_id = mainAccount;
+                    } else if (options.type === TRANSFER) {
+                        transaction.src_id = mainAccount;
+                        transaction.dest_id = state.getNextAccount();
+                        if (transaction.dest_id === mainAccount) {
+                            transaction.dest_id = state.getNextAccount(mainAccount);
+                        }
+                    } else if (options.type === DEBT) {
+                        transaction.src_id = 0;
+                        transaction.dest_id = mainAccount;
+
+                        transaction.debtType = true;
+                        model.person = state.getFirstPerson();
+                        transaction.person_id = model.person?.id ?? 0;
+
+                        transaction.acc_id = mainAccount;
+                    }
+
+                    if (transaction.src_id) {
+                        const srcAccount = state.accounts.getItem(transaction.src_id);
+                        if (srcAccount) {
+                            transaction.src_curr = srcAccount.curr_id;
+                        }
+                    }
+
+                    if (transaction.dest_id) {
+                        const destAccount = state.accounts.getItem(transaction.dest_id);
+                        if (destAccount) {
+                            transaction.dest_curr = destAccount.curr_id;
+                        }
+                    }
+
+                    if (options.type === EXPENSE) {
+                        transaction.dest_curr = transaction.src_curr;
+                    } else if (options.type === INCOME || options.type === LIMIT_CHANGE) {
+                        transaction.src_curr = transaction.dest_curr;
+                    } else if (options.type === DEBT && transaction.src_id === 0) {
+                        if (transaction.dest_curr === 0) {
+                            const currency = this.getFirstCurrency();
+                            if (currency) {
+                                transaction.dest_curr = currency.id;
+                            }
+                        }
+
+                        transaction.src_curr = transaction.dest_curr;
+                    }
+
+                    transaction.type = options.type;
+                }
+
+                Object.assign(model, this.transactionToModel(transactionOptions, state));
             }
 
             model.isDiffCurr = (model.src_curr_id !== model.dest_curr_id);
@@ -268,7 +336,7 @@ export class TransactionForm extends TestComponent {
 
             model.isReminder = !!fromReminder;
         } else if (model.isUpdate) {
-            const transaction = (formType === SCHEDULE_ITEM_FORM)
+            transaction = (formType === SCHEDULE_ITEM_FORM)
                 ? state.schedule.getItem(id)
                 : state.transactions.getItem(id);
             assert(transaction, 'Transaction not found');
@@ -367,14 +435,16 @@ export class TransactionForm extends TestComponent {
         model.comment = transaction.comment;
 
         if (model.type === DEBT) {
-            model.debtType = (
+            model.debtType = transaction.debtType ?? (
                 !!model.srcAccount
                 && model.srcAccount.owner_id !== state.profile.owner_id
             );
 
-            const personId = (model.debtType)
-                ? model.srcAccount.owner_id
-                : model.destAccount.owner_id;
+            const personId = transaction.person_id ?? (
+                (model.debtType)
+                    ? model.srcAccount.owner_id
+                    : model.destAccount.owner_id
+            );
             const personCurrId = (model.debtType)
                 ? model.src_curr_id
                 : model.dest_curr_id;
@@ -391,6 +461,12 @@ export class TransactionForm extends TestComponent {
                 personCurrId,
                 appState,
             );
+
+            if (model.debtType) {
+                model.srcAccount = model.personAccount;
+            } else {
+                model.destAccount = model.personAccount;
+            }
 
             if (model.noAccount) {
                 if (model.debtType) {
@@ -571,12 +647,12 @@ export class TransactionForm extends TestComponent {
         };
 
         if (isAvailable) {
-            res.srcAmountField.value = model.srcAmount.toString();
+            res.srcAmountField.value = model.srcAmount?.toString() ?? '';
             res.srcAmountField.currSign = (model.srcCurr) ? model.srcCurr.sign : '';
             res.srcAmountField.isCurrActive = (isIncome || (isDebt && model.debtType));
             res.srcAmountField.isInvalid = model.srcAmountInvalidated;
 
-            res.destAmountField.value = model.destAmount.toString();
+            res.destAmountField.value = model.destAmount?.toString() ?? '';
             res.destAmountField.currSign = (model.destCurr) ? model.destCurr.sign : '';
             res.destAmountField.isCurrActive = (isExpense || (isDebt && !model.debtType));
             res.destAmountField.isInvalid = model.destAmountInvalidated;

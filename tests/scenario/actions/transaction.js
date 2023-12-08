@@ -223,7 +223,7 @@ export const updateFromMainViewAndSubmit = async (pos, actions) => {
 };
 
 export const duplicateAndSubmit = async (type, pos, actions) => {
-    setBlock(`Duplicate transaction [${pos}] from main view`, 2);
+    setBlock(`Duplicate transaction [${pos}]`, 2);
 
     await duplicate(type, pos);
     await App.scenario.runner.runTasks(actions);

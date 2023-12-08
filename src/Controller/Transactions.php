@@ -175,6 +175,56 @@ class Transactions extends ListViewController
     }
 
     /**
+     * Updates "src_curr" and "dest_curr" values according to "src_id" and "dest_id"
+     *  and returns resulting array
+     *
+     * @param array $transaction
+     * @param array $options
+     *
+     * @return array
+     */
+    private function updateCurrenciesByAccounts(array $transaction, array $options = [])
+    {
+        $res = $transaction;
+
+        $trAvailable = $options["available"] ?? true;
+
+        $res["src_curr"] = 0;
+        $res["dest_curr"] = 0;
+
+        $src_id = $res["src_id"] ?? 0;
+        $dest_id = $res["dest_id"] ?? 0;
+
+        if ($src_id !== 0) {
+            $sourceAccount = $this->accModel->getItem($src_id);
+            if ($sourceAccount) {
+                $res["src_curr"] = $sourceAccount->curr_id;
+            }
+        }
+
+        if ($dest_id !== 0) {
+            $destAccount = $this->accModel->getItem($dest_id);
+            if ($destAccount) {
+                $res["dest_curr"] = $destAccount->curr_id;
+            }
+        }
+
+        if ($res["type"] === EXPENSE || ($res["type"] === TRANSFER && !$trAvailable)) {
+            $res["dest_curr"] = $res["src_curr"];
+        } elseif ($res["type"] === INCOME || $res["type"] === LIMIT_CHANGE) {
+            $res["src_curr"] = $res["dest_curr"];
+        } elseif ($res["type"] === DEBT && $src_id === 0) {
+            if ($res["dest_curr"] === 0) {
+                $res["dest_curr"] = $this->currModel->getIdByPos(0);
+            }
+
+            $res["src_curr"] = $res["dest_curr"];
+        }
+
+        return $res;
+    }
+
+    /**
      * /transactions/create/ route handler
      * Renders create transaction view
      */
@@ -236,7 +286,41 @@ class Transactions extends ListViewController
             ];
         }
 
-        $tr["type"] = $this->getRequestedType($_GET, ($tr["type"] ?? EXPENSE));
+        if (!is_array($tr)) {
+            $this->fail(__("transactions.errors.create"));
+        }
+
+        $updateCurrencies = false;
+
+        // Update accounts if creating transaction from another transaction or from reminder
+        // and requested type of transaction is different
+        $originalType = $tr["type"] ?? EXPENSE;
+        $requestedType = $this->getRequestedType($_GET, $originalType);
+        $typeChanged = ($requestedType !== $originalType && ($fromTransaction || $fromReminder));
+        if ($typeChanged) {
+            $src_id = $tr["src_id"] ?? 0;
+            $dest_id = $tr["dest_id"] ?? 0;
+            $mainAccount = ($src_id !== 0) ? $src_id : $dest_id;
+
+            if ($requestedType === EXPENSE) {
+                $tr["src_id"] = $mainAccount;
+                $tr["dest_id"] = 0;
+            } elseif ($requestedType == INCOME) {
+                $tr["src_id"] = 0;
+                $tr["dest_id"] = $mainAccount;
+            } elseif ($requestedType === TRANSFER) {
+                $tr["src_id"] = $mainAccount;
+                $tr["dest_id"] = $this->accModel->getAnother($mainAccount);
+            } elseif ($requestedType === DEBT) {
+                $tr["src_id"] = 0;
+                $tr["dest_id"] = $mainAccount;
+                $tr["acc_id"] = $mainAccount;
+                $tr["lastAcc_id"] = $mainAccount;
+            }
+
+            $updateCurrencies = true;
+        }
+        $tr["type"] = $requestedType;
 
         // Check availability of selected type of transaction
         $trAvailable = false;
@@ -255,7 +339,7 @@ class Transactions extends ListViewController
         }
 
         // Check specified account
-        $accountRequested = isset($_GET["acc_id"]) && !$fromReminder;
+        $accountRequested = isset($_GET["acc_id"]);
         $acc_id = ($accountRequested) ? intval($_GET["acc_id"]) : 0;
         // Redirect if invalid account is specified
         if ($acc_id) {
@@ -265,7 +349,7 @@ class Transactions extends ListViewController
             }
         }
         // Use first account if nothing is specified
-        if (!$acc_id && !$accountRequested) {
+        if (!$acc_id && !$accountRequested && !$fromReminder && !$fromTransaction) {
             if ($tr["type"] == LIMIT_CHANGE) {
                 if (is_array($creditCardAccounts) && count($creditCardAccounts) > 0) {
                     $acc_id = $creditCardAccounts[0]->id;
@@ -292,6 +376,10 @@ class Transactions extends ListViewController
         }
 
         if ($tr["type"] == DEBT) {
+            if ($typeChanged && $acc_id === 0) {
+                $acc_id = $tr["dest_id"] ?? 0;
+            }
+
             $debtAcc = $this->accModel->getItem($acc_id);
             // Prepare person account
             $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
@@ -307,7 +395,7 @@ class Transactions extends ListViewController
             $tr["acc_id"] = $acc_id;
             $tr["lastAcc_id"] = $acc_id;
             $tr["noAccount"] = ($acc_id == 0);
-        } elseif (!$fromReminder && !$fromTransaction) {
+        } elseif (($typeChanged && $acc_id !== 0) || (!$fromReminder && !$fromTransaction)) {
             // set source and destination accounts
             $src_id = 0;
             $dest_id = 0;
@@ -325,28 +413,14 @@ class Transactions extends ListViewController
 
             $tr["src_id"] = $src_id;
             $tr["dest_id"] = $dest_id;
-            $tr["src_curr"] = 0;
-            $tr["dest_curr"] = 0;
 
-            if ($src_id != 0) {
-                $accObj = $this->accModel->getItem($src_id);
-                if ($accObj) {
-                    $tr["src_curr"] = $accObj->curr_id;
-                }
-            }
+            $updateCurrencies = true;
+        }
 
-            if ($dest_id != 0) {
-                $accObj = $this->accModel->getItem($dest_id);
-                if ($accObj) {
-                    $tr["dest_curr"] = $accObj->curr_id;
-                }
-            }
-
-            if ($tr["type"] == EXPENSE || ($tr["type"] == TRANSFER && !$trAvailable)) {
-                $tr["dest_curr"] = $tr["src_curr"];
-            } elseif ($tr["type"] == INCOME || $tr["type"] == LIMIT_CHANGE) {
-                $tr["src_curr"] = $tr["dest_curr"];
-            }
+        if ($updateCurrencies) {
+            $tr = $this->updateCurrenciesByAccounts($tr, [
+                "available" => $trAvailable,
+            ]);
         }
 
         $data["appProps"] = [
