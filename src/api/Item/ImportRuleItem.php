@@ -4,7 +4,6 @@ namespace JezveMoney\App\Item;
 
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportConditionModel;
-use JezveMoney\App\Model\UserModel;
 
 class ImportRuleItem
 {
@@ -93,7 +92,6 @@ class ImportRuleItem
 
         $item = (object)$item;
 
-        $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $addExtended = isset($params["extended"]) && $params["extended"] == true;
 
         $res = new \stdClass();
@@ -101,10 +99,6 @@ class ImportRuleItem
         $res->flags = $item->flags;
         $res->createdate = $item->createdate;
         $res->updatedate = $item->updatedate;
-
-        if ($requestAll) {
-            $res->user_id = $item->user_id;
-        }
 
         if ($addExtended) {
             $condModel = ImportConditionModel::getInstance();

@@ -268,7 +268,6 @@ class ImportActionModel extends CachedTable
      * Returns array of import actions
      *
      * @param array $params array of options:
-     *     - 'full' => (bool) - returns import actions of all users, admin only
      *     - 'rule' => (int) - select import actions by rule, default is 0
      *     - 'action' => (int) - select import actions by action type, default is 0
      *
@@ -276,29 +275,15 @@ class ImportActionModel extends CachedTable
      */
     public function getData(array $params = [])
     {
-        $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $ruleFilter = isset($params["rule"]) ? intval($params["rule"]) : 0;
         $actionFilter = isset($params["action"]) ? intval($params["action"]) : 0;
 
-        $itemsData = [];
-        if ($requestAll) {
-            $qResult = $this->dbObj->selectQ("*", $this->tbl_name, null, null, "id ASC");
-            while ($row = $this->dbObj->fetchRow($qResult)) {
-                $itemObj = $this->rowToObj($row);
-                if ($itemObj) {
-                    $itemsData[] = $itemObj;
-                }
-            }
-        } else {
-            if (!$this->checkCache()) {
-                return null;
-            }
-
-            $itemsData = $this->cache;
+        if (!$this->checkCache()) {
+            return null;
         }
 
         $res = [];
-        foreach ($itemsData as $item) {
+        foreach ($this->cache as $item) {
             if ($ruleFilter && $item->rule_id != $ruleFilter) {
                 continue;
             }

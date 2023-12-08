@@ -148,34 +148,18 @@ class ImportRuleModel extends CachedTable
      * Returns array of import conditions
      *
      * @param array $params array of options:
-     *     - 'full' => (bool) - returns import conditions of all users, admin only
      *     - 'extended' => (int) - return extenden condition objects, default is false
      *
      * @return ImportRuleItem[]|null
      */
     public function getData(array $params = [])
     {
-        $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
-
-        $itemsData = [];
-        if ($requestAll) {
-            $qResult = $this->dbObj->selectQ("*", $this->tbl_name, null, null, "id ASC");
-            while ($row = $this->dbObj->fetchRow($qResult)) {
-                $itemObj = $this->rowToObj($row);
-                if ($itemObj) {
-                    $itemsData[] = $itemObj;
-                }
-            }
-        } else {
-            if (!$this->checkCache()) {
-                return null;
-            }
-
-            $itemsData = $this->cache;
+        if (!$this->checkCache()) {
+            return null;
         }
 
         $res = [];
-        foreach ($itemsData as $item) {
+        foreach ($this->cache as $item) {
             $res[] = ImportRuleItem::getUserData($item, $params);
         }
 

@@ -39,9 +39,7 @@ class ImportAction extends ApiListController
     protected function prepareListRequest(array $request)
     {
         $res = [];
-        if (isset($request["full"]) && $request["full"] == true) {
-            $res["full"] = true;
-        }
+
         if (isset($request["rule"])) {
             $res["rule"] = $request["rule"];
         }
