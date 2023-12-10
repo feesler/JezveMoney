@@ -682,8 +682,9 @@ export class TransactionForm extends TestComponent {
             const remindersAvailable = isTransactionForm && state.schedule.length > 0;
             const reminderId = parseInt(model.reminderId, 10);
             const scheduleId = parseInt(model.scheduleId, 10);
+            const { repeatEnabled } = model;
 
-            if (remindersAvailable) {
+            if (remindersAvailable && !repeatEnabled) {
                 res.reminderField = {
                     visible: true,
                     closeBtn: {
@@ -704,8 +705,6 @@ export class TransactionForm extends TestComponent {
             res.reminderDialog = {
                 visible: model.reminderDialogVisible,
             };
-
-            const { repeatEnabled } = model;
 
             res.repeatSwitch = {
                 visible: !model.isReminder,
