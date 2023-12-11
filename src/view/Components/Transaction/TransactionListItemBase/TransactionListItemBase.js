@@ -31,6 +31,10 @@ const COMMENT_CLASS = 'trans-item-base__comment';
 const AMOUNT_CATEGORY_CLASS = 'trans-item-base__amount-category';
 const DATE_COMMENT_CLASS = 'trans-item-base__date-comment';
 const COLUMN_CLASS = 'trans-item-base__column';
+const ACCOUNTS_COLUMN_CLASS = 'trans-item-base__column trans-item-base__accounts-column';
+const AMOUNTS_COLUMN_CLASS = 'trans-item-base__column trans-item-base__amounts-column';
+const RESULTS_COLUMN_CLASS = 'trans-item-base__column trans-item-base__results-column';
+const DETE_CATEGORY_COLUMN_CLASS = 'trans-item-base__column trans-item-base__date-category-column';
 /* Fields */
 /* Details mode */
 const DETAILS_CLASS = 'trans-item-base_details';
@@ -124,7 +128,7 @@ export class TransactionListItemBase extends Component {
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
+            props: { className: ACCOUNTS_COLUMN_CLASS },
             children: [this.sourceField.elem, this.destField.elem],
         });
         // Amount
@@ -137,14 +141,14 @@ export class TransactionListItemBase extends Component {
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
+            props: { className: AMOUNTS_COLUMN_CLASS },
             children: [this.srcAmountField.elem, this.destAmountField.elem],
         });
 
-        let amountResultGroup;
+        const amountResultGroup = [amountGroup];
 
+        // Result balance
         if (state.showResults) {
-            // Result balance
             this.srcResultField = Field.create({
                 title: __('transactions.sourceResult'),
                 className: RESULT_FIELD_CLASS,
@@ -154,15 +158,10 @@ export class TransactionListItemBase extends Component {
                 className: RESULT_FIELD_CLASS,
             });
             const resultsGroup = createElement('div', {
-                props: { className: COLUMN_CLASS },
+                props: { className: RESULTS_COLUMN_CLASS },
                 children: [this.srcResultField.elem, this.destResultField.elem],
             });
-            amountResultGroup = createElement('div', {
-                props: { className: COLUMN_CLASS },
-                children: [amountGroup, resultsGroup],
-            });
-        } else {
-            amountResultGroup = amountGroup;
+            amountResultGroup.push(resultsGroup);
         }
 
         // Date
@@ -188,7 +187,7 @@ export class TransactionListItemBase extends Component {
         });
 
         const dateCategoryGroup = createElement('div', {
-            props: { className: COLUMN_CLASS },
+            props: { className: DETE_CATEGORY_COLUMN_CLASS },
             children: [
                 this.dateField.elem,
                 this.categoryField.elem,
@@ -198,7 +197,7 @@ export class TransactionListItemBase extends Component {
         this.elem.append(
             this.typeField.elem,
             sourceDestGroup,
-            amountResultGroup,
+            ...amountResultGroup,
             dateCategoryGroup,
             this.commentField.elem,
         );
