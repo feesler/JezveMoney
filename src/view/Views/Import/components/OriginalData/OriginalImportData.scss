@@ -60,6 +60,15 @@
     font-size: 16px;
     padding: 2px 0;
   }
+
+  .comment-column {
+    flex-flow: row wrap;
+
+    .column__data {
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+  }
 }
 
 /* Desktop */

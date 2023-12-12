@@ -136,6 +136,8 @@ export class ReminderField extends Field {
             return;
         }
 
+        this.selectButton.enable(!state.disabled);
+
         if (!state.reminder_id && !state.schedule_id) {
             this.reminderItem?.elem?.remove();
             this.reminderItem = null;
@@ -164,7 +166,5 @@ export class ReminderField extends Field {
         }
 
         this.reminderItem.show();
-
-        this.selectButton.enable(!state.disabled);
     }
 }

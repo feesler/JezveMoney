@@ -1852,12 +1852,9 @@ export class TransactionForm extends Component {
 
     renderReminder(state, prevState) {
         if (
-            this.props.type !== 'transaction'
-            || !state.isAvailable
+            (this.props.type !== 'transaction')
             || !(App.model.schedule?.length > 0)
         ) {
-            this.reminderField?.elem?.remove();
-            this.reminderField = null;
             return;
         }
 
@@ -1867,8 +1864,22 @@ export class TransactionForm extends Component {
             transaction.reminder_id === prevTransaction?.reminder_id
             && transaction.schedule_id === prevTransaction?.schedule_id
             && transaction.reminder_date === prevTransaction?.reminder_date
+            && transaction.interval_type === prevTransaction?.interval_type
             && state.submitStarted === prevState?.submitStarted
+            && state.isAvailable === prevState?.isAvailable
         ) {
+            return;
+        }
+
+        const intervalType = transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = (intervalType !== INTERVAL_NONE);
+
+        if (
+            !state.isAvailable
+            || isRepeat
+        ) {
+            this.reminderField?.elem?.remove();
+            this.reminderField = null;
             return;
         }
 

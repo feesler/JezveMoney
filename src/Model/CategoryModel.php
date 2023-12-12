@@ -332,6 +332,18 @@ class CategoryModel extends SortableModel
             $item->parent_id = $parent_id;
             $category = (array)$item;
 
+            if ($parent_id === 0) {
+                $category["color"] = $this->getNextColor();
+            } else {
+                $parent = $this->getItem($parent_id);
+                if (!$parent) {
+                    throw new \Error("Parent item not found");
+                }
+
+                $category["color"] = $parent->color;
+                $category["type"] = $parent->type;
+            }
+
             $this->update($item_id, $category);
         }
 

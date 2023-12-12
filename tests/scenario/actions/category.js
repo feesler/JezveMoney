@@ -159,6 +159,12 @@ export const submit = async () => {
         const { isUpdate } = App.view;
         const expectedCategory = App.view.getExpectedCategory();
 
+        let selectedType = null;
+        if (isUpdate) {
+            const origCategory = App.state.categories.getItem(expectedCategory.id);
+            selectedType = origCategory?.type ?? null;
+        }
+
         await App.view.submit();
 
         if (validInput) {
@@ -170,7 +176,7 @@ export const submit = async () => {
                 App.state.createCategory(expectedCategory);
             }
 
-            const expected = CategoryListView.getInitialState();
+            const expected = CategoryListView.getInitialState({ selectedType });
             App.view.checkState(expected);
         }
 

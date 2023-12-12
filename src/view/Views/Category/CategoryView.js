@@ -262,9 +262,11 @@ class CategoryView extends AppView {
         }
 
         const colorItems = App.model.categories.findByColor(color);
+        const parentId = parseInt(state.data.parent_id, 10);
         if (
             colorItems?.length > 0
             && state.original.id !== colorItems[0].id
+            && parentId !== colorItems[0].id
         ) {
             this.store.dispatch(actions.invalidateColorField());
         }

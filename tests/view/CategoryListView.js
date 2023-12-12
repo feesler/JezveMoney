@@ -148,9 +148,22 @@ export class CategoryListView extends AppView {
         return model.items.filter((item) => item.selected);
     }
 
+    static getDefaultType(model = this.model) {
+        return model.items.reduce((currentType, item) => {
+            if (currentType === null || currentType === ANY_TYPE) {
+                return item.type;
+            }
+
+            return (item.type === ANY_TYPE)
+                ? currentType
+                : Math.min(currentType, item.type);
+        }, null);
+    }
+
     static getInitialState(options = {}, state = App.state) {
         const {
             detailsItem = null,
+            selectedType = null,
         } = options;
 
         const model = {
@@ -163,15 +176,13 @@ export class CategoryListView extends AppView {
             items: state.categories.clone(),
         };
 
-        const type = model.items.reduce((selectedType, item) => {
-            if (selectedType === null || selectedType === ANY_TYPE) {
-                return item.type;
-            }
-
-            return (item.type === ANY_TYPE)
-                ? selectedType
-                : Math.min(selectedType, item.type);
-        }, null);
+        const hasSelectedType = (
+            selectedType !== null
+            && model.items.some((item) => item.type === selectedType)
+        );
+        const type = (hasSelectedType)
+            ? selectedType
+            : this.getDefaultType(model);
 
         model.selectedType = (type !== null) ? Category.getTypeString(type) : null;
 

@@ -5,7 +5,6 @@
   column-gap: var(--trans-item-column-gap);
   position: relative;
   overflow: hidden;
-  flex: 1 1 auto;
   background-color: var(--list-item-bg-color);
 }
 
@@ -35,17 +34,13 @@
   width: 100%;
 }
 
+/* Accounts */
 .trans-item-base__title {
   font-size: 14px;
   color: var(--main-text-color);
 }
 
-.trans-item-base__amount {
-  color: var(--trans-item-amount-color);
-  font-size: 16px;
-  font-weight: 600;
-}
-
+/* Amount and category group */
 .trans-item-base__amount-category {
   display: flex;
   flex-flow: row wrap;
@@ -55,6 +50,26 @@
   overflow: hidden;
 }
 
+/* Amount field */
+.trans-item-base__amount {
+  margin-right: auto;
+  color: var(--trans-item-amount-color);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Category field */
+.trans-item-base__category {
+  max-width: 100%;
+  padding: 0 12px;
+  border-radius: 100vh;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  background-color: var(--trans-item-category-color, var(--btn-bg));
+  color: var(--trans-item-category-text, var(--list-item-text-color));
+}
+
+/* Date and comment group */
 .trans-item-base__date-comment {
   display: flex;
   flex-flow: row nowrap;
@@ -64,20 +79,12 @@
   width: 100%;
 }
 
+/* Comment field */
 .trans-item-base__date {
   flex: 0 0 auto;
 }
 
-.trans-item-base__category {
-  padding: 0 12px;
-  margin-left: auto;
-  border-radius: 100vh;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  background-color: var(--trans-item-category-color, var(--btn-bg));
-  color: var(--trans-item-category-text, var(--list-item-text-color));
-}
-
+/* Date field */
 .trans-item-base__comment {
   flex: 1 1 auto;
   min-height: 0;
@@ -91,6 +98,7 @@
 }
 
 .trans-item-base_details {
+  grid-template-columns: 1fr 1fr;
   row-gap: var(--trans-item-details-row-gap);
 
   .field {
@@ -111,22 +119,111 @@
     line-height: 23px;
   }
 
-  .trans-item-base__column {
+  .trans-item-base__accounts-group,
+  .trans-item-base__amounts-group,
+  .trans-item-base__results-group,
+  .trans-item-base__date-category-group {
     display: grid;
+    grid-column: 1 / 3;
     grid-template-columns: repeat(
       auto-fit,
-      minmax(var(--trans-item-min-column-width), 1fr)
+      minmax(var(--trans-item-column-min-width), 1fr)
     );
     gap: var(--trans-item-details-row-gap) var(--trans-item-column-gap);
   }
 
+  /* Transaction type field */
+  .trans-item-base__type-field {
+    grid-column: 1 / 3;
+  }
+
+  /* Amount field */
   .trans-item-base__amount-field .field__content {
     color: var(--trans-item-amount-color);
   }
+
+  /* Comment field */
+  .trans-item-base__comment-field {
+    grid-column: 1 / 3;
+  }
 }
 
-@media (min-width: 1200px) {
+@container (min-width: 576px) {
   .trans-item-base_details {
-    grid-template-columns: 0.5fr 1fr 2fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
+
+    /* Comment field */
+    .trans-item-base__comment-field {
+      grid-column: 3 / 4;
+    }
+  }
+}
+
+@container (min-width: 768px) {
+  .trans-item-base {
+    grid-template-columns: 1fr 3fr 2fr;
+
+    /* Amount and category group */
+    .trans-item-base__amount-category {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      justify-items: flex-start;
+    }
+  }
+}
+
+@container (min-width: 992px) {
+  .trans-item-base_details {
+    grid-template-columns: repeat(4, 1fr);
+
+    /* Results group */
+    .trans-item-base__results-group {
+      grid-column: 3 / 5;
+    }
+
+    /* Comment field */
+    .trans-item-base__comment-field {
+      grid-column: 3 / 5;
+    }
+  }
+}
+
+@container (min-width: 1200px) {
+  .trans-item-base_details {
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr;
+
+    /* Transaction type field */
+    .trans-item-base__type-field {
+      grid-column: 1 / 2;
+    }
+
+    /* Accounts group */
+    .trans-item-base__accounts-group {
+      grid-column: 2 / 3;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Amounts group */
+    .trans-item-base__amounts-group {
+      grid-column: 3 / 4;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Results group */
+    .trans-item-base__results-group {
+      grid-column: 4 / 5;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Date and category group */
+    .trans-item-base__date-category-group {
+      grid-column: 5 / 6;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Comment field */
+    .trans-item-base__comment-field {
+      grid-column: 6 / 7;
+    }
   }
 }

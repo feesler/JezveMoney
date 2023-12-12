@@ -168,7 +168,11 @@ export class CategoryView extends AppView {
 
         // Check color not used by other category
         const colorItems = App.state.categories.findByColor(this.model.color);
-        if (colorItems?.length > 0 && this.model.id !== colorItems[0].id) {
+        if (
+            colorItems?.length > 0
+            && this.model.id !== colorItems[0].id
+            && this.model.parent_id !== colorItems[0].id
+        ) {
             return false;
         }
 
