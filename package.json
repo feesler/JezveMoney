@@ -5,6 +5,9 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
+        "p-install": "npm install",
+        "p-update": "npm update",
+        "p-version": "npm version",
         "lint-php": "npm-run-all lint-php-cs lint-php-phan",
         "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php --ignore=*/vendor/* ./src/",
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
@@ -30,14 +33,8 @@
         "build-tests": "npx webpack --progress -c ./config/webpack.tests.js",
         "build-all": "npm-run-all build build-tests",
         "commit-version": "node ./scripts/commit-version.js",
-        "release": "npm-run-all update build update-composer commit-version deploy-full",
-        "ver-major": "npm version major",
-        "ver-minor": "npm version minor",
-        "ver-patch": "npm version patch",
-        "postversion": "node ./scripts/version.js",
-        "release-major": "npm-run-all all ver-major release",
-        "release-minor": "npm-run-all all ver-minor release",
-        "release-patch": "npm-run-all all ver-patch release"
+        "release": "node ./scripts/release.js",
+        "postversion": "node ./scripts/version.js"
     },
     "keywords": [
         "money",
