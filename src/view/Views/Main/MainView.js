@@ -19,7 +19,7 @@ import {
     createColorStyle,
 } from '../../utils/utils.js';
 import {
-    formatDateLabel,
+    formatLongDateLabel,
     formatValue,
     isStackedData,
 } from '../../utils/statistics.js';
@@ -574,7 +574,7 @@ class MainView extends AppView {
         return ChartPopup.fromTarget(target, {
             filter: statistics.filter,
             formatValue: (value) => formatValue(value, statistics),
-            renderDateLabel: (value) => formatDateLabel(value, statistics),
+            renderDateLabel: (value) => formatLongDateLabel(value, this.store.getState()),
         });
     }
 

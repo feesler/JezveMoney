@@ -6,10 +6,11 @@ import {
 import { Component } from 'jezvejs';
 
 import { COLORS_COUNT } from '../../../utils/utils.js';
+import { getDataCategoryName } from '../../../utils/statistics.js';
+
 import { Transaction } from '../../../Models/Transaction.js';
 
 import './ChartPopup.scss';
-import { getDataCategoryName } from '../../../utils/statistics.js';
 
 /* CSS classes */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';

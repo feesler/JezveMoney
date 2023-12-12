@@ -1,8 +1,9 @@
-import { asArray } from '@jezvejs/types';
+import { asArray, isDate } from '@jezvejs/types';
+import { getLongMonthName } from '@jezvejs/datetime';
 
 import { App } from '../Application/App.js';
 import { normalize } from './decimal.js';
-import { __ } from './utils.js';
+import { __, timeToDate } from './utils.js';
 
 import { Transaction } from '../Models/Transaction.js';
 
@@ -47,12 +48,47 @@ export const formatDateLabel = (value, state) => {
     if (group === 'month') {
         return App.formatDate(value, {
             locales: App.dateFormatLocale,
-            options: { year: 'numeric', month: '2-digit' },
+            options: { year: '2-digit', month: 'short' },
         });
     }
 
     if (group === 'year') {
         return App.formatDate(value, {
+            locales: App.dateFormatLocale,
+            options: { year: 'numeric' },
+        });
+    }
+
+    return null;
+};
+
+/**
+ * Returns long formatted date string for specified state
+ *
+ * @param {string|number} value
+ * @param {object} state
+ * @returns {string}
+ */
+export const formatLongDateLabel = (value, state) => {
+    const date = (isDate(value)) ? value : timeToDate(value);
+    if (!isDate(date)) {
+        throw new Error('Invalid date object');
+    }
+
+    const { group } = (state.form ?? state.filter);
+
+    if (group === 'day' || group === 'week') {
+        return App.formatDate(date);
+    }
+
+    if (group === 'month') {
+        const rYear = date.getFullYear();
+        const monthLong = getLongMonthName(date, App.dateFormatLocale);
+        return `${monthLong} ${rYear}`;
+    }
+
+    if (group === 'year') {
+        return App.formatDate(date, {
             locales: App.dateFormatLocale,
             options: { year: 'numeric' },
         });

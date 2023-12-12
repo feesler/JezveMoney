@@ -20,6 +20,7 @@ import {
 } from '../../utils/utils.js';
 import {
     formatDateLabel,
+    formatLongDateLabel,
     formatValue,
     getDataCategoryName,
     isStackedData,
@@ -407,7 +408,7 @@ class StatisticsView extends AppView {
         return ChartPopup.fromTarget(target, {
             filter: state.filter,
             formatValue: (value) => formatValue(value, state),
-            renderDateLabel: (value) => formatDateLabel(value, state),
+            renderDateLabel: (value) => formatLongDateLabel(value, state),
         });
     }
 
