@@ -103,7 +103,7 @@ export class ImportListMainMenu extends PopupMenu {
             onClick: () => dispatch(actions.restoreSelectedItems()),
         }, {
             type: 'separator',
-            hidden: !isSelectMode && restoreAvailable,
+            hidden: !(isSelectMode && restoreAvailable),
         }, {
             id: 'enableSelectedBtn',
             title: __('actions.enableSelected'),
