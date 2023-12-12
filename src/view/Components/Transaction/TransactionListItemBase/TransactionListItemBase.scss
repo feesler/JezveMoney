@@ -148,7 +148,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@container (min-width: 576px) {
   .trans-item-base_details {
     grid-template-columns: repeat(3, 1fr);
 
@@ -159,7 +159,7 @@
   }
 }
 
-@media (min-width: 992px) {
+@container (min-width: 768px) {
   .trans-item-base {
     grid-template-columns: 1fr 3fr 2fr;
 
@@ -172,7 +172,7 @@
   }
 }
 
-@media (min-width: 1200px) {
+@container (min-width: 992px) {
   .trans-item-base_details {
     grid-template-columns: repeat(4, 1fr);
 
@@ -188,7 +188,7 @@
   }
 }
 
-@media (min-width: 1400px) {
+@container (min-width: 1200px) {
   .trans-item-base_details {
     grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr;
 

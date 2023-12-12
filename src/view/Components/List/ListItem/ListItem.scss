@@ -34,6 +34,7 @@
 
 /* Item content */
 .list-item__content {
+  container-type: inline-size;
   display: grid;
   align-items: start;
   row-gap: var(--list-item-row-gap);
