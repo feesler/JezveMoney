@@ -119,7 +119,10 @@
     line-height: 23px;
   }
 
-  .trans-item-base__column {
+  .trans-item-base__accounts-group,
+  .trans-item-base__amounts-group,
+  .trans-item-base__results-group,
+  .trans-item-base__date-category-group {
     display: grid;
     grid-column: 1 / 3;
     grid-template-columns: repeat(
@@ -173,8 +176,8 @@
   .trans-item-base_details {
     grid-template-columns: repeat(4, 1fr);
 
-    /* Results column */
-    .trans-item-base__results-column {
+    /* Results group */
+    .trans-item-base__results-group {
       grid-column: 3 / 5;
     }
 
@@ -194,26 +197,26 @@
       grid-column: 1 / 2;
     }
 
-    /* Accounts column */
-    .trans-item-base__accounts-column {
+    /* Accounts group */
+    .trans-item-base__accounts-group {
       grid-column: 2 / 3;
       grid-template-columns: 1fr 1fr;
     }
 
-    /* Amounts column */
-    .trans-item-base__amounts-column {
+    /* Amounts group */
+    .trans-item-base__amounts-group {
       grid-column: 3 / 4;
       grid-template-columns: 1fr 1fr;
     }
 
-    /* Results column */
-    .trans-item-base__results-column {
+    /* Results group */
+    .trans-item-base__results-group {
       grid-column: 4 / 5;
       grid-template-columns: 1fr 1fr;
     }
 
     /* Date and category group */
-    .trans-item-base__date-category-column {
+    .trans-item-base__date-category-group {
       grid-column: 5 / 6;
       grid-template-columns: 1fr 1fr;
     }
