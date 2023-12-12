@@ -163,7 +163,7 @@ export class CategoriesStory extends TestStory {
 
         setBlock('Update category with used color', 2);
         await Actions.updateById(INVEST_CATEGORY);
-        await Actions.inputColor('#289c26');
+        await Actions.inputColor('#fb8b24');
         await Actions.submit();
 
         setBlock('Submit category after invalid color', 2);

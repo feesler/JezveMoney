@@ -5,7 +5,7 @@ import { api } from './api.js';
 export class ColorsList extends List {
     static async create() {
         const data = await api.color.list();
-        return new ColorsList(data);
+        return super.create(data);
     }
 
     async fetch() {

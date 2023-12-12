@@ -107,10 +107,19 @@ export const deleteItems = (removeChild = true) => async ({ dispatch, getState }
  * @param {object} request - request object
  */
 export const sendChangePosRequest = (request) => async ({ dispatch, getState }) => {
+    const state = getState();
+    if (state.loading) {
+        return;
+    }
+
     dispatch(actions.startLoading());
 
     try {
-        const prepared = prepareRequest(request);
+        const prepared = prepareRequest({
+            ...request,
+            parent_id: (request.parent_id === null) ? 0 : request.parent_id,
+        });
+
         const response = await API.category.setPos(prepared);
 
         const data = getListDataFromResponse(response);

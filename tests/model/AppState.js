@@ -1638,6 +1638,19 @@ export class AppState {
         if (origItem.parent_id !== parentId) {
             const updItem = structuredClone(origItem);
             updItem.parent_id = parentId;
+
+            if (parentId === 0) {
+                updItem.color = this.getNextCategoryColor();
+            } else {
+                const parent = this.categories.getItem(parentId);
+                if (!parent) {
+                    return false;
+                }
+
+                updItem.color = parent.color;
+                updItem.type = parent.type;
+            }
+
             if (!this.updateCategory(updItem)) {
                 return false;
             }
