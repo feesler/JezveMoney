@@ -39,7 +39,7 @@ const run = async () => {
 
     await runCommand('commit-version');
 
-    await runCommand('deploy-full');
+    await runCommand('deploy -- full');
 };
 
 run();

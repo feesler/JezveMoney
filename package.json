@@ -18,7 +18,6 @@
         "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/ ./config/ ./scripts/",
         "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location ./node_modules/.cache/stylelint/ --rd",
         "deploy": "node ./scripts/deploy.js",
-        "deploy-full": "node ./scripts/deploy.js full",
         "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
         "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
         "start": "npx webpack --watch --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
