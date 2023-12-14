@@ -103,27 +103,16 @@ export const formatInputDate = (date, params = {}) => {
     assert.isDate(date);
 
     const format = getLocaleDateFormat(params);
-
     const inputFormatOptions = {
         day: '2-digit',
         month: '2-digit',
         year: (format.yearLength === 2) ? '2-digit' : 'numeric',
     };
 
-    let res = formatDate(date, {
+    return formatDate(date, {
         locales: params?.locales ?? [],
         options: inputFormatOptions,
     });
-    res = res.trim();
-
-    // Remove trailing separator
-    const separator = format.separator.trim();
-    if (res.endsWith(separator)) {
-        const length = res.lastIndexOf(separator);
-        res = res.substring(0, length);
-    }
-
-    return res;
 };
 
 /** Parses date from string and format it back */

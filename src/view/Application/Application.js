@@ -183,7 +183,7 @@ export class Application {
         const options = params?.options ?? this.dateFormatOptions;
         const format = getLocaleDateFormat({ locales, options });
 
-        let res = this.formatDate(date, {
+        return this.formatDate(date, {
             locales,
             options: {
                 day: '2-digit',
@@ -191,15 +191,6 @@ export class Application {
                 year: (format.yearLength === 2) ? '2-digit' : 'numeric',
             },
         });
-        res = res.trim();
-
-        const separator = format.separator.trim();
-        if (res.endsWith(separator)) {
-            const length = res.lastIndexOf(separator);
-            res = res.substring(0, length);
-        }
-
-        return res;
     }
 
     formatNumber(value, params = {}) {
