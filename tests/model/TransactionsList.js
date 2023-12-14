@@ -1,10 +1,9 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
-import { formatDate } from '@jezvejs/datetime';
+import { formatDate, getWeek } from '@jezvejs/datetime';
 import {
     createCSV,
     cutDate,
-    getWeek,
     dateToSeconds,
     secondsToDate,
     MONTHS_IN_YEAR,

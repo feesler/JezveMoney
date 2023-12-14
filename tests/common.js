@@ -6,6 +6,7 @@ import {
     getLocaleDateFormat,
     shiftDate,
     shiftYear,
+    getDaysInMonth,
 } from '@jezvejs/datetime';
 import { fixFloat } from '@jezvejs/number';
 
@@ -125,29 +126,6 @@ export const reformatDate = (str, params = {}) => {
     return formatInputDate(new Date(fixedDate), params);
 };
 
-// Returns the ISO week of the date.
-export const getWeek = (timestamp) => {
-    const date = new Date(timestamp);
-    date.setHours(0, 0, 0, 0);
-    // Thursday in current week decides the year.
-    date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-    // January 4 is always in week 1.
-    const week1 = new Date(date.getFullYear(), 0, 4);
-    // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-    const diff = date.getTime() - week1.getTime();
-
-    return 1 + Math.round((diff / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
-};
-
-/** Returns last date of month */
-export const getLastDayOfMonth = (date) => (
-    new Date(Date.UTC(
-        date.getFullYear(),
-        date.getMonth() + 1,
-        0,
-    ))
-);
-
 export const stepInterval = (timestamp, intervalType, step = 1) => {
     assert(timestamp, 'Invalid timestamp');
     assert(step >= 0, 'Invalid interval step');
@@ -175,12 +153,12 @@ export const stepInterval = (timestamp, intervalType, step = 1) => {
             date.getMonth() + step,
             1,
         ));
-        const maxDate = getLastDayOfMonth(targetMonth);
+        const maxDate = getDaysInMonth(targetMonth);
 
         return Date.UTC(
             date.getFullYear(),
             date.getMonth() + step,
-            Math.min(date.getDate(), maxDate.getDate()),
+            Math.min(date.getDate(), maxDate),
         );
     }
 
