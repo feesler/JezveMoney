@@ -536,11 +536,8 @@ export class PersonListView extends AppView {
         this.model.listMenuVisible = false;
         this.model.tiles = this.model.tiles.map(selectItem);
         this.model.hiddenTiles = this.model.hiddenTiles.map(selectItem);
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAll() {
@@ -550,11 +547,8 @@ export class PersonListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.onDeselectAll();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Delete secified person from context menu */

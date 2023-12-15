@@ -448,13 +448,12 @@ export class ImportRuleForm extends TestComponent {
 
         this.model.conditions.push(condition);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        await this.performAction(() => this.content.conditionsList.create());
-
-        return this.checkState();
+            await this.performAction(() => this.content.conditionsList.create());
+        });
     }
 
     async deleteCondition(index) {
@@ -463,16 +462,15 @@ export class ImportRuleForm extends TestComponent {
 
         this.model.conditions.splice(ind, 1);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        await this.performAction(() => {
-            const item = this.content.conditionsList.items[index];
-            return item.clickDelete();
+            await this.performAction(() => {
+                const item = this.content.conditionsList.items[index];
+                return item.clickDelete();
+            });
         });
-
-        return this.checkState();
     }
 
     async runOnCondition(index, { action, data }) {
@@ -534,14 +532,13 @@ export class ImportRuleForm extends TestComponent {
         conditionModel.state = ImportConditionForm.getStateName(conditionModel);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        const item = this.content.conditionsList.items[ind];
-        await this.performAction(() => item.changeFieldType(value));
-
-        return this.checkState();
+            const item = this.content.conditionsList.items[ind];
+            await this.performAction(() => item.changeFieldType(value));
+        });
     }
 
     async changeConditionValue(index, name, value) {
@@ -558,18 +555,17 @@ export class ImportRuleForm extends TestComponent {
         }
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        const item = this.content.conditionsList.items[ind];
-        if (name === 'date') {
-            await this.performAction(() => item.inputDate(value));
-        } else {
-            await this.performAction(() => item.changeValue(name, value));
-        }
-
-        return this.checkState();
+            return this.performAction(() => {
+                const item = this.content.conditionsList.items[ind];
+                return (name === 'date')
+                    ? item.inputDate(value)
+                    : item.changeValue(name, value);
+            });
+        });
     }
 
     async changeConditionOperator(index, value) {
@@ -580,14 +576,13 @@ export class ImportRuleForm extends TestComponent {
         conditionModel.operator = value;
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        const item = this.content.conditionsList.items[ind];
-        await this.performAction(() => item.changeOperator(value));
-
-        return this.checkState();
+            const item = this.content.conditionsList.items[ind];
+            return this.performAction(() => item.changeOperator(value));
+        });
     }
 
     async changeConditionTemplate(index, value) {
@@ -624,14 +619,13 @@ export class ImportRuleForm extends TestComponent {
         conditionModel.date = App.formatInputDate(value);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.resetValidation();
-        const expected = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        const item = this.content.conditionsList.items[ind];
-        await this.performAction(() => item.changeDate(value));
-
-        return this.checkState(expected);
+            const item = this.content.conditionsList.items[ind];
+            return this.performAction(() => item.changeDate(value));
+        });
     }
 
     async inputConditionValue(index, value) {
@@ -650,14 +644,13 @@ export class ImportRuleForm extends TestComponent {
         conditionModel.state = ImportConditionForm.getStateName(conditionModel);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openConditions();
+        return this.runTestAction(async () => {
+            await this.openConditions();
 
-        const item = this.content.conditionsList.items[ind];
-        await this.performAction(() => item.togglePropValue());
-
-        return this.checkState();
+            const item = this.content.conditionsList.items[ind];
+            return this.performAction(() => item.togglePropValue());
+        });
     }
 
     async openActions() {
@@ -683,13 +676,12 @@ export class ImportRuleForm extends TestComponent {
         };
         this.model.actions.push(action);
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openActions();
+        return this.runTestAction(async () => {
+            await this.openActions();
 
-        await this.performAction(() => this.content.actionsList.create());
-
-        return this.checkState();
+            return this.performAction(() => this.content.actionsList.create());
+        });
     }
 
     async deleteAction(index) {
@@ -708,16 +700,15 @@ export class ImportRuleForm extends TestComponent {
         }
 
         this.resetValidation();
-        this.expectedState = this.getExpectedState();
 
-        await this.openActions();
+        return this.runTestAction(async () => {
+            await this.openActions();
 
-        await this.performAction(() => {
-            const item = this.content.actionsList.items[index];
-            return item.clickDelete();
+            return this.performAction(() => {
+                const item = this.content.actionsList.items[index];
+                return item.clickDelete();
+            });
         });
-
-        return this.checkState();
     }
 
     async runOnAction(index, { action, data }) {
@@ -782,14 +773,13 @@ export class ImportRuleForm extends TestComponent {
 
         this.resetValidation();
         this.onActionUpdate();
-        this.expectedState = this.getExpectedState();
 
-        await this.openActions();
+        return this.runTestAction(async () => {
+            await this.openActions();
 
-        const item = this.content.actionsList.items[ind];
-        await this.performAction(() => item.changeAction(value));
-
-        return this.checkState();
+            const item = this.content.actionsList.items[ind];
+            return this.performAction(() => item.changeAction(value));
+        });
     }
 
     async changeActionValue(index, name, value) {
@@ -806,14 +796,13 @@ export class ImportRuleForm extends TestComponent {
 
         this.resetValidation();
         this.onActionUpdate();
-        this.expectedState = this.getExpectedState();
 
-        await this.openActions();
+        return this.runTestAction(async () => {
+            await this.openActions();
 
-        const item = this.content.actionsList.items[ind];
-        await this.performAction(() => item.changeValue(name, value));
-
-        return this.checkState();
+            const item = this.content.actionsList.items[ind];
+            return this.performAction(() => item.changeValue(name, value));
+        });
     }
 
     async changeActionTransactionType(index, value) {

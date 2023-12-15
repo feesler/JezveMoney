@@ -303,10 +303,8 @@ export class AccountView extends AppView {
         }
 
         this.model.name = val;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.name.input(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.name.input(val));
     }
 
     onBalanceChanged(value) {
@@ -327,20 +325,16 @@ export class AccountView extends AppView {
         const { precision } = this.model.currObj;
         const decimal = trimToDigitsLimit(val, precision);
         this.onBalanceChanged(decimal);
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.balance.input(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.balance.input(val));
     }
 
     async inputLimit(val) {
         const { precision } = this.model.currObj;
         const decimal = trimToDigitsLimit(val, precision);
         this.onLimitChanged(decimal);
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.limit.input(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.limit.input(val));
     }
 
     async changeCurrency(val) {
@@ -353,10 +347,8 @@ export class AccountView extends AppView {
         const { precision } = this.model.currObj;
         const decimal = trimToDigitsLimit(this.model.initbalance, precision);
         this.onBalanceChanged(decimal);
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.currDropDown.setSelection(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.currDropDown.setSelection(val));
     }
 
     async changeType(val) {
@@ -364,10 +356,8 @@ export class AccountView extends AppView {
         assert.isString(accountTypes[type], `Invalid account type: ${val}`);
 
         this.model.type = type;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.typeDropDown.setSelection(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.typeDropDown.setSelection(val));
     }
 
     async changeIcon(val) {
@@ -382,10 +372,8 @@ export class AccountView extends AppView {
 
         this.model.icon_id = iconObj.id;
         this.model.tileIcon = iconObj;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.iconDropDown.setSelection(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.iconDropDown.setSelection(val));
     }
 
     async submit() {

@@ -777,11 +777,8 @@ export class ImportTransactionForm extends TestComponent {
 
         this.trimAmounts();
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.typeField.dropDown.selectItem(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.typeField.dropDown.selectItem(value));
     }
 
     async changeTransferAccount(value) {
@@ -824,11 +821,8 @@ export class ImportTransactionForm extends TestComponent {
         this.model.personId = value;
         this.model.person = App.state.persons.getItem(value);
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.personField.dropDown.selectItem(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.personField.dropDown.selectItem(value));
     }
 
     async inputSourceAmount(value) {
@@ -840,11 +834,8 @@ export class ImportTransactionForm extends TestComponent {
             this.model.destAmount = cutValue;
         }
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.srcAmountField.inputElem, value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => input(this.content.srcAmountField.inputElem, value));
     }
 
     async inputDestAmount(value) {
@@ -856,11 +847,8 @@ export class ImportTransactionForm extends TestComponent {
             this.model.srcAmount = cutValue;
         }
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.destAmountField.inputElem, value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => input(this.content.destAmountField.inputElem, value));
     }
 
     async changeSourceCurrency(value) {
@@ -874,11 +862,8 @@ export class ImportTransactionForm extends TestComponent {
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.trimAmounts();
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => dropDown.selectItem(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => dropDown.selectItem(value));
     }
 
     async changeDestCurrency(value) {
@@ -892,11 +877,8 @@ export class ImportTransactionForm extends TestComponent {
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.trimAmounts();
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => dropDown.selectItem(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => dropDown.selectItem(value));
     }
 
     async inputDate(value) {
@@ -904,11 +886,8 @@ export class ImportTransactionForm extends TestComponent {
 
         this.model.date = value;
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.dateField.inputElem, value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => input(this.content.dateField.inputElem, value));
     }
 
     async changeCategory(value) {
@@ -917,22 +896,16 @@ export class ImportTransactionForm extends TestComponent {
 
         this.model.categoryId = parseInt(value, 10);
         this.cleanValidation();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => dropDown.selectItem(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => dropDown.selectItem(value));
     }
 
     async inputComment(value) {
         this.checkEnabled(this.content.commentField);
 
         this.model.comment = value;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.commentField.inputElem, value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => input(this.content.commentField.inputElem, value));
     }
 
     async openReminderDialog() {
@@ -973,11 +946,8 @@ export class ImportTransactionForm extends TestComponent {
         assert(this.reminderDialog?.content?.visible, 'Reminder dialog not visible');
 
         this.model.reminderDialogVisible = false;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.reminderDialog.close());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.close());
     }
 
     async selectReminderByIndex(index) {
@@ -989,11 +959,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.reminderDate = item?.date ?? 0;
         this.model.isReminder = true;
 
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.selectItemByIndex(index));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.selectItemByIndex(index));
     }
 
     async removeReminder() {
@@ -1003,117 +969,62 @@ export class ImportTransactionForm extends TestComponent {
         this.model.scheduleId = 0;
         this.model.reminderDate = 0;
         this.model.isReminder = false;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.reminderField.removeReminder());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.reminderField.removeReminder());
     }
 
     async filterRemindersByState(state) {
         assert(this.reminderDialog?.content?.visible, 'Reminder field not available');
 
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.filterByState(state));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.filterByState(state));
     }
 
     async selectRemindersStartDateFilter(value) {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.selectStartDateFilter(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.selectStartDateFilter(value));
     }
 
     async selectRemindersEndDateFilter(value) {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.selectEndDateFilter(value));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.selectEndDateFilter(value));
     }
 
     async clearRemindersStartDateFilter() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.clearStartDateFilter());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.clearStartDateFilter());
     }
 
     async clearRemindersEndDateFilter() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.clearEndDateFilter());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.clearEndDateFilter());
     }
 
     async clearAllRemindersFilters() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.clearAllFilters());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.clearAllFilters());
     }
 
     async goToRemindersFirstPage() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.goToFirstPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.goToFirstPage());
     }
 
     async goToRemindersLastPage() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.goToLastPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.goToLastPage());
     }
 
     async goToRemindersPrevPage() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.goToPrevPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.goToPrevPage());
     }
 
     async goToRemindersNextPage() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.goToNextPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.goToNextPage());
     }
 
     async showMoreReminders() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.showMore());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.showMore());
     }
 
     async setRemindersClassicMode() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.setClassicMode());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.setClassicMode());
     }
 
     async setRemindersDetailsMode() {
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.reminderDialog.setDetailsMode());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.reminderDialog.setDetailsMode());
     }
 
     async clickSave() {

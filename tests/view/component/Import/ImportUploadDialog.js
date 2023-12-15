@@ -554,11 +554,8 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         this.model.filename = filename;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.serverAddressInput.elem, filename));
-
-        return this.checkState();
+        return this.runTestAction(() => input(this.content.serverAddressInput.elem, filename));
     }
 
     async upload() {
@@ -608,11 +605,8 @@ export class ImportUploadDialog extends TestComponent {
             this.model.initialAccount = App.state.accounts.getItem(template.account_id);
         }
         this.model.isValid = this.isValidTemplate();
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.templateDropDown.selectItem(val));
-
-        return this.checkState();
+        return this.runTestAction(() => this.content.templateDropDown.selectItem(val));
     }
 
     async selectTemplateByIndex(val) {
@@ -632,11 +626,8 @@ export class ImportUploadDialog extends TestComponent {
             date_locale: IMPORT_DATE_LOCALE,
             columns: {},
         });
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.createTplBtn.elem));
-
-        return this.checkState();
+        return this.runTestAction(() => click(this.content.createTplBtn.elem));
     }
 
     async openTemplateMenu() {
@@ -703,11 +694,8 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.name = val;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.tplNameInp.elem, val));
-
-        return this.checkState();
+        return this.runTestAction(() => input(this.content.tplNameInp.elem, val));
     }
 
     async selectTemplateColumn(name, index) {
@@ -734,22 +722,16 @@ export class ImportUploadDialog extends TestComponent {
         this.checkTplFormState();
 
         this.model.template.date_locale = locale;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dateFormatSel.selectItem(locale));
-
-        return this.checkState();
+        return this.runTestAction(() => this.content.dateFormatSel.selectItem(locale));
     }
 
     async inputTemplateFirstRow(val) {
         this.checkTplFormState();
 
         this.model.template.first_row = parseInt(val, 10);
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => input(this.content.firstRowInp.elem, val.toString()));
-
-        return this.checkState();
+        return this.runTestAction(() => input(this.content.firstRowInp.elem, val.toString()));
     }
 
     async decreaseTemplateFirstRow() {
@@ -758,11 +740,8 @@ export class ImportUploadDialog extends TestComponent {
         assert(!this.content.decFirstRowBtn.disabled, 'Decrease first row button is disabled');
 
         this.model.template.first_row -= 1;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.decFirstRowBtn.elem));
-
-        return this.checkState();
+        return this.runTestAction(() => click(this.content.decFirstRowBtn.elem));
     }
 
     async increaseTemplateFirstRow() {
@@ -775,11 +754,8 @@ export class ImportUploadDialog extends TestComponent {
         } else {
             this.model.template.first_row += 1;
         }
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.incFirstRowBtn.elem));
-
-        return this.checkState();
+        return this.runTestAction(() => click(this.content.incFirstRowBtn.elem));
     }
 
     async toggleTemplateAccount() {
@@ -791,11 +767,8 @@ export class ImportUploadDialog extends TestComponent {
             const account = App.state.getFirstAccount();
             this.model.template.account_id = account.id;
         }
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.tplAccountSwitch.toggle());
-
-        return this.checkState();
+        return this.runTestAction(() => this.content.tplAccountSwitch.toggle());
     }
 
     async selectTemplateAccountById(val) {
@@ -803,11 +776,8 @@ export class ImportUploadDialog extends TestComponent {
 
         const account = App.state.accounts.getItem(val);
         this.model.template.account_id = account.id;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.tplAccountSel.selectItem(val));
-
-        return this.checkState();
+        return this.runTestAction(() => this.content.tplAccountSel.selectItem(val));
     }
 
     async selectTemplateAccountByIndex(index) {
@@ -871,20 +841,13 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.model.isValid = this.isValidTemplate(template);
 
-        this.expectedState = this.getExpectedState();
-
-        await this.performAction(() => click(this.content.cancelTplBtn.elem));
-
-        return this.checkState();
+        return this.runTestAction(() => click(this.content.cancelTplBtn.elem));
     }
 
     async selectAccount(val) {
         this.model.initialAccount = App.state.accounts.getItem(val);
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.initialAccount.selectItem(val));
-
-        return this.checkState();
+        return this.runTestAction(() => this.content.initialAccount.selectItem(val));
     }
 
     async selectEncoding(val) {
@@ -923,10 +886,7 @@ export class ImportUploadDialog extends TestComponent {
 
         this.model.state = BROWSE_FILE_STATE;
         this.model.filename = '';
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => click(this.content.backBtn.elem));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => click(this.content.backBtn.elem));
     }
 }
