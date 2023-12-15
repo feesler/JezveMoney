@@ -521,12 +521,15 @@ class StatisticsView extends AppView {
         this.noDataMessage.show(state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
 
-        const data = (noData)
-            ? { values: [], series: [] }
-            : state.chartData;
-        data.stacked = isStackedData(state.filter);
+        if (state.chartData !== prevState.chartData) {
+            const data = (noData)
+                ? { values: [], series: [] }
+                : state.chartData;
+            data.stacked = isStackedData(state.filter);
 
-        this.histogram.setData(data);
+            this.histogram.setData(data);
+        }
+
         if (state.activeCategory !== prevState.activeCategory) {
             this.histogram.setActiveCategory(state.activeCategory);
         }
