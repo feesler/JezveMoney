@@ -92,9 +92,28 @@ export class Application {
         }
 
         this.modelClass[name] = ModelClass;
-        this.model[name] = ModelClass.create(data);
+        const model = ModelClass.create(data);
+        this.model[name] = model;
 
-        return this.model[name];
+        this.onModelDataLoaded(name, model);
+
+        return model;
+    }
+
+    setModelData(name, data) {
+        const model = this.model[name] ?? null;
+        if (model === null) {
+            return;
+        }
+
+        model.setData(data);
+        this.onModelDataLoaded(name);
+    }
+
+    onModelDataLoaded(name) {
+        if (name === 'userCurrencies') {
+            this.model.userCurrencies.defaultSort();
+        }
     }
 
     get baseURL() {

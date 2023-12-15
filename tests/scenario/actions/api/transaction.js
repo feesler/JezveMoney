@@ -205,12 +205,6 @@ export const filter = async (params) => {
             expTransList = expTransList.getPage(targetPage, params.onPage, targetRange, isDesc);
         }
 
-        // Sort again if asc order was requested
-        // TODO: think how to avoid automatic sort at TransactionsList.setData()
-        if (!isDesc) {
-            expTransList = expTransList.sortAsc();
-        }
-
         // Send API sequest to server
         const trList = await api.transaction.list(params);
         assert(trList, 'Fail to read list of transactions');

@@ -7,16 +7,6 @@ import { UserCurrency } from './UserCurrency.js';
  */
 export class UserCurrencyList extends List {
     /**
-     * Assign new data to the list
-     * @param {Array} data - array of list items
-     */
-    setData(data) {
-        super.setData(data);
-
-        this.sort((a, b) => a.pos - b.pos);
-    }
-
-    /**
      * Create list item from specified object
      * @param {Object} obj
      */
@@ -32,5 +22,23 @@ export class UserCurrencyList extends List {
         }
 
         return this.find((item) => item.curr_id === currId);
+    }
+
+    defaultSort() {
+        this.sortByPosAsc();
+    }
+
+    /**
+     * Sort items by ascending position
+     */
+    sortByPosAsc() {
+        this.sort((a, b) => a.pos - b.pos);
+    }
+
+    /**
+     * Sort items by descending position
+     */
+    sortByPosDesc() {
+        this.sort((a, b) => b.pos - a.pos);
     }
 }

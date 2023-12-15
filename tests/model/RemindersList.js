@@ -172,14 +172,6 @@ export class RemindersList extends List {
         this.setData(data);
     }
 
-    sortAsc() {
-        return this.sortItems(this);
-    }
-
-    sortDesc() {
-        return this.sortItems(this, true);
-    }
-
     deleteTransactions(transactions) {
         const ids = asArray(transactions);
 

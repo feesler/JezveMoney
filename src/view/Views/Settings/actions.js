@@ -6,7 +6,7 @@ import { getListDataFromResponse, prepareRequest } from './helpers.js';
 import { actions } from './reducer.js';
 
 export const setListData = (data, keepState = false) => ({ dispatch }) => {
-    App.model.userCurrencies.setData(data);
+    App.setModelData('userCurrencies', data);
     dispatch(actions.listRequestLoaded(keepState));
 };
 
