@@ -1,14 +1,14 @@
 import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
+
+import { App } from '../../../Application.js';
 import {
     ConditionFields,
     ConditionOperators,
     conditions,
 } from '../../../model/ImportCondition.js';
 import { actions, ImportActionTypes } from '../../../model/ImportAction.js';
-import { App } from '../../../Application.js';
 import * as Actions from '../../actions/api/importrule.js';
-import { formatProps } from '../../../common.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);
@@ -16,46 +16,48 @@ const create = async () => {
     const taxiCondition = conditions.comment.includes.value('BANK MESSAGE');
     const taxiAction = actions.setComment('Rule');
 
-    const data = [{
-        conditions: [
-            conditions.mainAccount.isNot.value(App.scenario.CASH_RUB),
-        ],
-        actions: [taxiAction],
-    }, {
-        conditions: [
-            conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount),
-            conditions.comment.includes.value('BANK MESSAGE'),
-        ],
-        actions: [
-            actions.setTransactionType('transfer_out'),
-            actions.setComment('Bank'),
-        ],
-    }, {
-        conditions: [taxiCondition],
-        actions: [taxiAction],
-    }, {
-        conditions: [
-            conditions.mainAccount.is.value(App.scenario.ACCOUNT_3),
-            conditions.comment.includes.value('CREDIT LIMIT'),
-        ],
-        actions: [
-            actions.setTransactionType('limit'),
-        ],
-    }, {
-        conditions: [
-            conditions.comment.includes.value('R-BANK'),
-            conditions.comment.notIncludes.value('C2C'),
-        ],
-        actions: [
-            actions.setCategory(App.scenario.INVEST_CATEGORY),
-        ],
-    }];
+    const data = {
+        RULE_1: {
+            conditions: [
+                conditions.mainAccount.isNot.value(App.scenario.CASH_RUB),
+            ],
+            actions: [taxiAction],
+        },
+        RULE_2: {
+            conditions: [
+                conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount),
+                conditions.comment.includes.value('BANK MESSAGE'),
+            ],
+            actions: [
+                actions.setTransactionType('transfer_out'),
+                actions.setComment('Bank'),
+            ],
+        },
+        RULE_3: {
+            conditions: [taxiCondition],
+            actions: [taxiAction],
+        },
+        RULE_4: {
+            conditions: [
+                conditions.mainAccount.is.value(App.scenario.ACCOUNT_3),
+                conditions.comment.includes.value('CREDIT LIMIT'),
+            ],
+            actions: [
+                actions.setTransactionType('limit'),
+            ],
+        },
+        RULE_5: {
+            conditions: [
+                conditions.comment.includes.value('R-BANK'),
+                conditions.comment.notIncludes.value('C2C'),
+            ],
+            actions: [
+                actions.setCategory(App.scenario.INVEST_CATEGORY),
+            ],
+        },
+    };
 
-    [
-        App.scenario.RULE_1,
-        App.scenario.RULE_2,
-        App.scenario.RULE_3,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const createInvalid = async () => {
@@ -269,54 +271,59 @@ const createInvalid = async () => {
         ],
     }];
 
-    const res = await App.scenario.runner.runGroup(Actions.create, data);
-    // Double check all rules was not created
-    res.forEach((item, index) => {
-        assert(!item, `Created import rule with invalid data: { ${formatProps(data[index])} }`);
-    });
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created import rule using invalid data');
+    }, data);
 };
 
 const createWithChainedRequest = async () => {
     setBlock('Create import rule with chained request', 2);
 
-    const data = [{
-        conditions: [
-            conditions.comment.includes.value('Chained'),
-        ],
-        actions: [
-            actions.setComment('Chained rule'),
-        ],
-        returnState: {
-            importrules: {},
+    const data = {
+        RULE_CHAINED: {
+            conditions: [
+                conditions.comment.includes.value('Chained'),
+            ],
+            actions: [
+                actions.setComment('Chained rule'),
+            ],
+            returnState: {
+                importrules: {},
+            },
         },
-    }];
+    };
 
-    [
-        App.scenario.RULE_CHAINED,
-    ] = await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.createOneByOne(Actions.create, data);
 };
 
 const update = async () => {
+    setBlock('Update import rule', 2);
+
+    const data = [{
+        id: App.scenario.RULE_1,
+        conditions: [
+            conditions.mainAccount.is.value(App.scenario.CASH_RUB),
+            conditions.comment.includes.value('MARKET'),
+        ],
+        actions: [
+            actions.setTransactionType('transfer_in'),
+        ],
+    }];
+
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update import rule');
+    }, data);
+};
+
+const updateInvalid = async () => {
     setBlock('Update import rule', 2);
 
     const isDiffAmount = conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount);
     const setIncomingDebt = actions.setTransactionType('debt_in');
 
     const data = [{
-        id: App.scenario.RULE_1,
-        conditions: [{
-            field_id: ConditionFields.mainAccount,
-            operator: ConditionOperators.is,
-            value: App.scenario.CASH_RUB,
-        }, {
-            field_id: ConditionFields.comment,
-            operator: ConditionOperators.includes,
-            value: 'MARKET',
-        }],
-        actions: [
-            actions.setTransactionType('transfer_in'),
-        ],
-    }, {
         id: App.scenario.RULE_2,
         conditions: null,
         actions: [setIncomingDebt],
@@ -342,7 +349,10 @@ const update = async () => {
         actions: [null],
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(!res, 'Updated import rule using invalid data');
+    }, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -362,7 +372,10 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update import rule');
+    }, data);
 };
 
 const del = async () => {
@@ -399,6 +412,7 @@ export const apiImportRulesTests = {
         await createInvalid();
         await createWithChainedRequest();
         await update();
+        await updateInvalid();
         await updateWithChainedRequest();
         await del();
         await delWithChainedRequest();

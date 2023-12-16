@@ -190,11 +190,8 @@ export class MainView extends AppView {
         }
 
         this.model.summaryTab = 'accounts';
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.summaryWidget.showAccounts());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.summaryWidget.showAccounts());
     }
 
     async showPersonsTab() {
@@ -203,11 +200,8 @@ export class MainView extends AppView {
         }
 
         this.model.summaryTab = 'persons';
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.summaryWidget.showPersons());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.summaryWidget.showPersons());
     }
 
     async toggleHiddenAccounts() {
@@ -219,11 +213,8 @@ export class MainView extends AppView {
         assert(hiddenAccounts.length > 0, 'No hidden accounts');
 
         this.model.showHiddenAccounts = !this.model.showHiddenAccounts;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.summaryWidget.accountsTab.toggleHidden());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.summaryWidget.accountsTab.toggleHidden());
     }
 
     async goToNewTransactionByAccount(index) {
@@ -248,11 +239,8 @@ export class MainView extends AppView {
         assert(hiddenPersons.length > 0, 'No hidden persons');
 
         this.model.showHiddenPersons = !this.model.showHiddenPersons;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.summaryWidget.personsTab.toggleHidden());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.summaryWidget.personsTab.toggleHidden());
     }
 
     async goToNewTransactionByPerson(index) {

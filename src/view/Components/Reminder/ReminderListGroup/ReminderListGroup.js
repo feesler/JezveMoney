@@ -232,7 +232,7 @@ export class ReminderListGroup extends Component {
         const stateFilter = getStateFilter(state);
 
         if (stateFilter === REMINDER_UPCOMING && state.upcomingItems === null) {
-            this.store.dispatch(requestUpcoming({
+            this.dispatch(requestUpcoming({
                 ...getUpcomingRequestData(state),
                 keepState: true,
             }));
@@ -249,25 +249,25 @@ export class ReminderListGroup extends Component {
 
     /** Updates dialog state */
     update() {
-        this.store.dispatch(actions.update());
+        this.dispatch(actions.update());
     }
 
     /** Reset dialog state */
     reset() {
-        this.store.dispatch(actions.reset(this.props));
+        this.dispatch(actions.reset(this.props));
     }
 
     startLoading(isLoadingMore = false) {
-        this.store.dispatch(actions.startLoading(isLoadingMore));
+        this.dispatch(actions.startLoading(isLoadingMore));
     }
 
     stopLoading() {
-        this.store.dispatch(actions.stopLoading());
+        this.dispatch(actions.stopLoading());
     }
 
     /** Updates render time */
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     showContextMenu(itemId) {
@@ -277,7 +277,7 @@ export class ReminderListGroup extends Component {
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.toggleSelectItem(itemId));
         this.notifyUpdate();
     }
 
@@ -308,10 +308,10 @@ export class ReminderListGroup extends Component {
             return;
         }
 
-        this.store.dispatch(actions.changeStateFilter(stateFilter));
+        this.dispatch(actions.changeStateFilter(stateFilter));
 
         if (stateFilter === REMINDER_UPCOMING) {
-            this.store.dispatch(requestUpcoming({
+            this.dispatch(requestUpcoming({
                 ...getUpcomingRequestData(state),
                 keepState: true,
             }));
@@ -335,11 +335,11 @@ export class ReminderListGroup extends Component {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(range));
+        this.dispatch(actions.changeDateFilter(range));
 
         const state = this.store.getState();
         if (getStateFilter(state) === REMINDER_UPCOMING) {
-            this.store.dispatch(requestUpcoming({
+            this.dispatch(requestUpcoming({
                 ...getUpcomingRequestData(state),
                 range: 1,
                 page: 1,
@@ -366,11 +366,11 @@ export class ReminderListGroup extends Component {
     async onClearAllFilters(e) {
         e.preventDefault();
 
-        this.store.dispatch(actions.clearAllFilters());
+        this.dispatch(actions.clearAllFilters());
 
         const state = this.store.getState();
         if (getStateFilter(state) === REMINDER_UPCOMING) {
-            this.store.dispatch(requestUpcoming({
+            this.dispatch(requestUpcoming({
                 ...getUpcomingRequestData(state),
                 range: 1,
                 page: 1,
@@ -440,7 +440,7 @@ export class ReminderListGroup extends Component {
         const isUpcoming = getStateFilter(state) === REMINDER_UPCOMING;
 
         if (!isUpcoming) {
-            this.store.dispatch(actions.showMore());
+            this.dispatch(actions.showMore());
             this.setRenderTime();
             this.notifyUpdate();
             return;
@@ -453,7 +453,7 @@ export class ReminderListGroup extends Component {
         }
         range += 1;
 
-        this.store.dispatch(requestUpcoming({
+        this.dispatch(requestUpcoming({
             ...getUpcomingRequestData(state),
             range,
             page,
@@ -464,7 +464,7 @@ export class ReminderListGroup extends Component {
 
     /** Paginator 'change' event handler */
     onChangePage(page) {
-        this.store.dispatch(actions.changePage(page));
+        this.dispatch(actions.changePage(page));
         this.setRenderTime();
         this.notifyUpdate();
     }
@@ -476,7 +476,7 @@ export class ReminderListGroup extends Component {
             return;
         }
 
-        this.store.dispatch(actions.toggleMode());
+        this.dispatch(actions.toggleMode());
         this.setRenderTime();
         this.notifyUpdate();
     }

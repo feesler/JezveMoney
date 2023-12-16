@@ -212,13 +212,13 @@ class CategoryView extends AppView {
     /** Name input event handler */
     onNameInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeName(value));
+        this.dispatch(actions.changeName(value));
     }
 
     /** Color input event handler */
     onColorInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeColor(value));
+        this.dispatch(actions.changeColor(value));
     }
 
     /** Parent category select event handler */
@@ -227,7 +227,7 @@ class CategoryView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeParent(category.id));
+        this.dispatch(actions.changeParent(category.id));
     }
 
     /** Type select event handler */
@@ -236,7 +236,7 @@ class CategoryView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeType(type.id));
+        this.dispatch(actions.changeType(type.id));
     }
 
     /** Form submit event handler */
@@ -251,12 +251,12 @@ class CategoryView extends AppView {
         const { name, color } = state.data;
 
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('categories.invalidName')));
+            this.dispatch(actions.invalidateNameField(__('categories.invalidName')));
             this.nameField.focus();
         } else {
             const category = App.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
-                this.store.dispatch(actions.invalidateNameField(__('categories.existingName')));
+                this.dispatch(actions.invalidateNameField(__('categories.existingName')));
                 this.nameField.focus();
             }
         }
@@ -268,7 +268,7 @@ class CategoryView extends AppView {
             && state.original.id !== colorItems[0].id
             && parentId !== colorItems[0].id
         ) {
-            this.store.dispatch(actions.invalidateColorField());
+            this.dispatch(actions.invalidateColorField());
         }
 
         const { validation } = this.store.getState();
@@ -278,11 +278,11 @@ class CategoryView extends AppView {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     async submitCategory() {

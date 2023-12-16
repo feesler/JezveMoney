@@ -128,7 +128,7 @@ class PersonView extends AppView {
     /** Name input event handler */
     onNameInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeName(value));
+        this.dispatch(actions.changeName(value));
     }
 
     /** Form submit event handler */
@@ -142,12 +142,12 @@ class PersonView extends AppView {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('persons.invalidName')));
+            this.dispatch(actions.invalidateNameField(__('persons.invalidName')));
             this.nameField.focus();
         } else {
             const person = App.model.persons.findByName(name);
             if (person && state.original.id !== person.id) {
-                this.store.dispatch(actions.invalidateNameField(__('persons.existingName')));
+                this.dispatch(actions.invalidateNameField(__('persons.existingName')));
                 this.nameField.focus();
             }
         }
@@ -159,11 +159,11 @@ class PersonView extends AppView {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     async submitPerson() {

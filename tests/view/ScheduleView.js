@@ -635,11 +635,8 @@ export class ScheduleView extends AppView {
 
         this.model.listMenuVisible = false;
         this.items = ScheduledTransactionsList.create(this.items.map(selectItem));
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAll() {
@@ -651,11 +648,8 @@ export class ScheduleView extends AppView {
 
         this.model.listMenuVisible = false;
         this.items = ScheduledTransactionsList.create(this.items.map(deselectItem));
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Clicks by 'Show details' context menu item of specified transaction */

@@ -341,7 +341,6 @@ export class SelectReminderDialog extends TestComponent {
 
     onFilterUpdate() {
         this.model = this.updateModelFilter(this.model);
-        return this.getExpectedState();
     }
 
     getItems() {
@@ -441,7 +440,6 @@ export class SelectReminderDialog extends TestComponent {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
-        return this.getExpectedState();
     }
 
     setModelRange(model, range) {
@@ -471,7 +469,6 @@ export class SelectReminderDialog extends TestComponent {
 
     onRangeChanged(range) {
         this.model = this.setModelRange(this.model, range);
-        return this.getExpectedState();
     }
 
     onListUpdated(model = this.model) {
@@ -511,8 +508,6 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         this.model = res;
-
-        return this.getExpectedState();
     }
 
     getSourceItems(model = this.model) {
@@ -594,11 +589,10 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         this.model.filtersVisible = true;
-        const expected = this.getExpectedState();
 
-        await this.waitForAnimation(() => this.content.filtersBtn.click());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForAnimation(() => this.content.filtersBtn.click())
+        ));
     }
 
     async closeFilters() {
@@ -607,16 +601,15 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         this.model.filtersVisible = false;
-        const expected = this.getExpectedState();
 
-        const { closeFiltersBtn } = this.content;
-        if (closeFiltersBtn.visible) {
-            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
-        } else {
-            await this.waitForAnimation(() => this.content.filtersBtn.click());
-        }
-
-        return this.checkState(expected);
+        return this.runTestAction(async () => {
+            const { closeFiltersBtn } = this.content;
+            if (closeFiltersBtn.visible) {
+                await this.waitForAnimation(() => click(closeFiltersBtn.elem));
+            } else {
+                await this.waitForAnimation(() => this.content.filtersBtn.click());
+            }
+        });
     }
 
     async clearAllFilters() {
@@ -627,11 +620,11 @@ export class SelectReminderDialog extends TestComponent {
             startDate: null,
             endDate: null,
         };
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => click(this.content.clearFiltersBtn.elem));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => click(this.content.clearFiltersBtn.elem))
+        ));
     }
 
     async filterByState(state) {
@@ -647,11 +640,11 @@ export class SelectReminderDialog extends TestComponent {
         this.model.filter.state = stateType;
         this.model.list.page = 1;
         this.model.list.range = 1;
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.stateMenu.selectItemByValue(state));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.stateMenu.selectItemByValue(state))
+        ));
     }
 
     async selectStartDateFilter(value) {
@@ -664,11 +657,11 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         this.model.filter.startDate = startDate;
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.dateFilter.selectStart(date));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.dateFilter.selectStart(date))
+        ));
     }
 
     async selectEndDateFilter(value) {
@@ -681,33 +674,33 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         this.model.filter.endDate = endDate;
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.dateFilter.selectEnd(date));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.dateFilter.selectEnd(date))
+        ));
     }
 
     async clearStartDateFilter() {
         await this.openFilters();
 
         this.model.filter.startDate = null;
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.dateFilter.clearStart());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.dateFilter.clearStart())
+        ));
     }
 
     async clearEndDateFilter() {
         await this.openFilters();
 
         this.model.filter.endDate = null;
-        const expected = this.onFilterUpdate();
+        this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.dateFilter.clearEnd());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.dateFilter.clearEnd())
+        ));
     }
 
     async goToFirstPage() {
@@ -716,11 +709,11 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         await this.closeFilters();
-        const expected = this.onPageChanged(1);
+        this.onPageChanged(1);
 
-        await this.waitForList(() => this.content.paginator.goToFirstPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.paginator.goToFirstPage())
+        ));
     }
 
     async goToLastPage() {
@@ -729,44 +722,44 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         await this.closeFilters();
-        const expected = this.onPageChanged(this.pagesCount());
+        this.onPageChanged(this.pagesCount());
 
-        await this.waitForList(() => this.content.paginator.goToLastPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.paginator.goToLastPage())
+        ));
     }
 
     async goToPrevPage() {
         assert(!this.isFirstPage(), 'Can\'t go to previous page');
 
         await this.closeFilters();
-        const expected = this.onPageChanged(this.currentPage() - 1);
+        this.onPageChanged(this.currentPage() - 1);
 
-        await this.waitForList(() => this.content.paginator.goToPrevPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.paginator.goToPrevPage())
+        ));
     }
 
     async goToNextPage() {
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
         await this.closeFilters();
-        const expected = this.onPageChanged(this.currentPage() + 1);
+        this.onPageChanged(this.currentPage() + 1);
 
-        await this.waitForList(() => this.content.paginator.goToNextPage());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.paginator.goToNextPage())
+        ));
     }
 
     async showMore() {
         assert(!this.isLastPage(), 'Can\'t show more items');
 
         await this.closeFilters();
-        const expected = this.onRangeChanged(this.currentRange() + 1);
+        this.onRangeChanged(this.currentRange() + 1);
 
-        await this.waitForList(() => click(this.content.showMoreBtn.elem));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => click(this.content.showMoreBtn.elem))
+        ));
     }
 
     async toggleMode() {
@@ -776,11 +769,10 @@ export class SelectReminderDialog extends TestComponent {
 
         this.model.detailsMode = !this.model.detailsMode;
         const mode = (this.model.detailsMode) ? 'details' : 'classic';
-        const expected = this.getExpectedState();
 
-        await this.waitForList(() => this.content.modeSelector.selectItemByValue(mode));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForList(() => this.content.modeSelector.selectItemByValue(mode))
+        ));
     }
 
     async setClassicMode(directNavigate = false) {

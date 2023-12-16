@@ -2,16 +2,6 @@ import { SortableList } from './SortableList.js';
 import { UserCurrency } from './UserCurrency.js';
 
 export class UserCurrencyList extends SortableList {
-    /**
-     * Assign new data to the list
-     * @param {Array} data - array of list items
-     */
-    setData(data) {
-        super.setData(data);
-
-        this.defaultSort();
-    }
-
     defaultSort() {
         this.sort((a, b) => a.pos - b.pos);
     }

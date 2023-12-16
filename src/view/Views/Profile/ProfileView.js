@@ -206,13 +206,13 @@ class ProfileView extends AppView {
     }
 
     setAction(action) {
-        this.store.dispatch(actions.changeAction(action));
+        this.dispatch(actions.changeAction(action));
     }
 
     onNameChanged(value) {
         App.model.profile.name = value;
         this.header.setUserName(value);
-        this.store.dispatch(actions.changeUserName(value));
+        this.dispatch(actions.changeUserName(value));
     }
 
     /** Send delete profile API request */

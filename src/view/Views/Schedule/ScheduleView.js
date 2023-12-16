@@ -187,7 +187,7 @@ class ScheduleView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.store.dispatch(setListMode('list')),
+            onClick: () => this.dispatch(setListMode('list')),
         });
         this.createBtn.elem.after(this.listModeBtn.elem);
 
@@ -229,20 +229,20 @@ class ScheduleView extends AppView {
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
+        this.dispatch(actions.hideMenu());
     }
 
     showMore() {
-        this.store.dispatch(actions.showMore());
+        this.dispatch(actions.showMore());
         this.setRenderTime();
     }
 
     onChangePage(page) {
-        this.store.dispatch(actions.changePage(page));
+        this.dispatch(actions.changePage(page));
         this.setRenderTime();
     }
 
@@ -252,7 +252,7 @@ class ScheduleView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.toggleMode());
+        this.dispatch(actions.toggleMode());
         this.setRenderTime();
     }
 
@@ -282,36 +282,36 @@ class ScheduleView extends AppView {
     }
 
     showDetails() {
-        this.store.dispatch(actions.showDetails());
+        this.dispatch(actions.showDetails());
     }
 
     closeDetails() {
-        this.store.dispatch(actions.closeDetails());
+        this.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.store.dispatch(actions.selectAllItems());
+        this.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
+        this.dispatch(actions.deselectAllItems());
     }
 
     /** Updates render time */
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     renderDeleteConfirmDialog(state, prevState) {
@@ -333,8 +333,8 @@ class ScheduleView extends AppView {
             id: 'delete_warning',
             title: (multiple) ? __('schedule.deleteMultiple') : __('schedule.delete'),
             content: (multiple) ? __('schedule.deleteMultipleMessage') : __('schedule.deleteMessage'),
-            onConfirm: () => this.store.dispatch(deleteItems()),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(deleteItems()),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -346,7 +346,7 @@ class ScheduleView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = ScheduleItemContextMenu.create({
                 id: 'contextMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -374,7 +374,7 @@ class ScheduleView extends AppView {
             this.menu = ScheduleMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

@@ -472,11 +472,8 @@ export class SettingsView extends AppView {
 
         this.model.listMenuVisible = false;
         this.onSelectAllCurrencies();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAllCurrencies() {
@@ -488,11 +485,8 @@ export class SettingsView extends AppView {
 
         this.model.listMenuVisible = false;
         this.onDeselectAllCurrencies();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Delete secified currency from context menu */

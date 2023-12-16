@@ -139,6 +139,7 @@ export class AppState {
         }
         const transactions = state.transactions?.items ?? state.transactions;
         this.transactions.setData(transactions);
+        this.transactions.defaultSort();
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.schedule) {
@@ -182,6 +183,7 @@ export class AppState {
         }
         const userCurrencies = state.userCurrencies?.data ?? state.userCurrencies;
         this.userCurrencies.setData(userCurrencies);
+        this.userCurrencies.defaultSort();
         this.userCurrencies.autoincrement = state.userCurrencies.autoincrement;
     }
 
@@ -601,10 +603,6 @@ export class AppState {
             items = items.getPage(targetPage, onPage, targetRange, isDesc);
         }
 
-        if (!isDesc) {
-            items = items.sortAsc();
-        }
-
         const res = {
             items: this.getNoDatesList(items),
             filter: this.transactions.getFilter(request),
@@ -825,6 +823,7 @@ export class AppState {
 
         const ind = this.userCurrencies.create(data);
         const item = this.userCurrencies.getItemByIndex(ind);
+        this.userCurrencies.defaultSort();
 
         return (item) ? this.returnState(params.returnState, { id: item.id }) : false;
     }
@@ -847,6 +846,7 @@ export class AppState {
 
         // Prepare expected updates of user currencies list
         const res = this.userCurrencies.update(expectedItem);
+        this.userCurrencies.defaultSort();
 
         return (res) ? this.returnState(params.returnState) : false;
     }
@@ -2941,7 +2941,7 @@ export class AppState {
 
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
             const targetProp = ImportTemplate.columnsMap[columnName];
-            if (request[columnName]) {
+            if (columnName in request) {
                 res.columns[targetProp] = request[columnName];
             }
         });
@@ -2993,7 +2993,7 @@ export class AppState {
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
             const targetProp = ImportTemplate.columnsMap[columnName];
 
-            if (params[columnName]) {
+            if (columnName in params) {
                 expTemplate.columns[targetProp] = params[columnName];
             }
 
@@ -3016,7 +3016,7 @@ export class AppState {
         if (params.columns) {
             Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
                 const targetProp = ImportTemplate.columnsMap[columnName];
-                if (params.columns && params.columns[targetProp]) {
+                if (params.columns && (targetProp in params.columns)) {
                     expTemplate.columns[targetProp] = params.columns[targetProp];
                 }
             });

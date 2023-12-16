@@ -1110,11 +1110,7 @@ export class ImportView extends AppView {
     async deleteRule(index) {
         this.checkRulesListState();
 
-        this.expectedState = this.getExpectedState();
-
-        await this.performAction(() => this.rulesDialog.deleteRule(index));
-
-        return this.checkState();
+        return this.runTestAction(() => this.rulesDialog.deleteRule(index));
     }
 
     async addRuleCondition() {
@@ -1192,21 +1188,13 @@ export class ImportView extends AppView {
     async submitRule() {
         this.checkRulesFormState();
 
-        this.expectedState = this.getExpectedState();
-
-        await this.performAction(() => this.rulesDialog.submitRule());
-
-        return this.checkState();
+        return this.runTestAction(() => this.rulesDialog.submitRule());
     }
 
     async cancelRule() {
         this.checkRulesFormState();
 
-        this.expectedState = this.getExpectedState();
-
-        await this.performAction(() => this.rulesDialog.cancelRule());
-
-        return this.checkState();
+        return this.runTestAction(() => this.rulesDialog.cancelRule());
     }
 
     getRulesState() {

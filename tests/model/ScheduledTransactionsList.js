@@ -84,14 +84,6 @@ export class ScheduledTransactionsList extends List {
         this.setData(data);
     }
 
-    sortAsc() {
-        return this.sortItems(this);
-    }
-
-    sortDesc() {
-        return this.sortItems(this, true);
-    }
-
     getLongestInterval() {
         let maxDays = 0;
         let res = null;

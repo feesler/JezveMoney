@@ -78,9 +78,8 @@ export const updateList = (state, options = {}) => {
     }
 
     const list = ReminderList.create(items);
-    if (stateFilter === REMINDER_UPCOMING) {
-        list.sortByDateAsc();
-    }
+    list.defaultSort(stateFilter !== REMINDER_UPCOMING);
+
     result.items = list;
 
     if (stateFilter !== REMINDER_UPCOMING) {

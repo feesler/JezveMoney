@@ -1220,11 +1220,7 @@ export class ReminderListView extends AppView {
         const sourceItems = this.getSourceItems();
         this.setSourceItems(sourceItems.map(selectItem));
 
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAll() {
@@ -1238,11 +1234,7 @@ export class ReminderListView extends AppView {
         const sourceItems = this.getSourceItems();
         this.setSourceItems(sourceItems.map(deselectItem));
 
-        const expected = this.getExpectedState();
-
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Clicks by 'Show details' context menu item of specified transaction */

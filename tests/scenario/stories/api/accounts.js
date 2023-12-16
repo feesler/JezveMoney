@@ -38,6 +38,15 @@ const create = async () => {
             initbalance: 10.5,
             icon_id: 5,
         },
+        ACC_EXCESS_PROPS: {
+            type: ACCOUNT_TYPE_OTHER,
+            name: 'acc tst',
+            curr_id: USD,
+            initbalance: 10.5,
+            icon_id: 5,
+            xxx: 1,
+            yyy: 2,
+        },
     };
 
     await App.scenario.createOneByOne(Actions.create, data);
@@ -94,15 +103,6 @@ const createInvalid = async () => {
         name: 'acc tst',
         initbalance: 10.5,
     }, {
-        // Excess properties
-        type: ACCOUNT_TYPE_OTHER,
-        name: 'acc tst',
-        curr_id: USD,
-        initbalance: 10.5,
-        icon_id: 5,
-        xxx: 1,
-        yyy: 2,
-    }, {
         // Empty name
         type: ACCOUNT_TYPE_OTHER,
         name: '',
@@ -132,7 +132,10 @@ const createInvalid = async () => {
         icon_id: 5,
     }];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created account using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
@@ -244,7 +247,10 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created multiple accounts using invalid data');
+    }, data);
 };
 
 const read = async () => {
@@ -287,9 +293,10 @@ const update = async () => {
         type: ACCOUNT_TYPE_CREDIT,
     }];
 
-    const res = await App.scenario.runner.runGroup(Actions.update, data);
-    // Double check all accounts are updated
-    res.forEach((item) => assert(item, 'Failed to update account'));
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update account');
+    }, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -309,9 +316,10 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    const res = await App.scenario.runner.runGroup(Actions.update, data);
-    // Double check all accounts are created
-    res.forEach((item) => assert(item, 'Failed to create account'));
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update account');
+    }, data);
 };
 
 const updateInvalid = async () => {
@@ -323,7 +331,10 @@ const updateInvalid = async () => {
         name: 'acc rub',
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(!res, 'Updated account using invalid data');
+    }, data);
 };
 
 const setPos = async () => {

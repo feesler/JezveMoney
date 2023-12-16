@@ -243,7 +243,7 @@ class AccountView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeType(obj.id));
+        this.dispatch(actions.changeType(obj.id));
     }
 
     /** Icon select event handler */
@@ -252,7 +252,7 @@ class AccountView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeIcon(obj.id));
+        this.dispatch(actions.changeIcon(obj.id));
     }
 
     /** Currency select event handler */
@@ -261,25 +261,25 @@ class AccountView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeCurrency(obj.id));
+        this.dispatch(actions.changeCurrency(obj.id));
     }
 
     /** Initial balance input event handler */
     onInitBalanceInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeInitialBalance(value));
+        this.dispatch(actions.changeInitialBalance(value));
     }
 
     /** Limit input event handler */
     onLimitInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeLimit(value));
+        this.dispatch(actions.changeLimit(value));
     }
 
     /** Account name input event handler */
     onNameInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeName(value));
+        this.dispatch(actions.changeName(value));
     }
 
     /** Form submit event handler */
@@ -293,24 +293,24 @@ class AccountView extends AppView {
 
         const { name, initbalance, initlimit } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(__('accounts.invalidName')));
+            this.dispatch(actions.invalidateNameField(__('accounts.invalidName')));
             this.nameField.focus();
         } else {
             const account = App.model.accounts.findByName(name);
             if (account && state.original.id !== account.id) {
-                this.store.dispatch(actions.invalidateNameField(__('accounts.existingName')));
+                this.dispatch(actions.invalidateNameField(__('accounts.existingName')));
                 this.nameField.focus();
             }
         }
 
         if (initbalance.length === 0) {
-            this.store.dispatch(actions.invalidateInitialBalanceField());
+            this.dispatch(actions.invalidateInitialBalanceField());
             this.initBalanceField.input.elem.focus();
         }
 
         const isCreditCard = Account.isCreditCard(state.data.type);
         if (isCreditCard && initlimit.length === 0) {
-            this.store.dispatch(actions.invalidateLimitField());
+            this.dispatch(actions.invalidateLimitField());
             this.initLimitField.input.elem.focus();
         }
 
@@ -358,11 +358,11 @@ class AccountView extends AppView {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     async deleteAccount() {

@@ -1,10 +1,9 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
-import { formatDate } from '@jezvejs/datetime';
+import { formatDate, getWeek } from '@jezvejs/datetime';
 import {
     createCSV,
     cutDate,
-    getWeek,
     dateToSeconds,
     secondsToDate,
     MONTHS_IN_YEAR,
@@ -163,8 +162,8 @@ export class TransactionsList extends SortableList {
         return api.transaction.list();
     }
 
-    setData(data) {
-        super.setData(this.sortItems(data, true));
+    defaultSort() {
+        this.setData(this.sortItems(this, true));
     }
 
     getExpectedPos(params) {
@@ -243,7 +242,7 @@ export class TransactionsList extends SortableList {
         assert.instanceOf(accountsList, AccountsList, 'Invalid accounts list specified');
 
         let accounts = accountsList.toInitial();
-        const list = this.sortAsc();
+        const list = this.sortItems(this, false);
 
         for (const trans of list) {
             accounts = AccountsList.applyTransaction(accounts, trans);
@@ -266,6 +265,7 @@ export class TransactionsList extends SortableList {
         }
 
         this.setData(list);
+        this.defaultSort();
     }
 
     // Filter list of transactions by specified types
@@ -425,12 +425,16 @@ export class TransactionsList extends SortableList {
         return TransactionsList.create(items);
     }
 
-    filterItems(list, par) {
+    filterItems(list, params = {}) {
         let res = list;
-        const params = par || {};
 
         const isDesc = params.order?.toLowerCase() === 'desc';
-        res = this.sortItems(res, isDesc);
+
+        if (params.orderByDate) {
+            res = this.sortItemsByDate(res, isDesc);
+        } else {
+            res = this.sortItems(res, isDesc);
+        }
 
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
@@ -478,16 +482,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        let res = TransactionsList.create(items);
-        // Sort again if asc order was requested
-        // TODO: think how to avoid automatic sort at setData()
-        const isDesc = params.order?.toLowerCase() === 'desc';
-        if (params.orderByDate) {
-            res = this.sortItemsByDate(res, isDesc);
-        } else if (!isDesc) {
-            res = res.sortAsc();
-        }
-
+        const res = TransactionsList.create(items);
         return res;
     }
 
@@ -535,14 +530,6 @@ export class TransactionsList extends SortableList {
             const diff = (a.date - b.date);
             return (diff === 0) ? (a.pos - b.pos) : diff;
         });
-    }
-
-    sortAsc() {
-        return this.sortItems(this);
-    }
-
-    sortDesc() {
-        return this.sortItems(this, true);
     }
 
     getExpectedPages(list, limit) {
@@ -613,7 +600,7 @@ export class TransactionsList extends SortableList {
             __('transactions.comment'),
         ];
 
-        const data = this.sortAsc().map((transaction) => [
+        const data = this.sortItems(this, false).map((transaction) => [
             transaction.id,
             Transaction.typeToString(transaction.type),
             App.currency.format(transaction.src_curr, transaction.src_amount),

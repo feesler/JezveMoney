@@ -1,7 +1,9 @@
+import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
+
 import { App } from '../../../Application.js';
-import * as Actions from '../../actions/api/importtemplate.js';
 import { IMPORT_DATE_LOCALE } from '../../../model/ImportTemplate.js';
+import * as Actions from '../../actions/api/importtemplate.js';
 
 const create = async () => {
     setBlock('Create import template', 2);
@@ -79,7 +81,7 @@ const createWithChainedRequest = async () => {
 const createInvalid = async () => {
     setBlock('Create import template with invalid data', 2);
 
-    const invData = [{
+    const data = [{
         // Invalid templates
         name: 'Invalid template',
     }, {
@@ -107,51 +109,58 @@ const createInvalid = async () => {
         comment_col: 6,
     }];
 
-    await App.scenario.runner.runGroup(Actions.create, invData);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created import template using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
     setBlock('Create multiple import templates', 2);
 
-    const data = [{
-        name: 'Template 10',
-        type_id: 0,
-        first_row: 2,
-        date_locale: IMPORT_DATE_LOCALE,
-        account_id: App.scenario.CASH_RUB,
-        account_amount_col: 1,
-        account_curr_col: 2,
-        trans_amount_col: 3,
-        trans_curr_col: 4,
-        date_col: 5,
-        comment_col: 6,
-    }, {
-        name: 'Template 11',
-        type_id: 1,
-        first_row: 2,
-        date_locale: IMPORT_DATE_LOCALE,
-        account_id: 0,
-        account_amount_col: 7,
-        account_curr_col: 6,
-        trans_amount_col: 5,
-        trans_curr_col: 4,
-        date_col: 3,
-        comment_col: 2,
-    }, {
-        name: 'Template 12',
-        type_id: 1,
-        first_row: 2,
-        date_locale: 'en',
-        account_id: App.scenario.ACCOUNT_1,
-        account_amount_col: 1,
-        account_curr_col: 2,
-        trans_amount_col: 1,
-        trans_curr_col: 2,
-        date_col: 5,
-        comment_col: 6,
-    }];
+    const data = {
+        TEMPLATE_10: {
+            name: 'Template 10',
+            type_id: 0,
+            first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
+            account_id: App.scenario.CASH_RUB,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 3,
+            trans_curr_col: 4,
+            date_col: 5,
+            comment_col: 6,
+        },
+        TEMPLATE_11: {
+            name: 'Template 11',
+            type_id: 1,
+            first_row: 2,
+            date_locale: IMPORT_DATE_LOCALE,
+            account_id: 0,
+            account_amount_col: 7,
+            account_curr_col: 6,
+            trans_amount_col: 5,
+            trans_curr_col: 4,
+            date_col: 3,
+            comment_col: 2,
+        },
+        TEMPLATE_12: {
+            name: 'Template 12',
+            type_id: 1,
+            first_row: 2,
+            date_locale: 'en',
+            account_id: App.scenario.ACCOUNT_1,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 1,
+            trans_curr_col: 2,
+            date_col: 5,
+            comment_col: 6,
+        },
+    };
 
-    await Actions.create(data);
+    await App.scenario.createMultiple(Actions, data);
 };
 
 const createMultipleWithChainedRequest = async () => {
@@ -197,7 +206,7 @@ const createMultipleWithChainedRequest = async () => {
 const createMultipleInvalid = async () => {
     setBlock('Create multiple import templates with invalid data', 2);
 
-    const invData = [
+    const data = [
         null,
         {},
         { data: null },
@@ -231,7 +240,10 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.create, invData);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created multiple import templates using invalid data');
+    }, data);
 };
 
 const update = async () => {
@@ -245,7 +257,10 @@ const update = async () => {
         comment_col: 8,
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update import template');
+    }, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -261,7 +276,10 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update import template');
+    }, data);
 };
 
 const updateInvalid = async () => {
@@ -282,7 +300,10 @@ const updateInvalid = async () => {
         account_id: App.scenario.API_USER_ACC_RUB,
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(!res, 'Updated import template using invalid data');
+    }, data);
 };
 
 const del = async () => {

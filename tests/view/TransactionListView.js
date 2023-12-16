@@ -704,14 +704,11 @@ export class TransactionListView extends AppView {
         const item = this.content.transList.items[num];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
-        const expected = this.getExpectedState();
 
-        await this.performAction(async () => {
+        return this.runTestAction(async () => {
             await item.clickMenu();
             return wait('[data-id="ctxDeleteBtn"]', { visible: true });
         });
-
-        return this.checkState(expected);
     }
 
     async openListMenu() {
@@ -720,30 +717,24 @@ export class TransactionListView extends AppView {
         await this.closeFilters();
 
         this.model.listMenuVisible = true;
-        const expected = this.getExpectedState();
 
-        await this.performAction(async () => {
+        return this.runTestAction(async () => {
             assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: true });
         });
-
-        return this.checkState(expected);
     }
 
     async closeListMenu() {
         assert(this.listMenu?.visible, 'List menu not opened');
 
         this.model.listMenuVisible = false;
-        const expected = this.getExpectedState();
 
-        await this.performAction(async () => {
+        return this.runTestAction(async () => {
             assert(this.content.menuBtn.visible, 'Menu button not visible');
             await click(this.content.menuBtn.elem);
             return wait(listMenuSelector, { visible: false });
         });
-
-        return this.checkState(expected);
     }
 
     async changeListMode(listMode) {
@@ -762,17 +753,16 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.listMode = listMode;
-        const expected = this.getExpectedState();
 
-        if (listMode === 'list') {
-            await this.waitForList(() => this.content.listModeBtn.click());
-        } else if (listMode === 'select') {
-            await this.waitForList(() => this.listMenu.select('selectModeBtn'));
-        } else if (listMode === 'sort') {
-            await this.waitForList(() => this.listMenu.select('sortModeBtn'));
-        }
-
-        return this.checkState(expected);
+        return this.runTestAction(async () => {
+            if (listMode === 'list') {
+                await this.waitForList(() => this.content.listModeBtn.click());
+            } else if (listMode === 'select') {
+                await this.waitForList(() => this.listMenu.select('selectModeBtn'));
+            } else if (listMode === 'sort') {
+                await this.waitForList(() => this.listMenu.select('sortModeBtn'));
+            }
+        });
     }
 
     async setListMode() {
@@ -811,11 +801,10 @@ export class TransactionListView extends AppView {
         }
 
         this.model.filtersVisible = true;
-        const expected = this.getExpectedState();
 
-        await this.waitForAnimation(() => this.content.filtersBtn.click());
-
-        return this.checkState(expected);
+        return this.runTestAction(() => (
+            this.waitForAnimation(() => this.content.filtersBtn.click())
+        ));
     }
 
     async closeFilters() {
@@ -824,16 +813,15 @@ export class TransactionListView extends AppView {
         }
 
         this.model.filtersVisible = false;
-        const expected = this.getExpectedState();
 
-        const { closeFiltersBtn } = this.content;
-        if (closeFiltersBtn.visible) {
-            await this.waitForAnimation(() => click(closeFiltersBtn.elem));
-        } else {
-            await this.waitForAnimation(() => this.content.filtersBtn.click());
-        }
-
-        return this.checkState(expected);
+        return this.runTestAction(async () => {
+            const { closeFiltersBtn } = this.content;
+            if (closeFiltersBtn.visible) {
+                await this.waitForAnimation(() => click(closeFiltersBtn.elem));
+            } else {
+                await this.waitForAnimation(() => this.content.filtersBtn.click());
+            }
+        });
     }
 
     async clearAllFilters(directNavigate = false) {
@@ -1542,11 +1530,8 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(selectItem);
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAll() {
@@ -1558,11 +1543,8 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(deselectItem);
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Clicks by 'Show details' context menu item of specified transaction */

@@ -1,4 +1,6 @@
 import { setBlock } from 'jezve-test';
+import { assert } from '@jezvejs/assert';
+
 import { App } from '../../../Application.js';
 import * as Actions from '../../actions/api/person.js';
 
@@ -56,7 +58,10 @@ const createInvalid = async () => {
         flags: 1,
     }];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created person using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
@@ -120,7 +125,10 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created multiple persons using invalid data');
+    }, data);
 };
 
 const read = async () => {

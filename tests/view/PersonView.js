@@ -125,10 +125,8 @@ export class PersonView extends AppView {
 
     async inputName(val) {
         this.model.name = val;
-        this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.name.input(val));
-        return this.checkState();
+        return this.runTestAction(() => this.content.name.input(val));
     }
 
     async submit() {

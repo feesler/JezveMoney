@@ -121,15 +121,15 @@ class TransactionView extends AppView {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     onTransactionChange(transaction) {
-        this.store.dispatch(actions.changeTransaction(transaction));
+        this.dispatch(actions.changeTransaction(transaction));
     }
 
     async submitTransaction(request) {

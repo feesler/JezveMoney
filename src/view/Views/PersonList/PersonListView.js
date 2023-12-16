@@ -175,7 +175,7 @@ class PersonListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.store.dispatch(setListMode('list')),
+            onClick: () => this.dispatch(setListMode('list')),
         });
         this.createBtn.elem.after(this.listModeBtn.elem);
 
@@ -193,16 +193,16 @@ class PersonListView extends AppView {
         this.subscribeToStore(this.store);
 
         if (this.props.detailsId) {
-            this.store.dispatch(requestItem());
+            this.dispatch(requestItem());
         }
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
+        this.dispatch(actions.hideMenu());
     }
 
     onItemClick(itemId, e) {
@@ -224,31 +224,31 @@ class PersonListView extends AppView {
     }
 
     closeDetails() {
-        this.store.dispatch(actions.closeDetails());
+        this.dispatch(actions.closeDetails());
     }
 
     hideExportDialog() {
-        this.store.dispatch(actions.hideExportDialog());
+        this.dispatch(actions.hideExportDialog());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.store.dispatch(actions.selectAllItems());
+        this.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.store.dispatch(actions.deselectAllItems());
+        this.dispatch(actions.deselectAllItems());
     }
 
     onSort(info) {
@@ -267,7 +267,7 @@ class PersonListView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.store.dispatch(sendChangePosRequest(item.id, pos));
+        this.dispatch(sendChangePosRequest(item.id, pos));
     }
 
     renderDeleteConfirmDialog(state, prevState) {
@@ -289,8 +289,8 @@ class PersonListView extends AppView {
             id: 'delete_warning',
             title: (multiple) ? __('persons.deleteMultiple') : __('persons.delete'),
             content: (multiple) ? __('persons.deleteMultipleMessage') : __('persons.deleteMessage'),
-            onConfirm: () => this.store.dispatch(deleteItems()),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(deleteItems()),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -302,7 +302,7 @@ class PersonListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = PersonListContextMenu.create({
                 id: 'contextMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -330,7 +330,7 @@ class PersonListView extends AppView {
         if (!this.menu) {
             this.menu = PersonListMainMenu.create({
                 id: 'listMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 attachTo: this.menuButton.elem,
                 onClose: () => this.hideMenu(),
             });

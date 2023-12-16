@@ -104,13 +104,13 @@ export class ImportTemplateManager extends Component {
             id: 'createTplBtn',
             className: CREATE_BTN_CLASS,
             icon: 'plus',
-            onClick: () => this.store.dispatch(createTemplate()),
+            onClick: () => this.dispatch(createTemplate()),
         });
 
         // Template select
         this.templateSelect = TemplateSelect.create({
             onChange: (tpl) => this.onTemplateChange(tpl),
-            dispatch: (action) => this.store.dispatch(action),
+            dispatch: (action) => this.dispatch(action),
         });
 
         // Feedback element
@@ -144,8 +144,8 @@ export class ImportTemplateManager extends Component {
             rawData: this.props.rawData,
             template: this.props.template,
             listLoading: this.props.listLoading,
-            onSubmit: (request) => this.store.dispatch(requestSubmitTemplate(request)),
-            onCancel: () => this.store.dispatch(cancelTemplate()),
+            onSubmit: (request) => this.dispatch(requestSubmitTemplate(request)),
+            onCancel: () => this.dispatch(cancelTemplate()),
         });
 
         // Main account select
@@ -153,7 +153,7 @@ export class ImportTemplateManager extends Component {
             id: 'initialAccount',
             enableFilter: true,
             noResultsMessage: __('notFound'),
-            onChange: (account) => this.store.dispatch(changeMainAccount(account.id)),
+            onChange: (account) => this.dispatch(changeMainAccount(account.id)),
         });
         App.initAccountsList(this.accountDropDown);
         this.accountDropDown.setSelection(this.props.mainAccount.id);
@@ -202,11 +202,11 @@ export class ImportTemplateManager extends Component {
     }
 
     show() {
-        this.store.dispatch(actions.show());
+        this.dispatch(actions.show());
     }
 
     hide() {
-        this.store.dispatch(actions.hide());
+        this.dispatch(actions.hide());
     }
 
     onSubmit() {
@@ -238,17 +238,17 @@ export class ImportTemplateManager extends Component {
 
     /** Reset component state */
     reset() {
-        this.store.dispatch(actions.reset());
+        this.dispatch(actions.reset());
     }
 
     /** Show/hide loading indication */
     setLoading() {
-        this.store.dispatch(actions.setLoading());
+        this.dispatch(actions.setLoading());
     }
 
     /** Copy specified data to component */
     setRawData(data) {
-        this.store.dispatch(setRawData(data));
+        this.dispatch(setRawData(data));
     }
 
     /** Main account update handler */
@@ -257,7 +257,7 @@ export class ImportTemplateManager extends Component {
             throw new Error('Invalid account');
         }
 
-        this.store.dispatch(actions.setMainAccount(mainAccount));
+        this.dispatch(actions.setMainAccount(mainAccount));
     }
 
     /** Import template select 'change' event handler */
@@ -271,12 +271,12 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
-        this.store.dispatch(setTemplate(selectedTemplate.id));
-        this.store.dispatch(actions.selectTemplate(selectedTemplate.id));
+        this.dispatch(setTemplate(selectedTemplate.id));
+        this.dispatch(actions.selectTemplate(selectedTemplate.id));
     }
 
     startListLoading(formRequest = null) {
-        this.store.dispatch(actions.startListLoading(formRequest));
+        this.dispatch(actions.startListLoading(formRequest));
     }
 
     /** Set feedback for specified element */
@@ -342,8 +342,8 @@ export class ImportTemplateManager extends Component {
             id: 'tpl_delete_warning',
             title: __('import.templates.delete'),
             content: __('import.templates.deleteMessage'),
-            onConfirm: () => this.store.dispatch(requestDeleteTemplate()),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(requestDeleteTemplate()),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 

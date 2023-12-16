@@ -645,11 +645,8 @@ export class CategoryListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.items = this.model.items.map((item) => ({ ...item, selected: true }));
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('selectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
 
     async deselectAll() {
@@ -659,11 +656,8 @@ export class CategoryListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.onDeselectAll();
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.listMenu.select('deselectAllBtn'));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }
 
     /** Delete secified category from context menu */

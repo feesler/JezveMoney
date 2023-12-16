@@ -70,7 +70,7 @@ export class ImportRulesDialog extends Component {
             id: 'createRuleBtn',
             className: CREATE_BTN_CLASS,
             icon: 'plus',
-            onClick: () => this.store.dispatch(actions.createRule()),
+            onClick: () => this.dispatch(actions.createRule()),
         });
 
         // Header
@@ -178,7 +178,7 @@ export class ImportRulesDialog extends Component {
 
     /** Reset dialog state */
     reset() {
-        this.store.dispatch(actions.reset(this.props));
+        this.dispatch(actions.reset(this.props));
     }
 
     /** Hide dialog */
@@ -192,29 +192,29 @@ export class ImportRulesDialog extends Component {
 
     /** Search input */
     onSearchInputChange(value) {
-        this.store.dispatch(actions.changeSearchQuery(value));
+        this.dispatch(actions.changeSearchQuery(value));
     }
 
     /** Change page event handler */
     onChangePage(page) {
-        this.store.dispatch(actions.changePage(page));
+        this.dispatch(actions.changePage(page));
     }
 
     /** 'Show more' button 'click' event handler */
     showMore() {
-        this.store.dispatch(actions.showMore());
+        this.dispatch(actions.showMore());
     }
 
     /** Create rule button 'click' event handler */
     onCreateRuleClick() {
-        this.store.dispatch(actions.createRule());
+        this.dispatch(actions.createRule());
     }
 
     onItemClick(itemId, e) {
         const state = this.store.getState();
 
         if (e.target.closest('.toggle-btn')) {
-            this.store.dispatch(actions.toggleCollapseItem(itemId));
+            this.dispatch(actions.toggleCollapseItem(itemId));
             return;
         }
 
@@ -222,7 +222,7 @@ export class ImportRulesDialog extends Component {
             state.id === LIST_STATE
             && e.target.closest('.menu-btn')
         ) {
-            this.store.dispatch(actions.showContextMenu(itemId));
+            this.dispatch(actions.showContextMenu(itemId));
         }
     }
 
@@ -241,8 +241,8 @@ export class ImportRulesDialog extends Component {
             id: 'rule_delete_warning',
             title: __('import.rules.delete'),
             content: __('import.rules.deleteMessage'),
-            onConfirm: () => this.store.dispatch(deleteRule(contextItem)),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(deleteRule(contextItem)),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -253,8 +253,8 @@ export class ImportRulesDialog extends Component {
 
         if (!this.contextMenu) {
             this.contextMenu = RuleListContextMenu.create({
-                dispatch: (action) => this.store.dispatch(action),
-                onClose: () => this.store.dispatch(actions.hideContextMenu()),
+                dispatch: (action) => this.dispatch(action),
+                onClose: () => this.dispatch(actions.hideContextMenu()),
             });
         }
 
@@ -316,7 +316,7 @@ export class ImportRulesDialog extends Component {
 
         this.formContainer = ImportRuleForm.create({
             data: state.rule,
-            onSubmit: (data) => this.store.dispatch(submitRule(data)),
+            onSubmit: (data) => this.dispatch(submitRule(data)),
             onCancel: () => this.reset(),
         });
         this.rulesContent.append(this.formContainer.elem);

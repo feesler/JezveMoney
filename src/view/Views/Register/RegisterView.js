@@ -123,7 +123,7 @@ class RegisterView extends AppView {
      */
     onLoginInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeLogin(value));
+        this.dispatch(actions.changeLogin(value));
     }
 
     /**
@@ -131,7 +131,7 @@ class RegisterView extends AppView {
      */
     onPasswordInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changePassword(value));
+        this.dispatch(actions.changePassword(value));
     }
 
     /**
@@ -139,7 +139,7 @@ class RegisterView extends AppView {
      */
     onNameInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeName(value));
+        this.dispatch(actions.changeName(value));
     }
 
     /**
@@ -150,15 +150,15 @@ class RegisterView extends AppView {
         const { login, name, password } = state.form;
 
         if (login.length === 0) {
-            this.store.dispatch(actions.invalidateLoginField());
+            this.dispatch(actions.invalidateLoginField());
         }
 
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField());
+            this.dispatch(actions.invalidateNameField());
         }
 
         if (password.length === 0) {
-            this.store.dispatch(actions.invalidatePasswordField());
+            this.dispatch(actions.invalidatePasswordField());
         }
 
         const { validation } = this.store.getState();

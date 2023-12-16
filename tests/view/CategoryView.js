@@ -208,11 +208,8 @@ export class CategoryView extends AppView {
     async inputName(val) {
         this.model.name = val.toString();
         this.model.invalidated = false;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.nameInput.input(val));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.nameInput.input(val));
     }
 
     async inputColor(val) {
@@ -248,11 +245,8 @@ export class CategoryView extends AppView {
             this.model.type = category.type;
             this.model.color = category.color;
         }
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.parentSelect.setSelection(val));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.parentSelect.setSelection(val));
     }
 
     async selectType(val) {
@@ -260,11 +254,8 @@ export class CategoryView extends AppView {
         assert(Category.availTypes.includes(type), `Invalid type: ${val}`);
 
         this.model.type = type;
-        const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.typeSelect.setSelection(val));
-
-        return this.checkState(expected);
+        return this.runTestAction(() => this.content.typeSelect.setSelection(val));
     }
 
     async submit() {

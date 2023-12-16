@@ -193,7 +193,7 @@ class CategoryListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.store.dispatch(setListMode('list')),
+            onClick: () => this.dispatch(setListMode('list')),
         });
         this.createBtn.elem.after(this.listModeBtn.elem);
 
@@ -211,21 +211,21 @@ class CategoryListView extends AppView {
         this.subscribeToStore(this.store);
 
         if (this.props.detailsId) {
-            this.store.dispatch(requestItem());
+            this.dispatch(requestItem());
         }
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
+        this.dispatch(actions.hideMenu());
     }
 
     onChangeType(selected) {
         const type = Category.getTypeByString(selected?.id);
-        this.store.dispatch(actions.selectType(type));
+        this.dispatch(actions.selectType(type));
     }
 
     getItemById(itemId) {
@@ -254,20 +254,20 @@ class CategoryListView extends AppView {
     }
 
     closeDetails() {
-        this.store.dispatch(actions.closeDetails());
+        this.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.setRenderTime());
     }
 
     /**
@@ -310,7 +310,7 @@ class CategoryListView extends AppView {
                 : (parent?.pos ?? 0) + 1;
         }
 
-        this.store.dispatch(
+        this.dispatch(
             sendChangePosRequest({
                 id: itemId,
                 pos: newPos,
@@ -345,8 +345,8 @@ class CategoryListView extends AppView {
             title: (multiple) ? __('categories.deleteMultiple') : __('categories.delete'),
             content: (multiple) ? __('categories.deleteMultipleMessage') : __('categories.deleteMessage'),
             showChildrenCheckbox,
-            onConfirm: (opt) => this.store.dispatch(deleteItems(opt)),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: (opt) => this.dispatch(deleteItems(opt)),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -358,7 +358,7 @@ class CategoryListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = CategoryListContextMenu.create({
                 id: 'contextMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -387,7 +387,7 @@ class CategoryListView extends AppView {
             this.menu = CategoryListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

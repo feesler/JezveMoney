@@ -118,7 +118,7 @@ class ReminderListView extends AppView {
             stateFilterId: 'stateFilter',
             dateRangeFilterId: 'dateFilter',
             getURL: (...args) => this.getURL(...args),
-            onUpdate: (state) => this.updateRemindersList(state),
+            onUpdate: (data) => this.store.dispatch(actions.updateRemindersList(data)),
             showContextMenu: (itemId) => this.showContextMenu(itemId),
         });
         this.heading.elem.after(this.listGroup.elem);
@@ -127,31 +127,27 @@ class ReminderListView extends AppView {
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
-    }
-
-    updateRemindersList(data) {
-        this.store.dispatch(actions.updateRemindersList(data));
+        this.dispatch(actions.hideMenu());
     }
 
     showDetails() {
-        this.store.dispatch(actions.showDetails());
+        this.dispatch(actions.showDetails());
     }
 
     closeDetails() {
-        this.store.dispatch(actions.closeDetails());
+        this.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     renderContextMenu(state) {
@@ -162,7 +158,7 @@ class ReminderListView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = ReminderListContextMenu.create({
                 id: 'contextMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -190,7 +186,7 @@ class ReminderListView extends AppView {
             this.menu = ReminderListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

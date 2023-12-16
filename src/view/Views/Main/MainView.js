@@ -335,41 +335,41 @@ class MainView extends AppView {
 
     /** Toggle shows/hides hidden accounts */
     toggleHiddenAccounts() {
-        this.store.dispatch(actions.toggleHiddenAccounts());
+        this.dispatch(actions.toggleHiddenAccounts());
     }
 
     /** Toggle shows/hides hidden persons */
     toggleHiddenPersons() {
-        this.store.dispatch(actions.toggleHiddenPersons());
+        this.dispatch(actions.toggleHiddenPersons());
     }
 
     /** Shows context menu for specified item */
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showTransactionContextMenu(itemId));
+        this.dispatch(actions.showTransactionContextMenu(itemId));
     }
 
     /** Hides context menu */
     hideContextMenu() {
-        this.store.dispatch(actions.hideTransactionContextMenu());
+        this.dispatch(actions.hideTransactionContextMenu());
     }
 
     closeCategoryDialog() {
-        this.store.dispatch(actions.closeCategoryDialog());
+        this.dispatch(actions.closeCategoryDialog());
     }
 
     /** Set loading state and render view */
     startLoading() {
-        this.store.dispatch(actions.startLoading());
+        this.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        this.store.dispatch(actions.stopLoading());
+        this.dispatch(actions.stopLoading());
     }
 
     /** Update render time */
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     /** Transaction list 'click' event handler */
@@ -381,7 +381,7 @@ class MainView extends AppView {
 
     /** Transaction category select 'change' event handler */
     onChangeCategorySelect(category) {
-        this.store.dispatch(actions.changeCategorySelect(category.id));
+        this.dispatch(actions.changeCategorySelect(category.id));
     }
 
     renderDeleteConfirmDialog(state, prevState) {
@@ -403,8 +403,8 @@ class MainView extends AppView {
             id: 'delete_warning',
             title: (multiple) ? __('transactions.deleteMultiple') : __('transactions.delete'),
             content: (multiple) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
-            onConfirm: () => this.store.dispatch(deleteItems()),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(deleteItems()),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -538,7 +538,7 @@ class MainView extends AppView {
             this.transactionContextMenu = TransactionListContextMenu.create({
                 id: 'contextMenu',
                 actions,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -614,7 +614,7 @@ class MainView extends AppView {
         if (state.categoryDialog.show && !this.setCategoryDialog) {
             this.setCategoryDialog = SetCategoryDialog.create({
                 onChange: (category) => this.onChangeCategorySelect(category),
-                onSubmit: () => this.store.dispatch(setItemsCategory()),
+                onSubmit: () => this.dispatch(setItemsCategory()),
                 onCancel: () => this.closeCategoryDialog(),
             });
         }
