@@ -75,7 +75,9 @@ export const formatLongDateLabel = (value, state) => {
         throw new Error('Invalid date object');
     }
 
-    const { group } = (state.form ?? state.filter);
+    const {
+        group = 'week',
+    } = (state.form ?? state.filter ?? {});
 
     if (group === 'day' || group === 'week') {
         return App.formatDate(date);

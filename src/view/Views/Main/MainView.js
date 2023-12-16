@@ -574,7 +574,9 @@ class MainView extends AppView {
         return ChartPopup.fromTarget(target, {
             filter: statistics.filter,
             formatValue: (value) => formatValue(value, statistics),
-            renderDateLabel: (value) => formatLongDateLabel(value, this.store.getState()),
+            renderDateLabel: (value) => (
+                formatLongDateLabel(value, this.store.getState().statistics)
+            ),
         });
     }
 
