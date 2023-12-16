@@ -1,5 +1,9 @@
 import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
+
+import { App } from '../../../Application.js';
+import { dateToSeconds } from '../../../common.js';
+
 import {
     EXPENSE,
     INCOME,
@@ -7,9 +11,8 @@ import {
     DEBT,
     LIMIT_CHANGE,
 } from '../../../model/Transaction.js';
-import { App } from '../../../Application.js';
+
 import * as Actions from '../../actions/api/transaction.js';
-import { dateToSeconds, formatProps } from '../../../common.js';
 
 const create = async () => {
     setBlock('Create transactions', 2);
@@ -382,11 +385,10 @@ const createInvalid = async () => {
         dest_curr: EUR,
     }];
 
-    const res = await App.scenario.runner.runGroup(Actions.extractAndCreate, data);
-    // Double check all transactions not created
-    res.forEach((item, index) => {
-        assert(!item, `Created transaction with invalid data: { ${formatProps(data[index])} }`);
-    });
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.extractAndCreate(item);
+        assert(!res, 'Created transaction using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
@@ -611,7 +613,10 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.extractAndCreateMultiple, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.extractAndCreateMultiple(item);
+        assert(!res, 'Created multiple transactions using invalid data');
+    }, data);
 };
 
 const createWithReminder = async () => {
@@ -658,7 +663,10 @@ const updateWithReminder = async () => {
         date: reminders[0].date,
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update transaction');
+    }, data);
 };
 
 const update = async () => {
@@ -726,7 +734,10 @@ const update = async () => {
         dest_amount: 150,
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update transaction');
+    }, data);
 };
 
 const updateWithChainedRequest = async () => {
@@ -754,7 +765,10 @@ const updateWithChainedRequest = async () => {
         },
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(res, 'Failed to update transaction');
+    }, data);
 };
 
 const updateInvalid = async () => {
@@ -840,7 +854,10 @@ const updateInvalid = async () => {
         src_curr: EUR,
     }];
 
-    await App.scenario.runner.runGroup(Actions.update, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.update(item);
+        assert(!res, 'Updated transaction using invalid data');
+    }, data);
 };
 
 const del = async () => {

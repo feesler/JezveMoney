@@ -1,7 +1,8 @@
+import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
+
 import { App } from '../../../Application.js';
 import { EXPENSE, INCOME } from '../../../model/Transaction.js';
-import * as Actions from '../../actions/api/category.js';
 import {
     COLOR_1,
     COLOR_10,
@@ -15,6 +16,7 @@ import {
     COLOR_8,
     COLOR_9,
 } from '../../data/colors.js';
+import * as Actions from '../../actions/api/category.js';
 
 const create = async () => {
     setBlock('Create categories', 2);
@@ -119,7 +121,10 @@ const createInvalid = async () => {
         type: EXPENSE,
     }];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created category using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
@@ -208,7 +213,10 @@ const createMultipleInvalid = async () => {
         },
     ];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created multiple categories using invalid data');
+    }, data);
 };
 
 const read = async () => {

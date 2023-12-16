@@ -1,3 +1,4 @@
+import { assert } from '@jezvejs/assert';
 import { setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
 import * as Actions from '../../actions/api/userCurrencies.js';
@@ -44,7 +45,10 @@ const createInvalid = async () => {
         curr_id: 0,
     }];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created user currency using invalid data');
+    }, data);
 };
 
 const createMultiple = async () => {
@@ -96,7 +100,10 @@ const createMultipleInvalid = async () => {
         }, null],
     ];
 
-    await App.scenario.runner.runGroup(Actions.create, data);
+    await App.scenario.runner.runGroup(async (item) => {
+        const res = await Actions.create(item);
+        assert(!res, 'Created multiple user currencies using invalid data');
+    }, data);
 };
 
 const read = async () => {

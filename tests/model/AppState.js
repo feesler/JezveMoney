@@ -2941,7 +2941,7 @@ export class AppState {
 
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
             const targetProp = ImportTemplate.columnsMap[columnName];
-            if (request[columnName]) {
+            if (columnName in request) {
                 res.columns[targetProp] = request[columnName];
             }
         });
@@ -2993,7 +2993,7 @@ export class AppState {
         Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
             const targetProp = ImportTemplate.columnsMap[columnName];
 
-            if (params[columnName]) {
+            if (columnName in params) {
                 expTemplate.columns[targetProp] = params[columnName];
             }
 
@@ -3016,7 +3016,7 @@ export class AppState {
         if (params.columns) {
             Object.keys(ImportTemplate.columnsMap).forEach((columnName) => {
                 const targetProp = ImportTemplate.columnsMap[columnName];
-                if (params.columns && params.columns[targetProp]) {
+                if (params.columns && (targetProp in params.columns)) {
                     expTemplate.columns[targetProp] = params.columns[targetProp];
                 }
             });
