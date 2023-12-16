@@ -287,7 +287,7 @@ export class TransactionForm extends Component {
             id: 'swapBtn',
             icon: 'swap',
             className: 'swap-btn circle-btn',
-            onClick: () => this.store.dispatch(actions.swapSourceAndDest()),
+            onClick: () => this.dispatch(actions.swapSourceAndDest()),
         });
 
         this.sourceContainer = AccountContainer.create({
@@ -335,34 +335,34 @@ export class TransactionForm extends Component {
 
         this.srcAmountInfo = TileInfoItem.create({
             id: 'srcAmountInfo',
-            onClick: () => this.store.dispatch(actions.sourceAmountClick()),
+            onClick: () => this.dispatch(actions.sourceAmountClick()),
         });
         this.sourceContainer.infoBlock.append(this.srcAmountInfo.elem);
 
         this.destAmountInfo = TileInfoItem.create({
             id: 'destAmountInfo',
-            onClick: () => this.store.dispatch(actions.destAmountClick()),
+            onClick: () => this.dispatch(actions.destAmountClick()),
         });
         this.destContainer.infoBlock.append(this.destAmountInfo.elem);
 
         this.srcResultInfo = TileInfoItem.create({
             id: 'srcResultInfo',
             label: __('transactions.result'),
-            onClick: () => this.store.dispatch(actions.sourceResultClick()),
+            onClick: () => this.dispatch(actions.sourceResultClick()),
         });
         this.sourceContainer.infoBlock.append(this.srcResultInfo.elem);
 
         this.destResultInfo = TileInfoItem.create({
             id: 'destResultInfo',
             label: __('transactions.result'),
-            onClick: () => this.store.dispatch(actions.destResultClick()),
+            onClick: () => this.dispatch(actions.destResultClick()),
         });
         this.destContainer.infoBlock.append(this.destResultInfo.elem);
 
         this.exchangeInfo = TileInfoItem.create({
             id: 'exchangeInfo',
             label: __('transactions.exchangeRate'),
-            onClick: () => this.store.dispatch(actions.exchangeClick()),
+            onClick: () => this.dispatch(actions.exchangeClick()),
         });
         this.sourceContainer.infoBlock.append(this.exchangeInfo.elem);
 
@@ -554,19 +554,6 @@ export class TransactionForm extends Component {
         if (state.isUpdate && state.transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
         }
-    }
-
-    /** Subscribes view to store updates */
-    subscribeToStore(store) {
-        if (!store) {
-            throw new Error('Invalid store');
-        }
-
-        store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /** Creates reminder field */
@@ -900,7 +887,7 @@ export class TransactionForm extends Component {
 
     /** Updates form render time */
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     /**
@@ -909,7 +896,7 @@ export class TransactionForm extends Component {
      */
     onChangeType(value) {
         const type = parseInt(value, 10);
-        this.store.dispatch(actions.typeChange(type));
+        this.dispatch(actions.typeChange(type));
         this.notifyChanged();
     }
 
@@ -919,7 +906,7 @@ export class TransactionForm extends Component {
      */
     onSrcAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.sourceAccountChange(accountId));
+        this.dispatch(actions.sourceAccountChange(accountId));
         this.notifyChanged();
     }
 
@@ -929,7 +916,7 @@ export class TransactionForm extends Component {
      */
     onDestAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.destAccountChange(accountId));
+        this.dispatch(actions.destAccountChange(accountId));
         this.notifyChanged();
     }
 
@@ -939,7 +926,7 @@ export class TransactionForm extends Component {
      */
     onDebtAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.debtAccountChange(accountId));
+        this.dispatch(actions.debtAccountChange(accountId));
         this.notifyChanged();
     }
 
@@ -949,7 +936,7 @@ export class TransactionForm extends Component {
      */
     onPersonSelect(obj) {
         const personId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.personChange(personId));
+        this.dispatch(actions.personChange(personId));
         this.notifyChanged();
     }
 
@@ -957,7 +944,7 @@ export class TransactionForm extends Component {
      * Account disable button click event handler
      */
     toggleEnableAccount() {
-        this.store.dispatch(actions.toggleDebtAccount());
+        this.dispatch(actions.toggleDebtAccount());
         this.notifyChanged();
     }
 
@@ -967,7 +954,7 @@ export class TransactionForm extends Component {
      */
     onSrcCurrencySel(obj) {
         const currencyId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.sourceCurrencyChange(currencyId));
+        this.dispatch(actions.sourceCurrencyChange(currencyId));
         this.notifyChanged();
     }
 
@@ -977,41 +964,41 @@ export class TransactionForm extends Component {
      */
     onDestCurrencySel(obj) {
         const currencyId = parseInt(obj.id, 10);
-        this.store.dispatch(actions.destCurrencyChange(currencyId));
+        this.dispatch(actions.destCurrencyChange(currencyId));
         this.notifyChanged();
     }
 
     onSourceAmountInput(e) {
-        this.store.dispatch(actions.sourceAmountChange(e.target.value));
+        this.dispatch(actions.sourceAmountChange(e.target.value));
         this.notifyChanged();
     }
 
     onDestAmountInput(e) {
-        this.store.dispatch(actions.destAmountChange(e.target.value));
+        this.dispatch(actions.destAmountChange(e.target.value));
         this.notifyChanged();
     }
 
     onExchangeInput(e) {
-        this.store.dispatch(actions.exchangeChange(e.target.value));
+        this.dispatch(actions.exchangeChange(e.target.value));
         this.notifyChanged();
     }
 
     onSourceResultInput(e) {
-        this.store.dispatch(actions.sourceResultChange(e.target.value));
+        this.dispatch(actions.sourceResultChange(e.target.value));
         this.notifyChanged();
     }
 
     onDestResultInput(e) {
-        this.store.dispatch(actions.destResultChange(e.target.value));
+        this.dispatch(actions.destResultChange(e.target.value));
         this.notifyChanged();
     }
 
     onToggleExchange() {
-        this.store.dispatch(actions.toggleExchange());
+        this.dispatch(actions.toggleExchange());
     }
 
     onDateInput(e) {
-        this.store.dispatch(actions.dateChange(e.target.value));
+        this.dispatch(actions.dateChange(e.target.value));
         this.notifyChanged();
     }
 
@@ -1020,19 +1007,19 @@ export class TransactionForm extends Component {
      * @param {Date} date - selected date object
      */
     onDateSelect(date) {
-        this.store.dispatch(actions.dateChange(App.formatInputDate(date)));
+        this.dispatch(actions.dateChange(App.formatInputDate(date)));
         this.dateField.datePicker.hide();
         this.notifyChanged();
     }
 
     onCategoryChanged(category) {
         const categoryId = parseInt(category.id, 10);
-        this.store.dispatch(actions.categoryChange(categoryId));
+        this.dispatch(actions.categoryChange(categoryId));
         this.notifyChanged();
     }
 
     onCommentInput(e) {
-        this.store.dispatch(actions.commentChange(e.target.value));
+        this.dispatch(actions.commentChange(e.target.value));
         this.notifyChanged();
     }
 
@@ -1040,28 +1027,28 @@ export class TransactionForm extends Component {
      * Schedule date range change callback
      */
     onScheduleRangeChange(range) {
-        this.store.dispatch(actions.scheduleRangeChange(range));
+        this.dispatch(actions.scheduleRangeChange(range));
         this.notifyChanged();
     }
 
     onRepeatChanged(checked) {
-        this.store.dispatch(actions.enableRepeat(checked));
+        this.dispatch(actions.enableRepeat(checked));
         this.notifyChanged();
     }
 
     onIntervalTypeChanged(type) {
         const typeId = parseInt(type.id, 10);
-        this.store.dispatch(actions.intervalTypeChange(typeId));
+        this.dispatch(actions.intervalTypeChange(typeId));
         this.notifyChanged();
     }
 
     onIntervalStepChanged(value) {
-        this.store.dispatch(actions.intervalStepChange(value));
+        this.dispatch(actions.intervalStepChange(value));
         this.notifyChanged();
     }
 
     onWeekdayOffsetChanged(offset) {
-        this.store.dispatch(actions.intervalOffsetChange(offset));
+        this.dispatch(actions.intervalOffsetChange(offset));
         this.notifyChanged();
     }
 
@@ -1076,7 +1063,7 @@ export class TransactionForm extends Component {
             return;
         }
 
-        this.store.dispatch(actions.intervalOffsetChange(offset));
+        this.dispatch(actions.intervalOffsetChange(offset));
         this.notifyChanged();
     }
 
@@ -1085,7 +1072,7 @@ export class TransactionForm extends Component {
         const dayIndex = (transaction.interval_offset % 100);
         const offset = (month.id * 100) + dayIndex;
 
-        this.store.dispatch(actions.intervalOffsetChange(offset));
+        this.dispatch(actions.intervalOffsetChange(offset));
         this.notifyChanged();
     }
 
@@ -1094,12 +1081,12 @@ export class TransactionForm extends Component {
             return;
         }
 
-        this.store.dispatch(actions.selectReminder(reminder));
+        this.dispatch(actions.selectReminder(reminder));
         this.notifyChanged();
     }
 
     onRemoveReminder() {
-        this.store.dispatch(actions.removeReminder());
+        this.dispatch(actions.removeReminder());
         this.notifyChanged();
     }
 
@@ -1113,11 +1100,11 @@ export class TransactionForm extends Component {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     /** Form 'submit' event handler */
@@ -1183,7 +1170,7 @@ export class TransactionForm extends Component {
 
         const valid = (amount > 0);
         if (!valid) {
-            this.store.dispatch(actions.invalidateSourceAmount());
+            this.dispatch(actions.invalidateSourceAmount());
         }
     }
 
@@ -1195,21 +1182,21 @@ export class TransactionForm extends Component {
 
         const valid = (amount > 0);
         if (!valid) {
-            this.store.dispatch(actions.invalidateDestAmount());
+            this.dispatch(actions.invalidateDestAmount());
         }
     }
 
     validateDate(state) {
         const valid = App.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
-            this.store.dispatch(actions.invalidateDate());
+            this.dispatch(actions.invalidateDate());
         }
     }
 
     validateStartDate(state) {
         const valid = App.isValidDateString(state.form.startDate, validateDateOptions);
         if (!valid) {
-            this.store.dispatch(actions.invalidateStartDate());
+            this.dispatch(actions.invalidateStartDate());
         }
     }
 
@@ -1220,7 +1207,7 @@ export class TransactionForm extends Component {
             || App.isValidDateString(endDate, validateDateOptions)
         );
         if (!valid) {
-            this.store.dispatch(actions.invalidateEndDate());
+            this.dispatch(actions.invalidateEndDate());
         }
     }
 
@@ -1232,7 +1219,7 @@ export class TransactionForm extends Component {
             || (transaction.interval_step > 0)
         );
         if (!valid) {
-            this.store.dispatch(actions.invalidateIntervalStep());
+            this.dispatch(actions.invalidateIntervalStep());
         }
     }
 

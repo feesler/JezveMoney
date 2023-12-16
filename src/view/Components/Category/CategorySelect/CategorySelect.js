@@ -101,7 +101,7 @@ export class CategorySelect extends DropDown {
             return;
         }
 
-        this.store.dispatch(actions.setTrasactionType(transactionType));
+        this.dispatch(actions.setTrasactionType(transactionType));
 
         this.initCategories();
     }

@@ -234,52 +234,52 @@ class SettingsView extends AppView {
     }
 
     onChangeTab(item) {
-        this.store.dispatch(actions.changeTab(item?.id));
+        this.dispatch(actions.changeTab(item?.id));
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
+        this.dispatch(actions.hideMenu());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.toggleSelectItem(itemId));
     }
 
     startLoading() {
-        this.store.dispatch(actions.startLoading());
+        this.dispatch(actions.startLoading());
     }
 
     stopLoading() {
-        this.store.dispatch(actions.stopLoading());
+        this.dispatch(actions.stopLoading());
     }
 
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     setDateRenderTime() {
-        this.store.dispatch(actions.setDateRenderTime());
+        this.dispatch(actions.setDateRenderTime());
     }
 
     setListMode(listMode) {
-        this.store.dispatch(actions.changeListMode(listMode));
+        this.dispatch(actions.changeListMode(listMode));
         this.setRenderTime();
     }
 
     onCurrencySelect(selection) {
-        this.store.dispatch(sendCreateRequest({ curr_id: selection.id, flags: 0 }));
+        this.dispatch(sendCreateRequest({ curr_id: selection.id, flags: 0 }));
     }
 
     onItemClick(itemId, e) {
@@ -319,15 +319,15 @@ class SettingsView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.store.dispatch(sendChangePosRequest(item.id, pos));
+        this.dispatch(sendChangePosRequest(item.id, pos));
     }
 
     onDateFormatSelect(format) {
-        this.store.dispatch(requestDateLocale(format.id));
+        this.dispatch(requestDateLocale(format.id));
     }
 
     onDecimalFormatSelect(format) {
-        this.store.dispatch(requestDecimalLocale(format.id));
+        this.dispatch(requestDecimalLocale(format.id));
     }
 
     renderContextMenu(state) {
@@ -338,7 +338,7 @@ class SettingsView extends AppView {
         if (!this.contextMenu) {
             this.contextMenu = CurrencyListContextMenu.create({
                 id: 'contextMenu',
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -367,7 +367,7 @@ class SettingsView extends AppView {
             this.menu = CurrencyListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }

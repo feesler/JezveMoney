@@ -99,15 +99,15 @@ class ScheduleItemView extends AppView {
     }
 
     startSubmit() {
-        this.store.dispatch(actions.startSubmit());
+        this.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(actions.cancelSubmit());
+        this.dispatch(actions.cancelSubmit());
     }
 
     onScheduleItemChange(item) {
-        this.store.dispatch(actions.changeScheduleItem(item));
+        this.dispatch(actions.changeScheduleItem(item));
     }
 
     async submitScheduleItem(request) {

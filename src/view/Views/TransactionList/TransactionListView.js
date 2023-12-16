@@ -230,7 +230,7 @@ class TransactionListView extends AppView {
             id: 'listModeBtn',
             className: 'action-button',
             title: __('actions.done'),
-            onClick: () => this.store.dispatch(setListMode('list')),
+            onClick: () => this.dispatch(setListMode('list')),
         });
         this.createBtn.elem.after(this.listModeBtn.elem);
 
@@ -249,11 +249,11 @@ class TransactionListView extends AppView {
     }
 
     showMenu() {
-        this.store.dispatch(actions.showMenu());
+        this.dispatch(actions.showMenu());
     }
 
     hideMenu() {
-        this.store.dispatch(actions.hideMenu());
+        this.dispatch(actions.hideMenu());
     }
 
     /** Returns true if accounts or persons is available */
@@ -264,28 +264,28 @@ class TransactionListView extends AppView {
 
     showDetails(e) {
         e?.preventDefault();
-        this.store.dispatch(actions.showDetails());
+        this.dispatch(actions.showDetails());
     }
 
     closeDetails() {
-        this.store.dispatch(actions.closeDetails());
+        this.dispatch(actions.closeDetails());
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(actions.showContextMenu(itemId));
+        this.dispatch(actions.showContextMenu(itemId));
     }
 
     hideContextMenu() {
-        this.store.dispatch(actions.hideContextMenu());
+        this.dispatch(actions.hideContextMenu());
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(actions.toggleSelectItem(itemId));
+        this.dispatch(actions.toggleSelectItem(itemId));
     }
 
     /** Update render time */
     setRenderTime() {
-        this.store.dispatch(actions.setRenderTime());
+        this.dispatch(actions.setRenderTime());
     }
 
     getItem(id) {
@@ -313,7 +313,7 @@ class TransactionListView extends AppView {
             pos = nextItem.pos;
         }
 
-        this.store.dispatch(sendChangePosRequest(item.id, pos));
+        this.dispatch(sendChangePosRequest(item.id, pos));
     }
 
     /** Returns URL for filter of specified state */
@@ -347,7 +347,7 @@ class TransactionListView extends AppView {
     onClearAllFilters(e) {
         e.preventDefault();
 
-        this.store.dispatch(actions.clearAllFilters());
+        this.dispatch(actions.clearAllFilters());
         this.requestTransactions(this.getRequestData());
     }
 
@@ -355,7 +355,7 @@ class TransactionListView extends AppView {
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.store.dispatch(actions.changeTypeFilter(selected));
+        this.dispatch(actions.changeTypeFilter(selected));
         this.requestTransactions(this.getRequestData());
     }
 
@@ -393,13 +393,13 @@ class TransactionListView extends AppView {
         }
 
         if (accountsChanged) {
-            this.store.dispatch(actions.changeAccountsFilter(accountIds));
+            this.dispatch(actions.changeAccountsFilter(accountIds));
         }
         if (personsChanged) {
-            this.store.dispatch(actions.changePersonsFilter(personIds));
+            this.dispatch(actions.changePersonsFilter(personIds));
         }
         if (categoriesChanged) {
-            this.store.dispatch(actions.changeCategoriesFilter(categoryIds));
+            this.dispatch(actions.changeCategoriesFilter(categoryIds));
         }
 
         this.requestTransactions(this.getRequestData());
@@ -407,12 +407,12 @@ class TransactionListView extends AppView {
 
     /** Search field input event handler */
     onSearchInputChange(value) {
-        this.store.dispatch(actions.changeSearchQuery(value));
+        this.dispatch(actions.changeSearchQuery(value));
         this.requestTransactions(this.getRequestData());
     }
 
     onChangeCategorySelect(category) {
-        this.store.dispatch(actions.changeCategorySelect(category.id));
+        this.dispatch(actions.changeCategorySelect(category.id));
     }
 
     /** Date range filter change handler */
@@ -429,7 +429,7 @@ class TransactionListView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(data));
+        this.dispatch(actions.changeDateFilter(data));
         this.requestTransactions(this.getRequestData());
     }
 
@@ -450,7 +450,7 @@ class TransactionListView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeAmountFilter(data));
+        this.dispatch(actions.changeAmountFilter(data));
         this.requestTransactions(this.getRequestData());
     }
 
@@ -485,7 +485,7 @@ class TransactionListView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.toggleMode());
+        this.dispatch(actions.toggleMode());
         this.setRenderTime();
     }
 
@@ -535,22 +535,22 @@ class TransactionListView extends AppView {
             ...request
         } = options;
 
-        this.store.dispatch(actions.startLoading(isLoadingMore));
+        this.dispatch(actions.startLoading(isLoadingMore));
 
         try {
             const { data } = await API.transaction.list(request, { signal });
 
-            this.store.dispatch(setListData(data, keepState));
+            this.dispatch(setListData(data, keepState));
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
                 App.createErrorNotification(e.message);
-                this.store.dispatch(actions.listRequestError());
+                this.dispatch(actions.listRequestError());
             }
         }
 
         if (!aborted) {
-            this.store.dispatch(actions.stopLoading());
+            this.dispatch(actions.stopLoading());
             this.setRenderTime();
             this.abortController = null;
         }
@@ -575,8 +575,8 @@ class TransactionListView extends AppView {
             id: 'delete_warning',
             title: (multiple) ? __('transactions.deleteMultiple') : __('transactions.delete'),
             content: (multiple) ? __('transactions.deleteMultipleMessage') : __('transactions.deleteMessage'),
-            onConfirm: () => this.store.dispatch(deleteItems()),
-            onReject: () => this.store.dispatch(actions.hideDeleteConfirmDialog()),
+            onConfirm: () => this.dispatch(deleteItems()),
+            onReject: () => this.dispatch(actions.hideDeleteConfirmDialog()),
         });
     }
 
@@ -589,7 +589,7 @@ class TransactionListView extends AppView {
             this.contextMenu = TransactionListContextMenu.create({
                 id: 'contextMenu',
                 actions,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideContextMenu(),
             });
         }
@@ -619,7 +619,7 @@ class TransactionListView extends AppView {
             this.menu = TransactionListMainMenu.create({
                 id: 'listMenu',
                 attachTo: this.menuButton.elem,
-                dispatch: (action) => this.store.dispatch(action),
+                dispatch: (action) => this.dispatch(action),
                 onClose: () => this.hideMenu(),
             });
         }
@@ -652,8 +652,8 @@ class TransactionListView extends AppView {
         if (state.categoryDialog.show && !this.setCategoryDialog) {
             this.setCategoryDialog = SetCategoryDialog.create({
                 onChange: (category) => this.onChangeCategorySelect(category),
-                onSubmit: () => this.store.dispatch(setItemsCategory()),
-                onCancel: () => this.store.dispatch(actions.closeCategoryDialog()),
+                onSubmit: () => this.dispatch(setItemsCategory()),
+                onCancel: () => this.dispatch(actions.closeCategoryDialog()),
             });
         }
         if (!this.setCategoryDialog) {
@@ -843,7 +843,7 @@ class TransactionListView extends AppView {
         if (!this.exportDialog) {
             this.exportDialog = ExportDialog.create({
                 filter: state.exportFilter,
-                onCancel: () => this.store.dispatch(actions.hideExportDialog()),
+                onCancel: () => this.dispatch(actions.hideExportDialog()),
             });
         } else {
             this.exportDialog.setFilter(state.exportFilter);

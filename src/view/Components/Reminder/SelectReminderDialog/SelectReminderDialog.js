@@ -1,4 +1,3 @@
-import { isFunction } from '@jezvejs/types';
 import { createElement } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
@@ -99,7 +98,7 @@ export class SelectReminderDialog extends Component {
             listMode: 'singleSelect',
             showControls: false,
             onChange: (selected) => this.onChange(selected),
-            onUpdate: (state) => this.updateRemindersList(state),
+            onUpdate: (data) => this.store.dispatch(actions.updateRemindersList(data)),
         });
 
         this.dialog = Popup.create({
@@ -133,19 +132,11 @@ export class SelectReminderDialog extends Component {
     }
 
     onChange(selected) {
-        if (isFunction(this.props.onChange)) {
-            this.props.onChange(selected);
-        }
+        this.notifyEvent('onChange', selected);
     }
 
     onCancel() {
-        if (isFunction(this.props.onCancel)) {
-            this.props.onCancel();
-        }
-    }
-
-    updateRemindersList(data) {
-        this.store.dispatch(actions.updateRemindersList(data));
+        this.notifyEvent('onCancel');
     }
 
     renderList(state) {

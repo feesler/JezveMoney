@@ -154,7 +154,7 @@ class LoginView extends AppView {
     setRememberUser(value) {
         setCookie('remember', (value) ? 1 : 0);
 
-        this.store.dispatch(actions.setRememberUser(value));
+        this.dispatch(actions.setRememberUser(value));
     }
 
     /**
@@ -162,7 +162,7 @@ class LoginView extends AppView {
      */
     onLoginInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changeLogin(value));
+        this.dispatch(actions.changeLogin(value));
     }
 
     /**
@@ -170,7 +170,7 @@ class LoginView extends AppView {
      */
     onPasswordInput(e) {
         const { value } = e.target;
-        this.store.dispatch(actions.changePassword(value));
+        this.dispatch(actions.changePassword(value));
     }
 
     /**
@@ -189,11 +189,11 @@ class LoginView extends AppView {
         const { login, password } = state.form;
 
         if (login.length === 0) {
-            this.store.dispatch(actions.invalidateLoginField());
+            this.dispatch(actions.invalidateLoginField());
         }
 
         if (password.length === 0) {
-            this.store.dispatch(actions.invalidatePasswordField());
+            this.dispatch(actions.invalidatePasswordField());
         }
 
         const { validation } = this.store.getState();

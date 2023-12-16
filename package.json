@@ -96,7 +96,7 @@
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.34.0",
-        "jezvejs": "^2.18.5",
+        "jezvejs": "^2.19.0",
         "whatwg-fetch": "^3.6.20"
     }
 }

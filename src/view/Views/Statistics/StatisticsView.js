@@ -219,7 +219,7 @@ class StatisticsView extends AppView {
         const accounts = asArray(state.form.accounts);
         if (state.form.report === 'account' && accounts.length === 0) {
             const account = App.model.userAccounts.getItemByIndex(0);
-            this.store.dispatch(actions.changeAccountsFilter([account.id]));
+            this.dispatch(actions.changeAccountsFilter([account.id]));
         }
 
         this.requestData(this.getRequestData());
@@ -227,12 +227,12 @@ class StatisticsView extends AppView {
 
     /** Set loading state and render view */
     startLoading() {
-        this.store.dispatch(actions.startLoading());
+        this.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        this.store.dispatch(actions.stopLoading());
+        this.dispatch(actions.stopLoading());
     }
 
     /** Returns URL for filter of specified state */
@@ -252,7 +252,7 @@ class StatisticsView extends AppView {
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.store.dispatch(actions.changeTypeFilter(selected));
+        this.dispatch(actions.changeTypeFilter(selected));
         this.requestData(this.getRequestData());
     }
 
@@ -270,7 +270,7 @@ class StatisticsView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeDateFilter(data));
+        this.dispatch(actions.changeDateFilter(data));
         this.requestData(this.getRequestData());
     }
 
@@ -279,7 +279,7 @@ class StatisticsView extends AppView {
      * @param {string} value - selected report type
      */
     onSelectReportType(value) {
-        this.store.dispatch(actions.changeReportType(value));
+        this.dispatch(actions.changeReportType(value));
         this.requestData(this.getRequestData());
     }
 
@@ -295,7 +295,7 @@ class StatisticsView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeAccountsFilter(ids));
+        this.dispatch(actions.changeAccountsFilter(ids));
         this.requestData(this.getRequestData());
     }
 
@@ -311,7 +311,7 @@ class StatisticsView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeCategoriesFilter(ids));
+        this.dispatch(actions.changeCategoriesFilter(ids));
         this.requestData(this.getRequestData());
     }
 
@@ -324,7 +324,7 @@ class StatisticsView extends AppView {
             return;
         }
 
-        this.store.dispatch(actions.changeCurrencyFilter(obj.id));
+        this.dispatch(actions.changeCurrencyFilter(obj.id));
         this.requestData(this.getRequestData());
     }
 
@@ -333,28 +333,28 @@ class StatisticsView extends AppView {
      * @param {string} value - selected group item
      */
     onSelectGroupType(value) {
-        this.store.dispatch(actions.changeGroupType(value));
+        this.dispatch(actions.changeGroupType(value));
         this.requestData(this.getRequestData());
     }
 
     /** Histogram item 'click' event handler */
     onSelectDataColumn(target) {
-        this.store.dispatch(actions.selectDataColumn(target));
+        this.dispatch(actions.selectDataColumn(target));
     }
 
     /** Pie chart item 'mouseover' event handler */
     onPieChartItemOver(item) {
-        this.store.dispatch(actions.showPieChartInfo(item));
+        this.dispatch(actions.showPieChartInfo(item));
     }
 
     /** Pie chart item 'mouseout' event handler */
     onPieChartItemOut(item) {
-        this.store.dispatch(actions.hidePieChartInfo(item));
+        this.dispatch(actions.hidePieChartInfo(item));
     }
 
     /** Pie chart item 'click' event handler */
     onPieChartItemClick(item) {
-        this.store.dispatch(actions.selectPieChartItem(item));
+        this.dispatch(actions.selectPieChartItem(item));
     }
 
     replaceHistory(state) {
@@ -387,18 +387,18 @@ class StatisticsView extends AppView {
 
         try {
             const result = await API.transaction.statistics(options, { signal });
-            this.store.dispatch(actions.dataRequestLoaded(result.data));
+            this.dispatch(actions.dataRequestLoaded(result.data));
         } catch (e) {
             aborted = e.name === 'AbortError';
             if (!aborted) {
                 App.createErrorNotification(e.message);
-                this.store.dispatch(actions.dataRequestError());
+                this.dispatch(actions.dataRequestError());
             }
         }
 
         if (!aborted) {
             this.stopLoading();
-            this.store.dispatch(actions.setRenderTime());
+            this.dispatch(actions.setRenderTime());
         }
     }
 
@@ -414,7 +414,7 @@ class StatisticsView extends AppView {
 
     renderLegendContent(categories) {
         setTimeout(() => {
-            this.store.dispatch(actions.setLegendCategories(categories));
+            this.dispatch(actions.setLegendCategories(categories));
         });
 
         if (!Array.isArray(categories) || categories.length === 0) {
@@ -459,7 +459,7 @@ class StatisticsView extends AppView {
                         }
 
                         const selectedCategory = listItem.dataset.category;
-                        this.store.dispatch(actions.toggleActivateChartCategory(selectedCategory));
+                        this.dispatch(actions.toggleActivateChartCategory(selectedCategory));
                     },
                 },
             });
@@ -473,7 +473,7 @@ class StatisticsView extends AppView {
         // Toggle collapse/expand button
         if (!this.toggleLegendButton) {
             this.toggleLegendButton = this.createToggleShowAllButton({
-                onClick: () => this.store.dispatch(actions.toggleExpandLegend()),
+                onClick: () => this.dispatch(actions.toggleExpandLegend()),
             });
         }
 
