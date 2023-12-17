@@ -132,14 +132,7 @@ class AdminApiConsoleView extends AdminView {
         this.initProfileForms();
 
         // API controllers menu
-        this.controllersList = ControllersMenu.create({
-            id: 'controllersList',
-            items: apiMenu,
-            activeController: this.props.activeController,
-            activeMethod: this.props.activeMethod,
-            onMethodSelect: (formId) => this.activateView(formId),
-        });
-        this.apiMenuContent.append(this.controllersList.elem);
+        this.initMenu();
 
         this.activateView(this.props.activeMethod);
 
@@ -151,6 +144,31 @@ class AdminApiConsoleView extends AdminView {
             onClick: () => this.clearResults(),
         });
         this.resultsHeading.append(this.clearResultsBtn.elem);
+    }
+
+    initMenu() {
+        const { activeController, activeMethod } = this.props;
+
+        const items = apiMenu.map((item) => ({
+            ...item,
+            expanded: item.id === activeController,
+            items: item.items.map((childItem) => ({
+                ...childItem,
+                selected: (
+                    item.id === activeController
+                    && childItem.id === activeMethod
+                ),
+            })),
+        }));
+
+        this.controllersList = ControllersMenu.create({
+            id: 'controllersList',
+            items,
+            activeController: this.props.activeController,
+            activeMethod: this.props.activeMethod,
+            onItemClick: (formId) => this.activateView(formId),
+        });
+        this.apiMenuContent.append(this.controllersList.elem);
     }
 
     /** Initialization of forms for State API controller */

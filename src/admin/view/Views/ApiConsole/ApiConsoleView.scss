@@ -80,10 +80,11 @@ h3 {
 /* Desktop */
 @media (min-width: 768px) {
   .methods-menu {
+    top: 100px;
     z-index: 500;
 
     .navigation-content {
-      margin-top: 100px;
+      margin: 0;
     }
   }
 
