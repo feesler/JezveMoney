@@ -47,6 +47,8 @@ import { IconForm } from './components/Forms/Icons/IconForm.js';
 import { ColorForm } from './components/Forms/Colors/ColorForm.js';
 import { UserCurrencyForm } from './components/Forms/UserCurrencies/UserCurrencyForm.js';
 
+import { apiMenu } from './apiMenu.js';
+
 import './ApiConsoleView.scss';
 
 const defaultProps = {
@@ -132,6 +134,7 @@ class AdminApiConsoleView extends AdminView {
         // API controllers menu
         this.controllersList = ControllersMenu.create({
             id: 'controllersList',
+            items: apiMenu,
             activeController: this.props.activeController,
             activeMethod: this.props.activeMethod,
             onMethodSelect: (formId) => this.activateView(formId),
