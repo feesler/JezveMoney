@@ -15,6 +15,7 @@ const fieldSelectors = {
     endDateField: '.end-date-field',
     intervalField: '.interval-field',
     offsetField: '.offset-field',
+    typeField: '.type-field',
     sourceField: '.source-field',
     destinationField: '.destination-field',
     srcAmountField: '.src-amount-field',
@@ -104,7 +105,7 @@ export class ScheduleItemDetails extends TestComponent {
         const res = {
             title: {
                 visible: true,
-                value: Transaction.typeToString(item.type),
+                value: item.name,
             },
             startDateField: {
                 visible: true,
@@ -123,6 +124,10 @@ export class ScheduleItemDetails extends TestComponent {
             offsetField: {
                 visible: item.interval_type !== INTERVAL_NONE,
                 value: item.renderIntervalOffset(),
+            },
+            typeField: {
+                visible: true,
+                value: Transaction.typeToString(item.type),
             },
             sourceField: {
                 visible: showSource,
