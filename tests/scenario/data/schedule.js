@@ -39,6 +39,7 @@ export const createScheduledTransactions = async () => {
     const personAccount = App.state.getPersonAccount(MARIA, RUB);
 
     const data = [{
+        name: 'Expense 1',
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 100,
@@ -49,6 +50,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: 0,
     }, {
+        name: 'Expense 2',
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 7608,
@@ -62,6 +64,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 2,
         interval_offset: 0,
     }, {
+        name: 'Expense 3',
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 100000,
@@ -73,6 +76,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 0,
         interval_offset: 0,
     }, {
+        name: 'Income 1',
         type: INCOME,
         dest_id: ACC_RUB,
         dest_amount: 100000,
@@ -83,6 +87,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: App.dates.now.getDate() - 1,
     }, {
+        name: 'Income 2',
         type: INCOME,
         dest_id: ACC_RUB,
         dest_amount: 456,
@@ -92,6 +97,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: 2,
     }, {
+        name: 'Transfer 1',
         type: TRANSFER,
         src_id: ACC_RUB,
         dest_id: CARD_RUB,
@@ -103,6 +109,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 2,
         interval_offset: 0,
     }, {
+        name: 'Transfer 2',
         type: TRANSFER,
         src_id: ACC_RUB,
         dest_id: ACC_USD,
@@ -114,6 +121,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Debt 1',
         type: DEBT,
         src_id: personAccount.id,
         dest_id: 0,
@@ -126,6 +134,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 2,
         interval_offset: 0,
     }, {
+        name: 'Debt 2',
         type: DEBT,
         src_id: ACC_RUB,
         dest_id: personAccount.id,
@@ -138,6 +147,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Credit limit 1',
         type: LIMIT_CHANGE,
         src_id: 0,
         dest_id: CREDIT_CARD,
@@ -151,6 +161,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 2,
         interval_offset: 0,
     }, {
+        name: 'Credit limit 2',
         type: LIMIT_CHANGE,
         src_id: BTC_CREDIT,
         dest_id: 0,
@@ -165,6 +176,7 @@ export const createScheduledTransactions = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Expense 4',
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 1000,

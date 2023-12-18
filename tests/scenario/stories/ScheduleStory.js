@@ -38,8 +38,8 @@ export class ScheduleStory extends TestStory {
 
         await Actions.securityTests();
 
-        await this.validation();
         await this.create();
+        await this.validation();
         await this.list();
         await this.update();
         await this.duplicate();
@@ -62,6 +62,15 @@ export class ScheduleStory extends TestStory {
     async validation() {
         setBlock('Scheduled transaction form validation', 1);
 
+        await Actions.createAndSubmit('Empty schedule name', [
+            { action: Actions.inputDestAmount, data: '1' },
+        ]);
+
+        await Actions.createAndSubmit('Existing schedule name', [
+            { action: Actions.inputScheduleName, data: 'Daily expense' },
+            { action: Actions.inputDestAmount, data: '1' },
+        ]);
+
         await Actions.createAndSubmit('Invalid interval step', [
             { action: Actions.inputDestAmount, data: '1' },
             { action: Actions.inputIntervalStep, data: '' },
@@ -81,12 +90,14 @@ export class ScheduleStory extends TestStory {
         } = App.scenario;
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Some fee' },
             { action: Actions.inputDestAmount, data: '1000' },
             { action: Actions.inputComment, data: 'some fee' },
             { action: Actions.inputStartDate, data: App.datesFmt.weekAgo },
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Daily expense' },
             { action: Actions.inputDestAmount, data: '100' },
             { action: Actions.inputComment, data: 'Daily expense' },
             { action: Actions.changeIntervalType, data: INTERVAL_DAY },
@@ -94,12 +105,14 @@ export class ScheduleStory extends TestStory {
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'One time expense' },
             { action: Actions.inputDestAmount, data: '100000' },
             { action: Actions.inputComment, data: 'One time expense' },
             { action: Actions.toggleEnableRepeat },
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Percents' },
             { action: Actions.changeTransactionType, data: INCOME },
             { action: Actions.inputSrcAmount, data: '500' },
             { action: Actions.inputComment, data: 'Percents' },
@@ -108,6 +121,7 @@ export class ScheduleStory extends TestStory {
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Annual percents' },
             { action: Actions.changeTransactionType, data: INCOME },
             { action: Actions.inputSrcAmount, data: '75000' },
             { action: Actions.inputComment, data: 'Annual percents' },
@@ -119,6 +133,7 @@ export class ScheduleStory extends TestStory {
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Scheduled transfer' },
             { action: Actions.changeTransactionType, data: TRANSFER },
             { action: Actions.inputSrcAmount, data: '5000' },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
@@ -127,6 +142,7 @@ export class ScheduleStory extends TestStory {
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Scheduled debt' },
             { action: Actions.changeTransactionType, data: DEBT },
             { action: Actions.inputDestAmount, data: '1000' },
             { action: Actions.inputIntervalStep, data: '6' },
@@ -136,30 +152,36 @@ export class ScheduleStory extends TestStory {
         ]);
 
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Week schedule 7' },
             { action: Actions.inputDestAmount, data: '7' },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekdaysOffset },
         ]);
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Week schedule 8' },
             { action: Actions.inputDestAmount, data: '8' },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekDayOffset, data: [] },
         ]);
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Scheduled credit limit change' },
             { action: Actions.changeSrcAccount, data: CREDIT_CARD },
             { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
             { action: Actions.inputDestAmount, data: '9' },
             { action: Actions.toggleEnableRepeat },
         ]);
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Week schedule 10' },
             { action: Actions.inputDestAmount, data: '10' },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekendOffset },
         ]);
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Schedule 11' },
             { action: Actions.inputDestAmount, data: '11' },
         ]);
         await Actions.createAndSubmit([
+            { action: Actions.inputScheduleName, data: 'Schedule 12' },
             { action: Actions.inputDestAmount, data: '12' },
         ]);
     }
@@ -180,6 +202,11 @@ export class ScheduleStory extends TestStory {
         await Actions.updateAndSubmit(9, [
             { action: Actions.inputDestAmount, data: '900' },
             { action: Actions.toggleEnableRepeat },
+        ]);
+
+        setBlock('Verity update with existing name', 2);
+        await Actions.updateAndSubmit(3, [
+            { action: Actions.inputScheduleName, data: 'Daily expense' },
         ]);
     }
 

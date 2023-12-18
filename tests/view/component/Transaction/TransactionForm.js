@@ -84,6 +84,7 @@ const inputFieldSelectors = [
     '#srcResultField',
     '#destResultField',
     '#commentField',
+    '#scheduleNameField',
 ];
 
 /** Create or update transaction form class */
@@ -326,6 +327,7 @@ export class TransactionForm extends TestComponent {
             if (formType === TRANSACTION_FORM && !fromReminder) {
                 model.date = App.datesFmt.now;
             } else if (formType === SCHEDULE_ITEM_FORM) {
+                model.scheduleName = '';
                 model.repeatEnabled = true;
                 model.startDate = App.datesFmt.now;
                 model.endDate = '';
@@ -530,6 +532,7 @@ export class TransactionForm extends TestComponent {
         }
 
         if (formType === SCHEDULE_ITEM_FORM) {
+            model.scheduleName = transaction.name;
             model.repeatEnabled = transaction.interval_type !== INTERVAL_NONE;
             model.startDate = App.reformatDate(secondsToTime(transaction.start_date));
             model.endDate = (transaction.end_date)
@@ -712,6 +715,11 @@ export class TransactionForm extends TestComponent {
             };
 
             if (isScheduleItemForm || repeatEnabled) {
+                res.scheduleNameField = {
+                    visible: true,
+                    value: model.scheduleName,
+                };
+
                 res.dateRangeInput = {
                     visible: true,
                     startInputGroup: { visible: true },
@@ -1408,6 +1416,7 @@ export class TransactionForm extends TestComponent {
             res.srcResultField,
             res.destResultField,
             res.commentField,
+            res.scheduleNameField,
         ] = await asyncMap(
             inputFieldSelectors,
             async (selector) => InputField.create(this, await query(selector)),
@@ -1741,6 +1750,9 @@ export class TransactionForm extends TestComponent {
         // Schedule
         res.repeatEnabled = cont.repeatSwitch.checked;
 
+        res.scheduleName = cont.scheduleNameField.value;
+        res.scheduleNameInvalidated = cont.scheduleNameField.isInvalid;
+
         res.startDate = cont.dateRangeInput.value.startDate;
         res.endDate = cont.dateRangeInput.value.endDate;
         res.dateRangeInvalidated = cont.dateRangeInput.invalidated;
@@ -1781,6 +1793,19 @@ export class TransactionForm extends TestComponent {
         return isValidDateString(value, { locales, options: App.dateFormatOptions });
     }
 
+    isValidScheduleName(value, model = this.model, state = App.state) {
+        if (typeof value !== 'string' || value === '') {
+            return false;
+        }
+
+        const scheduleItem = state.schedule.findByName(value);
+        if (scheduleItem && (!model.id || (model.id && model.id !== scheduleItem.id))) {
+            return false;
+        }
+
+        return true;
+    }
+
     isValid() {
         const startFromDestAmount = (
             (this.model.type === EXPENSE || this.model.type === LIMIT_CHANGE)
@@ -1808,6 +1833,10 @@ export class TransactionForm extends TestComponent {
         }
 
         if (this.isScheduleItemForm() || this.model.repeatEnabled) {
+            if (!this.isValidScheduleName(this.model.scheduleName)) {
+                return false;
+            }
+
             if (!this.isValidDate(this.model.startDate)) {
                 return false;
             }
@@ -1889,6 +1918,7 @@ export class TransactionForm extends TestComponent {
             this.isScheduleItemForm()
             || (repeatEnabled && !reminderId && !scheduleId)
         ) {
+            res.name = this.model.scheduleName;
             res.start_date = App.dateStringToSeconds(this.model.startDate);
             res.end_date = App.dateStringToSeconds(this.model.endDate);
 
@@ -2583,11 +2613,17 @@ export class TransactionForm extends TestComponent {
             isValid = isValid && dateValid;
         }
 
+        let scheduleNameValid = true;
         let startDateValid = true;
         let endDateValid = true;
 
         if (this.isScheduleItemForm() || this.model.repeatEnabled) {
-            const { startDate } = this.model;
+            const { startDate, scheduleName } = this.model;
+            scheduleNameValid = this.isValidScheduleName(scheduleName);
+
+            isValid = isValid && scheduleNameValid;
+            this.model.scheduleNameInvalidated = !scheduleNameValid;
+
             startDateValid = this.isValidDate(startDate);
             isValid = isValid && startDateValid;
         }
@@ -3643,6 +3679,13 @@ export class TransactionForm extends TestComponent {
         this.model.categoryId = categoryId;
 
         return this.runTestAction(() => this.content.categorySelect.setSelection(val));
+    }
+
+    async inputScheduleName(val) {
+        this.model.scheduleNameInvalidated = false;
+        this.model.scheduleName = val.toString();
+
+        return this.runTestAction(() => this.content.scheduleNameField.input(val));
     }
 
     async inputComment(val) {

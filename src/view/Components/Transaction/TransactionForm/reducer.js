@@ -1178,6 +1178,22 @@ const slice = createSlice({
         },
     }),
 
+    scheduleNameChange: (state, name) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            name,
+        },
+        form: {
+            ...state.form,
+            name,
+        },
+        validation: {
+            ...state.validation,
+            scheduleName: true,
+        },
+    }),
+
     scheduleRangeChange: (state, range) => ({
         ...state,
         transaction: {
@@ -1355,6 +1371,15 @@ const slice = createSlice({
         validation: {
             ...state.validation,
             date: false,
+        },
+    }),
+
+    invalidateScheduleName: (state, message) => ({
+        ...state,
+        validation: {
+            ...state.validation,
+            scheduleName: message,
+            valid: false,
         },
     }),
 

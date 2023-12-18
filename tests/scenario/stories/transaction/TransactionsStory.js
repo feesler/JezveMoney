@@ -138,6 +138,7 @@ export class TransactionsStory extends TestStory {
         await Actions.createFromAccountAndSubmit(0, [
             { action: Actions.inputDestAmount, data: '1000' },
             { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Repeat Expense' },
             { action: Actions.selectDate, data: App.dates.weekAgo },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekendOffset },
@@ -237,6 +238,7 @@ export class TransactionsStory extends TestStory {
             { action: Actions.changeTransactionType, data: INCOME },
             { action: Actions.inputSrcAmount, data: '10000' },
             { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Repeat Income' },
             { action: Actions.selectDate, data: App.dates.monthAgo },
             { action: Actions.selectEndDate, data: App.dates.yearAfter },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
@@ -350,6 +352,7 @@ export class TransactionsStory extends TestStory {
             { action: Actions.changeTransactionType, data: TRANSFER },
             { action: Actions.inputSrcAmount, data: '1000' },
             { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Repeat Transfer' },
             { action: Actions.selectDate, data: App.dates.weekAgo },
             { action: Actions.selectEndDate, data: App.dates.weekAfter },
             { action: Actions.changeIntervalType, data: INTERVAL_DAY },
@@ -496,6 +499,7 @@ export class TransactionsStory extends TestStory {
         await Actions.createFromPersonAndSubmit(0, [
             { action: Actions.inputSrcAmount, data: '1000' },
             { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Repeat Debt' },
             { action: Actions.selectDate, data: App.dates.monthAgo },
             { action: Actions.selectStartDate, data: App.dates.monthAgo },
         ]);
@@ -578,6 +582,7 @@ export class TransactionsStory extends TestStory {
             { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
             { action: Actions.inputDestAmount, data: '1000' },
             { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Repeat Credit limit change' },
         ]);
     }
 

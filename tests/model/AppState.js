@@ -2209,6 +2209,15 @@ export class AppState {
             return false;
         }
 
+        if (typeof params.name !== 'string' || params.name === '') {
+            return false;
+        }
+        // Check there is no scheduled transactions with same name
+        const scheduleItem = this.schedule.findByName(params.name);
+        if (scheduleItem && (!params.id || (params.id && params.id !== scheduleItem.id))) {
+            return false;
+        }
+
         if (!Transaction.availTypes.includes(params.type)) {
             return false;
         }

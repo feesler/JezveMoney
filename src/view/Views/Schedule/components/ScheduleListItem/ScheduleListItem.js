@@ -16,15 +16,15 @@ import './ScheduleListItem.scss';
 /** CSS classes */
 const ITEM_CLASS = 'schedule-item';
 const SCHEDULE_GROUP_CLASS = 'schedule-item__schedule';
+const NAME_CLASS = 'schedule-item__name';
 const DATE_RANGE_CLASS = 'schedule-item__date-range';
-const START_DATE_CLASS = 'schedule-item__start-date';
-const END_DATE_CLASS = 'schedule-item__end-date';
 const INTERVAL_CLASS = 'schedule-item__interval';
 const OFFSET_CLASS = 'schedule-item__offset';
 /* Details mode */
 const DETAILS_CLASS = 'schedule-item_details';
 const COLUMN_CLASS = 'schedule-item__column';
 /* Fields */
+const NAME_FIELD_CLASS = 'schedule-item__name-field';
 const START_DATE_FIELD_CLASS = 'schedule-item__start-date-field';
 const END_DATE_FIELD_CLASS = 'schedule-item__end-date-field';
 const INTERVAL_FIELD_CLASS = 'schedule-item__interval-field';
@@ -58,11 +58,13 @@ export class ScheduleListItem extends ListItem {
     }
 
     initClassic() {
+        this.scheduleNameElem = createElement('div', { props: { className: NAME_CLASS } });
         this.dateRangeElem = createElement('div', { props: { className: DATE_RANGE_CLASS } });
         this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
         this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
 
         this.scheduleGroup.append(
+            this.scheduleNameElem,
             this.dateRangeElem,
             this.intervalElem,
             this.offsetElem,
@@ -70,18 +72,19 @@ export class ScheduleListItem extends ListItem {
     }
 
     initDetails() {
+        // Schedule name
+        this.scheduleNameField = Field.create({
+            title: __('schedule.name'),
+            className: NAME_FIELD_CLASS,
+        });
         // Start date
-        this.startDateElem = createElement('div', { props: { className: START_DATE_CLASS } });
         this.startDateField = Field.create({
             title: __('schedule.startDate'),
-            content: this.startDateElem,
             className: START_DATE_FIELD_CLASS,
         });
         // End date
-        this.endDateElem = createElement('div', { props: { className: END_DATE_CLASS } });
         this.endDateField = Field.create({
             title: __('schedule.endDate'),
-            content: this.endDateElem,
             className: END_DATE_FIELD_CLASS,
         });
         const dateRangeGroup = createElement('div', {
@@ -90,17 +93,13 @@ export class ScheduleListItem extends ListItem {
         });
 
         // Interval
-        this.intervalElem = createElement('div', { props: { className: INTERVAL_CLASS } });
         this.intervalField = Field.create({
             title: __('schedule.repeat'),
-            content: this.intervalElem,
             className: INTERVAL_FIELD_CLASS,
         });
         // Interval offset
-        this.offsetElem = createElement('div', { props: { className: OFFSET_CLASS } });
         this.offsetField = Field.create({
             title: __('schedule.intervalOffset'),
-            content: this.offsetElem,
             className: OFFSET_FIELD_CLASS,
         });
         const intervalGroup = createElement('div', {
@@ -109,6 +108,7 @@ export class ScheduleListItem extends ListItem {
         });
 
         this.scheduleGroup.append(
+            this.scheduleNameField.elem,
             dateRangeGroup,
             intervalGroup,
         );
@@ -118,13 +118,13 @@ export class ScheduleListItem extends ListItem {
         this.scheduleGroup.replaceChildren();
 
         // Details mode elements
+        this.scheduleNameField = null;
         this.startDateField = null;
         this.endDateField = null;
         this.intervalField = null;
         this.offsetField = null;
         // Common
-        this.startDateElem = null;
-        this.endDateElem = null;
+        this.scheduleNameElem = null;
         this.dateRangeElem = null;
         this.intervalElem = null;
         this.offsetElem = null;
@@ -143,9 +143,15 @@ export class ScheduleListItem extends ListItem {
     renderClassic(state) {
         const { item } = state;
 
+        this.scheduleNameElem.textContent = item.name;
         this.dateRangeElem.textContent = this.renderDateRange(item);
         this.intervalElem.textContent = item.renderInterval();
         this.offsetElem.textContent = item.renderIntervalOffset();
+    }
+
+    renderScheduleNameField(state) {
+        const { item } = state;
+        this.scheduleNameField.setContent(item.name);
     }
 
     renderStartDateField(state) {
@@ -181,6 +187,7 @@ export class ScheduleListItem extends ListItem {
     }
 
     renderDetails(state) {
+        this.renderScheduleNameField(state);
         this.renderStartDateField(state);
         this.renderEndDateField(state);
         this.renderIntervalField(state);

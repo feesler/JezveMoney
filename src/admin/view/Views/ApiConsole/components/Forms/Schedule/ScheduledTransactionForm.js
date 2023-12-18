@@ -48,6 +48,7 @@ export class ScheduledTransactionForm extends ApiRequestForm {
                 { title: 'Destination currency', name: 'dest_curr' },
                 { title: 'Category', name: 'category_id' },
                 { title: 'Comment', name: 'comment' },
+                { title: 'Schedule name', name: 'name' },
                 { title: 'Start date', name: 'start_date' },
                 { title: 'End date', name: 'end_date' },
                 { title: 'Interval type (0-4)', name: 'interval_type' },

@@ -12,6 +12,7 @@ class ScheduledTransactionItem
 {
     public $id = 0;
     public $user_id = 0;
+    public $name = null;
     public $type = 0;
     public $src_id = 0;
     public $dest_id = 0;
@@ -44,6 +45,7 @@ class ScheduledTransactionItem
 
         $res = new static();
         $res->id = intval($row["id"]);
+        $res->name = $row["name"];
         $res->user_id = intval($row["user_id"]);
         $res->src_id = intval($row["src_id"]);
         $res->dest_id = intval($row["dest_id"]);

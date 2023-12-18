@@ -74,6 +74,7 @@ export const getIntervalOffset = (date, type) => {
 export class ScheduledTransaction {
     static requiredProps = [
         'type',
+        'name',
         'src_id',
         'dest_id',
         'src_amount',
@@ -91,6 +92,7 @@ export class ScheduledTransaction {
 
     static availProps = [
         'id',
+        'name',
         'type',
         'src_id',
         'dest_id',
@@ -111,6 +113,7 @@ export class ScheduledTransaction {
 
     static debtProps = [
         'id',
+        'name',
         'type',
         'person_id',
         'acc_id',

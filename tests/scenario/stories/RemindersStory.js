@@ -352,6 +352,7 @@ export class RemindersStory extends TestStory {
         } = App.scenario;
 
         const data = {
+            name: 'One time expense',
             type: EXPENSE,
             src_id: ACC_RUB,
             src_amount: 100000,

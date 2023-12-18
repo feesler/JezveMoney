@@ -6,6 +6,12 @@ import { ScheduledTransaction } from '../../model/ScheduledTransaction.js';
 import { Transaction } from '../../model/Transaction.js';
 import { Reminder } from '../../model/Reminder.js';
 
+export const inputScheduleName = (value) => (
+    test(`Input schedule name '${value}'`, () => (
+        App.view.inputScheduleName(value)
+    ))
+);
+
 export const inputStartDate = (value) => (
     test(`Input schedule start date '${value}'`, () => (
         App.view.inputStartDate(value)

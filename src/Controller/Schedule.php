@@ -202,6 +202,7 @@ class Schedule extends ListViewController
 
             $tr = [
                 "type" => $this->getRequestedType($_GET, EXPENSE),
+                "name" => "",
                 "src_amount" => 0,
                 "dest_amount" => 0,
                 "category_id" => 0,
@@ -335,6 +336,7 @@ class Schedule extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "schedule" => $this->model->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,
@@ -382,6 +384,7 @@ class Schedule extends ListViewController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "categories" => $this->catModel->getData(),
+            "schedule" => $this->model->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
                 "mode" => $this->action,

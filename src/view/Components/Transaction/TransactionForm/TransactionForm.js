@@ -143,6 +143,7 @@ export class TransactionForm extends Component {
                 sourceAmount: true,
                 destAmount: true,
                 date: true,
+                scheduleName: true,
                 startDate: true,
                 endDate: true,
                 intervalStep: true,
@@ -159,6 +160,7 @@ export class TransactionForm extends Component {
         };
 
         if (isScheduleItem) {
+            initialState.form.name = transaction.name;
             initialState.form.startDate = App.formatInputDate(transaction.start_date);
             initialState.form.endDate = (transaction.end_date)
                 ? App.formatInputDate(transaction.end_date)
@@ -169,6 +171,7 @@ export class TransactionForm extends Component {
         } else {
             initialState.form.date = App.formatInputDate(transaction.date);
 
+            initialState.form.name = '';
             initialState.form.startDate = App.formatInputDate(transaction.date);
             initialState.form.endDate = '';
             initialState.form.intervalStep = 1;
@@ -568,6 +571,17 @@ export class TransactionForm extends Component {
 
     /** Creates schedule fields */
     createScheduleFields() {
+        // Schedule item name field
+        this.scheduleNameField = InputField.create({
+            id: 'scheduleNameField',
+            inputId: 'scheduleNameInput',
+            name: 'scheduleName',
+            title: __('schedule.name'),
+            className: 'form-row',
+            validate: true,
+            onInput: (e) => this.onScheduleNameInput(e),
+        });
+
         // Date range field
         this.dateRangeField = DateRangeField.create({
             id: 'dateRangeField',
@@ -696,6 +710,7 @@ export class TransactionForm extends Component {
 
         return [
             this.repeatSwitchField.elem,
+            this.scheduleNameField.elem,
             this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
@@ -1023,9 +1038,11 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    /**
-     * Schedule date range change callback
-     */
+    onScheduleNameInput(e) {
+        this.dispatch(actions.scheduleNameChange(e.target.value));
+        this.notifyChanged();
+    }
+
     onScheduleRangeChange(range) {
         this.dispatch(actions.scheduleRangeChange(range));
         this.notifyChanged();
@@ -1136,10 +1153,14 @@ export class TransactionForm extends Component {
 
         const isTransaction = (state.type === 'transaction');
         const isScheduleItem = (state.type === 'scheduleItem');
+        const trIntervalType = state.transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = trIntervalType !== INTERVAL_NONE;
 
         if (isTransaction) {
             this.validateDate(state);
-        } else if (isScheduleItem) {
+        }
+        if (isScheduleItem || isRepeat) {
+            this.validateScheduleName(state);
             this.validateStartDate(state);
             this.validateEndDate(state);
             this.validateIntervalStep(state);
@@ -1153,8 +1174,15 @@ export class TransactionForm extends Component {
 
         if (isTransaction) {
             valid = valid && validation.date;
-        } else if (isScheduleItem) {
-            valid = valid && validation.startDate && validation.endDate && validation.intervalStep;
+        }
+        if (isScheduleItem || isRepeat) {
+            valid = (
+                valid
+                && validation.scheduleName === true
+                && validation.startDate
+                && validation.endDate
+                && validation.intervalStep
+            );
         }
 
         if (valid) {
@@ -1190,6 +1218,20 @@ export class TransactionForm extends Component {
         const valid = App.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
             this.dispatch(actions.invalidateDate());
+        }
+    }
+
+    validateScheduleName(state) {
+        const { name } = state.form;
+        if (name.length === 0) {
+            this.dispatch(actions.invalidateScheduleName(__('schedule.errors.invalidName')));
+            this.scheduleNameField.focus();
+        } else {
+            const scheduleItem = App.model.schedule.findByName(name);
+            if (scheduleItem && state.transaction.id !== scheduleItem.id) {
+                this.dispatch(actions.invalidateScheduleName(__('schedule.errors.existingName')));
+                this.scheduleNameField.focus();
+            }
         }
     }
 
@@ -1260,6 +1302,7 @@ export class TransactionForm extends Component {
 
         const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
         if (type === 'scheduleItem' || trIntervalType !== INTERVAL_NONE) {
+            res.name = transaction.name;
             res.start_date = transaction.start_date;
             res.end_date = transaction.end_date;
             res.interval_type = transaction.interval_type;
@@ -1786,8 +1829,20 @@ export class TransactionForm extends Component {
     renderScheduleFields(state, prevState) {
         const { transaction, form, validation } = state;
         const { intervalType, intervalOffset } = form;
+        const isScheduleItem = (state.type === 'scheduleItem');
         const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = trIntervalType !== INTERVAL_NONE;
+
+        // Schedule item name field
+        const isValidName = (state.validation.scheduleName === true);
+        this.scheduleNameField.setState((fieldState) => ({
+            ...fieldState,
+            value: state.form.name,
+            valid: isValidName,
+            feedbackMessage: (isValidName) ? '' : state.validation.scheduleName,
+            disabled: state.submitStarted,
+        }));
+        this.scheduleNameField.show(isScheduleItem || isRepeat);
 
         this.renderDateRangeFilter(state, prevState);
 
@@ -1979,6 +2034,7 @@ export class TransactionForm extends Component {
             this.categoryField.show(state.isAvailable);
             this.commentField.show(state.isAvailable);
 
+            this.scheduleNameField.show(state.isAvailable);
             this.repeatSwitchField.show(state.isAvailable);
             this.dateRangeField.show(state.isAvailable);
             this.intervalStepField.show(state.isAvailable);

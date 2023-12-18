@@ -231,6 +231,7 @@ export const isStatistics = (obj) => verifyObject(obj, {
 /** Verify object is scheduled transaction */
 export const isScheduledTransaction = (obj) => verifyObject(obj, {
     id: isInteger,
+    name: isString,
     type: isInteger,
     src_id: isInteger,
     dest_id: isInteger,

@@ -318,6 +318,7 @@
         "deleteMultipleMessage": "Are you sure want to delete selected scheduled transactions?",
         "finish": "Finish",
         "date": "Date",
+        "name": "Name",
         "startDate": "Start date",
         "endDate": "End date",
         "noEndDate": "Not specified",
@@ -360,7 +361,9 @@
         "errors": {
             "create": "Fail to create new scheduled transaction",
             "update": "Fail to update scheduled transaction",
-            "delete": "Fail to delete scheduled transaction"
+            "delete": "Fail to delete scheduled transaction",
+            "invalidName": "Input name",
+            "existingName": "Scheduled transaction with this name already exist"
         }
     },
     "reminders": {

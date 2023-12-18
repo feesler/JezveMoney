@@ -91,6 +91,7 @@ class ScheduledTransactionModel extends CachedTable
     {
         $avFields = [
             "type",
+            "name",
             "src_id",
             "dest_id",
             "src_amount",
@@ -112,6 +113,15 @@ class ScheduledTransactionModel extends CachedTable
             checkFields($params, $avFields, true);
         }
         $item = ($item_id) ? $this->getItem($item_id) : null;
+
+        if (isset($params["name"]) || is_null($params["name"])) {
+            $res["name"] = $this->dbObj->escape($params["name"]);
+            if (is_empty($res["name"])) {
+                throw new \Error("Invalid name specified");
+            }
+        } else {
+            $res["name"] = $item->name;
+        }
 
         if (isset($params["type"])) {
             $res["type"] = intval($params["type"]);
@@ -304,7 +314,29 @@ class ScheduledTransactionModel extends CachedTable
             }
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same scheduled transaction already exist");
+        }
+
         return $res;
+    }
+
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params item fields
+     * @param int $item_id item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
+    {
+        if (!is_array($params) || !isset($params["name"])) {
+            return false;
+        }
+
+        $foundItem = $this->findByName($params["name"]);
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
     /**
@@ -380,6 +412,7 @@ class ScheduledTransactionModel extends CachedTable
     public function prepareDebt(array $params)
     {
         $mandatoryParams = [
+            "name",
             "person_id",
             "op",
             "src_amount",
@@ -446,6 +479,7 @@ class ScheduledTransactionModel extends CachedTable
         $res["category_id"] = $params["category_id"];
         $res["comment"] = $params["comment"];
 
+        $res["name"] = $params["name"];
         $res["start_date"] = $params["start_date"];
         $res["end_date"] = $params["end_date"];
         $res["interval_type"] = $params["interval_type"];
@@ -475,7 +509,7 @@ class ScheduledTransactionModel extends CachedTable
         foreach ($this->affectedItems as $item_id => $item) {
             $item = (array)$item;
 
-            $res = $this->validateParams($item);
+            $res = $this->validateParams($item, $item_id);
 
             unset($res["interval_offset"]);
 
@@ -911,6 +945,40 @@ class ScheduledTransactionModel extends CachedTable
         }
 
         return $res;
+    }
+
+    /**
+     * Search for scheduled transaction with specified name
+     *
+     * @param string $name name of scheduled transaction to find
+     * @param bool $caseSens case sensitive flag, default is false
+     *
+     * @return object|null
+     */
+    public function findByName(string $name, bool $caseSens = false)
+    {
+        if (is_empty($name)) {
+            return null;
+        }
+
+        if (!$this->checkCache()) {
+            return null;
+        }
+
+        if (!$caseSens) {
+            $name = strtolower($name);
+        }
+
+        foreach ($this->cache as $item) {
+            if (
+                ($caseSens && $item->name == $name) ||
+                (!$caseSens && strtolower($item->name) == $name)
+            ) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     /**

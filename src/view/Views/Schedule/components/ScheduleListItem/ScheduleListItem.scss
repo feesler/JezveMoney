@@ -53,11 +53,11 @@
   overflow: hidden;
 }
 
+.schedule-item__name,
 .schedule-item__date-range,
-.schedule-item__start-date,
-.schedule-item__end-date,
 .schedule-item__interval,
 .schedule-item__offset,
+.schedule-item__name-field .field__content,
 .schedule-item__start-date-field .field__content,
 .schedule-item__end-date-field .field__content,
 .schedule-item__interval-field .field__content,
@@ -65,14 +65,19 @@
   color: var(--list-item-text-color);
 }
 
+.schedule-item__name,
 .schedule-item__date-range,
-.schedule-item__start-date,
-.schedule-item__end-date,
 .schedule-item__interval,
 .schedule-item__offset {
   min-height: 23px;
   line-height: 23px;
   flex: 0 0 auto;
+}
+
+.schedule-item__name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--hl-text-color);
 }
 
 .schedule-item__date-range,
@@ -128,7 +133,7 @@
 
     .schedule-item__schedule {
       align-items: flex-start;
-      grid-template-columns: 2fr 2fr;
+      grid-template-columns: 1fr 2fr 2fr;
     }
   }
 }

@@ -13,6 +13,7 @@ class ScheduledTransaction extends ApiListController
 {
     protected $requiredFields = [
         "type",
+        "name",
         "src_id",
         "dest_id",
         "src_amount",
@@ -30,6 +31,7 @@ class ScheduledTransaction extends ApiListController
 
     protected $debtRequiredFields = [
         "type",
+        "name",
         "person_id",
         "acc_id",
         "op",
