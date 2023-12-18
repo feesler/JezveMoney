@@ -17,12 +17,11 @@ import { InputGroup } from 'jezvejs/InputGroup';
 import { createStore } from 'jezvejs/Store';
 
 import {
-    cutTime,
     __,
     MAX_DAYS_IN_MONTH,
     createHiddenInputs,
 } from '../../../utils/utils.js';
-import { EXCHANGE_PRECISION, normalize, normalizeExch } from '../../../utils/decimal.js';
+import { EXCHANGE_PRECISION, normalizeExch } from '../../../utils/decimal.js';
 import { App } from '../../../Application/App.js';
 
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../Models/Account.js';
@@ -63,13 +62,8 @@ import { ReminderField } from '../../Reminder/ReminderField/ReminderField.js';
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 
-import {
-    actions,
-    reducer,
-    calculateSourceResult,
-    calculateDestResult,
-    updateStateExchange,
-} from './reducer.js';
+import { getInitialState } from './initialState.js';
+import { actions, reducer } from './reducer.js';
 import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
@@ -108,153 +102,7 @@ export class TransactionForm extends Component {
             ...props,
         });
 
-        const accountModel = App.model.accounts;
-        const currencyModel = App.model.currency;
-
-        const isScheduleItem = this.props.type === 'scheduleItem';
-        const transaction = { ...this.props.transaction };
-
-        if (isScheduleItem) {
-            transaction.start_date = cutTime(transaction.start_date);
-            transaction.end_date = (transaction.end_date) ? cutTime(transaction.end_date) : null;
-        } else {
-            transaction.date = cutTime(transaction.date);
-        }
-
-        const initialState = {
-            id: 0,
-            type: this.props.type,
-            transaction,
-            form: {
-                sourceAmount: '',
-                destAmount: '',
-                sourceResult: 0,
-                fSourceResult: 0,
-                destResult: 0,
-                fDestResult: 0,
-                exchange: 1,
-                fExchange: 1,
-                backExchange: 1,
-                fBackExchange: 1,
-                comment: transaction.comment,
-                useBackExchange: false,
-            },
-            validation: {
-                sourceAmount: true,
-                destAmount: true,
-                date: true,
-                scheduleName: true,
-                startDate: true,
-                endDate: true,
-                intervalStep: true,
-            },
-            srcAccount: accountModel.getItem(transaction.src_id),
-            destAccount: accountModel.getItem(transaction.dest_id),
-            srcCurrency: currencyModel.getItem(transaction.src_curr),
-            destCurrency: currencyModel.getItem(transaction.dest_curr),
-            isDiff: transaction.src_curr !== transaction.dest_curr,
-            isUpdate: this.props.mode === 'update',
-            isAvailable: this.props.isAvailable,
-            submitStarted: false,
-            renderTime: null,
-        };
-
-        if (isScheduleItem) {
-            initialState.form.name = transaction.name;
-            initialState.form.startDate = App.formatInputDate(transaction.start_date);
-            initialState.form.endDate = (transaction.end_date)
-                ? App.formatInputDate(transaction.end_date)
-                : '';
-            initialState.form.intervalStep = transaction.interval_step;
-            initialState.form.intervalType = transaction.interval_type;
-            initialState.form.intervalOffset = transaction.interval_offset;
-        } else {
-            initialState.form.date = App.formatInputDate(transaction.date);
-
-            initialState.form.name = '';
-            initialState.form.startDate = App.formatInputDate(transaction.date);
-            initialState.form.endDate = '';
-            initialState.form.intervalStep = 1;
-            initialState.form.intervalType = INTERVAL_MONTH;
-            initialState.form.intervalOffset = 0;
-        }
-
-        if (transaction.type === EXPENSE) {
-            initialState.id = (initialState.isDiff) ? STATE.E_S_AMOUNT_D_AMOUNT : STATE.E_D_AMOUNT;
-        } else if (transaction.type === INCOME) {
-            initialState.id = (initialState.isDiff) ? STATE.I_S_AMOUNT_D_AMOUNT : STATE.I_S_AMOUNT;
-        } else if (transaction.type === TRANSFER) {
-            initialState.id = (initialState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
-        } else if (transaction.type === DEBT) {
-            initialState.person = App.model.persons.getItem(transaction.person_id);
-            const personAccountId = (transaction.debtType)
-                ? transaction.src_id
-                : transaction.dest_id;
-            if (personAccountId) {
-                initialState.personAccount = accountModel.getItem(personAccountId);
-            } else {
-                const personAccountCurr = (transaction.debtType)
-                    ? transaction.src_curr
-                    : transaction.dest_curr;
-                initialState.personAccount = {
-                    id: 0,
-                    balance: 0,
-                    curr_id: personAccountCurr,
-                };
-            }
-
-            if (transaction.debtType) {
-                initialState.srcAccount = initialState.personAccount;
-                initialState.account = initialState.destAccount;
-
-                if (initialState.isDiff) {
-                    initialState.id = STATE.DG_S_AMOUNT_D_AMOUNT;
-                } else {
-                    initialState.id = (transaction.noAccount)
-                        ? STATE.DG_NOACC_S_AMOUNT
-                        : STATE.DG_S_AMOUNT;
-                }
-            } else {
-                initialState.destAccount = initialState.personAccount;
-                initialState.account = initialState.srcAccount;
-
-                if (initialState.isDiff) {
-                    initialState.id = STATE.DT_S_AMOUNT_D_AMOUNT;
-                } else {
-                    initialState.id = (transaction.noAccount)
-                        ? STATE.DT_NOACC_D_AMOUNT
-                        : STATE.DT_D_AMOUNT;
-                }
-            }
-        } else if (transaction.type === LIMIT_CHANGE) {
-            initialState.id = (isScheduleItem)
-                ? STATE.L_AMOUNT
-                : STATE.L_RESULT;
-
-            if (transaction.src_id !== 0) {
-                initialState.destAccount = initialState.srcAccount;
-                initialState.srcAccount = null;
-                initialState.destCurrency = initialState.srcCurrency;
-
-                transaction.dest_id = transaction.src_id;
-                transaction.src_id = 0;
-                transaction.dest_curr = transaction.src_curr;
-                transaction.src_amount = -transaction.src_amount;
-                transaction.dest_amount = transaction.src_amount;
-            }
-        }
-
-        initialState.form.sourceAmount = (transaction.src_amount)
-            ? normalize(transaction.src_amount, initialState.srcCurrency.precision)
-            : '';
-        initialState.form.destAmount = (transaction.dest_amount)
-            ? normalize(transaction.dest_amount, initialState.destCurrency.precision)
-            : '';
-
-        calculateSourceResult(initialState);
-        calculateDestResult(initialState);
-        updateStateExchange(initialState);
-
+        const initialState = getInitialState(this.props);
         this.store = createStore(reducer, { initialState });
 
         this.init();
