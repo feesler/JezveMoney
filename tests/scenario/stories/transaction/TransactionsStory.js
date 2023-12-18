@@ -144,6 +144,14 @@ export class TransactionsStory extends TestStory {
             { action: Actions.selectWeekendOffset },
         ]);
 
+        // Check schedule fields are validated
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
+        ]);
+
         // Check create transaction with hidden account
         await Actions.createFromAccountAndSubmit(0, [
             { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
@@ -243,6 +251,15 @@ export class TransactionsStory extends TestStory {
             { action: Actions.selectEndDate, data: App.dates.yearAfter },
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekDayOffset, data: 4 },
+        ]);
+
+        // Check schedule fields are validated
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: Actions.changeTransactionType, data: INCOME },
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
 
         // Check create transaction with hidden account
@@ -356,6 +373,15 @@ export class TransactionsStory extends TestStory {
             { action: Actions.selectDate, data: App.dates.weekAgo },
             { action: Actions.selectEndDate, data: App.dates.weekAfter },
             { action: Actions.changeIntervalType, data: INTERVAL_DAY },
+        ]);
+
+        // Check schedule fields are validated
+        await Actions.createFromAccountAndSubmit(0, [
+            { action: Actions.changeTransactionType, data: TRANSFER },
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
 
         // Check create transaction with hidden account
@@ -504,6 +530,14 @@ export class TransactionsStory extends TestStory {
             { action: Actions.selectStartDate, data: App.dates.monthAgo },
         ]);
 
+        // Check schedule fields are validated
+        await Actions.createFromPersonAndSubmit(0, [
+            { action: Actions.inputSrcAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
+        ]);
+
         // Check create transaction with hidden person
         await Actions.createFromPersonAndSubmit(0, [
             { action: Actions.changePerson, data: HIDDEN_PERSON },
@@ -584,6 +618,15 @@ export class TransactionsStory extends TestStory {
             { action: Actions.toggleEnableRepeat },
             { action: Actions.inputScheduleName, data: 'Repeat Credit limit change' },
         ]);
+
+        // Check schedule fields are validated
+        await Actions.createFromAccountAndSubmit(index, [
+            { action: Actions.changeTransactionType, data: LIMIT_CHANGE },
+            { action: Actions.inputDestAmount, data: '1000' },
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
+        ]);
     }
 
     async updateExpense() {
@@ -623,6 +666,13 @@ export class TransactionsStory extends TestStory {
             { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
             { action: Actions.inputDestAmount, data: '99.9' },
         ]);
+
+        // Check schedule fields are validated
+        await Actions.updateAndSubmit(EXPENSE, 5, [
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
+        ]);
     }
 
     async updateIncome() {
@@ -660,6 +710,13 @@ export class TransactionsStory extends TestStory {
         await Actions.updateAndSubmit(INCOME, 4, [
             { action: Actions.changeDestAccount, data: HIDDEN_ACC },
             { action: Actions.inputSrcAmount, data: '99.9' },
+        ]);
+
+        // Check schedule fields are validated
+        await Actions.updateAndSubmit(INCOME, 5, [
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
     }
 
@@ -703,6 +760,13 @@ export class TransactionsStory extends TestStory {
         await Actions.updateAndSubmit(TRANSFER, 5, [
             { action: Actions.changeSrcAccount, data: HIDDEN_ACC },
             { action: Actions.inputSrcAmount, data: '1000' },
+        ]);
+
+        // Check schedule fields are validated
+        await Actions.updateAndSubmit(TRANSFER, 6, [
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
     }
 
@@ -764,6 +828,13 @@ export class TransactionsStory extends TestStory {
             { action: Actions.changeAccount, data: HIDDEN_ACC },
             { action: Actions.inputDestAmount, data: '105' },
         ]);
+
+        // Check schedule fields are validated
+        await Actions.updateAndSubmit(DEBT, 5, [
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
+        ]);
     }
 
     async updateLimitChange() {
@@ -773,10 +844,18 @@ export class TransactionsStory extends TestStory {
             { action: Actions.clickDestAmount },
             { action: Actions.inputDestAmount, data: '100000' },
         ]);
+
         await Actions.updateAndSubmit(LIMIT_CHANGE, 1, [
             { action: Actions.clickDestAmount },
             { action: Actions.inputDestAmount, data: '5000' },
             { action: Actions.changeDestAccount, data: App.scenario.BTC_CREDIT },
+        ]);
+
+        // Check schedule fields are validated
+        await Actions.updateAndSubmit(LIMIT_CHANGE, 2, [
+            { action: Actions.toggleEnableRepeat },
+            { action: Actions.inputScheduleName, data: 'Invalid start date' },
+            { action: Actions.inputStartDate, data: '' },
         ]);
     }
 
