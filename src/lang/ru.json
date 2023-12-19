@@ -42,7 +42,8 @@
         "hide": "Скрыть",
         "showMore": "Показать ещё...",
         "showAll": "Показать все",
-        "showVisible": "Свернуть"
+        "showVisible": "Свернуть",
+        "openInNewTab": "открыть в новой вкладке"
     },
     "loading": "Загрузка...",
     "typeToFilter": "Поиск",
@@ -371,6 +372,7 @@
         "confirm": "Внести без изменений",
         "update": "Редактировать",
         "cancel": "Отменить",
+        "linkedTransaction": "Связанная транзакция",
         "state": {
             "upcoming": "Предстоящие",
             "scheduled": "Запланированные",
@@ -488,7 +490,6 @@
         },
         "checkSimilar": "Искать похожие транзакции",
         "similarFound": "Найдена похожая транзакция: ",
-        "openSimilar": "открыть в новой вкладке",
         "checkReminders": "Искать подходящие напоминания",
         "selectFile": "Выбрать файл",
         "selectFileDescription": "или перетащите его на этот диалог",

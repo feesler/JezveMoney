@@ -45,6 +45,7 @@ export class RemindersStory extends TestStory {
         await this.removeReminder();
         await this.dialogPagination();
         await this.dialogFilters();
+        await this.details();
         await this.filters();
         await this.upcoming();
         await this.confirmCancelled();
@@ -56,7 +57,6 @@ export class RemindersStory extends TestStory {
     async list() {
         await this.detailsMode();
         await this.select();
-        await this.details();
         await this.pagination();
     }
 
@@ -261,9 +261,11 @@ export class RemindersStory extends TestStory {
         await Actions.closeDetails();
         await Actions.showDetails({ index: 1 });
         await Actions.closeDetails();
+        await Actions.filterByState({ state: REMINDER_CONFIRMED });
         await Actions.showDetails({ index: 0, directNavigate: true });
         await Actions.showDetails({ index: 1, directNavigate: true });
         await Actions.closeDetails();
+        await Actions.filterByState({ state: REMINDER_SCHEDULED });
     }
 
     async pagination() {

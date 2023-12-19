@@ -39,7 +39,7 @@ export class SimilarTransactionInfo extends Component {
                         className: SIMILAR_LINK_CLASS,
                         href: url,
                         target: '_blank',
-                        textContent: __('import.openSimilar'),
+                        textContent: __('actions.openInNewTab'),
                     },
                 }),
             ],

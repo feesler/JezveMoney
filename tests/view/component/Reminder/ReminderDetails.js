@@ -4,13 +4,15 @@ import {
     query,
     click,
     evaluate,
+    baseUrl,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
-import { Reminder } from '../../../model/Reminder.js';
+import { REMINDER_CONFIRMED, Reminder } from '../../../model/Reminder.js';
 
 const fieldSelectors = {
+    typeField: '.type-field',
     sourceField: '.source-field',
     destinationField: '.destination-field',
     srcAmountField: '.src-amount-field',
@@ -18,6 +20,7 @@ const fieldSelectors = {
     dateField: '.date-field',
     categoryField: '.category-field',
     commentField: '.comment-field',
+    transactionField: '.transaction-field',
     createDateField: '.create-date-field',
     updateDateField: '.update-date-field',
 };
@@ -46,8 +49,17 @@ export class ReminderDetails extends TestComponent {
             ? category.name
             : __('categories.noCategory');
 
+        const scheduleItem = state.schedule.getItem(reminder.schedule_id);
+        assert(scheduleItem, 'Scheduled transaction not found');
+
+        const isConfirmed = reminder.state === REMINDER_CONFIRMED;
+
         const res = {
             title: {
+                visible: true,
+                value: scheduleItem.name,
+            },
+            typeField: {
                 visible: true,
                 value: Transaction.typeToString(reminder.type),
             },
@@ -76,6 +88,9 @@ export class ReminderDetails extends TestComponent {
                 visible: reminder.comment.length > 0,
                 value: reminder.comment,
             },
+            transactionField: {
+                visible: isConfirmed,
+            },
             createDateField: {
                 value: App.secondsToDateString(reminder.createdate),
                 visible: true,
@@ -94,6 +109,9 @@ export class ReminderDetails extends TestComponent {
         }
         if (isDiff) {
             res.destAmountField.value = destCurr.format(reminder.dest_amount);
+        }
+        if (isConfirmed) {
+            res.transactionField.link = `${baseUrl()}transactions/${reminder.transaction_id}`;
         }
 
         return res;
@@ -119,6 +137,11 @@ export class ReminderDetails extends TestComponent {
                     value: contentEl?.textContent,
                     visible: !!elem && !elem.hidden,
                 };
+
+                if (field === 'transactionField') {
+                    const linkEl = contentEl?.querySelector('a');
+                    state.transactionField.link = linkEl?.href ?? '';
+                }
             });
 
             return state;

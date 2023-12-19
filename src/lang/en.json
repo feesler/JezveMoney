@@ -42,7 +42,8 @@
         "hide": "Hide",
         "showMore": "Show more...",
         "showAll": "Show all",
-        "showVisible": "Hide"
+        "showVisible": "Hide",
+        "openInNewTab": "open in new tab"
     },
     "loading": "Loading...",
     "typeToFilter": "Type to filter",
@@ -371,6 +372,7 @@
         "confirm": "Submit without changes",
         "update": "Edit",
         "cancel": "Cancel",
+        "linkedTransaction": "Linked transaction",
         "state": {
             "upcoming": "Upcoming",
             "scheduled": "Scheduled",
@@ -488,7 +490,6 @@
         },
         "checkSimilar": "Check similar transactions",
         "similarFound": "Similar transaction found: ",
-        "openSimilar": "open in new tab",
         "checkReminders": "Confirm suitable reminders",
         "selectFile": "Select file",
         "selectFileDescription": "or simply drop it to this dialog",

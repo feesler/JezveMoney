@@ -387,7 +387,13 @@ export class ReminderListView extends AppView {
     }
 
     cloneModel(model) {
-        return structuredClone(model);
+        const res = structuredClone(model);
+
+        if (res.detailsItem) {
+            res.detailsItem = new Reminder(res.detailsItem);
+        }
+
+        return res;
     }
 
     updateModelFilter(model) {
@@ -1251,8 +1257,13 @@ export class ReminderListView extends AppView {
         assert(this.model.detailsItem, 'Item not found');
         if (directNavigate) {
             this.model.detailsMode = false;
+            this.model.filtersVisible = false;
+            this.model.filter.state = REMINDER_SCHEDULED;
         }
-        const expected = this.getExpectedState();
+
+        const expected = (directNavigate)
+            ? this.onFilterUpdate()
+            : this.getExpectedState();
 
         if (directNavigate) {
             await this.goToDetailsURL();
