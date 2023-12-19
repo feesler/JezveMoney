@@ -27,6 +27,8 @@ const defaultProps = {
     reminder_id: null,
     schedule_id: null,
     reminder_date: null,
+    selectButton: true,
+    closeButton: true,
     disabled: false,
     onSelect: null,
     onRemove: null,
@@ -50,23 +52,14 @@ export class ReminderField extends Field {
 
     init() {
         this.titleTextElem = createElement('span');
-        this.closeButton = CloseButton.create({
-            onClick: (e) => this.onClose(e),
-        });
 
         this.titleElem = createElement('label', {
             props: { className: TITLE_CLASS },
-            children: [this.titleTextElem, this.closeButton.elem],
+            children: [this.titleTextElem],
         });
 
-        this.selectButton = Button.create({
-            className: SELECT_BUTTON_CLASS,
-            title: __('transactions.selectReminder'),
-            onClick: (e) => this.onClickSelect(e),
-        });
         this.controlsContainer = createElement('div', {
             props: { className: CONTROLS_CONTAINER_CLASS },
-            children: this.selectButton.elem,
         });
 
         this.contentContainer = createElement('div', {
@@ -110,8 +103,16 @@ export class ReminderField extends Field {
     }
 
     renderTitle(state, prevState) {
+        if (state.title !== prevState?.title) {
+            this.titleTextElem.textContent = state.title ?? '';
+        }
+
+        this.renderCloseButton(state, prevState);
+    }
+
+    renderCloseButton(state, prevState) {
         if (
-            state.title === prevState?.title
+            state.closeButton === prevState?.closeButton
             && state.reminder_id === prevState?.reminder_id
             && state.schedule_id === prevState?.schedule_id
             && state.disabled === prevState?.disabled
@@ -119,14 +120,51 @@ export class ReminderField extends Field {
             return;
         }
 
-        const reminderSelected = state.reminder_id || state.schedule_id;
+        if (!state.closeButton) {
+            this.closeButton?.elem?.remove();
+            this.closeButton = null;
+            return;
+        }
 
-        this.titleTextElem.textContent = state.title ?? '';
+        if (!this.closeButton) {
+            this.closeButton = CloseButton.create({
+                onClick: (e) => this.onClose(e),
+            });
+            this.titleElem.append(this.closeButton.elem);
+        }
+
+        const reminderSelected = state.reminder_id || state.schedule_id;
         this.closeButton.show(!!reminderSelected);
         this.closeButton.enable(!state.disabled);
     }
 
-    renderContent(state, prevState) {
+    renderSelectButton(state, prevState) {
+        if (
+            state.selectButton === prevState?.selectButton
+            && state.disabled === prevState?.disabled
+        ) {
+            return;
+        }
+
+        if (!state.selectButton) {
+            this.selectButton?.elem?.remove();
+            this.selectButton = null;
+            return;
+        }
+
+        if (!this.selectButton) {
+            this.selectButton = Button.create({
+                className: SELECT_BUTTON_CLASS,
+                title: __('transactions.selectReminder'),
+                onClick: (e) => this.onClickSelect(e),
+            });
+            this.controlsContainer.append(this.selectButton.elem);
+        }
+
+        this.selectButton.enable(!state.disabled);
+    }
+
+    renderReminderItem(state, prevState) {
         if (
             state.reminder_id === prevState?.reminder_id
             && state.schedule_id === prevState?.schedule_id
@@ -135,8 +173,6 @@ export class ReminderField extends Field {
         ) {
             return;
         }
-
-        this.selectButton.enable(!state.disabled);
 
         if (!state.reminder_id && !state.schedule_id) {
             this.reminderItem?.elem?.remove();
@@ -166,5 +202,10 @@ export class ReminderField extends Field {
         }
 
         this.reminderItem.show();
+    }
+
+    renderContent(state, prevState) {
+        this.renderSelectButton(state, prevState);
+        this.renderReminderItem(state, prevState);
     }
 }

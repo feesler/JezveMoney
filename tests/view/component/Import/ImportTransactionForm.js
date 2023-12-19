@@ -325,7 +325,11 @@ export class ImportTransactionForm extends TestComponent {
             this.parseField(await query(this.elem, selector))
         ));
 
-        res.reminderField = await ReminderField.create(this, await query('.reminder-field'));
+        const reminderElem = await query(this.elem, '.reminder-field');
+        if (reminderElem) {
+            res.reminderField = await ReminderField.create(this, reminderElem);
+        }
+
         if (res.reminderDialog.visible) {
             res.reminderDialog = await SelectReminderDialog.create(this, res.reminderDialog.elem);
         }
@@ -564,8 +568,6 @@ export class ImportTransactionForm extends TestComponent {
         const scheduleId = (model.scheduleId) ? parseInt(model.scheduleId, 10) : 0;
         if (reminderId !== 0) {
             res.reminder_id = reminderId;
-            res.schedule_id = 0;
-            res.reminder_date = 0;
         } else if (scheduleId !== 0) {
             res.schedule_id = scheduleId;
             res.reminder_date = parseInt(model.reminderDate, 10);
