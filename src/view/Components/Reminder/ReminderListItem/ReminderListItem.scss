@@ -8,6 +8,17 @@
   --list-item-column-gap: 16px;
   --list-item-row-gap: 2px;
   --list-item-details-row-gap: 8px;
+
+  /* Schedule part */
+  .reminder-item__schedule-name {
+    font-size: 1rem;
+    color: var(--hl-text-color);
+  }
+
+  /* Transaction part */
+  .trans-item-base__title {
+    color: var(--dimmed-text-color);
+  }
 }
 
 .reminder-item[data-type="1"] {
@@ -39,6 +50,7 @@
   border-left-width: 2px;
   border-left-style: solid;
   border-left-color: var(--transaction-color);
+  row-gap: var(--trans-item-details-row-gap);
 }
 
 /* Disabled state */

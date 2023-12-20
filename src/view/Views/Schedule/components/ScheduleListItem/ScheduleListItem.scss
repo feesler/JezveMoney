@@ -8,6 +8,10 @@
   flex-flow: row nowrap;
   align-items: stretch;
   position: relative;
+
+  .trans-item-base__title {
+    color: var(--dimmed-text-color);
+  }
 }
 
 .schedule-item[data-type="1"] {
@@ -76,7 +80,6 @@
 
 .schedule-item__name {
   font-size: 1rem;
-  font-weight: 600;
   color: var(--hl-text-color);
 }
 

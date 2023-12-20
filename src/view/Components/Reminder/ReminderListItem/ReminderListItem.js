@@ -1,4 +1,6 @@
-import { enable, getClassName } from '@jezvejs/dom';
+import { createElement, enable, getClassName } from '@jezvejs/dom';
+
+import { App } from '../../../Application/App.js';
 
 import { Reminder } from '../../../Models/Reminder.js';
 
@@ -9,6 +11,9 @@ import './ReminderListItem.scss';
 
 /** CSS classes */
 const ITEM_CLASS = 'reminder-item';
+const SCHEDULE_CLASS = 'reminder-item__schedule';
+const SCHEDULE_NAME_CLASS = 'reminder-item__schedule-name';
+const SCHEDULE_INTERVAL_CLASS = 'reminder-item__schedule-interval';
 
 const defaultProps = {
     mode: 'classic', // 'classic' or 'details'
@@ -32,7 +37,45 @@ export class ReminderListItem extends ListItem {
         });
     }
 
-    renderContent(state, prevState) {
+    getScheduleName(state) {
+        const { item } = state;
+        const { schedule } = App.model;
+        const scheduleItem = schedule.getItem(item.schedule_id);
+        if (!scheduleItem) {
+            throw new Error('Scheduled transaction not found');
+        }
+
+        return scheduleItem.name;
+    }
+
+    renderScheduleContent(state, prevState) {
+        if (state.item === prevState?.item) {
+            return;
+        }
+
+        if (!this.scheduleInfo) {
+            this.scheduleNameElem = createElement('div', {
+                props: { className: SCHEDULE_NAME_CLASS },
+            });
+            this.scheduleIntervalElem = createElement('div', {
+                props: { className: SCHEDULE_INTERVAL_CLASS },
+            });
+
+            this.scheduleInfo = createElement('div', {
+                props: { className: SCHEDULE_CLASS },
+                children: [
+                    this.scheduleNameElem,
+                ],
+            });
+
+            this.contentElem.prepend(this.scheduleInfo);
+        }
+
+        const scheduleName = this.getScheduleName(state);
+        this.scheduleNameElem.textContent = scheduleName;
+    }
+
+    renderTransactionContent(state, prevState) {
         if (
             state.item === prevState?.item
             && state.mode === prevState?.mode
@@ -53,6 +96,11 @@ export class ReminderListItem extends ListItem {
             this.transactionBase = TransactionListItemBase.create(transactionState);
             this.contentElem.append(this.transactionBase.elem);
         }
+    }
+
+    renderContent(state, prevState) {
+        this.renderScheduleContent(state, prevState);
+        this.renderTransactionContent(state, prevState);
     }
 
     render(state, prevState = {}) {
