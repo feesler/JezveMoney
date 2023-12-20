@@ -43,7 +43,7 @@ export class CategoryDetails extends ItemDetails {
             props: {
                 className: 'btn link-btn',
                 type: 'button',
-                textContent: __('actions.show'),
+                textContent: __('categories.showChildren'),
             },
         });
 

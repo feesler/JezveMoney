@@ -106,7 +106,11 @@ export class CategoryListView extends AppView {
             : [];
 
         if (model.detailsItem) {
-            res.itemInfo = CategoryDetails.getExpectedState(model.detailsItem, state);
+            const detailsModel = {
+                category: model.detailsItem,
+                subcategoriesExpanded: model.subcategoriesExpanded,
+            };
+            res.itemInfo = CategoryDetails.getExpectedState(detailsModel, state);
             res.itemInfo.visible = true;
         }
 
@@ -173,6 +177,7 @@ export class CategoryListView extends AppView {
             listMenuVisible: false,
             contextMenuVisible: false,
             detailsItem,
+            subcategoriesExpanded: false,
             items: state.categories.clone(),
         };
 
@@ -304,6 +309,7 @@ export class CategoryListView extends AppView {
             items: [],
             selectedType: cont.tabs?.tabs?.value ?? null,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
+            subcategoriesExpanded: !!(cont.itemInfo?.subcategoriesList?.expanded),
         };
 
         cont.sections.forEach((section) => {
@@ -410,6 +416,15 @@ export class CategoryListView extends AppView {
         }
 
         return App.view.checkState(expected);
+    }
+
+    /** Closes item details */
+    async toggleDetailsSubcategories() {
+        assert(this.model.detailsItem, 'Details not open');
+
+        this.model.subcategoriesExpanded = !this.model.subcategoriesExpanded;
+
+        return this.runTestAction(() => this.content.itemInfo.toggleSubcategories());
     }
 
     /** Opens specified categories tab */
