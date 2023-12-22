@@ -307,12 +307,25 @@ export class DateRangeInput extends Component {
         }
 
         const selectPart = (selectStartDateFilter) ? 'start' : 'end';
-        if (selectPart === this.state.selectPart) {
-            this.datePicker.show(!this.datePicker.visible());
-        } else {
+        const partChanged = (selectPart !== this.state.selectPart);
+        const visible = partChanged || !this.datePicker.visible();
+
+        if (partChanged) {
             this.datePicker.setRangePart(selectPart);
-            this.datePicker.show();
         }
+
+        if (visible) {
+            const { form } = this.state;
+            const dateStr = (selectStartDateFilter) ? form.startDate : form.endDate;
+            const date = parseDate(dateStr);
+            if (date) {
+                this.datePicker.setSelection(date);
+            } else {
+                this.datePicker.showMonth(new Date());
+            }
+        }
+
+        this.datePicker.show(visible);
 
         this.setState({
             ...this.state,

@@ -84,6 +84,7 @@ const prepareTests = async () => {
     [
         App.scenario.API_USER_SCHEDULED_TRANSACTION,
     ] = await App.scenario.runner.runGroup(scheduleActions.extractAndCreate, [{
+        name: 'API user scheduled expense',
         type: EXPENSE,
         src_id: App.scenario.API_USER_ACC_RUB,
         src_amount: 100,

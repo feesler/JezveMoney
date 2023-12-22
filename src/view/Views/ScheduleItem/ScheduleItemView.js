@@ -21,6 +21,7 @@ import { TransactionForm } from '../../Components/Transaction/TransactionForm/Tr
 
 import { actions, reducer } from './reducer.js';
 import './ScheduleItemView.scss';
+import { Schedule } from '../../Models/Schedule.js';
 
 /**
  * Create/update scheduled transaction view
@@ -39,6 +40,7 @@ class ScheduleItemView extends AppView {
         App.loadModel(PersonList, 'persons', App.props.persons);
         App.loadModel(IconList, 'icons', App.props.icons);
         App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
         App.initCategoriesModel();
         App.checkUserAccountModels();
         App.checkPersonModels();

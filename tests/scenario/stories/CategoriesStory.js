@@ -3,6 +3,7 @@ import * as Actions from '../actions/category.js';
 import { App } from '../../Application.js';
 import { EXPENSE, INCOME } from '../../model/Transaction.js';
 import { ANY_TYPE } from '../../model/AppState.js';
+import { testLocales } from '../actions/locale.js';
 
 export class CategoriesStory extends TestStory {
     async beforeRun() {
@@ -253,8 +254,15 @@ export class CategoriesStory extends TestStory {
     async details() {
         setBlock('Category details', 1);
 
-        await Actions.showDetails({ index: 0 });
-        await Actions.closeDetails();
+        await testLocales(async () => {
+            await Actions.checkNavigation();
+
+            await Actions.showDetails({ index: 0 });
+            await Actions.toggleDetailsSubcategories();
+            await Actions.toggleDetailsSubcategories();
+            await Actions.closeDetails();
+        });
+
         await Actions.showDetails({ index: 1 });
         await Actions.showDetails({ index: 2 });
         await Actions.showDetails({ index: 2 });

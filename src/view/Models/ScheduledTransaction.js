@@ -12,6 +12,7 @@ import { ListItem } from './ListItem.js';
 
 const availFields = [
     'id',
+    'name',
     'type',
     'src_id',
     'dest_id',

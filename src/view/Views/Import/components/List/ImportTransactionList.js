@@ -79,7 +79,7 @@ export class ImportTransactionList extends ListContainer {
             item,
             collapsed: item.collapsed,
             selected: item.selected,
-            toggleButton: !!item.originalData,
+            toggleButton: !!(item.originalData || item.reminderId || item.scheduleId),
             listMode,
             showMenuButton: (listMode === 'list'),
             showControls: true,

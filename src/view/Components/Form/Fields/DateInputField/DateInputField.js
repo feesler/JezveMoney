@@ -102,8 +102,12 @@ export class DateInputField extends Field {
 
         const visible = this.datePicker.visible();
         const { date } = this.state;
-        if (!visible && date) {
-            this.datePicker.setSelection(timeToDate(date));
+        if (!visible) {
+            if (date) {
+                this.datePicker.setSelection(timeToDate(date));
+            } else {
+                this.datePicker.showMonth(new Date());
+            }
         }
 
         this.datePicker.show(!visible);

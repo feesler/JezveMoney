@@ -21,6 +21,7 @@ import {
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 import { __ } from '../../../model/locale.js';
+import { ReminderField } from '../Fields/ReminderField.js';
 
 const sourceTransactionTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -107,6 +108,30 @@ export class ImportTransactionItem extends TestComponent {
             res.personField.value = person.name;
         }
 
+        // Reminder field
+        const remindersAvailable = App.state.schedule.length > 0;
+        const reminderId = parseInt(model.reminderId, 10);
+        const scheduleId = parseInt(model.scheduleId, 10);
+        const hasReminder = remindersAvailable && !!(reminderId || scheduleId);
+
+        if (hasReminder) {
+            const value = {};
+            res.reminderField = {
+                value,
+            };
+
+            if (reminderId) {
+                value.reminder_id = (model.reminderId ?? 0).toString();
+            } else if (scheduleId) {
+                value.schedule_id = (model.scheduleId ?? 0).toString();
+                value.reminder_date = (model.reminderDate ?? 0).toString();
+            }
+        }
+
+        if (model.original || hasReminder) {
+            res.toggleBtn = { visible: true };
+        }
+
         return res;
     }
 
@@ -130,6 +155,13 @@ export class ImportTransactionItem extends TestComponent {
             comment: item.comment,
             isDifferent: item.src_curr !== item.dest_curr,
         };
+
+        if (item.reminder_id) {
+            model.reminderId = item.reminder_id;
+        } else if (item.schedule_id) {
+            model.scheduleId = item.schedule_id;
+            model.reminderDate = item.reminder_date;
+        }
 
         return this.getExpectedState(model, state);
     }
@@ -194,6 +226,11 @@ export class ImportTransactionItem extends TestComponent {
         res.originalData = null;
         if (res.origDataTable) {
             res.originalData = await OriginalImportData.create(this, res.origDataTable);
+        }
+
+        const reminderElem = await query(this.elem, '.reminder-field');
+        if (reminderElem) {
+            res.reminderField = await ReminderField.create(this, reminderElem);
         }
 
         return res;
@@ -290,12 +327,18 @@ export class ImportTransactionItem extends TestComponent {
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
-        res.imported = cont.toggleBtn.visible;
-        if (cont.originalData && res.imported) {
+        // Original imported data
+        if (cont.originalData) {
             res.original = {
                 ...cont.originalData.model,
             };
         }
+
+        // Reminder
+        const reminder = cont.reminderField?.value;
+        res.reminderId = reminder?.reminder_id ?? 0;
+        res.scheduleId = reminder?.schedule_id ?? 0;
+        res.reminderDate = reminder?.reminder_date ?? 0;
 
         return res;
     }

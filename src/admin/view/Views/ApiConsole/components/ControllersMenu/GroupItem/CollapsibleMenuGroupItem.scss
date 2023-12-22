@@ -1,0 +1,15 @@
+/* Collapsible menu group */
+.menu-group_collapsible {
+  .menu-list {
+    display: none;
+  }
+}
+
+.menu-group_collapsible.expanded {
+  --menu-group-header-text-color: var(--accent-color-alt);
+  --menu-group-header-font-weight: 500;
+
+  .menu-list {
+    display: flex;
+  }
+}

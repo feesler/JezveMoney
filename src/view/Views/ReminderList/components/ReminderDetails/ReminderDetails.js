@@ -1,13 +1,16 @@
+import { createElement } from '@jezvejs/dom';
+
 import { __ } from '../../../../utils/utils.js';
 import { App } from '../../../../Application/App.js';
 
 import { Transaction } from '../../../../Models/Transaction.js';
-import { Reminder } from '../../../../Models/Reminder.js';
+import { REMINDER_CONFIRMED, Reminder } from '../../../../Models/Reminder.js';
 
 import { Field } from '../../../../Components/Common/Field/Field.js';
 import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
+const TYPE_FIELD_CLASS = 'type-field';
 const SOURCE_FIELD_CLASS = 'source-field';
 const DEST_FIELD_CLASS = 'destination-field';
 const SRC_AMOUNT_FIELD_CLASS = 'src-amount-field';
@@ -15,6 +18,7 @@ const DEST_AMOUNT_FIELD_CLASS = 'dest-amount-field';
 const DATE_FIELD_CLASS = 'date-field';
 const CATEGORY_FIELD_CLASS = 'category-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
+const TRANSACTION_FIELD_CLASS = 'transaction-field';
 
 /**
  * Scheduled transaction reminder details component
@@ -36,6 +40,11 @@ export class ReminderDetails extends ItemDetails {
 
     /** Component initialization */
     getContent() {
+        this.typeField = Field.create({
+            title: __('transactions.type'),
+            className: TYPE_FIELD_CLASS,
+        });
+
         this.sourceField = Field.create({
             title: __('transactions.source'),
             className: SOURCE_FIELD_CLASS,
@@ -71,7 +80,20 @@ export class ReminderDetails extends ItemDetails {
             className: COMMENT_FIELD_CLASS,
         });
 
+        this.transactionLink = createElement('a', {
+            props: {
+                target: '_blank',
+                textContent: __('actions.openInNewTab'),
+            },
+        });
+        this.transactionField = Field.create({
+            title: __('reminders.linkedTransaction'),
+            className: TRANSACTION_FIELD_CLASS,
+            content: this.transactionLink,
+        });
+
         return [
+            this.typeField.elem,
             this.sourceField.elem,
             this.destinationField.elem,
             this.srcAmountField.elem,
@@ -79,6 +101,7 @@ export class ReminderDetails extends ItemDetails {
             this.dateField.elem,
             this.categoryField.elem,
             this.commentField.elem,
+            this.transactionField.elem,
         ];
     }
 
@@ -111,6 +134,17 @@ export class ReminderDetails extends ItemDetails {
         return category.name;
     }
 
+    getScheduleName(state) {
+        const { item } = state;
+        const { schedule } = App.model;
+        const scheduleItem = schedule.getItem(item.schedule_id);
+        if (!scheduleItem) {
+            throw new Error('Scheduled transaction not found');
+        }
+
+        return scheduleItem.name;
+    }
+
     /**
      * Render specified state
      * @param {object} state - current state object
@@ -126,7 +160,11 @@ export class ReminderDetails extends ItemDetails {
         const showDest = item.dest_id !== 0;
         const isDiff = item.src_curr !== item.dest_curr;
 
-        this.heading.setTitle(Transaction.getTypeTitle(item.type));
+        const scheduleName = this.getScheduleName(state);
+        this.heading.setTitle(scheduleName);
+
+        // Transaction
+        this.typeField.setContent(Transaction.getTypeTitle(item.type));
 
         this.sourceField.show(showSource);
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
@@ -150,6 +188,12 @@ export class ReminderDetails extends ItemDetails {
 
         this.commentField.show(item.comment.length > 0);
         this.commentField.setContent(item.comment);
+
+        const isConfirmed = (item.state === REMINDER_CONFIRMED);
+        this.transactionField.show(isConfirmed);
+        this.transactionLink.href = (isConfirmed)
+            ? App.getURL(`transactions/${item.transaction_id}`)
+            : '';
 
         this.renderDateField(this.createDateField, item.createdate);
         this.renderDateField(this.updateDateField, item.updatedate);

@@ -43,6 +43,7 @@ const create = async () => {
 
     const data = {
         SCHEDULED_TR_EXPENSE_1: {
+            name: 'Expense 1',
             type: EXPENSE,
             src_id: ACC_RUB,
             src_amount: 100,
@@ -54,6 +55,7 @@ const create = async () => {
             interval_offset: 0,
         },
         SCHEDULED_TR_EXPENSE_2: {
+            name: 'Expense 2',
             type: EXPENSE,
             src_id: ACC_RUB,
             src_amount: 7608,
@@ -68,6 +70,7 @@ const create = async () => {
             interval_offset: 0,
         },
         SCHEDULED_TR_INCOME_1: {
+            name: 'Income 1',
             type: INCOME,
             dest_id: ACC_RUB,
             dest_amount: 1000.5054,
@@ -79,6 +82,7 @@ const create = async () => {
             interval_offset: 20,
         },
         SCHEDULED_TR_INCOME_2: {
+            name: 'Income 2',
             type: INCOME,
             dest_id: ACC_RUB,
             dest_amount: 456,
@@ -89,6 +93,7 @@ const create = async () => {
             interval_offset: [1, 2],
         },
         SCHEDULED_TR_TRANSFER_1: {
+            name: 'Transfer 1',
             type: TRANSFER,
             src_id: ACC_RUB,
             dest_id: CASH_RUB,
@@ -101,6 +106,7 @@ const create = async () => {
             interval_offset: 0,
         },
         SCHEDULED_TR_TRANSFER_2: {
+            name: 'Transfer 2',
             type: TRANSFER,
             src_id: ACC_RUB,
             dest_id: ACC_USD,
@@ -113,6 +119,7 @@ const create = async () => {
             interval_offset: [],
         },
         SCHEDULED_TR_DEBT_1: {
+            name: 'Debt 1',
             type: DEBT,
             src_id: personXAccount.id,
             dest_id: 0,
@@ -126,6 +133,7 @@ const create = async () => {
             interval_offset: 0,
         },
         SCHEDULED_TR_DEBT_2: {
+            name: 'Debt 2',
             type: DEBT,
             src_id: ACC_RUB,
             dest_id: personXAccount.id,
@@ -139,6 +147,7 @@ const create = async () => {
             interval_offset: 20,
         },
         SCHEDULED_TR_LIMIT_1: {
+            name: 'Credit limit 1',
             type: LIMIT_CHANGE,
             src_id: 0,
             dest_id: ACCOUNT_3,
@@ -153,6 +162,7 @@ const create = async () => {
             interval_offset: 0,
         },
         SCHEDULED_TR_LIMIT_2: {
+            name: 'Credit limit 2',
             type: LIMIT_CHANGE,
             src_id: BTC_CREDIT,
             dest_id: 0,
@@ -210,6 +220,7 @@ const createWithChainedRequest = async () => {
 
     const data = {
         SCHEDULED_TR_EXPENSE_CHAINED_1: {
+            name: 'Expense chained 1',
             type: EXPENSE,
             src_id: ACC_RUB,
             src_amount: 10,
@@ -383,6 +394,45 @@ const createInvalid = async () => {
         src_curr: RUB,
         dest_amount: 9,
         dest_curr: EUR,
+    }, { // No schedule name
+        type: DEBT,
+        src_id: personXAccount.id,
+        src_amount: 10,
+        start_date: App.datesSec.monthAgo,
+        end_date: null,
+        interval_type: INTERVAL_MONTH,
+        interval_step: 1,
+        interval_offset: 0,
+    }, { // Invalid schedule name
+        type: DEBT,
+        src_id: personXAccount.id,
+        src_amount: 10,
+        name: '',
+        start_date: App.datesSec.monthAgo,
+        end_date: null,
+        interval_type: INTERVAL_MONTH,
+        interval_step: 1,
+        interval_offset: 0,
+    }, { // Invalid schedule name
+        type: DEBT,
+        src_id: personXAccount.id,
+        src_amount: 10,
+        name: null,
+        start_date: App.datesSec.monthAgo,
+        end_date: null,
+        interval_type: INTERVAL_MONTH,
+        interval_step: 1,
+        interval_offset: 0,
+    }, { // Existing schedule name
+        type: DEBT,
+        src_id: personXAccount.id,
+        src_amount: 10,
+        name: 'Expense 1',
+        start_date: App.datesSec.monthAgo,
+        end_date: null,
+        interval_type: INTERVAL_MONTH,
+        interval_step: 1,
+        interval_offset: 0,
     }, { // Invalid start date
         type: DEBT,
         src_id: personXAccount.id,
@@ -453,6 +503,7 @@ const createMultiple = async () => {
     const personXAccount = App.state.getPersonAccount(PERSON_X, RUB);
 
     const data = [{
+        name: 'Multi expense',
         type: EXPENSE,
         src_id: ACC_RUB,
         src_amount: 7608,
@@ -466,6 +517,7 @@ const createMultiple = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Multi income',
         type: INCOME,
         dest_id: ACC_USD,
         src_amount: 6500,
@@ -478,6 +530,7 @@ const createMultiple = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Multi transfer',
         type: TRANSFER,
         src_id: ACC_RUB,
         dest_id: CASH_RUB,
@@ -490,6 +543,7 @@ const createMultiple = async () => {
         interval_step: 1,
         interval_offset: 20,
     }, {
+        name: 'Multi debt',
         type: DEBT,
         src_id: personXAccount.id,
         dest_id: 0,
@@ -522,6 +576,7 @@ const createMultipleWithChainedRequest = async () => {
     const data = {
         data: {
             SCHEDULED_TR_MULTI_CHAINED_1: {
+                name: 'Multi expense chained',
                 type: EXPENSE,
                 src_id: ACC_RUB,
                 src_amount: 5500,
@@ -534,6 +589,7 @@ const createMultipleWithChainedRequest = async () => {
                 interval_offset: 5,
             },
             SCHEDULED_TR_MULTI_CHAINED_2: {
+                name: 'Multi income chained',
                 type: INCOME,
                 dest_id: ACC_USD,
                 src_amount: 1000,
@@ -608,6 +664,7 @@ const update = async () => {
 
     const data = [{
         id: App.scenario.SCHEDULED_TR_EXPENSE_1,
+        name: 'Expense 1 updated',
         src_id: App.scenario.CASH_RUB,
     }, {
         id: App.scenario.SCHEDULED_TR_EXPENSE_2,
@@ -696,6 +753,15 @@ const updateInvalid = async () => {
 
     const data = [{
         id: -1,
+    }, {
+        id: App.scenario.SCHEDULED_TR_EXPENSE_1,
+        name: '',
+    }, {
+        id: App.scenario.SCHEDULED_TR_EXPENSE_1,
+        name: null,
+    }, {
+        id: App.scenario.SCHEDULED_TR_EXPENSE_1,
+        name: 'Expense 2',
     }, {
         id: App.scenario.SCHEDULED_TR_EXPENSE_1,
         src_id: 0,

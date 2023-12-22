@@ -8,6 +8,7 @@ import { Field } from '../../../../Components/Common/Field/Field.js';
 import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
 
 /** CSS classes */
+const TYPE_FIELD_CLASS = 'type-field';
 const SOURCE_FIELD_CLASS = 'source-field';
 const DEST_FIELD_CLASS = 'destination-field';
 const SRC_AMOUNT_FIELD_CLASS = 'src-amount-field';
@@ -61,6 +62,11 @@ export class ScheduleItemDetails extends ItemDetails {
         });
 
         // Main content
+        this.typeField = Field.create({
+            title: __('transactions.type'),
+            className: TYPE_FIELD_CLASS,
+        });
+
         this.sourceField = Field.create({
             title: __('transactions.source'),
             className: SOURCE_FIELD_CLASS,
@@ -96,6 +102,7 @@ export class ScheduleItemDetails extends ItemDetails {
             this.endDateField.elem,
             this.intervalField.elem,
             this.offsetField.elem,
+            this.typeField.elem,
             this.sourceField.elem,
             this.destinationField.elem,
             this.srcAmountField.elem,
@@ -182,7 +189,7 @@ export class ScheduleItemDetails extends ItemDetails {
         const showDest = item.dest_id !== 0;
         const isDiff = item.src_curr !== item.dest_curr;
 
-        this.heading.setTitle(Transaction.getTypeTitle(item.type));
+        this.heading.setTitle(state.item.name);
 
         // Schedule
         this.renderStartDateField(state);
@@ -191,6 +198,8 @@ export class ScheduleItemDetails extends ItemDetails {
         this.renderIntervalOffsetField(state);
 
         // Transaction
+        this.typeField.setContent(Transaction.getTypeTitle(item.type));
+
         this.sourceField.show(showSource);
         this.sourceField.setContent(this.getAccountOrPerson(item.src_id));
 

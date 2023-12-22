@@ -227,6 +227,10 @@ export class TransactionView extends AppView {
         return this.form.setRemindersDetailsMode();
     }
 
+    async inputScheduleName(val) {
+        return this.form.inputScheduleName(val);
+    }
+
     async selectStartDate(val) {
         return this.form.selectStartDate(val);
     }

@@ -4,9 +4,8 @@ import {
     query,
     click,
     evaluate,
-    asyncMap,
     queryAll,
-    prop,
+    waitForFunction,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { Category } from '../../../model/Category.js';
@@ -25,7 +24,8 @@ const fieldSelectors = {
  * Category details test component
  */
 export class CategoryDetails extends TestComponent {
-    static getExpectedState(category, state = App.state) {
+    static getExpectedState(model, state = App.state) {
+        const { category } = model;
         assert(category, 'Invalid category');
 
         const parent = state.categories.getItem(category.parent_id);
@@ -71,11 +71,24 @@ export class CategoryDetails extends TestComponent {
             },
         };
 
+        if (!parent && subcategories.length > 0) {
+            res.toggleSubcategoriesBtn = {
+                visible: true,
+                title: (model.subcategoriesExpanded)
+                    ? __('categories.hideChildren')
+                    : __('categories.showChildren'),
+            };
+        }
+
         return res;
     }
 
     get loading() {
         return this.content.loading;
+    }
+
+    get subcategoriesList() {
+        return this.content.subcategoriesList;
     }
 
     async parseContent() {
@@ -111,14 +124,45 @@ export class CategoryDetails extends TestComponent {
 
         res.closeBtn = { elem: await query(this.elem, '.close-btn') };
         res.subcategoriesList = { elem: await query(this.elem, '.subcategories-list') };
+        res.toggleSubcategoriesBtn = {
+            elem: await query(res.subcategoriesList.elem, '.collapsible-header .link-btn'),
+        };
 
         const childElems = await queryAll(this.elem, '.subcategory-item');
-        res.subcategories = await asyncMap(childElems, (el) => prop(el, 'textContent'));
+
+        [
+            res.subcategoriesList.expanded,
+            res.subcategoriesList.animationInProgress,
+            res.toggleSubcategoriesBtn.title,
+            ...res.subcategories
+        ] = await evaluate((listEl, ...elems) => ([
+            listEl.classList.contains('collapsible__expanded'),
+            listEl.classList.contains('collapsible_animated'),
+            ...elems.map((el) => el?.textContent),
+        ]), res.subcategoriesList.elem, res.toggleSubcategoriesBtn.elem, ...childElems);
 
         return res;
     }
 
     async close() {
         return click(this.content.closeBtn.elem);
+    }
+
+    async toggleSubcategories() {
+        assert(this.content.toggleSubcategoriesBtn.visible, 'Toggle subcategories button not available');
+
+        const expectedExpanded = !this.subcategoriesList.expanded;
+
+        await click(this.content.toggleSubcategoriesBtn.elem);
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.subcategoriesList.animationInProgress
+                && this.subcategoriesList.expanded === expectedExpanded
+            );
+        });
+
+        await this.parse();
     }
 }

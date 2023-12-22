@@ -370,6 +370,7 @@ class TransactionModel extends SortableModel
         $res["comment"] = $params["comment"];
 
         $scheduleParams = [
+            "name",
             "start_date",
             "end_date",
             "interval_type",
@@ -408,7 +409,7 @@ class TransactionModel extends SortableModel
         foreach ($this->affectedTransactions as $item_id => $item) {
             $item = (array)$item;
 
-            $res = $this->validateParams($item);
+            $res = $this->validateParams($item, $item_id);
 
             $res["date"] = date("Y-m-d H:i:s", $item["date"]);
 

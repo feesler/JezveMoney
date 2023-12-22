@@ -27,6 +27,9 @@ export class RemindersListItem extends TestComponent {
                 detailsMode,
             };
 
+            const scheduleNameElem = elem.querySelector('.reminder-item__schedule-name');
+            item.scheduleName = scheduleNameElem.textContent;
+
             if (detailsMode) {
                 const [
                     srcAccEl,
@@ -117,6 +120,13 @@ export class RemindersListItem extends TestComponent {
 
         item.extend(state);
 
+        // Schedule part
+        const scheduleItem = state.schedule.getItem(item.schedule_id);
+        assert(scheduleItem, 'Scheduled transaction not found');
+
+        res.scheduleName = scheduleItem.name;
+
+        // Transaction part
         const srcAcc = state.accounts.getItem(item.src_id);
         const destAcc = state.accounts.getItem(item.dest_id);
         const srcAmountFmt = App.currency.format(item.src_curr, item.src_amount);

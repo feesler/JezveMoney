@@ -269,6 +269,7 @@ export const checkPHPerrors = (content) => {
         '<b>Warning</b>',
         '<b>Parse error</b>',
         '<b>Fatal error</b>',
+        '<b>Deprecated</b>',
         'xdebug-error',
     ];
 

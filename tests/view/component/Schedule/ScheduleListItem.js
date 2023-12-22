@@ -30,6 +30,8 @@ export class ScheduleListItem extends TestComponent {
         assert.instanceOf(item, ScheduledTransaction, 'Invalid item');
         assert(state, 'Invalid state object');
 
+        res.name = item.name;
+
         if (detailsMode) {
             res.startDate = App.secondsToDateString(item.start_date);
             res.endDate = this.renderEndDate(item);
@@ -222,6 +224,11 @@ export class ScheduleListItem extends TestComponent {
                 (detailsMode) ? '.trans-item-base__comment-field .field__content' : '.trans-item-base__comment',
             );
             item.comment = commentElem?.textContent ?? '';
+
+            const nameElem = elem.querySelector(
+                (detailsMode) ? '.schedule-item__name-field .field__content' : '.schedule-item__name',
+            );
+            item.name = nameElem?.textContent ?? '';
 
             return item;
         }, this.elem, EXPENSE, INCOME);

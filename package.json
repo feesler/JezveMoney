@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.86.0",
+    "version": "1.87.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -96,7 +96,7 @@
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.34.0",
-        "jezvejs": "^2.19.0",
+        "jezvejs": "^2.20.2",
         "whatwg-fetch": "^3.6.20"
     }
 }

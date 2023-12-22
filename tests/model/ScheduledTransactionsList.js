@@ -17,6 +17,18 @@ export class ScheduledTransactionsList extends List {
         return new ScheduledTransaction(obj);
     }
 
+    findByName(name, caseSens = false) {
+        let lookupName;
+
+        if (caseSens) {
+            lookupName = name;
+            return this.find((item) => item.name === lookupName);
+        }
+
+        lookupName = name.toLowerCase();
+        return this.find((item) => item.name.toLowerCase() === lookupName);
+    }
+
     /** Returns expected list of scheduled transactions after update specified account */
     updateAccount(accList, account) {
         const res = TransactionsList.onUpdateAccount(this, accList, account);

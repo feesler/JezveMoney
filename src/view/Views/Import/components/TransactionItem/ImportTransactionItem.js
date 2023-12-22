@@ -7,6 +7,7 @@ import { ImportTransaction, typeNames } from '../../../../Models/ImportTransacti
 
 import { CollapsibleListItem } from '../../../../Components/List/CollapsibleListItem/CollapsibleListItem.js';
 import { Field } from '../../../../Components/Common/Field/Field.js';
+import { ReminderField } from '../../../../Components/Reminder/ReminderField/ReminderField.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 
@@ -93,28 +94,84 @@ export class ImportTransactionItem extends CollapsibleListItem {
         );
     }
 
+    renderReminder(state, prevState) {
+        const { item } = state;
+
+        if (
+            (App.model.schedule.length === 0)
+            || (!item.reminderId && !item.scheduleId)
+        ) {
+            this.reminderField = null;
+            return null;
+        }
+
+        const prevItem = prevState?.item;
+        if (
+            item.reminderId === prevItem?.reminderId
+            && item.scheduleId === prevItem?.scheduleId
+            && item.reminderDate === prevItem?.reminderDate
+        ) {
+            return this.reminderField;
+        }
+
+        if (!this.reminderField) {
+            this.reminderField = ReminderField.create({
+                title: __('transactions.reminder'),
+                selectButton: false,
+                closeButton: false,
+            });
+        }
+
+        this.reminderField.setState((fieldState) => ({
+            ...fieldState,
+            reminder_id: item.reminderId,
+            schedule_id: item.scheduleId,
+            reminder_date: item.reminderDate,
+        }));
+        this.reminderField.show();
+
+        return this.reminderField;
+    }
+
     renderContainer(state, prevState) {
+        const { item } = state;
+        const prevItem = prevState?.item ?? null;
+
         const originalData = state.item.originalData ?? null;
-        const prevOriginalData = prevState?.item?.originalData;
-        if (originalData === prevOriginalData) {
+        if (
+            item.reminderId === prevItem?.reminderId
+            && item.reminderDate === prevItem?.reminderDate
+            && item.scheduleId === prevItem?.scheduleId
+            && originalData === prevItem?.originalData
+        ) {
             return;
         }
 
-        if (!originalData) {
+        const hasReminder = !!(item.reminderId || item.scheduleId);
+        if (!originalData && !hasReminder) {
             this.setCollapsibleContent(null);
             return;
         }
 
-        const origDataContainer = OriginalImportData.create({
-            ...originalData,
-        });
+        const content = [];
 
-        const content = [origDataContainer.elem];
+        // Original imported data
+        if (originalData) {
+            const origData = OriginalImportData.create(originalData);
+            content.push(origData.elem);
+        }
 
+        // Similar transaction
         const { similarTransaction } = state.item;
-        if (similarTransaction) {
+        if (originalData && similarTransaction) {
             const info = SimilarTransactionInfo.create(similarTransaction);
             content.push(info.elem);
+        }
+
+        // Reminder
+        const reminder = this.renderReminder(state, prevState);
+        if (reminder) {
+            content.push(reminder.elem);
         }
 
         this.setCollapsibleContent(content);

@@ -2,6 +2,7 @@
 
 namespace JezveMoney\App\Controller;
 
+use JezveMoney\App\Item\AccountItem;
 use JezveMoney\Core\ListViewController;
 use JezveMoney\Core\Message;
 use JezveMoney\Core\Template;
@@ -71,26 +72,17 @@ class Accounts extends ListViewController
         $userCurrModel = UserCurrencyModel::getInstance();
         $iconModel = IconModel::getInstance();
 
-        $accInfo = new \stdClass();
-        $accInfo->id = 0;
-        $accInfo->type = 0;
-        $accInfo->name = "";
-        $accInfo->curr_id = $currMod->getIdByPos(0);
-        $accInfo->balance = 0;
-        $accInfo->initbalance = "";
-        $accInfo->limit = 0;
-        $accInfo->initlimit = "";
-        $accInfo->icon_id = 0;
-        $accInfo->icon = null;
-        $accInfo->flags = 0;
-
-        $currObj = $currMod->getItem($accInfo->curr_id);
-        if (!$currObj) {
-            throw new \Error(__("currencies.errors.notFound"));
-        }
-
-        $accInfo->sign = $currObj->sign;
-        $data["accInfo"] = $accInfo;
+        $account = new AccountItem();
+        $account->id = 0;
+        $account->type = 0;
+        $account->name = "";
+        $account->curr_id = $currMod->getIdByPos(0);
+        $account->balance = 0;
+        $account->initbalance = "";
+        $account->limit = 0;
+        $account->initlimit = "";
+        $account->icon_id = 0;
+        $account->flags = 0;
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -100,7 +92,7 @@ class Accounts extends ListViewController
             "icons" => $iconModel->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
-                "account" => $accInfo,
+                "account" => $account,
             ],
         ];
 
@@ -146,17 +138,11 @@ class Accounts extends ListViewController
         if (!$acc_id) {
             $this->fail();
         }
-        $data["acc_id"] = $acc_id;
 
-        $accInfo = $this->model->getItem($acc_id);
-        if (!$accInfo) {
+        $account = $this->model->getItem($acc_id);
+        if (!$account) {
             $this->fail(__("accounts.errors.update"));
         }
-
-        $currObj = $currMod->getItem($accInfo->curr_id);
-        $accInfo->sign = ($currObj) ? $currObj->sign : null;
-        $accInfo->icon = $this->model->getIconFile($acc_id);
-        $data["accInfo"] = $accInfo;
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -166,7 +152,7 @@ class Accounts extends ListViewController
             "icons" => $iconModel->getData(),
             "nextAddress" => $this->getNextAddress(),
             "view" => [
-                "account" => $accInfo,
+                "account" => $account,
             ],
         ];
 

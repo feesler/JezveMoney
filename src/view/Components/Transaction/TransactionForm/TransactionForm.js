@@ -17,12 +17,11 @@ import { InputGroup } from 'jezvejs/InputGroup';
 import { createStore } from 'jezvejs/Store';
 
 import {
-    cutTime,
     __,
     MAX_DAYS_IN_MONTH,
     createHiddenInputs,
 } from '../../../utils/utils.js';
-import { EXCHANGE_PRECISION, normalize, normalizeExch } from '../../../utils/decimal.js';
+import { EXCHANGE_PRECISION, normalizeExch } from '../../../utils/decimal.js';
 import { App } from '../../../Application/App.js';
 
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../Models/Account.js';
@@ -63,13 +62,8 @@ import { ReminderField } from '../../Reminder/ReminderField/ReminderField.js';
 import { AccountContainer } from './components/AccountContainer/AccountContainer.js';
 import { TileInfoItem } from './components/TileInfoItem/TileInfoItem.js';
 
-import {
-    actions,
-    reducer,
-    calculateSourceResult,
-    calculateDestResult,
-    updateStateExchange,
-} from './reducer.js';
+import { getInitialState } from './initialState.js';
+import { actions, reducer } from './reducer.js';
 import * as STATE from './stateId.js';
 
 import './TransactionForm.scss';
@@ -108,150 +102,7 @@ export class TransactionForm extends Component {
             ...props,
         });
 
-        const accountModel = App.model.accounts;
-        const currencyModel = App.model.currency;
-
-        const isScheduleItem = this.props.type === 'scheduleItem';
-        const transaction = { ...this.props.transaction };
-
-        if (isScheduleItem) {
-            transaction.start_date = cutTime(transaction.start_date);
-            transaction.end_date = (transaction.end_date) ? cutTime(transaction.end_date) : null;
-        } else {
-            transaction.date = cutTime(transaction.date);
-        }
-
-        const initialState = {
-            id: 0,
-            type: this.props.type,
-            transaction,
-            form: {
-                sourceAmount: '',
-                destAmount: '',
-                sourceResult: 0,
-                fSourceResult: 0,
-                destResult: 0,
-                fDestResult: 0,
-                exchange: 1,
-                fExchange: 1,
-                backExchange: 1,
-                fBackExchange: 1,
-                comment: transaction.comment,
-                useBackExchange: false,
-            },
-            validation: {
-                sourceAmount: true,
-                destAmount: true,
-                date: true,
-                startDate: true,
-                endDate: true,
-                intervalStep: true,
-            },
-            srcAccount: accountModel.getItem(transaction.src_id),
-            destAccount: accountModel.getItem(transaction.dest_id),
-            srcCurrency: currencyModel.getItem(transaction.src_curr),
-            destCurrency: currencyModel.getItem(transaction.dest_curr),
-            isDiff: transaction.src_curr !== transaction.dest_curr,
-            isUpdate: this.props.mode === 'update',
-            isAvailable: this.props.isAvailable,
-            submitStarted: false,
-            renderTime: null,
-        };
-
-        if (isScheduleItem) {
-            initialState.form.startDate = App.formatInputDate(transaction.start_date);
-            initialState.form.endDate = (transaction.end_date)
-                ? App.formatInputDate(transaction.end_date)
-                : '';
-            initialState.form.intervalStep = transaction.interval_step;
-            initialState.form.intervalType = transaction.interval_type;
-            initialState.form.intervalOffset = transaction.interval_offset;
-        } else {
-            initialState.form.date = App.formatInputDate(transaction.date);
-
-            initialState.form.startDate = App.formatInputDate(transaction.date);
-            initialState.form.endDate = '';
-            initialState.form.intervalStep = 1;
-            initialState.form.intervalType = INTERVAL_MONTH;
-            initialState.form.intervalOffset = 0;
-        }
-
-        if (transaction.type === EXPENSE) {
-            initialState.id = (initialState.isDiff) ? STATE.E_S_AMOUNT_D_AMOUNT : STATE.E_D_AMOUNT;
-        } else if (transaction.type === INCOME) {
-            initialState.id = (initialState.isDiff) ? STATE.I_S_AMOUNT_D_AMOUNT : STATE.I_S_AMOUNT;
-        } else if (transaction.type === TRANSFER) {
-            initialState.id = (initialState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
-        } else if (transaction.type === DEBT) {
-            initialState.person = App.model.persons.getItem(transaction.person_id);
-            const personAccountId = (transaction.debtType)
-                ? transaction.src_id
-                : transaction.dest_id;
-            if (personAccountId) {
-                initialState.personAccount = accountModel.getItem(personAccountId);
-            } else {
-                const personAccountCurr = (transaction.debtType)
-                    ? transaction.src_curr
-                    : transaction.dest_curr;
-                initialState.personAccount = {
-                    id: 0,
-                    balance: 0,
-                    curr_id: personAccountCurr,
-                };
-            }
-
-            if (transaction.debtType) {
-                initialState.srcAccount = initialState.personAccount;
-                initialState.account = initialState.destAccount;
-
-                if (initialState.isDiff) {
-                    initialState.id = STATE.DG_S_AMOUNT_D_AMOUNT;
-                } else {
-                    initialState.id = (transaction.noAccount)
-                        ? STATE.DG_NOACC_S_AMOUNT
-                        : STATE.DG_S_AMOUNT;
-                }
-            } else {
-                initialState.destAccount = initialState.personAccount;
-                initialState.account = initialState.srcAccount;
-
-                if (initialState.isDiff) {
-                    initialState.id = STATE.DT_S_AMOUNT_D_AMOUNT;
-                } else {
-                    initialState.id = (transaction.noAccount)
-                        ? STATE.DT_NOACC_D_AMOUNT
-                        : STATE.DT_D_AMOUNT;
-                }
-            }
-        } else if (transaction.type === LIMIT_CHANGE) {
-            initialState.id = (isScheduleItem)
-                ? STATE.L_AMOUNT
-                : STATE.L_RESULT;
-
-            if (transaction.src_id !== 0) {
-                initialState.destAccount = initialState.srcAccount;
-                initialState.srcAccount = null;
-                initialState.destCurrency = initialState.srcCurrency;
-
-                transaction.dest_id = transaction.src_id;
-                transaction.src_id = 0;
-                transaction.dest_curr = transaction.src_curr;
-                transaction.src_amount = -transaction.src_amount;
-                transaction.dest_amount = transaction.src_amount;
-            }
-        }
-
-        initialState.form.sourceAmount = (transaction.src_amount)
-            ? normalize(transaction.src_amount, initialState.srcCurrency.precision)
-            : '';
-        initialState.form.destAmount = (transaction.dest_amount)
-            ? normalize(transaction.dest_amount, initialState.destCurrency.precision)
-            : '';
-
-        calculateSourceResult(initialState);
-        calculateDestResult(initialState);
-        updateStateExchange(initialState);
-
+        const initialState = getInitialState(this.props);
         this.store = createStore(reducer, { initialState });
 
         this.init();
@@ -568,6 +419,17 @@ export class TransactionForm extends Component {
 
     /** Creates schedule fields */
     createScheduleFields() {
+        // Schedule item name field
+        this.scheduleNameField = InputField.create({
+            id: 'scheduleNameField',
+            inputId: 'scheduleNameInput',
+            name: 'scheduleName',
+            title: __('schedule.name'),
+            className: 'form-row',
+            validate: true,
+            onInput: (e) => this.onScheduleNameInput(e),
+        });
+
         // Date range field
         this.dateRangeField = DateRangeField.create({
             id: 'dateRangeField',
@@ -696,6 +558,7 @@ export class TransactionForm extends Component {
 
         return [
             this.repeatSwitchField.elem,
+            this.scheduleNameField.elem,
             this.intervalFieldsGroup,
             this.weekDayField.elem,
             this.daySelectField.elem,
@@ -1023,9 +886,11 @@ export class TransactionForm extends Component {
         this.notifyChanged();
     }
 
-    /**
-     * Schedule date range change callback
-     */
+    onScheduleNameInput(e) {
+        this.dispatch(actions.scheduleNameChange(e.target.value));
+        this.notifyChanged();
+    }
+
     onScheduleRangeChange(range) {
         this.dispatch(actions.scheduleRangeChange(range));
         this.notifyChanged();
@@ -1136,10 +1001,14 @@ export class TransactionForm extends Component {
 
         const isTransaction = (state.type === 'transaction');
         const isScheduleItem = (state.type === 'scheduleItem');
+        const trIntervalType = state.transaction.interval_type ?? INTERVAL_NONE;
+        const isRepeat = trIntervalType !== INTERVAL_NONE;
 
         if (isTransaction) {
             this.validateDate(state);
-        } else if (isScheduleItem) {
+        }
+        if (isScheduleItem || isRepeat) {
+            this.validateScheduleName(state);
             this.validateStartDate(state);
             this.validateEndDate(state);
             this.validateIntervalStep(state);
@@ -1153,8 +1022,15 @@ export class TransactionForm extends Component {
 
         if (isTransaction) {
             valid = valid && validation.date;
-        } else if (isScheduleItem) {
-            valid = valid && validation.startDate && validation.endDate && validation.intervalStep;
+        }
+        if (isScheduleItem || isRepeat) {
+            valid = (
+                valid
+                && validation.scheduleName === true
+                && validation.startDate
+                && validation.endDate
+                && validation.intervalStep
+            );
         }
 
         if (valid) {
@@ -1190,6 +1066,20 @@ export class TransactionForm extends Component {
         const valid = App.isValidDateString(state.form.date, validateDateOptions);
         if (!valid) {
             this.dispatch(actions.invalidateDate());
+        }
+    }
+
+    validateScheduleName(state) {
+        const { name } = state.form;
+        if (name.length === 0) {
+            this.dispatch(actions.invalidateScheduleName(__('schedule.errors.invalidName')));
+            this.scheduleNameField.focus();
+        } else {
+            const scheduleItem = App.model.schedule.findByName(name);
+            if (scheduleItem && state.transaction.id !== scheduleItem.id) {
+                this.dispatch(actions.invalidateScheduleName(__('schedule.errors.existingName')));
+                this.scheduleNameField.focus();
+            }
         }
     }
 
@@ -1260,6 +1150,7 @@ export class TransactionForm extends Component {
 
         const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
         if (type === 'scheduleItem' || trIntervalType !== INTERVAL_NONE) {
+            res.name = transaction.name;
             res.start_date = transaction.start_date;
             res.end_date = transaction.end_date;
             res.interval_type = transaction.interval_type;
@@ -1786,8 +1677,20 @@ export class TransactionForm extends Component {
     renderScheduleFields(state, prevState) {
         const { transaction, form, validation } = state;
         const { intervalType, intervalOffset } = form;
+        const isScheduleItem = (state.type === 'scheduleItem');
         const trIntervalType = transaction.interval_type ?? INTERVAL_NONE;
         const isRepeat = trIntervalType !== INTERVAL_NONE;
+
+        // Schedule item name field
+        const isValidName = (state.validation.scheduleName === true);
+        this.scheduleNameField.setState((fieldState) => ({
+            ...fieldState,
+            value: state.form.name,
+            valid: isValidName,
+            feedbackMessage: (isValidName) ? '' : state.validation.scheduleName,
+            disabled: state.submitStarted,
+        }));
+        this.scheduleNameField.show(isScheduleItem || isRepeat);
 
         this.renderDateRangeFilter(state, prevState);
 
@@ -1979,6 +1882,7 @@ export class TransactionForm extends Component {
             this.categoryField.show(state.isAvailable);
             this.commentField.show(state.isAvailable);
 
+            this.scheduleNameField.show(state.isAvailable);
             this.repeatSwitchField.show(state.isAvailable);
             this.dateRangeField.show(state.isAvailable);
             this.intervalStepField.show(state.isAvailable);

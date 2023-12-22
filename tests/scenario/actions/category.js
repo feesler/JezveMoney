@@ -14,7 +14,7 @@ import { __ } from '../../model/locale.js';
 import { Category } from '../../model/Category.js';
 
 /** Navigate to categories list page */
-const checkNavigation = async () => {
+export const checkNavigation = async () => {
     if (!(App.view instanceof CategoryListView)) {
         await App.view.navigateToCategories();
     }
@@ -116,6 +116,12 @@ export const showDetails = async ({ index, directNavigate = false }) => {
 export const closeDetails = (directNavigate = false) => (
     test('Close category details', () => (
         App.view.closeDetails(directNavigate)
+    ))
+);
+
+export const toggleDetailsSubcategories = () => (
+    test('Toggle show/hide subcategories at details', () => (
+        App.view.toggleDetailsSubcategories()
     ))
 );
 
