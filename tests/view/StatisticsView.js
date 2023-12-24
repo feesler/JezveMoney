@@ -354,10 +354,7 @@ export class StatisticsView extends AppView {
         const [firstValue] = histogram.values ?? [];
         const dataSet = firstValue?.data ?? [];
         const noData = !dataSet.length && !histogram.series?.length;
-        const isStacked = (
-            report === 'category'
-            || (report === 'account' && model.filter.accounts?.length > 1)
-        );
+        const isStacked = (report === 'category' || report === 'account');
 
         const dataSets = getDataSets(histogram);
         const columnsInGroup = (isStacked) ? getColumnsInGroupCount(dataSets) : dataSets.length;
