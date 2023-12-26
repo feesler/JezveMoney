@@ -3,6 +3,7 @@
   --menu-separator-color: var(--nav-menu-separator-color);
   --menu-item-side-content-size: auto;
   --menu-item-active-background: none;
+  --menu-item-icon-color: var(--main-text-color);
 
   display: flex;
   flex-flow: column nowrap;
@@ -11,6 +12,10 @@
   height: 100%;
   width: 100%;
   list-style-type: none;
+
+  .menu-list {
+    margin-left: 0.75rem;
+  }
 
   .menu-separator {
     width: auto;
@@ -25,6 +30,7 @@
   height: 40px;
   flex-shrink: 0;
   padding: 0;
+  column-gap: 0.25rem;
 }
 
 .nav-item .menu-item__content {
