@@ -214,12 +214,10 @@ class ScheduledTransactionItem
             && ($limit === 0 || count($res) < $limit)
             && $interval <= $endDate
         ) {
-            if ($interval >= $startDate) {
-                $dates = $this->getReminderDates($interval);
-                foreach ($dates as $date) {
-                    if ($date <= $endDate) {
-                        $res[] = $date;
-                    }
+            $dates = $this->getReminderDates($interval);
+            foreach ($dates as $date) {
+                if ($date >= $startDate && $date <= $endDate) {
+                    $res[] = $date;
                 }
             }
 
