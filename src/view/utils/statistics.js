@@ -106,8 +106,8 @@ export const formatLongDateLabel = (value, state) => {
  * @returns {boolean}
  */
 export const isStackedData = (filter) => (
-    filter?.report === 'category'
-    || (filter?.report === 'account' && filter.accounts?.length > 1)
+    (filter?.report === 'category')
+    || (filter?.report === 'account')
 );
 
 /**

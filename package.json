@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.87.0",
+    "version": "1.87.1",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -75,7 +75,7 @@
         "postcss-loader": "^6.2.1",
         "progress": "^2.0.3",
         "sass": "^1.69.5",
-        "sass-loader": "^13.3.2",
+        "sass-loader": "^13.3.3",
         "shelljs": "^0.8.5",
         "ssh2-sftp-client": "^9.1.0",
         "style-loader": "^2.0.0",
@@ -96,7 +96,7 @@
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.34.0",
-        "jezvejs": "^2.20.2",
+        "jezvejs": "^2.21.1",
         "whatwg-fetch": "^3.6.20"
     }
 }

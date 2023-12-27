@@ -1000,8 +1000,8 @@ a.paginator-arrow:focus-visible {
 }
 
 .histogram__bar {
-  --historgam-bar-color: var(--category-color);
-  --historgam-active-bar-color: var(--category-active-color);
+  --histogram-bar-color: var(--category-color);
+  --histogram-active-bar-color: var(--category-active-color);
 }
 
 @for $i from 1 through length(colors.$colors) {

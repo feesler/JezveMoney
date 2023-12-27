@@ -504,14 +504,12 @@ export class ScheduledTransaction {
             && (limit === 0 || res.length < limit)
             && interval <= endDate
         ) {
-            if (interval >= startDate) {
-                const dates = this.getReminderDates(interval);
-                dates.forEach((date) => {
-                    if (date <= endDate) {
-                        res.push(date);
-                    }
-                });
-            }
+            const dates = this.getReminderDates(interval);
+            dates.forEach((date) => {
+                if (date >= startDate && date <= endDate) {
+                    res.push(date);
+                }
+            });
 
             interval = this.getNextInterval(interval);
         }

@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     createElement,
     show,
-    getClassName,
     computedStyle,
 } from '@jezvejs/dom';
 import { asArray } from '@jezvejs/types';
@@ -22,7 +21,6 @@ import {
     formatDateLabel,
     formatLongDateLabel,
     formatValue,
-    getDataCategoryName,
     isStackedData,
 } from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
@@ -36,6 +34,7 @@ import { AccountList } from '../../Models/AccountList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 
 // Common components
+import { ChartLegend } from '../../Components/Common/ChartLegend/ChartLegend.js';
 import { ChartPopup } from '../../Components/Common/ChartPopup/ChartPopup.js';
 import { NoDataMessage } from '../../Components/Common/NoDataMessage/NoDataMessage.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -51,12 +50,6 @@ import '../../Application/Application.scss';
 import './StatisticsView.scss';
 
 /* CSS classes */
-const LEGEND_CONTENT_CLASS = 'chart-legend__content';
-const LEGEND_LIST_CLASS = 'chart__legend-list';
-const LEGEND_ITEM_CLASS = 'chart-legend__item';
-const LEGEND_ITEM_ACTIVE_CLASS = 'chart-legend__item_active';
-const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
-
 const LEGEND_MAX_HEIGHT_PROP = '--chart-legend-max-collapsed-height';
 
 const defaultProps = {
@@ -174,10 +167,15 @@ class StatisticsView extends AppView {
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
             onlyVisibleCategoriesLegend: true,
-            renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatNumberShort(value),
             renderXAxisLabel: (value) => formatDateLabel(value, this.store.getState()),
             onItemClick: (target) => this.onSelectDataColumn(target),
+            setActiveCategory: (value) => this.dispatch(actions.toggleActivateChartCategory(value)),
+            setLegendCategories: (value) => this.dispatch(actions.setLegendCategories(value)),
+            toggleExpandLegend: () => this.dispatch(actions.toggleExpandLegend()),
+            components: {
+                Legend: ChartLegend,
+            },
         });
 
         // Loading indicator
@@ -412,89 +410,6 @@ class StatisticsView extends AppView {
         });
     }
 
-    renderLegendContent(categories) {
-        setTimeout(() => {
-            this.dispatch(actions.setLegendCategories(categories));
-        });
-
-        if (!Array.isArray(categories) || categories.length === 0) {
-            return null;
-        }
-
-        const state = this.store.getState();
-        const categoryReport = (state.filter.report === 'category');
-
-        // Data categories legend list
-        if (!this.legendList) {
-            this.legendList = createElement('ul', { props: { className: LEGEND_LIST_CLASS } });
-        } else {
-            this.legendList.textContent = '';
-        }
-
-        const listItems = categories.map((category, index) => {
-            const id = (categoryReport) ? category : (index + 1);
-            const strCategory = category?.toString();
-
-            const item = createElement('li', {
-                props: {
-                    className: getClassName(
-                        LEGEND_ITEM_CLASS,
-                        `legend-item-${id}`,
-                    ),
-                    dataset: {
-                        category,
-                    },
-                },
-                children: createElement('span', {
-                    props: {
-                        className: LEGEND_ITEM_TITLE_CLASS,
-                        textContent: getDataCategoryName(category, state),
-                    },
-                }),
-                events: {
-                    click: (e) => {
-                        const listItem = e.target.closest(`.${LEGEND_ITEM_CLASS}`);
-                        if (!listItem) {
-                            return;
-                        }
-
-                        const selectedCategory = listItem.dataset.category;
-                        this.dispatch(actions.toggleActivateChartCategory(selectedCategory));
-                    },
-                },
-            });
-
-            item.classList.toggle(LEGEND_ITEM_ACTIVE_CLASS, state.activeCategory === strCategory);
-
-            return item;
-        });
-        this.legendList.append(...listItems);
-
-        // Toggle collapse/expand button
-        if (!this.toggleLegendButton) {
-            this.toggleLegendButton = this.createToggleShowAllButton({
-                onClick: () => this.dispatch(actions.toggleExpandLegend()),
-            });
-        }
-
-        return createElement('div', {
-            props: { className: LEGEND_CONTENT_CLASS },
-            children: [
-                this.legendList,
-                this.toggleLegendButton.elem,
-            ],
-        });
-    }
-
-    createToggleShowAllButton(props = {}) {
-        return Button.create({
-            className: 'link-btn',
-            type: 'button',
-            title: __('actions.showAll'),
-            ...props,
-        });
-    }
-
     renderFilters(state, prevState = {}) {
         if (state.filter !== prevState.filter) {
             this.replaceHistory(state);
@@ -520,6 +435,13 @@ class StatisticsView extends AppView {
         const noData = !dataSet.length && !state.chartData?.series?.length;
         this.noDataMessage.show(state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
+
+        if (!noData && state.filter !== prevState.filter) {
+            this.histogram.setState((chartState) => ({
+                ...chartState,
+                filter: state.filter,
+            }));
+        }
 
         if (state.chartData !== prevState.chartData) {
             const data = (noData)

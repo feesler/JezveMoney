@@ -8,7 +8,7 @@ use JezveMoney\App\Model\IconModel;
 const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
 const DECIMAL_TYPE = "DECIMAL(25," . CurrencyModel::MAX_PRECISION . ")";
 
-define("DB_VERSION", 35);
+define("DB_VERSION", 36);
 
 /**
  * Database version manager class
@@ -1200,6 +1200,29 @@ class DBVersion
         }
 
         return 35;
+    }
+
+    /**
+     * Creates database version 36
+     *
+     * @return int
+     */
+    private function version36()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "users";
+        $res = $this->dbClient->updateQ(
+            $tableName,
+            ["reminders_date" => null],
+        );
+        if (!$res) {
+            throw new \Error("Failed to update table '$tableName'");
+        }
+
+        return 36;
     }
 
     /**

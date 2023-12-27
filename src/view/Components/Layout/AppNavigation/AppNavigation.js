@@ -20,16 +20,61 @@ const LOGO_CLASS = 'header-logo';
 const BACK_BTN_CLASS = 'close-btn circle-btn';
 
 const menuItems = [
-    { id: 'accounts', titleToken: 'accounts.listTitle', createButton: 'accounts/create/' },
-    { id: 'persons', titleToken: 'persons.listTitle', createButton: 'persons/create/' },
-    { id: 'categories', titleToken: 'categories.listTitle', createButton: 'categories/create/' },
-    { id: 'transactions', titleToken: 'transactions.listTitle', createButton: 'transactions/create/' },
-    { id: 'schedule', titleToken: 'schedule.listTitle', createButton: 'schedule/create/' },
-    { id: 'reminders', titleToken: 'reminders.listTitle' },
-    { id: 'statistics', titleToken: 'statistics.title' },
-    { id: 'import', titleToken: 'import.listTitle' },
-    { id: 'navSeparator1', type: 'separator' },
-    { id: 'about', titleToken: 'about.title', loggedOut: true },
+    {
+        id: 'accounts',
+        titleToken: 'accounts.listTitle',
+        icon: 'menu-accounts',
+        createButton: 'accounts/create/',
+    },
+    {
+        id: 'persons',
+        titleToken: 'persons.listTitle',
+        icon: 'menu-persons',
+        createButton: 'persons/create/',
+    },
+    {
+        id: 'categories',
+        titleToken: 'categories.listTitle',
+        icon: 'menu-categories',
+        createButton: 'categories/create/',
+    },
+    {
+        id: 'transactions',
+        titleToken: 'transactions.listTitle',
+        icon: 'menu-transactions',
+        createButton: 'transactions/create/',
+    },
+    {
+        id: 'schedule',
+        titleToken: 'schedule.listTitle',
+        icon: 'menu-schedule',
+        createButton: 'schedule/create/',
+    },
+    {
+        id: 'reminders',
+        titleToken: 'reminders.listTitle',
+        icon: 'notification',
+    },
+    {
+        id: 'statistics',
+        titleToken: 'statistics.title',
+        icon: 'menu-statistics',
+    },
+    {
+        id: 'import',
+        titleToken: 'import.listTitle',
+        icon: 'import',
+    },
+    {
+        id: 'navSeparator1',
+        type: 'separator',
+    },
+    {
+        id: 'about',
+        titleToken: 'about.title',
+        icon: 'menu-about',
+        loggedOut: true,
+    },
 ];
 
 /**
