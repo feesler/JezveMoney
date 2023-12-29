@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\App\API\Factory\TransactionsFactory;
+use JezveMoney\App\Model\ReminderModel;
 use JezveMoney\Core\ApiSortableListController;
 use JezveMoney\App\Model\TransactionModel;
 
@@ -68,6 +69,36 @@ class Transaction extends ApiSortableListController
         $this->updateErrorMsg = __("transactions.errors.update");
         $this->deleteErrorMsg = __("transactions.errors.delete");
         $this->changePosErrorMsg = __("transactions.errors.changePos");
+    }
+
+    /**
+     * Returns item object prepared for API response
+     *
+     * @param object $item item object from model
+     * @param bool $isList list item flag. Default is false
+     *
+     * @return object
+     */
+    protected function prepareItem(object $item, bool $isList = false)
+    {
+        if ($isList) {
+            return $item;
+        }
+
+        $reminderModel = ReminderModel::getInstance();
+        $res = (array)$item;
+
+        $reminders = $reminderModel->getData([
+            "transaction_id" => $item->id,
+        ]);
+        if (count($reminders) === 1) {
+            $reminder = $reminders[0];
+            $res["reminder_id"] = $reminder->id;
+            $res["reminder_date"] = $reminder->date;
+            $res["schedule_id"] = $reminder->schedule_id;
+        }
+
+        return (object)$res;
     }
 
     /**

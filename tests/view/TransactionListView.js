@@ -340,7 +340,17 @@ export class TransactionListView extends AppView {
     }
 
     getDetailsItem(itemId) {
-        return App.state.transactions.getItem(itemId);
+        const item = App.state.transactions.getItem(itemId);
+
+        const reminders = App.state.reminders.applyFilter({});
+        if (reminders?.length === 1) {
+            const [reminder] = reminders;
+            item.reminder_id = reminder.id;
+            item.reminder_date = reminder.date;
+            item.schedule_id = reminder.schedule_id;
+        }
+
+        return item;
     }
 
     getDetailsURL(model = this.model) {

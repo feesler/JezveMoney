@@ -3,6 +3,7 @@ import { App } from '../../../../Application/App.js';
 import { DEBT, Transaction } from '../../../../Models/Transaction.js';
 import { Field } from '../../../../Components/Common/Field/Field.js';
 import { ItemDetails } from '../../../../Components/Layout/ItemDetails/ItemDetails.js';
+import { ReminderField } from '../../../../Components/Reminder/ReminderField/ReminderField.js';
 
 /** CSS classes */
 const SOURCE_FIELD_CLASS = 'source-field';
@@ -66,6 +67,12 @@ export class TransactionDetails extends ItemDetails {
             className: COMMENT_FIELD_CLASS,
         });
 
+        this.reminderField = ReminderField.create({
+            title: __('transactions.reminder'),
+            selectButton: false,
+            closeButton: false,
+        });
+
         return [
             this.createRow(
                 this.sourceField.elem,
@@ -82,6 +89,7 @@ export class TransactionDetails extends ItemDetails {
             this.dateField.elem,
             this.categoryField.elem,
             this.commentField.elem,
+            this.reminderField.elem,
         ];
     }
 
@@ -193,6 +201,29 @@ export class TransactionDetails extends ItemDetails {
 
         this.commentField.show(item.comment.length > 0);
         this.commentField.setContent(item.comment);
+
+        let reminderId = item.reminder_id ?? 0;
+        let reminderDate = item.reminder_date ?? 0;
+        let scheduleId = item.schedule_id ?? 0;
+        if (reminderId === 0) {
+            const { reminders } = App.model;
+            const reminder = reminders.find((reminderItem) => (
+                reminderItem.transaction_id === item.id
+            ));
+            if (reminder) {
+                reminderId = reminder.id;
+                reminderDate = reminder.date;
+                scheduleId = reminder.schedule_id;
+            }
+        }
+
+        this.reminderField.show(reminderId !== 0);
+        this.reminderField.setState((fieldState) => ({
+            ...fieldState,
+            reminder_id: reminderId,
+            reminder_date: reminderDate,
+            schedule_id: scheduleId,
+        }));
 
         this.renderDateField(this.createDateField, item.createdate);
         this.renderDateField(this.updateDateField, item.updatedate);

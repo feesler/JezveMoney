@@ -8,6 +8,7 @@ import {
 import { App } from '../../../Application.js';
 import { __ } from '../../../model/locale.js';
 import { Transaction } from '../../../model/Transaction.js';
+import { ReminderField } from '../Fields/ReminderField.js';
 
 const fieldSelectors = {
     sourceField: '.source-field',
@@ -49,6 +50,9 @@ export class TransactionDetails extends TestComponent {
             return state;
         }, this.elem, fieldSelectors);
 
+        const reminderFieldEl = await query(this.elem, '.reminder-field');
+        res.reminderField = await ReminderField.create(this, reminderFieldEl);
+
         res.closeBtn = { elem: await query(this.elem, '.close-btn') };
 
         return res;
@@ -87,6 +91,12 @@ export class TransactionDetails extends TestComponent {
             ? category.name
             : __('categories.noCategory');
 
+        // Reminder field
+        const remindersAvailable = App.state.schedule.length > 0;
+        const reminderId = parseInt((item.reminder_id ?? 0), 10);
+        const scheduleId = parseInt((item.schedule_id ?? 0), 10);
+        const hasReminder = remindersAvailable && reminderId !== 0;
+
         const res = {
             title: {
                 visible: true,
@@ -123,6 +133,9 @@ export class TransactionDetails extends TestComponent {
                 visible: item.comment.length > 0,
                 value: item.comment,
             },
+            reminderField: {
+                visible: hasReminder,
+            },
             createDateField: {
                 value: App.secondsToDateString(item.createdate),
                 visible: true,
@@ -143,6 +156,15 @@ export class TransactionDetails extends TestComponent {
         }
         if (isDiff) {
             res.destAmountField.value = destCurr.format(item.dest_amount);
+        }
+
+        // Reminder field
+        if (hasReminder) {
+            res.reminderField.value = {
+                reminder_id: reminderId.toString(),
+                schedule_id: scheduleId.toString(),
+                reminder_date: (item.reminder_date ?? 0).toString(),
+            };
         }
 
         return res;
