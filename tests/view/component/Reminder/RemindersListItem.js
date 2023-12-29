@@ -20,6 +20,7 @@ export class RemindersListItem extends TestComponent {
             const detailsMode = !!elem.querySelector('.trans-item-base_details');
             const item = {
                 id: elem.dataset.id,
+                reminderState: elem.dataset.state,
                 scheduleId: elem.dataset.scheduleId,
                 reminderDate: elem.dataset.date,
                 type: parseInt(elem.dataset.type, 10),
@@ -119,6 +120,9 @@ export class RemindersListItem extends TestComponent {
         assert(state, 'Invalid state object');
 
         item.extend(state);
+
+        // Reminder state
+        res.reminderState = Reminder.getStateName(item.state);
 
         // Schedule part
         const scheduleItem = state.schedule.getItem(item.schedule_id);

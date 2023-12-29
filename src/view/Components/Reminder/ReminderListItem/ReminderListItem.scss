@@ -1,5 +1,16 @@
 .reminder-item {
   --reminder-item-disabled-opacity: 0.5;
+  --reminder-item-state-icon-size: 1.5rem;
+  --reminder-item-state-icon-color: var(--main-text-color);
+  --reminder-item-column-gap: 0.5rem;
+
+  /* Reminder state colors */
+  --reminder-item-upcoming-icon-color: #c0c0c0;
+  --reminder-item-scheduled-icon-color: var(--main-text-color);
+  --reminder-item-confirmed-icon-color: #8b8b8b;
+  --reminder-item-cancelled-icon-color: #ff8a8a;
+
+  /* Transaction part */
   --trans-item-column-gap: 16px;
   --trans-item-row-gap: 2px;
   --trans-item-details-row-gap: 8px;
@@ -9,13 +20,40 @@
   --list-item-row-gap: 2px;
   --list-item-details-row-gap: 8px;
 
+  /* Reminder state */
+  .reminder-item__state {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .reminder-item__state-icon {
+    width: var(--reminder-item-state-icon-size);
+    height: var(--reminder-item-state-icon-size);
+    fill: var(--reminder-item-state-icon-color);
+  }
+
   /* Schedule part */
+  .reminder-item__schedule {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+
   .reminder-item__schedule-name {
     font-size: 1rem;
     color: var(--hl-text-color);
   }
 
   /* Transaction part */
+  .trans-item-base {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
+
   .trans-item-base__title {
     color: var(--dimmed-text-color);
   }
@@ -46,15 +84,56 @@
   --trans-item-amount-color: var(--transaction-color);
 }
 
+.reminder-item[data-state="upcoming"] {
+  --reminder-item-state-icon-color: var(--reminder-item-upcoming-icon-color);
+}
+
+.reminder-item[data-state="scheduled"] {
+  --reminder-item-state-icon-color: var(--reminder-item-scheduled-icon-color);
+}
+
+.reminder-item[data-state="confirmed"] {
+  --reminder-item-state-icon-color: var(--reminder-item-confirmed-icon-color);
+}
+
+.reminder-item[data-state="cancelled"] {
+  --reminder-item-state-icon-color: var(--reminder-item-cancelled-icon-color);
+}
+
 .reminder-item .list-item__content {
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
   border-left-width: 2px;
   border-left-style: solid;
   border-left-color: var(--transaction-color);
-  row-gap: var(--trans-item-details-row-gap);
+  row-gap: var(--reminder-item-column-gap);
+  column-gap: var(--reminder-item-column-gap);
 }
 
 /* Disabled state */
 .reminder-item[disabled] {
   pointer-events: none;
   opacity: var(--reminder-item-disabled-opacity);
+}
+
+@container (min-width: 768px) {
+  .reminder-item {
+    /* Reminder state */
+    .reminder-item__state {
+      grid-column: 1 / 2;
+      grid-row: 1 / 3;
+    }
+
+    /* Schedule part */
+    .reminder-item__schedule {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+    }
+
+    /* Transaction part */
+    .trans-item-base {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+  }
 }
