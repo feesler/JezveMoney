@@ -1,0 +1,23 @@
+/* Collapsible list item */
+.collapsible.list-item {
+  /* Selected state */
+  &.list-item_selected {
+    &::after {
+      display: none;
+    }
+
+    > .collapsible-header::after {
+      content: "";
+      display: block;
+      left: 32px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: var(--list-item-selected-color);
+      opacity: var(--list-item-selected-opacity);
+      z-index: 2;
+      cursor: pointer;
+    }
+  }
+}

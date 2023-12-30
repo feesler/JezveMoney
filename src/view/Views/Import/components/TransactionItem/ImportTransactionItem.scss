@@ -100,25 +100,6 @@
       transform: rotate(180deg);
     }
   }
-
-  /* Selected item */
-  &.list-item_selected {
-    &::after {
-      display: none;
-    }
-
-    .collapsible-header::after {
-      content: "";
-      display: block;
-      position: absolute;
-      left: 32px;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      border: 2px solid var(--accent-color);
-      z-index: 2;
-    }
-  }
 }
 
 .import-item[data-type="1"] {

@@ -1,14 +1,12 @@
 /* Transaction list item */
 .trans-item {
   --trans-item-amount-color: var(--accent-color-alt);
-  --trans-item-selected-color: var(--accent-color);
   --trans-item-column-gap: 16px;
   --trans-item-row-gap: 2px;
   --trans-item-details-row-gap: 8px;
   --trans-item-column-min-width: 130px;
 
   /* List item */
-  --list-item-selected-color: var(--trans-item-selected-color);
   --list-item-row-gap: var(--trans-item-row-gap);
 }
 

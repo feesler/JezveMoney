@@ -1,5 +1,6 @@
 .list-item {
   --list-item-selected-color: var(--accent-color);
+  --list-item-selected-opacity: 0.4;
   --list-item-row-gap: 2px;
   --list-item-column-gap: 16px;
 
@@ -87,7 +88,6 @@
 
 /* Selected state */
 .list-item_selected::after {
-  border: 2px solid var(--list-item-selected-color);
   bottom: 0;
   content: "";
   cursor: pointer;
@@ -96,6 +96,8 @@
   position: absolute;
   right: 0;
   top: 0;
+  background: var(--list-item-selected-color);
+  opacity: var(--list-item-selected-opacity);
 }
 
 /* Sort mode */
