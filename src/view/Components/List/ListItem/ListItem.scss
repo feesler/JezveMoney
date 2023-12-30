@@ -75,6 +75,7 @@
 .list_select {
   .list-item {
     cursor: pointer;
+    user-select: none;
   }
 
   .list-item__select {
