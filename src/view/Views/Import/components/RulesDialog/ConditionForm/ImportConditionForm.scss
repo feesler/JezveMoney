@@ -19,66 +19,68 @@
 
     width: fit-content;
   }
-}
 
-/* Form container */
-.cond-form__container {
-  display: flex;
-  flex-flow: column nowrap;
-  max-height: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  row-gap: 8px;
+  /* Form container */
+  .cond-form__container {
+    display: flex;
+    flex-flow: column nowrap;
+    max-height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    row-gap: 8px;
 
-  .checkbox__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    .checkbox__label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
-}
 
-/* Fields container */
-.cond-form__fields {
-  display: flex;
-  flex-flow: row wrap;
-  max-height: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  column-gap: 8px;
-  row-gap: 8px;
-}
+  /* Fields container */
+  .cond-form__fields {
+    display: flex;
+    flex-flow: row wrap;
+    max-height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    column-gap: 8px;
+    row-gap: 8px;
+  }
 
-.property-field,
-.operator-field {
-  flex-grow: 0;
-  flex-shrink: 0;
-}
+  .property-field,
+  .operator-field {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
 
-.account-field,
-.tpl-field,
-.currency-field,
-.amount-field,
-.text-field,
-.date-field {
-  flex: 1 1 0;
-  min-width: 200px;
-}
+  .account-field,
+  .tpl-field,
+  .currency-field,
+  .amount-field,
+  .text-field,
+  .date-field {
+    flex: 1 1 0;
+    min-width: 200px;
+  }
 
-.date-field {
-  --field-title-margin: 0;
+  .date-field {
+    --field-title-margin: 0;
 
-  max-width: 200px;
-}
+    max-width: 200px;
+  }
 
-/* Controls container */
-.cond-form__controls {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
+  /* Controls container */
+  .cond-form__controls {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
 }
 
 /* Desktop */
 @media (min-width: 768px) {
-  .cond-form__fields {
-    column-gap: 8px;
+  .cond-form {
+    .cond-form__fields {
+      column-gap: 8px;
+    }
   }
 }
