@@ -1,6 +1,7 @@
 .trans-item-base {
   display: grid;
-  align-items: stretch;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: start;
   row-gap: var(--trans-item-row-gap);
   column-gap: var(--trans-item-column-gap);
   position: relative;
@@ -36,22 +37,16 @@
 
 /* Accounts */
 .trans-item-base__title {
+  grid-row: 1 / 2;
+  grid-column: 1 / 6;
   font-size: 14px;
   color: var(--main-text-color);
 }
 
-/* Amount and category group */
-.trans-item-base__amount-category {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  row-gap: var(--trans-item-row-gap);
-  column-gap: var(--trans-item-column-gap);
-  overflow: hidden;
-}
-
 /* Amount field */
 .trans-item-base__amount {
+  grid-row: 2 / 3;
+  grid-column: 1 / 4;
   margin-right: auto;
   color: var(--trans-item-amount-color);
   font-size: 16px;
@@ -60,6 +55,9 @@
 
 /* Category field */
 .trans-item-base__category {
+  grid-row: 2 / 3;
+  grid-column: 4 / 6;
+  justify-self: end;
   max-width: 100%;
   padding: 0 12px;
   border-radius: 100vh;
@@ -69,23 +67,17 @@
   color: var(--trans-item-category-text, var(--list-item-text-color));
 }
 
-/* Date and comment group */
-.trans-item-base__date-comment {
-  display: flex;
-  flex-flow: row nowrap;
-  font-size: 12px;
-  column-gap: var(--trans-item-column-gap);
-  overflow: hidden;
-  width: 100%;
-}
-
 /* Comment field */
 .trans-item-base__date {
+  grid-row: 3 / 4;
+  grid-column: 1 / 2;
   flex: 0 0 auto;
 }
 
 /* Date field */
 .trans-item-base__comment {
+  grid-row: 3 / 4;
+  grid-column: 2 / 6;
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -161,13 +153,32 @@
 
 @container (min-width: 768px) {
   .trans-item-base {
-    grid-template-columns: 1fr 3fr 2fr;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr 2fr;
+    justify-items: start;
 
-    /* Amount and category group */
-    .trans-item-base__amount-category {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      justify-items: flex-start;
+    .trans-item-base__title {
+      grid-row: 1 / 2;
+      grid-column: 1 / 2;
+    }
+
+    .trans-item-base__amount {
+      grid-row: 1 / 2;
+      grid-column: 2 / 3;
+    }
+
+    .trans-item-base__category {
+      grid-row: 1 / 2;
+      grid-column: 3 / 4;
+    }
+
+    .trans-item-base__date {
+      grid-row: 1 / 2;
+      grid-column: 4 / 5;
+    }
+
+    .trans-item-base__comment {
+      grid-row: 1 / 2;
+      grid-column: 5 / 7;
     }
   }
 }

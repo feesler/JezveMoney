@@ -28,8 +28,6 @@ const AMOUNT_CLASS = 'trans-item-base__amount';
 const DATE_CLASS = 'trans-item-base__date';
 const CATEGORY_CLASS = 'trans-item-base__category';
 const COMMENT_CLASS = 'trans-item-base__comment';
-const AMOUNT_CATEGORY_CLASS = 'trans-item-base__amount-category';
-const DATE_COMMENT_CLASS = 'trans-item-base__date-comment';
 const ACCOUNTS_GROUP_CLASS = 'trans-item-base__accounts-group';
 const AMOUNTS_GROUP_CLASS = 'trans-item-base__amounts-group';
 const RESULTS_GROUP_CLASS = 'trans-item-base__results-group';
@@ -86,28 +84,15 @@ export class TransactionListItemBase extends Component {
         this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
         this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
-        const amountCategoryElem = createElement('div', {
-            props: { className: AMOUNT_CATEGORY_CLASS },
-            children: [
-                this.amountElem,
-                this.categoryElem,
-            ],
-        });
-
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
-        const dateCommentElem = createElement('div', {
-            props: { className: DATE_COMMENT_CLASS },
-            children: [
-                this.dateElem,
-                this.commentElem,
-            ],
-        });
 
         this.elem.append(
             this.titleElem,
-            amountCategoryElem,
-            dateCommentElem,
+            this.amountElem,
+            this.categoryElem,
+            this.dateElem,
+            this.commentElem,
         );
     }
 

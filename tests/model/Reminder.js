@@ -51,6 +51,18 @@ export class Reminder {
         [REMINDER_CANCELLED]: 'cancelled',
     };
 
+    static getStateByName(value) {
+        return Object.keys(this.stateNames).find((state) => (
+            (typeof this.stateNames[state] === 'string')
+            && (this.stateNames[state] === value)
+        ));
+    }
+
+    static getStateName(stateType) {
+        const type = parseInt(stateType, 10);
+        return this.stateNames[type] ?? null;
+    }
+
     static isValidState(value) {
         const state = parseInt(value, 10);
         return this.availStates.includes(state);

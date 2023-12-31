@@ -63,6 +63,9 @@ class Transactions extends ListViewController
 
         $request = array_merge($_GET, $fixedOptions);
 
+        $scheduleModel = ScheduledTransactionModel::getInstance();
+        $reminderModel = ReminderModel::getInstance();
+
         $factory = TransactionsFactory::getInstance();
         $transactions = $factory->getList($request);
 
@@ -70,6 +73,9 @@ class Transactions extends ListViewController
         $showDetails = (isset($_GET["mode"]) && $_GET["mode"] == "details");
 
         $detailsId = $this->getRequestedItem();
+        $detailsItem = ($detailsId)
+            ? $this->getTransactionData(intval($detailsId), ["reminder" => true])
+            : null;
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -77,13 +83,15 @@ class Transactions extends ListViewController
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "categories" => $this->catModel->getData(),
+            "schedule" => $scheduleModel->getData(),
+            "reminders" => $reminderModel->getData(),
             "view" => [
                 "items" => $transactions->items,
                 "filter" => $transactions->filter,
                 "pagination" => $transactions->pagination,
                 "mode" => $showDetails ? "details" : "classic",
                 "detailsId" => $detailsId,
-                "detailsItem" => $this->model->getItem($detailsId),
+                "detailsItem" => $detailsItem,
             ],
         ];
 
@@ -133,16 +141,33 @@ class Transactions extends ListViewController
      * Returns array with view data for specified transaction
      *
      * @param int $item_id transaction id
+     * @param array $options
      *
      * @return array|null
      */
-    private function getTransactionData(int $item_id)
+    private function getTransactionData(int $item_id, array $options = [])
     {
         $item = $this->model->getItem($item_id);
         if (is_null($item)) {
             return null;
         }
+
         $tr = (array)$item;
+
+        $addReminder = $options["reminder"] ?? false;
+        if ($addReminder) {
+            $reminderModel = ReminderModel::getInstance();
+            $reminders = $reminderModel->getData([
+                "transaction_id" => $item_id,
+            ]);
+            if (count($reminders) === 1) {
+                $reminder = $reminders[0];
+                $tr["reminder_id"] = $reminder->id;
+                $tr["reminder_date"] = $reminder->date;
+                $tr["schedule_id"] = $reminder->schedule_id;
+            }
+        }
+
         if ($tr["type"] !== DEBT) {
             return $tr;
         }
@@ -467,17 +492,9 @@ class Transactions extends ListViewController
         $reminderModel = ReminderModel::getInstance();
 
         $trans_id = intval($this->actionParam);
-        $tr = $this->getTransactionData($trans_id);
+        $tr = $this->getTransactionData($trans_id, ["reminder" => true]);
         if (is_null($tr)) {
             throw new \Error(__("transactions.errors.update"));
-        }
-
-        $reminders = $reminderModel->getData([
-            "transaction_id" => $trans_id,
-            "returnIds" => true,
-        ]);
-        if (count($reminders) === 1) {
-            $tr["reminder_id"] = $reminders[0];
         }
 
         // check type change request

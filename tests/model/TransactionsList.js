@@ -626,7 +626,7 @@ export class TransactionsList extends SortableList {
             return res - 1;
         }
         if (month === MONTHS_IN_YEAR - 1 && week === 1) {
-            return res - 1;
+            return res + 1;
         }
 
         return res;

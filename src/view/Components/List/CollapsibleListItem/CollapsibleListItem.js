@@ -3,6 +3,8 @@ import { Collapsible } from 'jezvejs/Collapsible';
 import { ListItem } from '../ListItem/ListItem.js';
 import { ToggleButton } from '../../Common/ToggleButton/ToggleButton.js';
 
+import './CollapsibleListItem.scss';
+
 const defaultProps = {
     collapsed: true,
     content: null,

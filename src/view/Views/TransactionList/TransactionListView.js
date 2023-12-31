@@ -29,6 +29,8 @@ import { CurrencyList } from '../../Models/CurrencyList.js';
 import { AccountList } from '../../Models/AccountList.js';
 import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
+import { Schedule } from '../../Models/Schedule.js';
+import { ReminderList } from '../../Models/ReminderList.js';
 
 // Common components
 import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
@@ -102,6 +104,8 @@ class TransactionListView extends AppView {
         App.loadModel(PersonList, 'persons', App.props.persons);
         App.loadModel(CategoryList, 'categories', App.props.categories);
         App.initCategoriesModel();
+        App.loadModel(Schedule, 'schedule', App.props.schedule);
+        App.loadModel(ReminderList, 'reminders', App.props.reminders);
 
         this.store = createStore(reducer, { initialState });
     }
