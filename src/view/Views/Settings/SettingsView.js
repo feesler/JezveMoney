@@ -29,6 +29,13 @@ import { CurrencyItem } from './components/CurrencyItem/CurrencyItem.js';
 import { CurrencyListContextMenu } from './components/ContextMenu/CurrencyListContextMenu.js';
 import { CurrencyListMainMenu } from './components/MainMenu/CurrencyListMainMenu.js';
 
+import {
+    createFormatExamplesTitle,
+    createFormatExamplesContainer,
+    renderDateFormatExample,
+    renderNumberFormatExample,
+    getNumberFormatOptions,
+} from './helpers.js';
 import { actions, createItemsFromModel, reducer } from './reducer.js';
 import {
     requestDateLocale,
@@ -215,10 +222,16 @@ class SettingsView extends AppView {
             onItemSelect: (sel) => this.onDateFormatSelect(sel),
         });
 
+        this.dateFormatExamples = createFormatExamplesContainer();
+
         this.dateFormatSection = Section.create({
             id: 'dateFormat',
-            title: __('settings.dateFormat'),
-            content: this.dateFormatSelect.elem,
+            title: __('settings.dateFormat.title'),
+            content: [
+                this.dateFormatSelect.elem,
+                createFormatExamplesTitle(__('settings.dateFormat.formatExamples')),
+                this.dateFormatExamples,
+            ],
         });
 
         // Numbers format
@@ -226,10 +239,16 @@ class SettingsView extends AppView {
             onItemSelect: (sel) => this.onDecimalFormatSelect(sel),
         });
 
+        this.numberFormatExamples = createFormatExamplesContainer();
+
         this.numberFormatSection = Section.create({
             id: 'numberFormat',
-            title: __('settings.numberFormat'),
-            content: this.decimalFormatSelect.elem,
+            title: __('settings.numberFormat.title'),
+            content: [
+                this.decimalFormatSelect.elem,
+                createFormatExamplesTitle(__('settings.dateFormat.formatExamples')),
+                this.numberFormatExamples,
+            ],
         });
     }
 
@@ -418,13 +437,63 @@ class SettingsView extends AppView {
         }));
     }
 
-    renderDateFormat(state) {
+    renderDateFormat(state, prevState) {
+        if (
+            state.dateLocale === prevState.dateLocale
+            && state.dateRenderTime === prevState.dateRenderTime
+        ) {
+            return;
+        }
+
+        // Date format DropDown
         this.dateFormatSelect.selectItem(state.dateLocale);
+
+        // Date format examples
+        const now = new Date();
+        const special = new Date(Date.UTC(now.getFullYear(), 0, 23));
+
+        this.dateFormatExamples.replaceChildren(
+            renderDateFormatExample(__('settings.dateFormat.today'), now, state),
+            renderDateFormatExample(__('settings.dateFormat.special'), special, state),
+        );
+
         this.dateFormatSection.contentContainer.dataset.time = state.dateRenderTime;
     }
 
-    renderDecimalFormat(state) {
+    renderDecimalFormat(state, prevState) {
+        if (
+            state.decimalLocale === prevState.decimalLocale
+            && state.dateRenderTime === prevState.dateRenderTime
+        ) {
+            return;
+        }
+
+        // Number format DropDown
         this.decimalFormatSelect.selectItem(state.decimalLocale);
+
+        // Number format examples
+        const exampleValues = [
+            {
+                value: 12345678.90,
+                options: getNumberFormatOptions({ precision: 2 }),
+            },
+            {
+                value: -12345678.90,
+                options: getNumberFormatOptions({ precision: 2 }),
+            },
+            { value: 12345678 },
+            {
+                value: 0.12345678,
+                options: getNumberFormatOptions({ precision: 8 }),
+            },
+        ];
+
+        this.numberFormatExamples.replaceChildren(
+            ...exampleValues.flatMap((value) => ([
+                renderNumberFormatExample(value, state),
+            ])),
+        );
+
         this.numberFormatSection.contentContainer.dataset.time = state.dateRenderTime;
     }
 

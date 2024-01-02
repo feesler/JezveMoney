@@ -6,3 +6,31 @@
   width: 100%;
   gap: 4px;
 }
+
+/* Section description */
+.section__description {
+  color: var(--dimmed-text-color);
+}
+
+/* Formatted examples list */
+.format-examples {
+  display: flex;
+  flex-flow: column nowrap;
+  max-width: 300px;
+  row-gap: 5px;
+}
+
+/* Formatted example item */
+.formatted {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.formatted-title {
+  color: var(--dimmed-text-color);
+}
+
+.formatted-value {
+  color: var(--main-text-color);
+  margin-left: auto;
+}

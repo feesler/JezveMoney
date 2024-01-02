@@ -17,8 +17,12 @@ import {
     TabList,
     PopupMenu,
 } from 'jezvejs-test';
-import { AppView } from './AppView.js';
+
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
+import { getNumberFormatOptions } from '../common.js';
+
+import { AppView } from './AppView.js';
 import { CurrenciesList } from './component/Currency/CurrenciesList.js';
 
 const MAIN_TAB_ID = 'index';
@@ -74,18 +78,47 @@ export class SettingsView extends AppView {
             }, res.contextMenu.elem);
         }
 
-        // Date format
-        [
-            res.dateRenderTime,
-            res.decimalRenderTime,
-        ] = await evaluate(() => {
-            const dateEl = document.querySelector('#dateFormat .settings-block__content');
-            const decimalEl = document.querySelector('#numberFormat .settings-block__content');
-            return [
-                dateEl?.dataset?.time,
-                decimalEl?.dataset?.time,
-            ];
-        });
+        // Regional tab
+        const selectedTab = res.tabs.selectedId;
+        const isRegionalTab = selectedTab === REGIONAL_TAB_ID;
+
+        if (isRegionalTab) {
+            [
+                res.dateRenderTime,
+                res.decimalRenderTime,
+                res.dateExamples,
+                res.numberExamples,
+            ] = await evaluate(() => {
+                const dateEl = document.querySelector('#dateFormat .settings-block__content');
+                const dateExamplesElems = Array.from(
+                    dateEl.querySelectorAll('.format-examples .formatted'),
+                );
+                const dateExamples = dateExamplesElems.map((el) => {
+                    const titleEl = el?.firstElementChild;
+                    const valueEl = titleEl?.nextElementSibling;
+
+                    return {
+                        title: titleEl?.textContent,
+                        value: valueEl?.textContent,
+                    };
+                });
+
+                const decimalEl = document.querySelector('#numberFormat .settings-block__content');
+                const numberExamplesElems = Array.from(
+                    decimalEl.querySelectorAll('.format-examples .formatted-value'),
+                );
+                const numberExamples = numberExamplesElems.map((el) => (
+                    el?.textContent
+                ));
+
+                return [
+                    dateEl?.dataset?.time,
+                    decimalEl?.dataset?.time,
+                    dateExamples,
+                    numberExamples,
+                ];
+            });
+        }
 
         const dateLocaleDropDownEl = await query('#dateFormat .dd__container');
         res.dateLocaleDropDown = await DropDown.create(this, dateLocaleDropDownEl);
@@ -199,6 +232,49 @@ export class SettingsView extends AppView {
                 itemId: model.contextItem,
                 ctxDeleteBtn: { visible: isCurrenciesTab },
             };
+        }
+
+        if (isRegionalTab) {
+            // Date format examples
+            const dateValues = [
+                {
+                    title: __('settings.dateFormat.today'),
+                    value: App.dates.now,
+                },
+                {
+                    title: __('settings.dateFormat.special'),
+                    value: new Date(App.dates.now.getFullYear(), 0, 23),
+                },
+            ];
+
+            res.dateExamples = dateValues.map(({ title, value }) => ({
+                title,
+                value: App.formatDate(value, { locales: model.dateLocale }),
+            }));
+
+            // Number format exmaples
+            const numberValues = [
+                {
+                    value: 12345678.90,
+                    options: getNumberFormatOptions({ precision: 2 }),
+                },
+                {
+                    value: -12345678.90,
+                    options: getNumberFormatOptions({ precision: 2 }),
+                },
+                { value: 12345678 },
+                {
+                    value: 0.12345678,
+                    options: getNumberFormatOptions({ precision: 8 }),
+                },
+            ];
+
+            res.numberExamples = numberValues.map(({ value, options = {} }) => (
+                App.formatNumber(value, {
+                    locales: model.decimalLocale,
+                    options,
+                })
+            ));
         }
 
         return res;

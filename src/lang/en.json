@@ -604,8 +604,16 @@
         "regional": "Regional setup",
         "language": "Language",
         "darkTheme": "Dark theme",
-        "dateFormat": "Date format",
-        "numberFormat": "Decimal format",
+        "dateFormat": {
+            "title": "Date format",
+            "formatExamples": "Formatting examples",
+            "today": "Today",
+            "special": "23rd of January"
+        },
+        "numberFormat": {
+            "title": "Decimal format",
+            "formatExamples": "Formatting examples"
+        },
         "errors": {
             "update": "Fail to update settings"
         }

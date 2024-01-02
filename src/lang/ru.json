@@ -604,8 +604,16 @@
         "regional": "Региональные настройки",
         "language": "Язык",
         "darkTheme": "Тёмная тема",
-        "dateFormat": "Формат даты",
-        "numberFormat": "Формат чисел",
+        "dateFormat": {
+            "title": "Формат даты",
+            "formatExamples": "Примеры форматирования",
+            "today": "Сегодня",
+            "special": "23 января"
+        },
+        "numberFormat": {
+            "title": "Формат чисел",
+            "formatExamples": "Примеры форматирования"
+        },
         "errors": {
             "update": "Не удалось обновить настройки"
         }
