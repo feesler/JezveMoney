@@ -4,6 +4,8 @@ namespace JezveMoney\Core;
 
 use Aura\Accept\AcceptFactory;
 
+const LANG_DIR = "lang";
+
 /**
  * Locale class
  */
@@ -43,14 +45,20 @@ class Locale
      */
     public static function getAvailable()
     {
-        $files = glob(self::getFileName("*"));
+        $pattern = APP_ROOT . LANG_DIR . "/*";
+        $files = glob($pattern);
         if ($files === false || count($files) === 0) {
             return [];
         }
 
         $res = [];
         foreach ($files as $file) {
-            if (!is_file($file)) {
+            if (!is_dir($file)) {
+                continue;
+            }
+
+            $localeCommon = $file . "/common.json";
+            if (!is_file($localeCommon)) {
                 continue;
             }
 
@@ -62,6 +70,18 @@ class Locale
     }
 
     /**
+     * Returns relative file path for locale
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    public static function getRelativeFileName(string $locale)
+    {
+        return LANG_DIR . "/$locale/common.json";
+    }
+
+    /**
      * Returns file name for locale
      *
      * @param string $locale
@@ -70,7 +90,7 @@ class Locale
      */
     public static function getFileName(string $locale)
     {
-        return APP_ROOT . "lang/" . $locale . ".json";
+        return APP_ROOT . static::getRelativeFileName($locale);
     }
 
     /**

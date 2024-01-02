@@ -1,3 +1,3 @@
-import tokens from '../../lang/en.json';
+import tokens from '../../lang/en/common.json';
 
 window.localeTokens = tokens;

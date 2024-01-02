@@ -1,6 +1,6 @@
 import { assert } from '@jezvejs/assert';
-import enTokens from '../../src/lang/en.json' assert { type: 'json' };
-import ruTokens from '../../src/lang/ru.json' assert { type: 'json' };
+import enTokens from '../../src/lang/en/common.json' assert { type: 'json' };
+import ruTokens from '../../src/lang/ru/common.json' assert { type: 'json' };
 import { App } from '../Application.js';
 
 export const tokensMap = {
