@@ -13,6 +13,7 @@ use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\App\Model\ScheduledTransactionModel;
 use JezveMoney\App\Model\UserCurrencyModel;
 use JezveMoney\App\Model\UserSettingsModel;
+use JezveMoney\Core\Locale;
 
 /**
  * Profile API controller
@@ -340,6 +341,7 @@ class Profile extends ApiController
                 wlog("Update item error: " . $e->getMessage());
             }
             if (!$updateResult) {
+                Locale::loadViewTokens("SettingsView");
                 throw new \Error(__("settings.errors.update"));
             }
 

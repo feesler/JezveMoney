@@ -7,7 +7,7 @@
                 <div class="content_wrap admin_cont_wrap">
                     <section id="mainTab" class="settings-block">
                         <header id="mainHeading" class="heading">
-                            <h2><?= __("settings.main") ?></h2>
+                            <h2><?= __("userNavigation.settings") ?></h2>
                         </header>
                         <div id="mainContainer">
                             <label id="enableLogsField" class="switch switch-field form-row">
