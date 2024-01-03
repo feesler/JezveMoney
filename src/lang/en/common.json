@@ -87,6 +87,9 @@
         "createDate": "Created",
         "updateDate": "Updated"
     },
+    "navigation": {
+        "about": "About"
+    },
     "userNavigation": {
         "language": "Language",
         "darkTheme": "Dark theme",
@@ -618,10 +621,6 @@
             "month": "Month",
             "year": "Year"
         }
-    },
-    "about": {
-        "title": "About",
-        "version": "Version"
     },
     "login": {
         "title": "Log in",

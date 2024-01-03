@@ -87,6 +87,9 @@
         "createDate": "Дата создания",
         "updateDate": "Дата изменения"
     },
+    "navigation": {
+        "about": "О проекте"
+    },
     "userNavigation": {
         "language": "Язык",
         "darkTheme": "Тёмная тема",
@@ -618,10 +621,6 @@
             "month": "Месяц",
             "year": "Год"
         }
-    },
-    "about": {
-        "title": "О проекте",
-        "version": "Версия"
     },
     "login": {
         "title": "Вход",

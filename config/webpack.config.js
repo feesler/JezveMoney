@@ -83,26 +83,34 @@ export default {
             filename: 'view/js/[name].js',
         },
 
-        /* Settings */
+        /* Settings view */
         SettingsView: {
             import: './src/view/Views/Settings/SettingsView.js',
             filename: 'view/js/[name].js',
         },
-
         SettingsView_locale_en: {
             import: './src/view/Locales/Views/Settings/en.js',
             filename: 'view/js/locale/settings/en.js',
         },
-
         SettingsView_locale_ru: {
             import: './src/view/Locales/Views/Settings/ru.js',
             filename: 'view/js/locale/settings/ru.js',
         },
 
+        /* About view */
         AboutView: {
             import: './src/view/Views/About/AboutView.js',
             filename: 'view/js/[name].js',
         },
+        AboutView_locale_en: {
+            import: './src/view/Locales/Views/About/en.js',
+            filename: 'view/js/locale/about/en.js',
+        },
+        AboutView_locale_ru: {
+            import: './src/view/Locales/Views/About/ru.js',
+            filename: 'view/js/locale/about/ru.js',
+        },
+
         TransactionListView: {
             import: './src/view/Views/TransactionList/TransactionListView.js',
             filename: 'view/js/[name].js',

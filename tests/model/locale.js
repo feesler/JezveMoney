@@ -4,6 +4,10 @@ import { assert } from '@jezvejs/assert';
 import enTokens from '../../src/lang/en/common.json' assert { type: 'json' };
 import ruTokens from '../../src/lang/ru/common.json' assert { type: 'json' };
 
+// AboutView tokens
+import enAboutTokens from '../../src/lang/en/AboutView/index.json' assert { type: 'json' };
+import ruAboutTokens from '../../src/lang/ru/AboutView/index.json' assert { type: 'json' };
+
 // SettingsView tokens
 import enSettingsTokens from '../../src/lang/en/SettingsView/index.json' assert { type: 'json' };
 import ruSettingsTokens from '../../src/lang/ru/SettingsView/index.json' assert { type: 'json' };
@@ -13,10 +17,12 @@ import { App } from '../Application.js';
 export const tokensMap = {
     en: {
         ...enTokens,
+        ...enAboutTokens,
         ...enSettingsTokens,
     },
     ru: {
         ...ruTokens,
+        ...ruAboutTokens,
         ...ruSettingsTokens,
     },
 };
