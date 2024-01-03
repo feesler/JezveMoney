@@ -222,6 +222,17 @@ export const trimToDigitsLimit = (val, limit, allowNegative = true) => {
     return handleNegative(trimmed, allowNegative);
 };
 
+/**
+ * Returns options object for number format
+ * @param {object} param0
+ * @param {number} param0.precision - number of fractional digits
+ * @returns {object}
+ */
+export const getNumberFormatOptions = ({ precision }) => ({
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+});
+
 /*
 * Other
 */

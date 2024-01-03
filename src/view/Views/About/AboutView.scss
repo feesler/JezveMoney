@@ -1,0 +1,32 @@
+/* Logo container */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  background-color: var(--accent-active-color);
+}
+
+/* Logo */
+.logo.about-logo {
+  --logo-size: 100px;
+}
+
+/* Application info item */
+.app-info {
+  line-height: 1.75rem;
+}
+
+/* Description paragraph */
+.paragraph {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+  .logo.about-logo {
+    --logo-size: 200px;
+    --btn-font-size: 32px;
+  }
+}

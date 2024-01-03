@@ -87,6 +87,14 @@
         "createDate": "Created",
         "updateDate": "Updated"
     },
+    "navigation": {
+        "about": "About"
+    },
+    "userNavigation": {
+        "language": "Language",
+        "darkTheme": "Dark theme",
+        "settings": "Settings"
+    },
     "main": {
         "total": "Total",
         "noAccounts": "No accounts",
@@ -115,6 +123,7 @@
             "AED": "UAE Dirham",
             "BTC": "Bitcoin"
         },
+        "other": "Other currencies",
         "deleteMessage": "Are you sure want to delete selected currency?",
         "errors": {
             "create": "Fail to create new currency",
@@ -593,23 +602,6 @@
             "userNotFound": "User not found"
         }
     },
-    "settings": {
-        "title": "Settings",
-        "main": "Common",
-        "currencies": {
-            "title": "Currencies",
-            "noData": "No currencies selected",
-            "other": "Other currencies"
-        },
-        "regional": "Regional setup",
-        "language": "Language",
-        "darkTheme": "Dark theme",
-        "dateFormat": "Date format",
-        "numberFormat": "Decimal format",
-        "errors": {
-            "update": "Fail to update settings"
-        }
-    },
     "statistics": {
         "title": "Statistics",
         "noData": "No results",
@@ -629,10 +621,6 @@
             "month": "Month",
             "year": "Year"
         }
-    },
-    "about": {
-        "title": "About",
-        "version": "Version"
     },
     "login": {
         "title": "Log in",

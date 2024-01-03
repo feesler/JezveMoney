@@ -4,13 +4,7 @@ import { Spinner } from 'jezvejs/Spinner';
 import { __ } from '../../../utils/utils.js';
 import './LoadingIndicator.scss';
 
-const defaultProps = {
-    title: __('loading'),
-    visible: false,
-    fixed: true,
-    blockScroll: true,
-};
-
+/* CSS classes */
 const CONTAINER_CLASS = 'loading-indicator';
 const FIXED_CONTAINER_CLASS = 'loading-indicator_fixed';
 const SPINNER_CLASS = 'loading-indicator__spinner';
@@ -20,13 +14,20 @@ const TITLE_CLASS = 'loading-indicator__title';
  * Loading indicator component
  */
 export class LoadingIndicator extends Component {
-    constructor(props) {
-        super(props);
-
-        this.props = {
-            ...defaultProps,
-            ...this.props,
+    static getDefaultProps() {
+        return {
+            title: __('loading'),
+            visible: false,
+            fixed: true,
+            blockScroll: true,
         };
+    }
+
+    constructor(props = {}) {
+        super({
+            ...LoadingIndicator.getDefaultProps(),
+            ...props,
+        });
 
         this.state = {
             ...this.props,

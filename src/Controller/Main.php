@@ -10,6 +10,7 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\Core\Application;
+use JezveMoney\Core\Locale;
 
 const DEFAULT_CHART_LIMIT = 5;
 
@@ -93,6 +94,9 @@ class Main extends TemplateController
      */
     public function about()
     {
+        $viewName = "AboutView";
+        Locale::loadViewTokens($viewName);
+
         $this->template = new Template(VIEW_TPL_PATH . "About.tpl");
         $data = [
             "titleString" => __("appName")
@@ -107,7 +111,7 @@ class Main extends TemplateController
             "profile" => $this->getProfileData(),
         ];
 
-        $this->initResources("AboutView");
+        $this->initResources($viewName);
         $this->render($data);
     }
 }

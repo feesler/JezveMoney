@@ -4,6 +4,8 @@ namespace JezveMoney\Core;
 
 use Aura\Accept\AcceptFactory;
 
+const LANG_DIR = "lang";
+
 /**
  * Locale class
  */
@@ -43,14 +45,20 @@ class Locale
      */
     public static function getAvailable()
     {
-        $files = glob(self::getFileName("*"));
+        $pattern = APP_ROOT . LANG_DIR . "/*";
+        $files = glob($pattern);
         if ($files === false || count($files) === 0) {
             return [];
         }
 
         $res = [];
         foreach ($files as $file) {
-            if (!is_file($file)) {
+            if (!is_dir($file)) {
+                continue;
+            }
+
+            $localeCommon = $file . "/common.json";
+            if (!is_file($localeCommon)) {
                 continue;
             }
 
@@ -62,6 +70,31 @@ class Locale
     }
 
     /**
+     * Returns relative file path for locale
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    public static function getRelativeFileName(string $locale)
+    {
+        return LANG_DIR . "/$locale/common.json";
+    }
+
+    /**
+     * Returns relative file path for specified view and locale
+     *
+     * @param string $viewName
+     * @param string $locale
+     *
+     * @return string
+     */
+    public static function getRelativeViewFileName(string $viewName, string $locale)
+    {
+        return LANG_DIR . "/$locale/$viewName/index.json";
+    }
+
+    /**
      * Returns file name for locale
      *
      * @param string $locale
@@ -70,7 +103,33 @@ class Locale
      */
     public static function getFileName(string $locale)
     {
-        return APP_ROOT . "lang/" . $locale . ".json";
+        return APP_ROOT . static::getRelativeFileName($locale);
+    }
+
+    /**
+     * Returns file name for specified view and locale
+     *
+     * @param string $viewName
+     * @param string $locale
+     *
+     * @return string
+     */
+    public static function getViewFileName(string $viewName, string $locale)
+    {
+        return APP_ROOT . static::getRelativeViewFileName($viewName, $locale);
+    }
+
+    /**
+     * Returns true if tokens specified specified view and locale are exists
+     *
+     * @param string $viewName
+     * @param string $locale
+     *
+     * @return bool
+     */
+    public static function isViewTokensExists(string $viewName, string $locale)
+    {
+        return file_exists(self::getViewFileName($viewName, $locale));
     }
 
     /**
@@ -105,6 +164,22 @@ class Locale
     public static function loadUserLocale()
     {
         self::load(self::getUserLocale());
+    }
+
+    /**
+     * Loads tokens for specified view
+     *
+     * @param string $viewName
+     */
+    public static function loadViewTokens(string $viewName)
+    {
+        $locale = self::getUserLocale();
+        if (!self::isViewTokensExists($viewName, $locale)) {
+            return;
+        }
+
+        $viewTokens = JSON::fromFile(self::getViewFileName($viewName, $locale), true);
+        static::$tokens = array_merge(static::$tokens, $viewTokens);
     }
 
     /**

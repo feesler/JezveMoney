@@ -71,7 +71,7 @@ const menuItems = [
     },
     {
         id: 'about',
-        titleToken: 'about.title',
+        titleToken: 'navigation.about',
         icon: 'menu-about',
         loggedOut: true,
     },

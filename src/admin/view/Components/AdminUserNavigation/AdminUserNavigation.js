@@ -64,7 +64,7 @@ export class AdminUserNavigation extends UserNavigation {
         const menuItems = [
             { id: 'separator1', type: 'separator' },
             { id: 'profile', url: 'profile/', title: __('profile.title') },
-            { id: 'settings', url: 'settings/', title: __('settings.title') },
+            { id: 'settings', url: 'settings/', title: __('userNavigation.settings') },
             { id: 'logout', url: 'logout/', title: __('actions.logout') },
             { id: 'separator1', type: 'separator' },
             { id: 'back', url: '', title: 'Back' },
