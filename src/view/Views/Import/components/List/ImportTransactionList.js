@@ -37,7 +37,7 @@ export class ImportTransactionList extends ListContainer {
         this.listSortable = Sortable.create({
             onSort: (info) => this.onSort(info),
             elem: this.elem,
-            group: 'importTransactions',
+            group: (elem) => elem?.dataset.group,
             selector: state.itemSortSelector,
             placeholderClass: 'import-item__placeholder',
             copyWidth: true,

@@ -269,6 +269,7 @@ export class ImportTransactionItem extends CollapsibleListItem {
 
         const type = ImportTransaction.getTargetType(state.item.type);
         this.elem.setAttribute('data-type', type);
+        this.elem.setAttribute('data-group', state.item.date);
 
         this.renderContainer(state, prevState);
     }
