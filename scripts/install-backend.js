@@ -15,6 +15,7 @@ const serverFilter = [
     'admin/.htaccess',
     'admin/index.php',
     'Controller/',
+    'database/',
     'Model/',
     'Template/',
     'lang/',
