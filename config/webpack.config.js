@@ -82,10 +82,23 @@ export default {
             import: './src/view/Views/Profile/ProfileView.js',
             filename: 'view/js/[name].js',
         },
+
+        /* Settings */
         SettingsView: {
             import: './src/view/Views/Settings/SettingsView.js',
             filename: 'view/js/[name].js',
         },
+
+        SettingsView_locale_en: {
+            import: './src/view/Locales/Views/Settings/en.js',
+            filename: 'view/js/locale/settings/en.js',
+        },
+
+        SettingsView_locale_ru: {
+            import: './src/view/Locales/Views/Settings/ru.js',
+            filename: 'view/js/locale/settings/ru.js',
+        },
+
         AboutView: {
             import: './src/view/Views/About/AboutView.js',
             filename: 'view/js/[name].js',

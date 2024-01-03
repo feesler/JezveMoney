@@ -69,7 +69,7 @@ export class UserNavigation extends Component {
         if (loggedIn) {
             const menuItems = [
                 { id: 'profile', titleToken: 'profile.title' },
-                { id: 'settings', titleToken: 'settings.title' },
+                { id: 'settings', titleToken: 'userNavigation.settings' },
                 { id: 'logout', titleToken: 'actions.logout' },
             ];
             if (App.isAdminUser()) {

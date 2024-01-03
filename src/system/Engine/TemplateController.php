@@ -44,7 +44,6 @@ abstract class TemplateController extends Controller
 
         $this->jsArr = [
             "polyfill/index.js",
-            "locale/" . $this->locale . ".js",
         ];
     }
 
@@ -55,17 +54,33 @@ abstract class TemplateController extends Controller
             throw new \Error("Invalid view name");
         }
 
-        $viewResources = $manifest[$viewName];
+        $langEntryPoint = $viewName . "_locale_" . $this->locale;
+        if (!isset($manifest[$langEntryPoint])) {
+            $langEntryPoint = "locale_" . $this->locale;
+        }
+        $this->handleEntryResources($manifest[$langEntryPoint]);
+
+        $this->handleEntryResources($manifest[$viewName]);
+    }
+
+    protected function handleEntryResources(mixed $resources)
+    {
+        $viewResources = asArray($resources);
+
         foreach ($viewResources as $resource) {
             if (str_ends_with($resource, ".js")) {
                 if (str_starts_with($resource, JS_PATH)) {
                     $resource = substr($resource, strlen(JS_PATH));
-                    $this->jsArr[] = $resource;
+                    if (!in_array($resource, $this->jsArr)) {
+                        $this->jsArr[] = $resource;
+                    }
                 }
             } elseif (str_ends_with($resource, ".css")) {
                 if (str_starts_with($resource, CSS_PATH)) {
                     $resource = substr($resource, strlen(CSS_PATH));
-                    $this->cssArr[] = $resource;
+                    if (!in_array($resource, $this->cssArr)) {
+                        $this->cssArr[] = $resource;
+                    }
                 }
             } else {
                 throw new \Error("Invalid type of resource");

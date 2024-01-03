@@ -10,7 +10,7 @@ export class ThemeSwitchField extends SwitchField {
         super({
             ...props,
             checked: App.getCurrentTheme() === DARK_THEME,
-            label: __('settings.darkTheme'),
+            label: __('userNavigation.darkTheme'),
             onChange: (checked) => App.setTheme(checked),
         });
     }

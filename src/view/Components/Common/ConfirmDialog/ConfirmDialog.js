@@ -5,14 +5,6 @@ import { Popup } from 'jezvejs/Popup';
 
 import { __ } from '../../../utils/utils.js';
 
-const defaultProps = {
-    destroyOnResult: true,
-    title: null,
-    confirmButtonTitle: __('dialog.confirm'),
-    cancelButtonTitle: __('dialog.reject'),
-    content: null,
-};
-
 /**
  * Confirmation dialog component
  * @param {Object} props
@@ -22,9 +14,19 @@ const defaultProps = {
  * @param {Function} props.onReject - reject callback function
  */
 export class ConfirmDialog extends Component {
+    static getDefaultProps() {
+        return {
+            destroyOnResult: true,
+            title: null,
+            confirmButtonTitle: __('dialog.confirm'),
+            cancelButtonTitle: __('dialog.reject'),
+            content: null,
+        };
+    }
+
     constructor(props = {}) {
         super({
-            ...defaultProps,
+            ...ConfirmDialog.getDefaultProps(),
             ...props,
         });
 

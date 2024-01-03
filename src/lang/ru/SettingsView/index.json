@@ -1,0 +1,24 @@
+{
+    "settings": {
+        "title": "Настройки",
+        "main": "Основное",
+        "currencies": {
+            "title": "Валюты",
+            "noData": "Валюты не выбраны"
+        },
+        "regional": "Региональные настройки",
+        "dateFormat": {
+            "title": "Формат даты",
+            "formatExamples": "Примеры форматирования",
+            "today": "Сегодня",
+            "special": "23 января"
+        },
+        "numberFormat": {
+            "title": "Формат чисел",
+            "formatExamples": "Примеры форматирования"
+        },
+        "errors": {
+            "update": "Не удалось обновить настройки"
+        }
+    }
+}

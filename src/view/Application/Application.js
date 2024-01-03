@@ -539,7 +539,7 @@ export class Application {
             otherCurrencies.push({ ...currency, name: currency.formatName() });
         });
 
-        this.appendListItems(ddlist, otherCurrencies, { group: __('settings.currencies.other') });
+        this.appendListItems(ddlist, otherCurrencies, { group: __('currencies.other') });
     }
 
     appendListItems(ddlist, items, options = {}) {

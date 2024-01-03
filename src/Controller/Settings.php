@@ -4,6 +4,7 @@ namespace JezveMoney\App\Controller;
 
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\UserCurrencyModel;
+use JezveMoney\Core\Locale;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
@@ -19,6 +20,9 @@ class Settings extends TemplateController
      */
     public function index()
     {
+        $viewName = "SettingsView";
+        Locale::loadViewTokens($viewName);
+
         $availActions = ["main", "currencies", "regional"];
 
         $this->template = new Template(VIEW_TPL_PATH . "Settings.tpl");
@@ -44,7 +48,7 @@ class Settings extends TemplateController
             "view" => $viewProps,
         ];
 
-        $this->initResources("SettingsView");
+        $this->initResources($viewName);
         $this->render($data);
     }
 

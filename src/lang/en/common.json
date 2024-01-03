@@ -87,6 +87,11 @@
         "createDate": "Created",
         "updateDate": "Updated"
     },
+    "userNavigation": {
+        "language": "Language",
+        "darkTheme": "Dark theme",
+        "settings": "Settings"
+    },
     "main": {
         "total": "Total",
         "noAccounts": "No accounts",
@@ -115,6 +120,7 @@
             "AED": "UAE Dirham",
             "BTC": "Bitcoin"
         },
+        "other": "Other currencies",
         "deleteMessage": "Are you sure want to delete selected currency?",
         "errors": {
             "create": "Fail to create new currency",
@@ -591,31 +597,6 @@
             "resetData": "Fail to reset",
             "delete": "Fail to delete profile",
             "userNotFound": "User not found"
-        }
-    },
-    "settings": {
-        "title": "Settings",
-        "main": "Common",
-        "currencies": {
-            "title": "Currencies",
-            "noData": "No currencies selected",
-            "other": "Other currencies"
-        },
-        "regional": "Regional setup",
-        "language": "Language",
-        "darkTheme": "Dark theme",
-        "dateFormat": {
-            "title": "Date format",
-            "formatExamples": "Formatting examples",
-            "today": "Today",
-            "special": "23rd of January"
-        },
-        "numberFormat": {
-            "title": "Decimal format",
-            "formatExamples": "Formatting examples"
-        },
-        "errors": {
-            "update": "Fail to update settings"
         }
     },
     "statistics": {
