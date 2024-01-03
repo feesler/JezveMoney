@@ -127,7 +127,6 @@ const slice = createSlice({
     setLegendCategories: (state, legendCategories) => ({
         ...state,
         legendCategories,
-        expandedLegend: false,
     }),
 
     toggleActivateChartCategory: (state, category) => (

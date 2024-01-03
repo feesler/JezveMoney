@@ -1,5 +1,5 @@
 import { asArray } from '@jezvejs/types';
-import { createElement, getClassName } from '@jezvejs/dom';
+import { computedStyle, createElement, getClassName } from '@jezvejs/dom';
 import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 
@@ -15,9 +15,12 @@ const ITEM_CLASS = 'chart-legend__item';
 const ITEM_SELECTOR = `.${ITEM_CLASS}`;
 const ITEM_ACTIVE_CLASS = 'chart-legend__item_active';
 const ITEM_TITLE_CLASS = 'chart-legend__item-title';
+const LEGEND_MAX_HEIGHT_PROP = '--chart-legend-max-collapsed-height';
 
 const defaultProps = {
+    data: null,
     categories: [],
+    expandedLegend: false,
     activateCategoryOnClick: true,
     onClick: null,
     setActiveCategory: null,
@@ -53,6 +56,7 @@ export class ChartLegend extends Component {
         this.toggleLegendButton = this.createToggleShowAllButton({
             onClick: (e) => this.notifyEvent('toggleExpandLegend', e),
         });
+        this.toggleLegendButton.hide();
 
         this.elem = createElement('div', {
             props: { className: CONTENT_CLASS },
@@ -61,6 +65,15 @@ export class ChartLegend extends Component {
                 this.toggleLegendButton.elem,
             ],
         });
+    }
+
+    getMaxLegendHeight() {
+        if (!this.legendList) {
+            return 0;
+        }
+
+        const value = computedStyle(this.legendList).getPropertyValue(LEGEND_MAX_HEIGHT_PROP);
+        return (value.length > 0) ? parseInt(value, 10) : 0;
     }
 
     createToggleShowAllButton(props = {}) {
@@ -73,6 +86,8 @@ export class ChartLegend extends Component {
     }
 
     onClick(e) {
+        e?.stopPropagation();
+
         if (this.state.activateCategoryOnClick) {
             this.activateCategory(e);
         }
@@ -125,21 +140,45 @@ export class ChartLegend extends Component {
         return res;
     }
 
-    render(state) {
+    renderToggleLegendButton(state, prevState) {
+        if (
+            state.data === prevState.data
+            && state.categories === prevState.categories
+            && state.expandedLegend === prevState.expandedLegend
+        ) {
+            return;
+        }
+
+        if (!this.toggleLegendButton || !this.legendList) {
+            return;
+        }
+
+        const maxHeight = this.getMaxLegendHeight();
+        const showToggleButton = maxHeight && this.legendList.scrollHeight > maxHeight;
+
+        this.toggleLegendButton.show(showToggleButton);
+        this.toggleLegendButton.setTitle(
+            (state.expandedLegend)
+                ? __('actions.showVisible')
+                : __('actions.showAll'),
+        );
+
+        this.legendList.classList.toggle('expanded', state.expandedLegend);
+    }
+
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
 
         const categories = asArray(state.categories);
 
-        setTimeout(() => {
-            this.notifyEvent('setLegendCategories', categories);
-        });
-
         const items = categories.map((category, index) => (
             this.renderItem({ category, index }, state)
         ));
 
         this.legendList.replaceChildren(...items);
+
+        this.renderToggleLegendButton(state, prevState);
     }
 }
