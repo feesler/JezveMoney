@@ -1,9 +1,5 @@
 import 'jezvejs/style';
-import {
-    createElement,
-    show,
-    computedStyle,
-} from '@jezvejs/dom';
+import { createElement, show } from '@jezvejs/dom';
 import { asArray } from '@jezvejs/types';
 import { Histogram } from 'jezvejs/Histogram';
 import { Button } from 'jezvejs/Button';
@@ -50,7 +46,6 @@ import '../../Application/Application.scss';
 import './StatisticsView.scss';
 
 /* CSS classes */
-const LEGEND_MAX_HEIGHT_PROP = '--chart-legend-max-collapsed-height';
 
 const defaultProps = {
     filter: {},
@@ -166,6 +161,8 @@ class StatisticsView extends AppView {
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
+            expandedLegend: false,
+            renderLegend: (...args) => this.renderLegend(...args),
             onlyVisibleCategoriesLegend: true,
             renderYAxisLabel: (value) => formatNumberShort(value),
             renderXAxisLabel: (value) => formatDateLabel(value, this.store.getState()),
@@ -421,11 +418,34 @@ class StatisticsView extends AppView {
         }));
     }
 
+    renderLegend(items, state) {
+        const categories = asArray(items);
+
+        this.notifyEvent('setLegendCategories', categories);
+
+        if (!this.legend) {
+            const Legend = ChartLegend;
+            this.legend = Legend.create({
+                ...state,
+                categories,
+            });
+        } else {
+            this.legend.setState((legendState) => ({
+                ...legendState,
+                ...state,
+                categories,
+            }));
+        }
+
+        return this.legend.elem;
+    }
+
     renderHistogram(state, prevState = {}) {
         if (
             state.chartData === prevState.chartData
             && state.filter?.report === prevState.filter?.report
             && state.activeCategory === prevState.activeCategory
+            && state.expandedLegend === prevState.expandedLegend
         ) {
             return;
         }
@@ -440,6 +460,7 @@ class StatisticsView extends AppView {
             this.histogram.setState((chartState) => ({
                 ...chartState,
                 filter: state.filter,
+                expandedLegend: state.expandedLegend,
             }));
         }
 
@@ -456,42 +477,14 @@ class StatisticsView extends AppView {
             this.histogram.setActiveCategory(state.activeCategory);
         }
 
+        if (state.expandedLegend !== prevState.expandedLegend) {
+            this.histogram.setState((chartState) => ({
+                ...chartState,
+                expandedLegend: state.expandedLegend,
+            }));
+        }
+
         this.histogram.elem.classList.toggle('categories-report', state.filter.report === 'category');
-    }
-
-    getMaxLegendHeight() {
-        if (!this.legendList) {
-            return 0;
-        }
-
-        const value = computedStyle(this.legendList).getPropertyValue(LEGEND_MAX_HEIGHT_PROP);
-        return parseInt(value, 10);
-    }
-
-    renderToggleLegendButton(state, prevState) {
-        if (
-            state.chartData === prevState.chartData
-            && state.legendCategories === prevState.legendCategories
-            && state.expandedLegend === prevState.expandedLegend
-        ) {
-            return;
-        }
-
-        if (!this.toggleLegendButton || !this.legendList) {
-            return;
-        }
-
-        const maxHeight = this.getMaxLegendHeight();
-        const showToggleButton = maxHeight && this.legendList.scrollHeight > maxHeight;
-
-        this.toggleLegendButton.show(showToggleButton);
-        this.toggleLegendButton.setTitle(
-            (state.expandedLegend)
-                ? __('actions.showVisible')
-                : __('actions.showAll'),
-        );
-
-        this.legendList.classList.toggle('expanded', state.expandedLegend);
     }
 
     renderPieChart(state, prevState) {
@@ -527,7 +520,6 @@ class StatisticsView extends AppView {
 
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
-        this.renderToggleLegendButton(state, prevState);
         this.renderPieChart(state, prevState);
 
         this.histogram.elem.dataset.time = state.renderTime;

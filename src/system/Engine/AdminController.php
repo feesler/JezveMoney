@@ -22,7 +22,6 @@ abstract class AdminController extends TemplateController
         $this->cssAdmin = [];
         $this->jsArr = [
             "polyfill/index.js",
-            "locale/" . $this->locale . ".js",
         ];
         $this->jsAdmin = [];
     }
@@ -39,7 +38,19 @@ abstract class AdminController extends TemplateController
             throw new \Error("Invalid view name");
         }
 
-        $viewResources = $manifest[$viewName];
+        $langEntryPoint = $viewName . "_locale_" . $this->locale;
+        if (!isset($manifest[$langEntryPoint])) {
+            $langEntryPoint = "locale_" . $this->locale;
+        }
+        $this->handleEntryResources($manifest[$langEntryPoint]);
+
+        $this->handleEntryResources($manifest[$viewName]);
+    }
+
+    protected function handleEntryResources(mixed $resources)
+    {
+        $viewResources = asArray($resources);
+
         foreach ($viewResources as $resource) {
             if (str_ends_with($resource, ".js")) {
                 if (str_starts_with($resource, JS_PATH)) {

@@ -7,6 +7,7 @@ import {
     asyncMap,
 } from 'jezve-test';
 import { RemindersListItem } from './RemindersListItem.js';
+import { RemindersListGroup } from './RemindersListGroup.js';
 
 export class TransactionRemindersList extends TestComponent {
     static render(data, state) {
@@ -37,6 +38,13 @@ export class TransactionRemindersList extends TestComponent {
         } else {
             res.listMode = 'list';
         }
+
+        const groupElems = await queryAll(this.elem, '.reminders-group');
+
+        res.groups = await asyncMap(
+            groupElems,
+            (item) => RemindersListGroup.create(this.parent, item),
+        );
 
         const listItems = await queryAll(this.elem, '.reminder-item');
         if (listItems.length === 0) {

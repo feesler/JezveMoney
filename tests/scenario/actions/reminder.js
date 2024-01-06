@@ -78,6 +78,14 @@ export const cancel = async (index) => {
     });
 };
 
+export const toggleGroupByDate = async () => {
+    await test('Toggle group reminders by date', async () => {
+        await checkNavigation();
+
+        return App.view.toggleGroupByDate();
+    });
+};
+
 export const toggleSelect = async (index) => {
     const indexes = asArray(index);
     await test(`Toggle select items [${indexes.join()}]`, async () => {

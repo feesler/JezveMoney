@@ -7,6 +7,7 @@ defineHostConstants();
 
 require_once(APP_ROOT . "system/common.php");
 require_once(APP_ROOT . "system/dateUtils.php");
+require_once(APP_ROOT . "system/crypt.php");
 
 // Error settings
 if (PRODUCTION) {

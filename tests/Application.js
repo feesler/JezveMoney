@@ -21,6 +21,7 @@ import {
     fixDate,
     formatInputDate,
     reformatDate,
+    renderMonth,
     secondsToDateString,
 } from './common.js';
 
@@ -132,6 +133,13 @@ class Application extends TestApplication {
 
     reformatDate(date) {
         return reformatDate(date, {
+            locales: this.state.getDateFormatLocale(),
+            options: this.dateFormatOptions,
+        });
+    }
+
+    renderMonth(date) {
+        return renderMonth(date, {
             locales: this.state.getDateFormatLocale(),
             options: this.dateFormatOptions,
         });

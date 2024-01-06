@@ -55,79 +55,6 @@ class UserModel extends CachedTable
     }
 
     /**
-     * Returns salt for specified string
-     *
-     * @param string $str source string
-     *
-     * @return string
-     */
-    private function getSalt(string $str)
-    {
-        $bfPrefix = "\$2y\$10\$";
-
-        return $bfPrefix . substr(md5($str), 0, 20) . "..";
-    }
-
-    /**
-     * Returns hash for specified string and salt
-     *
-     * @param string $str source string
-     * @param string $salt salt
-     *
-     * @return string
-     */
-    private function getHash(string $str, string $salt)
-    {
-        return substr(crypt($str, $salt), 28);
-    }
-
-    /**
-     * Checks correctness of hash
-     *
-     * @param string $str source string
-     * @param string $salt salt
-     * @param string $hash hash to test
-     *
-     * @return bool
-     */
-    private function checkHash(string $str, string $salt, string $hash)
-    {
-        $full_hash = substr($salt, 0, 28) . $hash;
-
-        return (crypt($str, $salt) == $full_hash);
-    }
-
-    /**
-     * Creates pre hash for login/password pair
-     *
-     * @param string $login login string
-     * @param string $password password string
-     *
-     * @return string
-     */
-    private function createPreHash(string $login, string $password)
-    {
-        $salt = $this->getSalt($login);
-        return $this->getHash($password, $salt);
-    }
-
-    /**
-     * Creates hash for login/password pair
-     *
-     * @param string $login login string
-     * @param string $password password string
-     *
-     * @return string
-     */
-    private function createHash(string $login, string $password)
-    {
-        $salt = $this->getSalt($login);
-        $hashed = $this->getHash($password, $salt);
-
-        return $this->getHash($hashed, $salt);
-    }
-
-    /**
      * Checks correctness of login/password data
      *
      * @param string $login login string
@@ -143,10 +70,10 @@ class UserModel extends CachedTable
             return false;
         }
 
-        $salt = $this->getSalt($login);
-        $hashed = $this->getHash($password, $salt);
+        $salt = getSalt($login);
+        $hashed = getHash($password, $salt);
 
-        return $this->checkHash($hashed, $salt, $uObj->passhash);
+        return checkHash($hashed, $salt, $uObj->passhash);
     }
 
     /**
@@ -165,9 +92,9 @@ class UserModel extends CachedTable
             return false;
         }
 
-        $salt = $this->getSalt($login);
+        $salt = getSalt($login);
 
-        return $this->checkHash($passhash, $salt, $uObj->passhash);
+        return checkHash($passhash, $salt, $uObj->passhash);
     }
 
     /**
@@ -543,7 +470,7 @@ class UserModel extends CachedTable
         }
 
         if (isset($params["password"]) && isset($res["login"])) {
-            $res["passhash"] = $this->createHash($res["login"], $params["password"]);
+            $res["passhash"] = createHash($res["login"], $params["password"]);
             if (is_empty($res["passhash"])) {
                 throw new \Error("Invalid password specified");
             }
@@ -738,7 +665,7 @@ class UserModel extends CachedTable
         sessionStart();
         $_SESSION["userid"] = $this->getIdByLogin($login);
 
-        $preHash = $this->createPreHash($login, $password);
+        $preHash = createPreHash($login, $password);
 
         $this->setupCookies($login, $preHash);
 
@@ -797,12 +724,12 @@ class UserModel extends CachedTable
 
         $user_id = $this->getIdByLogin($login);
 
-        $passhash = $this->createHash($login, $newpass);
+        $passhash = createHash($login, $newpass);
         if (!$this->setPassHash($login, $passhash)) {
             return false;
         }
 
-        $preHash = $this->createPreHash($login, $newpass);
+        $preHash = createPreHash($login, $newpass);
 
         if ($this->currentUser && $user_id == $this->currentUser->id) {
             $this->setupCookies($login, $preHash);
@@ -848,7 +775,7 @@ class UserModel extends CachedTable
             return false;
         }
 
-        $passhash = $this->createHash($login, $password);
+        $passhash = createHash($login, $password);
         $elogin = $this->dbObj->escape($login);
         $curDate = date("Y-m-d H:i:s");
 

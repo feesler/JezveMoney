@@ -126,6 +126,16 @@ export const reformatDate = (str, params = {}) => {
     return formatInputDate(new Date(fixedDate), params);
 };
 
+export const renderMonth = (value, params = {}) => {
+    const date = secondsToDate(value);
+    const monthName = formatDate(date, {
+        locales: params?.locales ?? [],
+        options: { month: 'long' },
+    });
+
+    return `${monthName} ${date.getFullYear()}`;
+};
+
 export const stepInterval = (timestamp, intervalType, step = 1) => {
     assert(timestamp, 'Invalid timestamp');
     assert(step >= 0, 'Invalid interval step');

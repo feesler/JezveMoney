@@ -1,8 +1,12 @@
 import { assert } from '@jezvejs/assert';
-import { asArray } from '@jezvejs/types';
+import { asArray, isDate } from '@jezvejs/types';
+import { isSameYearMonth } from '@jezvejs/datetime';
+
+import { App } from '../Application.js';
+import { dateToSeconds, secondsToDate } from '../common.js';
+
 import { List } from './List.js';
 import { REMINDER_SCHEDULED, Reminder } from './Reminder.js';
-import { App } from '../Application.js';
 
 /** List of scheduled transaction reminders */
 export class RemindersList extends List {
@@ -145,6 +149,34 @@ export class RemindersList extends List {
         }
 
         return RemindersList.create(items);
+    }
+
+    getDateGroups() {
+        let prevDate = null;
+        const groups = [];
+        let group = null;
+
+        this.forEach((item) => {
+            const currentDate = secondsToDate(item.date);
+            const isSameMonth = isDate(prevDate) && isSameYearMonth(currentDate, prevDate);
+
+            if (!isSameMonth) {
+                const seconds = dateToSeconds(currentDate);
+                group = {
+                    id: seconds,
+                    date: seconds,
+                    items: [],
+                };
+                groups.push(group);
+                prevDate = currentDate;
+            }
+
+            if (isSameMonth) {
+                group.items.push(item);
+            }
+        });
+
+        return groups;
     }
 
     sortItems(list, desc = false) {

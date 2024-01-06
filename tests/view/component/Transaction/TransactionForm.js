@@ -471,22 +471,28 @@ export class TransactionForm extends TestComponent {
             }
 
             if (model.noAccount) {
+                const lastAcc = (isReminder)
+                    ? state.accounts.getItem(transaction.lastAcc_id)
+                    : state.getFirstAccount();
+
                 if (model.debtType) {
-                    destAccountAfter = structuredClone(state.getFirstAccount());
-                    if (destAccountAfter) {
-                        destAccountAfter.balance = normalize(
-                            destAccountAfter.balance + model.fDestAmount,
-                            model.destCurr.precision,
-                        );
-                    }
+                    destAccountAfter = lastAcc ?? { balance: 0 };
                 } else {
-                    srcAccountAfter = structuredClone(state.getFirstAccount());
-                    if (srcAccountAfter) {
-                        srcAccountAfter.balance = normalize(
-                            srcAccountAfter.balance - model.fSrcAmount,
-                            model.srcCurr.precision,
-                        );
-                    }
+                    srcAccountAfter = lastAcc ?? { balance: 0 };
+                }
+
+                if (srcAccountAfter && (!model.debtType || isReminder)) {
+                    srcAccountAfter.balance = normalize(
+                        srcAccountAfter.balance - model.fSrcAmount,
+                        model.srcCurr.precision,
+                    );
+                }
+
+                if (destAccountAfter && (model.debtType || isReminder)) {
+                    destAccountAfter.balance = normalize(
+                        destAccountAfter.balance + model.fDestAmount,
+                        model.destCurr.precision,
+                    );
                 }
             } else {
                 model.account = (model.debtType)
@@ -512,7 +518,12 @@ export class TransactionForm extends TestComponent {
         model.srcAmount = model.fSrcAmount.toString();
         model.destAmount = model.fDestAmount.toString();
 
-        if (isReminder || isDuplicate) {
+        const useAfter = (
+            (model.type === DEBT && model.noAccount)
+            || (model.type === LIMIT_CHANGE && model.srcAccount)
+        );
+
+        if (!useAfter && (isReminder || isDuplicate)) {
             model.fSrcResBal = (model.srcAccount)
                 ? normalize(
                     model.srcAccount.balance - model.fSrcAmount,
