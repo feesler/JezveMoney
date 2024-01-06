@@ -58,6 +58,7 @@ export class RemindersStory extends TestStory {
         await this.detailsMode();
         await this.select();
         await this.pagination();
+        await this.groupByDate();
     }
 
     async confirm() {
@@ -279,6 +280,21 @@ export class RemindersStory extends TestStory {
         await Actions.showMore();
         await Actions.goToFirstPage();
         await Actions.showMore();
+    }
+
+    async groupByDate() {
+        setBlock('Group reminders by date', 1);
+
+        await Actions.toggleGroupByDate();
+        await Actions.showMore();
+        await Actions.showMore();
+        await Actions.filterByState({ state: REMINDER_UPCOMING });
+        await Actions.showMore();
+        await Actions.showMore();
+        await Actions.setSelectMode();
+        await Actions.setListMode();
+
+        await Actions.toggleGroupByDate();
     }
 
     async filters() {

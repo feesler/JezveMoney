@@ -1,14 +1,19 @@
 import { PopupMenu } from 'jezvejs/PopupMenu';
 
 import { __, getSelectedItems } from '../../../../utils/utils.js';
+
 import { REMINDER_CANCELLED, REMINDER_CONFIRMED } from '../../../../Models/Reminder.js';
+
 import {
     cancelReminder,
     confirmReminder,
     deselectAllItems,
     selectAllItems,
     setListMode,
+    toggleGroupByDate,
 } from '../../../../Components/Reminder/ReminderListGroup/actions.js';
+
+import { getRemindersGroupByDate } from '../../helpers.js';
 
 /** Reminders list main menu component */
 export class ReminderListMainMenu extends PopupMenu {
@@ -30,6 +35,8 @@ export class ReminderListMainMenu extends PopupMenu {
 
         const isConfirmed = context.filter.reminderState === REMINDER_CONFIRMED;
         const isCancelled = context.filter.reminderState === REMINDER_CANCELLED;
+
+        const groupByDate = getRemindersGroupByDate() === 1;
 
         const { dispatch } = this.state;
         this.setItems([{
@@ -64,6 +71,16 @@ export class ReminderListMainMenu extends PopupMenu {
             title: __('reminders.cancel'),
             hidden: !(selCount > 0 && !isCancelled),
             onClick: () => dispatch(cancelReminder()),
+        }, {
+            id: 'separator3',
+            type: 'separator',
+            hidden: !isListMode,
+        }, {
+            id: 'groupByDateBtn',
+            title: __('transactions.groupByDate'),
+            icon: (groupByDate) ? 'check' : null,
+            hidden: !(isListMode),
+            onClick: () => dispatch(toggleGroupByDate()),
         }]);
     }
 }

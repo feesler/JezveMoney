@@ -150,3 +150,32 @@ export const showDetails = () => async ({ dispatch }) => {
     dispatch(actions.showDetails());
     dispatch(requestItem());
 };
+
+export const requestGroupByDate = (groupByDate) => async ({ dispatch }) => {
+    const { settings } = App.model.profile;
+    if (settings.rem_group_by_date === groupByDate) {
+        return;
+    }
+
+    dispatch(actions.startLoading());
+
+    try {
+        await API.profile.updateSettings({
+            rem_group_by_date: groupByDate,
+        });
+        settings.rem_group_by_date = groupByDate;
+
+        dispatch(actions.toggleGroupByDate());
+    } catch (e) {
+        App.createErrorNotification(e.message);
+    }
+
+    dispatch(actions.stopLoading());
+    dispatch(actions.setRenderTime());
+};
+
+export const toggleGroupByDate = () => ({ dispatch }) => {
+    const { settings } = App.model.profile;
+    const groupByDate = (settings.rem_group_by_date === 0) ? 1 : 0;
+    dispatch(requestGroupByDate(groupByDate));
+};

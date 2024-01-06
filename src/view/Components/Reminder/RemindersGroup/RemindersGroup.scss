@@ -1,0 +1,34 @@
+/* Reminders list component */
+.reminders-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 4px;
+}
+
+.reminders-group__header {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 2rem;
+}
+
+.reminders-group__title {
+  position: absolute;
+  padding: 0.1rem 1.5rem;
+  background-color: var(--main-bg-color);
+  color: var(--list-item-text-color);
+  font-size: 0.9rem;
+  font-weight: 300;
+  text-transform: capitalize;
+}
+
+.reminders-group__header-line {
+  width: 100%;
+  border: 0 none;
+  border-top: 1px solid var(--list-separator-color);
+  margin: 0.25rem 0;
+}

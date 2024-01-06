@@ -1,5 +1,6 @@
-import { isFunction } from '@jezvejs/types';
+import { asArray, isDate, isFunction } from '@jezvejs/types';
 import { createElement } from '@jezvejs/dom';
+import { isSameYearMonth } from '@jezvejs/datetime';
 import { Component } from 'jezvejs';
 import { Button } from 'jezvejs/Button';
 import { ListContainer } from 'jezvejs/ListContainer';
@@ -13,7 +14,9 @@ import {
     __,
     dateStringToTime,
     getAbsoluteIndex,
+    getSeconds,
     getSelectedItems,
+    timeToDate,
 } from '../../../utils/utils.js';
 
 // Models
@@ -27,6 +30,7 @@ import { ToggleDetailsButton } from '../../List/ToggleDetailsButton/ToggleDetail
 import { FiltersContainer } from '../../List/FiltersContainer/FiltersContainer.js';
 import { ReminderFilters } from '../ReminderFilters/ReminderFilters.js';
 import { ReminderListItem } from '../ReminderListItem/ReminderListItem.js';
+import { RemindersGroup } from '../RemindersGroup/RemindersGroup.js';
 
 import {
     reducer,
@@ -60,6 +64,7 @@ const defaultProps = {
     listMode: 'list', // 'list', 'select' or 'singleSelect'
     modeSelectorType: 'link',
     showControls: true,
+    groupByDate: false,
     onItemClick: null,
     getURL: null,
     onShowMore: null,
@@ -115,13 +120,17 @@ export class ReminderListGroup extends Component {
         });
 
         this.reminderList = ListContainer.create({
-            ItemComponent: ReminderListItem,
+            ItemComponent: () => this.getListItemComponent(),
             getItemProps: (item, state) => ({
-                item: Reminder.createExtended(item),
+                item: (state.groupByDate)
+                    ? { ...item, items: asArray(item.items).map((i) => Reminder.createExtended(i)) }
+                    : Reminder.createExtended(item),
                 selected: item.selected,
                 listMode: state.listMode,
                 mode: state.mode,
                 showControls: state.showControls,
+                groupByDate: state.groupByDate,
+                onItemClick: (id, e) => this.onItemClick(id, e),
             }),
             isListChanged: (state, prevState) => (
                 state.items !== prevState.items
@@ -135,6 +144,7 @@ export class ReminderListGroup extends Component {
             placeholderClass: 'list-item_placeholder',
             listMode: 'list',
             PlaceholderComponent: NoDataMessage,
+            groupByDate: this.state.groupByDate,
             getPlaceholderProps: () => ({ title: __('reminders.noData') }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
@@ -247,6 +257,11 @@ export class ReminderListGroup extends Component {
         }
     }
 
+    getListItemComponent() {
+        const state = this.store.getState();
+        return (state.groupByDate) ? RemindersGroup : ReminderListItem;
+    }
+
     /** Updates dialog state */
     update() {
         this.dispatch(actions.update());
@@ -313,6 +328,8 @@ export class ReminderListGroup extends Component {
         if (stateFilter === REMINDER_UPCOMING) {
             this.dispatch(requestUpcoming({
                 ...getUpcomingRequestData(state),
+                range: 1,
+                page: 1,
                 keepState: true,
             }));
         }
@@ -582,13 +599,45 @@ export class ReminderListGroup extends Component {
         const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = state.items.slice(firstItem, lastItem);
 
+        let listItems = null;
+        if (state.groupByDate) {
+            let prevDate = null;
+            const groups = [];
+            let group = null;
+
+            items.forEach((item) => {
+                const currentDate = timeToDate(item.date);
+                const isSameMonth = isDate(prevDate) && isSameYearMonth(currentDate, prevDate);
+
+                if (!isSameMonth) {
+                    const seconds = getSeconds(currentDate);
+                    group = {
+                        id: seconds,
+                        date: seconds,
+                        items: [item],
+                    };
+                    groups.push(group);
+                    prevDate = currentDate;
+                }
+
+                if (isSameMonth) {
+                    group.items.push(item);
+                }
+            });
+
+            listItems = groups;
+        } else {
+            listItems = items;
+        }
+
         this.reminderList.setState((listState) => ({
             ...listState,
-            items,
+            items: listItems,
             mode: state.mode,
             listMode: state.listMode,
             renderTime: state.renderTime,
             showControls: state.showControls,
+            groupByDate: state.groupByDate,
         }));
         this.reminderList.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
     }

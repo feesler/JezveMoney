@@ -29,6 +29,7 @@ const AVAILABLE_SETTINGS = [
     "decimal_locale",
     "tr_group_by_date",
     "tz_offset",
+    "rem_group_by_date",
 ];
 
 const DEFAULT_SETTINGS = [
@@ -39,6 +40,7 @@ const DEFAULT_SETTINGS = [
     "decimal_locale" => DEFAULT_LOCALE,
     "tr_group_by_date" => 0,
     "tz_offset" => 0,
+    "rem_group_by_date" => 0,
 ];
 
 const SECONDS_IN_MINUTE = 60;

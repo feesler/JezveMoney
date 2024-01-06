@@ -64,6 +64,7 @@ const availSettings = [
     'decimal_locale',
     'tr_group_by_date',
     'tz_offset',
+    'rem_group_by_date',
 ];
 
 /** Categories */
@@ -451,6 +452,10 @@ export class AppState {
 
     getTimezoneOffset() {
         return this.profile.settings.tz_offset;
+    }
+
+    getGroupRemindersByDate() {
+        return this.profile.settings.rem_group_by_date === 1;
     }
 
     getCurrencies() {

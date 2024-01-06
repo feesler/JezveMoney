@@ -17,13 +17,12 @@ import {
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
+
+// Application
 import { App } from '../Application.js';
-import { RemindersList } from '../model/RemindersList.js';
-import { AppView } from './AppView.js';
-import { Counter } from './component/Counter.js';
-import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
-import { ReminderDetails } from './component/Reminder/ReminderDetails.js';
-import { TransactionRemindersList } from './component/Reminder/TransactionRemindersList.js';
+import { dateToSeconds } from '../common.js';
+
+// Models
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
@@ -31,11 +30,20 @@ import {
     REMINDER_UPCOMING,
     Reminder,
 } from '../model/Reminder.js';
-import { dateToSeconds } from '../common.js';
+import { RemindersList } from '../model/RemindersList.js';
+
+// Components
+import { AppView } from './AppView.js';
+import { Counter } from './component/Counter.js';
+import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
+import { ReminderDetails } from './component/Reminder/ReminderDetails.js';
+import { TransactionRemindersList } from './component/Reminder/TransactionRemindersList.js';
 
 const listMenuSelector = '#listMenu';
 
-/** Scheduled transactions list view class */
+/**
+ * Reminders list test view class
+ */
 export class ReminderListView extends AppView {
     static getExpectedState(model, state = App.state) {
         const filteredItems = this.getFilteredItems(model);
@@ -139,6 +147,9 @@ export class ReminderListView extends AppView {
                 cancelBtn: {
                     visible: showSelectItems && selected.length > 0 && !isCancelled,
                 },
+                groupByDateBtn: {
+                    visible: listMode,
+                },
             };
         }
 
@@ -163,6 +174,19 @@ export class ReminderListView extends AppView {
                 ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
                 ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
             };
+        }
+
+        if (isItemsAvailable && model.groupByDate) {
+            const { page, range } = model.list;
+            const onPage = App.config.transactionsOnPage;
+
+            const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
+
+            const dateGroups = pageItems.getDateGroups();
+            res.remindersList.groups = dateGroups.map((item) => ({
+                id: item.id,
+                title: App.renderMonth(item.date),
+            }));
         }
 
         if (showPaginator) {
@@ -312,6 +336,7 @@ export class ReminderListView extends AppView {
             filtersVisible: !!cont.filtersContainer.visible,
             filtersAnimation: !!cont.filtersAnimation,
             detailsItem: this.getDetailsItem(this.getDetailsId()),
+            groupByDate: App.state.getGroupRemindersByDate(),
         };
 
         const reminderState = parseInt(cont.stateMenu.value, 10);
@@ -1394,5 +1419,25 @@ export class ReminderListView extends AppView {
         await this.waitForList(() => this.listMenu.select('cancelBtn'));
 
         return this.checkState(expected);
+    }
+
+    /** Toggle enables/disables group reminders by date */
+    async toggleGroupByDate() {
+        await this.setListMode();
+        await this.openListMenu();
+
+        this.model.groupByDate = !this.model.groupByDate;
+        this.model.listMenuVisible = false;
+
+        App.state.updateSettings({
+            rem_group_by_date: (this.model.groupByDate) ? 1 : 0,
+        });
+
+        const expected = this.getExpectedState();
+
+        await this.waitForList(() => this.listMenu.select('groupByDateBtn'));
+        this.checkState(expected);
+
+        return App.state.fetchAndTest();
     }
 }

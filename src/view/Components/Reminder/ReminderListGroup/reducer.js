@@ -236,6 +236,11 @@ const slice = createSlice({
         },
     }),
 
+    toggleGroupByDate: (state) => ({
+        ...state,
+        groupByDate: !state.groupByDate,
+    }),
+
     toggleMode: (state) => ({
         ...state,
         mode: (state.mode === 'details') ? 'classic' : 'details',

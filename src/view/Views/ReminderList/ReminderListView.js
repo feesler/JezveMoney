@@ -34,6 +34,7 @@ import { ReminderListContextMenu } from './components/ContextMenu/ReminderListCo
 import { ReminderListMainMenu } from './components/MainMenu/ReminderListMainMenu.js';
 
 import { actions, reducer } from './reducer.js';
+import { getRemindersGroupByDate } from './helpers.js';
 import './ReminderListView.scss';
 
 /**
@@ -115,6 +116,7 @@ class ReminderListView extends AppView {
 
         this.listGroup = ReminderListGroup.create({
             ...this.props,
+            groupByDate: getRemindersGroupByDate() === 1,
             stateFilterId: 'stateFilter',
             dateRangeFilterId: 'dateFilter',
             getURL: (...args) => this.getURL(...args),

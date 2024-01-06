@@ -376,6 +376,9 @@ class TransactionModel extends SortableModel
             "interval_type",
             "interval_step",
             "interval_offset",
+            "reminder_id",
+            "schedule_id",
+            "reminder_date",
         ];
 
         foreach ($scheduleParams as $paramName) {
