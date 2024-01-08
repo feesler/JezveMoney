@@ -26,7 +26,7 @@ import { dateToSeconds } from '../common.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     REMINDER_UPCOMING,
     Reminder,
 } from '../model/Reminder.js';
@@ -684,7 +684,7 @@ export class ReminderListView extends AppView {
         const res = new URL(`${baseUrl()}reminders/`);
         const params = {};
 
-        if (model.filter.state !== REMINDER_SCHEDULED) {
+        if (model.filter.state !== REMINDER_ACTIVE) {
             params.state = Reminder.stateNames[model.filter.state];
         }
 
@@ -1283,7 +1283,7 @@ export class ReminderListView extends AppView {
         if (directNavigate) {
             this.model.detailsMode = false;
             this.model.filtersVisible = false;
-            this.model.filter.state = REMINDER_SCHEDULED;
+            this.model.filter.state = REMINDER_ACTIVE;
         }
 
         const expected = (directNavigate)

@@ -7,7 +7,7 @@ import * as ApiActions from '../actions/api/schedule.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     REMINDER_UPCOMING,
 } from '../../model/Reminder.js';
 import { EXPENSE, Transaction, TRANSFER } from '../../model/Transaction.js';
@@ -215,7 +215,7 @@ export class RemindersStory extends TestStory {
         await trActions.filterRemindersByState(REMINDER_CONFIRMED);
         await trActions.filterRemindersByState(REMINDER_UPCOMING);
         await trActions.filterRemindersByState(REMINDER_CANCELLED);
-        await trActions.filterRemindersByState(REMINDER_SCHEDULED);
+        await trActions.filterRemindersByState(REMINDER_ACTIVE);
 
         await trActions.selectRemindersEndDateFilter(App.dates.monthAfter);
         await trActions.selectRemindersStartDateFilter(App.dates.weekAfter);
@@ -266,7 +266,7 @@ export class RemindersStory extends TestStory {
         await Actions.showDetails({ index: 0, directNavigate: true });
         await Actions.showDetails({ index: 1, directNavigate: true });
         await Actions.closeDetails();
-        await Actions.filterByState({ state: REMINDER_SCHEDULED });
+        await Actions.filterByState({ state: REMINDER_ACTIVE });
     }
 
     async pagination() {
@@ -306,7 +306,7 @@ export class RemindersStory extends TestStory {
         await Actions.reload();
         await Actions.filterByState({ state: REMINDER_CONFIRMED, directNavigate: true });
         await Actions.reload();
-        await Actions.filterByState({ state: REMINDER_SCHEDULED });
+        await Actions.filterByState({ state: REMINDER_ACTIVE });
         await Actions.filterByState({ state: REMINDER_UPCOMING });
         await Actions.filterByState({ state: REMINDER_UPCOMING, directNavigate: true });
         await Actions.reload();
@@ -330,7 +330,7 @@ export class RemindersStory extends TestStory {
         );
         await Actions.clearAllFilters({ directNavigate: true });
 
-        await Actions.filterByState({ state: REMINDER_SCHEDULED });
+        await Actions.filterByState({ state: REMINDER_ACTIVE });
         await Actions.selectStartDateFilter({ date: App.dates.monthAgo });
         await Actions.selectEndDateFilter({ date: App.dates.weekAgo });
 
@@ -346,7 +346,7 @@ export class RemindersStory extends TestStory {
         setBlock('Create transaction for reminder with type change request in URL', 1);
 
         const reminder = App.state.reminders.find((item) => (
-            item?.state === REMINDER_SCHEDULED
+            item?.state === REMINDER_ACTIVE
         ));
 
         const data = Transaction.basicTypes.map((type) => ({

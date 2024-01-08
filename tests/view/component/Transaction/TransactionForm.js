@@ -51,7 +51,7 @@ import { ScheduledTransaction, getIntervalOffset } from '../../../model/Schedule
 import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
-import { REMINDER_SCHEDULED } from '../../../model/Reminder.js';
+import { REMINDER_ACTIVE } from '../../../model/Reminder.js';
 import { getCurrencyPrecision } from '../../../model/import.js';
 import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
 
@@ -2669,7 +2669,7 @@ export class TransactionForm extends TestComponent {
 
         const dialogModel = {
             filter: {
-                state: REMINDER_SCHEDULED,
+                state: REMINDER_ACTIVE,
                 startDate: null,
                 endDate: null,
             },

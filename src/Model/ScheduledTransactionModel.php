@@ -1375,7 +1375,7 @@ class ScheduledTransactionModel extends CachedTable
      */
     protected function createReminders(int $item_id, array $params = [])
     {
-        $params["state"] = REMINDER_SCHEDULED;
+        $params["state"] = REMINDER_ACTIVE;
 
         $reminders = $this->getExpectedReminders($item_id, $params);
         $this->reminderModel->createMultiple($reminders);
@@ -1430,7 +1430,7 @@ class ScheduledTransactionModel extends CachedTable
             $params = [
                 "startDate" => $range["startDate"],
                 "endDate" => $range["endDate"],
-                "state" => REMINDER_SCHEDULED,
+                "state" => REMINDER_ACTIVE,
             ];
             $reminders = $this->getAllExpectedReminders($params);
             $this->reminderModel->createMultiple($reminders);

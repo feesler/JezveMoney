@@ -26,7 +26,7 @@ const commonTransactionFields = [
 
 /* Reminder state */
 export const REMINDER_UPCOMING = 0;
-export const REMINDER_SCHEDULED = 1;
+export const REMINDER_ACTIVE = 1;
 export const REMINDER_CONFIRMED = 2;
 export const REMINDER_CANCELLED = 3;
 
@@ -36,7 +36,7 @@ export const REMINDER_CANCELLED = 3;
 export class Reminder extends ListItem {
     static stateNames = {
         [REMINDER_UPCOMING]: 'upcoming',
-        [REMINDER_SCHEDULED]: 'scheduled',
+        [REMINDER_ACTIVE]: 'active',
         [REMINDER_CONFIRMED]: 'confirmed',
         [REMINDER_CANCELLED]: 'cancelled',
     };

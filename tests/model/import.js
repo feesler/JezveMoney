@@ -2,7 +2,7 @@ import { assert } from '@jezvejs/assert';
 import { formatDate } from '@jezvejs/datetime';
 import { createCSV } from '../common.js';
 import { App } from '../Application.js';
-import { REMINDER_SCHEDULED } from './Reminder.js';
+import { REMINDER_ACTIVE } from './Reminder.js';
 import { ImportTransaction } from './ImportTransaction.js';
 
 /** Returns data formatted in 'ru' locale */
@@ -207,7 +207,7 @@ export const getCurrencyPrecision = (id) => {
 
 /** Returns true if specified reminder is suitable for transaction */
 const isSuitableReminder = (item, reminder) => {
-    if (!item || reminder?.state !== REMINDER_SCHEDULED) {
+    if (!item || reminder?.state !== REMINDER_ACTIVE) {
         return false;
     }
 

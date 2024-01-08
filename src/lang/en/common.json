@@ -384,7 +384,7 @@
         "linkedTransaction": "Linked transaction",
         "state": {
             "upcoming": "Upcoming",
-            "scheduled": "Scheduled",
+            "active": "Active",
             "submitted": "Submitted",
             "cancelled": "Cancelled"
         },

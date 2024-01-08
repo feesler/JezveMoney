@@ -17,7 +17,7 @@ import { PersonList } from '../../Models/PersonList.js';
 import { CategoryList } from '../../Models/CategoryList.js';
 import { Schedule } from '../../Models/Schedule.js';
 import {
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     Reminder,
 } from '../../Models/Reminder.js';
 import { ReminderList } from '../../Models/ReminderList.js';
@@ -243,7 +243,7 @@ class ReminderListView extends AppView {
         const itemPart = (state.detailsId) ? state.detailsId : '';
         const params = {};
 
-        if (filter.reminderState !== REMINDER_SCHEDULED) {
+        if (filter.reminderState !== REMINDER_ACTIVE) {
             params.state = Reminder.getStateName(filter.reminderState);
         }
 

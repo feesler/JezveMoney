@@ -384,7 +384,7 @@
         "linkedTransaction": "Связанная транзакция",
         "state": {
             "upcoming": "Предстоящие",
-            "scheduled": "Запланированные",
+            "active": "Активные",
             "submitted": "Внесенные",
             "cancelled": "Отмененные"
         },

@@ -11,7 +11,7 @@ use function JezveMoney\Core\inSetCondition;
 
 // Reminder state
 define("REMINDER_UPCOMING", 0);
-define("REMINDER_SCHEDULED", 1);
+define("REMINDER_ACTIVE", 1);
 define("REMINDER_CONFIRMED", 2);
 define("REMINDER_CANCELLED", 3);
 
@@ -28,14 +28,14 @@ class ReminderModel extends CachedTable
     use Singleton;
 
     public static $availStates = [
-        REMINDER_SCHEDULED,
+        REMINDER_ACTIVE,
         REMINDER_CONFIRMED,
         REMINDER_CANCELLED,
     ];
 
     public static $stateNames = [
         REMINDER_UPCOMING => "upcoming",
-        REMINDER_SCHEDULED => "scheduled",
+        REMINDER_ACTIVE => "active",
         REMINDER_CONFIRMED => "confirmed",
         REMINDER_CANCELLED => "cancelled",
     ];
@@ -266,7 +266,7 @@ class ReminderModel extends CachedTable
 
     /**
      * Cancels confirmation of specified reminders:
-     *  changes state to REMINDER_SCHEDULED if reminder date is in past
+     *  changes state to REMINDER_ACTIVE if reminder date is in past
      *  removes reminder if date is in future
      *
      * @param mixed $items item id or array of item ids
@@ -298,7 +298,7 @@ class ReminderModel extends CachedTable
             } else {
                 $updRes = $this->update($item_id, [
                     "transaction_id" => 0,
-                    "state" => REMINDER_SCHEDULED,
+                    "state" => REMINDER_ACTIVE,
                 ]);
                 if (!$updRes) {
                     return false;
@@ -368,7 +368,7 @@ class ReminderModel extends CachedTable
 
             $filter["state"] = $stateType;
         } else {
-            $filter["state"] = REMINDER_SCHEDULED;
+            $filter["state"] = REMINDER_ACTIVE;
         }
         $isUpcoming = $filter["state"] === REMINDER_UPCOMING;
 
@@ -497,7 +497,7 @@ class ReminderModel extends CachedTable
             $this->tbl_name,
             [
                 "user_id=" . self::$user_id,
-                "state=" . REMINDER_SCHEDULED,
+                "state=" . REMINDER_ACTIVE,
             ],
         );
     }
@@ -759,7 +759,7 @@ class ReminderModel extends CachedTable
 
         $updRes = $this->dbObj->updateQ(
             $this->tbl_name,
-            ["transaction_id" => 0, "state" => REMINDER_SCHEDULED],
+            ["transaction_id" => 0, "state" => REMINDER_ACTIVE],
             "transaction_id" . inSetCondition($transactions),
         );
         if (!$updRes) {

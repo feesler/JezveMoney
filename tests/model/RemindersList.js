@@ -6,7 +6,7 @@ import { App } from '../Application.js';
 import { dateToSeconds, secondsToDate } from '../common.js';
 
 import { List } from './List.js';
-import { REMINDER_SCHEDULED, Reminder } from './Reminder.js';
+import { REMINDER_ACTIVE, Reminder } from './Reminder.js';
 
 /** List of scheduled transaction reminders */
 export class RemindersList extends List {
@@ -211,7 +211,7 @@ export class RemindersList extends List {
             (ids.includes(item.transaction_id))
                 ? this.createItem({
                     ...item,
-                    state: REMINDER_SCHEDULED,
+                    state: REMINDER_ACTIVE,
                     transaction_id: 0,
                 })
                 : item

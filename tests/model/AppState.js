@@ -47,7 +47,7 @@ import { RemindersList } from './RemindersList.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     Reminder,
 } from './Reminder.js';
 import { Account } from './Account.js';
@@ -582,7 +582,7 @@ export class AppState {
     }
 
     updateRemindersCount() {
-        const scheduledReminders = this.getReminders({ state: REMINDER_SCHEDULED });
+        const scheduledReminders = this.getReminders({ state: REMINDER_ACTIVE });
         this.profile.remindersCount = scheduledReminders.length;
         return true;
     }
@@ -2608,7 +2608,7 @@ export class AppState {
         return reminderDates.every((timestamp) => {
             const reminder = {
                 schedule_id: scheduleId,
-                state: REMINDER_SCHEDULED,
+                state: REMINDER_ACTIVE,
                 date: timeToSeconds(timestamp),
                 transaction_id: 0,
             };
@@ -2888,7 +2888,7 @@ export class AppState {
                 ? this.deleteReminder(id)
                 : this.updateReminder({
                     id: reminder.id,
-                    state: REMINDER_SCHEDULED,
+                    state: REMINDER_ACTIVE,
                     transaction_id: 0,
                 });
         });

@@ -12,7 +12,7 @@ import {
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     REMINDER_UPCOMING,
     Reminder,
 } from '../../../Models/Reminder.js';
@@ -44,7 +44,7 @@ const defaultProps = {
     stateFilterId: undefined,
     dateRangeFilterId: undefined,
     filter: {
-        reminderState: REMINDER_SCHEDULED,
+        reminderState: REMINDER_ACTIVE,
         startDate: null,
         endDate: null,
     },
@@ -105,7 +105,7 @@ export class ReminderFilters extends Component {
             itemParam: 'state',
             defaultItemType: this.props.getURL ? 'link' : 'button',
             items: [
-                { id: REMINDER_SCHEDULED, title: __('reminders.state.scheduled') },
+                { id: REMINDER_ACTIVE, title: __('reminders.state.active') },
                 { id: REMINDER_UPCOMING, title: __('reminders.state.upcoming') },
                 { id: REMINDER_CONFIRMED, title: __('reminders.state.submitted') },
                 { id: REMINDER_CANCELLED, title: __('reminders.state.cancelled') },
@@ -259,7 +259,7 @@ export class ReminderFilters extends Component {
         const { filter } = state;
         const clearAllURLParams = {};
 
-        if (filter.state !== REMINDER_SCHEDULED) {
+        if (filter.state !== REMINDER_ACTIVE) {
             clearAllURLParams.state = Reminder.getStateName(filter.reminderState);
         }
 

@@ -20,7 +20,7 @@ import {
 } from '../../../utils/utils.js';
 
 // Models
-import { REMINDER_SCHEDULED, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
+import { REMINDER_ACTIVE, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 // Common components
 import { LoadingIndicator } from '../../Common/LoadingIndicator/LoadingIndicator.js';
@@ -53,7 +53,7 @@ const SELECTED_COUNTER_CLASS = 'selected-counter';
 const defaultProps = {
     items: [],
     filter: {
-        reminderState: REMINDER_SCHEDULED,
+        reminderState: REMINDER_ACTIVE,
         startDate: null,
         endDate: null,
     },
