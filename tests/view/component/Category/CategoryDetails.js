@@ -102,7 +102,6 @@ export class CategoryDetails extends TestComponent {
 
             const state = {
                 title: textElemState(el.querySelector('.heading h1')),
-                loading: trLinkEl?.classList.contains('vhidden'),
                 transactionsLink: {
                     visible: !!trLinkEl && !trLinkEl.hidden,
                 },
@@ -118,6 +117,9 @@ export class CategoryDetails extends TestComponent {
                     visible: !!elem && !elem.hidden,
                 };
             });
+
+            const trCount = parseInt(state.transactionsField.value, 10);
+            state.loading = Number.isNaN(trCount);
 
             return state;
         }, this.elem, fieldSelectors);
