@@ -108,7 +108,13 @@ class TransactionModel extends SortableModel
      */
     protected function dataQuery()
     {
-        return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "pos ASC");
+        return $this->dbObj->selectQ(
+            "*",
+            $this->tbl_name,
+            "user_id=" . self::$user_id,
+            null,
+            "date ASC, pos ASC",
+        );
     }
 
     /**
@@ -499,7 +505,8 @@ class TransactionModel extends SortableModel
             $a = $this->getAffected($a);
             $b = $this->getAffected($b);
 
-            return $a->pos - $b->pos;
+            $dateDiff = $a->date - $b->date;
+            return ($dateDiff === 0) ? ($a->pos - $b->pos) : $dateDiff;
         });
     }
 
@@ -2052,13 +2059,9 @@ class TransactionModel extends SortableModel
         $condArr = $this->getDBCondition($params);
 
         // Sort order condition
-        $orderByDate = (isset($params["orderByDate"]) && $params["orderByDate"] == true);
         $isDesc = (isset($params["desc"]) && $params["desc"] == true);
-        $orderAndLimit = "";
-        if ($orderByDate) {
-            $orderAndLimit .= "date " . (($isDesc == true) ? "DESC" : "ASC") . ", ";
-        }
-        $orderAndLimit .= "pos " . (($isDesc == true) ? "DESC" : "ASC");
+        $sortOrder = ($isDesc == true) ? "DESC" : "ASC";
+        $orderAndLimit = "date " . $sortOrder . ", pos " . $sortOrder;
 
         // Pagination conditions
         $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
@@ -2364,7 +2367,6 @@ class TransactionModel extends SortableModel
         // Prepare transactions list request
         $dataParams = [
             "type" => $transTypes,
-            "orderByDate" => true,
         ];
         if (count($accounts) > 0) {
             $dataParams["accounts"] = $accounts;
