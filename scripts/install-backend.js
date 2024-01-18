@@ -22,7 +22,6 @@ const serverFilter = [
     'system/',
     'api/',
     'index.php',
-    '.htaccess',
     'favicon.ico',
     'manifest.webmanifest',
 ];
