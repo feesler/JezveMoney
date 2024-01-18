@@ -232,7 +232,7 @@ export const updateStateExchange = (state) => {
 };
 
 /** Search for person account in specified currency. Returns empty account object if not found */
-const getPersonAccount = (personId, currencyId) => {
+export const getPersonAccount = (personId, currencyId) => {
     const account = App.model.accounts.getPersonAccount(
         personId,
         currencyId,
