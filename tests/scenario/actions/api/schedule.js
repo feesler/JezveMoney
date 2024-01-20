@@ -74,11 +74,11 @@ export const update = async (params) => {
     let updateRes;
 
     await test(`Update scheduled transaction (${formatProps(params)})`, async () => {
-        const resExpected = App.state.updateScheduledTransaction(params);
-
         const item = App.state.schedule.getItem(params.id);
         const updParams = (item) ? structuredClone(item) : {};
         Object.assign(updParams, params);
+
+        const resExpected = App.state.updateScheduledTransaction(params);
 
         try {
             updateRes = await api.schedule.update(updParams);

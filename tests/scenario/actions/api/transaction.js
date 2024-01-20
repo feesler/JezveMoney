@@ -94,13 +94,16 @@ export const update = async (params) => {
     let updateRes;
 
     await test(`Update transaction (${formatProps(params)})`, async () => {
-        const resExpected = App.state.updateTransaction(params);
-
         const expTrans = App.state.transactions.getItem(params.id);
-        const updParams = (expTrans)
+        let updParams = (expTrans)
             ? App.state.transactionToRequest(expTrans)
             : { date: App.datesSec.now, comment: '' };
+        if (!updParams) {
+            updParams = expTrans ?? {};
+        }
         Object.assign(updParams, params);
+
+        const resExpected = App.state.updateTransaction(params);
 
         try {
             updateRes = await api.transaction.update(updParams);

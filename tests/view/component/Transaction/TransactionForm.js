@@ -476,9 +476,9 @@ export class TransactionForm extends TestComponent {
                     : state.getFirstAccount();
 
                 if (model.debtType) {
-                    destAccountAfter = lastAcc ?? { balance: 0 };
+                    destAccountAfter = lastAcc ?? state.getFirstAccount();
                 } else {
-                    srcAccountAfter = lastAcc ?? { balance: 0 };
+                    srcAccountAfter = lastAcc ?? state.getFirstAccount();
                 }
 
                 if (srcAccountAfter && (!model.debtType || isReminder)) {

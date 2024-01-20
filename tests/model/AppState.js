@@ -1905,7 +1905,7 @@ export class AppState {
             res.person_id = destAcc.owner_id;
             res.acc_id = (srcAcc) ? srcAcc.id : 0;
         } else {
-            throw new Error('Invalid transaction');
+            return false;
         }
 
         delete res.src_id;
@@ -1931,6 +1931,9 @@ export class AppState {
 
         const srcCurrency = App.currency.getItem(res.src_curr);
         const destCurrency = App.currency.getItem(res.dest_curr);
+        if (!srcCurrency || !destCurrency) {
+            return null;
+        }
 
         res.src_amount = normalize(res.src_amount, srcCurrency.precision);
         res.dest_amount = normalize(res.dest_amount, destCurrency.precision);
@@ -2054,6 +2057,9 @@ export class AppState {
         // Convert original transaction to request form
         // (only for DEBT: person_id, acc_id, op fields)
         const updTrans = this.transactionToRequest(origTrans);
+        if (!updTrans) {
+            return false;
+        }
         Object.assign(updTrans, params);
 
         const correct = this.validateTransaction(updTrans);
@@ -2409,6 +2415,9 @@ export class AppState {
 
         const srcCurrency = App.currency.getItem(res.src_curr);
         const destCurrency = App.currency.getItem(res.dest_curr);
+        if (!srcCurrency || !destCurrency) {
+            return null;
+        }
 
         res.src_amount = normalize(res.src_amount, srcCurrency.precision);
         res.dest_amount = normalize(res.dest_amount, destCurrency.precision);
@@ -2444,13 +2453,13 @@ export class AppState {
             ...params,
         };
 
-        let resExpected = this.validateScheduledTransaction(itemData);
-        if (!resExpected) {
+        const expItem = this.getExpectedScheduledTransaction(itemData);
+        if (!expItem) {
             return false;
         }
 
-        const expItem = this.getExpectedScheduledTransaction(itemData);
-        if (!expItem) {
+        let resExpected = this.validateScheduledTransaction(expItem);
+        if (!resExpected) {
             return false;
         }
 
@@ -2476,17 +2485,24 @@ export class AppState {
             return false;
         }
 
-        const itemData = structuredClone(origItem);
-        const data = copyFields(params, ScheduledTransaction.availProps);
-        Object.assign(itemData, data);
-
-        const resExpected = this.validateScheduledTransaction(itemData);
-        if (!resExpected) {
+        // Convert original transaction to request form
+        // (only for DEBT: person_id, acc_id, op fields)
+        const itemData = this.transactionToRequest({
+            ...origItem,
+            ...params,
+        });
+        if (!itemData) {
             return false;
         }
+        Object.assign(itemData, params);
 
         const expItem = this.getExpectedScheduledTransaction(itemData);
         if (!expItem) {
+            return false;
+        }
+
+        const resExpected = this.validateScheduledTransaction(expItem);
+        if (!resExpected) {
             return false;
         }
 
