@@ -547,12 +547,12 @@ export class TransactionsList extends SortableList {
         return TransactionsList.create(res);
     }
 
-    getDateGroups(list) {
+    getDateGroups() {
         let prevDate = null;
         const groups = [];
         let group = null;
 
-        list.forEach((item) => {
+        this.forEach((item) => {
             const currentDate = dateToSeconds(secondsToDate(item.date));
             if (currentDate !== prevDate) {
                 group = {
