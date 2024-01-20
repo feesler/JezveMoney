@@ -9,7 +9,7 @@ import {
     __,
 } from '../../../utils/utils.js';
 
-import { REMINDER_SCHEDULED } from '../../../Models/Reminder.js';
+import { REMINDER_ACTIVE } from '../../../Models/Reminder.js';
 
 import { ReminderListGroup } from '../ReminderListGroup/ReminderListGroup.js';
 
@@ -27,7 +27,7 @@ const HEADER_CLASS = 'dialog-header';
 const defaultProps = {
     id: undefined,
     filter: {
-        reminderState: REMINDER_SCHEDULED,
+        reminderState: REMINDER_ACTIVE,
         startDate: null,
         endDate: null,
     },

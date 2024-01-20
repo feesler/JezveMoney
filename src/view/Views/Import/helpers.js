@@ -1,5 +1,5 @@
 import { App } from '../../Application/App.js';
-import { REMINDER_SCHEDULED, Reminder } from '../../Models/Reminder.js';
+import { REMINDER_ACTIVE, Reminder } from '../../Models/Reminder.js';
 
 /** Returns page number and relative index of specified absolute index */
 export const getPageIndex = (index, state) => {
@@ -83,7 +83,7 @@ export const removeSameReminder = (item, ref) => (
 
 /** Returns true if specified reminder is suitable for transaction */
 export const isSuitableReminder = (item, reminder) => {
-    if (!item || reminder?.state !== REMINDER_SCHEDULED) {
+    if (!item || reminder?.state !== REMINDER_ACTIVE) {
         return false;
     }
 

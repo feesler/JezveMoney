@@ -430,11 +430,7 @@ export class TransactionsList extends SortableList {
 
         const isDesc = params.order?.toLowerCase() === 'desc';
 
-        if (params.orderByDate) {
-            res = this.sortItemsByDate(res, isDesc);
-        } else {
-            res = this.sortItems(res, isDesc);
-        }
+        res = this.sortItems(res, isDesc);
 
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
@@ -503,18 +499,6 @@ export class TransactionsList extends SortableList {
     }
 
     sortItems(list, desc = false) {
-        assert.isArray(list, 'Invalid list specified');
-
-        const res = structuredClone(list);
-
-        if (desc) {
-            return res.sort((a, b) => b.pos - a.pos);
-        }
-
-        return res.sort((a, b) => a.pos - b.pos);
-    }
-
-    sortItemsByDate(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
         const res = TransactionsList.create(list);
@@ -842,7 +826,6 @@ export class TransactionsList extends SortableList {
         const itemsFilter = {
             order: 'asc',
             type: transTypes,
-            orderByDate: true,
         };
         if (accountId.length > 0) {
             itemsFilter.accounts = accountId;

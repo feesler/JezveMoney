@@ -7,13 +7,13 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../Application.js';
-import { REMINDER_SCHEDULED } from '../../model/Reminder.js';
+import { REMINDER_ACTIVE } from '../../model/Reminder.js';
 
 export class Header extends TestComponent {
     static getExpectedState(state = App.state) {
         const res = {};
 
-        const reminders = state.getReminders({ state: REMINDER_SCHEDULED });
+        const reminders = state.getReminders({ state: REMINDER_ACTIVE });
         if (reminders.length > 0) {
             res.remindersBtn = {
                 visible: true,

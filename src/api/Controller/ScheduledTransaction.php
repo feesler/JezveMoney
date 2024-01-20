@@ -102,6 +102,18 @@ class ScheduledTransaction extends ApiListController
     }
 
     /**
+     * Performs controller-specific preparation of update request data
+     *
+     * @param array $request update request data
+     *
+     * @return array
+     */
+    protected function preUpdate(array $request)
+    {
+        return $this->preCreate($request);
+    }
+
+    /**
      * Updates end date of specified scheduled transaction(s) to today
      */
     public function finish()

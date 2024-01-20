@@ -189,6 +189,8 @@ export class ScheduleStory extends TestStory {
     async update() {
         setBlock('Update scheduled transaction', 1);
 
+        const { HIDDEN_PERSON } = App.scenario;
+
         await Actions.updateAndSubmit(0, [
             { action: Actions.changeIntervalType, data: INTERVAL_WEEK },
             { action: Actions.selectWeekDayOffset, data: 2 },
@@ -207,6 +209,11 @@ export class ScheduleStory extends TestStory {
         setBlock('Verity update with existing name', 2);
         await Actions.updateAndSubmit(3, [
             { action: Actions.inputScheduleName, data: 'Daily expense' },
+        ]);
+
+        setBlock('Update to debt with not existing account of person', 2);
+        await Actions.updateAndSubmit(6, [
+            { action: Actions.changePerson, data: HIDDEN_PERSON },
         ]);
     }
 

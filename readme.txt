@@ -1,14 +1,57 @@
-- Environment setup to run PHP from shell:
+- Install and setup OSPanel 6
 
-1. Add following to PATH:
+ 1. Download OpenServer installation binary: https://github.com/OSPanel/OpenServerPanel/releases
+ 2. Install program and reboot Windows
+ 3. Run OpenServer
+ 4. Open console and run:
+    osp init PHP-8.3
+    osp on PHP-8.3
+    osp use PHP-8.3
+    osp on MariaDB-11.2
+    osp add MariaDB-11.2
+
+ 5. Add domain configuration to C:\OSPanel\config\domains.ini:
+    [testsrv]
+
+    aliases              = testsrv
+    auto_configure       = on
+    enabled              = on
+    engine               = PHP-8.3
+    ip                   = auto
+    log_format           = combined
+    cgi_dir              = {root_dir}\home\{host}\cgi-bin
+    public_dir           = {root_dir}\home\{host}\www
+    ssl                  = on
+    ssl_auto_cert        = on
+    ssl_cert_file        = {root_dir}\data\ssl\domains\{host}\cert.crt
+    ssl_key_file         = {root_dir}\data\ssl\domains\{host}\cert.key
+    project_add_commands =
+    project_add_modules  =
+    project_home_dir     =
+    project_use_sys_env  = off
+    terminal_codepage    =
+
+ 7. Run cmd.exe as Administrator and navigate to project directory
+ 6. Create directory for domain at C:\OSPanel\home:
+    mkdir C:\OSPanel\home\testsrv
+ 8. Create symbolic link www for real domain directory:
+    mklink /D C:\OSPanel\home\testsrv\www <full project path>\dist
+
+ 9. Update PHP configuration at C:\OSPanel\config\PHP-8.3\default\templates\php.ini
+    1) Enable AST extension:
+    extension                      = ast
+
+10. Setup Windows environment to run PHP from shell:
+    1) Add following to PATH:
     "$phpPath\ext"
     "$phpPath\pear"
     "$phpPath\pear\bin"
     "$phpPath"
-    "$osPanelPath\modules\MariaDB-10.6\bin"
-    "$osPanelPath\modules\PHP-8.2\Apache\bin"
-    "$osPanelPath\modules\PHP-8.2\Apache"
-2. Add environment variables:
+    "$osPanelPath\modules\MariaDB-11.2\bin"
+    "$osPanelPath\modules\PHP-8.3\Apache\bin"
+    "$osPanelPath\modules\PHP-8.3\Apache"
+
+    2) Add environment variables:
     PHP_BIN = "$phpPath\php.exe"
     PHP_BINARY = "$phpPath\php.exe"
     PHP_BINDIR = "$phpPath\"
@@ -26,7 +69,9 @@
     PHPRC = "$phpPath"
 
 Ex.: $osPanelPath = "C:\OSPanel"
-$phpPath = "$osPanelPath\modules\PHP-8.2\PHP"
+$phpPath = "$osPanelPath\modules\PHP-8.3\PHP"
+
+11. Reboot Windows
 
 
 - Install and setup phpMyAdmin with MariaDB on OSPanel 6

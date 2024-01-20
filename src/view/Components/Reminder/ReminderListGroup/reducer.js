@@ -8,7 +8,7 @@ import {
 } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
 import { ReminderList } from '../../../Models/ReminderList.js';
-import { REMINDER_SCHEDULED, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
+import { REMINDER_ACTIVE, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 /** Returns initial state object */
 export const getInitialState = (props = {}) => ({
@@ -25,7 +25,7 @@ export const getInitialState = (props = {}) => ({
 });
 
 export const getStateFilter = (state) => (
-    state?.filter?.reminderState ?? REMINDER_SCHEDULED
+    state?.filter?.reminderState ?? REMINDER_ACTIVE
 );
 
 export const getItemsSource = (state) => (

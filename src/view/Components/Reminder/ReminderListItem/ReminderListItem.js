@@ -6,7 +6,7 @@ import { App } from '../../../Application/App.js';
 
 // Models
 import {
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     REMINDER_UPCOMING,
     REMINDER_CONFIRMED,
     REMINDER_CANCELLED,
@@ -28,7 +28,7 @@ const SCHEDULE_NAME_CLASS = 'reminder-item__schedule-name';
 const SCHEDULE_INTERVAL_CLASS = 'reminder-item__schedule-interval';
 
 const reminderStateIconMap = {
-    [REMINDER_SCHEDULED]: 'notification',
+    [REMINDER_ACTIVE]: 'notification',
     [REMINDER_UPCOMING]: 'menu-schedule',
     [REMINDER_CONFIRMED]: 'check',
     [REMINDER_CANCELLED]: 'close',

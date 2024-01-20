@@ -6,7 +6,7 @@ import { CloseButton } from 'jezvejs/CloseButton';
 import { App } from '../../../Application/App.js';
 import { __ } from '../../../utils/utils.js';
 
-import { Reminder } from '../../../Models/Reminder.js';
+import { REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 import { Field } from '../../Common/Field/Field.js';
 import { ReminderListItem } from '../ReminderListItem/ReminderListItem.js';
@@ -184,13 +184,14 @@ export class ReminderField extends Field {
             ? App.model.reminders.getItem(state.reminder_id)
             : ({
                 schedule_id: state.schedule_id,
+                state: REMINDER_UPCOMING,
                 date: state.reminder_date,
             });
 
         if (!this.reminderItem) {
             this.reminderItem = ReminderListItem.create({
                 disabled: state.disabled,
-                item,
+                item: Reminder.createExtended(item),
             });
             this.contentContainer.prepend(this.reminderItem.elem);
         } else {

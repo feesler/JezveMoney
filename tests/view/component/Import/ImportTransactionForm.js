@@ -30,7 +30,7 @@ import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
 import { __ } from '../../../model/locale.js';
 import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
-import { REMINDER_SCHEDULED } from '../../../model/Reminder.js';
+import { REMINDER_ACTIVE } from '../../../model/Reminder.js';
 
 const sourceTransactionTypes = ['expense', 'transfer_out', 'debt_out'];
 
@@ -917,7 +917,7 @@ export class ImportTransactionForm extends TestComponent {
 
         const dialogModel = {
             filter: {
-                state: REMINDER_SCHEDULED,
+                state: REMINDER_ACTIVE,
                 startDate: null,
                 endDate: null,
             },

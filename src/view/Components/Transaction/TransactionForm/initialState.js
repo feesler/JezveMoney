@@ -15,6 +15,7 @@ import {
     calculateSourceResult,
     calculateDestResult,
     updateStateExchange,
+    getPersonAccount,
 } from './reducer.js';
 import * as STATE from './stateId.js';
 
@@ -103,20 +104,19 @@ export const getInitialState = (props = {}) => {
         res.id = (res.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
     } else if (transaction.type === DEBT) {
         res.person = App.model.persons.getItem(transaction.person_id);
+
+        const personAccountCurr = (transaction.debtType)
+            ? transaction.src_curr
+            : transaction.dest_curr;
+
         const personAccountId = (transaction.debtType)
             ? transaction.src_id
             : transaction.dest_id;
+
         if (personAccountId) {
             res.personAccount = accountModel.getItem(personAccountId);
         } else {
-            const personAccountCurr = (transaction.debtType)
-                ? transaction.src_curr
-                : transaction.dest_curr;
-            res.personAccount = {
-                id: 0,
-                balance: 0,
-                curr_id: personAccountCurr,
-            };
+            res.personAccount = getPersonAccount(transaction.person_id, personAccountCurr);
         }
 
         if (transaction.debtType) {

@@ -7,7 +7,7 @@ import { testDateLocales, testDecimalLocales } from '../../actions/settings.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
-    REMINDER_SCHEDULED,
+    REMINDER_ACTIVE,
     REMINDER_UPCOMING,
 } from '../../../model/Reminder.js';
 import { IMPORT_COND_FIELD_COMMENT, IMPORT_COND_OP_STRING_INCLUDES } from '../../../model/ImportCondition.js';
@@ -525,7 +525,7 @@ export class ImportListStory extends TestStory {
             { action: 'filterRemindersByState', data: REMINDER_CONFIRMED },
             { action: 'filterRemindersByState', data: REMINDER_UPCOMING },
             { action: 'filterRemindersByState', data: REMINDER_CANCELLED },
-            { action: 'filterRemindersByState', data: REMINDER_SCHEDULED },
+            { action: 'filterRemindersByState', data: REMINDER_ACTIVE },
             { action: 'selectRemindersEndDateFilter', data: App.dates.monthAfter },
             { action: 'selectRemindersStartDateFilter', data: App.dates.weekAfter },
             { action: 'clearRemindersEndDateFilter' },

@@ -1,4 +1,16 @@
+Options -MultiViews
+
 RewriteEngine on
 RewriteBase /
+
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteRule app(/.*)?$ https://%{SERVER_NAME}/ [R=301,L]
+
+RewriteCond %{DOCUMENT_ROOT}/app/$1 -f
+RewriteRule (.+\.(ico|gif|jpg|jpeg|png|js|css|webmanifest))$ app/$1 [L]
+
+RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css|webmanifest)$
+RewriteCond %{REQUEST_URI} !(admin|api)
+RewriteRule ^(.*)$ app/index.php?route=$1 [L,QSA]
 
 RewriteRule ^((?!app/).*)$ app/$1 [L,NC]
