@@ -1514,11 +1514,13 @@ class ScheduledTransactionModel extends CachedTable
 
         $longestInterval = $this->getLongestInterval();
 
-        $request["endDate"] = stepInterval(
-            $request["endDate"],
-            $longestInterval->interval_type,
-            $longestInterval->interval_step + 1,
-        );
+        if ($longestInterval) {
+            $request["endDate"] = stepInterval(
+                $request["endDate"],
+                $longestInterval->interval_type,
+                $longestInterval->interval_step + 1,
+            );
+        }
 
         $prevCount = 0;
         $reminders = $this->getAllExpectedReminders($request);
