@@ -67,19 +67,21 @@
   color: var(--trans-item-category-text, var(--list-item-text-color));
 }
 
-/* Comment field */
+/* Date field */
 .trans-item-base__date {
   grid-row: 3 / 4;
   grid-column: 1 / 2;
   flex: 0 0 auto;
+  font-size: 0.8rem;
 }
 
-/* Date field */
+/* Comment field */
 .trans-item-base__comment {
   grid-row: 3 / 4;
   grid-column: 2 / 6;
   flex: 1 1 auto;
   min-height: 0;
+  font-size: 0.8rem;
 }
 
 .trans-item-base__category,
@@ -87,6 +89,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Group by date state */
+.trans-group .trans-item-base__comment {
+  grid-column: 1 / 6;
 }
 
 .trans-item-base_details {
