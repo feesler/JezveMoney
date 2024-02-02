@@ -98,6 +98,11 @@ export class StatisticsStory extends TestStory {
         await Actions.selectMonthRangeFilter();
         await Actions.selectHalfYearRangeFilter();
 
+        // Change report type from accounts to categories
+        await Actions.byAccounts();
+        await Actions.filterByAccounts([ACC_3, ACC_RUB]);
+        await Actions.byCategories();
+
         await this.locales();
 
         await this.availability();

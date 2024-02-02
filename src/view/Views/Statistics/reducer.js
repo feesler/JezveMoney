@@ -67,6 +67,8 @@ const slice = createSlice({
                 form: {
                     ...state.form,
                     report,
+                    accounts: [],
+                    categories: [],
                 },
             }
     ),
