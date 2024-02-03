@@ -170,6 +170,7 @@ class StatisticsView extends AppView {
             setActiveCategory: (value) => this.dispatch(actions.toggleActivateChartCategory(value)),
             setLegendCategories: (value) => this.dispatch(actions.setLegendCategories(value)),
             toggleExpandLegend: () => this.dispatch(actions.toggleExpandLegend()),
+            scrollDone: () => this.dispatch(actions.setRenderTime()),
             components: {
                 Legend: ChartLegend,
             },
@@ -393,7 +394,6 @@ class StatisticsView extends AppView {
 
         if (!aborted) {
             this.stopLoading();
-            this.dispatch(actions.setRenderTime());
         }
     }
 

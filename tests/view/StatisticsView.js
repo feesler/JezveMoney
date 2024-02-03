@@ -448,6 +448,7 @@ export class StatisticsView extends AppView {
             await this.parse();
             return (
                 !this.model.filtersAnimation
+                && !this.model.chart.animation
                 && this.model.filtersVisible === expectedVisibility
             );
         });
