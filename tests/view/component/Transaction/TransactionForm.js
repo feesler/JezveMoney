@@ -1369,7 +1369,7 @@ export class TransactionForm extends TestComponent {
             ];
         }, this.elem, hiddenInputs, res.reminderDialog.elem);
 
-        const location = await url();
+        const location = url();
         res.isUpdate = location.includes('/update/');
         if (res.isUpdate) {
             assert(res.id, 'Wrong transaction id');

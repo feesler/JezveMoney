@@ -47,7 +47,7 @@ export class TransactionView extends AppView {
     async parseContent() {
         const res = {};
 
-        const viewURL = await url();
+        const viewURL = url();
         res.isUpdate = viewURL.includes('/update/');
 
         if (res.isUpdate) {

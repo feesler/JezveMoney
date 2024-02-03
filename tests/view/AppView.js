@@ -41,7 +41,7 @@ export class AppView extends TestView {
     }
 
     async postParse() {
-        this.location = await url();
+        this.location = url();
 
         const documentElem = await query('html');
         this.content.locale = await prop(documentElem, 'lang');
