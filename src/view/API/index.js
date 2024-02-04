@@ -1,52 +1,15 @@
 import { asArray } from '@jezvejs/types';
-import { App } from '../Application/App.js';
-
-/** Strings */
-const MSG_REQUEST_FAIL = 'API request failed';
-
-/** Send API request */
-export const apiRequest = async (method, path, data = null, options = {}) => {
-    const { baseURL } = App;
-    const isPOST = method.toLowerCase() === 'post';
-    const url = new URL(`${baseURL}api/${path}`);
-    const reqOptions = {
-        method,
-        headers: {},
-        ...options,
-    };
-
-    if (isPOST) {
-        if (data instanceof FormData) {
-            reqOptions.body = data;
-        } else {
-            reqOptions.headers['Content-Type'] = 'application/json';
-            reqOptions.body = JSON.stringify(data);
-        }
-    } else if (data) {
-        Object.entries(data).forEach(([name, value]) => {
-            if (Array.isArray(value)) {
-                const arrayName = `${name}[]`;
-                value.forEach((item) => url.searchParams.append(arrayName, item));
-            } else if (typeof value !== 'undefined' && value !== null) {
-                url.searchParams.set(name, value.toString());
-            }
-        });
-    }
-
-    const response = await fetch(url, reqOptions);
-    const apiResult = await response.json();
-    if (apiResult?.result !== 'ok') {
-        const errorMessage = (apiResult?.msg) ? apiResult.msg : MSG_REQUEST_FAIL;
-        throw new Error(errorMessage);
-    }
-
-    return apiResult;
-};
+import { APIRequest } from './APIRequest.js';
 
 /** Send GET API request */
-export const apiGet = (...args) => apiRequest('GET', ...args);
+export const apiGet = (path, data, params) => (
+    APIRequest.createGet({ path, data, params }).send()
+);
+
 /** Send GET API request */
-export const apiPost = (...args) => apiRequest('POST', ...args);
+export const apiPost = (path, data, params) => (
+    APIRequest.createPost({ path, data, params }).send()
+);
 
 /** Send GET request for items by ids */
 export const idsRequest = (path, val) => {

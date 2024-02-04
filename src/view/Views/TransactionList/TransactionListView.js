@@ -21,7 +21,7 @@ import {
 import { MAX_PRECISION, normalize } from '../../utils/decimal.js';
 import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
-import { API } from '../../API/index.js';
+import { APIRequest } from '../../API/APIRequest.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
@@ -518,6 +518,7 @@ class TransactionListView extends AppView {
         const { form } = this.store.getState();
 
         const res = {
+            order: 'desc',
             ...form,
             startDate: dateStringToTime(form.startDate, { fixShortYear: false }),
             endDate: dateStringToTime(form.endDate, { fixShortYear: false }),
@@ -527,12 +528,10 @@ class TransactionListView extends AppView {
     }
 
     async requestTransactions(options) {
-        if (this.abortController) {
-            this.abortController.abort();
+        if (this.dataRequest) {
+            this.dataRequest.cancel();
         }
-        this.abortController = new AbortController();
-        const { signal } = this.abortController;
-        let aborted = false;
+
         const {
             keepState = false,
             isLoadingMore = false,
@@ -542,22 +541,26 @@ class TransactionListView extends AppView {
         this.dispatch(actions.startLoading(isLoadingMore));
 
         try {
-            const { data } = await API.transaction.list(request, { signal });
-
-            this.dispatch(setListData(data, keepState));
-        } catch (e) {
-            aborted = e.name === 'AbortError';
-            if (!aborted) {
-                App.createErrorNotification(e.message);
-                this.dispatch(actions.listRequestError());
+            this.dataRequest = APIRequest.createGet({
+                path: 'transaction/list',
+                cancelable: true,
+                data: request,
+            });
+            const result = await this.dataRequest.send();
+            if (result === null) {
+                this.dataRequest = null;
+                return;
             }
+
+            this.dispatch(setListData(result.data, keepState));
+        } catch (e) {
+            App.createErrorNotification(e.message);
+            this.dispatch(actions.listRequestError());
         }
 
-        if (!aborted) {
-            this.dispatch(actions.stopLoading());
-            this.setRenderTime();
-            this.abortController = null;
-        }
+        this.dispatch(actions.stopLoading());
+        this.setRenderTime();
+        this.dataRequest = null;
     }
 
     renderDeleteConfirmDialog(state, prevState) {

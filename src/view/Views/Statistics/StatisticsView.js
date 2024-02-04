@@ -20,7 +20,7 @@ import {
     isStackedData,
 } from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
-import { API } from '../../API/index.js';
+import { APIRequest } from '../../API/APIRequest.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
@@ -371,30 +371,33 @@ class StatisticsView extends AppView {
         return res;
     }
 
-    async requestData(options) {
-        if (this.abortController) {
-            this.abortController.abort();
+    async requestData(data) {
+        if (this.dataRequest) {
+            this.dataRequest.cancel();
         }
-        this.abortController = new AbortController();
-        const { signal } = this.abortController;
-        let aborted = false;
 
         this.startLoading();
 
         try {
-            const result = await API.transaction.statistics(options, { signal });
+            this.dataRequest = APIRequest.createGet({
+                path: 'transaction/statistics',
+                cancelable: true,
+                data,
+            });
+            const result = await this.dataRequest.send();
+            if (result === null) {
+                this.dataRequest = null;
+                return;
+            }
+
             this.dispatch(actions.dataRequestLoaded(result.data));
         } catch (e) {
-            aborted = e.name === 'AbortError';
-            if (!aborted) {
-                App.createErrorNotification(e.message);
-                this.dispatch(actions.dataRequestError());
-            }
+            App.createErrorNotification(e.message);
+            this.dispatch(actions.dataRequestError());
         }
 
-        if (!aborted) {
-            this.stopLoading();
-        }
+        this.stopLoading();
+        this.dataRequest = null;
     }
 
     /** Returns content of chart popup for specified target */
