@@ -8,6 +8,8 @@ const defaultProps = {
     data: null,
     cancelable: false,
     params: {},
+    timeout: 30000,
+    retryCount: 0,
 };
 
 /**
@@ -32,12 +34,6 @@ export class APIRequest {
             ...props,
         };
 
-        let signal = null;
-        if (this.props.cancelable) {
-            this.abortController = new AbortController();
-            ({ signal } = this.abortController);
-        }
-
         const {
             method,
             path,
@@ -50,7 +46,6 @@ export class APIRequest {
             method,
             headers: {},
             ...params,
-            signal,
         };
 
         if (isPOST) {
@@ -70,11 +65,57 @@ export class APIRequest {
                 }
             });
         }
+
+        this.remainingTries = this.props.retryCount;
+        this.requestTimeout = 0;
+    }
+
+    setAbortController() {
+        let signal = null;
+        if (this.props.cancelable) {
+            this.abortController = new AbortController();
+            ({ signal } = this.abortController);
+        }
+
+        this.reqOptions.signal = signal;
+    }
+
+    setupTimeout() {
+        this.resetTimeout();
+
+        const timeout = parseInt(this.props.timeout ?? 0, 10);
+        if (timeout === 0) {
+            return;
+        }
+
+        this.requestTimeout = setTimeout(() => {
+            this.requestTimeout = 0;
+
+            if (this.remainingTries > 0) {
+                this.remainingTries -= 1;
+            } else {
+                throw new Error('Timeout');
+            }
+
+            this.send();
+        }, timeout);
+    }
+
+    resetTimeout() {
+        if (this.requestTimeout) {
+            clearTimeout(this.requestTimeout);
+            this.requestTimeout = 0;
+        }
     }
 
     async send() {
         try {
+            this.cancel();
+            this.setAbortController();
+            this.setupTimeout();
+
             this.response = await fetch(this.url, this.reqOptions);
+            this.resetTimeout();
             this.apiResult = await this.response.json();
 
             if (this.apiResult?.result !== 'ok') {
