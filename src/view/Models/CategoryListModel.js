@@ -1,5 +1,5 @@
-import { List } from './List.js';
-import { Person } from './Person.js';
+import { ListModel } from './ListModel.js';
+import { Category } from './Category.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
@@ -9,31 +9,29 @@ import {
 } from '../utils/utils.js';
 
 /**
- * @constructor PersonList class
- * @param {object[]} props - array of persons
+ * @constructor CategoryListModel class
+ * @param {object[]} props - array of categories
  */
-export class PersonList extends List {
+export class CategoryListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj
      */
     createItem(obj) {
-        return new Person(obj);
+        return new Category(obj);
     }
 
-    /**
-     * Return list of visible Persons
-     */
-    getVisible() {
-        return this.filter((item) => item && item.isVisible());
+    /** Returns array of ids of child categories */
+    findByParent(id) {
+        return this.filter((item) => item.parent_id === id);
     }
 
-    /** Return list of hidden Persons */
-    getHidden() {
-        return this.filter((item) => item && !item.isVisible());
+    /** Returns array of categories for specified transaction type */
+    findByType(type) {
+        return this.filter((item) => item.type === type);
     }
 
-    /** Search person with specified name */
+    /** Search category with specified name */
     findByName(name, caseSens = false) {
         if (typeof name !== 'string' || name.length === 0) {
             return null;
@@ -45,6 +43,12 @@ export class PersonList extends List {
                 ? (person.name === lookupName)
                 : (person.name.toLowerCase() === lookupName)
         ));
+    }
+
+    /** Returns array of items with specified color */
+    findByColor(color, parentId = 0) {
+        const categoryId = parseInt(parentId, 10);
+        return this.filter((item) => (item.color === color && item.parent_id === categoryId));
     }
 
     sortBy(sortMode) {

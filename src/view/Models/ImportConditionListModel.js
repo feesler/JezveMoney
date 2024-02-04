@@ -1,4 +1,4 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_EQUAL,
@@ -8,10 +8,10 @@ import {
 } from './ImportCondition.js';
 
 /**
- * ImportConditionList class
+ * ImportConditionListModel class
  * @param {object[]} props - array of import conditions
  */
-export class ImportConditionList extends List {
+export class ImportConditionListModel extends ListModel {
     /**
      * Search for condition for specified property with `is` (equal) operator
      * @param {Number} field
@@ -59,7 +59,7 @@ export class ImportConditionList extends List {
      * @param {Number} field
      */
     findIsCondition(fieldId) {
-        return ImportConditionList.findIsCondition(this, fieldId);
+        return ImportConditionListModel.findIsCondition(this, fieldId);
     }
 
     /**

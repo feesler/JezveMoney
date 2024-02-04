@@ -7,7 +7,7 @@ import {
     formatDateRange,
 } from '../../../utils/utils.js';
 import { App } from '../../../Application/App.js';
-import { ReminderList } from '../../../Models/ReminderList.js';
+import { ReminderListModel } from '../../../Models/ReminderListModel.js';
 import { REMINDER_ACTIVE, REMINDER_UPCOMING, Reminder } from '../../../Models/Reminder.js';
 
 /** Returns initial state object */
@@ -77,7 +77,7 @@ export const updateList = (state, options = {}) => {
         }));
     }
 
-    const list = ReminderList.create(items);
+    const list = ReminderListModel.create(items);
     list.defaultSort(stateFilter !== REMINDER_UPCOMING);
 
     result.items = list;

@@ -1,11 +1,11 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { Icon } from './Icon.js';
 
 /**
  * Icons list class
  * @param {object[]} props - array of icons
  */
-export class IconList extends List {
+export class IconListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj

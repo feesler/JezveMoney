@@ -16,7 +16,7 @@ import {
     ImportAction,
 } from '../../../../../Models/ImportAction.js';
 import { ImportCondition } from '../../../../../Models/ImportCondition.js';
-import { ImportActionList } from '../../../../../Models/ImportActionList.js';
+import { ImportActionListModel } from '../../../../../Models/ImportActionListModel.js';
 
 import { ToggleButton } from '../../../../../Components/Common/ToggleButton/ToggleButton.js';
 import { FormControls } from '../../../../../Components/Form/FormControls/FormControls.js';
@@ -590,7 +590,7 @@ export class ImportRuleForm extends Component {
         ));
 
         const rule = new ImportRule(state.rule);
-        rule.actions = ImportActionList.create(newActions);
+        rule.actions = ImportActionListModel.create(newActions);
 
         const newState = {
             ...state,
@@ -625,7 +625,7 @@ export class ImportRuleForm extends Component {
         });
 
         const rule = new ImportRule(this.state.rule);
-        rule.actions = ImportActionList.create(newActions);
+        rule.actions = ImportActionListModel.create(newActions);
 
         const newState = {
             ...this.state,

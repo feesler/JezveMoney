@@ -31,14 +31,14 @@ const availFields = [
     'updatedate',
 ];
 
-/** Schedule interval types */
+/** ScheduledTransactionListModel interval types */
 export const INTERVAL_NONE = 0;
 export const INTERVAL_DAY = 1;
 export const INTERVAL_WEEK = 2;
 export const INTERVAL_MONTH = 3;
 export const INTERVAL_YEAR = 4;
 
-/* Schedule interval type tokens */
+/* ScheduledTransactionListModel interval type tokens */
 const intervalTokens = {
     [INTERVAL_DAY]: 'schedule.item.everyDay',
     [INTERVAL_WEEK]: 'schedule.item.everyWeek',
@@ -51,7 +51,7 @@ const stepIntervalTokens = {
     [INTERVAL_MONTH]: 'schedule.item.everyNMonth',
     [INTERVAL_YEAR]: 'schedule.item.everyNYear',
 };
-/* Schedule interval offset tokens */
+/* ScheduledTransactionListModel interval offset tokens */
 const weekOffsetTokens = [
     'schedule.item.onSundays',
     'schedule.item.onMondays',

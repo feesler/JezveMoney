@@ -7,10 +7,10 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { Person } from '../../Models/Person.js';
-import { PersonList } from '../../Models/PersonList.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
 
 export const createList = (items, sortMode) => {
-    const res = PersonList.create(items);
+    const res = PersonListModel.create(items);
     res.sortBy(sortMode);
     return res;
 };

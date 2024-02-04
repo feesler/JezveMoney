@@ -8,12 +8,13 @@ import { App } from '../../Application/App.js';
 import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
-import { AccountList } from '../../Models/AccountList.js';
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { IconList } from '../../Models/IconList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { IconListModel } from '../../Models/IconListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
 
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -21,7 +22,6 @@ import { TransactionForm } from '../../Components/Transaction/TransactionForm/Tr
 
 import { actions, reducer } from './reducer.js';
 import './ScheduleItemView.scss';
-import { Schedule } from '../../Models/Schedule.js';
 
 /**
  * Create/update scheduled transaction view
@@ -34,13 +34,13 @@ class ScheduleItemView extends AppView {
             throw new Error('Invalid schedule transaction view properties');
         }
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
-        App.loadModel(PersonList, 'persons', App.props.persons);
-        App.loadModel(IconList, 'icons', App.props.icons);
-        App.loadModel(CategoryList, 'categories', App.props.categories);
-        App.loadModel(Schedule, 'schedule', App.props.schedule);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
+        App.loadModel(IconListModel, 'icons', App.props.icons);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
+        App.loadModel(ScheduledTransactionListModel, 'schedule', App.props.schedule);
         App.initCategoriesModel();
         App.checkUserAccountModels();
         App.checkPersonModels();

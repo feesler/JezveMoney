@@ -8,10 +8,10 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { Account } from '../../Models/Account.js';
-import { AccountList } from '../../Models/AccountList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
 
 export const createList = (items, sortMode) => {
-    const res = AccountList.create(items);
+    const res = AccountListModel.create(items);
     res.sortBy(sortMode);
     return res;
 };

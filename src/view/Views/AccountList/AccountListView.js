@@ -15,9 +15,9 @@ import {
 } from '../../utils/utils.js';
 
 // Models
-import { AccountList } from '../../Models/AccountList.js';
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { IconList } from '../../Models/IconList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { IconListModel } from '../../Models/IconListModel.js';
 
 // Common components
 import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
@@ -50,10 +50,10 @@ class AccountListView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
         App.checkUserAccountModels();
-        App.loadModel(IconList, 'icons', App.props.icons);
+        App.loadModel(IconListModel, 'icons', App.props.icons);
 
         const { visibleUserAccounts, hiddenUserAccounts } = App.model;
         const { settings } = App.model.profile;

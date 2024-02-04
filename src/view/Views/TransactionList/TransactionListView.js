@@ -25,12 +25,12 @@ import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { Schedule } from '../../Models/Schedule.js';
-import { ReminderList } from '../../Models/ReminderList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
+import { ReminderListModel } from '../../Models/ReminderListModel.js';
 
 // Common components
 import { ExportDialog } from '../../Components/Transaction/ExportDialog/ExportDialog.js';
@@ -99,13 +99,13 @@ class TransactionListView extends AppView {
             renderTime: Date.now(),
         };
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
-        App.loadModel(PersonList, 'persons', App.props.persons);
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
-        App.loadModel(Schedule, 'schedule', App.props.schedule);
-        App.loadModel(ReminderList, 'reminders', App.props.reminders);
+        App.loadModel(ScheduledTransactionListModel, 'schedule', App.props.schedule);
+        App.loadModel(ReminderListModel, 'reminders', App.props.reminders);
 
         this.store = createStore(reducer, { initialState });
     }

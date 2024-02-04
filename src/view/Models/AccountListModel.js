@@ -1,4 +1,4 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { Account } from './Account.js';
 import {
     SORT_BY_CREATEDATE_ASC,
@@ -12,7 +12,7 @@ import {
  * Accounts list class
  * @param {object[]} props - array of accounts
  */
-export class AccountList extends List {
+export class AccountListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj

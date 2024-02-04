@@ -13,7 +13,7 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
 import { Category } from '../../Models/Category.js';
-import { CategoryList } from '../../Models/CategoryList.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
 import { Transaction } from '../../Models/Transaction.js';
 
 // Common components
@@ -49,7 +49,7 @@ class CategoryView extends AppView {
             initialState.data = { ...initialState.original };
         }
 
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });

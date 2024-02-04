@@ -11,7 +11,7 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 // Models
-import { PersonList } from '../../Models/PersonList.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
 
 // Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -42,7 +42,7 @@ class PersonView extends AppView {
             initialState.data = { ...initialState.original };
         }
 
-        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
 
         this.store = createStore(reducer, { initialState });
     }

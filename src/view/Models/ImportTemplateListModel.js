@@ -1,20 +1,20 @@
-import { List } from './List.js';
-import { ScheduledTransaction } from './ScheduledTransaction.js';
+import { ListModel } from './ListModel.js';
+import { ImportTemplate } from './ImportTemplate.js';
 
 /**
- * @constructor Schedule class
- * @param {object[]} props - array of scheduled transactions
+ * @constructor ImportTemplateListModel class
+ * @param {object[]} props - array of import rules
  */
-export class Schedule extends List {
+export class ImportTemplateListModel extends ListModel {
     /**
-     * Creates list item from specified object
+     * Create list item from specified object
      * @param {Object} obj
      */
     createItem(obj) {
-        return new ScheduledTransaction(obj);
+        return new ImportTemplate(obj);
     }
 
-    /** Search scheduled transaction with specified name */
+    /** Searches for import template with specified name */
     findByName(name, caseSens = false) {
         if (typeof name !== 'string' || name.length === 0) {
             return null;

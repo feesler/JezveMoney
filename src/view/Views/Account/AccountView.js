@@ -12,11 +12,11 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { API } from '../../API/index.js';
 
 // Models
-import { IconList } from '../../Models/IconList.js';
+import { IconListModel } from '../../Models/IconListModel.js';
 import { accountTypes, Account } from '../../Models/Account.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
-import { CurrencyList } from '../../Models/CurrencyList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
 
 // Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -39,10 +39,10 @@ class AccountView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
-        App.loadModel(IconList, 'icons', App.props.icons);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
+        App.loadModel(IconListModel, 'icons', App.props.icons);
 
         const initialState = {
             nameChanged: false,

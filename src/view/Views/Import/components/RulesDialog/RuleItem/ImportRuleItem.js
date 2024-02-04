@@ -8,8 +8,8 @@ import { __ } from '../../../../../utils/utils.js';
 import { App } from '../../../../../Application/App.js';
 
 import { ImportRule } from '../../../../../Models/ImportRule.js';
-import { ImportConditionList } from '../../../../../Models/ImportConditionList.js';
-import { ImportActionList } from '../../../../../Models/ImportActionList.js';
+import { ImportConditionListModel } from '../../../../../Models/ImportConditionListModel.js';
+import { ImportActionListModel } from '../../../../../Models/ImportActionListModel.js';
 
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
@@ -120,8 +120,8 @@ export class ImportRuleItem extends CollapsibleListItem {
         const { item } = state;
 
         if (
-            !(item.actions instanceof ImportActionList)
-            || !(item.conditions instanceof ImportConditionList)
+            !(item.actions instanceof ImportActionListModel)
+            || !(item.conditions instanceof ImportConditionListModel)
             || item.conditions.length === 0
             || item.actions.length === 0
         ) {

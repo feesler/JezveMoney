@@ -12,8 +12,8 @@ import { App } from '../../Application/App.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
 
 // Common components
 import { LocaleSelectField } from '../../Components/Form/Fields/LocaleSelectField/LocaleSelectField.js';
@@ -56,8 +56,8 @@ class SettingsView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
 
         const { settings } = App.model.profile;
 

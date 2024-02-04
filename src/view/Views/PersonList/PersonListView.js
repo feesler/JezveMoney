@@ -15,8 +15,8 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { PersonList } from '../../Models/PersonList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
 
 // Common components
 import { ConfirmDialog } from '../../Components/Common/ConfirmDialog/ConfirmDialog.js';
@@ -49,8 +49,8 @@ class PersonListView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
         App.checkPersonModels();
 
         const { visiblePersons, hiddenPersons } = App.model;

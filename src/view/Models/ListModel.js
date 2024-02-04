@@ -1,8 +1,8 @@
 /**
- * Base List class
+ * Base List model class
  * @param {object[]} props - array of list items
  */
-export class List extends Array {
+export class ListModel extends Array {
     static create(props = []) {
         const instance = new this(props);
         instance.setData(props);

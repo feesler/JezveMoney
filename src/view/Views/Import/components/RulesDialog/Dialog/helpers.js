@@ -1,5 +1,5 @@
 import { App } from '../../../../../Application/App.js';
-import { ImportRuleList } from '../../../../../Models/ImportRuleList.js';
+import { ImportRuleListModel } from '../../../../../Models/ImportRuleListModel.js';
 
 /** Returns rules list according to current filters */
 export const createList = (items, state) => {
@@ -13,7 +13,7 @@ export const createList = (items, state) => {
         ('collapsed' in item) ? item : { ...item, collapsed: true }
     ));
 
-    return ImportRuleList.create(res);
+    return ImportRuleListModel.create(res);
 };
 
 /** Updates rules list state */

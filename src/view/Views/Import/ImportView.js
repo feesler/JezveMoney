@@ -13,15 +13,15 @@ import { API } from '../../API/index.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { ImportRuleList } from '../../Models/ImportRuleList.js';
-import { ImportTemplateList } from '../../Models/ImportTemplateList.js';
-import { Schedule } from '../../Models/Schedule.js';
-import { ReminderList } from '../../Models/ReminderList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { ImportRuleListModel } from '../../Models/ImportRuleListModel.js';
+import { ImportTemplateListModel } from '../../Models/ImportTemplateListModel.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
+import { ReminderListModel } from '../../Models/ReminderListModel.js';
 
 // Common components
 import { Field } from '../../Components/Common/Field/Field.js';
@@ -62,17 +62,17 @@ class ImportView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
         App.checkUserAccountModels();
-        App.loadModel(PersonList, 'persons', App.props.persons);
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
-        App.loadModel(ImportRuleList, 'rules', App.props.rules);
-        App.loadModel(ImportTemplateList, 'templates', App.props.templates);
-        App.loadModel(Schedule, 'schedule', App.props.schedule);
-        App.loadModel(ReminderList, 'reminders', App.props.reminders);
+        App.loadModel(ImportRuleListModel, 'rules', App.props.rules);
+        App.loadModel(ImportTemplateListModel, 'templates', App.props.templates);
+        App.loadModel(ScheduledTransactionListModel, 'schedule', App.props.schedule);
+        App.loadModel(ReminderListModel, 'reminders', App.props.reminders);
 
         const { userAccounts } = App.model;
         const mainAccount = userAccounts.getItemByIndex(0);

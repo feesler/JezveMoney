@@ -1,11 +1,11 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { ImportRule } from './ImportRule.js';
 
 /**
- * @constructor ImportRuleList class
+ * @constructor ImportRuleListModel class
  * @param {object[]} props - array of import rules
  */
-export class ImportRuleList extends List {
+export class ImportRuleListModel extends ListModel {
     /**
      * Assign new data to the list
      * @param {Array} data - array of list items

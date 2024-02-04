@@ -1,10 +1,10 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { Reminder } from './Reminder.js';
 
 /**
  * Scheduled transaction reminders list class
  */
-export class ReminderList extends List {
+export class ReminderListModel extends ListModel {
     /**
      * Creates list item from specified object
      * @param {Object} obj

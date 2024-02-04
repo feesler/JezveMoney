@@ -1,11 +1,11 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { UserCurrency } from './UserCurrency.js';
 
 /**
- * @constructor UserCurrencyList class
+ * @constructor UserCurrencyListModel class
  * @param {object[]} props - array of user currencies
  */
-export class UserCurrencyList extends List {
+export class UserCurrencyListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj
