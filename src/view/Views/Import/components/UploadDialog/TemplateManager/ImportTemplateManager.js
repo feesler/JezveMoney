@@ -123,6 +123,7 @@ export class ImportTemplateManager extends Component {
         this.templateField = Field.create({
             id: 'tplField',
             className: TPL_FIELD_CLASS,
+            titleTagName: 'header',
             title: [
                 createElement('span', { props: { textContent: __('import.templates.title') } }),
                 this.createTplBtn.elem,
