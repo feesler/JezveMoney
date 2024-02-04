@@ -127,7 +127,11 @@ export class Tile extends Component {
 
         this.subTitleElem.replaceChildren(...subtitle);
 
-        this.elem.classList.toggle(WIDE_CLASS, (subtitle.length > SUBTITLE_LIMIT));
+        const maxLength = asArray(state.subtitle).reduce((res, item) => (
+            Math.max(res, item.length)
+        ), 0);
+
+        this.elem.classList.toggle(WIDE_CLASS, (maxLength > SUBTITLE_LIMIT));
     }
 
     renderIcon(state, prevState = {}) {
