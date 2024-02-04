@@ -26,7 +26,7 @@ import {
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountListModel.js';
 import { __ } from '../../../model/locale.js';
 import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';

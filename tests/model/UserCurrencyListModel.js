@@ -1,7 +1,10 @@
-import { SortableList } from './SortableList.js';
+import { SortableListModel } from './SortableListModel.js';
 import { UserCurrency } from './UserCurrency.js';
 
-export class UserCurrencyList extends SortableList {
+/**
+ * User currencies list model class
+ */
+export class UserCurrencyListModel extends SortableListModel {
     defaultSort() {
         this.sort((a, b) => a.pos - b.pos);
     }

@@ -1,6 +1,6 @@
 import { assert } from '@jezvejs/assert';
 import { hasFlag } from 'jezvejs';
-import { SortableList } from './SortableList.js';
+import { SortableListModel } from './SortableListModel.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
@@ -12,7 +12,10 @@ import { api } from './api.js';
 
 export const PERSON_HIDDEN = 1;
 
-export class PersonsList extends SortableList {
+/**
+ * Person list model class
+ */
+export class PersonListModel extends SortableListModel {
     async fetch() {
         return api.person.list();
     }
@@ -39,13 +42,13 @@ export class PersonsList extends SortableList {
     getVisible() {
         const res = this.filter((item) => !this.isHidden(item));
 
-        return PersonsList.create(res);
+        return PersonListModel.create(res);
     }
 
     getHidden() {
         const res = this.filter((item) => this.isHidden(item));
 
-        return PersonsList.create(res);
+        return PersonListModel.create(res);
     }
 
     sortByVisibility() {

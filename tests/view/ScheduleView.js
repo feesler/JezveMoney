@@ -23,7 +23,7 @@ import { Counter } from './component/Counter.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { ScheduleItemDetails } from './component/Schedule/ScheduleItemDetails.js';
 import { ScheduleList } from './component/Schedule/ScheduleList.js';
-import { ScheduledTransactionsList } from '../model/ScheduledTransactionsList.js';
+import { ScheduledTransactionListModel } from '../model/ScheduledTransactionListModel.js';
 
 const listMenuSelector = '#listMenu';
 
@@ -187,7 +187,7 @@ export class ScheduleView extends AppView {
         res.paginator = await Paginator.create(this, await query('.paginator'));
 
         const listContainer = await query('.list-container');
-        assert(listContainer, 'List container not found');
+        assert(listContainer, 'ListModel container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
         const scheduleList = await query('.schedule-list');
@@ -500,7 +500,7 @@ export class ScheduleView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
@@ -515,7 +515,7 @@ export class ScheduleView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.listMenu?.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'ListModel menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
@@ -634,7 +634,7 @@ export class ScheduleView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.items = ScheduledTransactionsList.create(this.items.map(selectItem));
+        this.items = ScheduledTransactionListModel.create(this.items.map(selectItem));
 
         return this.runTestAction(() => this.listMenu.select('selectAllBtn'));
     }
@@ -647,7 +647,7 @@ export class ScheduleView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.items = ScheduledTransactionsList.create(this.items.map(deselectItem));
+        this.items = ScheduledTransactionListModel.create(this.items.map(deselectItem));
 
         return this.runTestAction(() => this.listMenu.select('deselectAllBtn'));
     }

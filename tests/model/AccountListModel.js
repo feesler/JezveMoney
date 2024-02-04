@@ -10,7 +10,7 @@ import {
     SORT_MANUALLY,
 } from '../common.js';
 import { api } from './api.js';
-import { SortableList } from './SortableList.js';
+import { SortableListModel } from './SortableListModel.js';
 import { App } from '../Application.js';
 import { getCurrencyPrecision } from './import.js';
 import { __ } from './locale.js';
@@ -44,7 +44,10 @@ export const getAccountTypeName = (value) => {
     return __(accountTypes[type]);
 };
 
-export class AccountsList extends SortableList {
+/**
+ * Accounts list model class
+ */
+export class AccountListModel extends SortableListModel {
     /** Apply transaction to accounts */
     static applyTransaction(accounts, transaction) {
         assert.isArray(accounts, 'Invalid accounts list specified');
@@ -76,7 +79,7 @@ export class AccountsList extends SortableList {
             }
         }
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     /** Cancel transaction from accounts */
@@ -110,7 +113,7 @@ export class AccountsList extends SortableList {
             }
         }
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     async fetch() {
@@ -118,25 +121,25 @@ export class AccountsList extends SortableList {
     }
 
     createTransaction(transaction) {
-        const res = AccountsList.applyTransaction(this, transaction);
-        return AccountsList.create(res);
+        const res = AccountListModel.applyTransaction(this, transaction);
+        return AccountListModel.create(res);
     }
 
     updateTransaction(origTransaction, newTransaction) {
-        const afterCancel = AccountsList.cancelTransaction(this, origTransaction);
-        const res = AccountsList.applyTransaction(afterCancel, newTransaction);
+        const afterCancel = AccountListModel.cancelTransaction(this, origTransaction);
+        const res = AccountListModel.applyTransaction(afterCancel, newTransaction);
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     deleteTransactions(transactions) {
         const transList = asArray(transactions);
 
         const res = transList.reduce((data, transaction) => (
-            AccountsList.cancelTransaction(data, transaction)
+            AccountListModel.cancelTransaction(data, transaction)
         ), structuredClone(this));
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     /** Reset initial balances of all accounts to current values */
@@ -146,7 +149,7 @@ export class AccountsList extends SortableList {
             initbalance: account.balance,
         }));
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     /** Reset balance of all accounts to initial values */
@@ -156,7 +159,7 @@ export class AccountsList extends SortableList {
             balance: account.initbalance,
         }));
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     findByName(name, caseSens = false) {
@@ -178,13 +181,13 @@ export class AccountsList extends SortableList {
     getUserAccounts() {
         const res = this.filter((item) => item.owner_id === App.owner_id);
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     getPersonsAccounts() {
         const res = this.filter((item) => item.owner_id !== App.owner_id);
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     isHidden(account) {
@@ -196,13 +199,13 @@ export class AccountsList extends SortableList {
     getVisible() {
         const res = this.filter((item) => !this.isHidden(item));
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     getHidden() {
         const res = this.filter((item) => this.isHidden(item));
 
-        return AccountsList.create(res);
+        return AccountListModel.create(res);
     }
 
     /** Return visible user accounts */

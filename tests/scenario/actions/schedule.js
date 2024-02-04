@@ -18,7 +18,7 @@ import {
 import { App } from '../../Application.js';
 import { generateId } from '../../common.js';
 import { __ } from '../../model/locale.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../model/AccountListModel.js';
 import { ScheduleItemView } from '../../view/ScheduleItemView.js';
 
 export * from './transactionForm.js';

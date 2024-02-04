@@ -1,5 +1,5 @@
 import { App } from '../../Application.js';
-import { PERSON_HIDDEN } from '../../model/PersonsList.js';
+import { PERSON_HIDDEN } from '../../model/PersonListModel.js';
 
 export const createPersons = async () => {
     const data = {

@@ -6,7 +6,7 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../../../model/AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../../../model/AccountListModel.js';
 import { __ } from '../../../model/locale.js';
 
 const fieldSelectors = {

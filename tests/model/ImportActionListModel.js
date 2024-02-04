@@ -1,10 +1,13 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     ImportAction,
 } from './ImportAction.js';
 
-export class ImportActionList extends List {
+/**
+ * Import action list model class
+ */
+export class ImportActionListModel extends ListModel {
     /** Convert object to ImportAction */
     createItem(obj) {
         return new ImportAction(obj);
@@ -55,6 +58,6 @@ export class ImportActionList extends List {
     defaultSort() {
         const data = structuredClone(this);
         data.sort((a, b) => a.action_id - b.action_id);
-        return ImportActionList.create(data);
+        return ImportActionListModel.create(data);
     }
 }

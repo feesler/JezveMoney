@@ -428,7 +428,7 @@ export class SettingsView extends AppView {
     async openCurrenciesListMenu() {
         await this.showUserCurrenciesTab();
 
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();

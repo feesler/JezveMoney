@@ -1,14 +1,16 @@
 import { assert } from '@jezvejs/assert';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
-import { TransactionsList } from './TransactionsList.js';
+import { TransactionListModel } from './TransactionListModel.js';
 import { App } from '../Application.js';
 import { timeToSeconds } from '../common.js';
 import { REMINDER_UPCOMING } from './Reminder.js';
-import { RemindersList } from './RemindersList.js';
+import { ReminderListModel } from './ReminderListModel.js';
 
-/** List of scheduled transactions */
-export class ScheduledTransactionsList extends List {
+/**
+ * Scheduled transactions list model class
+ */
+export class ScheduledTransactionListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj
@@ -31,23 +33,23 @@ export class ScheduledTransactionsList extends List {
 
     /** Returns expected list of scheduled transactions after update specified account */
     updateAccount(accList, account) {
-        const res = TransactionsList.onUpdateAccount(this, accList, account);
+        const res = TransactionListModel.onUpdateAccount(this, accList, account);
 
-        return ScheduledTransactionsList.create(res);
+        return ScheduledTransactionListModel.create(res);
     }
 
     /** Returns expected list of scheduled transactions after delete specified accounts */
     deleteAccounts(accList, ids) {
-        const res = TransactionsList.onDeleteAccounts(this, accList, ids);
+        const res = TransactionListModel.onDeleteAccounts(this, accList, ids);
 
-        return ScheduledTransactionsList.create(res);
+        return ScheduledTransactionListModel.create(res);
     }
 
     /** Returns expected list of transactions after delete specified categories */
     deleteCategories(ids) {
-        const res = TransactionsList.onDeleteCategories(this, ids);
+        const res = TransactionListModel.onDeleteCategories(this, ids);
 
-        return ScheduledTransactionsList.create(res);
+        return ScheduledTransactionListModel.create(res);
     }
 
     getExpectedPages(list, limit) {
@@ -76,7 +78,7 @@ export class ScheduledTransactionsList extends List {
             return this;
         }
 
-        return ScheduledTransactionsList.create(items);
+        return ScheduledTransactionListModel.create(items);
     }
 
     sortItems(list, desc = false) {
@@ -137,7 +139,7 @@ export class ScheduledTransactionsList extends List {
             });
         });
 
-        const list = RemindersList.create(res);
+        const list = ReminderListModel.create(res);
         list.defaultSort(false);
 
         return list;

@@ -1,8 +1,11 @@
 import { asArray } from '@jezvejs/types';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { ImportTemplate } from './ImportTemplate.js';
 
-export class ImportTemplateList extends List {
+/**
+ * Import template list model class
+ */
+export class ImportTemplateListModel extends ListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj

@@ -7,7 +7,7 @@ import {
     evaluate,
 } from 'jezve-test';
 import { Button, LinkMenu, Paginator } from 'jezvejs-test';
-import { TransactionRemindersList } from './TransactionRemindersList.js';
+import { ReminderList } from './ReminderList.js';
 import { DatePickerFilter } from '../Fields/DatePickerFilter.js';
 import { App } from '../../../Application.js';
 import {
@@ -16,7 +16,7 @@ import {
 } from '../../../model/Reminder.js';
 import { Counter } from '../Counter.js';
 import { dateToSeconds } from '../../../common.js';
-import { RemindersList } from '../../../model/RemindersList.js';
+import { ReminderListModel } from '../../../model/ReminderListModel.js';
 
 /**
  * Select reminder dialog test component
@@ -114,7 +114,7 @@ export class SelectReminderDialog extends TestComponent {
             items = pageItems;
         }
 
-        return TransactionRemindersList.render(items, state);
+        return ReminderList.render(items, state);
     }
 
     static getFilteredItems(model, state = App.state) {
@@ -136,7 +136,7 @@ export class SelectReminderDialog extends TestComponent {
             }
 
             const upcoming = state.getUpcomingReminders(params);
-            sourceItems = RemindersList.create(upcoming.items);
+            sourceItems = ReminderListModel.create(upcoming.items);
             sourceItems.defaultSort(false);
         } else {
             sourceItems = state.reminders.clone();
@@ -211,12 +211,12 @@ export class SelectReminderDialog extends TestComponent {
         res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
 
         const listContainer = await query(this.elem, '.list-container');
-        assert(listContainer, 'List container not found');
+        assert(listContainer, 'ListModel container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
         const listElem = await query(this.elem, '.reminder-list');
         assert(listElem, 'Reminders list element not found');
-        res.remindersList = await TransactionRemindersList.create(this, listElem);
+        res.remindersList = await ReminderList.create(this, listElem);
 
         [
             res.header.title,
@@ -310,7 +310,7 @@ export class SelectReminderDialog extends TestComponent {
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems, App.state);
+            const { items } = ReminderList.render(pageItems, App.state);
 
             res.list = {
                 page: 1,
@@ -370,7 +370,7 @@ export class SelectReminderDialog extends TestComponent {
         }
 
         const upcoming = state.getUpcomingReminders(params);
-        this.upcomingItems = RemindersList.create(upcoming.items);
+        this.upcomingItems = ReminderListModel.create(upcoming.items);
         this.upcomingItems.defaultSort(false);
 
         this.upcomingPagination = upcoming.pagination;
@@ -432,7 +432,7 @@ export class SelectReminderDialog extends TestComponent {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems, App.state);
+        const { items } = ReminderList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -461,7 +461,7 @@ export class SelectReminderDialog extends TestComponent {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(res.list.page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems, App.state);
+        const { items } = ReminderList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -483,7 +483,7 @@ export class SelectReminderDialog extends TestComponent {
             const range = Math.min(model.list.range, pages - page + 1);
 
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems, App.state);
+            const { items } = ReminderList.render(pageItems, App.state);
 
             res.list = {
                 page,
@@ -517,7 +517,7 @@ export class SelectReminderDialog extends TestComponent {
 
     setSourceItems(items, model = this.model) {
         const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
-        const list = RemindersList.create(items);
+        const list = ReminderListModel.create(items);
 
         if (isUpcoming) {
             this.upcomingItems = list;

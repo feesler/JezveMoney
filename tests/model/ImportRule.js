@@ -8,8 +8,8 @@ import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_STRING_NOT_INCLUDES,
 } from './ImportCondition.js';
-import { ImportConditionList } from './ImportConditionList.js';
-import { ImportActionList } from './ImportActionList.js';
+import { ImportConditionListModel } from './ImportConditionListModel.js';
+import { ImportActionListModel } from './ImportActionListModel.js';
 import { ImportConditionValidationError } from '../error/ImportConditionValidationError.js';
 import { ImportActionValidationError } from '../error/ImportActionValidationError.js';
 import { __ } from './locale.js';
@@ -30,8 +30,8 @@ export class ImportRule {
             this.id = data.id;
         }
 
-        this.conditions = ImportConditionList.create(data.conditions);
-        this.actions = ImportActionList.create(data.actions);
+        this.conditions = ImportConditionListModel.create(data.conditions);
+        this.actions = ImportActionListModel.create(data.actions);
     }
 
     /** Convert ImportRule instance to object */
@@ -77,9 +77,9 @@ export class ImportRule {
             return result;
         }
 
-        const notEqConds = new ImportConditionList();
-        const lessConds = new ImportConditionList();
-        const greaterConds = new ImportConditionList();
+        const notEqConds = new ImportConditionListModel();
+        const lessConds = new ImportConditionListModel();
+        const greaterConds = new ImportConditionListModel();
 
         try {
             this.conditions.forEach((condition, ind) => {

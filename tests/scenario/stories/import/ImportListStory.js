@@ -184,7 +184,7 @@ export class ImportListStory extends TestStory {
     }
 
     async listModes() {
-        setBlock('List modes', 1);
+        setBlock('ListModel modes', 1);
 
         const { cardFile } = App.scenario;
         await Actions.uploadFile(cardFile);
@@ -194,7 +194,7 @@ export class ImportListStory extends TestStory {
         await Actions.toggleSelectItems([0, 1]);
         await Actions.setListMode();
 
-        setBlock('List items select', 2);
+        setBlock('ListModel items select', 2);
         await Actions.toggleSelectItems([0, 1]);
         await Actions.toggleSelectItems([0, 1]);
 

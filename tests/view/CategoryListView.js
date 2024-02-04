@@ -27,14 +27,14 @@ import {
     SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
     SORT_MANUALLY,
 } from '../common.js';
-import { CategoryList } from '../model/CategoryList.js';
+import { CategoryListModel } from '../model/CategoryListModel.js';
 
 const listMenuSelector = '#listMenu';
 
 const ANY_TYPE = 0;
 const transTypes = [...Transaction.availTypes.map((type) => parseInt(type, 10)), ANY_TYPE];
 
-/** List of categories view class */
+/** ListModel of categories view class */
 export class CategoryListView extends AppView {
     static getExpectedState(model = this.model, state = App.state) {
         const itemsCount = state.categories.length;
@@ -79,7 +79,7 @@ export class CategoryListView extends AppView {
         res.sections = (categories.length > 0)
             ? transTypes.map((type) => {
                 const typeItems = categories.filter((item) => item.type === type);
-                const items = CategoryList.create(typeItems);
+                const items = CategoryListModel.create(typeItems);
                 items.sortBy(sortMode);
 
                 const mainCategories = items.findByParent(0);
@@ -528,7 +528,7 @@ export class CategoryListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();

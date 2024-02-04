@@ -31,19 +31,19 @@ import { ImportRule } from './ImportRule.js';
 import {
     ACCOUNT_HIDDEN,
     ACCOUNT_TYPE_CREDIT_CARD,
-    AccountsList,
+    AccountListModel,
     accountTypes,
-} from './AccountsList.js';
-import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
-import { TransactionsList } from './TransactionsList.js';
-import { ImportRuleList } from './ImportRuleList.js';
-import { ImportTemplateList } from './ImportTemplateList.js';
+} from './AccountListModel.js';
+import { PERSON_HIDDEN, PersonListModel } from './PersonListModel.js';
+import { TransactionListModel } from './TransactionListModel.js';
+import { ImportRuleListModel } from './ImportRuleListModel.js';
+import { ImportTemplateListModel } from './ImportTemplateListModel.js';
 import { api } from './api.js';
-import { CategoryList } from './CategoryList.js';
-import { UserCurrencyList } from './UserCurrencyList.js';
-import { ScheduledTransactionsList } from './ScheduledTransactionsList.js';
+import { CategoryListModel } from './CategoryListModel.js';
+import { UserCurrencyListModel } from './UserCurrencyListModel.js';
+import { ScheduledTransactionListModel } from './ScheduledTransactionListModel.js';
 import { ScheduledTransaction } from './ScheduledTransaction.js';
-import { RemindersList } from './RemindersList.js';
+import { ReminderListModel } from './ReminderListModel.js';
 import {
     REMINDER_CANCELLED,
     REMINDER_CONFIRMED,
@@ -116,7 +116,7 @@ export class AppState {
         this.profile = structuredClone(state.profile);
 
         if (!this.accounts) {
-            this.accounts = AccountsList.create();
+            this.accounts = AccountListModel.create();
         }
 
         const accounts = state.accounts?.data ?? state.accounts;
@@ -126,7 +126,7 @@ export class AppState {
         this.sortAccounts();
 
         if (!this.persons) {
-            this.persons = PersonsList.create();
+            this.persons = PersonListModel.create();
         }
 
         const persons = state.persons?.data ?? state.persons;
@@ -136,7 +136,7 @@ export class AppState {
         this.sortPersons();
 
         if (!this.transactions) {
-            this.transactions = TransactionsList.create();
+            this.transactions = TransactionListModel.create();
         }
         const transactions = state.transactions?.items ?? state.transactions;
         this.transactions.setData(transactions);
@@ -144,21 +144,21 @@ export class AppState {
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.schedule) {
-            this.schedule = ScheduledTransactionsList.create();
+            this.schedule = ScheduledTransactionListModel.create();
         }
         const schedule = state.schedule?.data ?? state.schedule;
         this.schedule.setData(schedule);
         this.schedule.autoincrement = state.schedule.autoincrement;
 
         if (!this.reminders) {
-            this.reminders = RemindersList.create();
+            this.reminders = ReminderListModel.create();
         }
         const reminders = state.reminders?.data ?? state.reminders;
         this.reminders.setData(reminders);
         this.reminders.autoincrement = state.reminders.autoincrement;
 
         if (!this.categories) {
-            this.categories = CategoryList.create();
+            this.categories = CategoryListModel.create();
         }
         const categories = state.categories?.data ?? state.categories;
         this.categories.setData(categories);
@@ -166,21 +166,21 @@ export class AppState {
         this.sortCategories();
 
         if (!this.templates) {
-            this.templates = ImportTemplateList.create();
+            this.templates = ImportTemplateListModel.create();
         }
         const templates = state.importtemplates ?? state.templates;
         this.templates.setData(templates?.data ?? templates);
         this.templates.autoincrement = templates.autoincrement;
 
         if (!this.rules) {
-            this.rules = ImportRuleList.create();
+            this.rules = ImportRuleListModel.create();
         }
         const rules = state.importrules ?? state.rules;
         this.rules.setData(rules?.data ?? rules);
         this.rules.autoincrement = rules.autoincrement;
 
         if (!this.userCurrencies) {
-            this.userCurrencies = UserCurrencyList.create();
+            this.userCurrencies = UserCurrencyListModel.create();
         }
         const userCurrencies = state.userCurrencies?.data ?? state.userCurrencies;
         this.userCurrencies.setData(userCurrencies);
@@ -598,7 +598,7 @@ export class AppState {
         };
 
         const filtered = this.transactions.applyFilter(request);
-        let items = TransactionsList.create(filtered);
+        let items = TransactionListModel.create(filtered);
         const { onPage } = request;
         const isDesc = request.order?.toLowerCase() === 'desc';
 
@@ -1115,7 +1115,7 @@ export class AppState {
             visible.sortBy(sortMode);
             const hidden = userAccounts.getHidden();
             hidden.sortBy(sortMode);
-            this.sortedAccountsCache = AccountsList.create([
+            this.sortedAccountsCache = AccountListModel.create([
                 ...visible,
                 ...hidden,
             ]);
@@ -1417,7 +1417,7 @@ export class AppState {
             visible.sortBy(sortMode);
             const hidden = this.persons.getHidden();
             hidden.sortBy(sortMode);
-            this.sortedPersonsCache = PersonsList.create([
+            this.sortedPersonsCache = PersonListModel.create([
                 ...visible,
                 ...hidden,
             ]);
@@ -1695,7 +1695,7 @@ export class AppState {
             const sortMode = this.getCategoriesSortMode();
             const sortedItems = transTypes.flatMap((type) => {
                 const typeItems = this.categories.filter((item) => item.type === type);
-                const items = CategoryList.create(typeItems);
+                const items = CategoryListModel.create(typeItems);
                 items.sortBy(sortMode);
 
                 const mainCategories = items.findByParent(0);
@@ -1705,7 +1705,7 @@ export class AppState {
                 });
             });
 
-            this.sortedCategoriesCache = CategoryList.create(sortedItems);
+            this.sortedCategoriesCache = CategoryListModel.create(sortedItems);
         }
 
         return this.sortedCategoriesCache;

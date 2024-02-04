@@ -1,4 +1,4 @@
-import { SortableList } from './SortableList.js';
+import { SortableListModel } from './SortableListModel.js';
 import { Category } from './Category.js';
 import {
     SORT_BY_CREATEDATE_ASC,
@@ -8,7 +8,10 @@ import {
     SORT_MANUALLY,
 } from '../common.js';
 
-export class CategoryList extends SortableList {
+/**
+ * Categories list model class
+ */
+export class CategoryListModel extends SortableListModel {
     /**
      * Create list item from specified object
      * @param {Object} obj

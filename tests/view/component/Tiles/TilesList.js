@@ -7,8 +7,8 @@ import {
     prop,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
-import { AccountsList } from '../../../model/AccountsList.js';
-import { PersonsList } from '../../../model/PersonsList.js';
+import { AccountListModel } from '../../../model/AccountListModel.js';
+import { PersonListModel } from '../../../model/PersonListModel.js';
 
 export class TilesList extends TestComponent {
     get items() {
@@ -75,7 +75,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderAccounts(accountsList, sortMode) {
-        assert.instanceOf(accountsList, AccountsList, 'Invalid data');
+        assert.instanceOf(accountsList, AccountListModel, 'Invalid data');
 
         const visibleAccounts = accountsList.getVisible();
         visibleAccounts.sortBy(sortMode);
@@ -85,7 +85,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderHiddenAccounts(accountsList, sortMode) {
-        assert.instanceOf(accountsList, AccountsList, 'Invalid data');
+        assert.instanceOf(accountsList, AccountListModel, 'Invalid data');
 
         const hiddenAccounts = accountsList.getHidden();
         hiddenAccounts.sortBy(sortMode);
@@ -95,7 +95,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderPersons(personsList, withDebts, sortMode) {
-        assert.instanceOf(personsList, PersonsList, 'Invalid data');
+        assert.instanceOf(personsList, PersonListModel, 'Invalid data');
 
         const visiblePersons = personsList.getVisible();
         visiblePersons.sortBy(sortMode);
@@ -105,7 +105,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderHiddenPersons(personsList, withDebts, sortMode) {
-        assert.instanceOf(personsList, PersonsList, 'Invalid data');
+        assert.instanceOf(personsList, PersonListModel, 'Invalid data');
 
         const hiddenPersons = personsList.getHidden();
         hiddenPersons.sortBy(sortMode);

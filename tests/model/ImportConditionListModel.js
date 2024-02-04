@@ -1,5 +1,5 @@
 import { assert } from '@jezvejs/assert';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_EQUAL,
@@ -8,7 +8,10 @@ import {
     IMPORT_COND_OP_STRING_INCLUDES,
 } from './ImportCondition.js';
 
-export class ImportConditionList extends List {
+/**
+ * Import condition list model class
+ */
+export class ImportConditionListModel extends ListModel {
     /** Convert object to ImportCondition */
     createItem(obj) {
         return new ImportCondition(obj);

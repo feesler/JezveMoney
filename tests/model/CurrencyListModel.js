@@ -1,10 +1,13 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
 import { Currency } from './Currency.js';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { api } from './api.js';
 
-export class CurrencyList extends List {
+/**
+ * Currencies list model class
+ */
+export class CurrencyListModel extends ListModel {
     static async create() {
         const data = await api.currency.list();
         return super.create(data);

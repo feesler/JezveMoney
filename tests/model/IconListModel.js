@@ -1,8 +1,11 @@
 import { Icon } from './Icon.js';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { api } from './api.js';
 
-export class IconsList extends List {
+/**
+ * Icons list model class
+ */
+export class IconListModel extends ListModel {
     static async create() {
         const data = await api.icon.list();
         return super.create(data);

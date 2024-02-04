@@ -53,7 +53,7 @@ import { ReminderField } from '../Fields/ReminderField.js';
 import { SelectReminderDialog } from '../Reminder/SelectReminderDialog.js';
 import { REMINDER_ACTIVE } from '../../../model/Reminder.js';
 import { getCurrencyPrecision } from '../../../model/import.js';
-import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountsList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD } from '../../../model/AccountListModel.js';
 
 export const TRANSACTION_FORM = 'transaction';
 export const SCHEDULE_ITEM_FORM = 'scheduleItem';

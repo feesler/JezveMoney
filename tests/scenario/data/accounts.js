@@ -6,7 +6,7 @@ import {
     ACCOUNT_TYPE_CREDIT_CARD,
     ACCOUNT_TYPE_DEBIT_CARD,
     ACCOUNT_TYPE_OTHER,
-} from '../../model/AccountsList.js';
+} from '../../model/AccountListModel.js';
 
 export const createAccounts = async () => {
     const {

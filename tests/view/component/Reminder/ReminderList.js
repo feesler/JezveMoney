@@ -9,7 +9,10 @@ import {
 import { RemindersListItem } from './RemindersListItem.js';
 import { RemindersListGroup } from './RemindersListGroup.js';
 
-export class TransactionRemindersList extends TestComponent {
+/**
+ * Reminders list test component
+ */
+export class ReminderList extends TestComponent {
     static render(data, state) {
         assert.isArray(data);
 
