@@ -23,6 +23,10 @@ class Logs extends AdminController
             "contents" => Logger::read(),
         ];
 
+        $data["appProps"] = [
+            "profile" => $this->getProfileData(),
+        ];
+
         $this->initResources("AdminLogsView");
         $this->render($data);
     }

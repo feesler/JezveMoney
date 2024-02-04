@@ -170,6 +170,7 @@ class StatisticsView extends AppView {
             setActiveCategory: (value) => this.dispatch(actions.toggleActivateChartCategory(value)),
             setLegendCategories: (value) => this.dispatch(actions.setLegendCategories(value)),
             toggleExpandLegend: () => this.dispatch(actions.toggleExpandLegend()),
+            scrollDone: () => this.dispatch(actions.setRenderTime()),
             components: {
                 Legend: ChartLegend,
             },
@@ -393,13 +394,20 @@ class StatisticsView extends AppView {
 
         if (!aborted) {
             this.stopLoading();
-            this.dispatch(actions.setRenderTime());
         }
     }
 
     /** Returns content of chart popup for specified target */
     renderPopupContent(target) {
         const state = this.store.getState();
+        if (state.loading) {
+            return null;
+        }
+
+        if (!target?.group?.[0]?.elem?.parentNode) {
+            return null;
+        }
+
         return ChartPopup.fromTarget(target, {
             filter: state.filter,
             formatValue: (value) => formatValue(value, state),
@@ -420,6 +428,7 @@ class StatisticsView extends AppView {
 
     renderLegend(items, state) {
         const categories = asArray(items);
+        const { filter } = state.data;
 
         this.notifyEvent('setLegendCategories', categories);
 
@@ -427,12 +436,14 @@ class StatisticsView extends AppView {
             const Legend = ChartLegend;
             this.legend = Legend.create({
                 ...state,
+                filter,
                 categories,
             });
         } else {
             this.legend.setState((legendState) => ({
                 ...legendState,
                 ...state,
+                filter,
                 categories,
             }));
         }
@@ -442,8 +453,9 @@ class StatisticsView extends AppView {
 
     renderHistogram(state, prevState = {}) {
         if (
-            state.chartData === prevState.chartData
-            && state.filter?.report === prevState.filter?.report
+            state.loading === prevState.loading
+            && state.chartData === prevState.chartData
+            && state.filter === prevState.filter
             && state.activeCategory === prevState.activeCategory
             && state.expandedLegend === prevState.expandedLegend
         ) {
@@ -456,19 +468,33 @@ class StatisticsView extends AppView {
         this.noDataMessage.show(state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
 
-        if (!noData && state.filter !== prevState.filter) {
+        // Hide popup if loading or data changed
+        if (
+            state.loading
+            || state.chartData !== prevState.chartData
+            || state.filter !== prevState.filter
+        ) {
             this.histogram.setState((chartState) => ({
                 ...chartState,
+                activeTarget: null,
+                popupTarget: null,
+                pinnedTarget: null,
+                activeCategory: null,
+                animateNow: false,
                 filter: state.filter,
                 expandedLegend: state.expandedLegend,
             }));
         }
 
-        if (state.chartData !== prevState.chartData) {
+        if (
+            state.chartData !== prevState.chartData
+            || state.filter !== prevState.filter
+        ) {
             const data = (noData)
                 ? { values: [], series: [] }
                 : state.chartData;
             data.stacked = isStackedData(state.filter);
+            data.filter = { ...state.filter };
 
             this.histogram.setData(data);
         }

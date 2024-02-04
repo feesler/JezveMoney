@@ -101,7 +101,7 @@ export class Heading extends Component {
 
     createObserver() {
         const options = {
-            root: null,
+            root: document,
             rootMargin: '-50px',
             threshold: 0,
         };

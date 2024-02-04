@@ -448,6 +448,7 @@ export class StatisticsView extends AppView {
             await this.parse();
             return (
                 !this.model.filtersAnimation
+                && !this.model.chart.animation
                 && this.model.filtersVisible === expectedVisibility
             );
         });
@@ -462,11 +463,10 @@ export class StatisticsView extends AppView {
 
         const model = this.cloneModel();
         model.filtersVisible = true;
-        const expected = this.getExpectedState(model);
 
         await this.waitForAnimation(() => this.filtersBtn.click(), model);
 
-        return this.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async closeFilters() {
@@ -476,16 +476,15 @@ export class StatisticsView extends AppView {
 
         const model = this.cloneModel();
         model.filtersVisible = false;
-        const expected = this.getExpectedState(model);
 
         const { closeFiltersBtn } = this.content;
         if (closeFiltersBtn.visible) {
-            await this.waitForAnimation(() => click(closeFiltersBtn.elem), model);
+            await this.waitForAnimation(() => click(this.content.closeFiltersBtn.elem), model);
         } else {
             await this.waitForAnimation(() => this.filtersBtn.click(), model);
         }
 
-        return this.checkState(expected);
+        return App.view.checkFixedState(model);
     }
 
     async filterByType(value) {

@@ -12,6 +12,7 @@ const defaultProps = {
     title: null,
     content: null,
     tagName: 'div',
+    titleTagName: 'label',
 };
 
 /**
@@ -37,7 +38,13 @@ export class Field extends Component {
     }
 
     init() {
-        this.titleElem = createElement('label', { props: { className: TITLE_CLASS } });
+        const { titleTagName } = this.props;
+        if (typeof titleTagName !== 'string' || titleTagName.length === 0) {
+            throw new Error('Invalid titleTagName property');
+        }
+
+        this.titleElem = createElement(titleTagName, { props: { className: TITLE_CLASS } });
+
         this.contentContainer = createElement('div', { props: { className: CONTENT_CLASS } });
 
         const { tagName } = this.props;

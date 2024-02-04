@@ -671,7 +671,7 @@ export class TransactionListView extends AppView {
                 const { page, range } = model.list;
                 const onPage = App.config.transactionsOnPage;
                 const pageItems = model.filtered.getPage(page, onPage, range, true);
-                const dateGroups = model.filtered.getDateGroups(pageItems);
+                const dateGroups = pageItems.getDateGroups();
                 res.transList.groups = dateGroups.map((item) => ({
                     id: item.id,
                     title: App.formatDate(secondsToDate(item.date)),
