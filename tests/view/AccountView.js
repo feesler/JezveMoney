@@ -14,7 +14,7 @@ import { InputField } from './component/Fields/InputField.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { __ } from '../model/locale.js';
-import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../model/AccountsList.js';
+import { accountTypes, ACCOUNT_TYPE_CREDIT_CARD, getAccountTypeName } from '../model/AccountListModel.js';
 
 /** Account view class */
 export class AccountView extends AppView {

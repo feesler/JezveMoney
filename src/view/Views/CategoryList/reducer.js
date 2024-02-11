@@ -9,20 +9,20 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { Category } from '../../Models/Category.js';
-import { CategoryList } from '../../Models/CategoryList.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
 import { availTransTypes } from '../../Models/Transaction.js';
 import { ANY_TYPE } from './helpers.js';
 
 /** Prepare data from categories list model for list component */
 export const createItemsFromModel = () => {
     const { categories } = App.model;
-    return CategoryList.create(categories);
+    return CategoryListModel.create(categories);
 };
 
 // Reducers
 const reduceDeselectAll = (state) => ({
     ...state,
-    items: CategoryList.create(state.items.map(reduceDeselectItem)),
+    items: CategoryListModel.create(state.items.map(reduceDeselectItem)),
 });
 
 export const selectAvailableType = (state) => {
@@ -90,12 +90,12 @@ const slice = createSlice({
 
     toggleSelectItem: (state, itemId) => ({
         ...state,
-        items: CategoryList.create(state.items.map(reduceToggleItem(itemId))),
+        items: CategoryListModel.create(state.items.map(reduceToggleItem(itemId))),
     }),
 
     selectAllItems: (state) => ({
         ...state,
-        items: CategoryList.create(state.items.map(reduceSelectItem)),
+        items: CategoryListModel.create(state.items.map(reduceSelectItem)),
     }),
 
     deselectAllItems: (state) => reduceDeselectAll(state),

@@ -1,8 +1,8 @@
 import { createSlice } from 'jezvejs/Store';
 
 import { App } from '../../Application/App.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { PersonList } from '../../Models/PersonList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
 import { getTransactionListContextIds } from './helpers.js';
 
 // Reducers
@@ -140,13 +140,13 @@ const slice = createSlice({
         transactions: data.transactions.items,
         accounts: {
             ...state.accounts,
-            visible: AccountList.create(App.model.visibleUserAccounts),
-            hidden: AccountList.create(App.model.hiddenUserAccounts),
+            visible: AccountListModel.create(App.model.visibleUserAccounts),
+            hidden: AccountListModel.create(App.model.hiddenUserAccounts),
         },
         persons: {
             ...state.persons,
-            visible: PersonList.create(App.model.visiblePersons),
-            hidden: PersonList.create(App.model.hiddenPersons),
+            visible: PersonListModel.create(App.model.visiblePersons),
+            hidden: PersonListModel.create(App.model.hiddenPersons),
         },
         chartData: data.histogram,
         transactionContextItem: null,

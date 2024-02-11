@@ -34,9 +34,9 @@ export class TransactionListStory extends TestStory {
         const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
 
         if (directNavigate) {
-            setBlock('Transaction List view: direct navigation', 1);
+            setBlock('Transaction ListModel view: direct navigation', 1);
         } else {
-            setBlock('Transaction List view: manual navigation', 1);
+            setBlock('Transaction ListModel view: manual navigation', 1);
         }
 
         await Actions.checkInitialState({ directNavigate });

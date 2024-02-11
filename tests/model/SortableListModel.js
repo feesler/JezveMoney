@@ -1,6 +1,9 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 
-export class SortableList extends List {
+/**
+ * Sortable list model class
+ */
+export class SortableListModel extends ListModel {
     create(data) {
         const item = data;
         item.pos = 0;

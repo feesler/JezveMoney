@@ -1,55 +1,50 @@
-import { assert } from '@jezvejs/assert';
-import { hasFlag } from 'jezvejs';
-import { SortableList } from './SortableList.js';
+import { ListModel } from './ListModel.js';
+import { Person } from './Person.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC,
     SORT_BY_NAME_DESC,
     SORT_MANUALLY,
-} from '../common.js';
-import { api } from './api.js';
+} from '../utils/utils.js';
 
-export const PERSON_HIDDEN = 1;
-
-export class PersonsList extends SortableList {
-    async fetch() {
-        return api.person.list();
+/**
+ * @constructor PersonListModel class
+ * @param {object[]} props - array of persons
+ */
+export class PersonListModel extends ListModel {
+    /**
+     * Create list item from specified object
+     * @param {Object} obj
+     */
+    createItem(obj) {
+        return new Person(obj);
     }
 
-    findByName(name, caseSens = false) {
-        let res;
+    /**
+     * Return list of visible Persons
+     */
+    getVisible() {
+        return this.filter((item) => item && item.isVisible());
+    }
 
-        if (caseSens) {
-            res = this.find((item) => item.name === name);
-        } else {
-            const lookupName = name.toLowerCase();
-            res = this.find((item) => item.name.toLowerCase() === lookupName);
+    /** Return list of hidden Persons */
+    getHidden() {
+        return this.filter((item) => item && !item.isVisible());
+    }
+
+    /** Search person with specified name */
+    findByName(name, caseSens = false) {
+        if (typeof name !== 'string' || name.length === 0) {
+            return null;
         }
 
-        return structuredClone(res);
-    }
-
-    isHidden(item) {
-        assert(item, 'Invalid person');
-
-        return hasFlag(item.flags, PERSON_HIDDEN);
-    }
-
-    getVisible() {
-        const res = this.filter((item) => !this.isHidden(item));
-
-        return PersonsList.create(res);
-    }
-
-    getHidden() {
-        const res = this.filter((item) => this.isHidden(item));
-
-        return PersonsList.create(res);
-    }
-
-    sortByVisibility() {
-        this.sort((a, b) => a.flags - b.flags);
+        const lookupName = (caseSens) ? name : name.toLowerCase();
+        return this.find((person) => (
+            (caseSens)
+                ? (person.name === lookupName)
+                : (person.name.toLowerCase() === lookupName)
+        ));
     }
 
     sortBy(sortMode) {

@@ -5,11 +5,13 @@ import { isSameYearMonth } from '@jezvejs/datetime';
 import { App } from '../Application.js';
 import { dateToSeconds, secondsToDate } from '../common.js';
 
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { REMINDER_ACTIVE, Reminder } from './Reminder.js';
 
-/** List of scheduled transaction reminders */
-export class RemindersList extends List {
+/**
+ * Scheduled transaction reminders list model class
+ */
+export class ReminderListModel extends ListModel {
     /**
      * Filters list of reminders and returns result
      * @param {Array} list array of Reminder objects
@@ -59,7 +61,7 @@ export class RemindersList extends List {
             date: reminder.date,
         };
 
-        const res = RemindersList.filterItems(this, options);
+        const res = ReminderListModel.filterItems(this, options);
         return res.length > 0;
     }
 
@@ -107,15 +109,15 @@ export class RemindersList extends List {
     /**
      * Filters list of reminders and returns result
      * @param {Object} params
-     * @returns RemindersList
+     * @returns ReminderListModel
      */
     applyFilter(params) {
-        const items = RemindersList.filterItems(this, params);
+        const items = ReminderListModel.filterItems(this, params);
         if (items === this) {
             return this;
         }
 
-        return RemindersList.create(items);
+        return ReminderListModel.create(items);
     }
 
     getExpectedPages(list, limit) {
@@ -148,7 +150,7 @@ export class RemindersList extends List {
             return this;
         }
 
-        return RemindersList.create(items);
+        return ReminderListModel.create(items);
     }
 
     getDateGroups() {

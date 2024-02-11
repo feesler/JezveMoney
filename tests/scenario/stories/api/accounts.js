@@ -8,7 +8,7 @@ import {
     ACCOUNT_TYPE_DEBIT_CARD,
     ACCOUNT_TYPE_CREDIT_CARD,
     ACCOUNT_TYPE_CREDIT,
-} from '../../../model/AccountsList.js';
+} from '../../../model/AccountListModel.js';
 import * as Actions from '../../actions/api/account.js';
 
 const create = async () => {

@@ -20,14 +20,14 @@ import {
     isStackedData,
 } from '../../utils/statistics.js';
 import { App } from '../../Application/App.js';
-import { API } from '../../API/index.js';
+import { APIRequest } from '../../API/APIRequest.js';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
 
 // Common components
 import { ChartLegend } from '../../Components/Common/ChartLegend/ChartLegend.js';
@@ -87,11 +87,11 @@ class StatisticsView extends AppView {
             renderTime: Date.now(),
         };
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
         App.checkUserAccountModels();
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
 
         this.store = createStore(reducer, { initialState });
@@ -371,30 +371,33 @@ class StatisticsView extends AppView {
         return res;
     }
 
-    async requestData(options) {
-        if (this.abortController) {
-            this.abortController.abort();
+    async requestData(data) {
+        if (this.dataRequest) {
+            this.dataRequest.cancel();
         }
-        this.abortController = new AbortController();
-        const { signal } = this.abortController;
-        let aborted = false;
 
         this.startLoading();
 
         try {
-            const result = await API.transaction.statistics(options, { signal });
+            this.dataRequest = APIRequest.createGet({
+                path: 'transaction/statistics',
+                cancelable: true,
+                data,
+            });
+            const result = await this.dataRequest.send();
+            if (result === null) {
+                this.dataRequest = null;
+                return;
+            }
+
             this.dispatch(actions.dataRequestLoaded(result.data));
         } catch (e) {
-            aborted = e.name === 'AbortError';
-            if (!aborted) {
-                App.createErrorNotification(e.message);
-                this.dispatch(actions.dataRequestError());
-            }
+            App.createErrorNotification(e.message);
+            this.dispatch(actions.dataRequestError());
         }
 
-        if (!aborted) {
-            this.stopLoading();
-        }
+        this.stopLoading();
+        this.dataRequest = null;
     }
 
     /** Returns content of chart popup for specified target */

@@ -20,8 +20,8 @@ import {
     Transaction,
     LIMIT_CHANGE,
 } from './Transaction.js';
-import { ACCOUNT_TYPE_CREDIT_CARD, AccountsList } from './AccountsList.js';
-import { SortableList } from './SortableList.js';
+import { ACCOUNT_TYPE_CREDIT_CARD, AccountListModel } from './AccountListModel.js';
+import { SortableListModel } from './SortableListModel.js';
 import { __ } from './locale.js';
 
 const WEEKS_IN_YEAR = 52;
@@ -36,7 +36,10 @@ const defaultReportType = 'category';
 const defaultTransactionType = EXPENSE;
 const defaultGroupType = 'week';
 
-export class TransactionsList extends SortableList {
+/**
+ * Transactions list model class
+ */
+export class TransactionListModel extends SortableListModel {
     /** Returns expected list of transactions after update specified account */
     static onUpdateAccount(list, accList, account) {
         const origAcc = accList.find((item) => item.id === account.id);
@@ -239,13 +242,13 @@ export class TransactionsList extends SortableList {
     }
 
     updateResults(accountsList) {
-        assert.instanceOf(accountsList, AccountsList, 'Invalid accounts list specified');
+        assert.instanceOf(accountsList, AccountListModel, 'Invalid accounts list specified');
 
         let accounts = accountsList.toInitial();
         const list = this.sortItems(this, false);
 
         for (const trans of list) {
-            accounts = AccountsList.applyTransaction(accounts, trans);
+            accounts = AccountListModel.applyTransaction(accounts, trans);
 
             trans.src_result = 0;
             if (trans.src_id) {
@@ -286,7 +289,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsByAccounts(list, ids) {
@@ -308,7 +311,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsByCategories(list, ids) {
@@ -328,7 +331,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsByDate(list, start, end) {
@@ -357,7 +360,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsByAmount(list, min, max) {
@@ -380,7 +383,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsByQuery(list, query) {
@@ -399,7 +402,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     getItemsPage(list, num, limit, range, desc = false) {
@@ -422,7 +425,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        return TransactionsList.create(items);
+        return TransactionListModel.create(items);
     }
 
     filterItems(list, params = {}) {
@@ -478,7 +481,7 @@ export class TransactionsList extends SortableList {
             return this;
         }
 
-        const res = TransactionsList.create(items);
+        const res = TransactionListModel.create(items);
         return res;
     }
 
@@ -501,7 +504,7 @@ export class TransactionsList extends SortableList {
     sortItems(list, desc = false) {
         assert.isArray(list, 'Invalid list specified');
 
-        const res = TransactionsList.create(list);
+        const res = TransactionListModel.create(list);
 
         if (desc) {
             return res.sort((a, b) => {
@@ -528,23 +531,23 @@ export class TransactionsList extends SortableList {
 
     /** Returns expected list of transactions after update specified account */
     updateAccount(accList, account) {
-        const res = TransactionsList.onUpdateAccount(this, accList, account);
+        const res = TransactionListModel.onUpdateAccount(this, accList, account);
 
-        return TransactionsList.create(res);
+        return TransactionListModel.create(res);
     }
 
     /** Returns expected list of transactions after delete specified accounts */
     deleteAccounts(accList, ids) {
-        const res = TransactionsList.onDeleteAccounts(this, accList, ids);
+        const res = TransactionListModel.onDeleteAccounts(this, accList, ids);
 
-        return TransactionsList.create(res);
+        return TransactionListModel.create(res);
     }
 
     /** Returns expected list of transactions after delete specified categories */
     deleteCategories(ids) {
-        const res = TransactionsList.onDeleteCategories(this, ids);
+        const res = TransactionListModel.onDeleteCategories(this, ids);
 
-        return TransactionsList.create(res);
+        return TransactionListModel.create(res);
     }
 
     getDateGroups() {

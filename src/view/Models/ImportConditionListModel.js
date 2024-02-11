@@ -1,5 +1,4 @@
-import { assert } from '@jezvejs/assert';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_EQUAL,
@@ -8,8 +7,31 @@ import {
     IMPORT_COND_OP_STRING_INCLUDES,
 } from './ImportCondition.js';
 
-export class ImportConditionList extends List {
-    /** Convert object to ImportCondition */
+/**
+ * ImportConditionListModel class
+ * @param {object[]} props - array of import conditions
+ */
+export class ImportConditionListModel extends ListModel {
+    /**
+     * Search for condition for specified property with `is` (equal) operator
+     * @param {Number} field
+     */
+    static findIsCondition(conditions, fieldId) {
+        const field = parseInt(fieldId, 10);
+        if (!field) {
+            throw new Error('Invalid field id');
+        }
+
+        return conditions.find((item) => (
+            item.field_id === field
+            && item.operator === IMPORT_COND_OP_EQUAL
+        ));
+    }
+
+    /**
+     * Create list item from specified object
+     * @param {Object} obj
+     */
     createItem(obj) {
         return new ImportCondition(obj);
     }
@@ -20,7 +42,9 @@ export class ImportConditionList extends List {
      */
     getRuleConditions(ruleId) {
         const id = parseInt(ruleId, 10);
-        assert(id, 'Invalid rule id');
+        if (!id) {
+            throw new Error('Invalid rule id');
+        }
 
         return this.filter((item) => item.rule_id === id);
     }
@@ -35,15 +59,7 @@ export class ImportConditionList extends List {
      * @param {Number} field
      */
     findIsCondition(fieldId) {
-        const field = parseInt(fieldId, 10);
-        if (!field) {
-            throw new Error('Invalid field id');
-        }
-
-        return this.find((item) => (
-            item.field_id === field
-            && item.operator === IMPORT_COND_OP_EQUAL
-        ));
+        return ImportConditionListModel.findIsCondition(this, fieldId);
     }
 
     /**
@@ -84,7 +100,9 @@ export class ImportConditionList extends List {
      * @param {ImportCondition} condition
      */
     hasSameCondition(condition) {
-        assert.instanceOf(condition, ImportCondition, 'Invalid condition');
+        if (!(condition instanceof ImportCondition)) {
+            throw new Error('Invalid condition');
+        }
 
         return !!this.find((item) => (
             item !== condition
@@ -100,7 +118,9 @@ export class ImportConditionList extends List {
      * @param {ImportCondition} condition
      */
     hasSameFieldCondition(condition) {
-        assert.instanceOf(condition, ImportCondition, 'Invalid condition');
+        if (!(condition instanceof ImportCondition)) {
+            throw new Error('Invalid condition');
+        }
 
         return !!this.find((item) => (
             item !== condition
@@ -115,7 +135,9 @@ export class ImportConditionList extends List {
      * @param {ImportCondition} condition
      */
     hasNotLessCondition(condition) {
-        assert.instanceOf(condition, ImportCondition, 'Invalid rule id');
+        if (!(condition instanceof ImportCondition)) {
+            throw new Error('Invalid rule id');
+        }
 
         if (condition.isPropertyValue()) {
             return false;
@@ -136,7 +158,9 @@ export class ImportConditionList extends List {
      * @param {ImportCondition} condition
      */
     hasNotGreaterCondition(condition) {
-        assert.instanceOf(condition, ImportCondition, 'Invalid rule id');
+        if (!(condition instanceof ImportCondition)) {
+            throw new Error('Invalid rule id');
+        }
 
         if (condition.isPropertyValue()) {
             return false;
@@ -154,10 +178,12 @@ export class ImportConditionList extends List {
     /**
      * Check list of conditions has guard condition for Main account:
      * Main account not equal accountId or Main account equal not accountId
-     * @param {ImportCondition} condition
+     * @param {number} accountId
      */
     hasAccountGuardCondition(accountId) {
-        assert(accountId, 'Invalid account id');
+        if (!accountId) {
+            throw new Error('Invalid account id');
+        }
 
         return this.find((condition) => (
             condition.isAccountField()

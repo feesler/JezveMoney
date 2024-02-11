@@ -13,14 +13,14 @@ import {
     TRANSFER,
     Transaction,
 } from '../../Models/Transaction.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { IconList } from '../../Models/IconList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { UserCurrencyList } from '../../Models/UserCurrencyList.js';
-import { Schedule } from '../../Models/Schedule.js';
-import { ReminderList } from '../../Models/ReminderList.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { IconListModel } from '../../Models/IconListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { UserCurrencyListModel } from '../../Models/UserCurrencyListModel.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
+import { ReminderListModel } from '../../Models/ReminderListModel.js';
 
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -43,14 +43,14 @@ class TransactionView extends AppView {
             throw new Error('Invalid Transaction view properties');
         }
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(UserCurrencyList, 'userCurrencies', App.props.userCurrencies);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
-        App.loadModel(PersonList, 'persons', App.props.persons);
-        App.loadModel(IconList, 'icons', App.props.icons);
-        App.loadModel(CategoryList, 'categories', App.props.categories);
-        App.loadModel(Schedule, 'schedule', App.props.schedule);
-        App.loadModel(ReminderList, 'reminders', App.props.reminders);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(UserCurrencyListModel, 'userCurrencies', App.props.userCurrencies);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
+        App.loadModel(IconListModel, 'icons', App.props.icons);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
+        App.loadModel(ScheduledTransactionListModel, 'schedule', App.props.schedule);
+        App.loadModel(ReminderListModel, 'reminders', App.props.reminders);
         App.initCategoriesModel();
 
         const accountModel = App.model.accounts;

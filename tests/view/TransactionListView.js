@@ -30,7 +30,7 @@ import {
     trimToDigitsLimit,
 } from '../common.js';
 
-import { TransactionsList } from '../model/TransactionsList.js';
+import { TransactionListModel } from '../model/TransactionListModel.js';
 
 import { AmountRangeFilter } from './component/Fields/AmountRangeFilter.js';
 import { Counter } from './component/Counter.js';
@@ -47,7 +47,7 @@ const listMenuSelector = '#listMenu';
 const categoryDialogSelector = '#selectCategoryDialog';
 const exportDialogSelector = '.export-dialog';
 
-/** List of transactions view class */
+/** ListModel of transactions view class */
 export class TransactionListView extends AppView {
     get filterSelect() {
         return this.content.filterSelect;
@@ -125,7 +125,7 @@ export class TransactionListView extends AppView {
         assert(res.searchForm, 'Search form not found');
 
         const listContainer = await query('.list-container');
-        assert(listContainer, 'List container not found');
+        assert(listContainer, 'ListModel container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
         res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
@@ -134,7 +134,7 @@ export class TransactionListView extends AppView {
         res.showMoreSpinner = { elem: await query('.list-footer .request-spinner') };
 
         const transList = await query('.trans-list');
-        assert(transList, 'List of transactions not found');
+        assert(transList, 'ListModel of transactions not found');
         res.transList = await TransactionList.create(this, transList);
 
         res.itemInfo = await TransactionDetails.create(
@@ -220,7 +220,7 @@ export class TransactionListView extends AppView {
         }
 
         res.filtered = res.data.applyFilter(res.filter);
-        res.filtered = TransactionsList.create(res.filtered);
+        res.filtered = TransactionListModel.create(res.filtered);
 
         if (cont.paginator && cont.transList) {
             const items = cont.transList.getItems();
@@ -296,7 +296,7 @@ export class TransactionListView extends AppView {
         const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
-        res.filtered = TransactionsList.create(res.filtered);
+        res.filtered = TransactionListModel.create(res.filtered);
         if (res.filtered.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = res.filtered.getPage(1, onPage, range, true);
@@ -446,7 +446,7 @@ export class TransactionListView extends AppView {
         const range = 1;
 
         res.filtered = res.data.applyFilter(res.filter);
-        res.filtered = TransactionsList.create(res.filtered);
+        res.filtered = TransactionListModel.create(res.filtered);
         res.list.page = page;
         res.list.range = range;
         const pageItems = res.filtered.getPage(page, onPage, range, true);
@@ -474,7 +474,7 @@ export class TransactionListView extends AppView {
         const onPage = App.config.transactionsOnPage;
 
         res.filtered = res.data.applyFilter(res.filter);
-        res.filtered = TransactionsList.create(res.filtered);
+        res.filtered = TransactionListModel.create(res.filtered);
         res.list.range = range;
         const pageItems = res.filtered.getPage(model.list.page, onPage, range, true);
 
@@ -722,7 +722,7 @@ export class TransactionListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         await this.closeFilters();
 
@@ -736,7 +736,7 @@ export class TransactionListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.listMenu?.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'ListModel menu not opened');
 
         this.model.listMenuVisible = false;
 

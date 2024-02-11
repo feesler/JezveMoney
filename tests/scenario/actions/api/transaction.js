@@ -5,7 +5,7 @@ import { ApiRequestError } from '../../../error/ApiRequestError.js';
 import { Transaction } from '../../../model/Transaction.js';
 import { formatProps } from '../../../common.js';
 import { App } from '../../../Application.js';
-import { TransactionsList } from '../../../model/TransactionsList.js';
+import { TransactionListModel } from '../../../model/TransactionListModel.js';
 
 /**
  * Create transaction with specified params and check expected state of app
@@ -198,7 +198,7 @@ export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
-        expTransList = TransactionsList.create(expTransList);
+        expTransList = TransactionListModel.create(expTransList);
 
         const isDesc = params.order?.toLowerCase() === 'desc';
         const onPage = params?.onPage ?? App.config.transactionsOnPage;

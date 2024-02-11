@@ -29,7 +29,7 @@ import { ExportDialog } from './component/ExportDialog.js';
 const listMenuSelector = '#listMenu';
 const exportDialogSelector = '.export-dialog';
 
-/** List of persons view class */
+/** ListModel of persons view class */
 export class PersonListView extends AppView {
     static getExpectedState(model, state = App.state) {
         const sortMode = state.getPersonsSortMode();
@@ -391,7 +391,7 @@ export class PersonListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         this.model.listMenuVisible = true;
         const expected = this.getExpectedState();
@@ -406,7 +406,7 @@ export class PersonListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.listMenu?.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'ListModel menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();

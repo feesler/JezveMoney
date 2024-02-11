@@ -11,7 +11,7 @@ import { PersonListView } from '../../view/PersonListView.js';
 import { PersonView } from '../../view/PersonView.js';
 import { App } from '../../Application.js';
 import { __ } from '../../model/locale.js';
-import { TransactionsList } from '../../model/TransactionsList.js';
+import { TransactionListModel } from '../../model/TransactionListModel.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {
@@ -183,7 +183,7 @@ export const exportTest = async (persons) => {
 
         const ids = App.state.getSortedPersonsByIndexes(itemIds, true);
         let transactions = App.state.transactions.applyFilter({ persons: ids });
-        transactions = TransactionsList.create(transactions);
+        transactions = TransactionListModel.create(transactions);
         const expectedContent = transactions.exportToCSV();
 
         const content = await App.view.exportPersons(itemIds);

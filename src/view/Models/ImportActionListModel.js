@@ -1,4 +1,4 @@
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -8,7 +8,7 @@ import {
  * Import actions list class
  * @param {object[]} props - array of import action
  */
-export class ImportActionList extends List {
+export class ImportActionListModel extends ListModel {
     /** Check list has specified action type */
     static findAction(actions, action) {
         const actionType = parseInt(action, 10);
@@ -81,26 +81,26 @@ export class ImportActionList extends List {
 
     /** Check list has specified action type */
     findAction(action) {
-        return ImportActionList.findAction(this, action);
+        return ImportActionListModel.findAction(this, action);
     }
 
     /** Check list has specified action type */
     hasAction(action) {
-        return ImportActionList.hasAction(this, action);
+        return ImportActionListModel.hasAction(this, action);
     }
 
     /** Check list has `Set transaction type` action with 'transfer_out' or 'transfer_in' value */
     hasSetTransfer() {
-        return ImportActionList.hasSetTransfer(this);
+        return ImportActionListModel.hasSetTransfer(this);
     }
 
     /** Check list has `Set transaction type` action with 'debt_out' or 'debt_in' value */
     hasSetDebt() {
-        return ImportActionList.hasSetDebt(this);
+        return ImportActionListModel.hasSetDebt(this);
     }
 
     defaultSort() {
-        const sorted = ImportActionList.sort(this);
-        return ImportActionList.create(sorted);
+        const sorted = ImportActionListModel.sort(this);
+        return ImportActionListModel.create(sorted);
     }
 }

@@ -1,8 +1,11 @@
 import { asArray } from '@jezvejs/types';
-import { List } from './List.js';
+import { ListModel } from './ListModel.js';
 import { ImportRule } from './ImportRule.js';
 
-export class ImportRuleList extends List {
+/**
+ * Import rules list model class
+ */
+export class ImportRuleListModel extends ListModel {
     createItem(obj) {
         return new ImportRule(obj);
     }

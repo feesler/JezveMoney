@@ -28,11 +28,11 @@ import '../../Application/Application.scss';
 import { AppView } from '../../Components/Layout/AppView/AppView.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { IconList } from '../../Models/IconList.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { IconListModel } from '../../Models/IconListModel.js';
 
 // Common components
 import { AccountTile } from '../../Components/Common/AccountTile/AccountTile.js';
@@ -61,25 +61,25 @@ class MainView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
         App.checkUserAccountModels();
-        App.loadModel(PersonList, 'persons', App.props.persons);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
         App.checkPersonModels();
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
-        App.loadModel(IconList, 'icons', App.props.icons);
+        App.loadModel(IconListModel, 'icons', App.props.icons);
 
         const initialState = {
             transactions: [...this.props.transactions],
             accounts: {
-                visible: AccountList.create(App.model.visibleUserAccounts),
-                hidden: AccountList.create(App.model.hiddenUserAccounts),
+                visible: AccountListModel.create(App.model.visibleUserAccounts),
+                hidden: AccountListModel.create(App.model.hiddenUserAccounts),
                 showHidden: false,
             },
             persons: {
-                visible: PersonList.create(App.model.visiblePersons),
-                hidden: PersonList.create(App.model.hiddenPersons),
+                visible: PersonListModel.create(App.model.visiblePersons),
+                hidden: PersonListModel.create(App.model.hiddenPersons),
                 showHidden: false,
             },
             categoryDialog: {

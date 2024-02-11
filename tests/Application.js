@@ -27,9 +27,9 @@ import {
 
 import { api } from './model/api.js';
 import { AppState } from './model/AppState.js';
-import { ColorsList } from './model/ColorsList.js';
-import { CurrencyList } from './model/CurrencyList.js';
-import { IconsList } from './model/IconsList.js';
+import { ColorListModel } from './model/ColorListModel.js';
+import { CurrencyListModel } from './model/CurrencyListModel.js';
+import { IconListModel } from './model/IconListModel.js';
 
 import { Scenario } from './scenario/index.js';
 
@@ -191,9 +191,9 @@ class Application extends TestApplication {
 
         await this.updateTimezone();
 
-        this.currency = await CurrencyList.create();
-        this.icons = await IconsList.create();
-        this.colors = await ColorsList.create();
+        this.currency = await CurrencyListModel.create();
+        this.icons = await IconListModel.create();
+        this.colors = await ColorListModel.create();
     }
 
     async updateTimezone() {

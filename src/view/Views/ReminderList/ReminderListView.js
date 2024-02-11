@@ -11,16 +11,16 @@ import { AppView } from '../../Components/Layout/AppView/AppView.js';
 import { __, formatDateRange } from '../../utils/utils.js';
 
 // Models
-import { CurrencyList } from '../../Models/CurrencyList.js';
-import { AccountList } from '../../Models/AccountList.js';
-import { PersonList } from '../../Models/PersonList.js';
-import { CategoryList } from '../../Models/CategoryList.js';
-import { Schedule } from '../../Models/Schedule.js';
+import { CurrencyListModel } from '../../Models/CurrencyListModel.js';
+import { AccountListModel } from '../../Models/AccountListModel.js';
+import { PersonListModel } from '../../Models/PersonListModel.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
 import {
     REMINDER_ACTIVE,
     Reminder,
 } from '../../Models/Reminder.js';
-import { ReminderList } from '../../Models/ReminderList.js';
+import { ReminderListModel } from '../../Models/ReminderListModel.js';
 
 // Common components
 import { Heading } from '../../Components/Layout/Heading/Heading.js';
@@ -44,12 +44,12 @@ class ReminderListView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CurrencyList, 'currency', App.props.currency);
-        App.loadModel(AccountList, 'accounts', App.props.accounts);
-        App.loadModel(PersonList, 'persons', App.props.persons);
-        App.loadModel(CategoryList, 'categories', App.props.categories);
-        App.loadModel(Schedule, 'schedule', App.props.schedule);
-        App.loadModel(ReminderList, 'reminders', App.props.reminders);
+        App.loadModel(CurrencyListModel, 'currency', App.props.currency);
+        App.loadModel(AccountListModel, 'accounts', App.props.accounts);
+        App.loadModel(PersonListModel, 'persons', App.props.persons);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
+        App.loadModel(ScheduledTransactionListModel, 'schedule', App.props.schedule);
+        App.loadModel(ReminderListModel, 'reminders', App.props.reminders);
 
         const filter = this.props.filter ?? {};
 

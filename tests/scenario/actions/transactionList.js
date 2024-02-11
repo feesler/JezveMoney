@@ -9,7 +9,7 @@ import { App } from '../../Application.js';
 import { TransactionListView } from '../../view/TransactionListView.js';
 import { Transaction } from '../../model/Transaction.js';
 import { TransactionList } from '../../view/component/TransactionList/TransactionList.js';
-import { TransactionsList } from '../../model/TransactionsList.js';
+import { TransactionListModel } from '../../model/TransactionListModel.js';
 
 /** Navigate to transactions list page */
 const checkNavigation = async () => {
@@ -486,7 +486,7 @@ export const exportTest = async () => {
         await checkNavigation();
 
         let transactions = App.state.transactions.applyFilter(App.view.model.filter);
-        transactions = TransactionsList.create(transactions);
+        transactions = TransactionListModel.create(transactions);
         const expectedContent = transactions.exportToCSV();
 
         const content = await App.view.exportTransactions();

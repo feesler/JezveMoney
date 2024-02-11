@@ -109,7 +109,7 @@ export class ImportAction {
         [IMPORT_ACTION_SET_CATEGORY]: 'setCategory',
     };
 
-    /** List of action types requires select value from list */
+    /** ListModel of action types requires select value from list */
     static selectActions = [
         IMPORT_ACTION_SET_TR_TYPE,
         IMPORT_ACTION_SET_ACCOUNT,
@@ -117,7 +117,7 @@ export class ImportAction {
         IMPORT_ACTION_SET_CATEGORY,
     ];
 
-    /** List of action types requires amount value */
+    /** ListModel of action types requires amount value */
     static amountActions = [
         IMPORT_ACTION_SET_SRC_AMOUNT,
         IMPORT_ACTION_SET_DEST_AMOUNT,

@@ -95,7 +95,7 @@ const stringOperators = [
     ConditionOperators.greater,
 ];
 
-/** List of available field types */
+/** ListModel of available field types */
 const fieldTypes = [
     { id: ConditionFields.mainAccount, titleToken: 'import.mainAccount', operators: itemOperators },
     { id: ConditionFields.template, titleToken: 'import.templates.title', operators: itemOperators },
@@ -145,7 +145,7 @@ const operatorNames = {
     [ConditionOperators.greater]: 'greater',
 };
 
-/** List of available condition operator types */
+/** ListModel of available condition operator types */
 const operatorTypes = [
     { id: ConditionOperators.includes, titleToken: 'import.conditions.opInline.includes' },
     { id: ConditionOperators.notIncludes, titleToken: 'import.conditions.opInline.notIncludes' },

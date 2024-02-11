@@ -18,7 +18,7 @@ import {
 
 // Models
 import { Category } from '../../Models/Category.js';
-import { CategoryList } from '../../Models/CategoryList.js';
+import { CategoryListModel } from '../../Models/CategoryListModel.js';
 import { Transaction, availTransTypes } from '../../Models/Transaction.js';
 
 // Common components
@@ -60,7 +60,7 @@ class CategoryListView extends AppView {
     constructor(...args) {
         super(...args);
 
-        App.loadModel(CategoryList, 'categories', App.props.categories);
+        App.loadModel(CategoryListModel, 'categories', App.props.categories);
         App.initCategoriesModel();
 
         const { settings } = App.model.profile;
@@ -489,9 +489,9 @@ class CategoryListView extends AppView {
             return;
         }
 
-        const categories = CategoryList.create(state.items);
+        const categories = CategoryListModel.create(state.items);
         categories.sortBy(state.sortMode);
-        const mainCategories = CategoryList.create(categories.findByParent(0));
+        const mainCategories = CategoryListModel.create(categories.findByParent(0));
         mainCategories.forEach((item) => {
             const children = categories.findByParent(item.id);
             item.setChildren(children);

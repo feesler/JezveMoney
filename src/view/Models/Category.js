@@ -1,5 +1,5 @@
 import { __ } from '../utils/utils.js';
-import { CategoryList } from './CategoryList.js';
+import { CategoryListModel } from './CategoryListModel.js';
 import { ListItem } from './ListItem.js';
 import { availTransTypes, Transaction } from './Transaction.js';
 
@@ -51,9 +51,9 @@ export class Category extends ListItem {
 
     /**
      * Sets child categories
-     * @param {CategoryList|Array} data
+     * @param {CategoryListModel|Array} data
      */
     setChildren(data) {
-        this.children = CategoryList.create(data);
+        this.children = CategoryListModel.create(data);
     }
 }

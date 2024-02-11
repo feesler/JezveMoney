@@ -7,10 +7,10 @@ import {
 } from '../../utils/utils.js';
 import { App } from '../../Application/App.js';
 import { ScheduledTransaction } from '../../Models/ScheduledTransaction.js';
-import { Schedule } from '../../Models/Schedule.js';
+import { ScheduledTransactionListModel } from '../../Models/ScheduledTransactionListModel.js';
 
 export const createList = (items) => {
-    const res = Schedule.create(items);
+    const res = ScheduledTransactionListModel.create(items);
     return res;
 };
 

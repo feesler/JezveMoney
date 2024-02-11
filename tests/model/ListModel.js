@@ -1,7 +1,10 @@
 import { assert } from '@jezvejs/assert';
 import { asArray } from '@jezvejs/types';
 
-export class List extends Array {
+/**
+ * Base list model class
+ */
+export class ListModel extends Array {
     static create(props = []) {
         const instance = new this();
         instance.setData(props);
@@ -193,7 +196,7 @@ export class List extends Array {
     }
 
     deleteItems(ids) {
-        const res = List.deleteByIds(this, ids);
+        const res = ListModel.deleteByIds(this, ids);
         this.setData(res);
 
         return true;

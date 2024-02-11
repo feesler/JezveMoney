@@ -20,7 +20,7 @@ import {
 export const sourceTypes = ['expense', 'transfer_out', 'debt_out'];
 
 export class ImportTransaction {
-    /** List of available transaction types */
+    /** ListModel of available transaction types */
     static availTypes = [
         { id: 'expense', titleToken: 'transactions.types.expense' },
         { id: 'income', titleToken: 'transactions.types.income' },

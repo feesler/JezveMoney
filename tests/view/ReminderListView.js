@@ -30,14 +30,14 @@ import {
     REMINDER_UPCOMING,
     Reminder,
 } from '../model/Reminder.js';
-import { RemindersList } from '../model/RemindersList.js';
+import { ReminderListModel } from '../model/ReminderListModel.js';
 
 // Components
 import { AppView } from './AppView.js';
 import { Counter } from './component/Counter.js';
 import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
 import { ReminderDetails } from './component/Reminder/ReminderDetails.js';
-import { TransactionRemindersList } from './component/Reminder/TransactionRemindersList.js';
+import { ReminderList } from './component/Reminder/ReminderList.js';
 
 const listMenuSelector = '#listMenu';
 
@@ -217,7 +217,7 @@ export class ReminderListView extends AppView {
             items = pageItems;
         }
 
-        return TransactionRemindersList.render(items, state);
+        return ReminderList.render(items, state);
     }
 
     static getFilteredItems(model) {
@@ -307,12 +307,12 @@ export class ReminderListView extends AppView {
         res.paginator = await Paginator.create(this, await query('.paginator'));
 
         const listContainer = await query('.list-container');
-        assert(listContainer, 'List container not found');
+        assert(listContainer, 'ListModel container not found');
         res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
         const listElem = await query('.reminder-list');
         assert(listElem, 'Reminders list element not found');
-        res.remindersList = await TransactionRemindersList.create(this, listElem);
+        res.remindersList = await ReminderList.create(this, listElem);
 
         res.itemInfo = await ReminderDetails.create(
             this,
@@ -431,7 +431,7 @@ export class ReminderListView extends AppView {
         if (filteredItems.length > 0) {
             const onPage = App.config.transactionsOnPage;
             const pageItems = filteredItems.getPage(1, onPage, 1, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems, App.state);
+            const { items } = ReminderList.render(pageItems, App.state);
 
             res.list = {
                 page: 1,
@@ -509,7 +509,7 @@ export class ReminderListView extends AppView {
                 selected: selectedBefore.includes(item.id),
             }));
         }
-        this.upcomingItems = RemindersList.create(items);
+        this.upcomingItems = ReminderListModel.create(items);
         this.upcomingItems.defaultSort(false);
 
         this.upcomingPagination = upcoming.pagination;
@@ -571,7 +571,7 @@ export class ReminderListView extends AppView {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems, App.state);
+        const { items } = ReminderList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -601,7 +601,7 @@ export class ReminderListView extends AppView {
 
         const filteredItems = this.getFilteredItems(res);
         const pageItems = filteredItems.getPage(res.list.page, onPage, range, !isUpcoming);
-        const { items } = TransactionRemindersList.render(pageItems, App.state);
+        const { items } = ReminderList.render(pageItems, App.state);
         res.list.items = items;
 
         return res;
@@ -624,7 +624,7 @@ export class ReminderListView extends AppView {
             const range = Math.min(model.list.range, pages - page + 1);
 
             const pageItems = filteredItems.getPage(page, onPage, range, !isUpcoming);
-            const { items } = TransactionRemindersList.render(pageItems, App.state);
+            const { items } = ReminderList.render(pageItems, App.state);
 
             res.list = {
                 page,
@@ -722,7 +722,7 @@ export class ReminderListView extends AppView {
 
     setSourceItems(items, model = this.model) {
         const isUpcoming = (model.filter.state === REMINDER_UPCOMING);
-        const list = RemindersList.create(items);
+        const list = ReminderListModel.create(items);
 
         if (isUpcoming) {
             this.upcomingItems = list;
@@ -1093,7 +1093,7 @@ export class ReminderListView extends AppView {
     }
 
     async openListMenu() {
-        assert(!this.listMenu?.visible, 'List menu already opened');
+        assert(!this.listMenu?.visible, 'ListModel menu already opened');
 
         await this.closeFilters();
 
@@ -1110,7 +1110,7 @@ export class ReminderListView extends AppView {
     }
 
     async closeListMenu() {
-        assert(this.listMenu?.visible, 'List menu not opened');
+        assert(this.listMenu?.visible, 'ListModel menu not opened');
 
         this.model.listMenuVisible = false;
         const expected = this.getExpectedState();
