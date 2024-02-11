@@ -112,6 +112,7 @@ export class ResetDataDialog extends ProfileDialog {
             persons: resetAll,
             categories: resetAll,
             transactions: resetAll,
+            schedule: resetAll,
             importTpl: resetAll,
             importRules: resetAll,
         };
