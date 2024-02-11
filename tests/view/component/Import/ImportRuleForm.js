@@ -4,14 +4,16 @@ import {
     query,
     queryAll,
     prop,
-    click,
     asyncMap,
     waitForFunction,
 } from 'jezve-test';
+import { Button } from 'jezvejs-test';
 
+// Application
 import { App } from '../../../Application.js';
 import { MAX_PRECISION, secondsToDate, trimToDigitsLimit } from '../../../common.js';
 
+// Models
 import { __ } from '../../../model/locale.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -27,6 +29,7 @@ import {
     IMPORT_ACTION_SET_PERSON,
 } from '../../../model/ImportAction.js';
 
+// Components
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
@@ -83,6 +86,14 @@ export class ImportRuleForm extends TestComponent {
             conditionsList: { visible: true },
             actionsList: { visible: true },
             feedbackElem: { visible: model.feedbackVisible },
+            submitBtn: {
+                title: __('actions.submit'),
+                visible: true,
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                visible: true,
+            },
         };
 
         this.setExpectedRule(localModel);
@@ -223,18 +234,26 @@ export class ImportRuleForm extends TestComponent {
         });
 
         res.idInput = { elem: await query(this.elem, 'input[type=hidden]') };
-        res.submitBtn = { elem: await query(this.elem, '.form-controls .submit-btn') };
-        res.cancelBtn = { elem: await query(this.elem, '.form-controls .cancel-btn') };
         res.feedbackElem = { elem: await query(this.elem, '.rule-form__feedback .invalid-feedback') };
         assert(
             res.idInput.elem
             && res.conditionsList?.elem
             && res.actionsList?.elem
-            && res.submitBtn.elem
-            && res.cancelBtn.elem
             && res.feedbackElem.elem,
             'Invalid structure of import rule from',
         );
+
+        res.submitBtn = await Button.create(
+            this,
+            await query(this.elem, '.form-controls .submit-btn'),
+        );
+        assert(res.submitBtn, 'Submit button not found');
+
+        res.cancelBtn = await Button.create(
+            this,
+            await query(this.elem, '.form-controls .cancel-btn'),
+        );
+        assert(res.cancelBtn, 'Cancel button not found');
 
         res.idInput.value = await prop(res.idInput.elem, 'value');
 
@@ -830,10 +849,10 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async submit() {
-        await click(this.content.submitBtn.elem);
+        return this.content.submitBtn.click();
     }
 
     async cancel() {
-        await click(this.content.cancelBtn.elem);
+        return this.content.cancelBtn.click();
     }
 }

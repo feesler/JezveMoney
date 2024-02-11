@@ -14,7 +14,13 @@ import {
     evaluate,
     waitForFunction,
 } from 'jezve-test';
-import { DropDown, LinkMenu, Switch } from 'jezvejs-test';
+import {
+    Button,
+    DropDown,
+    LinkMenu,
+    Switch,
+} from 'jezvejs-test';
+
 import {
     correct,
     correctExch,
@@ -658,6 +664,14 @@ export class TransactionForm extends TestComponent {
             exchangeInfo: {},
             reminderField: null,
             reminderDialog: {},
+            submitBtn: {
+                title: __('actions.submit'),
+                visible: isAvailable,
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                visible: isAvailable,
+            },
         };
 
         if (isAvailable) {
@@ -1462,9 +1476,10 @@ export class TransactionForm extends TestComponent {
 
         res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
-        res.submitBtn = await query('.form-controls .submit-btn');
+        res.submitBtn = await Button.create(this, await query('.form-controls .submit-btn'));
         assert(res.submitBtn, 'Submit button not found');
-        res.cancelBtn = await query('.form-controls .cancel-btn');
+
+        res.cancelBtn = await Button.create(this, await query('.form-controls .cancel-btn'));
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -2651,7 +2666,7 @@ export class TransactionForm extends TestComponent {
 
         this.model.dateRangeInvalidated = (!startDateValid || !endDateValid);
 
-        const action = () => click(this.content.submitBtn);
+        const action = () => this.content.submitBtn.click();
 
         return (isValid)
             ? navigation(action)
@@ -2659,7 +2674,7 @@ export class TransactionForm extends TestComponent {
     }
 
     async cancel() {
-        await navigation(() => click(this.content.cancelBtn));
+        await navigation(() => this.content.cancelBtn.click());
     }
 
     async openReminderDialog() {

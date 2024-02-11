@@ -12,18 +12,25 @@ import {
     evaluate,
 } from 'jezve-test';
 import { Button, PopupMenu } from 'jezvejs-test';
-import { AppView } from './AppView.js';
-import { TilesList } from './component/Tiles/TilesList.js';
-import { WarningPopup } from './component/WarningPopup.js';
+
+// Application
 import { App } from '../Application.js';
-import { Counter } from './component/Counter.js';
-import { AccountDetails } from './component/Account/AccountDetails.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
     SORT_MANUALLY,
 } from '../common.js';
+
+// Models
+import { __ } from '../model/locale.js';
+
+// Components
+import { AppView } from './AppView.js';
+import { TilesList } from './component/Tiles/TilesList.js';
+import { WarningPopup } from './component/WarningPopup.js';
+import { Counter } from './component/Counter.js';
+import { AccountDetails } from './component/Account/AccountDetails.js';
 import { ExportDialog } from './component/ExportDialog.js';
 
 const listMenuSelector = '#listMenu';
@@ -86,16 +93,46 @@ export class AccountListView extends AppView {
         if (model.listMenuVisible) {
             res.listMenu = {
                 visible: true,
-                selectModeBtn: { visible: isListMode && itemsCount > 0 },
-                sortModeBtn: { visible: showSortItems },
-                sortByNameBtn: { visible: showSortItems },
-                sortByDateBtn: { visible: showSortItems },
-                selectAllBtn: { visible: showSelectItems && totalSelected < itemsCount },
-                deselectAllBtn: { visible: showSelectItems && totalSelected > 0 },
-                exportBtn: { visible: showSelectItems && (totalSelected > 0) },
-                showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
-                deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
-                hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
+                selectModeBtn: {
+                    visible: isListMode && itemsCount > 0,
+                    title: __('actions.select'),
+                },
+                sortModeBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sort'),
+                },
+                sortByNameBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sortByName'),
+                },
+                sortByDateBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sortByDate'),
+                },
+                selectAllBtn: {
+                    visible: showSelectItems && totalSelected < itemsCount,
+                    title: __('actions.selectAll'),
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && totalSelected > 0,
+                    title: __('actions.deselectAll'),
+                },
+                exportBtn: {
+                    visible: showSelectItems && (totalSelected > 0),
+                    title: __('export.menuTitle'),
+                },
+                showBtn: {
+                    visible: showSelectItems && (hiddenSelected.length > 0),
+                    title: __('actions.show'),
+                },
+                hideBtn: {
+                    visible: showSelectItems && (visibleSelected.length > 0),
+                    title: __('actions.hide'),
+                },
+                deleteBtn: {
+                    visible: showSelectItems && (totalSelected > 0),
+                    title: __('actions.delete'),
+                },
             };
         }
 
@@ -108,12 +145,30 @@ export class AccountListView extends AppView {
             res.contextMenu = {
                 visible: true,
                 itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxExportBtn: { visible: true },
-                ctxShowBtn: { visible: isHidden },
-                ctxHideBtn: { visible: !isHidden },
-                ctxDeleteBtn: { visible: true },
+                ctxDetailsBtn: {
+                    visible: true,
+                    title: __('actions.openItem'),
+                },
+                ctxUpdateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxExportBtn: {
+                    visible: true,
+                    title: __('export.menuTitle'),
+                },
+                ctxShowBtn: {
+                    visible: isHidden,
+                    title: __('actions.show'),
+                },
+                ctxHideBtn: {
+                    visible: !isHidden,
+                    title: __('actions.hide'),
+                },
+                ctxDeleteBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 

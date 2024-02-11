@@ -13,15 +13,21 @@ import {
     asyncMap,
 } from 'jezve-test';
 import {
+    Button,
     Checkbox,
     DropDown,
     Switch,
     PopupMenu,
 } from 'jezvejs-test';
+
+// Application
 import { App } from '../../../Application.js';
-import { WarningPopup } from '../WarningPopup.js';
+
+// Models
 import { IMPORT_DATE_LOCALE, ImportTemplate } from '../../../model/ImportTemplate.js';
 import { __ } from '../../../model/locale.js';
+
+import { WarningPopup } from '../WarningPopup.js';
 
 export const BROWSE_FILE_STATE = 1;
 export const LOADING_STATE = 2;
@@ -95,7 +101,7 @@ export class ImportUploadDialog extends TestComponent {
             tplFormFeedback: { elem: await query('#tplFormFeedback') },
             convertFeedback: { elem: await query('#convertFeedback') },
             initialAccount: await DropDown.create(this, await query('#initialAccField .dd__container')),
-            submitBtn: { elem: await query(this.elem, '#submitUploadedBtn') },
+            submitBtn: await Button.create(this, await query(this.elem, '#submitUploadedBtn')),
         };
         Object.keys(res).forEach((child) => (
             assert(res[child]?.elem, `Invalid structure of ImportUploadDialog: ${child} component not found`)
@@ -438,8 +444,14 @@ export class ImportUploadDialog extends TestComponent {
         if (model.templateMenuVisible) {
             res.tplContextMenu = {
                 visible: true,
-                ctxUpdateTemplateBtn: { visible: true },
-                ctxDeleteTemplateBtn: { visible: true },
+                ctxUpdateTemplateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxDeleteTemplateBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 
@@ -506,7 +518,10 @@ export class ImportUploadDialog extends TestComponent {
             res.uploadFilename = model.filename;
         }
 
-        res.submitBtn = { visible: isConvertState && model.isValid };
+        res.submitBtn = {
+            visible: isConvertState && model.isValid,
+            title: __('import.convertDone'),
+        };
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE].includes(model.state)) {
             const firstRowInd = (Number.isNaN(model.template.first_row))
@@ -866,9 +881,9 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async submit() {
-        assert(this.content.submitBtn.visible, 'Submit button not visible');
+        assert(this.content.submitBtn?.content?.visible, 'Submit button not visible');
 
-        await click(this.content.submitBtn.elem);
+        await this.content.submitBtn.click();
         await waitForFunction(async () => {
             await this.parse();
             return !this.model.uploadInProgress;

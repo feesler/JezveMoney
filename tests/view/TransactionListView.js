@@ -20,7 +20,7 @@ import {
     PopupMenu,
 } from 'jezvejs-test';
 
-import { AppView } from './AppView.js';
+// Application
 import { App } from '../Application.js';
 import {
     MAX_PRECISION,
@@ -30,8 +30,12 @@ import {
     trimToDigitsLimit,
 } from '../common.js';
 
+// Models
 import { TransactionListModel } from '../model/TransactionListModel.js';
+import { __ } from '../model/locale.js';
 
+// Components
+import { AppView } from './AppView.js';
 import { AmountRangeFilter } from './component/Fields/AmountRangeFilter.js';
 import { Counter } from './component/Counter.js';
 import { DatePickerFilter } from './component/Fields/DatePickerFilter.js';
@@ -628,20 +632,36 @@ export class TransactionListView extends AppView {
                 visible: model.listMenuVisible,
                 selectModeBtn: {
                     visible: listMode && isItemsAvailable,
+                    title: __('actions.select'),
                 },
                 sortModeBtn: {
                     visible: listMode && model.list.items.length > 1,
+                    title: __('actions.sort'),
                 },
                 selectAllBtn: {
                     visible: showSelectItems && selected.length < model.list.items.length,
+                    title: __('actions.selectAll'),
                 },
                 deselectAllBtn: {
                     visible: showSelectItems && selected.length > 0,
+                    title: __('actions.deselectAll'),
                 },
-                exportBtn: { visible: isItemsAvailable },
-                setCategoryBtn: { visible: showSelectItems && selected.length > 0 },
-                deleteBtn: { visible: showSelectItems && selected.length > 0 },
-                groupByDateBtn: { visible: listMode },
+                exportBtn: {
+                    visible: isItemsAvailable,
+                    title: __('export.menuTitle'),
+                },
+                setCategoryBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                    title: __('transactions.setCategoryMenu'),
+                },
+                deleteBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                    title: __('actions.delete'),
+                },
+                groupByDateBtn: {
+                    visible: listMode,
+                    title: __('transactions.groupByDate'),
+                },
             };
         }
 
@@ -652,11 +672,26 @@ export class TransactionListView extends AppView {
             res.contextMenu = {
                 visible: model.contextMenuVisible,
                 itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxDuplicateBtn: { visible: true },
-                ctxSetCategoryBtn: { visible: true },
-                ctxDeleteBtn: { visible: true },
+                ctxDetailsBtn: {
+                    visible: true,
+                    title: __('actions.openItem'),
+                },
+                ctxUpdateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxDuplicateBtn: {
+                    visible: true,
+                    title: __('actions.duplicate'),
+                },
+                ctxSetCategoryBtn: {
+                    visible: true,
+                    title: __('transactions.setCategoryMenu'),
+                },
+                ctxDeleteBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 

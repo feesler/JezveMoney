@@ -13,21 +13,28 @@ import {
     wait,
 } from 'jezve-test';
 import { Button, PopupMenu, TabList } from 'jezvejs-test';
-import { AppView } from './AppView.js';
-import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
+
+// Application
 import { App } from '../Application.js';
-import { Counter } from './component/Counter.js';
-import { CategoryItem } from './component/Category/CategoryItem.js';
-import { Transaction } from '../model/Transaction.js';
-import { CategoryDetails } from './component/Category/CategoryDetails.js';
-import { Category } from '../model/Category.js';
 import {
     SORT_BY_CREATEDATE_ASC,
     SORT_BY_CREATEDATE_DESC,
     SORT_BY_NAME_ASC, SORT_BY_NAME_DESC,
     SORT_MANUALLY,
 } from '../common.js';
+
+// Models
+import { Category } from '../model/Category.js';
 import { CategoryListModel } from '../model/CategoryListModel.js';
+import { Transaction } from '../model/Transaction.js';
+import { __ } from '../model/locale.js';
+
+// Components
+import { AppView } from './AppView.js';
+import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
+import { Counter } from './component/Counter.js';
+import { CategoryItem } from './component/Category/CategoryItem.js';
+import { CategoryDetails } from './component/Category/CategoryDetails.js';
 
 const listMenuSelector = '#listMenu';
 
@@ -117,17 +124,34 @@ export class CategoryListView extends AppView {
         if (model.listMenuVisible) {
             res.listMenu = {
                 visible: model.listMenuVisible,
-                selectModeBtn: { visible: model.listMenuVisible && isListMode },
-                sortModeBtn: { visible: showSortItems },
-                sortByNameBtn: { visible: showSortItems },
-                sortByDateBtn: { visible: showSortItems },
+                selectModeBtn: {
+                    visible: model.listMenuVisible && isListMode,
+                    title: __('actions.select'),
+                },
+                sortModeBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sort'),
+                },
+                sortByNameBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sortByName'),
+                },
+                sortByDateBtn: {
+                    visible: showSortItems,
+                    title: __('actions.sortByDate'),
+                },
                 selectAllBtn: {
                     visible: showSelectItems && totalSelected < itemsCount,
+                    title: __('actions.selectAll'),
                 },
                 deselectAllBtn: {
                     visible: showSelectItems && totalSelected > 0,
+                    title: __('actions.deselectAll'),
                 },
-                deleteBtn: { visible: showSelectItems && totalSelected > 0 },
+                deleteBtn: {
+                    visible: showSelectItems && totalSelected > 0,
+                    title: __('actions.delete'),
+                },
             };
         }
 
@@ -138,10 +162,22 @@ export class CategoryListView extends AppView {
             res.contextMenu = {
                 visible: true,
                 itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxAddSubcategoryBtn: { visible: ctxCategory.parent_id === 0 },
-                ctxDeleteBtn: { visible: true },
+                ctxDetailsBtn: {
+                    visible: true,
+                    title: __('actions.openItem'),
+                },
+                ctxUpdateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxAddSubcategoryBtn: {
+                    visible: ctxCategory.parent_id === 0,
+                    title: __('categories.addSubcategory'),
+                },
+                ctxDeleteBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 
