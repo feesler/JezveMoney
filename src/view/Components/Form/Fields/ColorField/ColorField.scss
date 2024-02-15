@@ -14,40 +14,16 @@
     grid-column: 2 / 2;
   }
 
-  .input-field__input-container {
-    width: var(--input-height);
-    height: var(--input-height);
-    overflow: hidden;
-    position: relative;
-    border-radius: 100vh;
-  }
-
-  .input-field__input {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    opacity: 0;
-    z-index: 1;
-  }
-
-  .input-field__input-color {
-    display: block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background-color: var(--color-field-value);
-    box-shadow: inset 2px 2px 4px -2px var(--cf-box-shadow-color);
-    border-radius: 100vh;
+  .color-field__input {
+    --color-input-disabled-opacity: var(--cf-disabled-opacity);
+    --color-input-shadow-color: var(--cf-box-shadow-color);
+    --color-input-size: var(--input-height);
   }
 }
 
 /* Invalidated state */
 .color-field.validation-block.invalid-block {
-  .input-field__input-container {
+  .color-field__input {
     outline-color: var(--invalid-feedback-color);
     outline-offset: 2px;
     outline-style: solid;
@@ -58,9 +34,4 @@
 /* Disabled state */
 .field.color-field[disabled] {
   --field-title-color: var(--cf-disabled-text-color);
-}
-
-.field.color-field[disabled] .input-field__input-color,
-.field.color-field .input-field__input[disabled] + .input-field__input-color {
-  opacity: var(--cf-disabled-opacity);
 }
