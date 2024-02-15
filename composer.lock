@@ -4,61 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf345ad6855b0f36be457e196debd870",
+    "content-hash": "322c34eea09edd7bb234188982f66328",
     "packages": [
-        {
-            "name": "aura/accept",
-            "version": "4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/auraphp/Aura.Accept.git",
-                "reference": "d1d1a004a30a1322492ed99dc8f6e2ff3da81060"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Accept/zipball/d1d1a004a30a1322492ed99dc8f6e2ff3da81060",
-                "reference": "d1d1a004a30a1322492ed99dc8f6e2ff3da81060",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0"
-            },
-            "require-dev": {
-                "yoast/phpunit-polyfills": "^1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Aura\\Accept\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aura.Accept Contributors",
-                    "homepage": "https://github.com/auraphp/Aura.Accept/contributors"
-                }
-            ],
-            "description": "Provides content-negotiation tools using Accept* headers.",
-            "homepage": "https://github.com/auraphp/Aura.Accept",
-            "keywords": [
-                "accept",
-                "accept-charset",
-                "accept-encoding",
-                "accept-language",
-                "content negotiation",
-                "content type",
-                "media type"
-            ],
-            "support": {
-                "issues": "https://github.com/auraphp/Aura.Accept/issues",
-                "source": "https://github.com/auraphp/Aura.Accept/tree/4.0.0"
-            },
-            "time": "2022-03-26T05:26:51+00:00"
-        },
         {
             "name": "composer/semver",
             "version": "3.4.0",
