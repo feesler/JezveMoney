@@ -1,5 +1,5 @@
 import { createElement, enable } from '@jezvejs/dom';
-import { Input } from 'jezvejs/Input';
+import { ColorInput } from 'jezvejs/ColorInput';
 
 import { App } from '../../../../Application/App.js';
 import { Field } from '../../../Common/Field/Field.js';
@@ -9,10 +9,7 @@ import './ColorField.scss';
 const FIELD_CLASS = 'field horizontal-field color-field';
 const TITLE_CLASS = 'field__title';
 const CONTENT_CLASS = 'field__content';
-const INPUT_CLASS = 'input-field__input';
-const COLOR_VALUE_CLASS = 'input-field__input-color';
-const INPUT_CONTAINER_CLASS = 'input-field__input-container';
-const COLOR_PROP = '--color-field-value';
+const INPUT_CLASS = 'color-field__input';
 
 const defaultProps = {
     inputId: undefined,
@@ -41,28 +38,20 @@ export class ColorField extends Field {
     }
 
     init() {
-        this.input = Input.create({
+        this.input = ColorInput.create({
             id: this.props.inputId,
             className: INPUT_CLASS,
             type: 'color',
             name: this.props.name,
+            value: this.props.value,
+            disabled: this.props.disabled,
             onInput: this.props.onInput,
             onChange: this.props.onChange,
             onFocus: this.props.onFocus,
             onBlur: this.props.onBlur,
         });
 
-        this.colorValue = createElement('div', { props: { className: COLOR_VALUE_CLASS } });
-
-        this.inputContainer = createElement('div', {
-            props: { className: INPUT_CONTAINER_CLASS },
-            children: [
-                this.input.elem,
-                this.colorValue,
-            ],
-        });
-
-        this.state.content = [this.inputContainer];
+        this.state.content = [this.input.elem];
 
         if (this.state.validate) {
             this.feedbackElem = createElement('div', {
@@ -91,11 +80,18 @@ export class ColorField extends Field {
     }
 
     renderInput(state, prevState) {
-        this.input.value = state.value;
-
-        if (state.disabled !== prevState?.disabled) {
-            this.input.enable(!state.disabled);
+        if (
+            state.value === prevState.value
+            && state.disabled === prevState.disabled
+        ) {
+            return;
         }
+
+        this.input.setState((inputState) => ({
+            ...inputState,
+            value: state.value,
+            disabled: state.disabled,
+        }));
     }
 
     render(state, prevState = {}) {
@@ -108,10 +104,6 @@ export class ColorField extends Field {
         }
 
         this.renderInput(state, prevState);
-
-        if (state.value !== prevState?.value) {
-            this.inputContainer.style.setProperty(COLOR_PROP, state.value);
-        }
 
         if (state.disabled !== prevState?.disabled) {
             enable(this.elem, !state.disabled);

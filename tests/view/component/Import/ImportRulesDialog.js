@@ -127,9 +127,18 @@ export class ImportRulesDialog extends TestComponent {
         if (model.contextMenuVisible) {
             res.contextMenu = {
                 visible: true,
-                ctxUpdateRuleBtn: { visible: true },
-                ctxDuplicateRuleBtn: { visible: true },
-                ctxDeleteRuleBtn: { visible: true },
+                ctxUpdateRuleBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxDuplicateRuleBtn: {
+                    visible: true,
+                    title: __('actions.duplicate'),
+                },
+                ctxDeleteRuleBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 

@@ -2,7 +2,6 @@ import { assert } from '@jezvejs/assert';
 import {
     query,
     navigation,
-    click,
     evaluate,
     waitForFunction,
 } from 'jezve-test';
@@ -11,6 +10,7 @@ import { AppView } from './AppView.js';
 import { InputField } from './component/Fields/InputField.js';
 import { DeleteCategoryDialog } from './component/Category/DeleteCategoryDialog.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 import { Category } from '../model/Category.js';
 
 /** Create or update category test view */
@@ -26,6 +26,10 @@ export class CategoryView extends AppView {
 
         const res = {
             header: this.getHeaderExpectedState(state),
+            heading: {
+                visible: true,
+                text: (model.isUpdate) ? __('categories.update') : __('categories.create'),
+            },
             nameInput: {
                 visible: true,
                 value: model.name.toString(),
@@ -44,6 +48,14 @@ export class CategoryView extends AppView {
                 visible: true,
                 disabled: model.parent_id !== 0,
                 value: model.type.toString(),
+            },
+            submitBtn: {
+                title: __('actions.submit'),
+                visible: true,
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                visible: true,
             },
         };
 
@@ -101,10 +113,10 @@ export class CategoryView extends AppView {
 
         res.typeSelect = await DropDown.create(this, await query('#typeField .dd__container'));
 
-        res.submitBtn = await query('.form-controls .submit-btn');
+        res.submitBtn = await Button.create(this, await query('.form-controls .submit-btn'));
         assert(res.submitBtn, 'Submit button not found');
 
-        res.cancelBtn = await query('.form-controls .cancel-btn');
+        res.cancelBtn = await Button.create(this, await query('.form-controls .cancel-btn'));
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await DeleteCategoryDialog.create(
@@ -259,7 +271,7 @@ export class CategoryView extends AppView {
     }
 
     async submit() {
-        const action = () => click(this.content.submitBtn);
+        const action = () => this.content.submitBtn.click();
 
         if (this.isValid()) {
             await navigation(action);
@@ -269,6 +281,6 @@ export class CategoryView extends AppView {
     }
 
     async cancel() {
-        await navigation(() => click(this.content.cancelBtn));
+        await navigation(() => this.content.cancelBtn.click());
     }
 }

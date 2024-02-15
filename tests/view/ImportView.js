@@ -230,6 +230,13 @@ export class ImportView extends AppView {
         const hasEnabled = selectMode && selectedItems.some((item) => item.enabled);
         const hasDisabled = selectMode && selectedItems.some((item) => !item.enabled);
 
+        const hasNotSelectedEnabled = selectMode && this.items.some((item) => (
+            item.enabled && !item.selected
+        ));
+        const hasNotSelectedDisabled = selectMode && this.items.some((item) => (
+            !item.enabled && !item.selected
+        ));
+
         const pageNum = this.currentPage(model);
 
         res.submitBtn = {
@@ -277,22 +284,74 @@ export class ImportView extends AppView {
         if (model.listMenuVisible) {
             res.listMenu = {
                 visible: true,
-                createItemBtn: { visible: showListItems },
-                selectModeBtn: { visible: showListItems && hasItems },
-                sortModeBtn: { visible: showListItems && this.items.length > 1 },
+                createItemBtn: {
+                    visible: showListItems,
+                    title: __('import.itemCreate'),
+                },
+                selectModeBtn: {
+                    visible: showListItems && hasItems,
+                    title: __('actions.select'),
+                },
+                sortModeBtn: {
+                    visible: showListItems && this.items.length > 1,
+                    title: __('actions.sort'),
+                },
                 selectAllBtn: {
                     visible: showSelectItems && selectedItems.length < this.items.length,
+                    title: __('actions.selectAll'),
                 },
-                deselectAllBtn: { visible: showSelectItems && selectedItems.length > 0 },
-                restoreSelectedBtn: { visible: showSelectItems && restoreAvailable },
-                enableSelectedBtn: { visible: showMenuItems && hasDisabled },
-                disableSelectedBtn: { visible: showMenuItems && hasEnabled },
-                deleteSelectedBtn: { visible: showMenuItems && selectedItems.length > 0 },
-                deleteAllBtn: { visible: showMenuItems, disabled: !hasItems },
-                rulesCheck: { checked: model.rulesEnabled, visible: showListItems },
-                similarCheck: { checked: model.checkSimilarEnabled, visible: showListItems },
-                remindersCheck: { checked: model.checkRemindersEnabled, visible: showListItems },
-                rulesBtn: { visible: showListItems },
+                deselectAllBtn: {
+                    visible: showSelectItems && selectedItems.length > 0,
+                    title: __('actions.deselectAll'),
+                },
+                selectEnabledBtn: {
+                    visible: showSelectItems && hasNotSelectedEnabled,
+                    title: __('actions.selectEnabled'),
+                },
+                selectDisabledBtn: {
+                    visible: showSelectItems && hasNotSelectedDisabled,
+                    title: __('actions.selectDisabled'),
+                },
+                restoreSelectedBtn: {
+                    visible: showSelectItems && restoreAvailable,
+                    title: __('import.itemRestore'),
+                },
+                enableSelectedBtn: {
+                    visible: showMenuItems && hasDisabled,
+                    title: __('actions.enableSelected'),
+                },
+                disableSelectedBtn: {
+                    visible: showMenuItems && hasEnabled,
+                    title: __('actions.disableSelected'),
+                },
+                deleteSelectedBtn: {
+                    visible: showMenuItems && selectedItems.length > 0,
+                    title: __('actions.deleteSelected'),
+                },
+                deleteAllBtn: {
+                    visible: showMenuItems,
+                    disabled: !hasItems,
+                    title: __('actions.deleteAll'),
+                },
+                rulesCheck: {
+                    checked: model.rulesEnabled,
+                    visible: showListItems,
+                    title: __('import.rules.enable'),
+                },
+                similarCheck: {
+                    checked: model.checkSimilarEnabled,
+                    visible: showListItems,
+                    title: __('import.checkSimilar'),
+                },
+                remindersCheck: {
+                    checked: model.checkRemindersEnabled,
+                    visible: showListItems,
+                    title: __('import.checkReminders'),
+                },
+                rulesBtn: {
+                    visible: showListItems,
+                    title: __('import.rules.openDialog'),
+                },
             };
         }
 
@@ -310,10 +369,26 @@ export class ImportView extends AppView {
             res.contextMenu = {
                 visible: true,
                 itemIndex: model.contextItemIndex,
-                ctxRestoreBtn: { visible: itemRestoreAvail },
-                ctxEnableBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxDeleteBtn: { visible: true },
+                ctxRestoreBtn: {
+                    visible: itemRestoreAvail,
+                    title: __('import.itemRestore'),
+                },
+                ctxEnableBtn: {
+                    visible: true,
+                    title: (item.enabled) ? __('actions.disable') : __('actions.enable'),
+                },
+                ctxUpdateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxDuplicateBtn: {
+                    visible: true,
+                    title: __('actions.duplicate'),
+                },
+                ctxDeleteBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 

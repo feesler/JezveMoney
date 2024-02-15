@@ -2,7 +2,6 @@ import { assert } from '@jezvejs/assert';
 import {
     query,
     navigation,
-    click,
     evaluate,
 } from 'jezve-test';
 import { DropDown, Button } from 'jezvejs-test';
@@ -64,10 +63,10 @@ export class AccountView extends AppView {
         res.limit = await InputField.create(this, await query('#initLimitField'));
         assert(res.limit, 'Credit limit field not found');
 
-        res.submitBtn = await query('.form-controls .submit-btn');
+        res.submitBtn = await Button.create(this, await query('.form-controls .submit-btn'));
         assert(res.submitBtn, 'Submit button not found');
 
-        res.cancelBtn = await query('.form-controls .cancel-btn');
+        res.cancelBtn = await Button.create(this, await query('.form-controls .cancel-btn'));
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -221,7 +220,7 @@ export class AccountView extends AppView {
         const accTile = Tile.renderAccount(account);
 
         if (!model.nameTyped && !model.isUpdate) {
-            accTile.title = __('accounts.nameNew', this.locale);
+            accTile.title = __('accounts.nameNew');
         }
 
         accTile.visible = true;
@@ -230,7 +229,10 @@ export class AccountView extends AppView {
 
         const res = {
             header: this.getHeaderExpectedState(state),
-            heading: { visible: true },
+            heading: {
+                visible: true,
+                text: (model.isUpdate) ? __('accounts.update') : __('accounts.create'),
+            },
             tile: accTile,
             name: { value: model.name.toString(), visible: true },
             balance: { value: model.initbalance.toString(), visible: true },
@@ -247,7 +249,15 @@ export class AccountView extends AppView {
                 visible: true,
             },
             iconDropDown: {
-                textValue: __(`icons.byName.${model.tileIcon.name}`, this.locale),
+                textValue: __(`icons.byName.${model.tileIcon.name}`),
+                visible: true,
+            },
+            submitBtn: {
+                title: __('actions.submit'),
+                visible: true,
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
                 visible: true,
             },
         };
@@ -377,7 +387,7 @@ export class AccountView extends AppView {
     }
 
     async submit() {
-        const action = () => click(this.content.submitBtn);
+        const action = () => this.content.submitBtn.click();
 
         if (this.isValid()) {
             await navigation(action);
@@ -387,6 +397,6 @@ export class AccountView extends AppView {
     }
 
     async cancel() {
-        await navigation(() => click(this.content.cancelBtn));
+        await navigation(() => this.content.cancelBtn.click());
     }
 }

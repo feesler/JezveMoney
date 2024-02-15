@@ -17,13 +17,20 @@ import {
     Paginator,
     PopupMenu,
 } from 'jezvejs-test';
+
+// Application
 import { App } from '../Application.js';
+
+// Models
+import { ScheduledTransactionListModel } from '../model/ScheduledTransactionListModel.js';
+import { __ } from '../model/locale.js';
+
+// Components
 import { AppView } from './AppView.js';
 import { Counter } from './component/Counter.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { ScheduleItemDetails } from './component/Schedule/ScheduleItemDetails.js';
 import { ScheduleList } from './component/Schedule/ScheduleList.js';
-import { ScheduledTransactionListModel } from '../model/ScheduledTransactionListModel.js';
 
 const listMenuSelector = '#listMenu';
 
@@ -76,11 +83,26 @@ export class ScheduleView extends AppView {
         if (model.listMenuVisible) {
             res.listMenu = {
                 visible: true,
-                selectModeBtn: { visible: listMode && isItemsAvailable },
-                selectAllBtn: { visible: showSelectItems && selected.length < itemsCount },
-                deselectAllBtn: { visible: showSelectItems && selected.length > 0 },
-                finishBtn: { visible: showSelectItems && selected.length > 0 },
-                deleteBtn: { visible: showSelectItems && selected.length > 0 },
+                selectModeBtn: {
+                    visible: listMode && isItemsAvailable,
+                    title: __('actions.select'),
+                },
+                selectAllBtn: {
+                    visible: showSelectItems && selected.length < itemsCount,
+                    title: __('actions.selectAll'),
+                },
+                deselectAllBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                    title: __('actions.deselectAll'),
+                },
+                finishBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                    title: __('schedule.finish'),
+                },
+                deleteBtn: {
+                    visible: showSelectItems && selected.length > 0,
+                    title: __('actions.delete'),
+                },
             };
         }
 
@@ -91,11 +113,26 @@ export class ScheduleView extends AppView {
             res.contextMenu = {
                 visible: true,
                 itemId: model.contextItem,
-                ctxDetailsBtn: { visible: true },
-                ctxUpdateBtn: { visible: true },
-                ctxDuplicateBtn: { visible: true },
-                ctxFinishBtn: { visible: true },
-                ctxDeleteBtn: { visible: true },
+                ctxDetailsBtn: {
+                    visible: true,
+                    title: __('actions.openItem'),
+                },
+                ctxUpdateBtn: {
+                    visible: true,
+                    title: __('actions.update'),
+                },
+                ctxDuplicateBtn: {
+                    visible: true,
+                    title: __('actions.duplicate'),
+                },
+                ctxFinishBtn: {
+                    visible: true,
+                    title: __('schedule.finish'),
+                },
+                ctxDeleteBtn: {
+                    visible: true,
+                    title: __('actions.delete'),
+                },
             };
         }
 

@@ -2,7 +2,6 @@ import { assert } from '@jezvejs/assert';
 import {
     query,
     navigation,
-    click,
     evaluate,
 } from 'jezve-test';
 import { Button } from 'jezvejs-test';
@@ -10,6 +9,7 @@ import { AppView } from './AppView.js';
 import { InputField } from './component/Fields/InputField.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 
 /** Create or update person test view */
 export class PersonView extends AppView {
@@ -42,10 +42,10 @@ export class PersonView extends AppView {
         res.name = await InputField.create(this, await query('#nameField'));
         assert(res.name, 'Person name input not found');
 
-        res.submitBtn = await query('.form-controls .submit-btn');
+        res.submitBtn = await Button.create(this, await query('.form-controls .submit-btn'));
         assert(res.submitBtn, 'Submit button not found');
 
-        res.cancelBtn = await query('.form-controls .cancel-btn');
+        res.cancelBtn = await Button.create(this, await query('.form-controls .cancel-btn'));
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -89,9 +89,21 @@ export class PersonView extends AppView {
     getExpectedState(model = this.model, state = App.state) {
         const res = {
             header: this.getHeaderExpectedState(state),
+            heading: {
+                visible: true,
+                text: (model.isUpdate) ? __('persons.update') : __('persons.create'),
+            },
             name: {
                 visible: true,
                 value: model.name.toString(),
+            },
+            submitBtn: {
+                title: __('actions.submit'),
+                visible: true,
+            },
+            cancelBtn: {
+                title: __('actions.cancel'),
+                visible: true,
             },
         };
 
@@ -130,7 +142,7 @@ export class PersonView extends AppView {
     }
 
     async submit() {
-        const action = () => click(this.content.submitBtn);
+        const action = () => this.content.submitBtn.click();
 
         if (this.isValid()) {
             await navigation(action);
@@ -140,6 +152,6 @@ export class PersonView extends AppView {
     }
 
     async cancel() {
-        await navigation(() => click(this.content.cancelBtn));
+        await navigation(() => this.content.cancelBtn.click());
     }
 }

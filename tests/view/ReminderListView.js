@@ -31,6 +31,7 @@ import {
     Reminder,
 } from '../model/Reminder.js';
 import { ReminderListModel } from '../model/ReminderListModel.js';
+import { __ } from '../model/locale.js';
 
 // Components
 import { AppView } from './AppView.js';
@@ -134,21 +135,27 @@ export class ReminderListView extends AppView {
                 visible: true,
                 selectModeBtn: {
                     visible: listMode && isItemsAvailable,
+                    title: __('actions.select'),
                 },
                 selectAllBtn: {
                     visible: showSelectItems && selected.length < itemsCount,
+                    title: __('actions.selectAll'),
                 },
                 deselectAllBtn: {
                     visible: showSelectItems && selected.length > 0,
+                    title: __('actions.deselectAll'),
                 },
                 confirmBtn: {
                     visible: showSelectItems && selected.length > 0 && !isConfirmed,
+                    title: __('reminders.confirm'),
                 },
                 cancelBtn: {
                     visible: showSelectItems && selected.length > 0 && !isCancelled,
+                    title: __('reminders.cancel'),
                 },
                 groupByDateBtn: {
                     visible: listMode,
+                    title: __('transactions.groupByDate'),
                 },
             };
         }
@@ -169,10 +176,22 @@ export class ReminderListView extends AppView {
             res.contextMenu = {
                 visible: true,
                 itemId: model.contextItem.toString(),
-                ctxDetailsBtn: { visible: contextItem.state !== REMINDER_UPCOMING },
-                ctxUpdateBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
-                ctxConfirmBtn: { visible: contextItem.state !== REMINDER_CONFIRMED },
-                ctxCancelBtn: { visible: contextItem.state !== REMINDER_CANCELLED },
+                ctxDetailsBtn: {
+                    visible: contextItem.state !== REMINDER_UPCOMING,
+                    title: __('actions.openItem'),
+                },
+                ctxUpdateBtn: {
+                    visible: contextItem.state !== REMINDER_CONFIRMED,
+                    title: __('reminders.update'),
+                },
+                ctxConfirmBtn: {
+                    visible: contextItem.state !== REMINDER_CONFIRMED,
+                    title: __('reminders.confirm'),
+                },
+                ctxCancelBtn: {
+                    visible: contextItem.state !== REMINDER_CANCELLED,
+                    title: __('reminders.cancel'),
+                },
             };
         }
 
