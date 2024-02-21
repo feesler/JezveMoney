@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.90.2",
+    "version": "1.90.3",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -50,6 +50,7 @@
         "@babel/plugin-transform-runtime": "^7.23.9",
         "@babel/preset-env": "^7.23.9",
         "@jezvejs/assert": "^1.0.1",
+        "@jezvejs/release-tools": "^0.3.0",
         "astroturf": "^1.2.0",
         "autoprefixer": "^10.4.17",
         "babel-loader": "^8.3.0",
@@ -57,8 +58,7 @@
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^5.2.7",
         "css-minimizer-webpack-plugin": "^3.4.1",
-        "del-cli": "^3.0.1",
-        "dotenv": "^16.4.4",
+        "dotenv": "^16.4.5",
         "eslint": "^7.32.0",
         "eslint-config-airbnb-base": "^14.2.1",
         "eslint-import-resolver-webpack": "^0.13.8",
@@ -74,16 +74,15 @@
         "postcss-cli": "^8.3.1",
         "postcss-loader": "^6.2.1",
         "progress": "^2.0.3",
-        "sass": "^1.70.0",
+        "sass": "^1.71.1",
         "sass-loader": "^13.3.3",
         "shelljs": "^0.8.5",
-        "ssh2-sftp-client": "^9.1.0",
         "style-loader": "^2.0.0",
         "stylelint": "^15.11.0",
         "stylelint-config-prettier-scss": "^1.0.0",
         "stylelint-config-standard-scss": "^11.1.0",
         "svgo": "^3.2.0",
-        "webpack": "^5.90.1",
+        "webpack": "^5.90.3",
         "webpack-cli": "^4.10.0",
         "webpack-manifest-plugin": "^5.0.0",
         "webpack-merge": "^5.10.0"
@@ -96,7 +95,7 @@
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.36.0",
-        "jezvejs": "^2.24.0",
+        "jezvejs": "^2.25.0",
         "whatwg-fetch": "^3.6.20"
     }
 }

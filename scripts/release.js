@@ -1,25 +1,6 @@
-import runAll from 'npm-run-all';
+import { release } from '@jezvejs/release-tools';
 
 /* eslint-disable no-console */
-
-const runCommand = async (command) => {
-    const options = {
-        stdin: process.stdin,
-        stdout: process.stdout,
-        stderr: process.stderr,
-    };
-
-    try {
-        const [result] = await runAll([command], options);
-        if (result.code !== 0) {
-            console.log('Command failed');
-            process.exit(result.code);
-        }
-    } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-    }
-};
 
 if (process.argv.length < 2) {
     console.log('Usage: release.js <newversion>');
@@ -29,17 +10,16 @@ if (process.argv.length < 2) {
 const newVersion = process.argv[2];
 
 const run = async () => {
-    await runCommand('all');
-    await runCommand(`p-version -- ${newVersion}`);
-    await runCommand('p-install');
-    await runCommand('p-update -- --save');
+    await release({
+        newVersion,
+        beforeCommit: [
+            'update-composer',
+        ],
+        deployCommand: 'deploy -- full',
+        publish: false,
+    });
 
-    await runCommand('build');
-    await runCommand('update-composer');
-
-    await runCommand('commit-version');
-
-    await runCommand('deploy -- full');
+    process.exit(0);
 };
 
 run();
