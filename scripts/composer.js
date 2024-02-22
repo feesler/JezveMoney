@@ -62,4 +62,4 @@ composerConfig.forEach((path) => {
 // Create symbolic link to vendor/ directory
 const source = resolve(composerDir, 'vendor');
 const target = resolve(distDir, 'vendor');
-shell.ln('-s', source, target);
+shell.ln('-sf', source, target);
