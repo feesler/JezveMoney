@@ -30,7 +30,7 @@ const run = async () => {
             password: process.env.SFTP_PASSWORD,
             port: process.env.SFTP_PORT,
         },
-        sourceDir: join(currentDir, '..', 'dist'),
+        sourceDir: join(currentDir, '..', 'dist', APP_DIR),
         destDir: process.env.DEPLOY_PATH,
         appDir: process.env.APP_DIR,
         createDirs,
@@ -40,8 +40,8 @@ const run = async () => {
         removeSkipList,
         cleanAll: true,
         extraUpload: [HTACCESS_FILE],
-        filterFiles: (source) => {
-            const firstPart = getFirstPathPart(source);
+        filterFiles: (source, sourcePart) => {
+            const firstPart = getFirstPathPart(source, sourcePart);
             return (isFullDeploy || !skipList.includes(firstPart));
         },
         afterUpload: async () => {

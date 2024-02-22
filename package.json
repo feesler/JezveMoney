@@ -50,7 +50,7 @@
         "@babel/plugin-transform-runtime": "^7.23.9",
         "@babel/preset-env": "^7.23.9",
         "@jezvejs/assert": "^1.0.1",
-        "@jezvejs/release-tools": "^0.3.0",
+        "@jezvejs/release-tools": "^0.3.1",
         "astroturf": "^1.2.0",
         "autoprefixer": "^10.4.17",
         "babel-loader": "^8.3.0",
