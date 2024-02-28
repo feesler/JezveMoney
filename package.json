@@ -5,9 +5,6 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "p-install": "npm install",
-        "p-update": "npm update",
-        "p-version": "npm version",
         "lint-php": "npm-run-all lint-php-cs lint-php-phan",
         "lint-php-cs": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php --ignore=*/vendor/* ./src/",
         "lint-php-phan": ".\\dev-tools\\vendor\\bin\\phan --color",
@@ -50,7 +47,7 @@
         "@babel/plugin-transform-runtime": "^7.23.9",
         "@babel/preset-env": "^7.23.9",
         "@jezvejs/assert": "^1.0.1",
-        "@jezvejs/release-tools": "^0.3.1",
+        "@jezvejs/release-tools": "^0.5.0",
         "astroturf": "^1.2.0",
         "autoprefixer": "^10.4.17",
         "babel-loader": "^8.3.0",

@@ -40,6 +40,7 @@ const run = async () => {
         removeSkipList,
         cleanAll: true,
         extraUpload: [HTACCESS_FILE],
+        extraUploadRoot: '../../dist',
         filterFiles: (source, sourcePart) => {
             const firstPart = getFirstPathPart(source, sourcePart);
             return (isFullDeploy || !skipList.includes(firstPart));
