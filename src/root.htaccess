@@ -3,14 +3,20 @@ Options -MultiViews
 RewriteEngine on
 RewriteBase /
 
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteCond %{ENV:HTTPS} !on
+RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
+
 RewriteCond %{ENV:REDIRECT_STATUS} ^$
 RewriteRule app(/.*)?$ https://%{SERVER_NAME}/ [R=301,L]
 
 RewriteCond %{DOCUMENT_ROOT}/app/$1 -f
 RewriteRule (.+\.(ico|gif|jpg|jpeg|png|js|css|webmanifest))$ app/$1 [L]
 
+RewriteCond %{REQUEST_URI} !^/admin/
+RewriteCond %{REQUEST_URI} !^/api/
 RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css|webmanifest)$
-RewriteCond %{REQUEST_URI} !(admin|api)
 RewriteRule ^(.*)$ app/index.php?route=$1 [L,QSA]
 
 RewriteRule ^((?!app/).*)$ app/$1 [L,NC]
