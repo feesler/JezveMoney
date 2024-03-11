@@ -49,7 +49,7 @@
         "@jezvejs/assert": "^1.0.1",
         "@jezvejs/release-tools": "^0.5.1",
         "astroturf": "^1.2.0",
-        "autoprefixer": "^10.4.17",
+        "autoprefixer": "^10.4.18",
         "babel-loader": "^8.3.0",
         "browserslist": "^4.23.0",
         "copy-webpack-plugin": "^11.0.0",
@@ -92,7 +92,7 @@
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",
         "core-js": "^3.36.0",
-        "jezvejs": "^2.26.0",
+        "jezvejs": "^2.26.1",
         "whatwg-fetch": "^3.6.20"
     }
 }
