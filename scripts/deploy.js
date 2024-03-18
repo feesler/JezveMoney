@@ -1,7 +1,6 @@
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import * as dotenv from 'dotenv';
-import fetch from 'node-fetch';
 import { deploy, getFirstPathPart } from '@jezvejs/release-tools';
 
 /* eslint-disable no-console */
