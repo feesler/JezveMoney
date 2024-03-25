@@ -35,7 +35,7 @@ const columnWidth = 38;
 const columnGap = 10;
 const groupsGap = 10;
 const columnOuterWidth = columnWidth + columnGap;
-const visibilityOffset = 1;
+const visibilityOffset = 100;
 
 const availGroupTypes = [GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
 
@@ -366,7 +366,8 @@ export class StatisticsView extends AppView {
             ? (model.chart.width - expectedYAxisLabels)
             : model.chart.scrollerWidth;
 
-        const groupsVisible = Math.round(availableWidth / groupOuterWidth) + visibilityOffset;
+        const width = availableWidth + visibilityOffset;
+        const groupsVisible = Math.round(width / groupOuterWidth);
         const groupsCount = Math.max(0, Math.min(longestSet.length, groupsVisible));
         let barsCount = 0;
 
