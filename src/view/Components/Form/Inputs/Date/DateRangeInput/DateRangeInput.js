@@ -161,7 +161,7 @@ export class DateRangeInput extends Component {
 
         const { filter } = this.state;
 
-        const limitValue = (rangePart === 'start') ? filter.endate : filter.startDate;
+        const limitValue = (rangePart === 'start') ? filter.endDate : filter.startDate;
         if (!limitValue) {
             return false;
         }
