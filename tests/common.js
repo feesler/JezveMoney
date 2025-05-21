@@ -40,6 +40,18 @@ export const DEFAULT_PRECISION = 2;
 export const EXCHANGE_PRECISION = 4;
 export const MAX_PRECISION = 8;
 
+/* Limit for PHP error message */
+const MAX_PHP_ERROR_LENGTH = 200;
+/* PHP error signatures */
+const errSignatures = [
+    '<b>Notice</b>',
+    '<b>Warning</b>',
+    '<b>Parse error</b>',
+    '<b>Fatal error</b>',
+    '<b>Deprecated</b>',
+    'xdebug-error',
+];
+
 /** Return timestamp for the start of the day */
 export const cutDate = (value) => {
     const date = (typeof value === 'number') ? (new Date(value)) : value;
@@ -285,21 +297,18 @@ export const formatProps = (params) => (
 );
 
 export const checkPHPerrors = (content) => {
-    const errSignatures = [
-        '<b>Notice</b>',
-        '<b>Warning</b>',
-        '<b>Parse error</b>',
-        '<b>Fatal error</b>',
-        '<b>Deprecated</b>',
-        'xdebug-error',
-    ];
-
     if (!content) {
         return;
     }
 
-    const found = errSignatures.some((item) => content.includes(item));
-    assert(!found, 'PHP error signature found');
+    errSignatures.forEach((item) => {
+        const itemPosition = content.indexOf(item);
+        const errorContent = (itemPosition !== -1)
+            ? content.substring(itemPosition, itemPosition + MAX_PHP_ERROR_LENGTH)
+            : '';
+
+        assert(itemPosition === -1, `PHP error signature found: '${errorContent}'`);
+    });
 };
 
 /** Returns random integer id */
