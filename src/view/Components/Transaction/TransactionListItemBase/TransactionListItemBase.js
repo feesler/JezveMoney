@@ -104,11 +104,11 @@ export class TransactionListItemBase extends Component {
         });
         // Accounts
         this.sourceField = Field.create({
-            title: __('transactions.source'),
+            title: __('transactions.sourceAccount'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: __('transactions.destination'),
+            title: __('transactions.destAccount'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -352,6 +352,32 @@ export class TransactionListItemBase extends Component {
         this.commentElem.setAttribute('title', item.comment);
     }
 
+    getSourceLabel(state) {
+        const { item } = state;
+        const { profile, accounts } = App.model;
+        const account = accounts.getItem(item.src_id);
+        if (!account) {
+            return null;
+        }
+
+        return (item.type === DEBT && account.owner_id !== profile.owner_id)
+            ? __('transactions.sourcePerson')
+            : __('transactions.sourceAccount');
+    }
+
+    getDestLabel(state) {
+        const { item } = state;
+        const { profile, accounts } = App.model;
+        const account = accounts.getItem(item.dest_id);
+        if (!account) {
+            return null;
+        }
+
+        return (item.type === DEBT && account.owner_id !== profile.owner_id)
+            ? __('transactions.destPerson')
+            : __('transactions.destAccount');
+    }
+
     renderDetails(state) {
         const { item } = state;
         const { currency } = App.model;
@@ -362,6 +388,7 @@ export class TransactionListItemBase extends Component {
         // Source
         const showSource = (item.src_id !== 0);
         if (showSource) {
+            this.sourceField.setTitle(this.getSourceLabel(state));
             const sourceContent = this.getAccountOrPerson(item.src_id);
             this.sourceField.setContent(sourceContent);
         }
@@ -370,6 +397,7 @@ export class TransactionListItemBase extends Component {
         // Destination
         const showDest = (item.dest_id !== 0);
         if (showDest) {
+            this.destField.setTitle(this.getDestLabel(state));
             const destContent = this.getAccountOrPerson(item.dest_id);
             this.destField.setContent(destContent);
         }

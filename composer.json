@@ -1,16 +1,16 @@
 {
     "name": "henryfeesler/jezvemoney",
     "type": "project",
-    "version": "1.90.6",
+    "version": "1.90.7",
     "description": "",
     "config": {
         "vendor-dir": "vendor",
         "classmap-authoritative": true
     },
     "require": {
-        "phpoffice/phpspreadsheet": "^1.29",
-        "composer/semver": "^3.4.0",
-        "vlucas/phpdotenv": "^5.6"
+        "phpoffice/phpspreadsheet": "^1.29.10",
+        "composer/semver": "^3.4.3",
+        "vlucas/phpdotenv": "^5.6.2"
     },
     "autoload": {
         "psr-4": {
