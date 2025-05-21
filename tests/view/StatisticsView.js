@@ -361,14 +361,14 @@ export class StatisticsView extends AppView {
         const groupWidth = columnOuterWidth * columnsInGroup - columnGap;
         const groupOuterWidth = groupWidth + groupsGap;
         const longestSet = getLongestDataSet(dataSets);
-        const expectedYAxisLabels = (longestSet.length > 0) ? 100 : 0;
-        const availableWidth = (model.chart.scrollerWidth === 0)
-            ? (model.chart.width - expectedYAxisLabels)
-            : model.chart.scrollerWidth;
 
-        const width = availableWidth + visibilityOffset;
-        const groupsVisible = Math.round(width / groupOuterWidth);
-        const groupsCount = Math.max(0, Math.min(longestSet.length, groupsVisible));
+        const left = model.chart.scrollLeft - visibilityOffset;
+        const firstItem = Math.floor(left / groupOuterWidth);
+        const firstItemIndex = Math.max(0, firstItem);
+
+        const width = model.chart.width + 2 * visibilityOffset;
+        const itemsOnWidth = Math.round(width / groupOuterWidth);
+        const groupsCount = Math.max(0, Math.min(longestSet.length - firstItemIndex, itemsOnWidth));
         let barsCount = 0;
 
         if (!noData) {
