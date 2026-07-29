@@ -4,19 +4,19 @@
 	"description": "Personal finance application",
 	"icons": [
 		{
-			"src": "/view/img/icon_192.png",
+			"src": "/jezvemoney/view/img/icon_192.png",
 			"type": "image/png",
 			"sizes": "192x192"
 		},
 		{
-			"src": "/view/img/icon_512.png",
+			"src": "/jezvemoney/view/img/icon_512.png",
 			"type": "image/png",
 			"sizes": "512x512"
 		}
 	],
-	"start_url": "/",
+	"start_url": "/jezvemoney/",
 	"background_color": "#20A0FF",
 	"display": "minimal-ui",
-	"scope": "/",
+	"scope": "/jezvemoney/",
 	"theme_color": "#20A0FF"
 }

@@ -17,7 +17,7 @@ LOGS_PATH - path to the logs directory
 
 define("APP_PROTOCOL", "https://");
 
-define("PROD_HOST", "jezvemoney.ru");
+define("PROD_HOST", "henryfeesler.com");
 define("LOCAL_DEV_HOST", "testsrv");
 
 define("DEFAULT_LOCALE", "en");
@@ -112,8 +112,8 @@ function defineHostConstants()
     define("APP_HOST", $host);
     $domain = domainFromHost($host);
     define("APP_DOMAIN", $domain);
-    define("APP_ROOT", pathJoin($approot, "app"));
-    define("APP_PATH", "/");
+    define("APP_ROOT", pathJoin($approot, "jezvemoney", "app"));
+    define("APP_PATH", "/jezvemoney/");
 
     if (strcmp(APP_HOST, PROD_HOST) == 0) {
         define("PRODUCTION", true);
